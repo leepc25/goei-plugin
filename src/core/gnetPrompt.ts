@@ -4,14 +4,14 @@
 import { sitePicList } from './sitepics';
 import { hasAttachment } from './attach';
 import { viewSite, type BoardSite } from './boards';
-import { GUIDE_LABEL, type GuideName } from './guides';
+import { fillVars, GUIDE_LABEL, type GuideName } from './guides';
 import { evaluate } from './cbs';
 import {
   activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, countText, trimTokens, postLimit,
   type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField } from './gnet';
 import { applyAdvanced, genSettings } from './advanced';
 import { fnHistory, fnNum, fnRefs } from './reffn';
-import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
+import { craftMessages, craftSettings, memoTexts, retryAnalyze, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { cbsEnv, collectRefs, factionCodesToNames, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
 
@@ -44,7 +44,7 @@ export function gnetBooks(src: RefSource): GnetBooks {
   const env = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
   const cs = gnetSettings(src.chat.scriptstate).counts;
   return {
-    language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
+    language: genSettings(src.chat.scriptstate).language ?? (g.LANGUAGE?.trim() || LANGUAGE),
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
@@ -74,8 +74,11 @@ function fill(template: string, values: Record<string, string>): string {
 const LANGUAGE = 'Use the language of the actual conversation; default to Korean.';
 const IMPORTANT = '\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.';
 
+/** 지침 절이 있으면 그 글, 없으면(옛 글로 고쳐 둔 지침) 코드에 남긴 글. 아래 영어 글들은 모두 게시판 지침의 절로도 있다 (설정 → 지침에서 고침) */
+const orOld = (b: GnetBooks, name: string, old: string): string => b.read(name) || old;
+
 export function systemText(b: GnetBooks, guideline: string, format: string, identity?: unknown, attachments = false): string {
-  const intro = fmt(b.read('SYSTEM'), b.read('JAILBREAK'), b.read('JOB'), IMPORTANT, 'anonymous forum author', '', '')
+  const intro = fmt(b.read('SYSTEM'), b.read('JAILBREAK'), b.read('JOB'), `\n\n${orOld(b, 'IMPORTANT_NOTE', IMPORTANT.slice(2))}`, 'anonymous forum author', '', '')
     .replace(/## Main Protagonist \([^\n]*\)/, '## User-controlled protagonist (narrator reference only)');
   let outro = fmt(b.read('OUTPUT'), '', format, guideline);
   if (identity) outro += `\nROLE BINDING (application-owned metadata):\n${JSON.stringify(identity)}`;
@@ -85,6 +88,8 @@ export function systemText(b: GnetBooks, guideline: string, format: string, iden
 
 export interface GnetPrompt {
   messages: CraftMessage[];
+  /** 형식이 틀렸을 때 다시 묻는 글 (지침 절 RETRY.FORMAT). 없으면 코드에 남긴 글 */
+  retryRule?: string;
 }
 
 /** 생각 순서표 절 (작업마다) */
@@ -106,7 +111,7 @@ function pack(src: RefSource, b: GnetBooks, fn: GnetOp, thoughts: ThoughtsKey, g
     { role: 'system', content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames) },
     { role: 'user', content: factionCodesToNames(material, factionNames) },
   ];
-  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'gn'), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }) };
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'gn'), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }), retryRule: b.read('RETRY.FORMAT') };
 }
 
 function incomingRules(b: GnetBooks, plan: IncomingPlan): string {
@@ -124,7 +129,12 @@ function activityRules(b: GnetBooks, posts: ActivityPost[]): string {
 /** 분류 (2026-11-08): 글마다 그 게시판식 말머리를 하나. 옛 지침에는 tag 칸이 없어서 코드에서 붙인다 */
 export const TAG_RULE = 'Post category: every post (new or retained) also has "tag": one short category label in Korean, the way this board sorts its posts (a 말머리). Reuse labels already used on the board when they fit; supplied tags on retained posts are records, never change them.';
 
-export function commentTimeRule(now: string): string {
+/** 다양성 뽑기 안내 (지침 절 SAMPLING) */
+const SAMPLING_RULE = 'Diversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.';
+
+export function commentTimeRule(now: string, b?: GnetBooks): string {
+  const t = b?.read('COMMENT.TIME_RULE');
+  if (t) return fillVars(t, { now: now ? ` (${now})` : '' });
   return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. `
     + `It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ''}. `
     + 'Space comments realistically: quick replies minutes apart, slower threads hours apart. Supplied "time" values on existing comments are records; never change them.';
@@ -150,7 +160,7 @@ function boardExtras(src: RefSource, b: GnetBooks, write: boolean): { guideline:
     if (kept.length) parts.push(fill(b.read('KEYFIGURES.PREVIOUS'), { KEYFIGURES: JSON.stringify(kept) }));
     if (write) {
       parts.push(b.read('KEYFIGURES'));
-      format = '\nAlso include a top-level "keyFigures" array (use [] when there are no updates).';
+      format = `\n${orOld(b, 'KEYFIGURES.FORMAT', 'Also include a top-level "keyFigures" array (use [] when there are no updates).')}`;
     }
   }
   return { guideline: parts.filter(Boolean).join('\n\n'), format };
@@ -170,10 +180,10 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
   ];
   const ex = boardExtras(src, b, true);
   if (ex.guideline) guideline.push(ex.guideline);
-  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\n${TAG_RULE}${ex.format}`;
+  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat), b)}\n${orOld(b, 'POST.TAG_RULE', TAG_RULE)}${ex.format}`;
   if (s.sampling) {
     // 원본 미니보드 5.0.0: 두 벌 각각 확률을 적게 하고, 요청마다 무작위 씨앗 둘을 넣는다
-    format += '\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.'
+    format += `\n${orOld(b, 'SAMPLING', SAMPLING_RULE)}`
       + `\n<x-output-seed-a>${seed()}</x-output-seed-a>\n<x-output-seed-b>${seed()}</x-output-seed-b>`;
   }
   const protectedIds: number[] = [];
@@ -200,7 +210,7 @@ export function postPrompt(src: RefSource, st: GState, input: string, plan: Inco
   const activity = activityContext(st, null, fnHistory(src.chat.scriptstate, 'gn', 'post'));
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = input + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, 'post', 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\nAlso give post.tag: one short category label in Korean for this post, the way this board sorts its posts.`, extras, factionNames), activity };
+  return { ...pack(src, b, 'post', 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat), b)}\n${orOld(b, 'POST.TAG_FORMAT', 'Also give post.tag: one short category label in Korean for this post, the way this board sorts its posts.')}`, extras, factionNames), activity };
 }
 
 export interface CommentPrompt extends PublicPrompt {
@@ -211,11 +221,15 @@ export interface CommentPrompt extends PublicPrompt {
 /** 내 댓글(이미 저장됨)에 대한 반응. replyTo: 방금 저장한 내 댓글 번호 (원본 react의 commentIndex) */
 export function commentPrompt(
   src: RefSource, st: GState, postId: number, replyTo: number, body: string, plan: IncomingPlan, nick: string, factionNames: Record<string, string>,
-  action = `The protagonist publicly commented: ${body}`,
+  action0?: string,
   /** 글 하나만 새로고침은 「새로고침」 줄을 따른다 */
   fn: GnetOp = 'comment',
 ): CommentPrompt {
   const b = gnetBooks(src);
+  // 글 하나만 새로고침(POST_REFRESH_ACTION)과 내 댓글 알림 문장은 지침 절 ACTION.POST_REFRESH · ACTION.COMMENT
+  const action = action0 === undefined
+    ? (b.read('ACTION.COMMENT') ? fillVars(b.read('ACTION.COMMENT'), { body }) : `The protagonist publicly commented: ${body}`)
+    : action0 === POST_REFRESH_ACTION ? orOld(b, 'ACTION.POST_REFRESH', POST_REFRESH_ACTION) : action0;
   const p = findPost(st, postId);
   if (!p) throw new GnetError('대상 글이 없어졌어요.');
   // 원본과 같이: 글에 단 댓글은 "글" 범위(전체 댓글), 답글은 "댓글" 범위(최근 30개)
@@ -241,15 +255,18 @@ export function commentPrompt(
   const activity = activityContext(st, p.id);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = task + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, fn, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.REACT_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity, supplied: selected, total };
+  return { ...pack(src, b, fn, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.REACT_FORMAT')}\n${commentTimeRule(dateNow(src.chat), b)}`, extras, factionNames), activity, supplied: selected, total };
 }
 
 /** 글 하나만 새로고침: 시간이 흘러 다른 사람들이 이 글에 댓글을 더 단다 (주인공은 아무것도 하지 않음) */
 export const POST_REFRESH_ACTION =
   'Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.';
 
+/** 공개 글 참고의 안내 글 (지금 보는 게시판 지침의 PUBLIC.ACCESS 절). 없으면 빈 글 → publicBoard 가 코드에 남긴 글을 쓴다 */
+export const publicAccess = (src: RefSource): string => policySections(src.char.globalLore, SITE_GUIDE[viewSite(src.chat.scriptstate)])['PUBLIC.ACCESS']?.trim() ?? '';
+
 /** 공개 글 참고 (원본 RC.gnetPublic): 쪽지에서 언급된 글을 앞에, 최대 8개 */
-export function publicBoard(st: GState, query: string): { access: string; posts: unknown[] } | null {
+export function publicBoard(st: GState, query: string, access?: string): { access: string; posts: unknown[] } | null {
   const ranked = st.posts.map((p, i) => ({ p, i, hit: (!!p.title && query.includes(p.title)) || new RegExp(`#${p.id}(?![\\d.])`).test(query) }));
   ranked.sort((a, b) => (a.hit !== b.hit ? (a.hit ? -1 : 1) : a.i - b.i));
   const rows: unknown[] = [];
@@ -268,7 +285,7 @@ export function publicBoard(st: GState, query: string): { access: string; posts:
   }
   if (!rows.length) return null;
   return {
-    access: 'Published GNet material available for reference when this conversation mentions, shares or consults a post. Discuss its supplied details naturally. Availability alone does not establish that everyone already read it, the real identity behind a handle, or truth of its claims. No private notes or unsent drafts are included.',
+    access: access?.trim() || 'Published GNet material available for reference when this conversation mentions, shares or consults a post. Discuss its supplied details naturally. Availability alone does not establish that everyone already read it, the real identity behind a handle, or truth of its claims. No private notes or unsent drafts are included.',
     posts: rows,
   };
 }
@@ -296,20 +313,20 @@ export function dmPrompt(src: RefSource, st: GState, nick: string, latest: strin
     });
   }
   let task = `Current story time: ${dateNow(src.chat)}\n${fill(b.read('DM.REQUEST'), { NICK: nick, ORIGIN: anchor, HISTORY: JSON.stringify(lines) })}`;
-  const pub = publicBoard(st, `${latest}\n${anchor}`);
+  const pub = publicBoard(st, `${latest}\n${anchor}`, b.read('PUBLIC.ACCESS'));
   if (pub) task += `\nPUBLIC BOARD REFERENCE:\n${JSON.stringify(pub)}`;
   const identity = { speaker: { role: 'npc_correspondent', handle: nick }, owner: { role: 'user', handle: userHandle, personaName: '주인공', referenceOnly: true } };
   return pack(src, b, 'dm', 'THOUGHTS.DM', `${b.read('DM.GUIDELINE')}\n\n${b.read('ATTACHMENTS')}`, b.read('DM.FORMAT'), task, factionNames, identity);
 }
 
 /** 쪽지 답장이 형식에 안 맞을 때 한 번 더 (원본 재시도 문구) */
-export function retryMessages(prompt: GnetPrompt, raw: string, error: string): CraftMessage[] {
+export function retryMessages(prompt: GnetPrompt, raw: string, error: string, rule: string | undefined = prompt.retryRule): CraftMessage[] {
   return [
     ...prompt.messages,
     { role: 'assistant', content: raw },
     {
       role: 'user',
-      content: `<system>\nValidation error!\nYour previous output did not adhere to the required format, or contained invalid data.\nError message: ${error}\nPlease fix your last output into correct structure as previously instructed, while keeping the data intact.\n${RETRY_ANALYZE}\n</system>`,
+      content: rule?.trim() ? fillVars(rule.trim(), { error, analyze: retryAnalyze() }) : `<system>\nValidation error!\nYour previous output did not adhere to the required format, or contained invalid data.\nError message: ${error}\nPlease fix your last output into correct structure as previously instructed, while keeping the data intact.\n${retryAnalyze()}\n</system>`,
     },
   ];
 }

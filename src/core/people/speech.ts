@@ -6,6 +6,7 @@
 //         횟수를 3 미만으로 두면 세지 않고 모델이 알아서 바꾼다 (원본과 같음).
 // 이식판 차이: 항목 글이 한 줄(plain 이 줄바꿈을 지움)이라 표지는 글 끝의 「[말투 변화 조짐 가까워짐 1/3] 이유 / 이유」 꼴로 둔다. 표지는 코드만 쓴다.
 import type { PeopleSettings } from './settings';
+import { guideOr } from '../guides';
 
 export type SpeechVariety = 'off' | 'one' | 'two';
 export type SpeechChange = 'ask' | 'auto';
@@ -124,6 +125,7 @@ const DIRECTOR = [
 export function speechVarietyBlock(s: Pick<PeopleSettings, 'features' | 'registerVariety' | 'registerChange' | 'registerSignLimit'>, stage: 'writer' | 'director'): string {
   const v = speechVariety(s);
   if (v.level === 'off') return '';
-  if (stage === 'writer') return [...WRITER_ONE, ...(v.level === 'two' ? (v.counted ? WRITER_TWO : WRITER_TWO_FREE) : [])].join('\n');
-  return DIRECTOR.join('\n');
+  // 글은 지침 「인물 기록 갱신기(덧붙임)」 SPEECH.* 절 · 지침 「Director」 APPLY.SPEECH_VARIETY 절. 절이 없으면 위에 남긴 글
+  if (stage === 'writer') return [guideOr('UpdaterExtra', 'SPEECH.VARIETY', () => WRITER_ONE.join('\n'), { chars: SPEECH_ENTRY_CHARS }), ...(v.level === 'two' ? [v.counted ? guideOr('UpdaterExtra', 'SPEECH.SIGN', () => WRITER_TWO.join('\n')) : guideOr('UpdaterExtra', 'SPEECH.FREE', () => WRITER_TWO_FREE.join('\n'))] : [])].join('\n');
+  return guideOr('Director', 'APPLY.SPEECH_VARIETY', () => DIRECTOR.join('\n'));
 }

@@ -1,6 +1,7 @@
 // 보조 모델 이미지(에셋) 태그 보충. 원본 imgTagFireCore와 같은 흐름:
 // 단락 번호 매김 → Image tag 로어북의 캐릭터 → 등장 캐릭터만 → 보조 모델 JSON 패치 → 단락 뒤에 <img=...> 삽입.
 import type { LoreEntry } from './types';
+import { fillVars, guideOr, guideSec } from './guides';
 import { readDirectory } from './world/directory';
 import { termPresent } from './world/registry';
 
@@ -114,6 +115,17 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
       return names.length ? `- ${name} (${names.join(', ')})` : '';
     })
     .filter(Boolean);
+  // 글은 지침 「이미지 태그 넣기」 PROMPT · NO_TAG · NO_TAG_USER · ALIASES_HEAD 절 (설정 → 지침에서 고침). PROMPT 절이 없으면 아래에 남긴 글
+  const noTag = d.allowUser ? guideOr('Asset', 'NO_TAG', '- DO NOT tag the narrator or undefined NPCs.') : guideOr('Asset', 'NO_TAG_USER', '- DO NOT tag {{user}}, the narrator, or undefined NPCs.');
+  const aliasHead = guideOr('Asset', 'ALIASES_HEAD', '## Aliases (for presence verification — still use the full English name in tag)');
+  const narrative = paras.map((p, i) => `[${i + 1}] ${p}`).join('\n\n');
+  const tpl = guideSec('Asset', 'PROMPT');
+  if (tpl) {
+    return [{ role: 'user', content: fillVars(tpl, {
+      no_tag_rule: noTag, limit: n, plural: n === '1' ? '' : 's', limit_x3: limit * 3, names: active.join(' | '),
+      aliases: aliasLines.length ? `${aliasHead}\n${aliasLines.join('\n')}\n\n` : '', keywords: d.keywords.join(', '), first, narrative,
+    }) }];
+  }
   const w: string[] = [
     '# Insert <img> tags into a finished narrative.',
     '',
@@ -133,7 +145,7 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
     '- MUST tag every visible listed character at least ONCE when they appear and are the focus.',
     '- Tag at first appearance AND when emotion changes SIGNIFICANTLY (smile → cry, calm → angry, neutral → shocked).',
     '- DO NOT tag minor variations (smile → bigger smile = SAME tag, skip).',
-    d.allowUser ? '- DO NOT tag the narrator or undefined NPCs.' : '- DO NOT tag {{user}}, the narrator, or undefined NPCs.',
+    noTag,
     '- DO NOT invent character names or keywords. Use only the lists below.',
     '',
     '## HARD LIMIT (per-character, independent count)',
@@ -146,7 +158,7 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
     '## Allowed Character Names (use exactly as written)',
     active.join(' | '),
     '',
-    ...(aliasLines.length ? ['## Aliases (for presence verification — still use the full English name in tag)', ...aliasLines, ''] : []),
+    ...(aliasLines.length ? [aliasHead, ...aliasLines, ''] : []),
     '## Allowed Keywords (use exactly as written)',
     `SFW: ${d.keywords.join(', ')}`,
     '',
@@ -173,7 +185,7 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
     '',
     '## Narrative (numbered by paragraph)',
     '',
-    paras.map((p, i) => `[${i + 1}] ${p}`).join('\n\n'),
+    narrative,
     '',
     '# Reminder: Output ONLY the JSON array. No prose. No explanation. If no listed character appears, output [].',
   ];

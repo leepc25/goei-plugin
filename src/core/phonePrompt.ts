@@ -1,7 +1,7 @@
 // 괴담톡 요청문 (원본 buildPrompt·refreshPrompt·ruleBuilder·contactPrompts).
 // 지침은 카드의 Phone 로어북 @@SECTION을 요청 조건에 맞는 것만 골라 이어 붙이고, 자료는 JSON 하나로 보낸다.
 import { sitePicAsPhoto } from './attach';
-import { publicBoard } from './gnetPrompt';
+import { publicAccess, publicBoard } from './gnetPrompt';
 import { readGnet } from './gnet';
 import {
   agentStatus, announcementPacket, chancePassed, conversationState, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
@@ -11,7 +11,8 @@ import {
 import { applyAdvanced, genSettings, type RefToggles } from './advanced';
 import { fnHistory, fnNum, fnRefs } from './reffn';
 import { previousView, viewSettings, type ViewRoom } from './phoneView';
-import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
+import { craftMessages, craftSettings, memoTexts, retryAnalyze, type CraftMessage } from './craft';
+import { fillVars } from './guides';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { playerAgent } from './player';
 import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
@@ -19,9 +20,14 @@ import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySecti
 export interface PhonePrompt {
   messages: CraftMessage[];
   contactMode: boolean;
+  /** 새로고침 응답이 형식에 안 맞을 때 다시 묻는 글 (지침 절 RETRY.REFRESH). 없으면 코드에 남긴 글 */
+  retryRule?: string;
 }
 
 const LANGUAGE = 'Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.';
+
+/** 언어 문장: 지침 「괴담톡」 LANGUAGE 절 (없으면 위 글) */
+const languageLine = (p: Record<string, string>): string => p.LANGUAGE?.trim() || LANGUAGE;
 
 function sections(src: RefSource): Record<string, string> {
   applyAdvanced(src.chat.scriptstate);
@@ -97,7 +103,7 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
   if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   const br = phoneSettings(src.chat.scriptstate).banterRows;
-  return [...keys.map((k) => dropSitePicGuide(section(p, k)).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  return [...keys.map((k) => dropSitePicGuide(section(p, k)).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
 }
 
 // ── 자료 ──
@@ -312,12 +318,12 @@ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Re
     { role: 'system', content: factionCodesToNames(system, names) },
     { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
   ];
-  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode };
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode, retryRule: read('RETRY.REFRESH') };
 }
 
 function gnetBoard(src: RefSource, query: string): unknown {
   try {
-    return publicBoard(readGnet(src.chat), query) ?? undefined;
+    return publicBoard(readGnet(src.chat), query, publicAccess(src)) ?? undefined;
   } catch {
     return undefined;
   }
@@ -422,10 +428,12 @@ function personOfContact(c: Contact): PPerson {
 /** 새로고침 응답이 형식에 안 맞을 때 같은 자료로 한 번 더 (원본 재시도 문구) */
 export function refreshRetry(prompt: PhonePrompt, reason: string): PhonePrompt['messages'] {
   const [sys, ...rest] = prompt.messages;
+  // 글은 지침 「괴담톡」 RETRY.REFRESH 절. 절이 없으면 아래에 남긴 글
+  const rule = prompt.retryRule?.trim();
   return [
     {
       role: 'system',
-      content: `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}\n${RETRY_ANALYZE}`,
+      content: rule ? `${sys.content}\n${fillVars(rule, { reason: reason.slice(0, 600), analyze: retryAnalyze() })}` : `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}\n${retryAnalyze()}`,
     },
     ...rest,
   ];
@@ -441,7 +449,7 @@ export function viewPrompt(src: RefSource, names: Record<string, string>, views:
   if (set.preset === 'side') keys.push('VIEW.SIDE', `VIEW.SIDE.SPEAK.${set.speak ? 1 : 0}`, `VIEW.SCOPE.${set.scope}`, ...(set.size === '0' ? [] : [`VIEW.SIZE.${set.size}`]));
   else keys.push('VIEW.MIND', set.preset === 'mono' ? 'VIEW.MONO' : 'VIEW.MULTI', ...(set.preset === 'multi' ? [`VIEW.MULTI.SPEAK.${set.speak ? 1 : 0}`] : []));
   keys.push('VIEW.OUTPUT');
-  const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
   if (!system.includes('OUTPUT CONTRACT')) throw new PhoneError('Phone 로어북에 보기 전용 방 항목이 없어요.');
   const previousRoom = previousView(views, set.preset, fnHistory(src.chat.scriptstate, 'ph', 'view'));
   const owner = ownerCharacter(src).character;

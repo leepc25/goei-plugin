@@ -5,6 +5,7 @@
 // 종류 14개는 없앴다 (2026-11-07 밤 사용자). 물건마다 판정: 사용 가능 · 소모성(남은 횟수 숫자 하나, 사용마다 1 빼고 0이면 없어짐) · 장착(무기·장비).
 // 비소모 물건은 숫자 없이 상태만 설명 글로. 상태 4단계(멀쩡·손상·고장·파괴)는 보조 모델만 본문을 보고 바꾼다 (memory goei-equip-design).
 import type { Chat } from './types';
+import { guideOr } from './guides';
 import { aliveAnchors } from './wallet';
 import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
@@ -501,6 +502,8 @@ export function invJustResumed(chat: Chat): boolean {
   return !(chat.message ?? []).slice(at).some((m) => m.role === 'char');
 }
 const RESUMED_EVENT = 'item tracking was switched off for a while and just came back on — this list may not match what happened in the story since; follow the story and treat the list as a starting point';
+/** 위 글은 지침 「본편에 붙는 글」 INVENTORY.RESUMED 절에서 읽는다. 절이 없으면 위 글 */
+export const resumedEvent = (): string => guideOr('Main', 'INVENTORY.RESUMED', RESUMED_EVENT);
 /** 소지품을 메인 요청에 넣는가. 2026-11-11 사용자: 넣지 않을 거면 쓰는 뜻이 없다 → 따로 끄는 줄을 없애고 「사용」과 같은 값 */
 export const itemPushOn = (vars: Record<string, unknown> | undefined) => invOn(vars);
 /** 보조 모델이 본문을 읽어 목록을 맞추기 (기본 켬, '0' 이면 끔) */
@@ -677,8 +680,9 @@ export function itemsBlock(list: Item[], opts: { slots: number; limit: string; c
   // 숨긴 진짜 효과: 이번 턴에 쓰는 물건, 몸에 걸친 장비만 (11-09 사용자: 평소엔 광고 문구만 가고, 쓰는 순간에 「이번에 일어나는 일」로 받는다)
   const reveal = list.filter((e) => e.truth && (use.some((u) => u.name === e.name) || isEquipped(e, list)));
   if (reveal.length) {
-    out.push('Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):');
-    for (const e of reveal) out.push(e.truth === '?' ? `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ''} — decide what it really does now, then keep it the same from here on.` : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ''}`);
+    // 글은 지침 「본편에 붙는 글」 INVENTORY.REALLY · INVENTORY.REALLY_UNKNOWN 절. 절이 없으면 여기 남긴 글
+    out.push(guideOr('Main', 'INVENTORY.REALLY', 'Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):'));
+    for (const e of reveal) out.push(e.truth === '?' ? guideOr('Main', 'INVENTORY.REALLY_UNKNOWN', () => `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ''} — decide what it really does now, then keep it the same from here on.`, { name: e.name, label_note: e.effect ? ` (the label says 「${e.effect}」 and may be false)` : '' }) : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ''}`);
   }
   return out.join('\n');
 }
@@ -784,13 +788,14 @@ export function inventoryText(chat: Chat): string {
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).filter((e) => boughtPasses(vars, e.store)).map(boughtLine),
-    events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
+    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars)),
   });
   const guide = shop ? shopGuide(vars) : '';
-  return text ? `${text}\n${INVENTORY_NOTE}${guide ? `\n${guide}` : ''}` : '';
+  // 안내 글은 지침 「본편에 붙는 글」 INVENTORY.NOTE 절. 절이 없으면 INVENTORY_NOTE
+  return text ? `${text}\n${guideOr('Main', 'INVENTORY.NOTE', INVENTORY_NOTE)}${guide ? `\n${guide}` : ''}` : '';
 }
 
 /** 메시지 키 k 가 유저 키 userKey 뒤의 응답인가 (다시 굴리는 턴의 옛 응답) */

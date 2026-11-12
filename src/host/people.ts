@@ -8,8 +8,8 @@ import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
 import { hypaSummaries } from '../core/people/hypa';
-import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
-import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
+import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, shopKeyLine, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
+import { applyConsolidate, buildConsolidate, consolidateUserText, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
@@ -452,7 +452,7 @@ function updaterSystem(settings: PeopleSettings, sections: Set<string>, vars: Re
   let system = assemblePrompt(base, sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
   if (shop && !base.includes('<<SECTION:shop>>')) {
     const def = settings.prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
-    system += `\n\n${sectionBody(def, 'shop') ?? ''}\nAdd this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.`;
+    system += `\n\n${sectionBody(def, 'shop') ?? ''}\n${shopKeyLine()}`;
   }
   return system.replace('<<SHOP_RULE>>', () => (shop ? shopRule(vars) : '')).replace('<<SHOP_JUDGE>>', () => (shop ? shopJudgeGuide() : ''));
 }
@@ -512,7 +512,7 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
     if (settings.keepRaw) (diag.system = input.system), (diag.data = dataText);
     const messages: LlmMessage[] = [
       { role: 'system', content: input.system },
-      { role: 'user', content: `Record to tidy:\n${dataText}\n\nReturn the JSON object.` },
+      { role: 'user', content: consolidateUserText(dataText) },
     ];
     const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined, label: '정리' });
     diag.raw = raw;

@@ -3,6 +3,7 @@
 import type { AgentRow, Directory, OrgRow } from './directory';
 import { orgOf } from './directory';
 import { orgNameCbs } from './assemble';
+import { guideOr } from '../guides';
 import { excludedOrgs, fieldValue, RELATION_STAGES, type Relations, type RelationStage, type WorldRecord } from './records';
 
 const VAR = '{{getvar::st_faction}}';
@@ -38,7 +39,8 @@ const code = (o: OrgRow) => (o.faction ? ` [${o.faction}]` : '');
 
 /** Faction 지침: 세력 요약(소개 첫 문단) → 관계(중립 아닌 쌍만) → 공통 규칙 */
 export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, rel: Relations): string {
-  const parts: string[] = ['## Faction', FACTION_INTRO];
+  // 머리말·관계표 설명은 지침 「본편에 붙는 글」 FACTION.* · ROSTER.INTRO 절. 절이 없으면 위 글
+  const parts: string[] = ['## Faction', guideOr('Main', 'FACTION.INTRO', FACTION_INTRO)];
   const named = (name: string): string => {
     const o = dir.orgs.find((x) => x.name === name);
     return o ? orgNameCbs(dir, o) : name;
@@ -73,7 +75,7 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     const rows = members.map((a) => `| ${no.get(a)} ${named(a)} | ${members.map((b) => (a === b ? '-' : STAGE_MARK[stageOf(a, b)])).join(' | ')} |`);
     // 메모는 기본값이 비어 있고(사용자 2026-10-27), 사용자가 쓴 칸만 표 아래에 한 줄씩
     const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`]!.memo!.trim().replace(/\n+/g, ' '), dir)}`));
-    parts.push(`## Faction Relations\nHow the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
+    parts.push(`## Faction Relations\n${guideOr('Main', 'FACTION.RELATIONS_LEGEND', 'How the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.')}\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
   }
   if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations\n${fillCodes(rel.common.trim(), dir)}`);
   return parts.join('\n\n') + '\n\n---';
@@ -81,7 +83,7 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
 
 /** Roster 지침: 조직 → 부서(영문 표기) → 요원 소개 한 줄. 소개가 비면 그 요원은 빠진다 */
 export function assembleRoster(dir: Directory, agents: Map<string, WorldRecord>, orgs: Map<string, WorldRecord>): string {
-  const parts: string[] = [`## Roster\n${ROSTER_INTRO}`];
+  const parts: string[] = [`## Roster\n${guideOr('Main', 'ROSTER.INTRO', ROSTER_INTRO)}`];
   const byOrg = new Map<string, AgentRow[]>();
   for (const a of dir.agents) {
     const rec = agents.get(a.lore);

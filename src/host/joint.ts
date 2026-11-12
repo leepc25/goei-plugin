@@ -2,6 +2,7 @@
 // 작업들이 각자 요청문을 만들어 ask()로 맡기면, 기다리던 작업이 다 모이면 한 요청으로 보내고 응답을 칸마다 갈라 돌려준다.
 // 한 작업이 모델을 부르지 않고 끝나면(done) 남은 것끼리만 보낸다. 각 작업의 검사·재시도·저장은 그대로 각자 한다.
 import { JOINT_KEY, JOINT_LABEL, type JointKind } from '../core/netjoint';
+import { guideOr } from '../core/guides';
 import { runModel, type LlmMessage, type ModelChoice } from './llm';
 
 export type { JointKind } from '../core/netjoint';
@@ -20,18 +21,23 @@ export interface JointTask {
 
 const BOARD_KEYS = ['gnet', 'gal', 'wpf', 'sm'];
 
+// 글은 지침 「요청 공통」의 JOINT.* 절 (설정 → 지침에서 고침). 아래 영어 글은 그 절이 없는 옛 지침을 위한 것
 function instruction(keys: string[]): string {
   const boards = keys.filter((k) => BOARD_KEYS.includes(k));
-  return `Execute ${keys.length} independent automatic tasks in ONE response. Return exactly one JSON object with exactly these keys in this order: ${keys.map((k) => `"${k}"`).join(', ')} — without fences or commentary. `
+  const list = keys.map((k) => `"${k}"`).join(', ');
+  const boardsRule = boards.length > 1 ? `${guideOr('Common', 'JOINT.BOARDS', () => `The board tasks (${boards.join(', ')}) are DIFFERENT websites with different communities, voices and rules: write each strictly from its own messages, and never carry posts, nicknames, topics, slang or tone from one board into another.`, { boards: boards.join(', ') })} ` : '';
+  return guideOr('Common', 'JOINT.ENVELOPE', () => `Execute ${keys.length} independent automatic tasks in ONE response. Return exactly one JSON object with exactly these keys in this order: ${keys.map((k) => `"${k}"`).join(', ')} — without fences or commentary. `
     + 'Each value is the complete JSON object required by that task, not an encoded JSON string. Write Korean literally in UTF-8; do not transliterate it into Unicode escape sequences. '
     + 'Escape only JSON quotation marks, backslashes and control characters. A task may return null if it cannot produce a valid result; do not substitute another task. '
     + 'Follow each task\'s supplied messages and output contract only within its own result. This outer envelope overrides standalone output-only restrictions. '
     + 'Resolve contentParts by concatenating text or referenced sharedReferences text in order, without adding separators. Shared references are available to a task ONLY where its own message references them. '
-    + (boards.length > 1 ? `The board tasks (${boards.join(', ')}) are DIFFERENT websites with different communities, voices and rules: write each strictly from its own messages, and never carry posts, nicknames, topics, slang or tone from one board into another. ` : '')
+    + boardsRule
     + 'Never use phone contacts, private messages, notices, invitations, relationship evidence or phone-only narrator data to create board public posts or private messages. '
     + 'Never let any task infer private facts from another task\'s inputs or outputs. Preserve each task\'s permissions, chance decisions, cooldown eligibility, source boundaries and ownership. '
-    + 'Finish every object compactly: preserve each board\'s quantity and topic-dependent discussion; shorten prose instead of making threads silent. Phone text lengths remain ceilings, not targets.';
+    + 'Finish every object compactly: preserve each board\'s quantity and topic-dependent discussion; shorten prose instead of making threads silent. Phone text lengths remain ceilings, not targets.', { count: keys.length, keys: list, boards_rule: boardsRule });
 }
+/** 통합 응답을 못 갈랐을 때 겉 모양만 다시 묻는 글 (지침 「요청 공통」 JOINT.RETRY) */
+export const jointRetryText = (keys: string[]): string => guideOr('Common', 'JOINT.RETRY', () => `Your previous output could not be parsed as the required envelope. Return the SAME content again as exactly one JSON object with exactly these keys: ${keys.map((k) => `"${k}"`).join(', ')}. No code fences, no commentary, nothing before or after the object; a task that failed is null.`, { keys: keys.map((k) => `"${k}"`).join(', ') });
 
 /** 여러 요청을 하나로. 둘 이상의 요청에 똑같이 들어 있는 긴 문단(256자 이상)은 한 번만 싣고 자리표로 가리킨다 (원본 combinedPrompts) */
 export function combinedPrompts(tasks: JointTask[]): LlmMessage[] {
@@ -183,7 +189,7 @@ export class Joint {
       // (11-09 사용자: 따로 도는 것처럼 보였다). 모델 연결 오류(LlmError)는 형식 재시도가 없어서 여기서 버리면 그 턴의 자동 확인이 통째로 사라졌다 (QC 2026-10-28)
       console.log(`[goei] 통합 자동 확인 응답을 가르지 못해 겉 모양을 다시 묻어요: ${error instanceof Error ? error.message : String(error)}`);
       try {
-        const fix = await runModel([...prompt, { role: 'assistant', content: raw }, { role: 'user', content: `Your previous output could not be parsed as the required envelope. Return the SAME content again as exactly one JSON object with exactly these keys: ${keys.map((k) => `"${k}"`).join(', ')}. No code fences, no commentary, nothing before or after the object; a task that failed is null.` }], this.model, this.staticModel, `${label} 다시 묻기`);
+        const fix = await runModel([...prompt, { role: 'assistant', content: raw }, { role: 'user', content: jointRetryText(keys) }], this.model, this.staticModel, `${label} 다시 묻기`);
         parts = splitCombined(fix, keys);
       } catch (again) {
         console.log(`[goei] 통합 자동 확인 응답을 끝내 가르지 못해 따로 보내요: ${again instanceof Error ? again.message : String(again)}`);

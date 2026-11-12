@@ -3,7 +3,7 @@
 // 상점과 달리 본편 표식 없이 브라우저에서 언제든 연다. 우주몰은 운영자 문의 창이 있고, 포인트몰은 운영자가 없다(정가 구매만, 로그인해야 씀).
 import type { Chat } from './types';
 import { type TruthMode, emptyShop, readShop, reviveShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
-import type { GuideName } from './guides';
+import { guideOr, type GuideName } from './guides';
 import { lastBot, SHOP_CTX_VAR, SHOP_SHARED_VARS } from './shop';
 import { liveOrders, readyNotes } from './orders';
 import { readDesk } from './bmdesk';
@@ -190,11 +190,13 @@ export function cosAssignment(count: number, context: boolean, roll: CosRoll, rn
   if (!slots.length) return '';
   const want = slots.some((s) => s.useful);
   const G = site === 'bm' ? 'CATEGORY' : 'GENRE'; // 포인트몰은 장르가 아니라 상품 분류
+  // 글은 그 몰 지침의 ASSIGN_* 절. 절이 없으면 여기 남긴 글
+  const guide: GuideName = site === 'bm' ? 'Bm' : 'Cos';
   const lines = slots.map((s, i) => {
-    const role = s.useful ? " | ROLE: useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)" : want ? ' | ROLE: broad stock, unrelated to the current scene' : '';
+    const role = s.useful ? ` | ROLE: ${guideOr(guide, 'ASSIGN_ROLE_USEFUL', "useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)")}` : want ? ` | ROLE: ${guideOr(guide, 'ASSIGN_ROLE_BROAD', 'broad stock, unrelated to the current scene')}` : '';
     return `Item ${i + 1} — ${G}: ${s.genre} | VALUE TIER: ${s.tier.name} (${s.tier.desc}), price ${rollPrice(site, s.tier.lo, s.tier.hi)}${role}`;
   });
-  return `${lines.join('\n')}\nBuild each item to its assigned ${G} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. ${G === 'GENRE' ? 'Genres' : 'Categories'} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
+  return `${lines.join('\n')}\n${guideOr(guide, 'ASSIGN_RULE', () => `Build each item to its assigned ${G} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. ${G === 'GENRE' ? 'Genres' : 'Categories'} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`, { unit: G, units: G === 'GENRE' ? 'Genres' : 'Categories' })}`;
 }
 
 // ── 우주몰 시그니처 상품 (구버전 Lua: 「우리가 도움!」·「착한 친구」를 코드가 확률로 끼움, 모델 생성 아님) ──

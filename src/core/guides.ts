@@ -12,11 +12,16 @@ import bmdesk from '../data/guides/bmdesk.txt';
 import consult from '../data/guides/consult.txt';
 import updater from '../data/guides/updater-detailed.txt';
 import updaterCompact from '../data/guides/updater-compact.txt';
+import common from '../data/guides/common.txt';
+import mainText from '../data/guides/main.txt';
+import updaterExtra from '../data/guides/updater-extra.txt';
+import assetText from '../data/guides/asset.txt';
+import directorExtra from '../data/guides/director-extra.txt';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE, ROUTER_SYSTEM } from './people/basetext';
 
-export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router' | 'Consult';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router', 'Consult'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담' };
+export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router' | 'Consult' | 'Common' | 'Main' | 'UpdaterExtra' | 'Asset';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router', 'Consult', 'Common', 'Main', 'UpdaterExtra', 'Asset'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담', Common: '요청 공통(묶음·다시 묻기·생각 단계·첨부)', Main: '본편에 붙는 글(상태창·소지품·인물 기록)', UpdaterExtra: '인물 기록 갱신기(덧붙임·정리)', Asset: '이미지 태그 넣기(보조 모델)' };
 
 /* ── 게시판 사이트별 기본 지침 (2026-11-08 사용자: 사이트마다 따로). 기본 글은 한 벌(gnet.txt)에 사이트 갈래가 들어 있고,
    여기서 그 사이트 갈래만 남겨 사이트마다 따로 된 지침을 만든다. 그 뒤 사용자는 사이트마다 따로 고친다 ── */
@@ -198,8 +203,13 @@ const DEFAULTS: Record<GuideName, string> = {
   Hs: hsGuide(),
   Updater: updater.replace(/\r/g, ''),
   UpdaterCompact: updaterCompact.replace(/\r/g, ''),
-  Director: `@@SECTION FACTS\n${DIRECTOR_FACTS.join('\n')}\n@@END\n\n@@SECTION SCENE\n${DIRECTOR_SCENE.join('\n')}\n@@END\n`,
+  // 기능별 절·검색·출력 꼴·고침 요청은 director-extra.txt (2026-11-13 사용자: 코드에 박힌 지침을 지침 칸으로)
+  Director: `@@SECTION FACTS\n${DIRECTOR_FACTS.join('\n')}\n@@END\n\n@@SECTION SCENE\n${DIRECTOR_SCENE.join('\n')}\n@@END\n\n${directorExtra.replace(/\r/g, '')}`,
   Consult: consult.replace(/\r/g, ''),
+  Common: common.replace(/\r/g, ''),
+  Main: mainText.replace(/\r/g, ''),
+  UpdaterExtra: updaterExtra.replace(/\r/g, ''),
+  Asset: assetText.replace(/\r/g, ''),
   Router: `@@SECTION ROLE\n${ROUTER_SYSTEM.slice(0, 3).join('\n')}\n@@END\n\n@@SECTION RULES\n${ROUTER_SYSTEM.slice(3).join('\n')}\n@@END\n`,
 };
 
@@ -322,3 +332,28 @@ export function guideSections(name: GuideName): Record<string, string> {
 /** 절 글의 {이름} 자리를 채운다. 모르는 이름은 그대로 둔다 */
 export const fillGuide = (text: string | undefined, vars: Record<string, string>): string =>
   String(text ?? '').replace(/\{([a-z_]+)\}/g, (all, k: string) => (k in vars ? vars[k] : all)).trim();
+
+/* ── 코드에 박혀 있던 지침을 지침 절로 (2026-11-13 사용자: 「설정 지침칸으로 안 빠지고 하드코딩 돼 있는 것을 지침으로」) ──
+   부르는 쪽은 guideOr(지침, 절, 옛 글, 자리 값) 로 읽는다. 절이 없으면(옛 글로 고쳐 저장해 둔 지침) 코드에 남긴 옛 글을 그대로 쓴다 (hslog.ts hsMainRules 와 같은 길). */
+const secCache = new Map<GuideName, { src: string; secs: Record<string, string> }>();
+/** 지침 절 글 (고친 글 반영, 앞뒤 빈칸 뺌). 절이 없거나 비었으면 null */
+export function guideSec(name: GuideName, section: string): string | null {
+  const src = guidePrompt(name);
+  let c = secCache.get(name);
+  if (!c || c.src !== src) {
+    const secs: Record<string, string> = {};
+    for (const m of src.matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) secs[m[1].trim()] = m[2];
+    c = { src, secs };
+    secCache.set(name, c);
+  }
+  return c.secs[section]?.trim() || null;
+}
+/** 절 글의 {이름} 자리를 채운다 (앞뒤를 다듬지 않는다). 모르는 이름과 {{…}} 는 그대로 둔다. 채운 값은 다시 훑지 않는다 */
+export const fillVars = (text: string, vars: Record<string, string | number>): string =>
+  text.replace(/(?<!\{)\{([a-z0-9_]+)\}(?!\})/g, (all, k: string) => (k in vars ? String(vars[k]) : all));
+/** 지침 절이 있으면 그 글(자리 채움), 없으면 코드에 남긴 옛 글 */
+export function guideOr(name: GuideName, section: string, fallback: string | (() => string), vars?: Record<string, string | number>): string {
+  const t = guideSec(name, section);
+  if (t === null) return typeof fallback === 'function' ? fallback() : fallback;
+  return vars ? fillVars(t, vars) : t;
+}
