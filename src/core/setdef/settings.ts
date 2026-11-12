@@ -1,6 +1,7 @@
 // 화면·캐릭터 이미지·상황판·상태창·가계부·소지품·상점 설정 정의표. 버튼은 「set-열쇠」 꼴이다.
 // 조건에 따라 보이는 줄의 조건과, 값에 따라 달라지는 설명·조작은 아직 화면 코드(ui/settings.ts)에 있다
 import type { SetPage } from './types';
+import { ITEM_LEFT_WORDS_DEFAULT, ITEM_OFF_WORDS_DEFAULT, ITEM_WORDS_MAX } from '../itemrules';
 
 export const SETTINGS_SET: SetPage = {
   id: 'set',
@@ -68,6 +69,9 @@ export const SETTINGS_SET: SetPage = {
         { key: 'items-carry', label: '소지 한도', ctl: { t: 'custom' } },
         { key: 'items-edit', label: '고치기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요.' },
         { key: 'items-limit', label: '지닐 수 있는 한계', ctl: { t: 'custom' }, help: '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.' },
+        { key: 'items-rules', label: '판정 표', ctl: { t: 'custom' }, help: '물건의 판정(무기·장비·사용·소모)을 모델이 적은 대로 믿지 않고 이 표로 정해요. 왼쪽은 종류(옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니)나 물건말, 오른쪽은 판정이에요(무기·장비·사용·소모N을 「·」로 잇고, 없으면 -). 물건말 줄이 종류 줄보다 먼저예요. 표에 없는 종류는 모델이 적은 대로 들어가요. 직접 넣은 물건과 시작 소지품에는 쓰지 않아요. 줄을 전부 지우면 기본 표로 돌아가요.' },
+        { key: 'items-left-words', label: '두고 옴 말', ctl: { t: 'text', ph: '', def: ITEM_LEFT_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: '갱신기가 물건을 없앴다고 알리지 않고 설명만 「…에 두고 온」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 소지품에서 빼요(기록에 남고, 본문에서 다시 얻으면 같은 물건으로 돌아와요). 쉼표로 나눠 적어요.' },
+        { key: 'items-off-words', label: '장착 풀기 말', ctl: { t: 'text', ph: '', def: ITEM_OFF_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: '갱신기가 장착한 물건의 설명을 「벗어 둔 …」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 장착만 풀어요(소지품에는 남아요). 쉼표로 나눠 적어요.' },
         { key: 'items-alias', label: '그림 대체 말', ctl: { t: 'custom' }, help: '물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 「외투 → 코트」면 이름이 외투로 끝나는 물건을 코트 그림으로 찾아요. 줄을 전부 지우면 기본 표로 돌아가요. 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 전체에서 찾아요. 그래도 없으면 상자 그림이에요.' },
         { key: 'items-pool', label: '분류 그림 섞기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '물건 이름이 「과자·다과·간식」처럼 세부 이름이 아니라 분류 말이면 그 분류의 그림 가운데 하나를 물건마다 뽑아 보여 줘요. 한 번 정해진 그림은 그 물건에 그대로 남아요. 끄면 분류마다 대표 그림 한 장만 나와요.' },
         { key: 'items-misses', label: '그림 못 찾은 말', ctl: { t: 'custom' }, help: '이번에 앱을 켠 뒤로 제 그림을 못 찾아 상자로 간 물건이에요. 그림을 더 뽑을 때 참고해요.' },

@@ -108,3 +108,72 @@ test('used_now: 자료에 횟수·소모성·남은 횟수, 그 물건은 인용
   const d = next.log.find((l) => l.what === 'destroy');
   assert.equal(d.name, '권총'); assert.equal(d.anchor, 'c2');
 });
+
+// ── 2026-11-12 물건 구조 고침: unequip · left · 넓힌 gone, update 는 갈래를 못 바꿈, 본문에 없는 등급 말 빼기 (가짜 응답 — 실제 모델은 부르지 않는다) ──
+const c2 = {
+  scriptstate: { $st_faction: 'A00' },
+  message: [
+    ['user', '퇴근', 'u1'],
+    ['char', '재킷을 벗어 가방에 넣었다. 정장은 탈의실 3번 사물함에 넣고 문을 잠갔다. 우산은 경비원에게 압수당했다. 수집기는 눈금 끝까지 붉은 꿈결로 차 있었다. 일반 어스름 등급에서는 결코 나올 수 없는 색이었다.', 'c1'],
+    ['user', 'x', 'u2'],
+    ['char', '감정 창구의 판정 결과는 B등급이었다.', 'c2'],
+  ].map(([role, data, chatId]) => ({ role, data, chatId })),
+};
+const now2 = [
+  { name: '사내용 정장 세트', desc: '검은 정장', use: false, equip: 'gear', equipped: true, state: 'ok' },
+  { name: '재킷', desc: '', use: false, equip: 'gear', equipped: true, state: 'ok' },
+  { name: '우산', desc: '', use: false, equip: 'gear', equipped: false, state: 'ok' },
+  { name: '빈 꿈결 수집기', desc: '실린더', use: false, state: 'ok', pictures: ['빈 꿈결 수집기', '꿈결 수집기 C등급', '꿈결 수집기 B등급', '꿈결 수집기 A등급'] },
+];
+
+test('자료·절: 상태 그림이 여러 장인 물건은 items_now 에 pictures, 지침에 unequip·left·place', () => {
+  const s = settings();
+  const store = T.emptyStore();
+  const on = U.buildUpdate(c2, store, [1], { settings: s, system: 'S', values: {}, names, items: now2 });
+  assert.deepEqual(on.data.items_now[3].pictures, now2[3].pictures);
+  assert.equal(on.data.items_now[0].pictures, undefined);
+  for (const [kind, text] of [['detailed', P.UPDATER_DETAILED], ['compact', P.UPDATER_COMPACT]]) {
+    const g = U.assemblePrompt(text, new Set(['items']));
+    for (const w of ['`unequip`', '`left`', '`place`', '`pictures`', 'new|update|unequip|left|gone|destroyed']) assert.ok(g.includes(w), `${kind}: ${w}`);
+  }
+});
+
+test('검사: unequip 은 장착한 물건만, left 는 자리와 함께, 인용이 원문과 다르면 셋 다 버림, update 의 usable·equip 은 받지 않음', () => {
+  const s = settings();
+  const store = T.emptyStore();
+  const input = U.buildUpdate(c2, store, [1], { settings: s, system: 'S', values: {}, names, items: now2 });
+  const r = { items: [
+    { name: '재킷', action: 'unequip', desc: '', m: 'm2', quote: '재킷을 벗어 가방에 넣었다' },
+    { name: '사내용 정장 세트', action: 'left', place: '탈의실 3번 사물함', desc: '', m: 'm2', quote: '정장은 탈의실 3번 사물함에 넣고 문을 잠갔다' },
+    { name: '우산', action: 'gone', desc: '압수당함', m: 'm2', quote: '우산은 경비원에게 압수당했다' },
+    { name: '빈 꿈결 수집기', action: 'update', desc: 'A등급 붉은 꿈결이 가득 찬 실린더', usable: true, equip: 'none', icon: '꿈결 수집기 A등급', m: 'm2', quote: '수집기는 눈금 끝까지 붉은 꿈결로 차 있었다' },
+  ] };
+  const rep = U.applyUpdate(store, c2, input, r, { settings: s, items: true });
+  assert.deepEqual(rep.items.map((e) => [e.name, e.action, e.place]), [['재킷', 'unequip', undefined], ['사내용 정장 세트', 'left', '탈의실 3번 사물함'], ['우산', 'gone', undefined], ['빈 꿈결 수집기', 'update', undefined]]);
+  const col = rep.items[3];
+  assert.deepEqual([col.use, col.equip, col.icon], [undefined, undefined, '꿈결 수집기 a등급'], 'update: 갈래는 안 받고 그림 말은 받는다');
+  assert.equal(col.desc, '붉은 꿈결이 가득 찬 실린더', '본문에 없는 등급 말(A등급)은 설명에서 뺀다');
+  assert.ok(rep.dropped.some((d) => d.kind === 'items' && d.who === '빈 꿈결 수집기' && d.reason.includes('본문에 없는 등급 말을 뺌: A등급')));
+  // 인용이 원문과 다르면 버림 · 장착하지 않은 물건의 unequip 은 버림
+  const bad = { items: [
+    { name: '재킷', action: 'unequip', desc: '', m: 'm2', quote: '재킷을 벗어 던졌다' },
+    { name: '사내용 정장 세트', action: 'left', place: '집', desc: '', m: 'm2', quote: '정장을 집에 두고 왔다' },
+    { name: '우산', action: 'unequip', desc: '', m: 'm2', quote: '우산은 경비원에게 압수당했다' },
+    { name: '빈 꿈결 수집기', action: 'gone', desc: '', m: 'm2', quote: '수집기를 잃어버렸다' },
+  ] };
+  const rep2 = U.applyUpdate(T.emptyStore(), c2, input, bad, { settings: s, items: true });
+  assert.equal(rep2.items.length, 0);
+  assert.deepEqual(rep2.dropped.filter((d) => d.kind === 'items').map((d) => [d.who, d.reason]), [['재킷', '인용이 원문에 없음'], ['사내용 정장 세트', '인용이 원문에 없음'], ['우산', '장착하지 않은 물건'], ['빈 꿈결 수집기', '인용이 원문에 없음']]);
+});
+
+test('검사: 등급은 본문에 적혔을 때만 이름·설명에 남는다 (부정 꼴 「어스름 등급에서는 … 나올 수 없는」은 인정 안 함). 그림 말은 그대로 받는다', () => {
+  const s = settings();
+  const store = T.emptyStore();
+  const input = U.buildUpdate(c2, store, [1, 3], { settings: s, system: 'S', values: {}, names, items: now2 });
+  const r = { items: [
+    { name: '어스름 등급 꿈결 수집기', action: 'new', desc: 'C등급 꿈결이 찬 실린더', icon: '괴이/꿈결 수집기 C등급/dream collector', m: 'm2', quote: '일반 어스름 등급에서는 결코 나올 수 없는 색이었다' },
+    { name: '빈 꿈결 수집기', action: 'update', desc: 'B등급 판정을 받은 꿈결 수집기', icon: '꿈결 수집기 B등급', m: 'm4', quote: '판정 결과는 B등급이었다' },
+  ] };
+  const rep = U.applyUpdate(store, c2, input, r, { settings: s, items: true });
+  assert.deepEqual(rep.items.map((e) => [e.name, e.desc, e.icon]), [['꿈결 수집기', '꿈결이 찬 실린더', '괴이/꿈결 수집기 c등급/dream collector'], ['빈 꿈결 수집기', 'B등급 판정을 받은 꿈결 수집기', '꿈결 수집기 b등급']]);
+});

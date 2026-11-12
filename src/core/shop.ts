@@ -10,7 +10,7 @@
 //   플러그인은 숫자만 읽고 값은 거르지 않는다(11-07 사용자). 제안이 온 뒤에도 말하기로 흥정(제안 값 바뀜). 팔기 확정 = 가계부 수입 + 소지품에서 뺌(기록 sell).
 // - 잔고·소지품은 모델에 넘기지 않는다. PixelLab 그림은 표시용(이름 매칭)이라 모델과 무관하다.
 import type { Chat } from './types';
-import { cleanIcon, ITEM_ON_VAR, itemEquip, itemUses, itemWeight, parseTraits, traitsText, type ItemEquip } from './items';
+import { cleanIcon, ITEM_ON_VAR, itemEquip, itemUses, itemWeight, kindOfIcon, parseTraits, traitsFor, traitsText, type ItemEquip } from './items';
 import { colConfig } from './world/statuscols';
 import { messageKey } from './people/store';
 import { parseWon } from './wallet';
@@ -547,7 +547,7 @@ function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   const cost = costOf(cells[1] ?? '');
   if (!name || !cost) return null;
   const price = cost.price;
-  const out: Omit<ShopItem, 'id'> = { name, price, ...(cost.pay ? { pay: cost.pay } : {}), ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3], weight: cells[4] }), desc: clean(cells[5], 120), effect: clean(cells[6], 60) };
+  const out: Omit<ShopItem, 'id'> = { name, price, ...(cost.pay ? { pay: cost.pay } : {}), ...traitsOf({ ...shelfTraits(name, cells[2], cells[3]), icon: cells[3], weight: cells[4] }), desc: clean(cells[5], 120), effect: clean(cells[6], 60) };
   // 진실: 글이면 숨긴 진짜 효과, ?·모름이면 「아무도 모름」(쓸 때 본편이 정함) → '?'
   const truth = clean(cells[8], 60);
   if (/^(\?+|모름|unknown|미정)$/i.test(truth)) out.truth = '?';
@@ -1003,3 +1003,9 @@ export function shopJudgeBy(vars?: Vars): { pick: ShopJudge; by: 'main' | 'updat
 }
 
 export const genLanguage = (vars: Vars): string | null => genSettings(vars).language;
+
+/** 진열 줄의 쓰임: 모델이 적은 쓰임 글을 그대로 믿지 않고 종류(그림 칸) + 판정 표로 정한다 — 사서 소지품에 들어갈 때(core/items.ts addItem)와 같은 판정. 표에 줄이 없으면 적힌 대로 */
+function shelfTraits(name: string, traits: string, icon: string): ReturnType<typeof parseTraits> {
+  const t = parseTraits(traits);
+  return traitsFor(kindOfIcon(icon), icon, name, t) ?? t;
+}

@@ -26,7 +26,8 @@ import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
 import { mentionsPoints, pointsOn, pointsVars, readPoints } from '../core/points';
 import { addWalletEntry, aliveAnchors, mentionsAmount, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
+import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, setItemRules, usedItemsAt } from '../core/items';
+import { ensureItemIcons, itemPictures } from './itemicons';
 import { getPrefs } from '../core/settings';
 import { settleShop, shopJudgeBy, shopJudgeGuide, shopOn, shopRule, stripShopTags } from '../core/shop';
 import { guideSections } from '../core/guides';
@@ -277,7 +278,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const batchKeys = batches[b].map((i) => (fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : '')).filter(Boolean);
       // 소지품 (core/items.ts): 설정 「보조 모델이 읽기」가 켜져 있으면 지금 목록을 자료에 넣고 소지품 절을 켠다
       const itemsOn = itemAutoOn(fresh.chat.scriptstate);
-      const itemsNow = itemsOn ? itemsNowOf(fresh.chat) : null;
+      const itemsNow = itemsOn ? itemsNowOf(fresh.chat, itemPictures) : null;
+      // 상태 그림 묶음(꿈결 수집기)의 그림 이름은 그림 팩에서 읽는다: 아직 안 받았으면 받기만 걸어 두고 이번 요청은 그림 이름 없이 간다
+      if (itemsOn) void ensureItemIcons();
       const usedNow = itemsOn ? usedItemsAt(readItems(fresh.chat.scriptstate), batchKeys, aliveAnchors(fresh.chat)) : [];
       // 상점 판단 (11-09, 설정 「상점 판단」): 갱신기가 맡으면 이 묶음에 든 가장 최근 응답 하나를 판단한다. 다시 읽기(only)는 하지 않는다
       const lastChar = fresh.chat.message.reduce((a, m, i) => (m.role === 'char' ? i : a), -1);
@@ -376,7 +379,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         }
         // 소지품 변화를 목록($st_items)에 (core/items.ts applyItemChanges). 소모성 횟수는 「사용」 기록으로 이미 셈 — 여기선 본문이 말한 변화만
         if (report.items.length) {
-          const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate) });
+          // 판정 표·「두고 옴」 말은 이 채팅의 설정으로 (core/itemrules.ts). order = 메시지 차례 (사용자가 버린 물건은 버린 뒤의 메시지가 근거일 때만 되살린다)
+          setItemRules(next.scriptstate);
+          const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate), order: (next.message ?? []).map((m, i) => messageKey(m, i)) });
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
         }
         // 상점 판단 (11-09): 판단한 응답 끝의 표식을 갱신기 판단대로 바꾸고(있으면 붙이고 없으면 지움) 본편과 같은 정리(settleShop)를 돌린다.
@@ -675,7 +680,7 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       const walletOn = colConfig(ctx.chat.scriptstate).wallet !== 'off';
       const balance = walletOn ? walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat)) : null;
       const itemsOn = itemAutoOn(ctx.chat.scriptstate);
-      const itemsNow = itemsOn ? itemsNowOf(ctx.chat) : null;
+      const itemsNow = itemsOn ? itemsNowOf(ctx.chat, itemPictures) : null;
       const usedNow = itemsOn && list[last] ? usedItemsAt(readItems(ctx.chat.scriptstate), [messageKey(list[last], last)], aliveAnchors(ctx.chat)) : [];
       const memory = await hypaMemory(ctx.chat, ctx.char, [messageText(String(list[last]?.data ?? '')), ...Object.keys(store.people)].join('\n'), settings).catch(() => [] as string[]);
       // 상점 판단 (실제 호출과 같게, 릴리스 점검 11-09)

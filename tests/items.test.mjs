@@ -113,7 +113,8 @@ test('버리기·합치기·파괴는 기록 한 줄. 합치기는 둘 다 소�
   assert.deepEqual(mergedNow(it, 'c1'), ['combined 소금 into 소금 봉지']);
   assert.deepEqual(mergedNow(it, 'c2'), []);
   it = removeItem(it, b.id, 'destroy', 'story', 'c1');
-  assert.equal(it.list.length, 2);
+  assert.equal(it.list.length, 3, '줄은 지우지 않고 숨긴다 (11-12)');
+  assert.equal(liveItems(it, alive).length, 2);
   assert.deepEqual(it.log.filter((l) => l.what !== 'get').map((l) => l.what), ['merge', 'destroy']);
   assert.equal(removeItem(it, 'nope', 'drop', 'manual'), it);
 });
