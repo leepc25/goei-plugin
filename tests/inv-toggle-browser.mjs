@@ -74,7 +74,7 @@ for (const vp of ['pc', 'phone']) {
   // 5. 다시 켜면 메뉴가 돌아오고 상점 스위치도 켜짐
   await openEditor(page, 'set:items');
   await flip('set-inv-on', '1');
-  await goNode(page, 'set:wallet'); await sleep(250);
+  await goNode(page, 'set:items'); await sleep(250);
   await flip('set-wallet-on', '1');
   s = await ss();
   check(s.$it_on === '1' && s.$st_col_wallet === 'on', `[${vp}] 다시 켬 저장 안 됨 (${s.$it_on}, ${s.$st_col_wallet})`);

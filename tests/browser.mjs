@@ -231,7 +231,7 @@ async function leaveField(page) {
   await page.click('[data-action="set-col"][data-value="weather:use:1"]');
   await page.waitForFunction(() => document.querySelector('.gw-set')?.textContent?.includes('10칸 사용'));
   // 시작 잔고·잔고 직접 수정은 설정 「기록 → 가계부」 (2026-11-05 사용자)
-  await page.click('[data-action="ed-node"][data-value="set:wallet"]');
+  await page.click('[data-action="ed-node"][data-value="set:items"]');
   await page.waitForSelector('.st-won');
   await page.fill('.st-won', '120만');
   await page.dispatchEvent('.st-won', 'change');

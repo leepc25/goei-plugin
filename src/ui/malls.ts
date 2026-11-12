@@ -3,7 +3,7 @@
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
-import { setGroup, setRow } from './setrow';
+import { setGroup, setRow, stepSizeText } from './setrow';
 import { needAttr } from './needfill';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
@@ -967,7 +967,7 @@ function deskGroup(ctx: ChatContext): string {
     row('사용', mseg('bm', 'desk_on', d.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요.'),
     row('상담사 주사위 칸', axisTable(ctx.chat.scriptstate), '칸마다 값을 하나씩 뽑아요. 값은 쉼표로 나눠요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 다 지우면 기본 칸으로 돌아가요.', `ms-wide ${aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? 'ps-changed' : ''}`),
     row('지난 상담사 다시 만나기', mseg('bm', 'desk_again', d.again ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요.'),
-    row('겹치지 않게 넘길 수', `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
+    row('겹치지 않게 넘길 수', `<div class="st-step${stepSizeText(`${DESK_AVOID_RANGE[1]}명`)}"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
   ].join('') + reset);
 }
 
