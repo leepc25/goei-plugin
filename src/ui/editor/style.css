@@ -200,7 +200,7 @@
 .gw .adv-step > .gx-step:disabled, .gw .st-step > .gx-step:disabled { opacity: .4; cursor: default; }
 .gw .adv-step > input.adv-val { flex: 1 1 0; width: 0 !important; min-width: 0; height: auto; min-height: 0; max-height: none; padding: 0 6px; border: 0; border-radius: 0; background: transparent; text-align: center; -moz-appearance: textfield; }
 .gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.gw .adv-step > span { display: inline-flex; align-items: center; flex: none; padding: 0 4px 0 0; font-size: 13px; color: var(--dim); white-space: nowrap; }
+.gw .adv-step > span { display: inline-flex; align-items: center; flex: none; padding: 0 4px 0 2px; font-size: 13px; color: var(--dim); white-space: nowrap; }
 .gw .adv-num > span { display: inline-flex; align-items: center; padding: 0 10px 0 6px; font-size: 13px; color: var(--dim); white-space: nowrap; }
 .gw .st-step > b { display: inline-flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; padding: 0 2px; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--text); }
 .gw .adv-num { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
@@ -655,7 +655,7 @@
 .gw .ck-hasnum .ck-cell.ck-pl { justify-content: flex-end; padding-right: 2px; }
 .gw .ck-hasnum .ck-cell.ck-pr { justify-content: flex-start; padding-left: 2px; }
 /* 같은 종류 수 여럿을 한 줄에: 「이름 + 상자」 짝이 나란히, 모자라면 다음 줄로 */
-.gw .fam-set { display: grid; grid-template-columns: repeat(auto-fill, calc(var(--fam-l) + 8px + var(--step-sm))); gap: 8px 22px; align-items: center; }
+.gw .fam-set { display: grid; width: 100%; grid-template-columns: repeat(auto-fill, calc(var(--fam-l) + 8px + var(--step-sm))); gap: 8px 22px; align-items: center; }
 .gw .fam-set:has(.st-step.lg) { grid-template-columns: repeat(auto-fill, calc(var(--fam-l) + 8px + var(--step-lg))); }
 .gw .fam-set1 { display: grid; grid-template-columns: var(--fam-l) max-content; align-items: center; gap: 8px; }
 .gw .fam-l { font-size: 13px; color: var(--text); white-space: nowrap; }
