@@ -5197,3 +5197,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .hs.hs-m .hs-dim { place-items: end center; padding: 0; position: fixed; }
 .hs.hs-m .hs-pop { position: relative; top: auto; bottom: auto; width: 100%; max-height: 82%; border-radius: 14px 14px 0 0; border-bottom: 0; }
 
+
+/* 닫기·취소 단추 공통 (2026-11-13 사용자: X 가 상자 가운데에서 삐뚤다 → 다른 창도 같은 규칙으로).
+   아이콘이든 글자 ✕/× 든 단추 안쪽 여백을 지우고 격자 가운데에 놓는다. 크기·색·자리는 단추마다 제 규칙 그대로 */
+.gx-x, .it-ux, .gx-wt-del { padding: 0; line-height: 1; }
+.gx-agcard-x, .at-zoom-x, .hs .hs-pop > header button, .ms-cos .q-card .q-x { display: grid; place-items: center; padding: 0; line-height: 1; }
+.gx-x svg, .it-ux svg { display: block; }
+.ms-cos .q-card .q-x { display: inline-grid; }
