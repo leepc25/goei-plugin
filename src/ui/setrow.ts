@@ -127,10 +127,10 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
     const [a, b] = w.minmax!(d.key);
     if (c.keys) {
       const one = (key: string, n: number, name: string) => numBox(page, sk(w, key), n, c.lo, c.hi, c.unit, `${d.aria ?? d.label} ${name}`, c.act ?? 'num');
-      return { ctl: `<span class="ph-inline"><span>최소</span>${one(c.keys[0], a, '최소')}<span>최대</span>${one(c.keys[1], b, '최대')}</span>`, cur: `${a}~${b}` };
+      return { ctl: `<span class="ph-inline"><span class="ph-inline ph-pair"><span>최소</span>${one(c.keys[0], a, '최소')}</span><span class="ph-inline ph-pair"><span>최대</span>${one(c.keys[1], b, '최대')}</span></span>`, cur: `${a}~${b}` };
     }
     const box = (side: 'min' | 'max', n: number, name: string) => stepBox(act(page, c.act ?? 'count'), `${d.key}_${side}`, n, c.lo, c.hi, c.unit, `${d.label} ${name}`, w.busy);
-    return { ctl: `<span class="ph-inline"><span>최소</span>${box('min', a, '최소')}<span>최대</span>${box('max', b, '최대')}</span>`, cur: `${a}~${b}` };
+    return { ctl: `<span class="ph-inline"><span class="ph-inline ph-pair"><span>최소</span>${box('min', a, '최소')}</span><span class="ph-inline ph-pair"><span>최대</span>${box('max', b, '최대')}</span></span>`, cur: `${a}~${b}` };
   }
   if (c.t === 'step') {
     const n = Number(w.cur(d.key));

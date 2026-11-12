@@ -870,7 +870,7 @@ const tierBad = (x: TierRaw): string => {
   return '';
 };
 const stepBox = (action: string, key: string, text: string, down: boolean, up: boolean) => `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${down ? '' : 'disabled'} aria-label="줄이기">−</button><b>${text}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${up ? '' : 'disabled'} aria-label="늘리기">+</button></div>`;
-/** 값 등급 표: PC 는 제목 줄 + 줄마다 칸, 폰은 줄마다 카드 (같은 DOM, 배치만 CSS) */
+/** 값 등급 표: PC 는 제목 줄 + 등급마다 한 줄, 폰은 제목 두 줄 + 등급마다 두 줄 (같은 DOM, 배치만 CSS). 설명은 길어서 줄이 바뀌는 칸(.ms-list) — 잘리지 않게 (2026-11-12 전수점검 D1·D2) */
 function tierTable(vars: Record<string, unknown> | undefined, site: MallSite): string {
   const unit = site === 'bm' ? 'p' : '원';
   const rows = tierRows(vars, site);
@@ -882,7 +882,7 @@ function tierTable(vars: Record<string, unknown> | undefined, site: MallSite): s
     const num = (f: 'lo' | 'hi', label: string) => `<span class="ph-inline"><input class="gx-search ms-num" type="number" min="1" max="1000000000000" data-change="ms-tier" data-key="${k}:${f}" value="${esc(x[f].replace(/[^\d]/g, ''))}" aria-label="${label}"><span>${unit}</span></span>`;
     return `<div class="ms-tb-r${bad ? ' bad' : ''}">
       ${cell('n', '이름', `<input class="gx-search" data-change="ms-tier" data-key="${k}:name" value="${esc(x.name)}" maxlength="20" aria-label="이름">`)}
-      ${cell('d', '설명(영어)', `<input class="gx-search" data-change="ms-tier" data-key="${k}:desc" value="${esc(x.desc)}" maxlength="120" aria-label="설명(영어)">`)}
+      ${cell('d', '설명(영어)', `<textarea class="gx-search ms-list" rows="1" data-change="ms-tier" data-key="${k}:desc" maxlength="120" aria-label="설명(영어)">${esc(x.desc)}</textarea>`)}
       ${cell('lo', '하한', num('lo', '하한'))}
       ${cell('hi', '상한', num('hi', '상한'))}
       <div class="ms-tb-c w"><span>가중치</span>${stepBox('ms-tier-w', k, String(w), w > 0, w < 99)}</div>
