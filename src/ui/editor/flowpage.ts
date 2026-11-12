@@ -75,7 +75,8 @@ const go = (g: [string, string] | null) => (g ? `<button class="gx-mini fl-go" d
 
 /* ── 지난 턴: 호출 기록(host/trace.ts) 마지막 턴에서 실제 이름표로 모은 요청 토큰 하나 ── */
 function lastTurn() {
-  return [...(traceUi.turns ?? [])].reverse().find((t) => t.main || t.calls.length);
+  // 턴 밖에서 누른 호출만 있는 묶음(상점 열기·AI 상담 등, phase manual)은 「지난 턴」이 아니다
+  return [...(traceUi.turns ?? [])].reverse().find((t) => t.main || t.calls.some((c) => c.phase !== 'manual'));
 }
 function real(match: (label: string) => boolean): string {
   const t = lastTurn();
