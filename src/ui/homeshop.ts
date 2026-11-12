@@ -3,19 +3,20 @@
 // 편성 호출은 상점 요청문(core/shop.ts shelfPrompt)에 방송 절(지침 「망상홈쇼핑」 BROADCAST)을 붙여 한 번에: 상품·상품마다 큐시트·채팅.
 // 설정은 우주몰·포인트몰과 같은 틀(설정 → 인터넷 → 망상홈쇼핑). 재생 규칙·효과·속도 모두 설정에서 고친다.
 import { defGroups, type Wire } from './setrow';
-import { HOMESHOP_SET } from '../core/setdef/homeshop';
+import { HOMESHOP_SET, HS_DEF_TEXT, HS_FLAG, HS_PAIRS, HS_RETRY_KEY, HS_TEL_KEY } from '../core/setdef/homeshop';
+export { HS_RETRY_KEY, HS_TEL_KEY };
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
-import { broadcastMaterial, emptyShop, lastBot, programPrompt, turnKey, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
+import { broadcastMaterial, emptyShop, lastBot, programPrompt, turnKey, type ShopState } from '../core/shop';
 import { aliveAnchors } from '../core/wallet';
 import { addItem, addItemLog, itemId, liveItemsOf, readItems, itemsVars, removeItem, sellItem, type Item } from '../core/items';
 import { userTurns } from '../core/request';
 import { userInfo } from '../host/user';
 import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
-import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_FORMS_DEFAULT, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
+import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
 import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
@@ -77,11 +78,9 @@ export function resetHomeshop(): void {
 onHomeshopReady(() => liveEnv?.render());
 
 /** 주문 전화번호 (화면 글, 설정에서 고친다) */
-export const HS_TEL_KEY = '$hs_tel';
 
 const telOf = (ctx: ChatContext) => String(ctx.chat.scriptstate?.[HS_TEL_KEY] ?? '').trim() || HS_TEL_DEFAULT;
 /** 호출 실패 때 자동으로 다시 연결하는 횟수 (0~3, 기본 1) */
-export const HS_RETRY_KEY = '$hs_retry';
 const retryOf = (ctx: ChatContext) => { const n = Number(ctx.chat.scriptstate?.[HS_RETRY_KEY] ?? 1); return Number.isFinite(n) ? Math.max(0, Math.min(3, Math.round(n))) : 1; };
 
 // ── 모델 ──
@@ -549,13 +548,8 @@ export function boxButton(ctx: ChatContext, itemIdOf: string): string {
   return boxOrder(ctx.chat.scriptstate, itemIdOf, aliveAnchors(ctx.chat)) ? `<button class="gx-chip" data-action="hs-box-open" data-value="${esc(itemIdOf)}">열기</button>` : '';
 }
 
-// ── 설정 페이지 (우주몰·포인트몰과 같은 틀. 하드코딩 금지: 재생 규칙·효과·속도·줄 수 전부 여기서) ──
-
-/** 상점 설정 이름 (사이트 앞붙이 없이) → 설정 화면 키 */
-const SH: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
-const SH_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
-/** 켬/끔 칸: 설정 키 → 변수 이름 */
-const FLAG: Record<string, string> = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, drop: HS_KEY.drop, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
+// ── 설정 페이지 (우주 쇼핑몰·포인트몰과 같은 규칙: 이 페이지에는 망상홈쇼핑에만 있는 줄만. 재생 규칙·효과·속도·줄 수 전부 여기서) ──
+// 사용·자동 호출·모델·상품 수·값 기준과 상점 넷이 같이 쓰는 값은 설정 → 상점에 있다 (ui/famtable.ts shopTable → ui/settings.ts shopFamSet)
 
 export function homeshopSettingsPane(ctx: ChatContext): string {
   const vars = ctx.chat.scriptstate;
@@ -564,40 +558,27 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
   const clipHelp = art
     ? (['A', 'B'] as const).map((c) => `${c === 'A' ? '와이드' : '바스트'}: ${[...new Map(art.pack.cuts[c].clips.map((k) => [k.name, `${k.ko}(${CLIP_GROUP_LABEL[k.group]})`])).values()].join(', ')}`).join('<br>')
     : '방송 그림을 받으면 동작 목록이 보여요.';
-  // 줄은 정의표(core/setdef/homeshop.ts)에서 온다. 여기는 값을 읽어 주는 선만 잇는다
+  // 줄·묶음·차례는 정의표(core/setdef/homeshop.ts)에서 온다. 여기는 값을 읽어 주는 선만 잇는다
   const b = (x: boolean) => (x ? '1' : '0');
   const n = (k: string) => { const raw = vars?.[HS_NUM[k].key]; return raw === undefined || raw === '' ? HS_NUM[k].def : Number(raw); };
   const vals: Record<string, string> = {
-    on: b(s.on), net: b(s.net), auto: s.auto, retry: String(retryOf(ctx)), tel: String(vars?.[HS_TEL_KEY] ?? ''),
-    'sh:model': s.shop.model, 'sh:ctx': b(s.shop.context), 'sh:price': s.shop.price, 'sh:diverse': b(s.shop.diverse), 'sh:prev': b(s.shop.avoidPrev), 'sh:thoughts': s.shop.thoughts,
-    turns: String(s.shop.turns), refs: String(s.shop.refs), turn: b(s.turn), lock: b(s.lock), drop: b(s.drop.on), say: b(s.say), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
-    forms: String(vars?.[HS_KEY.forms] ?? ''), clips: s.clipsText, cut: b(s.fx.cut), bulb: b(s.fx.bulb), tear: b(s.fx.tear), scan: b(s.fx.scan), scalePc: s.scalePc, scalePh: s.scalePhone,
+    net: b(s.net), retry: String(retryOf(ctx)), say: b(s.say), turn: b(s.turn), lock: b(s.lock), drop: b(s.drop.on), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
+    clips: s.clipsText, cut: b(s.fx.cut), bulb: b(s.fx.bulb), tear: b(s.fx.tear), scan: b(s.fx.scan), scalePc: s.scalePc, scalePh: s.scalePhone,
+    ...Object.fromEntries(Object.entries(HS_DEF_TEXT).map(([k, [name]]) => [k, String(vars?.[name] ?? '')])),
   };
-  const pairs: Record<string, [string, string]> = { cue: ['cueMin', 'cueMax'], chat: ['chatMin', 'chatMax'], call: ['callLo', 'callHi'], fill: ['fillLo', 'fillHi'], end: ['endLo', 'endHi'] };
   const wire: Wire = {
     cur: (k) => vals[k] ?? String(n(k)),
-    minmax: (k) => (k === 'size' ? s.shop.size : [n(pairs[k][0]), n(pairs[k][1])]),
-    help: { clips: () => `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}` },
+    minmax: (k) => [n(HS_PAIRS[k][0]), n(HS_PAIRS[k][1])],
+    // 동작 분류에는 글로 된 기본값이 없다 (기본 분류는 방송 그림 팩에 있다): 칸은 비워 두고 적는 꼴은 설명에
+    help: { clips: () => `동작이 나오는 때를 바꿔요. 한 줄에 「컷:동작=분류」로 적어요(예: B:웃음=드물게). 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비워 두면 아래 분류 그대로예요.<br>${clipHelp}` },
   };
-  // 4단계: 상점 표로 올라간 줄을 빼고 남은 줄을 하는 일대로 다시 묶는다
-  const all = HOMESHOP_SET.groups.flatMap((g) => g.rows);
-  const pick = (title: string, keys: string[], note?: string) => ({ title, note, rows: keys.map((k) => all.find((r) => r.key === k)!).filter(Boolean) });
-  const page: typeof HOMESHOP_SET = { ...HOMESHOP_SET, groups: [
-    pick('', ['net', 'retry', 'say']),
-    pick('편성', ['cue', 'chat']),
-    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'drop', 'dropRate', 'dropFast', 'dropStep', 'soonAt', 'end', 'turn', 'lock']),
-    pick('주문', ['barter', 'peek']),
-    pick('컨텍스트 포함', ['call', 'forms', 'aud']),
-    pick('진행자 동작', ['fill', 'fillCool', 'rareP', 'rareCool', 'clips'], HOMESHOP_SET.groups.find((g) => g.title === '진행자 동작')?.note),
-    pick('방송 화면', ['tel', 'cut', 'bulb', 'tear', 'tearP', 'scan', 'scalePc', 'scalePh']),
-  ] };
-  const body = defGroups(page, wire);
+  const body = defGroups(HOMESHOP_SET, wire);
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${HS_NAME} 설정</b></div></header><div class="ph-form-body ps">${body}</div></div>`;
 }
 
-/** hs-cfg 「키=값」 · hs-num 「키=숫자」 · hs-shnum · hs-text 「키=글」 · hs-retry */
+/** hs-cfg 「키=값」 · hs-num 「키=숫자」 · hs-text 「키=글」 · hs-retry */
 async function homeshopSettingsAction(action: string, value: string | undefined, ctx: ChatContext, env: HsEnv): Promise<boolean> {
-  if (!['hs-cfg', 'hs-num', 'hs-shnum', 'hs-text', 'hs-retry'].includes(action)) return false;
+  if (!['hs-cfg', 'hs-num', 'hs-text', 'hs-retry'].includes(action)) return false;
   const set = async (vars: Record<string, string>) => {
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => (Object.entries(vars).every(([k, v]) => String(chat.scriptstate?.[k] ?? '') === v) ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
     await env.refresh();
@@ -611,10 +592,8 @@ async function homeshopSettingsAction(action: string, value: string | undefined,
   if (!m) return true;
   const [, k, v] = m;
   if (action === 'hs-cfg') {
-    if (FLAG[k]) return set({ [FLAG[k]]: v === '0' ? '0' : '' });
-    if (k === 'auto') return set({ [HS_KEY.auto]: v === 'manual' ? 'manual' : '' });
+    if (HS_FLAG[k]) return set({ [HS_FLAG[k]]: v === '0' ? '0' : '' });
     if (k === 'scalePc' || k === 'scalePh') return ['auto', 'fit', '0.5', '1', '2'].includes(v) ? set({ [k === 'scalePc' ? HS_KEY.scalePc : HS_KEY.scalePhone]: v }) : true;
-    if (k.startsWith('sh:') && SH[k.slice(3)]) return set({ [hsKey(SH[k.slice(3)])]: v });
     return true;
   }
   if (action === 'hs-num') {
@@ -623,23 +602,8 @@ async function homeshopSettingsAction(action: string, value: string | undefined,
     if (!d || !Number.isFinite(n) || v.trim() === '') return env.render(), true;
     return set({ [d.key]: String(Math.max(d.lo, Math.min(d.hi, n))) });
   }
-  if (action === 'hs-shnum') {
-    const r = SH_RANGE[k];
-    const n = Math.floor(Number(v));
-    if (!r || !Number.isFinite(n) || v.trim() === '') return env.render(), true;
-    const val = String(Math.max(r[0], Math.min(r[1], n)));
-    const s = hsSettings(ctx.chat.scriptstate).shop;
-    const extra: Record<string, string> = {};
-    // 최소·최대는 늘 둘 다 적는다 (기본 3~5 를 한쪽만 고쳐도 다른 쪽이 상점 기본으로 튀지 않게)
-    if (k === 'min') extra[hsKey('$sh_max')] = String(Math.max(Number(val), s.size[1]));
-    if (k === 'max') extra[hsKey('$sh_min')] = String(Math.min(Number(val), s.size[0]));
-    return set({ [hsKey(SH[k])]: val, ...extra });
-  }
   // hs-text
-  // 기본값이 든 칸: 기본값과 같거나 비우면 저장하지 않는다 (core/deftext)
-  if (k === 'tel') return set({ [HS_TEL_KEY]: defStored(v.replace(/\s+/g, ' '), HS_TEL_DEFAULT, undefined, 20) });
+  if (HS_DEF_TEXT[k]) { const [name, def, max] = HS_DEF_TEXT[k]; return set({ [name]: defStored(v.replace(/\s+/g, ' '), def, undefined, max) }); }
   if (k === 'clips') return set({ [HS_KEY.clips]: v.trim().slice(0, 2000) });
-  if (k === 'forms') return set({ [HS_KEY.forms]: defStored(v.replace(/\s+/g, ' '), HS_FORMS_DEFAULT, undefined, 200) });
-  if (k === 'sh:price') return set({ [hsKey('$sh_price')]: v.replace(/\s+/g, ' ').trim().slice(0, 80) });
   return true;
 }
