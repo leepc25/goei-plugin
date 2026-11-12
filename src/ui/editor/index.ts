@@ -51,7 +51,7 @@ const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['worl
 export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : 'set');
 // 「호출 흐름」(manage:flow) 은 점검이 아니라 기능 탭 맨 위 (2026-11-07 사용자: 설정된 흐름을 보는 페이지니 기능에 있어야)
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
-const legacyNode = (n: string): EditorNode => (/^set:(gnet|gal|wpf|sm)$/.test(n) ? 'set:net' : n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n === 'manage:lore' ? 'set:lore' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
+const legacyNode = (n: string): EditorNode => (/^set:(gnet|gal|wpf|sm)$/.test(n) ? 'set:net' : n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n === 'manage:lore' ? 'set:lore' : n === 'set:wallet' ? 'set:items' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
 
 export interface EditorHost {
   ctx: () => ChatContext | null;
@@ -402,16 +402,18 @@ const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Im
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
     // 2026-11-10 사용자: 호출 흐름 → 로어북 호출 → 생성 공통 → 화면 → 캐릭터 이미지 → 상태창은 기능이 아니라 따로 「기본」 묶음. 인터넷 사이트 여섯은 「인터넷」 아래로 묶는다
-    case 'set': return [{ title: '기본', items: [
+    // 2026-11-12 사용자: 「기본」에 두 종류가 섞였다 → 「호출」(호출 흐름·로어북 호출·생성 공통)과 「표시」(화면·캐릭터 이미지·상태창)로 나눈다. 순서·페이지는 그대로
+    case 'set': return [{ title: '호출', items: [
       ['manage:flow', '호출 흐름', ICONS.swap],
-      ...(['lore', 'adv', 'screen', 'image', 'status'] as SetPage[]).map(setItem),
-    ] }, { title: '기능', items: [
+      ...(['lore', 'adv'] as SetPage[]).map(setItem),
+    ] }, { title: '표시', items: (['screen', 'image', 'status'] as SetPage[]).map(setItem) }, { title: '기능', items: [
       setItem('board'),
       // 4단계: 틀로 묶는다. 인터넷 = 게시판 넷(누르면 게시판 표), 상점 = 기본 상점 + 쇼핑몰 둘 + 망상홈쇼핑(누르면 상점 표)
       setItem('net'),
       ...(['phone', 'wiki'] as SetPage[]).map(setItem),
       // 가계부·소지품·상점은 한 페이지 「소지품」 (2026-11-07 사용자: 각자 설정이 적어 합침, 켜고 끄기는 따로)
-      ...(['wallet', 'items', 'shop'] as SetPage[]).map(setItem),
+      // 2026-11-12 사용자: 가계부 페이지는 줄이 적어 「소지품」 페이지의 「가계부」 묶음으로 (옛 자리 set:wallet 은 legacyNode 가 소지품으로)
+      ...(['items', 'shop'] as SetPage[]).map(setItem),
       ...(['cos', 'bm', 'hs'] as SetPage[]).map(subItem),
       ['label:records', '기록', ICONS.records],
       ...(['journal', 'people', 'factions'] as SetPage[]).map(subItem),
@@ -494,8 +496,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'people': body = feat('people'); break;
     // 기록 하위 메뉴 넷 (2026-11-05 사용자): 일지 · 가계부 · 인물 · 세력
     case 'journal': body = feat('journal'); break;
-    case 'wallet': body = sec('wallet'); break;
-    case 'items': body = sec('items'); break;
+    case 'wallet': case 'items': body = sec('items') + sec('wallet'); break;
     // 상점 표는 아래 「열리는 조건」과 같은 범위(시작 전 = 새 채팅 기본값)의 값을 보이고 고친다. 게시판 표는 기능 페이지처럼 늘 이 채팅
     case 'shop': body = shopTable(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, settingsUi.busy) + sec('shop'); break;
     case 'net': body = boardTable(ctx.chat.scriptstate); break;
@@ -547,7 +548,7 @@ const gridOf = (scope: ParentNode | null | undefined, label: string): HTMLElemen
   [...(scope?.querySelectorAll<HTMLElement>(GRID_HEADS) ?? [])].find((b) => b.textContent?.trim() === label)?.closest<HTMLElement>('.ps-group') ?? null;
 type FindHit = { page: SetPage; label: string; group: string; help: string };
 let findIndex: FindHit[] | null = null;
-const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'net', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv'];
+const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'net', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'items', 'shop', 'people', 'factions', 'lore', 'adv'];
 const findNorm = (s: string) => s.toLowerCase().replace(/\s+/g, '');
 function buildFindIndex(ctx: ChatContext): FindHit[] {
   const out: FindHit[] = [];

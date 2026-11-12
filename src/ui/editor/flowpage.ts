@@ -20,6 +20,7 @@ import { advItem, advValue, genSettings } from '../../core/advanced';
 import { invOn } from '../../core/items';
 import { colConfig } from '../../core/world/statuscols';
 import { isOnOff, switchHtml } from '../controls';
+import { stepSizeText } from '../setrow';
 import { flowNodes, flowTokState } from './flow';
 import { traceUi } from './trace';
 
@@ -30,7 +31,6 @@ const MODEL2: Opts = [['main', '메인 모델'], ['aux', '보조 모델']];
 /** Router·Director·정리의 모델 (src/ui/people.ts stageModel) */
 const MODEL3: Opts = [['same', '갱신과 같게'], ['main', '메인 모델'], ['aux', '보조 모델']];
 const fmt = (v: number) => v.toLocaleString('ko-KR');
-const DASH = '<span class="fl-dim">–</span>';
 export const FLOW_DO = 'fl-do';
 
 /* ── 조작 하나: 그 설정의 지금 값·고를 수 있는 값·저장 동작 ── */
@@ -62,7 +62,7 @@ function ctlHtml(c: Ctl, aria: string): string {
     const n = Number(c.cur) || 0;
     const shown = n === 0 && c.zero ? c.zero : `${n}${c.unit ?? ''}`;
     const b = (to: number, sign: string, word: string, off: boolean) => `<button class="gx-step" data-action="${FLOW_DO}" data-value="${esc(c.act(String(to))[0] ?? '')}" ${off ? 'disabled' : ''} aria-label="${esc(aria)} ${word}">${sign}</button>`;
-    return `<div class="st-step">${b(n - 1, '−', '줄이기', n <= (c.lo ?? 0))}<b>${esc(shown)}</b>${b(n + 1, '+', '늘리기', n >= (c.hi ?? n))}</div>`;
+    return `<div class="st-step${stepSizeText(`${c.hi ?? n}${c.unit ?? ''}`, c.zero ?? '')}">${b(n - 1, '−', '줄이기', n <= (c.lo ?? 0))}<b>${esc(shown)}</b>${b(n + 1, '+', '늘리기', n >= (c.hi ?? n))}</div>`;
   }
   const opts = c.opts ?? [];
   if (isOnOff(opts)) {
@@ -114,33 +114,47 @@ export interface FlowTable { title: string; rows: Row[]; cols?: Col[]; leads?: R
 export interface FlowSection { title: string; note?: string; tables: FlowTable[] }
 
 const shown = (r: Row) => r.ctls.filter((c) => !c.hide);
-const pairs = (r: Row) => shown(r).map((c) => `<span class="fl-pair">${c.label ? `<span class="fl-l">${esc(c.label)}</span>` : ''}${ctlHtml(c, c.label ? `${r.name} ${c.label}` : r.name)}</span>`).join('');
-const stat = (r: Row, v: string | undefined) => `<div class="fl-st">${r.call ? v || DASH : ''}</div>`;
-/** 호출 글: 고정 칸 없이 그 줄의 마지막 조작 바로 오른쪽, 같은 줄에 흐린 글씨 */
-const said = (r: Row) => (r.calls ? `<span class="fl-said${r.on ? ' on' : ''}">${esc(r.calls)}</span>` : '');
-/** 격자 칸: 그 묶음의 조작에서 열 이름과 같은 선택지의 둥근 칸. 없으면 「–」 */
+/* ── 줄 그리기: 한 가지 틀 (2026-11-12 사용자: 글과 조작이 뒤섞임, 오와 열이 안 맞음, 격자가 딸린 줄로 끊김) ──
+ * PC 한 줄 = 이름 | 조작 | 호출 글(고정 칸) | 예상 | 지난 턴 | 설정 →.  설명은 늘 그 아래 줄, 조작이 시작하는 자리에서.
+ * 조작 칸은 두 칸으로 나눈다: 조작마다 왼쪽 칸부터 채우고, 폭이 넓은 조작(넓이 어림 wide)은 한 줄을 다 쓴다. 이름표는 늘 그 칸의 맨 앞.
+ * 격자 표는 격자 줄만 끊김 없이 잇는다. 딸린 줄(after)·격자 줄의 설명·앞 줄(leads)은 격자 아래에 보통 줄로 놓고, 딸린 줄 이름 앞에 그 격자 줄 이름을 붙인다. */
+const WIDE_PX = 215;
+const optPx = (l: string) => [...l].reduce((n, ch) => n + (ch === ' ' ? 3.6 : /[0-9,.()]/.test(ch) ? 8 : 12.4), 26);
+/** 조작 하나의 넓이 어림 (이름표 + 조작). 반 칸(약 217px)에 안 들어가면 한 줄을 다 쓴다 */
+function wide(c: Ctl): boolean {
+  const label = c.label ? optPx(c.label) - 26 + 8 : 0;
+  if (c.kind === 'step') return label + 206 > WIDE_PX;
+  const opts = c.opts ?? [];
+  if (isOnOff(opts)) return label + 64 > WIDE_PX;
+  return label + opts.reduce((n, [, l]) => n + optPx(l), 8) > WIDE_PX;
+}
+const pairs = (r: Row) => shown(r).map((c) => `<span class="fl-pair${wide(c) ? ' wide' : ''}">${c.label ? `<span class="fl-l">${esc(c.label)}</span>` : ''}${ctlHtml(c, c.label ? `${r.name} ${c.label}` : r.name)}</span>`).join('');
+/** 예상·지난 턴 칸: 숫자가 있을 때만 숫자. 없으면 비운다 (모든 줄 같은 규칙) */
+const stat = (v: string | undefined) => `<div class="fl-st">${v || ''}</div>`;
+/** 호출 글: 모든 줄에서 같은 자리(고정 칸). 설명 글과 달리 본문 색 */
+const said = (r: Row) => `<div class="fl-said${r.on ? ' on' : ''}">${r.calls ? esc(r.calls) : ''}</div>`;
+/** 격자 칸: 그 묶음의 조작에서 열 이름과 같은 선택지의 둥근 칸. 그 설정이 없는 칸은 비운다 */
 function cells(r: Row, cols: Col[]): string {
   return cols.map((g, gi) => g.opts.map((o, i) => {
     const c = r.grid?.[gi];
     const opt = c?.opts?.find(([, l]) => l === o);
-    const inner = c && opt ? doBtn('ck-m round', c.act(opt[0])[0], c.cur === opt[0], '', ` aria-label="${esc(`${r.name} ${g.group} ${o}`)}"`) : '<span class="ck-x" aria-label="없음">–</span>';
+    const inner = c && opt ? doBtn('ck-m round', c.act(opt[0])[0], c.cur === opt[0], '', ` aria-label="${esc(`${r.name} ${g.group} ${o}`)}"`) : '';
     return `<span class="ck-cell${i === 0 ? ' ck-first' : ''}">${inner}</span>`;
   }).join('')).join('');
 }
 
 function pcRow(r: Row, cols: Col[] | null): string {
-  const ctl = cols ? cells(r, cols) : `<div class="fl-ctl">${pairs(r)}${said(r)}${r.help ? `<small class="fl-help">${esc(r.help)}</small>` : ''}</div>`;
-  const line = `<div class="fl-line fl-row${cols ? '' : ' fl-plain'}${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><b class="fl-name">${esc(r.name)}</b>${ctl}${cols ? `<div class="fl-gsaid">${said(r)}</div>` : ''}${stat(r, r.est)}${stat(r, r.real)}${go(r.go) || '<span></span>'}</div>`;
-  const note = cols && r.help ? `<div class="fl-line fl-plain fl-note${r.on ? ' on' : ''}"><span></span><div class="fl-ctl"><small class="fl-help">${esc(r.help)}</small></div><div class="fl-st"></div><div class="fl-st"></div><span></span></div>` : '';
-  return line + note + (r.after ?? []).map((a) => pcRow({ ...a, sub: true }, null)).join('');
+  const ctl = cols ? `${cells(r, cols)}<span></span>` : `<div class="fl-ctl">${pairs(r)}</div>`;
+  const help = !cols && r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '';
+  return `<div class="fl-line fl-row${cols ? '' : ' fl-plain'}${help ? ' has-help' : ''}${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><b class="fl-name">${esc(r.name)}</b>${ctl}${said(r)}${stat(r.est)}${stat(r.real)}${go(r.go) || '<span class="fl-go"></span>'}${help}</div>`;
 }
 function pcHead(cols: Col[]): string {
   const opts = cols.flatMap((g) => g.opts.map((o, i) => ({ o, first: i === 0 })));
-  const tail = '<span></span><span></span><span></span><span></span>';
+  const tail = '<span></span><span></span><span></span><span></span><span></span>';
   return `<div class="fl-line fl-h1"><span></span>${cols.map((g) => `<b class="ck-first" style="grid-column: span ${g.opts.length}">${esc(g.group)}</b>`).join('')}${tail}</div>
     <div class="fl-line fl-h2"><span></span>${opts.map((c) => `<span class="${c.first ? 'ck-first' : ''}">${esc(c.o)}</span>`).join('')}${tail}</div>`;
 }
-/** 폰 판: 이름 · 호출 글 · [스위치 하나면 그 자리] · 설정 → / (예상 · 지난 턴) / 조작 줄. 격자 줄은 조작을 한 줄에 나란히 (모델만 이름표) */
+/** 폰 판: 이름 · 호출 글 · [스위치 하나면 그 자리] · 설정 → / (예상 · 지난 턴) / 조작 줄 / 설명. 격자 줄은 조작을 한 줄에 나란히 (모델만 이름표) */
 function card(r: Row, cols: Col[] | null): string {
   const list: [string, string][] = cols
     ? cols.flatMap((g, gi): [string, string][] => { const c = r.grid?.[gi]; return c ? [[g.group === '모델' ? g.group : '', ctlHtml(c, `${r.name} ${g.group}`)]] : []; })
@@ -148,18 +162,24 @@ function card(r: Row, cols: Col[] | null): string {
   const swOnly = list.length === 1 && /gx-switch/.test(list[0][1]);
   const tag = swOnly && list[0][0] ? `<span class="flc-tag">${esc(list[0][0])}</span>` : '';
   const ctl = ([l, c]: [string, string]) => `<div class="flc-c${l ? '' : ' nol'}">${l ? `<span class="flc-l">${esc(l)}</span>` : ''}${c}</div>`;
-  const body = (swOnly ? '' : list.length > 1 || cols ? `<div class="flc-side">${list.map(ctl).join('')}</div>` : list.map(ctl).join('')) + (r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '');
-  const nums = r.call && (r.est || r.real) ? `<div class="flc-num">예상 <b>${r.est || '–'}</b> · 지난 턴 <b>${r.real || '–'}</b></div>` : '';
+  const body = (swOnly ? '' : list.length > 1 || cols ? `<div class="flc-side">${list.map(ctl).join('')}</div>` : list.map(ctl).join('')) + (!cols && r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '');
+  const nums = r.est || r.real ? `<div class="flc-num">예상 <b>${r.est || '–'}</b> · 지난 턴 <b>${r.real || '–'}</b></div>` : '';
   const calls = r.calls ? `<small class="flc-calls">${esc(r.calls)}</small>` : '';
-  const self = `<div class="flc${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><div class="flc-top"><span class="flc-nm"><b class="fl-name">${esc(r.name)}</b>${tag}${calls}</span>${swOnly ? list[0][1] : ''}${go(r.go)}</div>${nums}${body}</div>`;
-  return self + (r.after ?? []).map((a) => card({ ...a, sub: true }, null)).join('');
+  return `<div class="flc${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><div class="flc-top"><span class="flc-nm"><b class="fl-name">${esc(r.name)}</b>${tag}${calls}</span>${swOnly ? list[0][1] : ''}${go(r.go)}</div>${nums}${body}</div>`;
+}
+/** 격자 표의 줄 나누기: 격자 줄(끊김 없이) / 그 아래 보통 줄(앞 줄 + 딸린 줄, 이름 앞에 격자 줄 이름) / 격자 줄의 설명 */
+function split(t: FlowTable): { grid: Row[]; below: Row[]; notes: [string, string][] } {
+  if (!t.cols) return { grid: [], below: t.rows, notes: [] };
+  const below = [...(t.leads ?? []), ...t.rows.flatMap((r) => (r.after ?? []).map((a): Row => ({ ...a, sub: false, name: `${r.name} ${a.name}` })))];
+  return { grid: t.rows, below, notes: t.rows.filter((r) => r.help).map((r): [string, string] => [r.name, r.help as string]) };
 }
 function table(t: FlowTable): string {
   const cols = t.cols ?? null;
-  const leads = t.leads ?? [];
+  const { grid, below, notes } = split(t);
+  const note = notes.map(([n, h]) => `<p class="fl-gnote"><b>${esc(n)}</b>${esc(h)}</p>`).join('');
   return `<section class="ps-group fl${cols ? ` fl-grid fl-g${cols.reduce((n, g) => n + g.opts.length, 0)}` : ''}">${t.title ? `<h3>${esc(t.title)}</h3>` : ''}
-    <div class="ps-rows fl-pc">${leads.map((l) => pcRow(l, null)).join('')}${cols ? pcHead(cols) : ''}${t.rows.map((r) => pcRow(r, cols)).join('')}</div>
-    <div class="ps-rows fl-ph">${leads.map((l) => card(l, null)).join('')}${t.rows.map((r) => card(r, cols)).join('')}</div></section>`;
+    <div class="ps-rows fl-pc">${cols ? `<div class="fl-gbox">${pcHead(cols)}${grid.map((r) => pcRow(r, cols)).join('')}${note}</div>` : ''}${below.map((r) => pcRow(r, null)).join('')}</div>
+    <div class="ps-rows fl-ph">${cols ? grid.map((r) => card(r, cols)).join('') + note : ''}${below.map((r) => card(r, null)).join('')}</div></section>`;
 }
 
 /* ── 어느 값을 보나 ──
@@ -218,7 +238,7 @@ export function flowSections(real0: ChatContext, started: boolean): { sections: 
     { name: 'Router', on: routerOn, call: true, ctls: [pick('pp.router', '', pp.router, [['code', '코드가 고름'], ['model', '모델이 고름']], P('router')), pick('pp.model_router', '모델', pv('model_router'), MODEL3, P('model_router'), !routerOn)], calls: routerOn ? '1회' : pp.on ? '호출 없음' : '호출 없음 (인물 기록 끔)', help: '장면에 나오는 인물을 고르는 단계예요. 모델이 고르면 호출이 1회 늘어요.', est: est('인물 Router'), real: real(is('라우터')), go: ['set:people', 'r:Router'] },
     { name: 'Director', on: dirOn, call: true, ctls: [pick('pp.director', '', pp.director, [['off', '사용 안 함'], ['note', '메모형(뒤)'], ['facts', '사실형(앞)'], ['scene', '연출형(앞)']], P('director')), pick('pp.model_director', '모델', pv('model_director'), MODEL3, P('model_director'), !dirOn)], calls: calls('인물 Director'), help: '이번 턴에 인물이 어떻게 연기할지 지시를 만드는 단계예요. 메모형은 갱신 호출에 얹고(호출 없음), 사실형·연출형은 메인 요청 전에 따로 불러요(1회).', est: est('인물 Director'), real: real(is('디렉터')), go: ['set:people', 'r:Director'] },
     ...(dirOn ? [
-      { name: '재사용', sub: true, on: pp.directorReuse, ctls: [sw('pp.director_reuse', '', pp.directorReuse, P('director_reuse'))], calls: '장면이 그대로면 지난 지시를 다시 써요 (호출 없음).', go: ['set:people', 'r:재사용'] },
+      { name: '재사용', sub: true, on: pp.directorReuse, ctls: [sw('pp.director_reuse', '', pp.directorReuse, P('director_reuse'))], help: '장면이 그대로면 지난 지시를 다시 써요 (호출 없음).', go: ['set:people', 'r:재사용'] },
       { name: '2차 검색', sub: true, on: pp.directorSearch, ctls: [sw('pp.director_search', '', pp.directorSearch, P('director_search'))], help: '자료가 모자라면 Director가 채팅·로어북·위키 검색을 요청하고, 코드가 찾아 한 번 더 불러요 (그 턴만 1회 추가)', go: ['set:people', 'r:2차 검색'] },
     ] as Row[] : []),
   ];
@@ -234,7 +254,7 @@ export function flowSections(real0: ChatContext, started: boolean): { sections: 
     { name: '갱신기', on: updOn, call: true, ctls: [pick('pp.when', '자동 호출', pp.when, [['manual', '수동'], ['turn', '매 턴']], P('when')), pick('pp.model', '모델', pp.stageModel.update, MODEL2, P('model'))], calls: calls('인물 갱신').replace(' (정리 얹음)', ''), help: '응답을 읽고 기록을 쓰는 단계예요.', est: est('인물 갱신'), real: real(is('갱신기')), go: ['set:people', 'r:자동 호출'] },
     { name: '상점 판단', sub: true, on: shopOn(ps), ctls: [pick('shop.judge', '', shop.judge, [['auto', '자동'], ['main', '메인 모델'], ['updater', '갱신기']], (v) => `set-shop-judge|${v}`)], calls: calls('상점 판단'), help: '지금 장면에 상점이 있는지 누가 볼지예요. 어느 쪽이어도 호출은 늘지 않아요.', go: ['set:shop', 'r:판단'] },
     { name: '정리', on: pp.on && tidySep, call: true, ctls: [pick('pp.tidy', '정리 방식', pp.tidy, [['same', '같은 호출에 얹기'], ['separate', '별도 호출']], P('tidy')), pick('pp.model_tidy', '모델', pv('model_tidy'), MODEL3, P('model_tidy'), !tidySep)], calls: pp.on && tidySep ? '넘긴 인물마다 1회' : '호출 없음', help: '저장 상한을 넘긴 인물의 기록을 합쳐요. 별도 호출이면 넘긴 인물마다 호출이 1회 늘어요.', est: '', real: real(is('정리')), go: ['set:people', 'r:정리 방식'] },
-    { name: '인물당 저장 상한', sub: true, on: pp.on, ctls: [pick('pp.person_cap', '', cap, capOpts.some(([v]) => v === cap) ? capOpts : [...capOpts, [cap, fmt(pp.personCap)]], P('person_cap'))], calls: '한 인물의 기록 글자 수예요. 넘으면 정리로 합쳐요.', go: ['set:people', 'r:인물당 저장 상한'] },
+    { name: '인물당 저장 상한', sub: true, on: pp.on, ctls: [pick('pp.person_cap', '', cap, capOpts.some(([v]) => v === cap) ? capOpts : [...capOpts, [cap, fmt(pp.personCap)]], P('person_cap'))], help: '한 인물의 기록 글자 수예요. 넘으면 정리로 합쳐요.', go: ['set:people', 'r:인물당 저장 상한'] },
   ];
   const imgOn = basic.assetOn && basic.assetModel === 'aux';
   const image: Row = { name: '이미지 태그', on: imgOn, call: true, ctls: [sw('img.on', '', basic.assetOn, (v) => `set-asset|${v}`), pick('img.model', '모델', basic.assetModel, MODEL2, (v) => `set-asset-model|${v}`)], calls: imgOn ? '1회' : basic.assetOn ? '호출 없음' : '호출 없음 (이미지 끔)', help: '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 메인 모델은 본문과 함께 적고, 보조 모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.', est: est('이미지 태그 보충'), real: real(is('이미지 태그 보충')), go: ['set:image', 'r:사용'] };
@@ -257,7 +277,7 @@ export function flowSections(real0: ChatContext, started: boolean): { sections: 
       after: [{ name: '자동 작성 제목', on: wikiOn && nw.autoTitle === 'model', ctls: [pick('wiki.auto_title', '', nw.autoTitle, [['model', '모델이 고름'], ['input', '직접 입력']], (v) => `wiki-auto_title|${v}`)], help: '저절로 쓰는 문서의 제목을 정하는 방법이에요. 「모델이 고름」이면 명부 항목 가운데 이번 이야기에 맞는 것을 써요. 호출이 1회 늘어요.', go: ['set:wiki', 'r:자동 작성 제목'] }] },
   ];
   const mallLeads: Row[] = [
-    { name: '가계부', on: walletUsed, ctls: [sw('wallet.on', '', walletUsed, (v) => `set-wallet-on|${v}`)], go: ['set:wallet', 'r:사용'] },
+    { name: '가계부', on: walletUsed, ctls: [sw('wallet.on', '', walletUsed, (v) => `set-wallet-on|${v}`)], go: ['set:items', 'r:사용@가계부'] },
     { name: '소지품', on: invOn(ds), ctls: [sw('items.on', '', invOn(ds), (v) => `set-inv-on|${v}`)], help: '가계부나 소지품을 끄면 쇼핑몰과 상점을 부르지 않아요.', go: ['set:items', 'r:사용'] },
   ];
   const malls: Row[] = (['cos', 'bm'] as const).map((site): Row => {
@@ -286,7 +306,7 @@ export function flowSections(real0: ChatContext, started: boolean): { sections: 
   const reit = Number(advValue(ds as never, 'gen', 'reiterate')) || 0;
   const common: Row[] = [
     { name: '형식 오류 재시도', on: gen.retries > 0, ctls: [advStep('retries')], help: '모델의 답이 형식에 맞지 않을 때 다시 묻는 횟수예요. 1회마다 호출이 1회 늘어요.', go: ['set:adv', 'r:형식 오류 재시도'] },
-    { name: '재시도 모델', on: gen.retries > 0, ctls: [pick('gen.retry_model', '', advValue(ds as never, 'gen', 'retry_model'), (retryModel?.opts ?? []) as Opts, (v) => `adv-set|gen:retry_model=${v}`)], calls: '다시 물을 때 부를 모델이에요.', go: ['set:adv', 'r:재시도 모델'] },
+    { name: '재시도 모델', on: gen.retries > 0, ctls: [pick('gen.retry_model', '', advValue(ds as never, 'gen', 'retry_model'), (retryModel?.opts ?? []) as Opts, (v) => `adv-set|gen:retry_model=${v}`)], help: '다시 물을 때 부를 모델이에요.', go: ['set:adv', 'r:재시도 모델'] },
     { name: '다시 보기', on: reit > 0, ctls: [advStep('reiterate')], help: '첫 응답 뒤 모델에게 지침과 형식을 지켰는지 다시 보게 하는 횟수예요. 1회마다 호출이 1회 늘어요.', go: ['set:adv', 'r:다시 보기'] },
   ];
 

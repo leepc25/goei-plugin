@@ -10,7 +10,7 @@ import { advChipsCtl, advCtl } from './advanced';
 import { advValue } from '../core/advanced';
 import { siteLogo } from './browser';
 import { ICONS } from './icons';
-import { ckWide, helpBox, mxGrid, numCtl, setGroup, setRow, setSeg, type CkBand } from './setrow';
+import { ckWide, helpBox, mxGrid, numCtl, numSet, setGroup, setRow, setSeg, type CkBand } from './setrow';
 import type { ShopCol } from './settings';
 
 type State = Record<string, unknown> | undefined;
@@ -89,7 +89,7 @@ export function boardTable(state: State, busy = false): string {
   /** 수는 전부 공통 규격의 「− 값 +」 상자 (세부 값 표의 조작 그대로) */
   const N = (k: string) => advCtl('gn', k, st0 as never);
   /** 같은 종류 수 여럿: 이름·상자 짝 */
-  const set = (items: [string, string][]) => `<div class="fam-set">${items.map(([l, c]) => `<span class="fam-set1"><span class="fam-l">${esc(l)}</span>${c}</span>`).join('')}</div>`;
+  const set = numSet;
   const SW = (k: string) => setSeg('adv-set', `gn:${k}`, advValue(st0 as never, 'gn', k) === '1' ? '1' : '0', ONOFF, busy);
   const C = (k: string, on: boolean) => setSeg('fam-set', `b:gn:${k}`, on ? '1' : '0', ONOFF, busy);
   const R = (label: string, ctl: string, lead = '', items: [string, string][] = []) => setRow(label, ctl, lead || items.length ? helpBox(lead, items) : '');
