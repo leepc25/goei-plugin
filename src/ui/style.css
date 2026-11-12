@@ -869,6 +869,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-members { flex: none; margin: 0; padding: 6px 16px; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--panel2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ph-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px 10px; overscroll-behavior: contain; }
 .ph-more { align-self: center; margin-bottom: 6px; }
+/* 쌓이는 목록(일지·연대기·가계부 거래·소지품 기록) 맨 아래 「더 보기」: 괴담톡의 「이전 대화 더 보기」와 같은 단추, 목록 가운데 (ui/more.ts) */
+.gx-more { display: flex; justify-content: center; padding: 12px 0 4px; }
+.gx-more .ph-more { margin: 0; }
+.gx-more .ph-more small { margin-left: 6px; color: var(--dim); font-size: 12px; font-weight: 400; }
 .ph-day { align-self: center; margin: 10px 0 6px; }
 .ph-day span { display: inline-block; padding: 3px 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel2) 80%, transparent); color: var(--sub); font-size: 12px; }
 .ph-msg { display: flex; gap: 8px; max-width: min(78%, 560px); }

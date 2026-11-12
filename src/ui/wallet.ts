@@ -12,6 +12,7 @@ import { getPrefs } from '../core/settings';
 import { messageKey } from '../core/people/store';
 import { ICONS } from './icons';
 import { isPhone } from './media';
+import { moreCut } from './more';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -115,13 +116,15 @@ export function walletList(ctx: ChatContext): string {
     else groups.push({ date: r.date, rows: [r] });
   }
   let lastMonth: string | null = null;
-  return groups.map((g) => {
+  // 처음엔 최근 것부터 정한 줄 수만, 나머지는 「더 보기」 (ui/more.ts). 날 합계·달 줄은 그날·그달 전체
+  const cut = moreCut(`wallet-${walletUi.kind}`, `${walletUi.filter}|${q}`, ctx.chat.scriptstate, groups, '건');
+  return cut.groups.map((g) => {
     const month = monthOf(g.date);
     const head = month && month !== lastMonth ? monthLine(month, rows) : '';
     lastMonth = month;
     return `${head}<section class="gx-wt-day">
     <h3><span>${esc(dayLabel(g.date))}</span><em>${esc(formatDelta(g.rows.filter((r) => r.e.src !== 'manual').reduce((n, r) => n + r.e.amount, 0)))}</em></h3>
-    <ul>${g.rows.map(({ e, after }) => {
+    <ul>${g.shown.map(({ e, after }) => {
       const open = walletUi.open === e.id;
       const sub = subOf(e);
       return `<li class="gx-wt-row${open ? ' open' : ''}">
@@ -134,7 +137,7 @@ export function walletList(ctx: ChatContext): string {
       </li>`;
     }).join('')}</ul>
   </section>`;
-  }).join('');
+  }).join('') + cut.more;
 }
 
 /** 전체·수입·지출 칩 + 찾기 줄. PC는 목록 위, 폰은 기록 서랍 위칸(2026-11-05 사용자: 손이 닿는 자리) */

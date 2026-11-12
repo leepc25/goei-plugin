@@ -19,6 +19,7 @@ import { playableAgents, playerAgent } from '../core/player';
 import { defaultLook, LOOK_KEY, lookId } from '../core/looks';
 import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
 import { bindNeedFill } from './needfill';
+import { moreAction, moreBegin, moreEnd, resetMore } from './more';
 import { chatLookPopup, flashPick, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, isFeatPage, openEditor, render as editorRender, type EditorNode } from './editor/index';
@@ -864,6 +865,7 @@ async function refresh(): Promise<void> {
 
 async function close(): Promise<void> {
   setShown(false);
+  resetMore();
   netSolo = false;
   stopCctvFx();
   await risuai.hideContainer();
@@ -969,6 +971,11 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close() }))) return;
+  if (action === 'list-more') {
+    // 쌓이는 목록의 「더 보기」 (ui/more.ts): 누른 횟수만 올리고 다시 그린다. 읽던 자리는 render 가 지킨다
+    moreAction(value ?? '');
+    return render();
+  }
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
     syncDrawer();
@@ -1550,7 +1557,10 @@ function render(): void {
   const solo = view.kind === 'started' && shopUi.open && shopUi.solo;
   // 고르기 화면(시작 패널)은 태블릿 세로 비율 3:4 (2026-11-08 사용자: 세로가 짧다)
   const pick = view.kind === 'picker' ? ' pick' : '';
+  // 「더 보기」로 펼친 목록: 이번 그리기에 나오지 않으면(다른 메뉴·하위 탭) 처음 줄 수로 돌아간다 (ui/more.ts)
+  moreBegin();
   const panel = `<div class="gx-panel${solo ? ' solo' : nav ? ' has-nav' : ` pre${pick}`}">${body()}</div>`;
+  moreEnd();
   root.innerHTML = fr.kind === 'none' || solo ? panel : frameHtml(fr.kind, !nav, panel);
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
   if (dirUi.scrollTo) {

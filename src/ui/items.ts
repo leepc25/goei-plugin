@@ -21,6 +21,7 @@ import { drawerBox, drawerHtml } from './drawer';
 import { ICONS } from './icons';
 import { ITEM_ICON } from './itemIcons';
 import { isPhone } from './media';
+import { moreCut } from './more';
 import { toast } from './toast';
 import { walletOn, walletPane, walletTools, walletUi } from './wallet';
 import { pointsOn } from '../core/points';
@@ -289,11 +290,13 @@ function logList(ctx: ChatContext): string {
     if (g && g.day === day) g.rows.push(l);
     else groups.push({ day, rows: [l] });
   }
-  return `${chips}<div class="gx-wallettab it-log">${groups.map((g) => {
+  // 처음엔 최근 것부터 정한 줄 수만, 나머지는 「더 보기」 (ui/more.ts). 날짜 머리의 획득·사용 수는 그날 전체
+  const cut = moreCut('items-log', `${itemsUi.logFilter}|${q}`, ctx.chat.scriptstate, groups);
+  return `${chips}<div class="gx-wallettab it-log">${cut.groups.map((g) => {
     const gi = g.rows.filter((l) => l.what === 'get').length;
     const go = g.rows.length - gi;
-    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${[gi ? `획득 ${gi}` : '', go ? `사용 ${go}` : ''].filter(Boolean).join(' · ')}</em></h3><ul>${g.rows.map(row).join('')}</ul></section>`;
-  }).join('')}</div>`;
+    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${[gi ? `획득 ${gi}` : '', go ? `사용 ${go}` : ''].filter(Boolean).join(' · ')}</em></h3><ul>${g.shown.map(row).join('')}</ul></section>`;
+  }).join('')}${cut.more}</div>`;
 }
 
 // ── 팝업 ──

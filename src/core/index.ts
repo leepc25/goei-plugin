@@ -46,3 +46,4 @@ export * from './items';
 export * from './startitems';
 export * from './shop';
 export * from './journal';
+export * from './paging';

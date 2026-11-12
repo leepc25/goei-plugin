@@ -5,7 +5,7 @@
 // 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 메인 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
 import { setRow, stepSizeText } from './setrow';
 import {
-  JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
+  JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_LIST_PAGE, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
   buildChronicle, CHRON_KIND_LABEL, type ChronEntry, type ChronKind,
 } from '../core/journal';
@@ -29,6 +29,7 @@ import { evArt } from './evpic';
 import { factionListView, factionView, peopleDocsView, peopleListView, personView, resetPeopleUi } from './people';
 import { toast } from './toast';
 import { isPhone } from './media';
+import { moreCut } from './more';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -251,7 +252,9 @@ export function journalList(ctx: ChatContext): string {
   }
   groups.sort((a, b) => (a.day === '' ? 1 : b.day === '' ? -1 : 0));
   const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
-  return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map((r) => journalRow(ctx, r)).join('')}</ul></section>`).join('');
+  // 처음엔 최근 것부터 정한 줄 수만, 나머지는 「더 보기」 (ui/more.ts). 날짜 머리의 건수는 그날 전체 — 더 보기를 눌러도 숫자가 바뀌지 않게
+  const cut = moreCut('rec-journal', `${rec.filter}|${q}`, ctx.chat.scriptstate, groups);
+  return cut.groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.shown.map((r) => journalRow(ctx, r)).join('')}</ul></section>`).join('') + cut.more;
 }
 
 function journalRow(ctx: ChatContext, r: JournalRow): string {
@@ -305,8 +308,9 @@ function chroniclePane(ctx: ChatContext): string {
     const inner = `${mark}<span class="gx-cr-main"><b>${esc(e.title)}</b><small>${esc(e.text)}</small></span><em class="gx-cr-kind">${esc(CHRON_KIND_LABEL[e.kind])}</em>`;
     return `<li>${act ? `<button class="gx-cr-row ${e.kind}"${act}>${inner}</button>` : `<div class="gx-cr-row ${e.kind}">${inner}</div>`}</li>`;
   };
+  const cut = moreCut('rec-chronicle', [...rec.chronOff].sort().join(','), ctx.chat.scriptstate, groups);
   return `${mon}${tools}
-    <div class="gx-jr-list gx-chron">${groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '날짜 없음')}</span><em>${g.rows.length}줄</em></h3><ul>${g.rows.map(line).join('')}</ul></section>`).join('')}</div>`;
+    <div class="gx-jr-list gx-chron">${cut.groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '날짜 없음')}</span><em>${g.rows.length}줄</em></h3><ul>${g.shown.map(line).join('')}</ul></section>`).join('')}${cut.more}</div>`;
 }
 
 // ── 보고서 요약 조각 (일지 줄에 붙는다) ──
@@ -600,6 +604,7 @@ export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
     row('보고서 카드 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 끝난 응답 아래에 보고서 카드를 띄울지만 정해요. 보고서 자체는 이 설정과 상관없이 모두 만들어져 「기록」에 쌓여요. 카드는 보여 주기만 하고 본문·요청에는 들어가지 않아요. 안 띄움으로 바꾸면 이미 뜬 카드도 사라져요.'),
     row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한', JR_JOURNAL_CAP.step, [`${JR_JOURNAL_CAP.max.toLocaleString('en-US')}줄`]), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
     row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < JR_REPORT_CAP.max, '보고서 상한', JR_REPORT_CAP.step, [`${JR_REPORT_CAP.max}건`]), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
+    row('한 번에 보일 줄 수', stepper('list_page', `${s.listPage}줄`, s.listPage > JR_LIST_PAGE.min, s.listPage < JR_LIST_PAGE.max, '한 번에 보일 줄 수', JR_LIST_PAGE.step, [`${JR_LIST_PAGE.max}줄`]), `일지·연대기·가계부·소지품 기록 목록에 처음 보일 줄 수예요 (${JR_LIST_PAGE.min}~${JR_LIST_PAGE.max}). 넘는 줄은 목록 아래 「더 보기」를 누르면 나와요.`),
   ].join('');
   return `<div class="ph-form jr-set">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>일지 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('jr')}</span></header>${defaultsConfirm('jr')}
@@ -658,6 +663,7 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     let next: number;
     if (key === 'journal_cap') next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s.journalCap + dir * JR_JOURNAL_CAP.step));
     else if (key === 'report_cap') next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s.reportCap + dir * JR_REPORT_CAP.step));
+    else if (key === 'list_page') next = Math.max(JR_LIST_PAGE.min, Math.min(JR_LIST_PAGE.max, s.listPage + dir * JR_LIST_PAGE.step));
     else return true;
     if (String(next) === jrValue(ctx.chat.scriptstate, key)) return true;
     await setVars(ctx, env, { [JR(key)]: String(next) });
