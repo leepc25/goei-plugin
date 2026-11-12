@@ -217,7 +217,7 @@ export const ckGrid = (groups: CkGroup[], rows: CkRow[], foot = '', title = '', 
   const head2 = `<div class="ck-line ck-h2${named ? '' : ' solo'}"><span></span>${flat.map((c) => `<span class="${c.first ? 'ck-first' : ''}${c.band ? ' ck-band' : ''}">${esc(c.o)}</span>`).join('')}</div>`;
   const body = rows.map((r) => `<div class="ck-line ck-row"><b class="ck-name">${r.label}</b>${flat.map((c, i) =>
     `<span class="ck-cell${c.first ? ' ck-first' : ''}${c.band ? ' ck-band' : ''}${c.pair}">${ckCtl(r.marks[i], r.acts[i], `${esc(c.g.name)} ${esc(c.o)}`, c.g.kind === 'one', busy)}</span>`).join('')}</div>`).join('');
-  return `<section class="ps-group ck${groups.some((g) => g.kind === 'num') ? ' ck-hasnum' : ''}" style="--ck-n:${flat.length}">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="ps-rows">${head1}${head2}${body}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ''}</section>`;
+  return `<section class="ps-group ck${groups.some((g) => g.kind === 'num') ? ' ck-hasnum' : ''}" style="--ck-n:${flat.length};--ck-cols:${flat.map((c) => (c.g.kind === 'num' ? 'minmax(126px, 1.35fr)' : 'minmax(0, 1fr)')).join(' ')}">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="ps-rows">${head1}${head2}${body}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ''}</section>`;
 };
 /** 띠 여러 개를 PC에서는 한 격자로 나란히, 폰에서는 띠마다 하나로 (폭이 달라서). foot = 설명(helpBox) */
 export interface CkBand { title: string; groups: CkGroup[]; marks: CkMark[][]; acts: (string | null)[][]; foot: string }

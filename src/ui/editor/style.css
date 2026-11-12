@@ -545,7 +545,7 @@
 .gw .mx-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 20px; padding: 10px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--dim); font-size: 13px; }
 .gw .mx-note { margin: 0; padding: 10px var(--pad); border-bottom: 1px solid var(--hair); font-size: 13px; line-height: 1.5; color: var(--dim); }
 .gw .ck { margin-bottom: 20px; }
-.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) repeat(var(--ck-n), minmax(0, 1fr)); align-items: center; padding: 0 10px; }
+.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) var(--ck-cols, repeat(var(--ck-n), minmax(0, 1fr))); align-items: center; padding: 0 10px; }
 .gw .ck-h1 { padding-top: 8px; font-size: 13px; color: var(--text); }
 .gw .ck-h1 b { padding: 2px 4px; font-weight: 700; text-align: center; word-break: keep-all; }
 .gw .ck-h2 { padding-bottom: 6px; border-bottom: 1px solid var(--hair); font-size: 12.5px; color: var(--dim); }

@@ -512,7 +512,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const on = featureState(ctx)[`set:${page}`];
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
   // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개)
-  if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '');
+  if (info) body = body.replace(/<p class="ps-note">메인 응답이 끝날 때마다[\s\S]*?<\/p>/, '');
   // 인물 페이지는 맨 위에 자기 도식이 있으니 「호출 흐름 →」 단추만 (callSummary 안에서)
   const calls = callSummary(ctx, page);
   const lead = info

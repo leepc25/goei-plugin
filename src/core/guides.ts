@@ -206,10 +206,10 @@ export function splitGuide(text: string): GuidePart[] {
 export const joinGuide = (parts: GuidePart[]): string => parts.map((p) => p.head + p.body + p.tail).join('');
 
 /* ── 내가 추가한 규칙 (2026-10-27 리수폿식 「프롬프트」 탭): 기기 설정에 두고, 붙일 지침의 늘 쓰이는 절 끝에 넣는다 ──
-   본편(RP): 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
+   RP: 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
 export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Phone' | 'Wiki';
 export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki'];
-export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '위키' };
+export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: 'RP', Directive: '이동·임무', GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '위키' };
 export interface UserRule {
   id: string;
   title: string;
