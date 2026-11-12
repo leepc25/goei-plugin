@@ -173,11 +173,10 @@ export const PEOPLE_RULE =
 export const knowledgeRule = (): string => guideOr('Main', 'PEOPLE.KNOWLEDGE_RULE', KNOWLEDGE_RULE);
 export const peopleRule = (): string => guideOr('Main', 'PEOPLE.RULE', () => PEOPLE_RULE.replace(KNOWLEDGE_RULE, () => knowledgeRule()), { knowledge_rule: knowledgeRule() });
 
-/** 여러 인물의 블록을 한 덩어리로 */
-export function peopleBlock(blocks: string[], maxChars = 16000): string {
+/** 여러 인물의 블록을 한 덩어리로. 상한 맞추기는 부르는 쪽(request.ts peopleBlockFor)이 인물 단위로 한다 (글 중간에서 자르지 않는다) */
+export function peopleBlock(blocks: string[]): string {
   if (!blocks.length) return '';
-  let body = blocks.join('\n\n');
-  if (body.length > maxChars) body = body.slice(0, maxChars - 1) + '…';
+  const body = blocks.join('\n\n');
   return `${PEOPLE_HEAD}\n${peopleRule()}\n\n${body}`;
 }
 

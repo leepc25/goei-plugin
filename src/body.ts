@@ -111,9 +111,16 @@ const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
  * 맨 끝의 정리 단계(core/sanitize.ts stripMarkers)가 플러그인 표식을 한 번 더 지워 모델이 표식 글자를 보지 않게 한다.
  * 실패한 단계는 모아 한 줄 로그 `[goei] 요청 조립 실패: 단계 …` 로 남긴다. 이 함수는 던지지 않는다 (던지면 시작기 main.ts 가 sanitize 로 같은 처리)
  */
+/** 직전 조립이 새로 끼운 system 글들. Risu 는 요청이 실패하면 앞 회차 결과에 replacer 를 다시 돌린다 (자동 재시도) — 그때 다시 조립하지 않는다 */
+let lastAdded = new Set<string>();
+const sysTexts = (ms: PromptMessage[]): string[] => ms.filter((m) => m?.role === 'system' && typeof m.content === 'string').map((m) => m.content as string);
+
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
   if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
+  // 자동 재시도: 이미 조립한 요청이 다시 들어왔다. 참고 기록·인물 기록이 두 번 끼고 호출 기록 턴이 새로 열리지 않게 그대로 보낸다 (전수검사 11-13)
+  if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
+  const input0 = new Set(sysTexts(messages));
   const failed: string[] = [];
   /** 한 단계: 던지면 이름·까닭을 모으고 fallback(= 그 단계 이전 모양) */
   const step = <T>(name: string, run: () => T, fallback: T): T => {
@@ -200,6 +207,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
   const out = sanitize(messages);
   if (liteNow) step('호출 기록', () => traceMain(out, failed), undefined);
+  lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
   return out;
 }
 

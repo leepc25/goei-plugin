@@ -9,6 +9,7 @@ import { latestNote } from './updater';
 import { rhythmClock, rhythmClockLines } from './rhythm';
 import { factionNow, factionsBlock, sceneFactionCodes, userFactionOf } from './faction';
 import { messageText } from '../refs';
+import { fixedSections } from './seed';
 import type { PeopleSettings } from './settings';
 import type { PeopleStore, Temper } from './types';
 
@@ -49,11 +50,13 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
   const blocks: string[] = [];
-  const sheets: string[] = [];
+  /** 인물마다: 시트 원문(요청에서 뺄 것)과 상한 밖 길이(시트 고정 절) */
+  const own: { sheet: string | null; exempt: number }[] = [];
   for (const n of people) {
     const p = o.store.people[n];
     const sheet = o.sheetOf(n);
-    if (sheet) sheets.push(sheet);
+    const exempt = !sheet ? 0 : o.settings.inject === 'split' ? fixedSections(sheet).reduce((s, x) => s + x.name.length + x.body.length + 2, 0) : o.settings.inject === 'append' ? sheet.trim().length : 0;
+    own.push({ sheet: sheet || null, exempt });
     const note = o.settings.director === 'note' ? latestNote(o.store, n, live) : null;
     blocks.push(
       personBlock(p, o.store, live, changes, {
@@ -77,6 +80,13 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
       }),
     );
   }
+  // 상한(본문 전체 글자 수)은 기록에만 건다 (고정 절 원문은 상한 밖). 넘치면 글 중간에서 자르지 않고 뒤 인물부터 통째로 뺀다 (모델이 고른 인물 → 글에 나온 인물, 항상 포함은 끝까지).
+  // 뺀 인물의 원래 시트는 요청에 남긴다 (전수검사 11-13: 4명부터 뒤 인물이 블록에서도 시트에서도 사라졌다)
+  let keep = blocks.length;
+  const sizeOf = (k: number) => blocks.slice(0, k).reduce((s, b) => s + b.length + 2, 0) - own.slice(0, k).reduce((s, x) => s + x.exempt, 0);
+  while (keep > 1 && sizeOf(keep) > o.settings.blockCap) keep--;
+  blocks.length = keep;
+  const sheets = own.slice(0, keep).map((x) => x.sheet).filter((x): x is string => !!x);
   // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
   if (o.settings.features.has('rhythm')) {
     const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
@@ -93,7 +103,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
     if (fb) blocks.push(fb);
   }
-  return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
+  return { text: peopleBlock(blocks), people, sheets };
 }
 
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();

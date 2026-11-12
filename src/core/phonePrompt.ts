@@ -301,6 +301,9 @@ function contactSources(body: Body): NonNullable<Body['recipientEvidenceSources'
 }
 
 function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Record<string, string>): PhonePrompt {
+  // 인물 로어북이 participants[].lore 와 universe.activeLoreBooks 에 똑같이 두 번 실리지 않게 참여자 쪽만 남긴다 (전수검사 11-13, 확인 1회 약 1.7만 토큰)
+  const ownLore = body.participants.map((p) => p.lore).filter((l): l is string => typeof l === 'string' && !!l);
+  if (ownLore.length) body.narratorOnly.universe.activeLoreBooks = body.narratorOnly.universe.activeLoreBooks.filter((b) => !ownLore.some((l) => l.includes(b.content)));
   const contactMode = body.participants.some((p) => p.manuallySavedContact);
   if (contactMode) {
     body.recipientEvidenceSources = contactSources(body);

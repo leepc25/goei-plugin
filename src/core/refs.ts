@@ -8,6 +8,7 @@ import { hasCall, stripCall } from './phone';
 import type { Chat, LoreEntry } from './types';
 import { cleanOutput, hasWorldTags } from './world/tags';
 import { buildRegistry, referenceEntries, type Registry } from './world/registry';
+import { stripThoughts } from './thoughts';
 
 export type RefKind = 'base' | 'primary' | 'active' | 'direct' | 'secondary';
 
@@ -222,7 +223,7 @@ export interface Turn {
 }
 
 export function messageText(data: string): string {
-  let t = stripStartCard(stripUnsentMark(String(data ?? '')));
+  let t = stripThoughts(stripStartCard(stripUnsentMark(String(data ?? ''))));
   if (t.includes('%%SCENE_CARD:')) {
     const s = readScene(t);
     t = s ? `[이동] 목표: ${s.target} / 투입: ${s.party}` : stripSceneCard(t);

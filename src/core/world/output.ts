@@ -7,6 +7,7 @@ import type { Chat, ScriptState } from '../types';
 import type { Catalog } from './catalog';
 import { applyOutput, bootstrap, parseWorld, reports, serializeWorld, type Rng, type WorldSettings, type WorldState } from './engine';
 import { cleanOutput, hasWorldTags } from './tags';
+import { splitThoughts } from '../thoughts';
 
 export const WORLD_KEY = '$goei_world';
 const LAST_KEY = '$goei_last';
@@ -90,9 +91,11 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
   if (!msg || msg.role !== 'char') return null;
 
   const state = chat.scriptstate ?? {};
-  const clean = cleanOutput(raw);
+  // 생각 모델의 속생각(<Thoughts>) 안 태그 초안은 읽지 않는다. 블록은 저장 본문 앞에 그대로 둔다 (전수검사 11-13)
+  const th = splitThoughts(raw);
+  const clean = th.head + cleanOutput(th.body);
   // 이미 처리한 응답에 리스너가 다시 불린 경우 (태그도 없고 지문도 같음)
-  if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean)) return null;
+  if (!hasWorldTags(th.body) && state[LAST_KEY] === fingerprint(index, clean)) return null;
 
   // 리롤·다시 생성: 같은 자리의 이전 응답이 반영되기 전 상태로 돌아가서 이번 응답만 반영한다.
   // 「같은 자리」 = 같은 번호 + 바로 앞 메시지가 같은 것(열쇠). Risu 는 리롤 때 새 chatId 를 주므로 응답 자체는 비교할 수 없고,
@@ -112,7 +115,7 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
       };
   const faction = before.faction;
   const base = parseWorld(before.world);
-  const result = applyOutput(base, c, s, faction, raw, rng);
+  const result = applyOutput(base, c, s, faction, th.body, rng);
   const now = result.faction ?? faction;
   // 이번 응답에서 활성이 된 항목에 시작 메시지 열쇠를 적는다 (엔진은 메시지 번호를 모른다). 옛 저장의 진행 중 항목은 비워 두고 since 로 기간을 잡는다 (journal/mine.ts)
   markStart(base, result.world, messageKey(msg, index));

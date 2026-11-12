@@ -82,7 +82,7 @@ export function splitNarrative(content: string): { narrative: string; trailing: 
   const narrative = at >= 0 ? content.slice(0, at) : content;
   const trailing = at >= 0 ? content.slice(at) : '';
   return {
-    narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, '').replace(/<!--[\s\S]*?-->/g, '')).trim(),
+    narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/gi, '').replace(/<!--[\s\S]*?-->/g, '')).trim(),
     trailing,
   };
 }
