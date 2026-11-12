@@ -895,9 +895,9 @@ const SHELF_RULES = (g: Record<string, string>, s: ShopSettings, st: ShopState, 
 /** 진열대 생각 단계 (호출 흐름 미리 보기도 쓴다) */
 export const shopThoughts = (): string => fillGuide(G().THOUGHTS_SHELF, {});
 
-function material(src: ShopSource, s: ShopSettings): string {
-  const parts = [`[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
-  if (src.st.loaded) {
+function material(src: ShopSource, s: ShopSettings, head = ''): string {
+  const parts = [head || `[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
+  if (src.st.loaded && !head) {
     const id = src.st.identity;
     parts.push(`[가게 정체 — 고정]\nsells: ${id.sells || '-'}\nnever: ${id.never || '-'}\nprices: ${id.prices || '-'}\ncurrency: ${id.points ? 'points' : 'won'}`);
   }
@@ -1003,3 +1003,17 @@ export function shopJudgeBy(vars?: Vars): { pick: ShopJudge; by: 'main' | 'updat
 }
 
 export const genLanguage = (vars: Vars): string | null => genSettings(vars).language;
+
+/** 망상홈쇼핑 편성 (지침 「망상홈쇼핑」): 방송 첫 절 + 물건 줄 절 + 방송 절(꼴) + 시청자 절. 가게 정체·주인 첫 대사는 없다 */
+export function programPrompt(src: ShopSource, s: ShopSettings, fill: Record<string, string>): CraftMessage[] {
+  const g = G('Hs');
+  const v = { ...fill, line: lineOf('Hs') };
+  const system = [fillGuide(g.COMMON, v), SHELF_RULES(g, s, src.st, 'Hs'), fillGuide(g.BROADCAST, v), fillGuide(g.HOST ?? '', v), fillGuide(g.VIEWERS ?? '', v), src.language ?? ''].filter(Boolean).join('\n\n');
+  const head = `[채널]\n${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ''}`;
+  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s, head)}\n\n[현재 작업]\n오늘 편성 (상품·상품마다 큐시트와 채팅)` }], s, fillGuide(g.THOUGHTS_PROGRAM ?? '', v));
+}
+
+/** 망상홈쇼핑 내 채팅 뒤 반응: 참고 자료·본편은 편성과 같게 넘긴다 */
+export function broadcastMaterial(src: ShopSource, s: ShopSettings): string {
+  return material(src, s, `[채널]\n${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ''}`);
+}
