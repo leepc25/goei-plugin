@@ -857,7 +857,7 @@ const tiersNorm = (t: string) => tiersText(parseTiers(t));
 const axesNorm = (t: string) => parseAxes(t).map((a) => `${a.name}: ${a.values.join(', ')}`).join('\n');
 const group = (title: string, rows: string) => setGroup(title, rows);
 
-// ── 시안(11-12 사용자: 「이름|설명|하한|상한|가중치」처럼 치게 하지 말고 칸마다 입력칸을): 저장 글 꼴은 그대로, 화면만 칸으로 ──
+// ── 칸 입력 (11-12 사용자: 「이름|설명|하한|상한|가중치」처럼 치게 하지 말고 칸마다 입력칸을): 저장 글 꼴은 그대로, 화면만 칸으로 ──
 interface TierRaw { name: string; desc: string; lo: string; hi: string; w: string }
 const tiersRaw = (text: string): TierRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes('|')).map((l) => { const [name = '', desc = '', lo = '', hi = '', w = ''] = l.split('|').map((x) => x.trim()); return { name, desc, lo, hi, w }; });
 const tiersRawText = (t: TierRaw[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join('\n');
@@ -1059,7 +1059,7 @@ async function deskSettingsAction(action: string, value: string | undefined, ctx
     return m[1] === 'desk_on' ? set({ [DESK_KEY.on]: m[2] === '0' ? '0' : '' }) : set({ [DESK_KEY.again]: m[2] === '1' ? '1' : '' });
   }
   {
-    // 시안: 주사위 칸 줄 단위 고치기 (저장 글 꼴 「칸 이름: 값, 값」 그대로)
+    // 주사위 칸 줄 단위 고치기 (저장 글 꼴 「칸 이름: 값, 값」 그대로)
     const rows = () => axisRows(ctx.chat.scriptstate);
     const save = (a: AxisRaw[]) => { const t = axesRawText(a); return set({ [DESK_KEY.axes]: !a.length || t === DESK_AXES_DEFAULT ? '' : t }); };
     const clean = (v: string, n: number) => v.replace(/[:,，\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
@@ -1154,7 +1154,7 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));
   }
   {
-    // 시안: 값 등급 칸 단위 고치기·목록 칩 (저장 글 꼴 그대로. 못 쓰는 줄도 남겨 두고 읽는 쪽이 거른다)
+    // 값 등급 칸 단위 고치기 (저장 글 꼴 그대로. 못 쓰는 줄도 남겨 두고 읽는 쪽이 거른다)
     const vars = ctx.chat.scriptstate;
     const saveT = (site: MallSite, t: TierRaw[]) => { const x = tiersRawText(t); return set({ [rollKeys(site).tiers]: !t.length || x === tiersText(rollDefaults(site).tiers) ? '' : x }); };
     const clean = (v: string, n: number) => v.replace(/[|\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);

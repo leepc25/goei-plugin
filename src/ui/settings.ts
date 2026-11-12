@@ -20,7 +20,9 @@ import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON_VAR, pointsAuto, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
 import { pointsFlagFor } from '../core/points';
-import { ICON_ALIAS_DEFAULT, readIconMisses } from '../core/iconmatch';
+import { readIconMisses } from '../core/iconmatch';
+import { aliasCanAdd, aliasChanged, aliasEdit, aliasRowBad, aliasShown, ALIAS_WORD_MAX } from '../core/aliasrows';
+import { keepOpen } from './panels';
 import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
@@ -122,6 +124,28 @@ function recentControl(key: string, v: number | undefined, label: string, busy: 
 }
 
 const group = setGroup;
+/** 그림 대체 말 표: 접는 덩어리 안에 줄마다 「끝 말 → 바꿀 말」 칸. PC 는 한 줄에 두 쌍, 폰은 한 쌍 (배치는 CSS .ms-pairs) */
+function aliasBlock(stored: unknown, busy: boolean): string {
+  const def = findDef(SETTINGS_SET, 'items-alias')!;
+  const rows = aliasShown(stored);
+  const dis = busy ? ' disabled' : '';
+  const head = '<div class="ms-tb-h"><span>이름의 끝 말</span><span></span><span>바꿔 찾을 말</span><span></span></div>';
+  const body = rows.map((r, i) => {
+    const bad = r.a || r.b ? aliasRowBad(r) : '';
+    return `<div class="ms-tb-r${bad ? ' bad' : ''}">
+      <label class="ms-tb-c n"><span>이름의 끝 말</span><input class="gx-search" data-change="set-items-alias-cell" data-key="${i}:a" value="${esc(r.a)}" maxlength="${ALIAS_WORD_MAX}" aria-label="이름의 끝 말"${dis}></label>
+      <i class="ms-arrow" aria-hidden="true">→</i>
+      <label class="ms-tb-c n"><span>바꿔 찾을 말</span><input class="gx-search" data-change="set-items-alias-cell" data-key="${i}:b" value="${esc(r.b)}" maxlength="${ALIAS_WORD_MAX}" aria-label="바꿔 찾을 말"${dis}></label>
+      <button class="gx-mini danger ms-tb-x" data-action="set-items-alias-del" data-value="${i}" aria-label="지우기"${dis}>×</button>
+      ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
+    </div>`;
+  }).join('');
+  const changed = aliasChanged(stored);
+  const foot = `<div class="ms-tb-foot"><button class="gx-mini primary" data-action="set-items-alias-add"${busy || !aliasCanAdd(stored) ? ' disabled' : ''}>추가</button>${changed ? `<button class="gx-mini" data-action="set-items-alias-reset"${dis}>기본값으로</button>` : ''}</div>`;
+  const help = typeof def.help === 'string' ? def.help : '';
+  return `<details class="ps-adv${changed ? ' ps-changed' : ''}" data-keep="items-alias"${keepOpen('items-alias')}><summary class="ps-adv-sum"><b>${esc(def.label)}</b><span class="adv-count">${rows.length}줄</span></summary><div class="ps-adv-body"><div class="ms-tb ms-pairs"><div class="ms-pg">${head}${rows.length > 1 ? head : ''}${body}</div>${foot}</div>${help ? `<p class="ps-note">${help}</p>` : ''}</div></details>`;
+}
+
 
 /** 상태창 칸 표 (설계안 7절): 칸마다 사용·표시. 날짜·시각·위치는 사용을 끌 수 없다. 플러그인이 쓰는 칸은 끄면 그 기능도 꺼진다고 알린다 */
 function statusColsTable(cfg: ColConfig, busy: boolean, vars: Record<string, unknown> | undefined): string {
@@ -429,11 +453,11 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           D('items-spent', itemsUiSpent(itVars)),
           D('items-start', itemStartOn(itVars) ? '1' : '0'),
         ].join('')),
-        group('물건 그림', [
-          D('items-alias', '', { ctl: `<textarea class="gx-search ms-area st-alias" rows="6" data-change="set-items-alias" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? '') || ICON_ALIAS_DEFAULT)}</textarea>` }),
+        // 그림 대체 말은 줄이 많아(기본 32줄) 접어 둔다 (11-12 사용자). 묶음의 줄들 아래, 고급 설정과 같은 접는 양식
+        `<section class="ps-group"><h3>물건 그림</h3><div class="ps-rows">${[
           D('items-pool', itemIconPoolOn(itVars) ? '1' : '0'),
           ...(scope === 'chat' ? [D('items-misses', '', { ctl: (() => { const m = readIconMisses(); return m.length ? `<div class="st-misses">${m.slice().reverse().map((x) => `<div>${esc(x.name)}${x.icon ? ` <small>(${esc(x.icon)})</small>` : ''} → 상자</div>`).join('')}</div>` : '<small>이번에 켠 뒤로 없어요.</small>'; })() })] : []),
-        ].join('')),
+        ].join('')}</div>${aliasBlock(itVars?.[ITEM_ICON_ALIAS_VAR], busy)}</section>`,
       ]),
     ].join(''),
     // 상점 (2026-11-07 사용자): 표식 `[shop: 가게|주인]` 으로 열리는 상점 팝업의 생성 방식. 채팅 변수 $sh_* 또는 새 채팅 기본값
@@ -975,9 +999,11 @@ export async function handleSettings(action: string, value: string | undefined, 
         await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_CARRY_VAR]: String(next) } }));
         return true;
       }
-      case 'set-items-alias':
-        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ICON_ALIAS_VAR]: v.trim() === ICON_ALIAS_DEFAULT.trim() ? '' : v.trim().slice(0, 2000) } }));
+      case 'set-items-alias-cell': case 'set-items-alias-del': case 'set-items-alias-add': case 'set-items-alias-reset': {
+        const next = aliasEdit(getPrefs().vars?.[ITEM_ICON_ALIAS_VAR], action.slice(16) as 'cell' | 'del' | 'add' | 'reset', v);
+        if (next !== null) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ICON_ALIAS_VAR]: next } }));
         return true;
+      }
       case 'set-items-limit':
         await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_LIMIT_VAR]: v.replace(/\s+/g, ' ').trim().slice(0, 60) } }));
         return true;
@@ -1129,11 +1155,11 @@ export async function handleSettings(action: string, value: string | undefined, 
         return next === String(chat.scriptstate?.[ITEM_LIMIT_VAR] ?? '') ? null : { [ITEM_LIMIT_VAR]: next };
       });
       return true;
-    case 'set-items-alias':
+    case 'set-items-alias-cell': case 'set-items-alias-del': case 'set-items-alias-add': case 'set-items-alias-reset':
       await save(ctx, env, (chat) => {
-        // 칸에는 기본 표가 실제 글로 들어 있다. 기본 표 그대로면 빈 값(= 기본 표)으로 둔다
-        const next = v.trim() === ICON_ALIAS_DEFAULT.trim() ? '' : v.trim().slice(0, 2000);
-        return next === String(chat.scriptstate?.[ITEM_ICON_ALIAS_VAR] ?? '') ? null : { [ITEM_ICON_ALIAS_VAR]: next };
+        // 저장 글 꼴은 그대로 「끝 말 → 바꿀 말」. 기본 표 그대로면 빈 값(= 기본 표)으로 둔다
+        const next = aliasEdit(chat.scriptstate?.[ITEM_ICON_ALIAS_VAR], action.slice(16) as 'cell' | 'del' | 'add' | 'reset', v);
+        return next === null ? null : { [ITEM_ICON_ALIAS_VAR]: next };
       });
       return true;
     case 'set-anomaly':
