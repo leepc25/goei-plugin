@@ -107,7 +107,7 @@ export const HS_KEY = {
   speed: '$hs_speed', hold: '$hs_hold', frame: '$hs_frame',
   cut: '$hs_fx_cut', bulb: '$hs_fx_bulb', tear: '$hs_fx_tear', tearP: '$hs_tear_p', scan: '$hs_fx_scan',
   fillLo: '$hs_fill_lo', fillHi: '$hs_fill_hi', fillCool: '$hs_fill_cool', rareP: '$hs_rare_p', rareCool: '$hs_rare_cool',
-  clips: '$hs_clips', scalePc: '$hs_scale_pc', scalePhone: '$hs_scale_ph',
+  clips: '$hs_clips', read: '$hs_read', scalePc: '$hs_scale_pc', scalePhone: '$hs_scale_ph',
   next: '$hs_next', turn: '$hs_turn', lock: '$hs_lock', left: '$hs_left',
   drop: '$hs_drop', dropRate: '$hs_drop_rate', dropFast: '$hs_drop_fast', dropStep: '$hs_drop_step', soonAt: '$hs_soon_at', endLo: '$hs_end_lo', endHi: '$hs_end_hi',
   callLo: '$hs_call_lo', callHi: '$hs_call_hi', forms: '$hs_forms', aud: '$hs_aud_on', peek: '$hs_peek', say: '$hs_say', barter: '$hs_barter',
@@ -142,6 +142,8 @@ export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: 
 /** 출연 형태 기본 목록 (설정에서 고친다, 쉼표·줄바꿈으로 나눔) */
 /** 주문 전화번호 기본값 */
 export const HS_TEL_DEFAULT = '080-404-0000';
+/** 내 채팅을 읽는 동안 진행자 컷에서 대기와 번갈아 트는 동작 (이름은 영문·우리말 어느 쪽이든) */
+export const HS_READ_DEFAULT = '고개 꺾기, 굳은 응시';
 export const HS_FORMS_DEFAULT = '전화 출연, 엑스트라, 모델';
 export type HsAuto = 'manual' | 'open';
 export type HsScale = 'auto' | 'fit' | '0.5' | '1' | '2';
@@ -183,6 +185,8 @@ export interface HsSettings {
   rules: HsRules;
   /** 동작 분류 고침 (「컷:이름=분류」 줄) */
   clipsText: string;
+  /** 내 채팅을 읽는 동안 트는 동작 이름들 */
+  read: string[];
   scalePc: HsScale;
   scalePhone: HsScale;
   /** 큐시트가 끝난 뒤 다음 부로 넘어가기까지 (초, 0 = 안 넘어감) */
@@ -223,6 +227,7 @@ export function hsSettings(vars: Vars): HsSettings {
     fx: { cut: vars?.[HS_KEY.cut] !== '0', bulb: vars?.[HS_KEY.bulb] !== '0', tear: vars?.[HS_KEY.tear] !== '0', scan: vars?.[HS_KEY.scan] !== '0', tearP: n(vars, 'tearP') / 100 },
     rules: { fill: pair(n(vars, 'fillLo'), n(vars, 'fillHi')), fillCool: n(vars, 'fillCool'), rareP: n(vars, 'rareP') / 100, rareCool: n(vars, 'rareCool') },
     clipsText: String(vars?.[HS_KEY.clips] ?? ''),
+    read: (() => { const f = String(vars?.[HS_KEY.read] ?? '').split(/[,\n]/).map((x) => x.trim().slice(0, 30)).filter(Boolean); return f.length ? f : HS_READ_DEFAULT.split(',').map((x) => x.trim()); })(),
     scalePc: scaleOf(vars?.[HS_KEY.scalePc], 'auto'),
     scalePhone: scaleOf(vars?.[HS_KEY.scalePhone], 'auto'),
     next: n(vars, 'next'),

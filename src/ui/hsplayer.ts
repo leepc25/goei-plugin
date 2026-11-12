@@ -4,7 +4,7 @@
 // - 글자·숫자·띠는 그림이 아니라 HTML 로 얹는다 (도트 글꼴, 11-10 도트 시안 site_mock_dot).
 // - 화면을 다시 그려도(app render) 캔버스·채팅 줄은 같은 DOM 을 다시 꽂아 끊기지 않는다. 화면에서 빠지면(탭 닫기·창 닫기) 멈추고, 다시 꽂히면 그 자리부터.
 // - 동작 고르기·길이 계산은 core/homeshop.ts (설정 값). 여기는 시간 흐름과 그리기만.
-import { clipsOf, cueMs, dropEnd, dropRest, nextDrop, moodMap, moodName, CUE_EVENT_WORD, idleState, installments, moodClip, nextIdle, parseClipGroups, type CueCut, type CutId, type HsClip, type HsCue, type HsSettings, type HsShow, type IdleState } from '../core/homeshop';
+import { clipsOf, cueMs, dropEnd, dropRest, nextDrop, moodMap, moodName, CUE_EVENT_WORD, idleState, installments, moodClip, nextIdle, parseClipGroups, pickVersion, type CueCut, type CutId, type HsClip, type HsCue, type HsSettings, type HsShow, type IdleState } from '../core/homeshop';
 import type { HsArt } from '../host/homeshop';
 import { HS_FONT } from '../host/homeshop';
 import { itemPic } from './items';
@@ -242,6 +242,19 @@ function tick(): void {
     r.frameAt = t;
     r.talking = false;
   };
+  // 내 채팅을 읽는 중: 진행자 컷에서 읽는 동작(고개 꺾기·응시)과 대기를 번갈아 (11-12 사용자: 흥미를 갖고 보는 느낌)
+  const startRead = () => {
+    if (f.s.fx.cut) r.cut = 'B';
+    r.flags.call = false;
+    const cs = clips(r.cut);
+    const base = cs.find((c) => c.group === 'base') ?? null;
+    const name = f.s.read.length && readN % 2 === 0 ? moodName(f.s.read[(readN / 2) % f.s.read.length], moodMap(f.art!.pack)) : '';
+    r.clip = (name && cs.some((c) => c.name === name) ? pickVersion(cs, name, idle[cutArt(r.cut)]) : null) ?? base ?? r.clip;
+    readN++;
+    r.frame = 0;
+    r.frameAt = t;
+    r.talking = false;
+  };
   if (r.cue < 0) startCue(0);
   // 동작 한 장씩
   while (r.clip && t - r.frameAt >= f.s.frame) {
@@ -259,8 +272,17 @@ function tick(): void {
         extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, /^\?+$/.test(c.nick) ? 'q' : ''));
         startCue(r.cue, extra.shift());
       }
-      else if (r.talking && r.cue + 1 < part.cues.length) startCue(r.cue + 1);
-      else if (r.talking && r.cue < part.cues.length) {
+      // 반응을 기다리는 동안은 대본을 멈추고 채팅을 읽는다. 반응이 오면 위에서 말하고, 그 뒤 대본을 잇는다
+      else if (holding && r.cue < part.cues.length) {
+        reading = true;
+        startRead();
+      }
+      else if ((r.talking || reading) && r.cue + 1 < part.cues.length) {
+        reading = false;
+        startCue(r.cue + 1);
+      }
+      else if ((r.talking || reading) && r.cue < part.cues.length) {
+        reading = false;
         // 큐시트 끝: 쉬다가 다음 부로
         r.cue = part.cues.length;
         r.gapUntil = f.s.next > 0 ? t + f.s.next * 1000 : Infinity;
@@ -273,7 +295,8 @@ function tick(): void {
         run = freshRun(next);
         hooks.advance(next);
         return;
-      } else startIdle();
+      } else if (holding) startRead();
+      else startIdle();
     }
   }
   if (!r.clip) r.clip = clips(r.cut)[0] ?? null;
@@ -517,7 +540,10 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ''}
 /** 시험·디버그: 지금 재생 자리 */
 /** 내 채팅의 반응을 기다리는 동안에는 저절로 다음 부로 넘어가지 않는다 */
 let holding = false;
-export const playerHold = (on: boolean): void => { holding = on; };
+/** 읽느라 대본을 멈춘 상태 · 읽는 동작 차례 */
+let reading = false;
+let readN = 0;
+export const playerHold = (on: boolean): void => { holding = on; if (on) readN = 0; };
 /** 방금까지 흐른 채팅 n줄 */
 export const playerRecentChat = (n: number): { nick: string; text: string }[] => shown.slice(-n);
 export const playerState = () => (run ? { part: run.part, cue: run.cue, cut: run.cut, clip: run.clip?.name ?? '', left: run.left, flags: { ...run.flags } } : null);

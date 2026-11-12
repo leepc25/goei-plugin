@@ -444,7 +444,7 @@
      "name": "twitch",
      "ko": "경련",
      "ver": "1",
-     "group": "rare",
+     "group": "filler",
      "frames": 17,
      "file": "b_twitch_1.webp"
     },
@@ -452,7 +452,7 @@
      "name": "twitch",
      "ko": "경련",
      "ver": "2",
-     "group": "rare",
+     "group": "filler",
      "frames": 17,
      "file": "b_twitch_2.webp"
     },
@@ -460,7 +460,7 @@
      "name": "silentlaugh",
      "ko": "소리 없는 웃음",
      "ver": "1",
-     "group": "rare",
+     "group": "filler",
      "frames": 17,
      "file": "b_silentlaugh_1.webp"
     },
@@ -468,7 +468,7 @@
      "name": "silentlaugh",
      "ko": "소리 없는 웃음",
      "ver": "2",
-     "group": "rare",
+     "group": "filler",
      "frames": 17,
      "file": "b_silentlaugh_2.webp"
     },

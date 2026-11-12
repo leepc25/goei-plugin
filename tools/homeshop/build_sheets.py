@@ -44,7 +44,9 @@ clipsB = []
 for c in man['clips']:
     f = f"b_{c['name']}_{c['ver']}.webp"
     n = sheet(os.path.join(SRC, 'cutB_final', f"{c['name']}_{c['ver']}"), f)
-    clipsB.append({'name': c['name'], 'ko': c['ko'], 'ver': c['ver'], 'group': c['group'], 'frames': n, 'file': f})
+    # 11-12 사용자: 수동 넘김이라 대기가 길다 → 순한 동작(경련·소리 없는 웃음)은 「가끔」으로
+    group = 'filler' if c['name'] in ('twitch', 'silentlaugh') else c['group']
+    clipsB.append({'name': c['name'], 'ko': c['ko'], 'ver': c['ver'], 'group': group, 'frames': n, 'file': f})
 
 layout = json.load(open(os.path.join(SRC, 'plate512_layout.json'), encoding='utf8'))
 meta = {
