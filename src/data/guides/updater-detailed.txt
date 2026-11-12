@@ -443,6 +443,7 @@ The chat keeps the user's character's inventory; `items_now` lists what they car
 - For `unequip` / `left` / `gone` / `destroyed` copy the listed `name` exactly. Not a change: an item merely not mentioned, an intention or plan to leave it, someone else's item. An item left or thrown away earlier (`items_away`, when present, lists them with where they were left) and taken back in the confirmed span is `new` under that exact name.
 - `used_now` (when present) lists items the user's character used this turn through the inventory, with how many times, whether each is a consumable, and the uses left after the program subtracted them. Do not report a consumable as `gone` just because it was used — the program already counted it. Report an item from `used_now` only when the text shows something more: it was damaged, broke, was destroyed, or a consumable's remaining amount differs from `uses_left`.
 - `name` Korean ≤30. `desc` Korean ≤80: what it is and its state in words (never a count such as ×3). `effect` Korean ≤60 only when the text states what the item does; otherwise null. Cite `m` and a verbatim `quote`.
+- `items_rule` (when present) is the user's limit on what may be reported as `new`; follow it. It does not apply to items already listed.
 - At most 4 items per response; one entry per item; never invent an item or an effect.
 - Money is never an item: cash, bills, coins, cheques, gift certificates with a face value, and account balances belong to the ledger (`transactions`), not to `items`.
 <<END:items>>

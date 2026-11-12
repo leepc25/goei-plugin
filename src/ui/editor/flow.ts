@@ -45,31 +45,37 @@ function tokKey(ctx: ChatContext): string {
 }
 const count = (m: LlmMessage[] | null | undefined): number | null => (m ? promptTokens({ messages: m }) : null);
 
+/** 한 가지를 세고 나면 화면에 차례를 넘긴다 (2026-11-13 사용자: 호출 흐름을 열 때 렉이 걸린다 — 요청 열두 개를 한 번에 조립하고 세느라 화면이 그동안 멈췄다) */
+const breathe = () => new Promise<void>((r) => setTimeout(r, 0));
+
 async function computeTokens(ctx: ChatContext): Promise<TokMap> {
   const map: TokMap = {};
-  const safe = (name: string, f: () => number | null) => {
+  const safe = async (name: string, f: () => number | null) => {
+    await breathe();
     try {
       map[name] = f();
     } catch {
       map[name] = null;
     }
   };
+  // 화면을 먼저 그리고 나서 세기 시작한다
+  await breathe();
   const pp = await previewPeopleCalls(ctx).catch(() => ({ router: null, director: null, update: null }));
-  map['인물 Router'] = count(pp.router);
-  map['인물 Director'] = count(pp.director);
-  map['인물 갱신'] = count(pp.update);
-  safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
-  safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
-  for (const site of BOARD_SITES) safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
-  safe('관전', () => count(previewPhoneView(ctx)));
-  safe('위키 자동 작성', () => {
+  await safe('인물 Router', () => count(pp.router));
+  await safe('인물 Director', () => count(pp.director));
+  await safe('인물 갱신', () => count(pp.update));
+  await safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
+  await safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
+  for (const site of BOARD_SITES) await safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
+  await safe('관전', () => count(previewPhoneView(ctx)));
+  await safe('위키 자동 작성', () => {
     const w = previewWikiAuto(ctx);
     const a = count(w.article);
     const t = count(w.title);
     return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
   });
-  safe('상점', () => count(previewShopShelf(ctx)));
-  for (const site of ['cos', 'bm'] as MallSite[]) safe(`${MALL_NAME[site]} 진열`, () => count(previewMallShelf(ctx, site)));
+  await safe('상점', () => count(previewShopShelf(ctx)));
+  for (const site of ['cos', 'bm'] as MallSite[]) await safe(`${MALL_NAME[site]} 진열`, () => count(previewMallShelf(ctx, site)));
   return map;
 }
 

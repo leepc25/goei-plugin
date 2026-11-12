@@ -222,3 +222,24 @@ test('팔기: 판 응답이 살아 있는 동안만 숨고 장착 칸에서 빠�
   assert.deepEqual(back.map((e) => e.name), ['단검']);
   assert.equal(back[0].slot, undefined);
 });
+
+// 2026-11-13: 삭제(기록까지 지움), 물건으로 만드는 범위, 만들지 않을 것
+import { applyItemChanges as _apply, purgeItem as _purge, itemScope as _scope, itemsRule as _rule, ITEM_SCOPE_SKIP as _skip } from '../dist-test/core.mjs';
+test('삭제: 목록과 그 물건의 기록 줄이 같이 지워진다', () => {
+  let it = addItem(empty, alive, { name: '정장', desc: '', from: 'story', anchor: 'c1' });
+  it = addItem(it, alive, { name: '손전등', desc: '', from: 'story', anchor: 'c1' });
+  const id = it.list.find((x) => x.name === '정장').id;
+  const out = _purge(it, id);
+  assert.deepEqual(out.list.map((x) => x.name), ['손전등']);
+  assert.ok(!out.log.some((l) => l.item === id));
+  assert.equal(_purge(out, 'none'), out);
+});
+test('물건으로 만드는 범위: 기본은 넓게, 좁게는 옷을 새로 만들지 않고 갖고 있던 것은 받는다', () => {
+  assert.equal(_scope({}), 'wide');
+  assert.equal(_scope({ $it_scope: 'narrow' }), 'narrow');
+  assert.equal(_rule({}), undefined);
+  assert.match(_rule({ $it_scope: 'mid', $it_skip: '명함, 영수증' }), /Do not report food.*Never report as `new`: 명함, 영수증/);
+  const ch = [{ name: '정장', action: 'new', desc: '', icon: '옷/정장/suit', anchor: 'c1' }, { name: '권총', action: 'new', desc: '', icon: '무기/권총/pistol', anchor: 'c1' }];
+  assert.deepEqual(_apply(empty, alive, ch, { skipKinds: _skip.narrow }).list.map((x) => x.name), ['권총']);
+  assert.deepEqual(_apply(empty, alive, ch, { skipKinds: _skip.wide }).list.map((x) => x.name).sort(), ['권총', '정장'].sort());
+});

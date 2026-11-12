@@ -29,7 +29,7 @@ import { defStored } from '../core/deftext';
 import { ITEM_LEFT_WORDS_DEFAULT, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_DEFAULT, ITEM_OFF_WORDS_VAR, ITEM_RULES_DEFAULT, ITEM_RULES_VAR, ITEM_WORDS_MAX, parseItemRules } from '../core/itemrules';
 import { ICON_KIND_LABEL, normIcon } from '../core/iconmatch';
 import { keepOpen } from './panels';
-import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
+import { invOn, ITEM_SCOPE_VAR, ITEM_SKIP_MAX, ITEM_SKIP_VAR, itemScope, itemSkip, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_AMOUNTS, isGiveKey, isGiveShop, isShopAmount, isShopFn, shopFnNone, shopFnVar, shopGiveVar } from '../core/shopfn';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
@@ -474,6 +474,10 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
         ...(!invOn(itVars) ? [] : [
           D('items-auto', '', { ctl: `<span class="ph-inline">${seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy)}<button class="gx-mini" data-action="ed-node" data-value="set:people">갱신기 설정 →</button></span>` }),
           D('items-state', itemStateOn(itVars) ? '1' : '0'),
+          ...(!itemAutoOn(itVars) ? [] : [
+            D('items-scope', itemScope(itVars)),
+            D('items-skip', '', { ctl: `<input class="st-text" type="text" maxlength="${ITEM_SKIP_MAX}" value="${esc(itemSkip(itVars))}" data-change="set-items-skip" aria-label="만들지 않을 것"${busy ? ' disabled' : ''}>` }),
+          ]),
         ]),
       ].join('')),
       ...(!invOn(itVars) ? [] : [
@@ -566,6 +570,7 @@ const INV_OPTS: Record<string, { key: string; values: string[]; max?: number; nu
   'set-items-start': { key: ITEM_START_VAR, values: ['1', '0'] },
   'set-items-detail': { key: ITEM_DETAIL_VAR, values: ['full', 'state', 'name'] },
   'set-items-state': { key: ITEM_STATE_VAR, values: ['1', '0'] },
+  'set-items-scope': { key: ITEM_SCOPE_VAR, values: ['narrow', 'mid', 'wide'] },
   'set-items-edit': { key: ITEM_EDIT_VAR, values: ['1', '0'] },
   'set-items-pool': { key: ITEM_ICON_POOL_VAR, values: ['1', '0'] },
   'set-items-spent': { key: ITEM_SPENT_VAR, values: ['remove', 'keep'] },
@@ -1083,6 +1088,9 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-items-off-words':
         await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_OFF_WORDS_VAR]: defStored(wordsText(v), ITEM_OFF_WORDS_DEFAULT, undefined, ITEM_WORDS_MAX) } }));
         return true;
+      case 'set-items-skip':
+        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_SKIP_VAR]: v.replace(/\s+/g, ' ').trim().slice(0, ITEM_SKIP_MAX) } }));
+        return true;
       case 'set-items-limit':
         await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_LIMIT_VAR]: v.replace(/\s+/g, ' ').trim().slice(0, 60) } }));
         return true;
@@ -1226,6 +1234,12 @@ export async function handleSettings(action: string, value: string | undefined, 
         const cur = itemCarrySetting(chat.scriptstate);
         const next = Math.min(ITEM_CARRY_MAX, Math.max(ITEM_CARRY_MIN, cur + (v.endsWith('+') ? 1 : -1)));
         return next === cur ? null : { [ITEM_CARRY_VAR]: String(next) };
+      });
+      return true;
+    case 'set-items-skip':
+      await save(ctx, env, (chat) => {
+        const next = v.replace(/\s+/g, ' ').trim().slice(0, ITEM_SKIP_MAX);
+        return next === String(chat.scriptstate?.[ITEM_SKIP_VAR] ?? '') ? null : { [ITEM_SKIP_VAR]: next };
       });
       return true;
     case 'set-items-limit':

@@ -16,7 +16,7 @@ import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFaction
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
 import { mentionsPoints, parsePoints } from '../points';
-import { cleanIcon, itemEquip, itemState, stripGrades, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
+import { cleanIcon, itemsRule, itemEquip, itemState, stripGrades, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -330,6 +330,8 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     items_now: o.items
       ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
       : undefined,
+    // 물건으로 만드는 범위·만들지 않을 것 (설정 → 소지품, core/items.ts itemsRule)
+    items_rule: o.items ? itemsRule(chat.scriptstate) : undefined,
     items_away: o.items && o.away?.length ? o.away.map((e) => ({ name: e.name, place: e.place || undefined })) : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
     // 상점 판단 (11-09): 가장 최근 응답 끝에 주인공이 물건을 살 수 있는 곳이 있나. 기준 글은 지침 「상점」 SHOP_RULE (본편 표식 지침과 같은 글)

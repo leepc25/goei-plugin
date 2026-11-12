@@ -722,6 +722,9 @@
 .gw .fl-bar { position: sticky; top: 0; z-index: 3; margin: 0 0 18px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); grid-template-columns: minmax(0, 1fr) var(--fl-st) var(--fl-st) var(--fl-go); }
 .gw .fl-bar > p { margin: 0; font-size: 13.5px; color: var(--text); }
 .gw .fl-bar > p b { font-weight: 700; }
+.gw .fl-bar > p .fl-sum > span { display: block; }
+.gw .fl-bar > p .fl-sum { display: block; margin-top: 2px; font-size: 12.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.gw .fl-bar > p .fl-sum b { color: var(--text); }
 .gw .fl-bar > div { display: flex; flex-direction: column; align-items: flex-end; padding: 0 12px; box-shadow: inset 1px 0 0 var(--gline); }
 .gw .fl-bar > div > span { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
 .gw .fl-bar > div > b { font-size: 15px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }

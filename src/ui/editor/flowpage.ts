@@ -342,7 +342,14 @@ export function flowPage(ctx: ChatContext, headFn: (crumb: string, title: string
   const estTok = tok.ready ? fmt(auxTok) : tok.pending ? '세는 중…' : tok.error ? `<span title="${esc(`토큰 셈 실패: ${tok.error}`)}">–</span>` : '–';
   const t = lastTurn();
   const rsent = (t ? t.calls.filter((c) => c.phase !== 'manual') : []).reduce((s, c) => s + (c.requestTokens ?? 0), 0);
-  const bar = `<div class="fl-line fl-bar"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b></p><div><span>예상 토큰</span><b>${estTok}</b></div><div><span>지난 턴 토큰</span><b>${t ? fmt(rsent) : '–'}</b></div><i></i></div>`;
+  // 지난 턴에 실제로 보낸 수와 이번 턴 어림: 메인 요청 + 보조 호출 = 합계 (2026-11-13 사용자: 오른쪽 두 수가 보조 호출만 더한 것인데 그렇게 적혀 있지 않아 틀린 수로 보였다).
+  // 메인 예상 = 지난 턴 메인 요청 + 지난 응답 (메인 요청은 Risu 가 조립해서 보내기 전에는 잴 수 없다. 다음 입력만큼 더 붙는다).
+  // 오른쪽 두 칸은 아래 표의 「예상」「지난 턴」 칸과 줄을 맞춘 틀이라 이름을 길게 쓰지 않는다
+  const mainTok = t?.main?.totalTokens;
+  const mainEst = mainTok !== undefined ? mainTok + (t?.reply?.tokens ?? 0) : undefined;
+  const sumLine = (label: string, m: number | undefined, a: number | null) => `<span>${label}: 메인 <b>${m !== undefined ? fmt(m) : '–'}</b> + 보조 <b>${a !== null ? fmt(a) : '–'}</b> = <b>${m !== undefined && a !== null ? fmt(m + a) : '–'}</b></span>`;
+  const turnSum = t ? `<small class="fl-sum">${sumLine('이번 턴 예상', mainEst, tok.ready ? auxTok : null)}${sumLine('지난 턴', mainTok, rsent)}</small>` : '';
+  const bar = `<div class="fl-line fl-bar"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>${turnSum}</p><div><span>보조 예상</span><b>${estTok}</b></div><div><span>보조 지난 턴</span><b>${t ? fmt(rsent) : '–'}</b></div><i></i></div>`;
   const body = sections.map((s) => `<h2 class="fam-h">${esc(s.title)}${s.note ? ` <small>${esc(s.note)}</small>` : ''}</h2>${s.tables.map(table).join('')}`).join('');
   return `<div class="gw-page gw-set">${headFn('', '호출 흐름', '한 턴에 플러그인이 모델을 부르는 순서예요. 호출 수와 모델을 바꾸는 값만 모았고, 여기서 바꾼 값은 각 메뉴의 설정과 같은 값이에요.')}
     <div class="gx-settings gw-setbody fl-page">${bar}${body}</div></div>`;

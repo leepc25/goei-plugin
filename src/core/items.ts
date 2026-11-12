@@ -513,6 +513,29 @@ export const ITEM_SPENT_VAR = '$it_spent';
 export const ITEM_STATE_VAR = '$it_state';
 export const itemStateOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_STATE_VAR] !== '0';
 /** 본편에 넘길 내용: full(기본, 이름·설명·효과·판정) · state(이름·판정) · name(이름만) */
+/** 물건으로 만드는 범위 (2026-11-13 사용자: 「어느선까지 만들게 할거냐」「좀 러프한 분류」 → 세 단계). 갱신기가 본문에서 읽어 새로 만드는 물건에만 적용한다.
+ *  상점에서 산 것·직접 넣은 것·전에 갖고 있던 것을 되찾는 것은 단계와 상관없이 들어온다. 기본은 넓게(= 전과 같은 동작) */
+export const ITEM_SCOPE_VAR = '$it_scope';
+export type ItemScope = 'narrow' | 'mid' | 'wide';
+export const itemScope = (vars: Record<string, unknown> | undefined): ItemScope => (vars?.[ITEM_SCOPE_VAR] === 'narrow' || vars?.[ITEM_SCOPE_VAR] === 'mid' ? vars[ITEM_SCOPE_VAR] as ItemScope : 'wide');
+/** 단계마다 만들지 않는 종류 (그림 말의 종류 코드, core/itemrules.ts kindOfIcon. 옷·음식·서류·잡동사니) */
+export const ITEM_SCOPE_SKIP: Record<ItemScope, string[]> = { narrow: ['wear', 'food', 'paper', 'misc'], mid: ['food', 'misc'], wide: [] };
+/** 갱신기에 넘기는 한 줄 (자료 items_rule) */
+const ITEM_SCOPE_RULE: Record<ItemScope, string> = {
+  narrow: 'Report `new` only for things with a use in the story: weapons, tools and devices, medicine, keys, talismans, sealed objects, anomaly-related objects, valuables. Do not report clothes, food and drink, documents or small everyday things.',
+  mid: 'Report `new` for things with a use in the story and for issued or bought gear worn or carried on the body (clothes, bags) and mission documents. Do not report food and drink or small everyday things.',
+  wide: '',
+};
+/** 만들지 않을 것: 사용자가 직접 적는 글 (갱신기에 그대로 넘긴다) */
+export const ITEM_SKIP_VAR = '$it_skip';
+export const ITEM_SKIP_MAX = 300;
+export const itemSkip = (vars: Record<string, unknown> | undefined): string => clean(vars?.[ITEM_SKIP_VAR], ITEM_SKIP_MAX);
+/** 자료 items_rule: 범위 단계의 글 + 사용자가 적은 「만들지 않을 것」. 둘 다 없으면 undefined */
+export function itemsRule(vars: Record<string, unknown> | undefined): string | undefined {
+  const skip = itemSkip(vars);
+  const out = [ITEM_SCOPE_RULE[itemScope(vars)], skip ? `Never report as \`new\`: ${skip}` : ''].filter(Boolean).join(' ');
+  return out || undefined;
+}
 export const ITEM_DETAIL_VAR = '$it_detail';
 export type ItemDetail = 'full' | 'state' | 'name';
 export const itemDetail = (vars: Record<string, unknown> | undefined): ItemDetail => (vars?.[ITEM_DETAIL_VAR] === 'state' || vars?.[ITEM_DETAIL_VAR] === 'name' ? vars[ITEM_DETAIL_VAR] as ItemDetail : 'full');
@@ -869,7 +892,7 @@ function unEmptyName(it: Items, alive: Set<string>, id: string, icon: string | u
  * 안전망: update 의 설명에 「두고 옴」 말이 있으면 left 로, 「벗음」 말만 있으면 unequip 으로 처리한다 (설정의 말 표).
  * opts.order = 채팅의 메시지 키 차례: 사용자가 「버리기」로 치운 물건은 버린 뒤의 메시지를 근거로 한 new 일 때만 되살린다
  */
-export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[], opts: { state?: boolean; order?: string[] } = {}): Items {
+export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[], opts: { state?: boolean; order?: string[]; skipKinds?: string[] } = {}): Items {
   let it = it0;
   // 설정 「상태 바꾸기」가 꺼져 있으면 손상·고장은 받지 않고, 파괴는 「없어짐」으로 (목록에서는 빠지되 상태 단계는 쓰지 않는다)
   const stateOn = opts.state !== false;
@@ -904,6 +927,8 @@ export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemCh
       // 사용자가 버린 물건: 버린 때보다 뒤의 메시지가 근거일 때만 되살린다 (같은 응답·앞 응답을 근거로 도로 생기지 않게)
       const back = outItemOf(it, alive, c.name);
       if (back?.outHow === 'drop' && !(order.indexOf(c.anchor) > (back.outKey ? order.indexOf(back.outKey) : -1) && order.includes(c.anchor))) continue;
+      // 범위 설정에서 뺀 종류는 새로 만들지 않는다 (갖고 있던 것을 되찾는 것은 받는다)
+      if (!back && !cur && opts.skipKinds?.length && opts.skipKinds.includes(kindOfIcon(c.icon))) continue;
       // 「빈 X」를 지닌 채 「… X」를 새로 얻었다고 오면(찬 수집기) 같은 물건이 찬 것 — 줄을 둘로 두지 않고 그 줄을 바꾼다
       const empty = !back && !cur ? live.find((e) => e.name.startsWith(`${FORM_EMPTY} `) && nameFilled(e.name) !== e.name && normName(c.name).endsWith(normName(nameFilled(e.name))) && !c.name.trim().startsWith(`${FORM_EMPTY} `)) : undefined;
       if (empty && !live.some((e) => sameItemName(e.name, c.name))) {
