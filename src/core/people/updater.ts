@@ -174,6 +174,8 @@ export interface BuildOpts {
   items?: ItemNow[] | null;
   /** 이 묶음 응답에서 「사용」 자리로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 소모성 횟수는 프로그램이 이미 뺐다 */
   used?: UsedNow[];
+  /** 치워 둔 물건 (두고 옴·버림·잃음, core/items.ts itemsAwayOf). 자료 items_away: 되찾으면 이 이름 그대로 new 를 쓰게 */
+  away?: { name: string; place?: string }[];
   /** 상점 판단 (갱신기가 판단할 때): 판단할 응답 위치(가장 최근 응답)와 주인공 이름들 */
   shop?: { at: number; self: string[] } | null;
 }
@@ -328,6 +330,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     items_now: o.items
       ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
       : undefined,
+    items_away: o.items && o.away?.length ? o.away.map((e) => ({ name: e.name, place: e.place || undefined })) : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
     // 상점 판단 (11-09): 가장 최근 응답 끝에 주인공이 물건을 살 수 있는 곳이 있나. 기준 글은 지침 「상점」 SHOP_RULE (본편 표식 지침과 같은 글)
     shop_check: shopM ? { m: shopM, protagonist: o.shop!.self.filter(Boolean) } : undefined,

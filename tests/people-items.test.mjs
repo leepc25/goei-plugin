@@ -132,9 +132,14 @@ test('자료·절: 상태 그림이 여러 장인 물건은 items_now 에 pictur
   const on = U.buildUpdate(c2, store, [1], { settings: s, system: 'S', values: {}, names, items: now2 });
   assert.deepEqual(on.data.items_now[3].pictures, now2[3].pictures);
   assert.equal(on.data.items_now[0].pictures, undefined);
+  // 치워 둔 물건: 있을 때만 items_away (이름·자리). 되찾으면 그 이름 그대로 new 를 쓰게
+  assert.equal(on.data.items_away, undefined);
+  const aw = U.buildUpdate(c2, store, [1], { settings: s, system: 'S', values: {}, names, items: now2, away: [{ name: '손전등', place: '탈의실 3번 사물함' }, { name: '우산' }] });
+  assert.deepEqual(aw.data.items_away, [{ name: '손전등', place: '탈의실 3번 사물함' }, { name: '우산', place: undefined }]);
+  assert.equal(U.buildUpdate(c2, store, [1], { settings: s, system: 'S', values: {}, names, items: null, away: [{ name: '우산' }] }).data.items_away, undefined, '소지품 절이 꺼져 있으면 없음');
   for (const [kind, text] of [['detailed', P.UPDATER_DETAILED], ['compact', P.UPDATER_COMPACT]]) {
     const g = U.assemblePrompt(text, new Set(['items']));
-    for (const w of ['`unequip`', '`left`', '`place`', '`pictures`', 'new|update|unequip|left|gone|destroyed']) assert.ok(g.includes(w), `${kind}: ${w}`);
+    for (const w of ['`unequip`', '`left`', '`place`', '`pictures`', '`items_away`', 'new|update|unequip|left|gone|destroyed']) assert.ok(g.includes(w), `${kind}: ${w}`);
   }
 });
 

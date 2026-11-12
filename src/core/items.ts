@@ -824,6 +824,15 @@ export function itemsNowOf(chat: Chat, pictures?: (name: string, icon?: string) 
   });
 }
 
+/** 자료 items_away: 치워 둔 물건(되살릴 수 있는 것)의 이름·자리. 되찾으면 갱신기가 이 이름 그대로 new 를 쓴다 */
+export function itemsAwayOf(chat: Chat): { name: string; place?: string }[] {
+  const it = readItems(chat.scriptstate);
+  const alive = aliveAnchors(chat);
+  return outItems(it, alive)
+    .filter((e) => outItemOf(it, alive, e.name) === e)
+    .map((e) => ({ name: e.name, ...(e.place ? { place: e.place } : {}) }));
+}
+
 /** 그림 말이 바뀌어 더는 「빈」 그림이 아닌데 이름이 「빈 …」이면 「빈」을 뗀다 (찬 수집기가 「빈 꿈결 수집기」로 남지 않게).
  *  새 그림 말이 그 물건의 것일 때만(물건 이름이 그림 말에 들어 있음), 같은 이름의 다른 물건이 없을 때만 */
 function unEmptyName(it: Items, alive: Set<string>, id: string, icon: string | undefined): Items {

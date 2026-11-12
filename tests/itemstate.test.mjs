@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  addItem, applyItemChanges, applyItemsPack, equipItem, equippedOf, gradeHits, gradeInQuote, inventoryText, isEquipped, itemLine, itemsBlock, itemsNowOf, itemsVars, liveItems, matchItemIcon, movedNow, outItems,
+  addItem, applyItemChanges, applyItemsPack, equipItem, equippedOf, gradeHits, gradeInQuote, inventoryText, isEquipped, itemLine, itemsBlock, itemsAwayOf, itemsNowOf, itemsVars, liveItems, matchItemIcon, movedNow, outItems,
   parseItemRules, readItems, removeItem, setItemRules, stripGrades, totalWeight, traitsFor, itemPictureNames, formFamilies, ITEM_FORM_DEFAULT, ITEM_RULES_VAR, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_VAR,
 } from '../dist-test/core.mjs';
 import { itemsPackText } from '../scripts/data-pack.mjs';
@@ -257,4 +257,20 @@ test('등급 말: 「B등급」「B급」·이름+「등급」만 등급. 「어
   assert.deepEqual(stripGrades('어둠 등급의 꿈결이 찬 실린더', q).cut, ['어둠 등급']);
   assert.deepEqual(stripGrades('B등급 판정을 받은 수집기', '판정 결과는 B등급이었다'), { text: 'B등급 판정을 받은 수집기', cut: [] }, '본문에 적힌 등급은 둔다');
   assert.deepEqual(stripGrades('어둠 현장에서 추출된 고농도 꿈결', q).cut, [], '등급 말이 아닌 것은 건드리지 않는다');
+});
+
+test('자료 items_away: 두고 온 것·없어진 것은 이름·자리로 넘어가고, 파괴된 것·다 쓴 것·지닌 것은 안 넘어간다. 되찾으면 목록에서 빠진다', () => {
+  setItemRules(undefined);
+  let s = suit();
+  s = addItem(s, alive, { name: '손전등', icon: '기기/손전등/flashlight', from: 'story', anchor: 'c1', quote: 'q' });
+  s = addItem(s, alive, { name: '유리병', icon: '도구/병/bottle', from: 'story', anchor: 'c1', quote: 'q' });
+  s = applyItemChanges(s, alive, [
+    ch({ anchor: 'c2', name: '사내용 정장 세트', action: 'left', place: '탈의실 3번 사물함', quote: '사물함에 넣어 두었다' }),
+    ch({ anchor: 'c2', name: '손전등', action: 'gone', quote: '손전등을 잃어버렸다' }),
+    ch({ anchor: 'c2', name: '유리병', action: 'destroyed', quote: '유리병이 산산조각 났다' }),
+  ], { order });
+  const chat = (st) => ({ message: order.map((k) => ({ role: k[0] === 'u' ? 'user' : 'char', data: 'x', chatId: k })), scriptstate: itemsVars(st) });
+  assert.deepEqual(itemsAwayOf(chat(s)), [{ name: '사내용 정장 세트', place: '탈의실 3번 사물함' }, { name: '손전등' }]);
+  const back = applyItemChanges(s, alive, [ch({ anchor: 'c3', name: '사내용 정장 세트', action: 'new', quote: '사물함에서 정장을 꺼냈다' })], { order });
+  assert.deepEqual(itemsAwayOf(chat(back)), [{ name: '손전등' }]);
 });
