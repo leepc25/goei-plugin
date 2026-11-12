@@ -1,6 +1,6 @@
 // 괴담톡 요청문 (원본 buildPrompt·refreshPrompt·ruleBuilder·contactPrompts).
 // 지침은 카드의 Phone 로어북 @@SECTION을 요청 조건에 맞는 것만 골라 이어 붙이고, 자료는 JSON 하나로 보낸다.
-import { fillSitePics } from './sitepics';
+import { sitePicAsPhoto } from './attach';
 import { publicBoard } from './gnetPrompt';
 import { readGnet } from './gnet';
 import {
@@ -96,7 +96,7 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
   if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   const br = phoneSettings(src.chat.scriptstate).banterRows;
-  return [...keys.map((k) => fillSitePics(section(p, k), src.char).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  return [...keys.map((k) => dropSitePicGuide(section(p, k)).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
 }
 
 // ── 자료 ──
@@ -119,6 +119,10 @@ interface RoomPacket {
   banter?: boolean;
 }
 
+/** 인물이 에셋 그림을 사진으로 보내던 기능은 괴담톡에서 뺐다 (2026-11-12 사용자: 감정 표시처럼 썼다). 고쳐 저장해 둔 옛 지침에 그 줄이 남아 있으면 지운다 */
+const SITE_PIC_GUIDE = 'Real photos: when the subject is one of the pictures listed below, an NPC may send [사진:Name] instead of a photo description, or [사진:Name_expression] for a person in the People list; the app shows the actual picture. Write the listed name exactly, on its own line inside the content/body string. Anything not listed stays a described [[ATTACH:photo]]. Send one only when that character would plausibly have or take such a photo.';
+const dropSitePicGuide = (text: string): string => (text.includes('__SITE_PICS__') ? text.split('\n').filter((l) => l.trim() !== '__SITE_PICS__' && l.trim() !== SITE_PIC_GUIDE).join('\n') : text);
+
 export function roomPacket(r: PRoom, reactions = false): RoomPacket {
   const messages = r.messages
     .slice(-HISTORY.room)
@@ -127,7 +131,7 @@ export function roomPacket(r: PRoom, reactions = false): RoomPacket {
       sender: m.sender === 'system' ? '-' : m.sender,
       type: m.kind === 'message' ? 'text' : m.kind === 'invite' ? 'invited' : m.kind,
       time: m.time,
-      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.kind === 'skip' ? '-' : m.text,
+      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.kind === 'skip' ? '-' : sitePicAsPhoto(m.text),
       audience: m.audience,
       recordID: m.id,
       ...(reactions && m.kind === 'message' ? { reactions: m.reactions || '-' } : {}),
@@ -255,7 +259,7 @@ function crossRoom(body: Body, st: PState): void {
     if (knownBy.length) {
       records.push({
         room: e.room.id, roomName: e.room.kind === 'group' ? roomLabel(e.room) : undefined, kind: e.room.kind, recordID: e.m.id, sender: e.m.sender,
-        senderName: e.room.people[e.m.sender]?.name, time: e.m.time, content: e.m.text, knownBy: knownBy.sort(),
+        senderName: e.room.people[e.m.sender]?.name, time: e.m.time, content: sitePicAsPhoto(e.m.text), knownBy: knownBy.sort(),
       });
     }
   }

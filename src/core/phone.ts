@@ -6,7 +6,7 @@ import { readWorld } from './world/output';
 import { phoneTabsSection, readDirectory, rosterOf } from './world/directory';
 import { BUILTIN, extraFactions, extraTabs, factionType, isFactionCode } from './factions';
 import { dateNow, storyTurns, tokens, cut } from './gnet';
-import { attachmentRecords, describe, stripForged } from './attach';
+import { attachmentRecords, describe, sitePicAsPhoto, stripForged } from './attach';
 import { pickRecords, related, type Focus, type Pick } from './focus';
 export { hasAttachment } from './attach';
 
@@ -1065,7 +1065,7 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
           order: m.id, related: roomHit || related(focus, [], m.text),
           data: {
             room: r.id, title: roomLabel(r), recipients: m.audience.map((c) => r.people[c]?.name ?? c), kind: m.kind,
-            sender: m.sender === 'me' ? '주인공' : m.sender === 'system' ? 'system' : r.people[m.sender]?.name ?? m.sender, text: describe(m.text), time: m.time, order: m.id,
+            sender: m.sender === 'me' ? '주인공' : m.sender === 'system' ? 'system' : r.people[m.sender]?.name ?? m.sender, text: describe(sitePicAsPhoto(m.text)), time: m.time, order: m.id,
           },
         });
       }
