@@ -4838,6 +4838,58 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-fx-head .ms-num { width: 64px; }
 .ms-fx-wide { flex: 1; min-width: 0; }
 .ms-fx-wide > input { flex: 1; min-width: 0; }
+/* 시안: 칸 입력 표 (값 등급·주사위 칸) — 조작은 전부 공통 규격 그대로(.gx-search·.ms-num·.st-step·.gx-mini·.gx-chip), 배치만 새로 */
+.gw .ps-row.ms-wide > .ps-ctl { display: block; }
+.ms-tb { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.ms-tb-h, .ms-tb-r { display: grid; grid-template-columns: 92px minmax(0, 1fr) 144px 144px 114px 34px; column-gap: 8px; align-items: center; }
+.ms-tb-h > span { font-size: 12.5px; color: var(--dim); }
+.ms-tb-c { display: block; min-width: 0; margin: 0; }
+.ms-tb-c > span:first-child { display: none; }
+.ms-tb-c > input.gx-search { width: 100%; box-sizing: border-box; }
+.ms-tb .ph-inline { flex-wrap: nowrap; }
+.ms-tb .ph-inline .ms-num { width: 120px; }
+.gw .ms-tb-r.bad input.gx-search.ms-num, .gw .ms-tb-r.bad .n > input.gx-search, .gw .ms-ax.bad .n > input.gx-search { border-color: var(--danger); }
+.ms-tb-err { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--danger); }
+.ms-tb-foot { display: flex; gap: 8px; padding-top: 2px; }
+.ms-axs .ms-tb-h, .ms-ax { display: grid; grid-template-columns: 168px minmax(0, 1fr) 34px; column-gap: 8px; align-items: start; }
+.ms-ax { padding: 8px 0; border-top: 1px solid var(--hair, var(--line)); }
+.ms-ax > .ms-tb-x { grid-column: 3; grid-row: 1; }
+.ms-ax > .ms-ax-v { grid-column: 2; grid-row: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.gw .ms-ax-v > .gx-chips { display: contents; }
+.ms-ax-v .ms-cl-add > input.gx-search { width: 150px; }
+.ms-cl { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.ms-cl-add { display: flex; gap: 6px; align-items: center; }
+.ms-cl-add > input.gx-search { width: 200px; max-width: 100%; }
+.gw .ms-cl .gx-chip small, .gw .ms-ax .gx-chip small { color: var(--dim); font-size: 13px; }
+.gw .ms-ax .gx-chip b { font-weight: 600; color: var(--accent); font-size: 12px; }
+.ms-clips .ms-tb-h, .ms-clip.ms-tb-r { grid-template-columns: 150px 220px minmax(0, 1fr) 34px; }
+.ms-clip select { width: 100%; }
+.ms-pairs .ms-tb-h, .ms-pairs .ms-tb-r { grid-template-columns: 220px 16px 220px 34px; }
+.ms-arrow { font-style: normal; color: var(--dim); text-align: center; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .ms-tb { gap: 8px; }
+  .ms-tb-h, .ms-axs .ms-tb-h { display: none; }
+  .ms-tb-r, .ms-ax { grid-template-columns: minmax(0, 1fr) 34px; row-gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+  .ms-tb-r > .ms-tb-c, .ms-ax > .ms-tb-c { display: grid; grid-template-columns: 68px minmax(0, 1fr); align-items: center; column-gap: 6px; grid-column: 1 / -1; }
+  .ms-tb-r > .ms-tb-c.n, .ms-ax > .ms-tb-c.n { grid-column: 1; }
+  .ms-tb-c > span:first-child { display: block; font-size: 12.5px; color: var(--dim); }
+  .ms-tb-r > .ms-tb-x, .ms-ax > .ms-tb-x { grid-column: 2; grid-row: 1; }
+  .ms-tb .ph-inline .ms-num { width: 150px; }
+  .ms-clip.ms-tb-r { grid-template-columns: minmax(0, 1fr) 34px; }
+  .ms-clip.ms-tb-r > .ms-tb-c { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .ms-clip.ms-tb-r > .ms-tb-c:first-child { grid-column: 1; }
+  .ms-clip.ms-tb-r > .ms-tb-x { align-self: end; }
+  .ms-pairs .ms-tb-r { grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) 34px; padding: 0; border: 0; border-radius: 0; }
+  .ms-pairs .ms-tb-r > .ms-tb-c { display: block; grid-column: auto; }
+  .ms-pairs .ms-tb-r > .ms-tb-x { grid-column: 4; }
+  .ms-pairs .ms-tb-c > span:first-child { display: none; }
+  .ms-tb-c.w > .st-step { justify-self: start; }
+  .ms-ax > .ms-ax-v { grid-column: 1 / -1; grid-row: auto; }
+  .ms-ax-v > .ms-cl-add { flex: 1 0 100%; }
+  .ms-ax-v .ms-cl-add > input.gx-search { flex: 1; width: auto; min-width: 0; }
+  .ms-ax-v > .ms-cl-add { min-width: 0; max-width: 100%; }
+  .ms-cl-add > input.gx-search { flex: 1; width: auto; min-width: 0; }
+}
 .ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
 .ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
 .ms-sample i { color: var(--accent); font-style: normal; }

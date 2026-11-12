@@ -856,6 +856,65 @@ const genresNorm = (t: string) => genresText(parseGenres(t));
 const tiersNorm = (t: string) => tiersText(parseTiers(t));
 const axesNorm = (t: string) => parseAxes(t).map((a) => `${a.name}: ${a.values.join(', ')}`).join('\n');
 const group = (title: string, rows: string) => setGroup(title, rows);
+
+// ── 시안(11-12 사용자: 「이름|설명|하한|상한|가중치」처럼 치게 하지 말고 칸마다 입력칸을): 저장 글 꼴은 그대로, 화면만 칸으로 ──
+interface TierRaw { name: string; desc: string; lo: string; hi: string; w: string }
+const tiersRaw = (text: string): TierRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes('|')).map((l) => { const [name = '', desc = '', lo = '', hi = '', w = ''] = l.split('|').map((x) => x.trim()); return { name, desc, lo, hi, w }; });
+const tiersRawText = (t: TierRaw[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join('\n');
+const tierRows = (vars: Record<string, unknown> | undefined, site: MallSite): TierRaw[] => { const st = String(vars?.[rollKeys(site).tiers] ?? ''); return tiersRaw(st.trim() ? st : tiersText(rollDefaults(site).tiers)); };
+const tierBad = (x: TierRaw): string => {
+  const a = Number(x.lo.replace(/[^\d]/g, '')); const b = Number(x.hi.replace(/[^\d]/g, ''));
+  if (!x.name) return '이름이 비어 있어 이 줄은 안 뽑혀요.';
+  if (!x.lo || a <= 0) return '하한이 비어 있어 이 줄은 안 뽑혀요.';
+  if (!x.hi || b < a) return '상한이 하한보다 작아 이 줄은 안 뽑혀요.';
+  return '';
+};
+const stepBox = (action: string, key: string, text: string, down: boolean, up: boolean) => `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${down ? '' : 'disabled'} aria-label="줄이기">−</button><b>${text}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${up ? '' : 'disabled'} aria-label="늘리기">+</button></div>`;
+/** 값 등급 표: PC 는 제목 줄 + 줄마다 칸, 폰은 줄마다 카드 (같은 DOM, 배치만 CSS) */
+function tierTable(vars: Record<string, unknown> | undefined, site: MallSite): string {
+  const unit = site === 'bm' ? 'p' : '원';
+  const rows = tierRows(vars, site);
+  const cell = (cls: string, label: string, inner: string) => `<label class="ms-tb-c ${cls}"><span>${label}</span>${inner}</label>`;
+  const body = rows.map((x, i) => {
+    const k = `${site}:${i}`;
+    const bad = tierBad(x);
+    const w = x.w === '' || !Number.isFinite(Number(x.w)) || Number(x.w) < 0 ? 1 : Math.min(99, Math.trunc(Number(x.w)));
+    const num = (f: 'lo' | 'hi', label: string) => `<span class="ph-inline"><input class="gx-search ms-num" type="number" min="1" max="1000000000000" data-change="ms-tier" data-key="${k}:${f}" value="${esc(x[f].replace(/[^\d]/g, ''))}" aria-label="${label}"><span>${unit}</span></span>`;
+    return `<div class="ms-tb-r${bad ? ' bad' : ''}">
+      ${cell('n', '이름', `<input class="gx-search" data-change="ms-tier" data-key="${k}:name" value="${esc(x.name)}" maxlength="20" aria-label="이름">`)}
+      ${cell('d', '설명(영어)', `<input class="gx-search" data-change="ms-tier" data-key="${k}:desc" value="${esc(x.desc)}" maxlength="120" aria-label="설명(영어)">`)}
+      ${cell('lo', '하한', num('lo', '하한'))}
+      ${cell('hi', '상한', num('hi', '상한'))}
+      <div class="ms-tb-c w"><span>가중치</span>${stepBox('ms-tier-w', k, String(w), w > 0, w < 99)}</div>
+      <button class="gx-mini danger ms-tb-x" data-action="ms-tier-del" data-value="${k}" aria-label="지우기">×</button>
+      ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="ms-tb"><div class="ms-tb-h"><span>이름</span><span>설명(영어)</span><span>하한</span><span>상한</span><span>가중치</span><span></span></div>${body}<div class="ms-tb-foot"><button class="gx-mini primary" data-action="ms-tier-add" data-value="${site}" ${rows.length >= 12 ? 'disabled' : ''}>등급 추가</button></div></div>`;
+}
+/** 쉼표 목록 → 칩 + 추가 칸 (칩을 누르면 그 항목이 빠진다) */
+const chipList = (items: string[], del: string, key: string, add: string, name: string, ph: string) =>
+  `<div class="ms-cl"><div class="gx-chips">${items.map((g, i) => `<button class="gx-chip" data-action="${del}" data-value="${key}${i}" aria-label="${esc(g)} 지우기">${esc(g)}<small>×</small></button>`).join('')}</div><div class="ms-cl-add"><input class="gx-search" name="${name}" maxlength="40" placeholder="${ph}" aria-label="${ph}"><button class="gx-mini" data-action="${add}" data-take="${name}">추가</button></div></div>`;
+/** 상담사 주사위 칸: 줄마다 칸 이름 + 값 칩. 같은 값을 여러 번 넣으면 「n번」 */
+interface AxisRaw { name: string; values: string[] }
+const axesRaw = (text: string): AxisRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes(':')).map((l) => { const i = l.indexOf(':'); return { name: l.slice(0, i).trim(), values: l.slice(i + 1).split(/[,，]/).map((x) => x.trim()).filter(Boolean) }; });
+const axesRawText = (a: AxisRaw[]): string => a.map((x) => `${x.name}: ${x.values.join(', ')}`).join('\n');
+const axisRows = (vars: Record<string, unknown> | undefined): AxisRaw[] => { const st = String(vars?.[DESK_KEY.axes] ?? ''); return axesRaw(st.trim() ? st : DESK_AXES_DEFAULT); };
+function axisTable(vars: Record<string, unknown> | undefined): string {
+  const rows = axisRows(vars);
+  const body = rows.map((a, i) => {
+    const uniq = [...new Set(a.values)];
+    const bad = !a.name ? '칸 이름이 비어 있어 이 칸은 안 뽑아요.' : !a.values.length ? '값이 없어 이 칸은 안 뽑아요.' : '';
+    const chips = uniq.map((v, j) => { const n = a.values.filter((x) => x === v).length; return `<button class="gx-chip" data-action="ms-axv-del" data-value="${i}:${j}" aria-label="${esc(v)} 지우기">${esc(v)}${n > 1 ? `<b>${n}번</b>` : ''}<small>×</small></button>`; }).join('');
+    return `<div class="ms-ax${bad ? ' bad' : ''}">
+      <label class="ms-tb-c n"><span>칸 이름</span><input class="gx-search" data-change="ms-ax-name" data-key="${i}" value="${esc(a.name)}" maxlength="20" placeholder="칸 이름" aria-label="칸 이름"></label>
+      <button class="gx-mini danger ms-tb-x" data-action="ms-ax-del" data-value="${i}" aria-label="지우기">×</button>
+      <div class="ms-ax-v"><div class="gx-chips">${chips}</div><div class="ms-cl-add"><input class="gx-search" name="ms-axv-${i}" maxlength="60" placeholder="값" aria-label="값"><button class="gx-mini" data-action="ms-axv-add:${i}" data-take="ms-axv-${i}">추가</button></div></div>
+      ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="ms-tb ms-axs"><div class="ms-tb-h"><span>칸 이름</span><span>값</span><span></span></div>${body}<div class="ms-tb-foot"><button class="gx-mini primary" data-action="ms-ax-add" ${rows.length >= 12 ? 'disabled' : ''}>칸 추가</button></div></div>`;
+}
 function mseg(site: MallSite, key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'ms-cfg', (v) => `${site}:${key}=${v}`);
   if (sw) return sw;
@@ -882,23 +941,22 @@ function cosRollGroup(ctx: ChatContext, site: MallSite): string {
   const K = rollKeys(site);
   const D = rollDefaults(site);
   const bm = site === 'bm';
-  const reset = rollChanged(vars, site) ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset" data-value="${site}">기본값으로</button></div>` : '';
+  const reset = rollChanged(vars, site) || String(vars?.[K.tiers] ?? '').trim() ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset" data-value="${site}">기본값으로</button></div>` : '';
   // 기본값은 칸에 진짜 글로 들어 있다 (11-12 사용자: 회색 안내 글이면 한 글자만 쳐도 다 사라진다). 다르게 고친 줄만 「바꾼 줄」 점
   const gSet = defChanged(String(vars?.[K.genres] ?? ''), genresText(D.genres), genresNorm);
-  const tSet = defChanged(String(vars?.[K.tiers] ?? ''), tiersText(D.tiers), tiersNorm);
   const mark = (on: boolean) => (on ? 'ps-changed' : '');
   // 지금 설정으로 한 번 뽑아 본 예 (열 때마다 달라짐)
   const n = Math.round((s.size[0] + s.size[1]) / 2);
   const money = (x: CosTier) => (bm ? `${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}p` : `₩${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}`);
   const sample = r.on ? cosDraw(n, s.context, r).map((x, i) => `<li><b>${i + 1}칸</b> ${esc(x.genre)} · ${esc(x.tier.name)} ${money(x.tier)}${x.useful ? ' · <i>상황용</i>' : ''}</li>`).join('') : '';
   const word = bm ? '분류' : '장르';
+  const listText = String(vars?.$mock_list ?? '') === 'text'; // 시안: 쉼표 목록 두 안 견주기 (text = 지금 같은 글 상자)
   const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 ${word}를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — ${bm ? 'CATEGORY' : 'GENRE'} · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, ${word}·등급을 바꾸지 못해요.${bm ? ' 로어북의 가격 예시 물건을 그대로 되풀이하기 어렵게 하는 장치예요.' : ''}</p>`;
-  const tierHelp = bm ? `한 줄에 「이름|설명(영어)|하한|상한|가중치」(포인트). 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 다 지우면 기본 5단계(30~9,999p, 싼 쪽에 가중치)로 돌아가요.` : '한 줄에 「이름|설명(영어)|하한|상한|가중치」. 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 다 지우면 기본 5단계(₩999,999~49,999,999, 모두 1)로 돌아가요.';
   return group('진열 배정', how + [
     row('사용', mseg(site, 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요).'),
-    row(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres">${esc(genresText(r.genres))}</textarea>`, `쉼표로 나눠요. 다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, mark(gSet)),
+    listText ? row(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres">${esc(genresText(r.genres))}</textarea>`, `쉼표로 나눠요. 다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, mark(gSet)) : row(`${word} 목록`, chipList(r.genres, 'ms-gen-del', `${site}:`, `ms-gen-add:${site}`, `ms-gen-${site}`, word), `다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, `ms-wide ${mark(gSet)}`),
     row(`${word} 뽑기`, mseg(site, 'roll_gmode', r.gmode, [['uniq', '칸마다 다르게'], ['any', '겹쳐도 됨'], ['one', `한 ${word}로`]]), r.gmode === 'uniq' ? '목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시.' : r.gmode === 'any' ? `칸마다 따로 무작위. 같은 ${word}가 여러 칸에 나올 수 있어요.` : `한 판에 ${word} 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).`),
-    row('값 등급', `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="${site}:tiers">${esc(tiersText(tSet ? parseTiers(String(vars?.[K.tiers] ?? '')) : D.tiers))}</textarea>`, tierHelp, mark(tSet)),
+    row('값 등급', tierTable(vars, site), bm ? '가중치는 뽑힐 비율이에요(0이면 안 뽑혀요). 다 지우면 기본 5단계(30~9,999p, 싼 쪽에 가중치)로 돌아가요.' : '가중치는 뽑힐 비율이에요(0이면 안 뽑혀요). 다 지우면 기본 5단계(₩999,999~49,999,999, 모두 1)로 돌아가요.', `ms-wide ${mark(String(vars?.[K.tiers] ?? '').trim() !== '')}`),
     row('등급 뽑기', mseg(site, 'roll_tmode', r.tmode, [['weight', '가중치대로'], ['even', '골고루'], ['same', '한 등급으로']]), r.tmode === 'weight' ? '칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요.' : r.tmode === 'even' ? '등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요.' : '한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요.'),
     row('상황용 칸', mseg(site, 'roll_useful', r.useful, [['auto', '자동'], ['0', '없음'], ['1', '1칸'], ['2', '2칸']]), '「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위.'),
     r.on ? row('뽑기 예', `<ul class="ms-sample">${sample}</ul>`, `지금 설정으로 ${n}칸을 한 번 뽑아 본 거예요. 열 때마다 달라져요.`) : '',
@@ -910,10 +968,10 @@ function deskGroup(ctx: ChatContext): string {
   const d = deskSettings(ctx.chat.scriptstate);
   const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 턴이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
   const aSet = defChanged(d.axesText, DESK_AXES_DEFAULT, axesNorm);
-  const reset = aSet ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
+  const reset = aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
   return group('1:1 상담', how + [
     row('사용', mseg('bm', 'desk_on', d.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요.'),
-    row('상담사 주사위 칸', `<textarea class="gx-search ms-area" rows="7" data-change="ms-desk" data-key="axes">${esc(aSet ? d.axesText : DESK_AXES_DEFAULT)}</textarea>`, '한 줄에 「칸 이름: 값, 값, …」. 칸마다 하나씩 뽑아요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 다 지우면 기본 칸으로 돌아가요.', aSet ? 'ps-changed' : ''),
+    row('상담사 주사위 칸', axisTable(ctx.chat.scriptstate), '칸마다 값을 하나씩 뽑아요. 같은 값을 또 추가하면 그만큼 잘 뽑혀요. 다 지우면 기본 칸으로 돌아가요.', `ms-wide ${aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? 'ps-changed' : ''}`),
     row('지난 상담사 다시 만나기', mseg('bm', 'desk_again', d.again ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요.'),
     row('겹치지 않게 넘길 수', `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
   ].join('') + reset);
@@ -1006,6 +1064,17 @@ async function deskSettingsAction(action: string, value: string | undefined, ctx
     if (!m) return false;
     return m[1] === 'desk_on' ? set({ [DESK_KEY.on]: m[2] === '0' ? '0' : '' }) : set({ [DESK_KEY.again]: m[2] === '1' ? '1' : '' });
   }
+  {
+    // 시안: 주사위 칸 줄 단위 고치기 (저장 글 꼴 「칸 이름: 값, 값」 그대로)
+    const rows = () => axisRows(ctx.chat.scriptstate);
+    const save = (a: AxisRaw[]) => { const t = axesRawText(a); return set({ [DESK_KEY.axes]: !a.length || t === DESK_AXES_DEFAULT ? '' : t }); };
+    const clean = (v: string, n: number) => v.replace(/[:,，\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+    if (action === 'ms-ax-name') { const m = /^(\d+)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true; return save(rows().map((a, i) => (i === Number(m[1]) ? { ...a, name: clean(m[2], 20) } : a))); }
+    if (action === 'ms-ax-del') return save(rows().filter((_, i) => i !== Number(value)));
+    if (action === 'ms-ax-add') return save([...rows(), { name: '', values: [] }]);
+    if (action === 'ms-axv-del') { const [i, j] = String(value).split(':').map(Number); return save(rows().map((a, k) => { if (k !== i) return a; const v = [...new Set(a.values)][j]; const at = a.values.lastIndexOf(v); return { ...a, values: a.values.filter((_, x) => x !== at) }; })); }
+    if (action.startsWith('ms-axv-add:')) { const i = Number(action.slice(11)); const v = clean(value ?? '', 60); return v ? save(rows().map((a, k) => (k === i ? { ...a, values: [...a.values, v] } : a))) : true; }
+  }
   if (action === 'ms-desk') {
     const m = /^axes=([\s\S]*)$/.exec(value ?? '');
     return m ? set({ [DESK_KEY.axes]: defStored(m[1], DESK_AXES_DEFAULT, axesNorm) }) : true;
@@ -1090,6 +1159,23 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     if (m[1] === 'truth') return set({ [COS_TRUTH_KEY]: m[2] === 'mix' ? '' : m[2] });
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));
+  }
+  {
+    // 시안: 값 등급 칸 단위 고치기·목록 칩 (저장 글 꼴 그대로. 못 쓰는 줄도 남겨 두고 읽는 쪽이 거른다)
+    const vars = ctx.chat.scriptstate;
+    const saveT = (site: MallSite, t: TierRaw[]) => { const x = tiersRawText(t); return set({ [rollKeys(site).tiers]: !t.length || x === tiersText(rollDefaults(site).tiers) ? '' : x }); };
+    const saveG = (site: MallSite, g: string[]) => set({ [rollKeys(site).genres]: defStored(genresText(g), genresText(rollDefaults(site).genres), genresNorm) });
+    const clean = (v: string, n: number) => v.replace(/[|\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+    if (action === 'ms-tier') {
+      const m = /^(cos|bm):(\d+):(name|desc|lo|hi)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true;
+      const site = m[1] as MallSite; const f = m[3] as 'name' | 'desc' | 'lo' | 'hi';
+      return saveT(site, tierRows(vars, site).map((x, i) => (i === Number(m[2]) ? { ...x, [f]: f === 'name' ? clean(m[4], 20) : f === 'desc' ? clean(m[4], 120) : m[4].replace(/[^\d]/g, '').slice(0, 13) } : x)));
+    }
+    if (action === 'ms-tier-w') { const m = /^(cos|bm):(\d+):([+-])$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveT(site, tierRows(vars, site).map((x, i) => { if (i !== Number(m[2])) return x; const w = x.w === '' || !Number.isFinite(Number(x.w)) ? 1 : Math.trunc(Number(x.w)); return { ...x, w: String(Math.max(0, Math.min(99, w + (m[3] === '+' ? 1 : -1)))) }; })); }
+    if (action === 'ms-tier-del') { const m = /^(cos|bm):(\d+)$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveT(site, tierRows(vars, site).filter((_, i) => i !== Number(m[2]))); }
+    if (action === 'ms-tier-add') { const site = (value === 'bm' ? 'bm' : 'cos') as MallSite; return saveT(site, [...tierRows(vars, site), { name: '', desc: '', lo: '', hi: '', w: '1' }]); }
+    if (action === 'ms-gen-del') { const m = /^(cos|bm):(\d+)$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveG(site, mallRoll(vars, site).genres.filter((_, i) => i !== Number(m[2]))); }
+    if (action.startsWith('ms-gen-add:')) { const site = (action.slice(11) === 'bm' ? 'bm' : 'cos') as MallSite; const v = (value ?? '').replace(/[,\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40); return v ? saveG(site, [...mallRoll(vars, site).genres, v]) : true; }
   }
   if (action === 'ms-roll') {
     const m = /^(?:(cos|bm):)?(genres|tiers)=([\s\S]*)$/.exec(value ?? '');
