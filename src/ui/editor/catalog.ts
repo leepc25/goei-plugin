@@ -197,6 +197,15 @@ export function pageRows(html: string, page: string, menu: string): CatRow[] {
     const help = txt(foot);
     if (title && help) out.push({ id: `row.${page}.${++infoN}`, page, menu, group: title, name: title, kind: 'info', cur: '', help, go: [`set:${page}`, ''], keys: [title] });
   });
+  // 접어 둔 칸 표(소지품 「그림 대체 말」, 2026-11-12): 줄이 수십 개인 짝 표라 상담은 설명만 한다 (고치기는 설정 화면의 칸에서)
+  doc.querySelectorAll<HTMLElement>('details.ps-adv').forEach((d) => {
+    if (d.closest(TWIN) || !d.querySelector('.ms-tb') || d.querySelector(ROW)) return;
+    const name = txt(d.querySelector(':scope > summary > b'));
+    if (!name) return;
+    const count = txt(d.querySelector(':scope > summary > .adv-count'));
+    const help = `${count ? `지금 ${count}. ` : ''}${txt(d.querySelector('.ps-note'))} 상담에서는 바꾸지 못해요. 설정 화면에서 펼쳐 칸으로 고쳐요.`.trim();
+    out.push({ id: `row.${page}.${++infoN}`, page, menu, group: txt(d.closest('.ps-group')?.querySelector('h3')), name, kind: 'info', cur: '', help, go: [`set:${page}`, ''], keys: [name] });
+  });
   return out;
 }
 

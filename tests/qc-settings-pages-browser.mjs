@@ -268,8 +268,8 @@ for (const vp of vps) {
       await settle(page);
       assert.ok(await page.$(worldBtn('preset_ttl', '+')), '자동 종료 ON → 유지 시간 줄');
     }
-    // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수 (가계부 묶음은 기록 페이지, 2026-11-05 사용자)
-    await goNode(page, 'set:wallet');
+    // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수 (가계부 묶음은 소지품 페이지, 2026-11-12 사용자)
+    await goNode(page, 'set:items');
     const won = '.gw .st-won';
     if (await page.$(won)) {
       const chatWon = async () => JSON.parse((await chatOf(page)).scriptstate.$st_wallet ?? '{}');

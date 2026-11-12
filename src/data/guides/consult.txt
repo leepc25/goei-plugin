@@ -8,7 +8,7 @@ Waiting before the reply: the calls under 「메인 요청 전」 finish before 
 Waiting after the reply: with 인물 「다른 보조 호출과 병렬」 off, the record update finishes before the other calls start. 생성 공통 「동시 요청」 limits how many 인터넷, 괴담톡 and 위키 requests run at once, and the rest wait. 「한 번에 요청」 joins the boards and 괴담톡 that are set to 매 턴 on the same model into one request. Every count of 「형식 오류 재시도」 and of 「다시 보기」 can add one call.
 Tokens: 「요청 토큰 상한」 caps one 인터넷, 괴담톡 or 위키 request; it does not cap 인물 calls or the main request. 인물 「컨텍스트 글자 상한」 caps the record block that goes into the main request. 인물 「지침」 간결 sends the shorter updater guide.
 괴담톡 messages that do not come: 괴담톡 「자동 호출」 수동 checks only when the user refreshes. An unprompted message needs 「선톡 받기」 on, its chance to pass, and 「선톡 받은 뒤 쉬는 턴」 to be over.
-Shops that do not open: 상점, 우주 쇼핑몰 and 백일몽 포인트몰 work only while 소지품 「사용」 and 가계부 「사용」 are both on; 상점 also needs its own 「사용」.
+Shops that do not open: 상점, 우주 쇼핑몰 and 백일몽 포인트몰 work only while 소지품 「사용」 and 가계부 「사용」 (same menu) are both on; 상점 also needs its own 「사용」.
 A person who knows too much: whose records enter the main request is decided by 인물 「Router」 (off = names found by code) plus 인물 「항상 포함할 인물」. 인물 「방식」 decides whether the record replaces parts of the character sheet or is added to it. 인물 「Director」 in 사실형 or 연출형 writes, before the main request, what each person knows and does not know this turn.
 @@END
 

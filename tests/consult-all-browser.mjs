@@ -225,7 +225,8 @@ if (PART.includes('sweep')) {
   const head = await page.evaluate(() => [...document.querySelectorAll('.gw-ai .gw-ai-top button')].map((b) => `${b.dataset.action}${b.disabled ? '(잠김)' : ''}`));
   ok(head.includes('ai-clear(잠김)'), `대화가 없을 때 「대화 지우기」는 잠겨 있다 (${head.join(',')})`);
   const nodes = await menuNodes(page);
-  ok(nodes.length >= 18, `설정 메뉴 ${nodes.length}개`);
+  // 2026-11-12 사용자: 가계부 페이지를 소지품에 합쳐 메뉴는 17개 (가계부 줄은 소지품 메뉴에서 읽힌다)
+  ok(nodes.length >= 17, `설정 메뉴 ${nodes.length}개`);
   menuNames = nodes.map((n) => n.name);
   console.log('시작 뒤 전수');
   for (const n of nodes) {
@@ -320,21 +321,22 @@ if (PART.includes('misc')) {
   await sleep(250);
   await clearTalk(page);
   const cos = await readMenu(page, '우주 쇼핑몰');
-  const tiers = cos.rows.find((r) => r.id === 'ms-roll.cos:tiers');
+  // 2026-11-12: 값 등급은 글 상자가 아니라 칸 표다 → 줄마다 이름·설명·하한·상한·가중치 칸이 따로 목록에 있다
+  const tiers = cos.rows.find((r) => r.id === 'ms-tier.cos:0:name');
   const genres = cos.rows.find((r) => r.id === 'ms-roll.cos:genres');
-  ok(tiers?.kind === 'text' && tiers.multi && genres?.kind === 'text', '기본값이 든 칸(값 등급·장르 목록)이 글 칸으로 목록에 있다');
-  ok(tiers.cur.includes('\\n') && !tiers.cur.includes('\n'), '여러 줄 글의 지금 값은 \\n 으로 이은 한 줄');
+  ok(tiers?.kind === 'text' && !tiers.multi && genres?.kind === 'text' && genres.multi, '기본값이 든 칸(값 등급 칸·장르 목록)이 글 칸으로 목록에 있다');
+  ok(['lo', 'hi'].every((f) => cos.rows.find((r) => r.id === `ms-tier.cos:0:${f}`)?.kind === 'num') && cos.rows.find((r) => r.id === 'ms-tier-w.cos:0')?.kind === 'step', '값 등급 칸: 하한·상한은 수 칸, 가중치는 − + 수');
   const sCos = await snap(page);
-  await send(page, '장르에 horror 추가', [`${SAY('장르 목록과 값 등급을 바꿀까요?')}\n<set>\nms-roll.cos:genres=${genres.cur}, horror\nms-roll.cos:tiers=${tiers.cur}\\n시험가|test tier|1|2|1\n</set>`]);
+  await send(page, '장르에 horror 추가', [`${SAY('장르 목록과 값 등급을 바꿀까요?')}\n<set>\nms-roll.cos:genres=${genres.cur}, horror\nms-tier.cos:0:name=시험가\n</set>`]);
   await send(page, '응', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   const cos2 = await readMenu(page, '우주 쇼핑몰');
   ok(cos2.rows.find((r) => r.id === genres.id).cur.endsWith(', horror'), '기본값이 든 칸: 상담이 바꾼 글이 화면에 있다');
   const t2 = cos2.rows.find((r) => r.id === tiers.id).cur;
-  ok(t2.split('\\n').length === tiers.cur.split('\\n').length + 1 && t2.includes('시험가|test tier|1|2|1'), '여러 줄 글 칸: \\n 이 진짜 줄바꿈으로 들어갔다 (한 줄 늘어남)');
+  eq(t2, '시험가', '값 등급 칸: 상담이 바꾼 글이 화면에 있다');
   ok(await page.evaluate(() => !!document.querySelector('.gw [data-change="ms-roll"][data-key="cos:genres"]')?.closest('.ps-row')?.classList.contains('ps-changed')), '바꾼 줄 표시(점)가 붙는다');
   ok((await snap(page)) !== sCos, '바꾼 글이 저장됐다');
   // 기본값과 똑같은 글로 되돌리자고 하면: 저장을 지운다 (기본값 = 저장 안 함)
-  await send(page, '원래대로', [`${SAY('원래 글로 돌릴까요?')}\n<set>\nms-roll.cos:genres=${genres.cur}\nms-roll.cos:tiers=${tiers.cur}\n</set>`]);
+  await send(page, '원래대로', [`${SAY('원래 글로 돌릴까요?')}\n<set>\nms-roll.cos:genres=${genres.cur}\nms-tier.cos:0:name=${tiers.cur}\n</set>`]);
   await send(page, '응', [`${SAY('돌렸어요.')}\n<apply>yes</apply>`]);
   eq(diffKeys(sCos, await snap(page)).join(', '), '', '기본값과 같은 글 = 저장하지 않음 (저장소가 처음과 같다)');
   ok(!(await page.evaluate(() => !!document.querySelector('.gw [data-change="ms-roll"][data-key="cos:genres"]')?.closest('.ps-row')?.classList.contains('ps-changed'))), '기본값으로 돌아가면 바꾼 줄 표시가 없다');
