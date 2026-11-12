@@ -9,7 +9,8 @@ import { evaluate } from './cbs';
 import {
   activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, countText, trimTokens, postLimit,
   type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField } from './gnet';
-import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { applyAdvanced, genSettings } from './advanced';
+import { fnHistory, fnNum, fnRefs } from './reffn';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { cbsEnv, collectRefs, factionCodesToNames, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
@@ -89,10 +90,11 @@ export interface GnetPrompt {
 /** 생각 순서표 절 (작업마다) */
 type ThoughtsKey = 'THOUGHTS.REFRESH' | 'THOUGHTS.ACTION' | 'THOUGHTS.DM';
 
-function pack(src: RefSource, b: GnetBooks, thoughts: ThoughtsKey, guideline: string, format: string, extras: string, factionNames: Record<string, string>, identity?: unknown): GnetPrompt {
-  const n = trimTurns(HISTORY.turns);
+/** fn = 기능(요청 종류): 넘길 내용·챗로그 턴 수를 기능 표·양 표의 그 줄에서 읽는다 (core/reffn.ts) */
+function pack(src: RefSource, b: GnetBooks, fn: GnetOp, thoughts: ThoughtsKey, guideline: string, format: string, extras: string, factionNames: Record<string, string>, identity?: unknown): GnetPrompt {
+  const n = trimTurns(fnNum(src.chat.scriptstate, 'gn', fn, 'turns'));
   const story = n ? storyText(recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages)) : '';
-  const t = refToggles(src.chat.scriptstate, 'gn');
+  const t = fnRefs(src.chat.scriptstate, 'gn', fn);
   const rows = collectRefs(src, {
     scope: 'gnet', text: `${extras}\n${story}`, primaryNames: SITE_LORE[viewSite(src.chat.scriptstate)], description: t.description, authors: t.authors, persona: t.persona, active: t.active,
     related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
@@ -185,7 +187,7 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
     TIME: dateNow(src.chat), USER_NICK: nick, KEEP_OWN: String(s.keepOwn), KEEP_REPLIED: String(s.keepReplied), PROTECTED: protectedIds.join(','),
     POST_LIMIT: String(postLimit(s)), NEXT_ID: String(st.seq || 100000), ACTION: action, BOARD: boardJson(reference),
   }) + incomingTask(plan);
-  return pack(src, b, 'THOUGHTS.REFRESH', guideline.join('\n\n'), format, extras, factionNames);
+  return pack(src, b, 'refresh', 'THOUGHTS.REFRESH', guideline.join('\n\n'), format, extras, factionNames);
 }
 
 export interface PublicPrompt extends GnetPrompt {
@@ -195,10 +197,10 @@ export interface PublicPrompt extends GnetPrompt {
 /** 새 글: 사용자가 적은 내용(아이디어 또는 본문)으로 제목·본문을 다듬고, 같은 응답에 댓글·선쪽지·다른 글 활동 */
 export function postPrompt(src: RefSource, st: GState, input: string, plan: IncomingPlan, factionNames: Record<string, string>): PublicPrompt {
   const b = gnetBooks(src);
-  const activity = activityContext(st, null);
+  const activity = activityContext(st, null, fnHistory(src.chat.scriptstate, 'gn', 'post'));
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = input + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\nAlso give post.tag: one short category label in Korean for this post, the way this board sorts its posts.`, extras, factionNames), activity };
+  return { ...pack(src, b, 'post', 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\nAlso give post.tag: one short category label in Korean for this post, the way this board sorts its posts.`, extras, factionNames), activity };
 }
 
 export interface CommentPrompt extends PublicPrompt {
@@ -210,6 +212,8 @@ export interface CommentPrompt extends PublicPrompt {
 export function commentPrompt(
   src: RefSource, st: GState, postId: number, replyTo: number, body: string, plan: IncomingPlan, nick: string, factionNames: Record<string, string>,
   action = `The protagonist publicly commented: ${body}`,
+  /** 글 하나만 새로고침은 「새로고침」 줄을 따른다 */
+  fn: GnetOp = 'comment',
 ): CommentPrompt {
   const b = gnetBooks(src);
   const p = findPost(st, postId);
@@ -237,7 +241,7 @@ export function commentPrompt(
   const activity = activityContext(st, p.id);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = task + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.REACT_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity, supplied: selected, total };
+  return { ...pack(src, b, fn, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.REACT_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity, supplied: selected, total };
 }
 
 /** 글 하나만 새로고침: 시간이 흘러 다른 사람들이 이 글에 댓글을 더 단다 (주인공은 아무것도 하지 않음) */
@@ -295,7 +299,7 @@ export function dmPrompt(src: RefSource, st: GState, nick: string, latest: strin
   const pub = publicBoard(st, `${latest}\n${anchor}`);
   if (pub) task += `\nPUBLIC BOARD REFERENCE:\n${JSON.stringify(pub)}`;
   const identity = { speaker: { role: 'npc_correspondent', handle: nick }, owner: { role: 'user', handle: userHandle, personaName: '주인공', referenceOnly: true } };
-  return pack(src, b, 'THOUGHTS.DM', `${b.read('DM.GUIDELINE')}\n\n${b.read('ATTACHMENTS')}`, b.read('DM.FORMAT'), task, factionNames, identity);
+  return pack(src, b, 'dm', 'THOUGHTS.DM', `${b.read('DM.GUIDELINE')}\n\n${b.read('ATTACHMENTS')}`, b.read('DM.FORMAT'), task, factionNames, identity);
 }
 
 /** 쪽지 답장이 형식에 안 맞을 때 한 번 더 (원본 재시도 문구) */

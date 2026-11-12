@@ -1,6 +1,8 @@
 // 틀별 설정 표 (설정 개편 4단계): 게시판 표(괴담넷·괴담갤·세정게·연어 마켓)와 상점 표(기본 상점·우주 쇼핑몰·포인트몰·망상홈쇼핑).
 // 격자: 줄 = 메뉴, 칸 = 메뉴마다 있는 설정. 그 밖의 값은 같은 틀의 메뉴가 한 값을 같이 쓴다. 사이트에만 있는 줄은 그 사이트 페이지에 남는다.
-import { BOARD_NAME, BOARD_SITES, boardState, isBoardSite, type BoardSite } from '../core/boards';
+import { BOARD_NAME, BOARD_REF_CFG, BOARD_SITES, boardState, isBoardSite, type BoardSite } from '../core/boards';
+import { REF_CHIP_KEYS } from '../core/reffn';
+import { fnGrids, refChipLabels } from './fngrid';
 import { CFG, COUNT_RANGE, GN_DEFAULTS, STORAGE_MAX, gnetRetention, gnetSettings, type CountKey } from '../core/gnet';
 import { jointOn } from '../core/netjoint';
 import { MALL_NAME, mallSettings } from '../core/malls';
@@ -27,6 +29,7 @@ const nm = (icon: string, name: string) => `<span class="mx-name">${icon}<span>$
 const BOARD_PICK: Record<string, string[]> = {
   lazy: ['1', 'open', '0'], mode: ['1', '2'], context: ['0', '1'], privacy: ['0', '1', '2', '3', '4'], incoming: ['1', '0'],
   sampling: ['1', '0'], keyfigures: ['1', '0'], keepown: ['1', '0'], keepreplied: ['1', '0'], joint: ['1', '0'], storage: ['1', '0'],
+  ...Object.fromEntries(BOARD_REF_CFG.map((k) => [k, ['1', '0']])),
 };
 const BOARD_TEXT = ['subject', 'mood', 'protagonist'];
 
@@ -84,7 +87,27 @@ export function boardTable(state: State, busy = false): string {
       ['선쪽지 확률', '새로고침 한 번에 선쪽지가 올 확률이에요.'],
     ]) };
 
-  /* ── 2. 네 게시판이 같이 쓰는 값: 한 번의 호출 순서대로 묶음 다섯. 값은 괴담넷 자리 하나 (core/boards.ts boardShared) ── */
+  /** 넘길 내용: 게시판마다의 칩 (값은 그 게시판 자리의 adv_ 칩, core/boards.ts BOARD_REF_CFG). 기능 표와 둘 다 켜진 것만 넘긴다 (core/reffn.ts) */
+  const refs: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: refChipLabels('gn'), kind: 'check' }],
+    marks: each((st) => REF_CHIP_KEYS.map((k) => advValue(st as never, 'gn', k) === '1')),
+    acts: each((st, site) => REF_CHIP_KEYS.map((k) => `b:${site}:adv_${k}=${advValue(st as never, 'gn', k) === '1' ? '0' : '1'}`)),
+    foot: helpBox('', [
+      ['상시 로어북', '조건 없이 늘 넘기는 로어북이에요.'],
+      ['관련 로어북', '지금 하는 작업과 최근 챗로그에 이름이 나온 로어북이에요. 토큰을 더 써요.'],
+      ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
+    ]) };
+
+  /* ── 2. 기능마다 따로 정하는 값: 줄 = 기능(요청 종류). 네 게시판이 한 값을 같이 쓴다 (core/reffn.ts) ── */
+  const byFn = fnGrids('gn', views[0], {
+    refs: helpBox('게시판 표와 기능 표에서 모두 켠 것만 넘겨요.'),
+    amount: helpBox('요청 토큰 상한을 넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요.', [
+      ['챗로그', '0이면 안 봐요.'],
+      ['지난 기록', '그 요청을 보낼 때 모델에 보여 주는 최근 기록의 수예요. 새로고침과 글 쓰기는 글, 댓글은 댓글, 쪽지는 쪽지예요.'],
+      ['요청 토큰 상한', '0이면 생성 공통 값을 따라요.'],
+    ]),
+  }, busy);
+
+  /* ── 3. 네 게시판이 같이 쓰는 값: 한 번의 호출 순서대로 묶음 넷. 값은 괴담넷 자리 하나 (core/boards.ts boardShared) ── */
   const st0 = views[0];
   /** 수는 전부 공통 규격의 「− 값 +」 상자 (세부 값 표의 조작 그대로) */
   const N = (k: string) => advCtl('gn', k, st0 as never);
@@ -96,15 +119,6 @@ export function boardTable(state: State, busy = false): string {
   const ret = gnetRetention(st0);
   const s0 = gnetSettings(st0);
 
-  const give = setGroup('모델에 넘기는 것', [
-    R('넘길 내용', advChipsCtl('gn', ['desc', 'authors', 'persona', 'active', 'related', 'secondary'], st0 as never), '', [
-      ['상시 로어북', '조건 없이 늘 넘기는 로어북이에요.'],
-      ['관련 로어북', '지금 하는 작업과 최근 챗로그에 이름이 나온 로어북이에요. 토큰을 더 써요.'],
-      ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
-    ]),
-    R('넘길 양', set([['챗로그', N('turns')], ['요청 토큰 상한', N('budget')]]), '요청 토큰 상한을 넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요.'),
-    R('요청별 지난 기록', set([['새로고침 때 글', N('refresh_posts')], ['답글 때 댓글', N('comments')], ['쪽지 때 쪽지', N('dm_history')]]), '그 요청을 보낼 때 모델에 보여 주는 최근 기록의 수예요.'),
-  ].join(''));
   const write = setGroup('모델이 쓰는 방식', [
     R('한 번에 요청', setSeg('fam-set', 'b:gn:joint', jointOn(state as never) ? '1' : '0', ONOFF, busy), '켜면 자동 호출이 「매 턴」이고 모델이 같은 게시판과 괴담톡을 한 요청으로 묶어요. 괴담톡 설정의 같은 줄과 한 값이에요.'),
     R('생각 단계', advCtl('gn', 'thoughts', st0 as never), '모델이 결과를 쓰기 전에 상황을 먼저 정리하게 해요.', [
@@ -133,8 +147,9 @@ export function boardTable(state: State, busy = false): string {
     R('최대 양', set([['게시글', N('ctx_post_count')], ['글마다 댓글', N('ctx_comment_count')], ['쪽지', N('ctx_dm_count')], ['토큰 상한', N('ctx_tokens')]]), '토큰 상한을 넘는 것은 빼요.'),
   ].join(''));
 
-  return `<h2 class="fam-h">게시판마다 따로 정하는 값</h2>${ckWide([call, priv], L, busy)}${texts}${ckWide([amount], L, busy)}`
-    + `<h2 class="fam-h">네 게시판이 같이 쓰는 값</h2>${give}${write}${limit}${keep}${attach}`;
+  return `<h2 class="fam-h">게시판마다 따로 정하는 값</h2>${ckWide([call, priv], L, busy)}${texts}${ckWide([amount], L, busy)}${ckWide([refs], L, busy)}`
+    + `<h2 class="fam-h">기능마다 따로 정하는 값</h2>${byFn}`
+    + `<h2 class="fam-h">네 게시판이 같이 쓰는 값</h2>${write}${limit}${keep}${attach}`;
 }
 
 /** 인터넷·상점 격자와 그 아래 줄의 단추. 게시판 값은 게시판 처리기(gn-*)에 사이트를 붙여 넘긴다 */

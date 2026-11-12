@@ -23,14 +23,12 @@ export const PHONE_SET: SetPage = {
           help: '답장·선톡·공지를 만들 때 부를 모델이에요.' },
       ],
     },
+    // 기능마다 따로 정하는 「넘길 내용」·「넘길 양」 격자 (core/reffn.ts · ui/fngrid.ts). 옛 한 줄(챗로그 포함·넘길 내용·방마다 참조할 말풍선·요청 토큰 상한)을 대신한다
+    { title: '넘길 내용 · 넘길 양', grid: 'fn', rows: [] },
     {
       title: '참조',
       rows: [
-        { key: 'adv_turns', label: '챗로그 포함', ctl: { t: 'adv', item: 'turns' } },
-        { key: 'adv_refs', label: '넘길 내용', ctl: { t: 'advchips', items: ['desc', 'authors', 'persona', 'active', 'related', 'secondary'] } },
         { key: 'status', label: '요원 상태 참조', ctl: onOff('0'), help: '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 요청에 넣어요. 출동 중인 요원은 그에 맞게 답해요' },
-        { key: 'adv_room_history', label: '방마다 참조할 말풍선', ctl: { t: 'adv', item: 'room_history' } },
-        { key: 'adv_budget', label: '요청 토큰 상한', ctl: { t: 'adv', item: 'budget' } },
       ],
     },
     {

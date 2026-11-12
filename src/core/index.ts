@@ -17,6 +17,7 @@ export * as homeshop from './homeshop';
 export * as phone from './phone';
 export * as phonePrompt from './phonePrompt';
 export * as phoneView from './phoneView';
+export * as reffn from './reffn';
 export * as settings from './settings';
 export * as asset from './asset';
 export * as attach from './attach';

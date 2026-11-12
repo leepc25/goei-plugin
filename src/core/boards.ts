@@ -13,7 +13,9 @@ export const BOARD_SITE_VAR = '$gn_site';
 /** 사이트마다 따로 두지 않는 괴담넷 변수: 닉네임은 인터넷 로그인 하나, 쪽지 자동 정리는 게시판 넷이 한 값 */
 const SHARED = new Set(['$gn_nick', '$gn_storage_auto_dm', '$gn_storage_limit_dm']);
 /** 게시판마다 따로 정하는 설정 (설정 → 인터넷의 격자). 그 밖의 게시판 설정($lb_cfg_lb-gn.*)은 네 게시판이 괴담넷 자리의 값 하나를 같이 쓴다 (2026-11-11 사용자) */
-export const BOARD_OWN_CFG = ['mode', 'lazy', 'context', 'privacy', 'subject', 'mood', 'protagonist', 'post_min', 'post_max', 'cmt_min', 'cmt_max', 'act_min', 'act_max', 'incoming', 'incoming_chance'];
+/** 게시판마다 따로 켜고 끄는 「넘길 내용」 칩 (2026-11-13 사용자: 게시판 표). 세부 값 표(core/advanced.ts gn 「참조」)의 칩 여섯과 같은 열쇠 */
+export const BOARD_REF_CFG = ['adv_desc', 'adv_authors', 'adv_persona', 'adv_active', 'adv_related', 'adv_secondary'];
+export const BOARD_OWN_CFG = ['mode', 'lazy', 'context', 'privacy', 'subject', 'mood', 'protagonist', 'post_min', 'post_max', 'cmt_min', 'cmt_max', 'act_min', 'act_max', 'incoming', 'incoming_chance', ...BOARD_REF_CFG];
 const OWN = new Set(BOARD_OWN_CFG);
 const GN_CFG = '$lb_cfg_lb-gn.';
 /** 네 게시판이 같이 쓰는 값인가 */

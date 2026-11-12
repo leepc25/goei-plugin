@@ -65,6 +65,8 @@ export interface Wire {
   lead?: Record<string, string>;
   /** 페이지 이름 (묶음 이름 '@page' 자리) */
   pageTitle?: string;
+  /** 묶음 자리에 그리는 격자 (정의표 묶음의 grid 이름 → HTML) */
+  grid?: Record<string, () => string>;
   /** 세부 값 표의 줄 (ui/advanced.ts advRow) · 칩 줄 */
   adv?(item: string): string;
   advChips?(items: string[], label: string): string;
@@ -176,7 +178,7 @@ export function defRow(page: SetPage, d: SetDef, w: Wire): string {
 }
 /** 정의표의 묶음 하나 */
 export const defGroup = (page: SetPage, g: SetGroup, w: Wire): string =>
-  setGroup(g.title === '@page' ? (w.pageTitle ?? '') : g.title, (g.note ? `<p class="ps-note">${g.note}</p>` : '') + (w.lead?.[g.title] ?? '') + g.rows.map((d) => defRow(page, d, w)).join(''));
+  g.grid ? (w.grid?.[g.grid]?.() ?? '') : setGroup(g.title === '@page' ? (w.pageTitle ?? '') : g.title, (g.note ? `<p class="ps-note">${g.note}</p>` : '') + (w.lead?.[g.title] ?? '') + g.rows.map((d) => defRow(page, d, w)).join(''));
 /** 정의표 전체 */
 export const defGroups = (page: SetPage, w: Wire): string => page.groups.map((g) => defGroup(page, g, w)).join('\n      ');
 
@@ -209,7 +211,8 @@ export const helpList = (t: string): string => {
 /* ── 체크 격자: 줄 = 메뉴, 열 = 고를 값 하나하나. one = 그 묶음에서 하나만(동그라미), check = 켜고 끄기(네모), num = 수(공통 규격 「− 값 +」) ── */
 export interface CkGroup { name: string; opts: string[]; kind: 'one' | 'check' | 'num'; band?: boolean }
 /** 수 칸: 지금 값과 범위. step = − + 한 번에 움직이는 폭 */
-export interface CkNum { n: number; lo: number; hi: number; step?: number }
+/** lg = 큰 상자 (그 칸의 가장 큰 수가 작은 상자에 안 들어가는 격자: 기능별 「넘길 양」. 그 격자의 수 칸은 모두 큰 것으로 맞춘다 sameStep) */
+export interface CkNum { n: number; lo: number; hi: number; step?: number; lg?: boolean }
 /** 칸 하나: true·false(체크) · 수 · null(그 메뉴에 없는 값) */
 export type CkMark = boolean | CkNum | null;
 /** acts: 칸마다 누르면 보낼 값. 체크 칸은 「갈래:메뉴:열쇠=값」 그대로(fam-set), 수 칸은 「갈래:메뉴:열쇠」(fam-num 이 「=값」을 붙인다) */
@@ -231,7 +234,7 @@ const ckCtl = (m: CkMark | undefined, act: string | null | undefined, aria: stri
   if (typeof m === 'boolean') return `<button class="ck-m ${round ? 'round' : 'box'}${m ? ' on' : ''}" data-action="${ckActs.set}" data-value="${esc(act)}" aria-pressed="${m}" aria-label="${aria}"${off}></button>`;
   const st = m.step ?? 1;
   const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="${ckActs.num}" data-value="${esc(act)}${ckActs.rel ? `:${sign === '+' ? '+' : '-'}` : `=${to}`}" ${on && !busy ? '' : 'disabled'} aria-label="${aria} ${name}">${sign}</button>`;
-  return `<div class="st-step adv-step${inGrid ? '' : stepSize(m.hi, ckUnit)}">${b(Math.max(m.lo, m.n - st), m.n > m.lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="${ckActs.num}" data-key="${esc(act)}" value="${m.n}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, '+', '늘리기')}</div>`;
+  return `<div class="st-step adv-step${inGrid ? (m.lg ? ' lg' : '') : stepSize(m.hi, ckUnit)}">${b(Math.max(m.lo, m.n - st), m.n > m.lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="${ckActs.num}" data-key="${esc(act)}" value="${m.n}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, '+', '늘리기')}</div>`;
 };
 /** 수 조작 하나 (격자 밖 줄에서도 같은 모양·같은 처리기) */
 export const numCtl = (act: string, m: CkNum, aria: string, unit = '', busy = false, acts: CkActs = FAM_ACTS): string => {
@@ -263,7 +266,8 @@ export const ckWide = (bands: CkBand[], labels: string[], busy = false, acts: Ck
 /** 「이름 + 수 상자」 짝 여럿이 든 줄: 고정 열(이름 칸 폭·상자 폭이 모든 줄에서 같다 → 윗줄 N번째 짝 바로 아래에 아랫줄 N번째 짝), 상자는 한 줄 안에서 같은 크기 */
 export const numSet = (items: [string, string][]): string => sameStep(`<div class="fam-set">${items.map(([l, c]) => `<span class="fam-set1"><span class="fam-l">${esc(l)}</span>${c}</span>`).join('')}</div>`);
 const ckWide0 = (bands: CkBand[], labels: string[], busy = false): string => {
-  const groups = bands.flatMap((b) => b.groups.map((g, i) => ({ ...g, name: g.name || b.title, band: i === 0 })));
+  // 띠가 하나뿐이고 묶음 이름이 없으면 머리 줄에 띠 이름을 되풀이하지 않는다 (격자 제목이 곧 그 이름)
+  const groups = bands.flatMap((b) => b.groups.map((g, i) => ({ ...g, name: g.name || (bands.length > 1 ? b.title : ''), band: i === 0 })));
   const rows = labels.map((label, r) => ({ label, marks: bands.flatMap((b) => b.marks[r]), acts: bands.flatMap((b) => b.acts[r]) }));
   const foot = bands.filter((b) => b.foot).map((b) => `<span class="ck-foot1">${b.foot}</span>`).join('');
   const pc = ckGrid(groups, rows, foot, bands.map((b) => b.title).join(' · '), busy).replace('class="ps-group ck', 'class="ps-group ck ck-pc');

@@ -54,6 +54,8 @@ export interface SetGroup {
   rows: SetDef[];
   /** 묶음 머리 아래 안내 글 (HTML) */
   note?: string;
+  /** 줄 대신 격자를 그리는 자리 (페이지의 선 Wire.grid 가 이 이름으로 그린다). rows 는 비운다 */
+  grid?: string;
 }
 /** 한 기능(페이지 계열)의 설정 */
 export interface SetPage {
