@@ -33,6 +33,7 @@ import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
 import { isPhone } from '../media';
+import { consultAction, consultAfterRender, consultAside, consultButton, consultClose, consultUi } from './consult';
 import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
@@ -135,6 +136,7 @@ function syncSettingsPage(): void {
 export function closeEditor(): void {
   edUi.open = false;
   edUi.confirm = '';
+  consultClose();
   if (root) root.hidden = true;
 }
 
@@ -160,7 +162,8 @@ function ensureRoot(): HTMLElement {
   bindCropDrag(root, () => render());
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
-    if (t === root) return void run('ed-close');
+    // 폰: AI 상담 판 바깥(어두운 곳)을 누르면 판만 닫는다
+    if (t === root) return void run(consultUi.open && isPhone() ? 'ai-close' : 'ed-close');
     // 거점: 지역 지도를 누른 자리가 거점 위치 (%) — 패널(app.ts)과 같은 처리
     const pickMap = t.closest<HTMLElement>('[data-base-pick]');
     if (pickMap) {
@@ -203,6 +206,7 @@ function ensureRoot(): HTMLElement {
     }
     const name = el?.dataset?.input;
     if (!name) return;
+    if (name === 'ai-q') { consultUi.input = el.value; return; }
     const ctx = host?.ctx();
     if (name === 'dir') {
       directoryInput(el.dataset.key ?? '', el.value, null);
@@ -296,7 +300,7 @@ function ensureRoot(): HTMLElement {
   // Esc 는 문서 전체에서 받는다: 단추를 누르면 창을 다시 그려 포커스가 body 로 가므로 창 요소의 keydown 만으론 한 번 누른 뒤엔 안 먹었다 (2026-10-28 QC).
   // 패널(app.ts)의 Esc 처리기는 편집 창이 떠 있으면 비켜 준다
   document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape' && edUi.open && !edUi.confirm) void run('ed-close');
+    if (ev.key === 'Escape' && edUi.open && !edUi.confirm) void run(consultUi.open ? 'ai-close' : 'ed-close');
   });
   // 칸 순서 끌기 (손잡이)
   let drag: string | null = null;
@@ -416,7 +420,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
-      { title: '기능별 지침', items: (['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Wiki', 'Shop', 'Phone', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
+      { title: '기능별 지침', items: (['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Wiki', 'Shop', 'Phone', 'Image', 'Consult'] as (GuideName | 'Image')[]).map(guideItem) },
       { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'Director', 'Router'] as GuideName[]).map(guideItem) },
     ];
     // 11-09 사용자: 설치·업데이트는 하나로, 아이콘은 서로 다르게, 다음 호출 로어북은 따로(펼친 채), 이름은 무엇을 보는지 바로 알게
@@ -758,7 +762,7 @@ export function render(): void {
   const phone = isPhone();
   const noticeHtml = edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : '';
   // 상단바에는 저장 단추를 두지 않는다 (2026-11-08 사용자: 모든 메뉴·항목은 바로 저장. 기본값 저장·불러오기·초기화·내보내기는 점검 → 저장·불러오기 한 곳)
-  const right = `${edUi.busy ? '<span class="gw-save-state">저장하는 중…</span>' : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
+  const right = `${edUi.busy ? '<span class="gw-save-state">저장하는 중…</span>' : ''}${consultButton()}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
   const top = phone
     ? `<header class="gw-top gx-head gw-phead">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
@@ -780,11 +784,12 @@ export function render(): void {
     ${tab === 'set' ? `<button class="gw-totop" data-action="ed-top" aria-label="맨 위로" title="맨 위로">${ICONS.up}</button>` : ''}
     ${foot}
     ${confirm}
-  </div>`;
+  </div>${consultAside(ctx, () => render())}`;
   // 같은 화면을 다시 그릴 때는 바뀐 곳만 (2026-11-06 사용자, 전수점검 남은 것 6). 다른 화면으로 갈 때·처음 열 때는 통째로
   if (sameNode && root.querySelector('.gw-win')) morph(root, html);
   else root.innerHTML = html;
   labelSwitches(root);
+  consultAfterRender(root, ctx);
   if (phone) {
     // 바뀐 곳만 그리면 서랍·하단 바 요소가 그대로 남으니 한 번만 묶는다
     const box = root.querySelector<HTMLElement>('.ph-drawer');
@@ -908,6 +913,9 @@ const run = (action: string, value?: string): Promise<void> =>
 
 export async function handle(action: string, value?: string): Promise<void> {
   const ctx = host?.ctx() ?? null;
+  if (action.startsWith('ai-')) {
+    return consultAction(action, value, { render: () => render(), ctx: () => host?.ctx() ?? null, started: () => host?.canChat?.() ?? true, panel: async (a, v) => { await host?.handle?.(a, v); }, editor: (a, v) => handle(a, v), phone: () => isPhone() });
+  }
   switch (action) {
     case 'ed-close':
       // 바로 저장 (2026-11-08 사용자): 아직 안 적힌 것이 있으면 적고 닫는다

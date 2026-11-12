@@ -778,3 +778,43 @@
   .gw .flc-c > .gx-segs > .gx-seg { flex: 1 1 auto; white-space: nowrap; }
   .gw .flc-c .fl-help { margin: 0; }
 }
+
+/* ── AI 상담 (설정 개편 6단계, 시안8): PC = 설정 창 옆 380px 창, 폰 = 아래에서 올라오는 판. 설정 창 머리의 「AI 상담」 단추로 연다 ── */
+.gw.ai-on { gap: 12px; }
+.gw.ai-on .gw-win { width: min(var(--gw-width, 90%), 1340px, calc(100% - 416px)); }
+.gw-ai { position: relative; width: 380px; height: min(90%, calc(100% - 24px)); flex: none; display: flex; flex-direction: column; background: var(--void); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 48px rgba(0, 0, 0, .35); overflow: hidden; }
+.gw-ai-top { display: flex; align-items: center; gap: 8px; height: 52px; flex: none; padding: 0 10px 0 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.gw-ai-top > b { font-size: 15px; font-weight: 700; }
+.gw-ai-top .gw-brand { margin-right: 0; }
+.gw-ai-top .ai-model { margin-left: 2px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: none; font: inherit; font-size: 12px; color: var(--dim); cursor: pointer; }
+.gw-ai-top .ai-model:hover:not(:disabled) { color: var(--text); border-color: var(--dim); }
+.gw-ai-top .gx-x { margin-left: auto; }
+.gw-ai-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.gw-ai .ai-sys { align-self: center; max-width: 92%; padding: 4px 10px; border-radius: 10px; background: var(--panel2); color: var(--dim); font-size: 12.5px; text-align: center; overflow-wrap: anywhere; }
+.gw-ai .ai-err { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 10px; color: var(--danger); }
+.gw-ai .ai-m { max-width: 86%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gw-ai .ai-me { align-self: flex-end; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--text); border-bottom-right-radius: 4px; }
+.gw-ai .ai-op { align-self: flex-start; background: var(--panel); border: 1px solid var(--hair, var(--panel2)); color: var(--text); border-bottom-left-radius: 4px; }
+.gw-ai .ai-card { align-self: stretch; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw-ai .ai-card > b { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text); }
+.gw-ai .ai-ch { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; padding: 6px 0; border-top: 1px solid var(--panel2); font-size: 13px; }
+.gw-ai .ai-ch > span { color: var(--dim); }
+.gw-ai .ai-ch > i { font-style: normal; color: var(--text); }
+.gw-ai .ai-ch > i s { color: var(--dim); }
+.gw-ai .ai-ch > i em { font-style: normal; font-weight: 700; color: var(--signal); }
+.gw-ai .ai-btns { display: flex; flex-wrap: wrap; gap: var(--gap); margin-top: 8px; }
+.gw-ai-in { display: flex; gap: var(--gap); flex: none; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--panel); }
+.gw-ai-in input { flex: 1; min-width: 0; }
+.gw .gw-top-right .ai-open.on { background: var(--accent-bg); border-color: var(--accent-line); }
+/* 좁은 PC 창: 옆에 둘 자리가 없으면 설정 창 오른쪽 위에 겹쳐 띄운다 */
+@media (max-width: 1280px) {
+  .gw.ai-on { gap: 0; }
+  .gw.ai-on .gw-win { width: min(var(--gw-width, 90%), 1340px); }
+  .gw-ai { position: fixed; right: 12px; top: 50%; transform: translateY(-50%); z-index: 5; width: min(380px, calc(100% - 24px)); }
+}
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw.ai-on { gap: 0; }
+  .gw.ai-on .gw-win { width: 100%; }
+  .gw-ai { position: fixed; left: 0; right: 0; top: auto; bottom: 0; transform: none; z-index: 5; width: auto; height: 82%; border-radius: 14px 14px 0 0; border-bottom: 0; }
+  .gw.ai-on::after { content: ''; position: fixed; inset: 0; z-index: 4; background: rgba(0, 0, 0, .45); }
+}
