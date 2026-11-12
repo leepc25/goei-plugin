@@ -127,7 +127,7 @@ export function walletList(ctx: ChatContext): string {
     const head = month && month !== lastMonth ? monthLine(month, rows) : '';
     lastMonth = month;
     return `${head}<section class="gx-wt-day">
-    <h3><span>${esc(dayLabel(g.date))}</span><em>${esc(formatDelta(g.rows.filter((r) => r.e.src !== 'manual').reduce((n, r) => n + r.e.amount, 0)))}</em></h3>
+    <h3><span>${esc(dayLabel(g.date))}</span>${((sum: number) => `<em class="${sum > 0 ? 'in' : sum < 0 ? 'out' : ''}">${esc(formatDelta(sum))}</em>`)(g.rows.filter((r) => r.e.src !== 'manual').reduce((n, r) => n + r.e.amount, 0))}</h3>
     <ul>${g.shown.map(({ e, after, time: when }) => {
       const open = walletUi.open === e.id;
       // 줄 둘째 칸 맨 앞에 그때 시각 (필드 거래는 제 시각이 이미 들어 있다)

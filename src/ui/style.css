@@ -2849,6 +2849,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-wt-empty { margin: 8px 4px; color: var(--dim); font-size: 13.5px; }
 .gx-wt-day h3 { display: flex; justify-content: space-between; margin: 4px 4px 6px; font-size: 13px; font-weight: 800; color: var(--dim); }
 .gx-wt-day h3 em { font-style: normal; font-variant-numeric: tabular-nums; }
+/* 그날 합계도 줄의 금액과 같은 색 (2026-11-13 사용자) */
+.gx-wt-day h3 em.in { color: var(--signal); font-weight: 700; } .gx-wt-day h3 em.out { color: var(--danger, #FF7A6B); font-weight: 700; }
 .gx-wt-day ul { list-style: none; margin: 0; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
 .gx-wt-row { display: grid; grid-template-columns: minmax(0, 1fr) 36px; align-items: center; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
 .gx-wt-row:last-child { border-bottom: 0; }
