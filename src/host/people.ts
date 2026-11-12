@@ -24,7 +24,7 @@ import { promptFor, UPDATER_COMPACT, UPDATER_DETAILED } from '../core/people/pro
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
-import { mentionsPoints, pointsOn, pointsVars, readPoints } from '../core/points';
+import { mentionsPoints, pointsOn, pointsVars, readPoints, syncPointsToStatus } from '../core/points';
 import { addWalletEntry, aliveAnchors, mentionsAmount, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { applyItemChanges, ITEM_SCOPE_SKIP, itemScope, itemAutoOn, itemStateOn, itemsAwayOf, itemsNowOf, itemsVars, readItems, setItemRules, usedItemsAt } from '../core/items';
 import { ensureItemIcons, itemPictures } from './itemicons';
@@ -376,6 +376,11 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         if (walletOn && walletSyncOn(next.scriptstate)) {
           const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
           if (w) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...walletVars(w) } };
+        }
+        // 포인트도 같다 (2026-11-13 사용자: 정산 5,000p 한 번이 「상태창 포인트 +5,000」「정산 지급 +5,000」「상태창 포인트 −5,000」 세 줄로 적혔다 — 포인트만 이 다시 맞춤이 빠져 있었다)
+        if (pointsUse && report.points.length && colConfig(next.scriptstate).points !== 'off' && walletSyncOn(next.scriptstate)) {
+          const p = syncPointsToStatus(readPoints(next.scriptstate), next);
+          if (p) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...pointsVars(p) } };
         }
         // 소지품 변화를 목록($st_items)에 (core/items.ts applyItemChanges). 소모성 횟수는 「사용」 기록으로 이미 셈 — 여기선 본문이 말한 변화만
         if (report.items.length) {

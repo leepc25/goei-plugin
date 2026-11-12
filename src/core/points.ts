@@ -57,8 +57,23 @@ export function recentPointLines(w: Wallet, alive: Set<string>, n: number): stri
 
 export const POINTS_SYNC_MEMO = '상태창 포인트';
 
+/** 두 번 센 흔적 지우기 (2026-11-13 사용자: 틀린 걸 뒤늦게 맞췄으면 기록도 고쳐야 한다).
+ *  같은 응답에 맞춤 줄(+x)과 본문 거래(+x)가 같이 있고, 그 뒤에 맞춤 줄(−x)이 있으면 맞춤 줄 둘은 같은 돈을 두 번 셌다가 되돌린 것이라 둘 다 지운다. 잔고는 그대로다 */
+export function dropDoubleSync(w: Wallet): Wallet {
+  const isSync = (e: Wallet['log'][number]) => e.memo === POINTS_SYNC_MEMO && e.id.startsWith('ps_');
+  const drop = new Set<string>();
+  w.log.forEach((a, i) => {
+    if (!isSync(a) || drop.has(a.id) || !a.amount) return;
+    if (!w.log.some((e) => !isSync(e) && e.src === 'story' && e.anchor === a.anchor && e.amount === a.amount)) return;
+    const back = w.log.find((e, k) => k > i && isSync(e) && !drop.has(e.id) && e.amount === -a.amount);
+    if (back) { drop.add(a.id); drop.add(back.id); }
+  });
+  return drop.size ? { ...w, log: w.log.filter((e) => !drop.has(e.id)) } : w;
+}
+
 /** 마지막 응답의 상태창 포인트 칸에 장부를 맞춘다 (가계부 syncWalletToStatus 와 같은 방식). 바뀐 게 없으면 null */
-export function syncPointsToStatus(w: Wallet, chat: Chat): Wallet | null {
+export function syncPointsToStatus(w0: Wallet, chat: Chat): Wallet | null {
+  const w = dropDoubleSync(w0);
   const msgs = chat.message ?? [];
   let i = msgs.length - 1;
   while (i >= 0 && msgs[i].role === 'user') i--;
@@ -83,7 +98,7 @@ export function syncPointsToStatus(w: Wallet, chat: Chat): Wallet | null {
   const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor)) };
   const diff = target - walletBalance(before, alive);
   const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: 'story' });
-  return JSON.stringify(next) === JSON.stringify(w) ? null : next;
+  return JSON.stringify(next) === JSON.stringify(w0) ? null : next;
 }
 
 /** 「1,200 p」. 음수는 「−1,200 p」 */
