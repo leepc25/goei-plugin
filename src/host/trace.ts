@@ -63,6 +63,8 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let open: TraceTurn | null = null;
 /** 열린 턴에 본편 응답이 붙었는지 (그 뒤 호출은 after) */
 let replied = false;
+/** 열린 턴의 응답 뒤 작업이 다 끝났는지 (그 뒤 손으로 누른 호출은 manual. 전수검사 11-13: 지난 턴 합계에 섞였다) */
+let ended = false;
 
 export const clip = (s: string, max = TRACE_TEXT): string => {
   if (s.length <= max) return s;
@@ -129,6 +131,7 @@ export async function clearTrace(): Promise<void> {
   turns = [];
   open = null;
   replied = false;
+  ended = false;
   notify();
   try {
     await risuai.pluginStorage.setItem(KEY, '[]');
@@ -149,6 +152,7 @@ export async function traceBegin(): Promise<void> {
   const t: TraceTurn = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, at: new Date().toISOString(), calls: [] };
   open = t;
   replied = false;
+  ended = false;
   progressBegin(); // 진행 창 (core/progress.ts): 새 턴
   await push(t);
 }
@@ -178,10 +182,18 @@ export function traceReply(text: string): void {
   save();
 }
 
-/** 보조 호출 한 건 (runModel 이 부른다). 열린 턴이 없으면 수동 턴을 만든다 */
+/** 지금 열린 턴의 id (body.ts 가 응답 뒤 작업을 마칠 때 그 턴만 닫으려고 쥔다) */
+export const traceTurnId = (): string | null => open?.id ?? null;
+
+/** 턴의 응답 뒤 작업이 다 끝났다. 앞 턴의 뒤 작업이 늦게 끝나도 새 턴은 닫지 않는다 */
+export function traceEnd(id: string | null): void {
+  if (open && id && open.id === id) ended = true;
+}
+
+/** 보조 호출 한 건 (runModel 이 부른다). 열린 턴이 없으면 수동 턴을 만든다. 턴이 끝난 뒤의 호출은 그 턴에 manual 로 붙는다 */
 export async function traceCall(c: Omit<TraceCall, 'phase' | 'at'> & { at: string }): Promise<void> {
   let t = open;
-  let phase: TraceCall['phase'] = replied ? 'after' : 'before';
+  let phase: TraceCall['phase'] = ended ? 'manual' : replied ? 'after' : 'before';
   if (!t) {
     const list = await load();
     const last = list[list.length - 1];

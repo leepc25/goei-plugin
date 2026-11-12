@@ -82,7 +82,7 @@ import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
-import { traceBegin, traceMain, traceReply } from './host/trace';
+import { traceBegin, traceEnd, traceMain, traceReply, traceTurnId } from './host/trace';
 import { progressAbort, progressEnd, progressPlan, progressTurn, progressWatch } from './core/progress';
 import { turnPlan } from './core/progplan';
 import { bookText } from './core/refs';
@@ -467,6 +467,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 이 턴만 닫는다. 뒤 작업이 없으면 바로
   const after: Promise<unknown>[] = [];
   const pTurn = progressTurn();
+  const tTurn = traceTurnId();
   try {
     const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
@@ -625,7 +626,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   } catch (error) {
     console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
-    void Promise.allSettled(after).then(() => progressEnd(pTurn));
+    void Promise.allSettled(after).then(() => { progressEnd(pTurn); traceEnd(tTurn); });
   }
 }
 

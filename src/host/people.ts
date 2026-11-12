@@ -43,6 +43,13 @@ import type { LoreEntry } from '../core/types';
 
 // ── 진단 ──
 
+/** 장면 인물이 없는 갱신기 호출(소지품·가계부·상점만 읽음): 새 인물에게 쓸 수 없는 절은 뺀다 (전수검사 11-13, 약 3천 토큰).
+ *  호감·호칭·지각 절은 남긴다: 이 응답에서 새로 등록한 인물의 cues·address·knowledge 를 쓴다 */
+function dropNoPeople(sections: Set<string>, settings: PeopleSettings): void {
+  for (const k of ['axes', 'sexual']) sections.delete(k);
+  for (const f of ['affinity', 'suspicion', 'openness'] as const) if (settings.qualitative.has(f)) sections.delete(f);
+}
+
 export interface DiagRun {
   at: string;
   chat: string;
@@ -294,6 +301,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (walletOn && walletLoose(fresh.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsUse) sections.add('points');
       if (itemsOn) sections.add('items');
+      if (!input.people.length) dropNoPeople(sections, settings);
       const system = updaterSystem(settings, sections, fresh.chat.scriptstate, !!input.shop);
       input.system = system;
       if (input.overBudget.length) {
@@ -697,6 +705,7 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       if (walletOn && walletLoose(ctx.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsOn(ctx.chat)) sections.add('points');
       if (itemsOn) sections.add('items');
+      if (!inp.people.length) dropNoPeople(sections, settings);
       const system = updaterSystem(settings, sections, ctx.chat.scriptstate, !!inp.shop);
       out.update = [{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(inp.data) }];
     }

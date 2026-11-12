@@ -42,7 +42,7 @@ export interface SetDef {
   /** 읽어 주기용 이름 (줄 이름과 다를 때) */
   aria?: string;
   /** 조작 옆에 붙는 수 칸 (켬·끔 + 확률, 켬·끔 + 상한). whenOn = 켜져 있을 때만 보인다 */
-  inline?: { key: string; lo: number; hi: number; unit: string; aria?: string; whenOn?: boolean };
+  inline?: { key: string; lo: number; hi: number; unit: string; aria?: string; whenOn?: boolean; step?: number };
   /** 다른 줄의 값이 이럴 때만 보이는 줄 (여럿이면 모두 맞아야) */
   show?: SetShow | SetShow[];
   /** 범위 배지: device = 이 기기 공통 값 (채팅·기본값 구분 없음) */

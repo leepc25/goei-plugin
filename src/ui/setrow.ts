@@ -78,8 +78,8 @@ const act = (page: SetPage, kind: 'cfg' | 'text' | 'count' | 'num' | 'shnum' | '
 
 /** 수 한 칸 */
 const sk = (w: Wire, key: string) => (w.scope ? `${w.scope}:${key}` : key);
-const numBox = (page: SetPage, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, kind: 'num' | 'shnum' | 'count' = 'num', busy = false) =>
-  stepBox(act(page, kind), key, cur, lo, hi, unit, aria, busy);
+const numBox = (page: SetPage, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, kind: 'num' | 'shnum' | 'count' = 'num', busy = false, step?: number) =>
+  stepBox(act(page, kind), key, cur, lo, hi, unit, aria, busy, step);
 /** 수 조작의 공통 규격: 한 상자 「− 값 +」. 가운데 값은 직접 쳐도 된다. − + 와 입력은 같은 처리기에 「열쇠=값」을 보낸다.
  *  한 번에 움직이는 폭: 범위가 1만 이상이면 500, 1천 이상이면 50, 200 이상이면 10, 그 밖은 1 */
 /** 수 칸 폭: 그 값이 가질 수 있는 가장 긴 수(최대값)의 자릿수에 맞춘다 */
@@ -97,10 +97,10 @@ export const stepSizeText = (...texts: string[]): '' | ' lg' => (Math.max(...tex
 /** 한 묶음(같은 줄·같은 격자)의 수 상자는 같은 크기: 하나라도 큰 것이면 모두 큰 것 */
 export function sameStep(html: string): string { return sameStep0(html); }
 const sameStep0 = (html: string): string => (/class="st-step[^"]* lg"/.test(html) ? html.replace(/class="st-step( adv-step)?"/g, 'class="st-step$1 lg"') : html);
-export const stepBox = (action: string, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, busy = false): string => {
+export const stepBox = (action: string, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, busy = false, step?: number): string => {
   const raw = String(cur ?? '').trim();
   const n = Math.max(lo, Math.min(hi, Number(raw) || 0));
-  const st = hi - lo >= 10000 ? 500 : hi - lo >= 1000 ? 50 : hi - lo >= 200 ? 10 : 1;
+  const st = step ?? (hi - lo >= 10000 ? 500 : hi - lo >= 1000 ? 50 : hi - lo >= 200 ? 10 : 1);
   const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="${action}" data-value="${esc(key)}=${to}" ${on && !busy ? '' : 'disabled'} aria-label="${esc(aria)} ${name}">${sign}</button>`;
   return `<div class="st-step adv-step${stepSize(hi, unit)}">${b(Math.max(lo, n - st), n > lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${lo}" max="${hi}" step="${st}" data-change="${action}" data-key="${esc(key)}" value="${raw === '' ? '' : n}" aria-label="${esc(aria)}"${busy ? ' disabled' : ''}>${unit ? `<span>${esc(unit)}</span>` : ''}${b(Math.min(hi, n + st), n < hi, '+', '늘리기')}</div>`;
 };
@@ -114,7 +114,7 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
     const i = d.inline;
     if (!i) return { ctl: seg, cur };
     const on = c.opts.find(([, l]) => l === 'ON')?.[0];
-    return { ctl: `<span class="ph-inline">${seg}${!i.whenOn || cur === on ? `<span class="ph-inline">${numBox(page, i.key, w.cur(i.key), i.lo, i.hi, i.unit, i.aria ?? d.label)}</span>` : ''}</span>`, cur };
+    return { ctl: `<span class="ph-inline">${seg}${!i.whenOn || cur === on ? `<span class="ph-inline">${numBox(page, i.key, w.cur(i.key), i.lo, i.hi, i.unit, i.aria ?? d.label, 'num', false, i.step)}</span>` : ''}</span>`, cur };
   }
   if (c.t === 'num') {
     const v = w.cur(d.key);
