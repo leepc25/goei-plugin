@@ -17,7 +17,7 @@ import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
 import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_FORMS_DEFAULT, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
-import { mountPlayer, playerCut, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
+import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
 import { itemPic } from './items';
 import { isPhone } from './media';
@@ -179,6 +179,12 @@ export async function homeshopAction(action: string, value: string | undefined, 
   liveEnv = env;
   sync(ctx);
   switch (action) {
+    case 'hs-next': {
+      // 다음 상품은 내가 넘긴다 (11-12 사용자: 꼭 자동일 필요 없다)
+      const now = readShow(ctx.chat.scriptstate);
+      if (now.loaded && now.at < now.parts.length) advance(now.at + 1);
+      return true;
+    }
     case 'hs-refresh':
       if (!hsSettings(ctx.chat.scriptstate).on || ui.loading) return true;
       ui.retried = 0;
@@ -344,6 +350,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
   const nick = userInfo().name || '나';
   ui.input = '';
   ui.saying = true;
+  playerHold(true);
   playerSay(nick, text.slice(0, 80), 'me');
   env.render();
   try {
@@ -370,6 +377,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
     ui.info = `채팅이 전달되지 않았어요. ${error instanceof Error ? error.message.split('\n')[0] : ''}`;
   } finally {
     ui.saying = false;
+    playerHold(false);
   }
   env.render();
 }
@@ -405,7 +413,7 @@ function lineup(show: HsShow, s: HsSettings, col = false): string {
 function onAir(ctx: ChatContext, show: HsShow, s: HsSettings, mobile: boolean): string {
   const { part, ordered } = nowPart(ctx);
   const ended = show.loaded && show.at >= show.parts.length;
-  const bar = `<div class="hs-bar"><span class="hs-on${show.loaded && !ended ? '' : ' off'}">${show.loaded && !ended ? 'LIVE' : 'OFF'}</span><b>${esc(show.title || HS_NAME)}</b>${part ? `<span class="hs-pt">${show.at + 1}부 <i>/ ${show.parts.length}부</i></span>` : ''}</div>`;
+  const bar = `<div class="hs-bar"><span class="hs-on${show.loaded && !ended ? '' : ' off'}">${show.loaded && !ended ? 'LIVE' : 'OFF'}</span><b>${esc(show.title || HS_NAME)}</b>${part ? `<span class="hs-pt">${show.at + 1}부 <i>/ ${show.parts.length}부</i></span><button class="hs-nx" data-action="hs-next">${show.at + 1 < show.parts.length ? '다음 상품 ▶' : '방송 마치기 ■'}</button>` : ''}</div>`;
   const tv = `<div class="hs-tv">${bar}<div class="hs-mount" data-hs-mount="stage"></div></div>`;
   const prod = part
     ? `<div class="hs-prod"><button class="hs-icon" data-action="hs-pop" data-value="peek" aria-label="상품 스티커 보기">${itemPic(part.item)}<span class="hs-stk" aria-hidden="true"></span></button>

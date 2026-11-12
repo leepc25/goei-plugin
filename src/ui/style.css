@@ -4962,6 +4962,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 @keyframes hs-blink { 50% { opacity: .2; } }
 .hs .hs-pt { color: var(--y); font-weight: 800; white-space: nowrap; }
 .hs .hs-pt i { font-style: normal; font-weight: 500; color: var(--sub); }
+.hs .hs-nx { height: 26px; padding: 0 10px; border: 1px solid var(--line2); border-radius: 4px; background: var(--card); color: #eee; font-weight: 800; font-size: 12.5px; white-space: nowrap; }
+.hs .hs-nx:hover { background: var(--card2); }
+.hs:has(.hs-scr[data-wait="1"]) .hs-nx { border-color: var(--y); color: #1a0c0f; background: var(--y); animation: hs-nx 1.4s ease-in-out infinite; }
+@keyframes hs-nx { 50% { opacity: .55; } }
 .hs .hs-tv .hs-mount { display: grid; place-items: center; width: 100%; background: #000; }
 .hs .hs-scr { position: relative; overflow: hidden; background: #000; -webkit-font-smoothing: none; }
 .hs .hs-cv { display: block; width: 100%; height: 100%; }

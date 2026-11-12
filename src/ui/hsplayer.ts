@@ -268,7 +268,7 @@ function tick(): void {
         r.flags.look = false;
         if (f.s.fx.cut) r.cut = 'B';
         startIdle();
-      } else if (t >= r.gapUntil) {
+      } else if (t >= r.gapUntil && !holding) {
         const next = r.part + 1;
         run = freshRun(next);
         hooks.advance(next);
@@ -320,6 +320,9 @@ function tick(): void {
   // 지금 동작 이름 (시험·디버그용 표시, 화면에는 안 보인다)
   const tag = `${r.cut}:${r.clip?.name ?? ''}:${r.cue}`;
   if (stage.dataset.clip !== tag) stage.dataset.clip = tag;
+  // 큐시트가 끝나 기다리는 중 (「다음 상품」 단추가 알려 준다)
+  const waiting = r.cue >= part.cues.length && !extra.length ? '1' : '';
+  if ((stage.dataset.wait ?? '') !== waiting) stage.dataset.wait = waiting;
   draw(f, r, t);
   drawCg(f, r, t);
 }
@@ -512,6 +515,9 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ''}
 }
 
 /** 시험·디버그: 지금 재생 자리 */
+/** 내 채팅의 반응을 기다리는 동안에는 저절로 다음 부로 넘어가지 않는다 */
+let holding = false;
+export const playerHold = (on: boolean): void => { holding = on; };
 /** 방금까지 흐른 채팅 n줄 */
 export const playerRecentChat = (n: number): { nick: string; text: string }[] => shown.slice(-n);
 export const playerState = () => (run ? { part: run.part, cue: run.cue, cut: run.cut, clip: run.clip?.name ?? '', left: run.left, flags: { ...run.flags } } : null);
