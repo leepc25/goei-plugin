@@ -69,6 +69,8 @@ export interface BrTab {
   at: number;
 }
 const HIST_MAX = 50;
+/** 닫은 탭을 몇 개까지 기억하나 */
+const CLOSED_MAX = 10;
 let seq = 1;
 export const br = {
   tabs: [{ id: seq++, site: '', hist: [], at: -1 }] as BrTab[],
@@ -118,7 +120,7 @@ export function newTab(): void {
 /** 탭 닫기. 마지막 탭을 닫으면 새 탭 하나가 남는다 */
 export function closeTab(i: number): void {
   const [gone] = br.tabs.splice(i, 1);
-  if (gone?.site) br.closed = [...br.closed, gone].slice(-10);
+  if (gone?.site) br.closed = [...br.closed, gone].slice(-CLOSED_MAX);
   if (!br.tabs.length) br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   if (br.cur >= i && br.cur > 0) br.cur--;
   br.cur = Math.min(br.cur, br.tabs.length - 1);
@@ -153,8 +155,16 @@ export const focusSite = (site: SiteId): void => void openSite(site);
 /* 새로고침해도 탭이 남게 (2026-11-08 사용자): 열린 사이트·보던 탭·탭마다 최근 기록을 이 채팅에 */
 export const BR_TABS_VAR = '$br_tabs';
 const SAVE_HIST = 10;
+const packTab = (t: BrTab) => ({ s: t.site, h: t.hist.slice(-SAVE_HIST), a: Math.max(-1, t.at - Math.max(0, t.hist.length - SAVE_HIST)) });
+function unpackTab(t: { s?: unknown; h?: unknown; a?: unknown } | null | undefined): BrTab {
+  const site: SiteId | '' = isSite(String(t?.s)) ? (t!.s as SiteId) : '';
+  const hist = Array.isArray(t?.h) ? t!.h.filter((x: unknown) => typeof x === 'string').slice(-SAVE_HIST) : [];
+  const at = Number.isInteger(t?.a) ? Math.min(Math.max(-1, t!.a as number), hist.length - 1) : hist.length - 1;
+  return { id: seq++, site, hist, at };
+}
+/** x = 닫은 탭 (2026-11-12 사용자: 닫은 탭 다시 열기가 안 됨 — 새로고침하면 닫은 탭 목록만 비던 것도 같이 남긴다). 없으면 넣지 않는다 */
 export function tabsJson(): string {
-  return JSON.stringify({ c: br.cur, t: br.tabs.map((t) => ({ s: t.site, h: t.hist.slice(-SAVE_HIST), a: Math.max(-1, t.at - Math.max(0, t.hist.length - SAVE_HIST)) })) });
+  return JSON.stringify({ c: br.cur, t: br.tabs.map(packTab), ...(br.closed.length ? { x: br.closed.map(packTab) } : {}) });
 }
 /** 채팅에 적힌 탭으로 (없거나 깨졌으면 빈 새 탭 하나) */
 export function restoreTabs(raw: unknown): void {
@@ -165,13 +175,9 @@ export function restoreTabs(raw: unknown): void {
   br.cur = 0;
   try {
     const v = JSON.parse(String(raw ?? ''));
-    for (const t of Array.isArray(v?.t) ? v.t : []) {
-      const site: SiteId | '' = isSite(String(t?.s)) ? (t.s as SiteId) : '';
-      const hist = Array.isArray(t?.h) ? t.h.filter((x: unknown) => typeof x === 'string').slice(-SAVE_HIST) : [];
-      const at = Number.isInteger(t?.a) ? Math.min(Math.max(-1, t.a), hist.length - 1) : hist.length - 1;
-      br.tabs.push({ id: seq++, site, hist, at });
-    }
+    for (const t of Array.isArray(v?.t) ? v.t : []) br.tabs.push(unpackTab(t));
     if (Number.isInteger(v?.c)) br.cur = v.c;
+    br.closed = (Array.isArray(v?.x) ? v.x : []).map(unpackTab).filter((t: BrTab) => t.site).slice(-CLOSED_MAX);
   } catch {
     /* 빈 탭으로 */
   }
