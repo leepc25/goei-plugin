@@ -56,7 +56,7 @@ const systems = (req) => req.filter((m) => m.role === 'system').map((m) => m.con
   assert.ok(ok, 'GNet 지침의 MAIN_CONTEXT 절 글칸');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').guides?.GNet);
   await page.click('.gw [data-action="ed-close"]');
-  await page.click('[data-action="close"]');
+  await page.evaluate(() => document.querySelector('[data-action="close"]').click()); // 진행 창(오른쪽 위, 창보다 위: 11-11)이 요청 중에는 닫기 단추를 덮을 수 있어 직접 누른다
   await page.waitForFunction(() => window.__calls.hide >= 1);
   const after = systems(await request());
   assert.ok(after.includes(MARK), `고친 지침이 바로 다음 요청에 들어가야 함 (캐릭터를 바꿀 때까지 옛 규칙이면 실패):\n${after.slice(0, 400)}`);
@@ -78,7 +78,7 @@ const systems = (req) => req.filter((m) => m.role === 'system').map((m) => m.con
   assert.ok(b1.includes('☁️'), `채팅 B 는 날씨 칸 표시 (A 의 칸 구성이 남으면 실패):\n${b1}`);
   await open(page);
   assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.theme), 'light', '창 배색도 B');
-  await page.click('[data-action="close"]');
+  await page.evaluate(() => document.querySelector('[data-action="close"]').click()); // 진행 창(오른쪽 위, 창보다 위: 11-11)이 요청 중에는 닫기 단추를 덮을 수 있어 직접 누른다
   await page.evaluate(() => { window.__chatIndex = 0; });
   await page.waitForTimeout(2600);
   assert.equal(await theme(), 'paper', '다시 A 로');

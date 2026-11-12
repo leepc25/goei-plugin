@@ -125,7 +125,8 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     assert.ok(open && open.includes('|관리국 본부|'), `닫는 괄호 없음: ${open}`);
     const multi = await run(`${STATUS}\n${STATUS2}`);
     assert.ok(multi.includes('관리국 지하 주차장') && !multi.includes('관리국 본부 사무실'), '한 응답에 둘이면 마지막');
-    assert.equal(await run('상태창 없음'), null, '상태창이 없으면 블록 없음');
+    // 상태창이 없고 시작 잔고가 있으면 시작 값 블록이 붙는다 (2026-11-09: 시작 잔고가 첫 응답 뒤 0이 되던 것)
+    assert.ok((await run('상태창 없음')).includes('No status line yet') , '상태창이 없으면 시작 값 블록');
     const bad = await run('[▣|날짜모름|시각모름|☀️|4°C|관리국 본부|없음|없음|없음|관리국/신입|140000]');
     assert.ok(bad && bad.includes('[▣|'), `읽지 못하는 줄은 그대로: ${bad}`);
   });
@@ -315,8 +316,10 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
       if (inject === 'split' || inject === 'record') assert.ok(!lore.includes('### Character - Jyaldi'), `${inject}: 시트 원문은 요청에서 뺀다`);
       else assert.ok(lore.includes('### Character - Jyaldi'), 'append: 시트 그대로');
     }
-    await setVars(page, { $pp_inject: 'off' });
-    assert.equal(block(await request(page, base())), undefined, 'off: 블록 없음');
+    // 「컨텍스트 포함」 끔은 「사용」과 합쳐졌다 (2026-11-11 설정 개편 3단계): 인물 기록을 끄면 블록이 없다
+    await setVars(page, { $pp_on: '0' });
+    assert.equal(block(await request(page, base())), undefined, '사용 끔: 블록 없음');
+    await setVars(page, { $pp_on: '1' });
     await setVars(page, { $pp_on: '0', $pp_inject: 'split' });
     assert.equal(block(await request(page, base())), undefined, '기능 끔: 블록 없음');
     // 연출형 Director: 보조 모델 1회, 실패해도 요청은 나간다
@@ -349,7 +352,11 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     let out = await request(page, base());
     c = ctxOf(out);
     assert.deepEqual(c.map(feature).sort(), ['gnet', 'phone', 'wiki']);
-    assert.equal(out.indexOf(out.find((m) => m.content.startsWith('[MODULE_CONTEXT_BEGIN]'))), out.length - 3 - 2, '참고 기록은 마지막 사용자 메시지 앞 (상태창 블록 없음, 이미지 지침은 끝)');
+    { // 참고 기록은 마지막 사용자 메시지 앞에 system 으로만 이어진다 (그 사이에 상태창·인물 기록 블록이 올 수 있다. 이미지 지침은 끝)
+      const at = out.indexOf(out.find((m) => m.content.startsWith('[MODULE_CONTEXT_BEGIN]')));
+      const user = out.map((m) => m.role).lastIndexOf('user');
+      assert.ok(at >= 0 && at < user && out.slice(at, user).every((m) => m.role === 'system'), '참고 기록은 마지막 사용자 메시지 앞');
+    }
     await setVars(page, { $ph_context: '0', $nw_context: '0' });
     c = ctxOf(await request(page, base()));
     assert.deepEqual(c.map(feature), ['gnet'], '괴담톡·위키 끔');
