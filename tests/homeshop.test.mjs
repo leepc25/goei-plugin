@@ -148,3 +148,102 @@ test('턴 열쇠: 응답을 다시 굴리면 같고 새 턴이면 달라진다 (
   assert.notEqual(turnKey({ message: [...base, { role: 'user', data: '계속', chatId: 'u2' }, { role: 'char', data: '둘째 답', chatId: 'c2' }] }), k1);
   assert.equal(turnKey({ message: [] }), '');
 });
+
+// ── 11-12: 상품마다 채팅 · 방송 전용 지침 ──
+const core1112 = await import('../dist-test/core.mjs');
+
+test('망상홈쇼핑: 채팅은 상품마다(#n) 읽고 그 부에 담는다. 머리 없는 줄은 공용', () => {
+  const raw = RAW.replace(/<chat>[\s\S]*<\/chat>/, `<chat>
+#1
+ㅇㅇ|이거 뭐임
+abc12|배송 며칠 걸려요
+#2
+감자|베개는 좀 끌리네
+</chat>`);
+  const r = parseShow(raw, moods);
+  assert.deepEqual(r.chats.map((c) => c.length), [2, 1]);
+  assert.deepEqual(r.chat, []);
+  const st = applyShow(emptyShow(), r, 'k1');
+  assert.deepEqual(st.parts.map((p) => p.chat?.length), [2, 1]);
+  // 저장했다 읽어도 부마다 그대로
+  const back = readShow(showVars(st));
+  assert.deepEqual(back.parts[0].chat, [{ nick: 'ㅇㅇ', text: '이거 뭐임' }, { nick: 'abc12', text: '배송 며칠 걸려요' }]);
+  assert.deepEqual(back.parts[1].chat, [{ nick: '감자', text: '베개는 좀 끌리네' }]);
+  // 머리 없이 온 옛 꼴은 공용 줄로
+  const old = applyShow(emptyShow(), parseShow(RAW, moods), 'k2');
+  assert.equal(old.chat.length, 2);
+  assert.equal(old.parts[0].chat, undefined);
+});
+
+test('망상홈쇼핑: 지침은 방송 전용 (상점 진열·주인 절을 빌리지 않고, 시청자 절·생각 단계가 있다)', () => {
+  const g = core1112.guideDefault('Hs');
+  const names = [...g.matchAll(/@@SECTION ([^\n]+)/g)].map((m) => m[1].trim());
+  for (const n of ['COMMON', 'SHELF', 'BROADCAST', 'VIEWERS', 'THOUGHTS_PROGRAM', 'SAY', 'CALL', 'AUDIENCE']) assert.ok(names.includes(n), n);
+  for (const n of ['FIRST', 'RESTOCK', 'THOUGHTS_SHELF', 'TALK', 'SELL', 'MAIN_TAG', 'SHOP_RULE']) assert.ok(!names.includes(n), `${n} 없어야`);
+  const viewers = /@@SECTION VIEWERS\n([\s\S]*?)\n@@END/.exec(g)[1];
+  assert.match(viewers, /without knowing what it is/);
+  assert.match(viewers, /know what the channel really is/);
+  assert.match(viewers, /Strange beings/);
+  // 대화 예시를 박지 않는다 (11-12 사용자): 따옴표로 든 말·한글 예문 없음
+  assert.doesNotMatch(viewers, /[「」"“”]|e\.g\.|[가-힣ㄱ-ㅎ]/);
+});
+
+test('망상홈쇼핑: 편성 요청문은 방송 꼴만 (가게 정체·주인 한마디·진열대 새로 짜기 없음), 채팅은 상품마다', () => {
+  const st = { ...core1112.emptyShop({ raw: '', shop: '망상홈쇼핑', owner: '레드 프라이데이' }, ''), loaded: true, identity: { sells: '망상홈쇼핑', never: '', prices: '무이자 N회' }, prev: ['행운의 무전기'] };
+  const src = { st, refs: '참고 글', story: '', status: '', situation: '', identity: '', language: null };
+  const msgs = core1112.programPrompt(src, core1112.shopSettings({}), { cue: '6 to 10', chat: '12 to 18', cuts: '와이드, 바스트', moods: '말하기', moods_b: '-', events: '가격 공개' });
+  const sys = msgs.find((m) => m.role === 'system').content;
+  const user = msgs.at(-1).content;
+  assert.match(sys, /live feed of 망상홈쇼핑/);
+  assert.match(sys, /<chat>\n#1\n닉네임\|말/);
+  assert.match(sys, /12 to 18 lines of the live viewer chat while that item is on air/);
+  assert.match(sys, /# Viewer chat/);
+  assert.match(sys, /행운의 무전기/);
+  assert.doesNotMatch(sys, /Re-stock|First visit|<owner>|shop-identity|\{[a-z_]+\}/);
+  assert.match(user, /^\[채널\]\n망상홈쇼핑 \/ 진행자: 레드 프라이데이/);
+  assert.match(user, /참고 글/);
+  assert.match(user, /\[현재 작업\]\n오늘 편성/);
+  assert.doesNotMatch(user, /가게 정체|진열대/);
+});
+
+test('남은 수량 저절로 줄기: 큐시트 끝에 끝 수에 닿고 0이 되지 않는다', () => {
+  const { dropEnd, dropRest, nextDrop } = homeshop;
+  const d0 = hsSettings({}).drop;
+  assert.deepEqual(d0, { on: true, rate: HS_NUM.dropRate.def / 100, fast: HS_NUM.dropFast.def / 10, step: HS_NUM.dropStep.def, soon: HS_NUM.soonAt.def, end: [HS_NUM.endLo.def, HS_NUM.endHi.def] });
+  assert.equal(hsSettings({ [HS_KEY.drop]: '0' }).drop.on, false);
+  assert.deepEqual(hsSettings({ [HS_NUM.endLo.key]: '9', [HS_NUM.endHi.key]: '4' }).drop.end, [4, 9]);
+  // 끝 수: 범위 안, 시작 값보다 작게, 1 이상
+  assert.equal(dropEnd(30, d0, () => 0), d0.end[0]);
+  assert.equal(dropEnd(30, d0, () => 0.999), d0.end[1]);
+  assert.equal(dropEnd(3, d0, () => 0.999), 2);
+  assert.equal(dropEnd(1, d0, () => 0.5), 1);
+  // 남은 길이: 가격 공개 뒤는 배수만큼 길게, 매진 뒤는 안 친다, 큐시트가 뺄 수는 따로
+  const s = { speed: 10, hold: 1, drop: d0 };
+  const cue = (ev, n) => ({ cut: 'B', mood: '', text: '가나다라마가나다라마', ev, ...(n ? { n } : {}) });
+  const cues = [cue(''), cue('left', 4), cue('price'), cue(''), cue('sold'), cue('')];
+  assert.deepEqual(dropRest(cues, 0, 1000, false, s), { ms: 1000 + 2000 + 2000 * d0.fast * 2, planned: 4 });
+  assert.deepEqual(dropRest(cues, 2, 500, true, s), { ms: 500 * d0.fast + 2000 * d0.fast, planned: 0 });
+  // 꺼짐 · 줄일 것 없음 · 시간 없음
+  assert.equal(nextDrop(30, 5, { ms: 10000, planned: 0 }, { ...d0, on: false }), null);
+  assert.equal(nextDrop(5, 5, { ms: 10000, planned: 0 }, d0), null);
+  assert.equal(nextDrop(9, 5, { ms: 10000, planned: 4 }, d0), null);
+  assert.equal(nextDrop(30, 5, { ms: 0, planned: 0 }, d0), null);
+  // 한 부를 처음부터 끝까지 흘려 본다 (33ms 씩): 끝에는 끝 수 근처, 그 아래로는 안 간다
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (const start of [30, 200, 999, 8]) {
+    const plain = Array.from({ length: 8 }, (_, i) => cue(i === 4 ? 'rush' : ''));
+    const end = dropEnd(start, d0, rnd);
+    let left = start, n = 0, wait = 0, fast = false, drops = 0;
+    for (let i = 0; i < plain.length; i++) {
+      if (plain[i].ev === 'rush') fast = true;
+      for (let at = 0; at < 2000; at += 33) {
+        if (!n) { const p = nextDrop(left, end, dropRest(plain, i, 2000 - at, fast, s), d0, rnd); if (p) ({ n, wait } = p); }
+        else if ((wait -= 33 * (fast ? d0.fast : 1)) <= 0) { left = Math.max(1, end, left - n); n = 0; drops++; }
+      }
+    }
+    assert.ok(left >= end && left >= 1, `${start}: ${left} >= ${end}`);
+    assert.ok(left - end <= Math.max(3, start * 0.1), `${start}: 끝 ${left} (목표 ${end})`);
+    assert.ok(drops <= 16 + 2, `${start}: ${drops}번 (1초보다 잦지 않게)`);
+  }
+});

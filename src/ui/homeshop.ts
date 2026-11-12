@@ -8,7 +8,7 @@ import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
-import { emptyShop, lastBot, shelfPrompt, turnKey, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
+import { broadcastMaterial, emptyShop, lastBot, programPrompt, turnKey, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
 import { aliveAnchors } from '../core/wallet';
 import { addItem, addItemLog, itemId, liveItemsOf, readItems, itemsVars, removeItem, sellItem, type Item } from '../core/items';
 import { userTurns } from '../core/request';
@@ -17,7 +17,7 @@ import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
 import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_FORMS_DEFAULT, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
-import { mountPlayer, playerCut, playerSay, playerState, setPlayerFeed, stopPlayer } from './hsplayer';
+import { mountPlayer, playerCut, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
 import { itemPic } from './items';
 import { isPhone } from './media';
@@ -84,22 +84,23 @@ const retryOf = (ctx: ChatContext) => { const n = Number(ctx.chat.scriptstate?.[
 
 // ── 모델 ──
 
-/** 편성 요청문: 상점 진열 요청(다시 짜기 꼴)에 방송 절을 붙인다 */
-function showPrompt(ctx: ChatContext, show: HsShow, s: HsSettings): LlmMessage[] {
+/** 방송 요청에 넘기는 자료 묶음 (참고 자료·본편은 상점과 같은 길로 모은다) */
+function showSource(ctx: ChatContext, show: HsShow, s: HsSettings) {
   const st: ShopState = { ...emptyShop({ raw: '', shop: HS_NAME, owner: HS_HOST }, ''), loaded: true, identity: { sells: HS_NAME, never: '', prices: '무이자 N회' }, prev: show.prev.concat(show.parts.map((p) => p.item.name)).slice(-24) };
-  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: hsVars(ctx.chat.scriptstate) as typeof ctx.chat.scriptstate } }, st, s.shop);
-  const msgs = shelfPrompt(src, s.shop, 'Hs');
+  return shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: hsVars(ctx.chat.scriptstate) as typeof ctx.chat.scriptstate } }, st, s.shop);
+}
+/** 지침에 채우는 낱말 (컷·표정·화면 사건) */
+function cueWords(): Record<string, string> {
   const art = homeshopArt();
   const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.ko))];
   const a = names('A');
   const b = names('B').filter((x) => !a.includes(x));
+  return { cuts: Object.values(CUE_CUT_WORD).join(', '), moods: a.join(', ') || '말하기', moods_b: b.join(', ') || '-', moods_all: [...a, ...b].join(', ') || '말하기', events: Object.values(CUE_EVENT_WORD).join(', ') };
+}
+/** 편성 요청문: 방송 전용 지침(첫 절·물건 줄·방송 꼴·시청자 절·생각 단계). 상점 진열 지침은 빌리지 않는다 (11-12 사용자) */
+function showPrompt(ctx: ChatContext, show: HsShow, s: HsSettings): LlmMessage[] {
   const range = (r: [number, number]) => (r[0] === r[1] ? `${r[0]}` : `${r[0]} to ${r[1]}`);
-  const extra = fillGuide(guideSections('Hs').BROADCAST, {
-    cue: range(s.cue), chat: range(s.chat), cuts: Object.values(CUE_CUT_WORD).join(', '),
-    moods: a.join(', ') || '말하기', moods_b: b.join(', ') || '-', events: Object.values(CUE_EVENT_WORD).join(', '),
-  });
-  const i = msgs.findIndex((m) => m.role === 'system');
-  return msgs.map((m, k) => (k === i ? { ...m, content: `${m.content}\n\n${extra}` } : m)) as LlmMessage[];
+  return programPrompt(showSource(ctx, show, s), s.shop, { ...cueWords(), cue: range(s.cue), chat: range(s.chat) }) as LlmMessage[];
 }
 
 /** 호출 흐름 미리 계산용 (모델은 안 부름). 꺼져 있으면 null */
@@ -297,6 +298,7 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
     const ops = readShow(ctx.chat.scriptstate).ops;
     ui.done = (usedBarter ? ops?.barter : ops?.done) || '주문이 접수되었습니다.';
     playerSay('안내', '주문 1건 접수', 'sys');
+    playerTake(1);
   }
   await env.refresh();
 }
@@ -346,12 +348,14 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
   env.render();
   try {
     const art = homeshopArt();
-    const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.ko))];
     const g = guideSections('Hs');
-    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: '1 to 3', say_chat: '2 to 5', cuts: Object.values(CUE_CUT_WORD).join(', '), moods: [...new Set([...names('A'), ...names('B')])].join(', ') || '말하기', events: Object.values(CUE_EVENT_WORD).join(', ') })].filter(Boolean).join('\n\n');
+    const w = cueWords();
+    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: '1 to 3', say_chat: '2 to 5', cuts: w.cuts, moods: w.moods_all, events: w.events }), fillGuide(g.VIEWERS ?? '', {})].filter(Boolean).join('\n\n');
     const st = playerState();
     const recent = part.cues.slice(Math.max(0, (st?.cue ?? 0) - 3), (st?.cue ?? 0) + 1).map((c) => `진행자: ${c.text}`).join('\n');
-    const user = `[지금 방송]\n${show.title ? `${show.title} · ` : ''}${show.at + 1}부 「${part.item.name}」 (${part.item.pay ?? ''})\n${part.item.desc}\n\n[방금 진행자]\n${recent || '-'}\n\n[시청자 채팅]\n${nick}: ${text.slice(0, 200)}`;
+    // 방금까지 흐른 채팅 (내 줄은 playerSay 로 이미 맨 끝에 있다): 같은 닉네임·말투를 잇게
+    const flowed = playerRecentChat(24).slice(0, -1).map((c) => `${c.nick}: ${c.text}`).join('\n');
+    const user = `${broadcastMaterial(showSource(ctx, show, s), s.shop)}\n\n[지금 방송]\n${show.title ? `${show.title} · ` : ''}${show.at + 1}부 「${part.item.name}」 (${part.item.pay ?? ''})\n${part.item.desc}\n\n[방금 진행자]\n${recent || '-'}${flowed ? `\n\n[방금까지 흐른 채팅]\n${flowed}` : ''}\n\n[지금 시청자가 쓴 채팅]\n${nick}: ${text.slice(0, 200)}`;
     const gs = genSettings(ctx.chat.scriptstate);
     const moods = moodMap(art?.pack ?? null);
     const { value } = await generate([{ role: 'system', content: system }, { role: 'user', content: user }] as LlmMessage[], s.shop.model, (raw) => {
@@ -518,7 +522,7 @@ export function boxButton(ctx: ChatContext, itemIdOf: string): string {
 const SH: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
 const SH_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
 /** 켬/끔 칸: 설정 키 → 변수 이름 */
-const FLAG: Record<string, string> = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
+const FLAG: Record<string, string> = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, drop: HS_KEY.drop, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
 
 export function homeshopSettingsPane(ctx: ChatContext): string {
   const vars = ctx.chat.scriptstate;
@@ -533,10 +537,10 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
   const vals: Record<string, string> = {
     on: b(s.on), net: b(s.net), auto: s.auto, retry: String(retryOf(ctx)), tel: String(vars?.[HS_TEL_KEY] ?? ''),
     'sh:model': s.shop.model, 'sh:ctx': b(s.shop.context), 'sh:price': s.shop.price, 'sh:diverse': b(s.shop.diverse), 'sh:prev': b(s.shop.avoidPrev), 'sh:thoughts': s.shop.thoughts,
-    turns: String(s.shop.turns), refs: String(s.shop.refs), turn: b(s.turn), lock: b(s.lock), say: b(s.say), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
+    turns: String(s.shop.turns), refs: String(s.shop.refs), turn: b(s.turn), lock: b(s.lock), drop: b(s.drop.on), say: b(s.say), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
     forms: String(vars?.[HS_KEY.forms] ?? ''), clips: s.clipsText, cut: b(s.fx.cut), bulb: b(s.fx.bulb), tear: b(s.fx.tear), scan: b(s.fx.scan), scalePc: s.scalePc, scalePh: s.scalePhone,
   };
-  const pairs: Record<string, [string, string]> = { cue: ['cueMin', 'cueMax'], chat: ['chatMin', 'chatMax'], call: ['callLo', 'callHi'], fill: ['fillLo', 'fillHi'] };
+  const pairs: Record<string, [string, string]> = { cue: ['cueMin', 'cueMax'], chat: ['chatMin', 'chatMax'], call: ['callLo', 'callHi'], fill: ['fillLo', 'fillHi'], end: ['endLo', 'endHi'] };
   const wire: Wire = {
     cur: (k) => vals[k] ?? String(n(k)),
     minmax: (k) => (k === 'size' ? s.shop.size : [n(pairs[k][0]), n(pairs[k][1])]),
@@ -548,7 +552,7 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
   const page: typeof HOMESHOP_SET = { ...HOMESHOP_SET, groups: [
     pick('', ['net', 'retry', 'say']),
     pick('편성', ['cue', 'chat']),
-    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'turn', 'lock']),
+    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'drop', 'dropRate', 'dropFast', 'dropStep', 'soonAt', 'end', 'turn', 'lock']),
     pick('주문', ['barter', 'peek']),
     pick('컨텍스트 포함', ['call', 'forms', 'aud']),
     pick('진행자 동작', ['fill', 'fillCool', 'rareP', 'rareCool', 'clips'], HOMESHOP_SET.groups.find((g) => g.title === '진행자 동작')?.note),

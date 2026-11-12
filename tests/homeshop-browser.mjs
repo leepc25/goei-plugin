@@ -40,6 +40,7 @@ sells: 망상홈쇼핑
 바스트|매진 임박|한 번 더 울리는 자명종!|매진
 </cue>
 <chat>
+#1
 ㅇㅇ|2번 재입고 되나요
 ???|여기 안에 있어요
 민지맘|저거 진짜 들려요?
@@ -48,6 +49,10 @@ sells: 망상홈쇼핑
 하루|6회면 몇 번 불려가요?
 rose|진행자 눈 왜저럼
 익명|방청 신청했는데 답이 없어요
+#2
+감자|이부전용 베개 줄
+#3
+abc92|삼부전용 자명종 줄
 </chat>
 <peek>
 수신 전용. 송신 버튼은 장식입니다.
@@ -104,6 +109,10 @@ for (const [vp, size] of VPS) {
   assert.ok(geo.tvH <= geo.pageH * 0.66, `방송 칸 높이 ${geo.tvH} / ${geo.pageH}`);
   await page.evaluate(() => document.querySelector('.hs-sec')?.scrollIntoView({ block: 'end' })); await page.waitForTimeout(300); await shot('lineup');
   await page.evaluate(() => document.querySelector('.hs-gnb')?.scrollIntoView({ block: 'start' }));
+  // 채팅은 지금 부의 것만 흐르고, 다 흘러도 되풀이하지 않는다 (11-12 사용자)
+  { const lines = await page.evaluate(() => [...document.querySelectorAll('.hs-chlog p')].map((p) => p.textContent));
+    assert.ok(!lines.some((t) => t.includes('이부전용') || t.includes('삼부전용')), `다른 부 채팅이 섞임: ${lines.join(' / ')}`);
+    assert.equal(new Set(lines).size, lines.length, `채팅 되풀이: ${lines.join(' / ')}`); }
   // 스티커 보기 → 들추기
   await click('[data-action="hs-pop"][data-value="peek"]'); await page.waitForTimeout(200);
   await click('[data-action="hs-lift"]'); await page.waitForTimeout(200); await shot('peek');
