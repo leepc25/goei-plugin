@@ -114,11 +114,11 @@ export const HS_KEY = {
 } as const;
 /** 숫자 칸 범위·기본값 (설정 화면과 읽기가 같이 쓴다) */
 export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: number; unit: string }> = {
-  chatMin: { key: HS_KEY.chatMin, lo: 0, hi: 120, def: 12, unit: '줄' },
-  chatMax: { key: HS_KEY.chatMax, lo: 0, hi: 120, def: 18, unit: '줄' },
+  chatMin: { key: HS_KEY.chatMin, lo: 0, hi: 120, def: 30, unit: '줄' },
+  chatMax: { key: HS_KEY.chatMax, lo: 0, hi: 120, def: 40, unit: '줄' },
   chatGap: { key: HS_KEY.chatGap, lo: 5, hi: 100, def: 22, unit: '×0.1초' },
-  cueMin: { key: HS_KEY.cueMin, lo: 2, hi: 20, def: 6, unit: '줄' },
-  cueMax: { key: HS_KEY.cueMax, lo: 2, hi: 20, def: 10, unit: '줄' },
+  cueMin: { key: HS_KEY.cueMin, lo: 2, hi: 20, def: 12, unit: '줄' },
+  cueMax: { key: HS_KEY.cueMax, lo: 2, hi: 20, def: 16, unit: '줄' },
   speed: { key: HS_KEY.speed, lo: 3, hi: 40, def: 11, unit: '자/초' },
   hold: { key: HS_KEY.hold, lo: 0, hi: 50, def: 12, unit: '×0.1초' },
   frame: { key: HS_KEY.frame, lo: 50, hi: 250, def: 110, unit: 'ms' },
