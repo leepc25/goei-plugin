@@ -1,4 +1,50 @@
-r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+ fill3(photos.get(asset));
+      else void loadPhoto(asset).then(fill3);
+    });
+  }
+  function zoomPhoto(src, alt) {
+    const box3 = document.createElement("div");
+    box3.className = "gx at-zoom";
+    box3.setAttribute("role", "dialog");
+    box3.setAttribute("aria-label", "사진 크게 보기");
+    box3.innerHTML = `<img src="${esc6(src)}" alt="${esc6(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
+    const close3 = () => {
+      box3.remove();
+      document.removeEventListener("keydown", key, true);
+    };
+    const key = (ev) => {
+      if (ev.key !== "Escape") return;
+      ev.stopPropagation();
+      close3();
+    };
+    box3.addEventListener("click", close3);
+    document.addEventListener("keydown", key, true);
+    document.body.appendChild(box3);
+  }
+  function card(kind, text5, asset) {
+    const label2 = ATTACH_LABELS[kind];
+    if (kind === "image") {
+      const src = asset ? photos.get(asset) : null;
+      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}" data-asset="${esc6(asset ?? "")}" alt="${esc6(text5 || label2)}" loading="lazy"></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
+    }
+    if (kind === "file") {
+      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc6(text5)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
+    }
+    if (kind === "link") {
+      const url = attachUrl(text5);
+      const go3 = url ? `<a class="at-go" href="${esc6(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
+      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc6(text5)}</b>${go3}</div></div>`;
+    }
+    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc6(text5)}</b><small>선물이 도착했습니다</small></div></div>`;
+    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc6(text5).replace(/\n/g, "<br>")}</span></div></div>`;
+  }
+  var sitePic = null;
+  function setSitePicSource(fn2) {
+    sitePic = fn2;
+  }
+  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
+  var camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
   function boardCard(kind, text5, asset, url) {
     if (kind === "image" || url) {
       const src = url ?? (asset ? photos.get(asset) : null);
@@ -129,12 +175,12 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
   }
   function findRow(char, name) {
     const lower = name.toLowerCase();
-    const card2 = (char.additionalAssets ?? []).filter(isRow2);
-    return card2.find((a) => a[0] === name) ?? card2.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
+    const card3 = (char.additionalAssets ?? []).filter(isRow2);
+    return card3.find((a) => a[0] === name) ?? card3.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
   }
   function assetNames(char) {
-    const card2 = (char.additionalAssets ?? []).filter(isRow2);
-    return [...new Set([...card2, ...modRows].map((r) => r[0]))].filter((n3) => !/^map\d+$/i.test(n3));
+    const card3 = (char.additionalAssets ?? []).filter(isRow2);
+    return [...new Set([...card3, ...modRows].map((r) => r[0]))].filter((n3) => !/^map\d+$/i.test(n3));
   }
   var DEFAULT_CROP = "50,16,44";
   var AGENT_CROPS = {
@@ -233,23 +279,23 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
       await im.decode();
       const W3 = im.naturalWidth;
       const H2 = im.naturalHeight;
-      let [sx, sy, sw, sh2] = [0, 0, W3, H2];
+      let [sx, sy, sw2, sh2] = [0, 0, W3, H2];
       if (crop) {
         const side = Math.min(W3, H2, crop[2] / 100 * W3);
         sx = Math.min(W3 - side, Math.max(0, crop[0] / 100 * W3 - side / 2));
         sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
-        sw = sh2 = side;
+        sw2 = sh2 = side;
         if (tall > 1) sh2 = Math.max(side, Math.min(H2 - sy, side * tall));
       }
-      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh2));
+      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw2, sh2));
       if (!crop && !(scale < 1)) return url;
       const canvas2 = document.createElement("canvas");
-      canvas2.width = Math.max(1, Math.round(sw * scale));
+      canvas2.width = Math.max(1, Math.round(sw2 * scale));
       canvas2.height = Math.max(1, Math.round(sh2 * scale));
       const g2 = canvas2.getContext("2d");
       if (!g2) return url;
       g2.imageSmoothingQuality = "high";
-      g2.drawImage(im, sx, sy, sw, sh2, 0, 0, canvas2.width, canvas2.height);
+      g2.drawImage(im, sx, sy, sw2, sh2, 0, 0, canvas2.width, canvas2.height);
       const blob = await new Promise((res) => canvas2.toBlob(res, "image/webp", 0.88));
       return blob ? URL.createObjectURL(blob) : url;
     } catch {
@@ -340,9 +386,9 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
     }
   }
   async function saveVarDefaults(prefixes, state) {
-    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    const mine2 = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
     await savePrefs((p2) => {
-      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(p2.vars ?? {})])].filter(mine);
+      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(p2.vars ?? {})])].filter(mine2);
       const vars = { ...p2.vars ?? {} };
       for (const k of keys) {
         const v = state?.[k];
@@ -353,10 +399,10 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
     });
   }
   function loadVarDefaults(prefixes, state) {
-    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    const mine2 = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
     const saved = getPrefs().vars ?? {};
     const out = {};
-    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
+    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine2)) out[k] = String(saved[k] ?? "");
     return out;
   }
   async function savePrefs(change) {
@@ -377,7 +423,7 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
     jr: ["$jr_"]
   };
   var MAIN_PREFIXES = ["$gen_", "$pp_", "$it_"];
-  var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, "$st_col_", "$st_wallet_", "$sh_", "$cos_sh_", "$bm_sh_", "$hs_sh_", "$hs_on", "$net_joint", ...Object.values(PREFIXES).flat()])];
+  var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, "$st_col_", "$st_wallet_", "$sh_", "$cos_sh_", "$bm_sh_", "$hs_", "$cos_roll_", "$bm_roll_", "$bm_desk_", "$cos_ready", "$cos_truth", "$cos_fixed", "$net_joint", ...Object.values(PREFIXES).flat()])];
   var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", pp: "인물 기록", jr: "기록" };
   var defaultsAsk = { pane: "", what: "" };
   var defaultsButtons = (pane2, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane2}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="${pane2}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}기본값 불러오기</button></span>`;
@@ -478,7 +524,7 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
 
   // src/core/progress.ts
   var GROUPS = ["router", "director", "main", "update", "net"];
-  var GROUP_LABEL = { router: "라우터", director: "디렉터", main: "본편", update: "갱신기", net: "인터넷", other: "기타" };
+  var GROUP_LABEL = { router: "라우터", director: "디렉터", main: "메인", update: "갱신기", net: "인터넷", other: "기타" };
   var PROGRESS_WATCHDOG = 10 * 60 * 1e3;
   var turn = null;
   var seq = 0;
@@ -497,7 +543,7 @@ r camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><
     }
   };
   var progressTurn = () => turn;
-  var MAIN_STAGE = { id: "main", label: "본편", group: "main", match: [] };
+  var MAIN_STAGE = { id: "main", label: "메인", group: "main", match: [] };
   function progressBegin() {
     turn = { at: Date.now(), plan: [MAIN_STAGE], calls: [], manual: false };
     endWanted = false;
@@ -913,7 +959,7 @@ ${RETRY_ANALYZE}` }
   }
   async function generate(messages, model2, parse3, o) {
     const fix = o.fix ?? defaultFix(messages);
-    let ask4 = messages;
+    let ask5 = messages;
     let use = model2;
     let earlier = null;
     let transientLeft = TRANSIENT_RETRIES;
@@ -921,7 +967,7 @@ ${RETRY_ANALYZE}` }
       let raw = "";
       try {
         try {
-          raw = attempt === 0 && o.first ? await o.first(ask4) : await slot(o.concurrent, () => runModel(ask4, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
+          raw = attempt === 0 && o.first ? await o.first(ask5) : await slot(o.concurrent, () => runModel(ask5, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
         } catch (error) {
           if (!transient(error) || transientLeft <= 0) throw error;
           transientLeft--;
@@ -931,7 +977,7 @@ ${RETRY_ANALYZE}` }
           continue;
         }
         for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
-          const again = [...ask4, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
+          const again = [...ask5, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
           try {
             const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? "기타"} 다시 보기 ${i}`));
             if (next.trim()) raw = next;
@@ -945,7 +991,7 @@ ${RETRY_ANALYZE}` }
         if (earlier && !retryable(error)) throw earlier;
         if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
         earlier = withRawText(error, raw);
-        ask4 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+        ask5 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
         use = o.retryModel === "same" ? model2 : o.retryModel;
       }
     }
@@ -1041,11 +1087,11 @@ ${RETRY_ANALYZE}` }
     return items.length ? chips(f, items, state, label2) : "";
   }
   function advSetRow(f, label2, keys, state, help = "") {
-    const cells = keys.map(([k, l]) => {
+    const cells2 = keys.map(([k, l]) => {
       const item2 = advItem(f, k);
       return item2 ? [l, control2(f, item2, advValue(state, f, item2.key))] : null;
     }).filter((c) => !!c);
-    return cells.length ? setRow(esc8(label2), numSet(cells), help ? esc8(help) : "") : "";
+    return cells2.length ? setRow(esc8(label2), numSet(cells2), help ? esc8(help) : "") : "";
   }
   function advCtl(f, key, state) {
     const item2 = advItem(f, key);
@@ -1788,20 +1834,20 @@ ${RETRY_ANALYZE}` }
     if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
     const confirm = phone.confirm === `room:${r.id}`;
     const visible2 = r.messages.filter((m) => m.kind !== "pause" || !hiddenPause(m.text));
-    const shown3 = visible2.slice(-PAGE * phone.page);
-    const more = visible2.length > shown3.length;
+    const shown4 = visible2.slice(-PAGE * phone.page);
+    const more = visible2.length > shown4.length;
     const name = (cid) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
     const isMsg = (m) => !!m && m.kind === "message" && m.sender !== "system";
     let lastDay = "";
-    const bubbles2 = shown3.map((m, i) => {
+    const bubbles2 = shown4.map((m, i) => {
       const dm = dayOf(m.time);
       const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : "";
       const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : "";
       if (day) lastDay = day;
       if (m.kind === "skip") return `${sep}<div class="ph-sys skip">생략됨</div>`;
       if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc9(m.text)}</div>`;
-      const prev = shown3[i - 1];
-      const next = shown3[i + 1];
+      const prev = shown4[i - 1];
+      const next = shown4[i + 1];
       const me = m.sender === "me";
       const first = !!sep || !isMsg(prev) || prev.sender !== m.sender;
       const last2 = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
@@ -2909,15 +2955,15 @@ ${RETRY_ANALYZE}` }
     const docs = sortedDocs(ctx2);
     const saved = new Set(docs.map((d) => d.title));
     const lower = q.toLowerCase();
-    const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
+    const mine2 = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
     const hits = matches2(ctx2, q).filter((e, i, all) => !saved.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
     const exact = canon(ctx2)(q);
     const known = saved.has(exact) || hits.some((e) => e.title === exact);
-    const shown3 = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-    const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown3.has(t));
+    const shown4 = /* @__PURE__ */ new Set([...mine2.map((d) => d.title), ...hits.map((e) => e.title)]);
+    const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown4.has(t));
     const grp = (label2, rows3) => rows3.length ? `<h4>${label2}<b>${rows3.length}</b></h4>${rows3.join("")}` : "";
     const fresh3 = known ? "" : `<button type="button" class="it new" data-action="wiki-write" data-value="${esc10(q)}"><span>「${esc10(q)}」 새 문서 만들기</span></button>`;
-    const body5 = grp("문서", mine.map((d) => linkRow(ctx2, d.title, { dot: !d.base }))) + grp("명부", hits.map((e) => linkRow(ctx2, e.title, { none: true, name: e.name }))) + grp("비슷한 문서", near.map((t) => linkRow(ctx2, t, { none: !saved.has(t) })));
+    const body5 = grp("문서", mine2.map((d) => linkRow(ctx2, d.title, { dot: !d.base }))) + grp("명부", hits.map((e) => linkRow(ctx2, e.title, { none: true, name: e.name }))) + grp("비슷한 문서", near.map((t) => linkRow(ctx2, t, { none: !saved.has(t) })));
     return body5 ? body5 + fresh3 : `<p class="wnone">「${esc10(q)}」 문서가 없어요.</p>${fresh3}`;
   }
   function wikiHomeResults(ctx2) {
@@ -2932,12 +2978,12 @@ ${RETRY_ANALYZE}` }
     const count2 = (t) => docs.filter((d) => inTab(ctx2, d, t)).length;
     const tabs2 = TABS.filter(([t]) => t === "all" || count2(t));
     const tab2 = tabs2.some(([t]) => t === wiki.tab) ? wiki.tab : "all";
-    const shown3 = docs.filter((d) => inTab(ctx2, d, tab2));
+    const shown4 = docs.filter((d) => inTab(ctx2, d, tab2));
     const chips3 = `<div class="wtabs" role="tablist">${tabs2.map(([t, label2]) => `<button type="button" class="${t === tab2 ? "on" : ""}" data-action="wiki-tab" data-value="${t}" role="tab" aria-selected="${t === tab2}">${label2}<small>${count2(t)}</small></button>`).join("")}</div>`;
     const keyOfDoc = (d) => keyOf(shownName(ctx2, d.title));
-    const keys = KEYS2.filter((k) => shown3.some((d) => keyOfDoc(d) === k));
+    const keys = KEYS2.filter((k) => shown4.some((d) => keyOfDoc(d) === k));
     const groups = keys.map((k) => {
-      const rows3 = shown3.filter((d) => keyOfDoc(d) === k);
+      const rows3 = shown4.filter((d) => keyOfDoc(d) === k);
       const head3 = keys.length > 1 ? `<button type="button" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows3.length}</b></button>` : `${k}<b>${rows3.length}</b>`;
       return `<h4 data-ksec="${k}">${head3}</h4>${rows3.map((d) => linkRow(ctx2, d.title, { dot: tab2 !== "story" && !d.base })).join("")}`;
     }).join("");
@@ -2966,8 +3012,8 @@ ${RETRY_ANALYZE}` }
   }
   function homeView(ctx2) {
     const docs = sortedDocs(ctx2);
-    const pick3 = (t) => `<button type="button" class="wl" data-action="wiki-pick" data-value="${esc10(t)}">${esc10(shownName(ctx2, t))}</button>`;
-    const links = (list4, tab2) => [...list4.slice(0, 9).map((d) => pick3(d.title)), `<button type="button" class="wl" data-action="wiki-browse" data-value="${tab2}">[전체]</button>`].join(" · ");
+    const pick4 = (t) => `<button type="button" class="wl" data-action="wiki-pick" data-value="${esc10(t)}">${esc10(shownName(ctx2, t))}</button>`;
+    const links = (list4, tab2) => [...list4.slice(0, 9).map((d) => pick4(d.title)), `<button type="button" class="wl" data-action="wiki-browse" data-value="${tab2}">[전체]</button>`].join(" · ");
     const places = docs.filter((d) => ["an", "ms"].includes(docCat(ctx2, d)));
     const people = docs.filter((d) => docCat(ctx2, d) === "ag");
     const today = todayDoc(ctx2, docs);
@@ -2978,7 +3024,7 @@ ${RETRY_ANALYZE}` }
       [IROW_ICO.pen, "새 문서 요청", '찾는 문서가 없으면 <button type="button" class="wl" data-action="wiki-new">문서 작성 요청</button>을 남겨 주세요.']
     ].filter((r) => !!r);
     const story = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0));
-    const recent = story.slice(0, 10).map((d) => `<div class="rc">${pick3(d.title)}${d.meta?.created ? `<small>${ago(d.meta.created)}</small>` : ""}</div>`).join("");
+    const recent = story.slice(0, 10).map((d) => `<div class="rc">${pick4(d.title)}${d.meta?.created ? `<small>${ago(d.meta.created)}</small>` : ""}</div>`).join("");
     return `<div class="wrap"><div class="doc mainp"><div class="h1r"><h1 class="wk-h1">괴이위키:대문</h1></div><div class="dm dm0">최근 수정 시각: 오늘</div><div class="cat">분류: <button type="button" class="wl" data-action="wiki-home">괴이위키</button></div><hr class="hl">
     <div class="intro"><h3>여러분이 기록해 나가는 <span>괴담의 나무</span></h3><p><button type="button" class="wl" data-action="wiki-home">괴이위키</button>에 오신 것을 환영합니다!</p><p class="sm2">괴이위키는 누구나 기여할 수 있는 위키입니다.<br>검증되지 않았거나 편향된 내용이 있을 수 있습니다.</p>
       <div class="bsr"><input type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="여기에서 검색" value="${esc10(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"><button type="button" data-action="wiki-search" data-take="wiki-home-q">검색</button></div>
@@ -3022,14 +3068,14 @@ ${RETRY_ANALYZE}` }
   }
   function compose(ctx2) {
     const job = jobs2.get(chatKey2(ctx2));
-    const mine = job?.title === wiki.title;
+    const mine2 = job?.title === wiki.title;
     const lore = hasBook(source2(ctx2), wiki.title);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc10(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc10(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
     return `<div class="wrap one"><div class="doc"><h1 class="wk-h1">${esc10(wiki.title)}</h1><div class="dm">새 문서</div>
     <div class="nodoc wk-compose"><p><b>해당 문서를 찾을 수 없습니다.</b></p><p class="src">${src}</p>
       ${docReqBox(req)}
-      <div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-start" data-value="${esc10(wiki.title)}" ${job ? "disabled" : ""}>${mine ? '<i class="spin"></i>작성하는 중…' : "문서 작성"}</button></div>${mine ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ""}</div></div></div>`;
+      <div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-start" data-value="${esc10(wiki.title)}" ${job ? "disabled" : ""}>${mine2 ? '<i class="spin"></i>작성하는 중…' : "문서 작성"}</button></div>${mine2 ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ""}</div></div></div>`;
   }
   function spoilerFold(ctx2, title2, e) {
     if (e?.cat !== "an") return false;
@@ -3082,15 +3128,15 @@ ${RETRY_ANALYZE}` }
     const docs = sortedDocs(ctx2);
     const saved = new Set(docs.map((d) => d.title));
     const lower = q.toLowerCase();
-    const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
+    const mine2 = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
     const hits = matches2(ctx2, q).filter((e, i, all) => !saved.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
-    const shown3 = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-    const near = similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown3.has(t));
+    const shown4 = /* @__PURE__ */ new Set([...mine2.map((d) => d.title), ...hits.map((e) => e.title)]);
+    const near = similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown4.has(t));
     const item2 = (title2, cat, text5, none3) => `<li><button type="button" class="wl t${none3 ? " none" : ""}" data-action="wiki-pick" data-value="${esc10(title2)}">${esc10(shownName(ctx2, title2))}</button><small>${esc10(cat)}</small>${text5 ? `<p>${esc10(text5)}</p>` : ""}</li>`;
     const ofDoc = (d) => item2(d.title, catName(ctx2, d), docSummary(d.body, 90), false);
     const ofEntry = (e) => item2(e.title, CAT_LABEL[entryFor(ctx2, e.title)?.cat ?? e.cat], [e.sub, "아직 없는 문서"].filter(Boolean).join(" · "), true);
     const list4 = [
-      ...mine.map(ofDoc),
+      ...mine2.map(ofDoc),
       ...hits.map(ofEntry),
       ...near.map((t) => {
         const d = docs.find((x) => x.title === t);
@@ -3601,9 +3647,9 @@ ${RETRY_ANALYZE}` }
     return current5.filter((e) => !retired(e) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
   }
   function keyPrint(key) {
-    const norm3 = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
+    const norm4 = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
     let h = 2166136261;
-    for (const b of new TextEncoder().encode(norm3)) h = Math.imul(h ^ b, 16777619) >>> 0;
+    for (const b of new TextEncoder().encode(norm4)) h = Math.imul(h ^ b, 16777619) >>> 0;
     return h.toString(16).padStart(8, "0");
   }
   function shippedKeys(lore) {
@@ -3656,7 +3702,7 @@ ${RETRY_ANALYZE}` }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.10" : "0";
+  var PLUGIN_VERSION = true ? "0.21.11" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -3756,68 +3802,4 @@ ${RETRY_ANALYZE}` }
       settingsFolder: !!findFolder(lore),
       firstMessage: isLanding(i.firstMessage),
       loreSettings: !installLoreSettings(i.loreSettings),
-      greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
-      pictures: { missing: missingPics, bytes: missingPics.reduce((n3, p2) => n3 + (Number(p2[3]) || 0), 0), total: want.length },
-      icon: i.iconOurs,
-      wikiPack: i.wikiPack,
-      tokenizer: i.tokenizer
-    };
-  }
-  var uuid = () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
-  function plantGreetings(existing) {
-    const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
-    const index = {};
-    const at = /* @__PURE__ */ new Map();
-    out.forEach((g2, n3) => {
-      if (!at.has(g2)) at.set(g2, n3);
-    });
-    const inst = installData();
-    for (const [key, n3] of Object.entries(inst.greetings.index)) {
-      const text5 = inst.greetings.texts[n3] ?? "";
-      let hit4 = at.get(text5);
-      if (hit4 === void 0) {
-        hit4 = out.length;
-        out.push(text5);
-        at.set(text5, hit4);
-      }
-      index[key] = hit4;
-    }
-    return { greetings: out, index };
-  }
-  function buildManifest(o) {
-    const prev = o.prev ?? {};
-    const { wiki: _wiki, ...keys } = prev.keys ?? {};
-    return {
-      ...prev,
-      schema: 1,
-      plugin: "goei-plugin",
-      version: prev.version ?? PLUGIN_VERSION,
-      greetings: o.greetings,
-      pictures: pictures(prev).length ? pictures(prev) : installData().pictures,
-      keys: { ...keys, settings: o.settingsKey }
-    };
-  }
-  var entry2 = (comment, content, folder, extra2 = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra2 });
-  var folderEntry = (comment, key) => ({ key, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
-  var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
-  function fillDirectory(cur, def) {
-    const out = { ...cur };
-    let gaps = 0;
-    for (const [k, dv] of Object.entries(def)) {
-      if (k === "_help") continue;
-      const cv = out[k];
-      if (empty(cv)) {
-        if (!empty(dv)) out[k] = dv, gaps++;
-        continue;
-      }
-      if (k === "괴담톡 탭") {
-        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
-        continue;
-      }
-      if (!isObj2(cv) || !isObj2(dv)) continue;
-      const sec2 = { ...cv };
-      for (const [name, de] of Object.entries(dv)) {
-        const ce = sec2[name];
-        if (ce === void 0) {
-  
+      greetings: { ok: !missing.length, missing, t

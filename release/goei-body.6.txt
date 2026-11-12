@@ -1,4 +1,52 @@
-in("\n\n");
+ const rank3 = get("직급") || (dice.find(([k]) => k === "직급")?.[1] ?? "");
+    return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank: rank3, dept: get("부서"), intro: get("소개"), voice: get("말투"), dice }, say: say2 };
+  }
+  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
+  function parseSay(raw) {
+    const say2 = bubbles(block3(raw, "say"));
+    if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
+    return say2;
+  }
+  var G2 = () => guideSections("BmDesk");
+  var diceText = (d) => d.map(([k, v]) => `${k}: ${v}`).join("\n");
+  var cardText = (a) => `손님에게 보이는 호칭: ${deskTag(a)}
+이름: ${a.name}
+직급: ${a.rank}
+부서: ${a.dept}
+소개: ${a.intro}
+말투: ${a.voice}
+${diceText(a.dice)}`;
+  var material2 = (src) => [
+    src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
+${src.refs}` : "",
+    `[지금 진열된 상품]
+${src.shelf || "(없음)"}`,
+    `[손님]
+사내 계정: ${src.nick || "-"}
+남은 포인트: ${Math.trunc(src.points).toLocaleString("en-US")}p`
+  ].filter(Boolean).join("\n\n");
+  function makePrompt(src, dice, recent, no) {
+    const g2 = G2();
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MAKE, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.MAKE_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
+    const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join("\n") : "(없음)";
+    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
+
+[손님에게 보이는 호칭]
+상담원 ${no}
+
+[이번 상담사 주사위]
+${diceText(dice)}
+
+[최근 상담사 — 겹치지 말 것]
+${past}
+
+[현재 작업]
+상담사 카드와 첫 메시지` }], thoughts: fillGuide(g2.THOUGHTS_MAKE, {}) };
+  }
+  function talkPrompt2(src, st) {
+    const g2 = G2();
+    const a = st.agent;
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.TALK, {}), fillGuide(g2.TALK_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
     const talk = st.talk.filter((l) => l.who !== "sys").map((l) => `${l.who === "me" ? "[손님]" : "[상담사]"} ${l.text}`).join("\n");
     return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
 
@@ -1177,19 +1225,19 @@ ${SEED_CLOSE}` : "", missing };
   };
   function wikiSettings(state) {
     const s8 = state ?? {};
-    const pick3 = (key, allowed, def) => allowed.includes(s8[key]) ? s8[key] : def;
+    const pick4 = (key, allowed, def) => allowed.includes(s8[key]) ? s8[key] : def;
     return {
       ...WIKI_DEFAULTS,
-      mode: pick3("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
-      model: pick3("$nw_model", ["main", "aux"], WIKI_DEFAULTS.model),
-      length: pick3("$nw_length", ["short", "standard", "detailed"], WIKI_DEFAULTS.length),
+      mode: pick4("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
+      model: pick4("$nw_model", ["main", "aux"], WIKI_DEFAULTS.model),
+      length: pick4("$nw_length", ["short", "standard", "detailed"], WIKI_DEFAULTS.length),
       refreshPrevious: s8["$nw_refresh_previous"] !== "0",
       chatTurns: advNum(s8, "nw", "turns"),
       referenceCount: advNum(s8, "nw", "ref_count"),
-      footnotes: pick3("$nw_footnotes", ["pop", "inline"], WIKI_DEFAULTS.footnotes),
-      images: pick3("$nw_images", ["off", "infobox", "body"], WIKI_DEFAULTS.images),
-      auto: pick3("$nw_auto", ["0", "open", "turn"], WIKI_DEFAULTS.auto),
-      autoTitle: pick3("$nw_auto_title", ["model", "input"], WIKI_DEFAULTS.autoTitle),
+      footnotes: pick4("$nw_footnotes", ["pop", "inline"], WIKI_DEFAULTS.footnotes),
+      images: pick4("$nw_images", ["off", "infobox", "body"], WIKI_DEFAULTS.images),
+      auto: pick4("$nw_auto", ["0", "open", "turn"], WIKI_DEFAULTS.auto),
+      autoTitle: pick4("$nw_auto_title", ["model", "input"], WIKI_DEFAULTS.autoTitle),
       autoQuery: String(s8["$nw_auto_query"] ?? "").trim().slice(0, 80)
     };
   }
@@ -1297,10 +1345,10 @@ ${SEED_CLOSE}` : "", missing };
     return docs;
   }
   function listDocs(chat, lore) {
-    const mine = docsIn(localLore(chat));
-    if (lore === void 0) return mine;
-    const have = new Set(mine.map((d) => d.title));
-    return [...mine, ...baseDocs(lore).filter((d) => !have.has(d.title))];
+    const mine2 = docsIn(localLore(chat));
+    if (lore === void 0) return mine2;
+    const have = new Set(mine2.map((d) => d.title));
+    return [...mine2, ...baseDocs(lore).filter((d) => !have.has(d.title))];
   }
   function findDoc(chat, title2, lore) {
     return listDocs(chat, lore).find((d) => d.title === title2) ?? null;
@@ -1569,8 +1617,8 @@ ${line2}`;
           const tc = /^#[0-9a-fA-F]{3,8}$/.test(c2 ?? "") ? c2 : color;
           const head3 = fields3.find(([k]) => k === "Head")?.[1];
           const rows3 = fields3.filter(([k]) => k === "Row" || k === "RowHead");
-          const cells = (v, tagName3) => v.split(";;").map((x) => `<${tagName3}>${inline(x.trim())}</${tagName3}>`).join("");
-          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
+          const cells2 = (v, tagName3) => v.split(";;").map((x) => `<${tagName3}>${inline(x.trim())}</${tagName3}>`).join("");
+          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells2(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${cells2(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
           break;
         }
         default:
@@ -1796,9 +1844,9 @@ ${story}`;
   }
   var unescape = (s8) => s8.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
   function assetPathOf(src) {
-    const sw = src.match(/\/sw\/img\/([0-9a-f]+)/i);
-    if (sw) {
-      const hex3 = sw[1];
+    const sw2 = src.match(/\/sw\/img\/([0-9a-f]+)/i);
+    if (sw2) {
+      const hex3 = sw2[1];
       const bytes = new Uint8Array(hex3.length / 2);
       for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex3.slice(i * 2, i * 2 + 2), 16);
       const path = new TextDecoder().decode(bytes);
@@ -2943,8 +2991,8 @@ ${block5.trim()}` };
     }
     const n3 = userName.trim();
     if (n3 && agentName && n3 !== agentName && n3.length >= 2 && !/^(?:user|나|유저)$/i.test(n3)) {
-      const esc44 = n3.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n3) ? `\\b${esc44}\\b` : esc44, "g");
+      const esc46 = n3.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n3) ? `\\b${esc46}\\b` : esc46, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m);
     }
     return out;
@@ -3380,8 +3428,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
   var setGroup = (title2, rows3, note = "") => `<section class="ps-group">${title2 ? `<h3>${title2}</h3>` : ""}${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${rows3}</div></section>`;
   function setSeg(action, key, cur, items, disabled = false) {
     const val = (v) => key ? `${key}=${v}` : v;
-    const sw = onOffSwitch(items, cur, action, val, disabled);
-    if (sw) return sw;
+    const sw2 = onOffSwitch(items, cur, action, val, disabled);
+    if (sw2) return sw2;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${val(v)}" aria-pressed="${cur === v}"${disabled ? " disabled" : ""}>${label2}</button>`).join("")}</div>`;
   }
   var act = (page, kind) => `${page.id}-${kind}`;
@@ -3430,6 +3478,11 @@ ${JSON.stringify(previousRoom ?? "")}`)
       return { ctl: `<div class="st-step">${b("-", n3 > c.lo, "줄이기")}<b>${esc5(`${n3}${c.unit}`)}</b>${b("+", n3 < c.hi, "늘리기")}</div>`, cur: String(n3) };
     }
     return { ctl: "", cur: "" };
+  }
+  function ckCols(isNum) {
+    const nums = isNum.filter(Boolean).length;
+    const wide2 = nums > 0 && isNum.length - nums > nums;
+    return isNum.map((n3) => wide2 && n3 ? "minmax(126px, 1.35fr)" : "minmax(0, 1fr)").join(" ");
   }
   function defRow(page, d, w) {
     for (const c of d.show ? Array.isArray(d.show) ? d.show : [d.show] : []) {
@@ -3493,7 +3546,7 @@ ${JSON.stringify(previousRoom ?? "")}`)
     const head1 = named2 ? `<div class="ck-line ck-h1"><span></span>${groups.map((g2) => `<b class="ck-first${g2.band ? " ck-band" : ""}" style="grid-column: span ${g2.opts.length}">${esc5(g2.name)}</b>`).join("")}</div>` : "";
     const head22 = `<div class="ck-line ck-h2${named2 ? "" : " solo"}"><span></span>${flat.map((c) => `<span class="${c.first ? "ck-first" : ""}${c.band ? " ck-band" : ""}">${esc5(c.o)}</span>`).join("")}</div>`;
     const body5 = rows3.map((r) => `<div class="ck-line ck-row"><b class="ck-name">${r.label}</b>${flat.map((c, i) => `<span class="ck-cell${c.first ? " ck-first" : ""}${c.band ? " ck-band" : ""}${c.pair}">${ckCtl(r.marks[i], r.acts[i], `${esc5(c.g.name)} ${esc5(c.o)}`, c.g.kind === "one", busy6)}</span>`).join("")}</div>`).join("");
-    return `<section class="ps-group ck${groups.some((g2) => g2.kind === "num") ? " ck-hasnum" : ""}" style="--ck-n:${flat.length}">${title2 ? `<h3>${esc5(title2)}</h3>` : ""}<div class="ps-rows">${head1}${head22}${body5}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ""}</section>`;
+    return `<section class="ps-group ck${groups.some((g2) => g2.kind === "num") ? " ck-hasnum" : ""}" style="--ck-n:${flat.length};--ck-cols:${ckCols(flat.map((c) => c.g.kind === "num"))}">${title2 ? `<h3>${esc5(title2)}</h3>` : ""}<div class="ps-rows">${head1}${head22}${body5}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ""}</section>`;
   };
   var ckWide = (bands, labels, busy6 = false, acts = FAM_ACTS) => {
     ckActs = acts;
@@ -3828,50 +3881,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
         if (url) img.src = url;
         else img.closest(".at-card-image")?.classList.add("broken");
       };
-      if (photos.has(asset)) fill3(photos.get(asset));
-      else void loadPhoto(asset).then(fill3);
-    });
-  }
-  function zoomPhoto(src, alt) {
-    const box3 = document.createElement("div");
-    box3.className = "gx at-zoom";
-    box3.setAttribute("role", "dialog");
-    box3.setAttribute("aria-label", "사진 크게 보기");
-    box3.innerHTML = `<img src="${esc6(src)}" alt="${esc6(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
-    const close3 = () => {
-      box3.remove();
-      document.removeEventListener("keydown", key, true);
-    };
-    const key = (ev) => {
-      if (ev.key !== "Escape") return;
-      ev.stopPropagation();
-      close3();
-    };
-    box3.addEventListener("click", close3);
-    document.addEventListener("keydown", key, true);
-    document.body.appendChild(box3);
-  }
-  function card(kind, text5, asset) {
-    const label2 = ATTACH_LABELS[kind];
-    if (kind === "image") {
-      const src = asset ? photos.get(asset) : null;
-      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}" data-asset="${esc6(asset ?? "")}" alt="${esc6(text5 || label2)}" loading="lazy"></button>
-      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
-    }
-    if (kind === "file") {
-      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc6(text5)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
-    }
-    if (kind === "link") {
-      const url = attachUrl(text5);
-      const go2 = url ? `<a class="at-go" href="${esc6(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
-      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc6(text5)}</b>${go2}</div></div>`;
-    }
-    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc6(text5)}</b><small>선물이 도착했습니다</small></div></div>`;
-    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc6(text5).replace(/\n/g, "<br>")}</span></div></div>`;
-  }
-  var sitePic = null;
-  function setSitePicSource(fn2) {
-    sitePic = fn2;
-  }
-  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
-  va
+      if (photos.has(asset))

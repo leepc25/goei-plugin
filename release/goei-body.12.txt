@@ -1,4 +1,338 @@
-: sheet,
+ckFor(chat, o) {
+    if (!o.settings.on) return { text: "", people: [], sheets: [] };
+    const names4 = entriesOf(o.store, o.extraNames ?? {});
+    const match = nameMatcher(names4);
+    const always = o.settings.always.filter((n3) => o.store.people[n3]);
+    const byCode = scenePeople(chat, o.store, match, { input: o.input }).filter((n3) => !always.includes(n3));
+    const byModel = (o.people ?? []).filter((n3) => o.store.people[n3] && !always.includes(n3) && !byCode.includes(n3));
+    const people = [...always, ...byCode, ...byModel].slice(0, Math.max(6, always.length));
+    if (!people.length) return { text: "", people: [], sheets: [] };
+    const live = liveness(chat);
+    const changes = liveChanges(o.store, live);
+    const blocks = [];
+    const sheets = [];
+    for (const n3 of people) {
+      const p2 = o.store.people[n3];
+      const sheet = o.sheetOf(n3);
+      if (sheet) sheets.push(sheet);
+      const note = o.settings.director === "note" ? latestNote(o.store, n3, live) : null;
+      blocks.push(
+        personBlock(p2, o.store, live, changes, {
+          sheet,
+          mode: o.settings.inject,
+          unknown: o.settings.features.has("perception") ? unknownTo(p2, o.store, live) : [],
+          user: o.user,
+          note,
+          temper: o.temperOf?.(n3),
+          speed: o.settings.speed,
+          speedDown: o.settings.speedDown,
+          turnCap: o.settings.turnCap,
+          // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
+          maxChars: Math.floor(o.settings.blockCap / people.length),
+          taste: o.settings.features.has("taste"),
+          openness: o.settings.features.has("openness"),
+          axes: o.settings.features.has("axes"),
+          features: o.settings.features,
+          qual: o.settings.qualitative,
+          sexual: sexualTexts(p2, o.settings)
+        })
+      );
+    }
+    if (o.settings.features.has("rhythm")) {
+      const docs = Object.values(o.store.docs).filter((d) => d.type === "rhythm").flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
+      const note = o.settings.director === "note" ? latestNote(o.store, "@rhythm", live)?.now : null;
+      const rb = rhythmBlock(docs, note, rhythmClockLines(rhythmClock(o.store, chat, live)));
+      if (rb) blocks.unshift(rb);
+    }
+    if (o.settings.features.has("faction_rep")) {
+      const list4 = Array.isArray(chat.message) ? chat.message : [];
+      const texts = [...o.input ? [o.input] : [], ...list4.slice(-2).map((m) => messageText(String(m.data ?? "")))];
+      const codes = sceneFactionCodes(o.store, people, texts, o.factionNames);
+      const uf = userFactionOf(o.store, chat);
+      const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
+      if (fb) blocks.push(fb);
+    }
+    return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
+  }
+  var squash4 = (s8) => s8.replace(/\s+/g, " ").trim();
+  function stripSheets(messages, sheets) {
+    if (!sheets.length) return messages;
+    const escRe2 = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const targets = sheets.map(squash4).filter(Boolean).map((t) => ({ t, re: new RegExp(t.split(" ").map(escRe2).join("\\s+")) }));
+    return messages.map((m) => {
+      if (typeof m?.content !== "string") return m;
+      let text5 = m.content;
+      let changed = false;
+      for (const { t, re } of targets) {
+        const i = text5.indexOf(t);
+        const next = i >= 0 ? text5.slice(0, i) + text5.slice(i + t.length) : text5.replace(re, "");
+        if (next !== text5) {
+          text5 = next;
+          changed = true;
+        }
+      }
+      return changed ? { ...m, content: text5.replace(/\n{3,}/g, "\n\n") } : m;
+    });
+  }
+  function insertBlock(messages, text5) {
+    if (!text5) return messages;
+    const at = messages.map((m) => m?.role).lastIndexOf("user");
+    const add = { role: "system", content: text5 };
+    return at < 0 ? [...messages, add] : [...messages.slice(0, at), add, ...messages.slice(at)];
+  }
+  function withPeopleBlock(messages, chat, o) {
+    const r = peopleBlockFor(chat, o);
+    if (!r.text) return messages;
+    const out = o.settings.inject === "split" || o.settings.inject === "record" ? stripSheets(messages, r.sheets) : messages;
+    return insertBlock(out, r.text);
+  }
+
+  // src/core/people/prompt/detailed.ts
+  var UPDATER_DETAILED = updater_detailed_default.replace(/\r/g, "").replace(/\n$/, "");
+
+  // src/core/people/prompt/compact.ts
+  var UPDATER_COMPACT = updater_compact_default.replace(/\r/g, "").replace(/\n$/, "");
+
+  // src/core/people/prompt/index.ts
+  var promptFor = (s8) => guideText(s8.prompt === "compact" ? "UpdaterCompact" : "Updater").replace(/\n$/, "");
+
+  // src/host/people.ts
+  var routerBase = () => {
+    const g2 = guideSections("Router");
+    return [g2.ROLE, g2.RULES].filter((x) => x?.trim()).join("\n");
+  };
+  var directorBase = () => {
+    const g2 = guideSections("Director");
+    return { facts: g2.FACTS, scene: g2.SCENE };
+  };
+  var DIAG_KEY = "goei-people-diag";
+  var DIAG_KEEP = 10;
+  var DIAG_FAIL_KEEP = 30;
+  async function loadDiag() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(DIAG_KEY);
+      const v = typeof raw === "string" ? JSON.parse(raw) : raw;
+      return Array.isArray(v) ? v : [];
+    } catch {
+      return [];
+    }
+  }
+  async function pushDiag(run6, keepRaw) {
+    try {
+      const list4 = await loadDiag();
+      const item2 = keepRaw ? run6 : { ...run6, system: void 0, data: void 0, raw: run6.ok ? void 0 : run6.raw };
+      list4.push(item2);
+      const ok = list4.filter((r) => r.ok).slice(-DIAG_KEEP);
+      const bad = list4.filter((r) => !r.ok).slice(-DIAG_FAIL_KEEP);
+      const next = [...ok, ...bad].sort((a, b) => a.at.localeCompare(b.at));
+      await risuai.pluginStorage.setItem(DIAG_KEY, JSON.stringify(next));
+    } catch {
+    }
+  }
+  async function clearDiag() {
+    try {
+      await risuai.pluginStorage.setItem(DIAG_KEY, "[]");
+    } catch {
+    }
+  }
+  var subs2 = /* @__PURE__ */ new Set();
+  var status = { busy: false, label: "", unread: 0 };
+  var peopleStatus = () => status;
+  function onPeopleStatus(cb) {
+    subs2.add(cb);
+    return () => void subs2.delete(cb);
+  }
+  function setStatus(next) {
+    status = { ...status, ...next };
+    for (const f of subs2) f(status);
+  }
+  var chatId = (ctx2) => `${String(ctx2.char.chaId ?? ctx2.charIndex)}:${ctx2.chatIndex}:${messageKey(ctx2.chat.message[0] ?? { role: "user", data: "" }, 0)}`;
+  var sheetOf = (ctx2) => (name) => bookText({ char: ctx2.char, chat: ctx2.chat }, name) || null;
+  function excludedNames(ctx2) {
+    const me = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
+    return me?.name ? [me.name] : [];
+  }
+  function factionNamesOf(lore) {
+    try {
+      return Object.fromEntries(factionList(lore).map((f) => [f.code, f.name]));
+    } catch {
+      return {};
+    }
+  }
+  function userFaction(chat) {
+    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
+    return typeof v === "string" ? v : "";
+  }
+  function seedAppearing(store2, chat, indexes, sheet, o = {}) {
+    const list4 = Array.isArray(chat.message) ? chat.message : [];
+    const exclude = new Set(o.exclude ?? []);
+    const match = nameMatcher(allNames().filter((n3) => !store2.people[n3.name] && !exclude.has(n3.name)));
+    const texts = indexes.flatMap((i) => [list4[i - 1], list4[i]]).filter(Boolean).map((m) => messageText(String(m.data ?? "")));
+    const found = /* @__PURE__ */ new Set();
+    for (const t of texts) for (const n3 of match(t)) found.add(n3);
+    const faction = userFaction(chat);
+    const made = [];
+    for (const name of found) {
+      store2.people[name] = seedPerson(name, sheet(name), seedBaseFor(name, faction, o.identity ?? store2.identity));
+      made.push(name);
+    }
+    return made;
+  }
+  function dropExcluded(store2, exclude) {
+    const gone = [];
+    for (const n3 of exclude) {
+      if (!store2.people[n3]) continue;
+      delete store2.people[n3];
+      store2.log = store2.log.filter((c) => c.who !== n3);
+      delete store2.folded[n3];
+      gone.push(n3);
+    }
+    return gone;
+  }
+  function statusIdentity(chat) {
+    const list4 = Array.isArray(chat.message) ? chat.message : [];
+    for (let i = list4.length - 1; i >= 0; i--) {
+      if (list4[i].role !== "char") continue;
+      const tags = findStatusTags(String(list4[i].data ?? ""));
+      const t = tags.at(-1);
+      if (!t) continue;
+      return t.identity ? parseIdentity(t.identity, messageKey(list4[i], i)) : null;
+    }
+    return null;
+  }
+  var running4 = 0;
+  var chain = Promise.resolve();
+  function requestPeopleUpdate(reason3, o = {}) {
+    running4++;
+    const run6 = chain.then(() => runOnce(reason3, o)).finally(() => {
+      running4--;
+    });
+    chain = run6.catch(() => {
+    });
+    return run6;
+  }
+  async function waitNotBusy() {
+    if (!isWaiting()) return;
+    await new Promise((resolve) => {
+      const off = onWaiting((w) => {
+        if (!w) {
+          off();
+          resolve();
+        }
+      });
+    });
+  }
+  async function runOnce(reason3, o) {
+    const result = { ran: 0, applied: 0, skipped: [], errors: [] };
+    const ctx2 = await loadContext().catch(() => null);
+    if (!ctx2) return result;
+    const settings = peopleSettings(ctx2.chat.scriptstate);
+    if (!settings.on || settings.when === "manual" && !o.manual) return result;
+    const store2 = peopleStore(ctx2.chat);
+    const allUnread = unreadIndexes(ctx2.chat, store2);
+    let unread = allUnread;
+    if (!o.scope?.indexes) unread = splitUnread(ctx2.chat, store2).newer;
+    else unread = o.scope.indexes.filter((i) => ctx2.chat.message[i]?.role === "char");
+    setStatus({ unread: allUnread.length });
+    if (!unread.length) return result;
+    const sheet = sheetOf(ctx2);
+    const identity = statusIdentity(ctx2.chat);
+    const idChanged = !!identity && (!store2.identity || store2.identity.faction !== identity.faction || store2.identity.rank !== identity.rank || store2.identity.from !== "status");
+    const exclude = excludedNames(ctx2);
+    const dropped = dropExcluded(store2, exclude);
+    const seeded = seedAppearing(store2, ctx2.chat, unread, sheet, { exclude, identity: identity ?? store2.identity });
+    if (seeded.length || idChanged || dropped.length) {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
+        const s8 = peopleStore(cur);
+        dropExcluded(s8, exclude);
+        for (const n3 of seeded) if (!s8.people[n3]) s8.people[n3] = store2.people[n3];
+        if (identity && idChanged) s8.identity = identity;
+        return withPeople(cur, s8);
+      }).catch(() => null);
+    }
+    const batches = planBatches(ctx2.chat, unread, settings.spanCap);
+    const id2 = chatId(ctx2);
+    for (let b = 0; b < batches.length; b++) {
+      setStatus({ busy: true, label: batches.length > 1 ? `관계 갱신 중… (${b + 1}/${batches.length})` : "관계 갱신 중…" });
+      const t0 = Date.now();
+      const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: id2, reason: reason3, model: settings.model, people: [], indexes: batches[b], sizes: { system: 0, data: 0, span: 0 }, outChars: 0, ms: 0, ok: false };
+      try {
+        const fresh3 = await loadContext().catch(() => null) ?? ctx2;
+        if (chatId(fresh3) !== id2) {
+          diag.stage = "skip";
+          diag.error = "채팅이 바뀌어 중단";
+          result.skipped.push(diag.error);
+          break;
+        }
+        const curStore = peopleStore(fresh3.chat);
+        const walletOn2 = colConfig(fresh3.chat.scriptstate).wallet !== "off";
+        const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
+        const balance = walletOn2 ? walletBalance(readWallet(fresh3.chat.scriptstate, walletStart), aliveAnchors(fresh3.chat)) : null;
+        const pointsUse = pointsOn(fresh3.chat);
+        const pointBal = pointsUse ? walletBalance(readPoints(fresh3.chat.scriptstate), aliveAnchors(fresh3.chat)) : null;
+        const batchKeys = batches[b].map((i) => fresh3.chat.message[i] ? messageKey(fresh3.chat.message[i], i) : "").filter(Boolean);
+        const itemsOn = itemAutoOn(fresh3.chat.scriptstate);
+        const itemsNow = itemsOn ? itemsNowOf(fresh3.chat) : null;
+        const usedNow = itemsOn ? usedItemsAt(readItems(fresh3.chat.scriptstate), batchKeys, aliveAnchors(fresh3.chat)) : [];
+        const lastChar = fresh3.chat.message.reduce((a, m, i) => m.role === "char" ? i : a, -1);
+        const shopAt = !o.scope?.only && shopOn(fresh3.chat.scriptstate) && shopJudgeBy(fresh3.chat.scriptstate).by === "updater" && batches[b].includes(lastChar) ? lastChar : -1;
+        const shopSelf = shopAt >= 0 ? [...exclude, userInfo().name] : [];
+        const input3 = buildUpdate(fresh3.chat, curStore, batches[b], { shop: shopAt >= 0 ? { at: shopAt, self: shopSelf } : null, settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n3) => [n3, valuesOf(n3)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh3.chat, fresh3.char, [...batches[b].map((i) => messageText(String(fresh3.chat.message[i]?.data ?? ""))), ...Object.keys(curStore.people)].join("\n"), settings), exclude, factionNames: factionNamesOf(fresh3.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow });
+        const sections3 = enabledSections(settings);
+        if (input3.tidy.length) sections3.add("tidy");
+        if (walletOn2) sections3.add("wallet");
+        if (walletOn2 && walletLoose(fresh3.chat.scriptstate)) sections3.add("wallet_loose");
+        if (pointsUse) sections3.add("points");
+        if (itemsOn) sections3.add("items");
+        const system = updaterSystem(settings, sections3, fresh3.chat.scriptstate, !!input3.shop);
+        input3.system = system;
+        if (input3.overBudget.length) {
+          diag.stage = "budget";
+          diag.error = `입력 상한 넘김(${settings.spanCap.toLocaleString()}자, ${input3.overBudget.length}개 응답): 보내지 않음. 설정 「응답 길이 상한」을 올리거나 긴 응답을 나눠 읽기`;
+          result.skipped.push(diag.error);
+          console.log(`[goei] 인물 기록 갱신 거부: ${diag.error}`);
+          continue;
+        }
+        const moneyOrItems = !!input3.shop || itemsOn || walletOn2 && (walletLoose(fresh3.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh3.chat.message[i]?.data ?? ""))))) || pointsUse && batches[b].some((i) => mentionsPoints(messageText(String(fresh3.chat.message[i]?.data ?? ""))));
+        if (!input3.people.length && !moneyOrItems) {
+          if (!o.scope?.only) await updateChat(fresh3.charIndex, fresh3.chatIndex, (cur) => {
+            const s8 = peopleStore(cur);
+            for (const i of input3.indexes) {
+              const m = cur.message[i];
+              if (m) s8.read[messageKey(m, i)] = messageHash(m);
+            }
+            return withPeople(cur, s8);
+          });
+          diag.ok = true;
+          diag.stage = "skip";
+          diag.error = "장면 인물 없음";
+          result.skipped.push("장면 인물 없음");
+          continue;
+        }
+        const dataText = JSON.stringify(input3.data);
+        diag.people = input3.people;
+        diag.sizes = { system: system.length, data: dataText.length, span: JSON.stringify(input3.data.span).length };
+        if (settings.keepRaw) {
+          diag.system = system;
+          diag.data = dataText;
+        }
+        const messages = [
+          { role: "system", content: system },
+          { role: "user", content: dataText }
+        ];
+        const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: 1, retryModel: "same", state: fresh3.chat.scriptstate, staticModel: settings.stageModelId.update || void 0, label: "갱신기" });
+        diag.raw = raw;
+        diag.outChars = raw.length;
+        await waitNotBusy();
+        const keys = new Map([...input3.tags.values()].map((i) => [i, messageKey(fresh3.chat.message[i], i)]));
+        const saved = await updateChat(fresh3.charIndex, fresh3.chatIndex, (cur) => {
+          if (chatId({ ...fresh3, chat: cur }) !== id2) return null;
+          for (const [i, k] of keys) if (!cur.message[i] || messageKey(cur.message[i], i) !== k) return null;
+          const s8 = peopleStore(cur);
+          const before = snapshotRun(s8);
+          const report = applyUpdate(s8, cur, input3, value, {
+            settings,
+            sheetOf: sheet,
             baseOf: (name) => seedBaseFor(name, userFaction(cur), s8.identity),
             exclude,
             only: o.scope?.only,
@@ -95,11 +429,11 @@ Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"
   async function backfillPeople(turns3) {
     const ctx2 = await loadContext().catch(() => null);
     if (!ctx2) return { ran: 0, applied: 0, skipped: ["채팅을 읽지 못했어요"], errors: [] };
-    const store = peopleStore(ctx2.chat);
-    const unread = unreadIndexes(ctx2.chat, store);
+    const store2 = peopleStore(ctx2.chat);
+    const unread = unreadIndexes(ctx2.chat, store2);
     const bots = ctx2.chat.message.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0);
-    const pick3 = new Set(turns3 > 0 ? bots.slice(-turns3) : bots);
-    const indexes = unread.filter((i) => pick3.has(i));
+    const pick4 = new Set(turns3 > 0 ? bots.slice(-turns3) : bots);
+    const indexes = unread.filter((i) => pick4.has(i));
     if (!indexes.length) return { ran: 0, applied: 0, skipped: ["그 범위에 안 읽은 응답이 없어요"], errors: [] };
     return requestPeopleUpdate("backfill", { manual: true, scope: { indexes } });
   }
@@ -107,8 +441,8 @@ Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"
     if (running4) return { ran: 0, applied: 0, skipped: ["갱신이 돌고 있어요"], errors: [], cleared: 0 };
     const ctx2 = await loadContext().catch(() => null);
     if (!ctx2) return { ran: 0, applied: 0, skipped: ["채팅을 읽지 못했어요"], errors: [], cleared: 0 };
-    const store = peopleStore(ctx2.chat);
-    const p2 = store.people[name];
+    const store2 = peopleStore(ctx2.chat);
+    const p2 = store2.people[name];
     if (!p2) return { ran: 0, applied: 0, skipped: ["기록이 없는 인물"], errors: [], cleared: 0 };
     const indexes = mentionIndexes(ctx2.chat, name, [...p2.aliases, ...allNames().find((n3) => n3.name === name)?.aliases ?? []], turns3);
     let cleared = 0;
@@ -128,8 +462,8 @@ Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"
     return consolidateInner(ctx2, name, peopleSettings(ctx2.chat.scriptstate));
   }
   async function consolidateInner(ctx2, name, settings) {
-    const store = peopleStore(ctx2.chat);
-    const input3 = buildConsolidate(store, ctx2.chat, name, settings);
+    const store2 = peopleStore(ctx2.chat);
+    const input3 = buildConsolidate(store2, ctx2.chat, name, settings);
     if (!input3) return { ok: false, message: "정리할 항목이 없어요." };
     const id2 = chatId(ctx2);
     const t0 = Date.now();
@@ -181,10 +515,10 @@ Return the JSON object.` }
     let plus;
     if (s8.hypaPlus) {
       const charId2 = String(char?.chaId ?? "").trim();
-      const chatKey7 = String(chat.id ?? "").trim();
-      if (charId2 && chatKey7) {
+      const chatKey8 = String(chat.id ?? "").trim();
+      if (charId2 && chatKey8) {
         try {
-          plus = await risuai.pluginStorage.getItem(`hypaplus_state_${charId2}_${chatKey7}`);
+          plus = await risuai.pluginStorage.getItem(`hypaplus_state_${charId2}_${chatKey8}`);
         } catch {
           plus = void 0;
         }
@@ -195,10 +529,10 @@ Return the JSON object.` }
   var routerCache = null;
   var routerHints = [];
   var routerHintsNow = () => routerHints;
-  async function routerPeople(chat, store, input3, settings, exclude = [], identityOf) {
-    if (settings.router !== "model" || !Object.keys(store.people).length) return null;
+  async function routerPeople(chat, store2, input3, settings, exclude = [], identityOf) {
+    if (settings.router !== "model" || !Object.keys(store2.people).length) return null;
     const names4 = allNames();
-    const built = buildRouter(chat, store, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
+    const built = buildRouter(chat, store2, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
     if (routerCache?.key === built.key) return routerCache.selected;
     const t0 = Date.now();
     const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
@@ -209,7 +543,7 @@ Return the JSON object.` }
       ]);
       diag.raw = raw;
       diag.outChars = raw.length;
-      const r = parseRouter(raw, store, names4, built.max);
+      const r = parseRouter(raw, store2, names4, built.max);
       diag.people = r.selected;
       diag.ok = true;
       routerCache = { key: built.key, selected: r.selected };
@@ -226,9 +560,9 @@ Return the JSON object.` }
     }
   }
   var directorCache = null;
-  async function directorNoteText(chat, store, people, input3, settings, user, lore, char) {
+  async function directorNoteText(chat, store2, people, input3, settings, user, lore, char) {
     if (settings.director !== "scene" && settings.director !== "facts") return "";
-    const built = buildDirector(chat, store, people, input3, settings, Object.fromEntries(people.map((n3) => [n3, valuesOf(n3)])), await hypaMemory(chat, char, [input3, ...Array.isArray(chat.message) ? chat.message.slice(-Math.max(1, settings.recentMsgs)).map((m) => messageText(String(m.data ?? ""))) : [], ...people].join("\n"), settings, Math.min(settings.hypaCap, 6e3)), directorBase());
+    const built = buildDirector(chat, store2, people, input3, settings, Object.fromEntries(people.map((n3) => [n3, valuesOf(n3)])), await hypaMemory(chat, char, [input3, ...Array.isArray(chat.message) ? chat.message.slice(-Math.max(1, settings.recentMsgs)).map((m) => messageText(String(m.data ?? ""))) : [], ...people].join("\n"), settings, Math.min(settings.hypaCap, 6e3)), directorBase());
     if (!built) return "";
     if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
     const call = async (b, reason3, allowSearch, repaired = false) => {
@@ -268,20 +602,20 @@ Return the JSON object.` }
     const out = { router: null, director: null, update: null };
     const settings = peopleSettings(ctx2.chat.scriptstate);
     if (!settings.on) return out;
-    const store = peopleStore(ctx2.chat);
+    const store2 = peopleStore(ctx2.chat);
     const exclude = excludedNames(ctx2);
     const lastUser = [...ctx2.chat.message ?? []].reverse().find((m) => m.role === "user");
     const input3 = messageText(String(lastUser?.data ?? ""));
     const names4 = allNames();
-    if (settings.router === "model" && Object.keys(store.people).length) {
-      const b = buildRouter(ctx2.chat, store, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf: sheetOf(ctx2) });
+    if (settings.router === "model" && Object.keys(store2.people).length) {
+      const b = buildRouter(ctx2.chat, store2, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf: sheetOf(ctx2) });
       out.router = [{ role: "system", content: b.system }, { role: "user", content: JSON.stringify(b.data) }];
     }
-    if ((settings.director === "scene" || settings.director === "facts") && Object.keys(store.people).length) {
+    if ((settings.director === "scene" || settings.director === "facts") && Object.keys(store2.people).length) {
       const me = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
-      const { people } = peopleBlockFor(ctx2.chat, { settings, store, sheetOf: sheetOf(ctx2), temperOf, extraNames: extraNames2(), input: input3, user: me?.name || userInfo().name || "주인공", factionNames: factionNamesOf(ctx2.char.globalLore) });
+      const { people } = peopleBlockFor(ctx2.chat, { settings, store: store2, sheetOf: sheetOf(ctx2), temperOf, extraNames: extraNames2(), input: input3, user: me?.name || userInfo().name || "주인공", factionNames: factionNamesOf(ctx2.char.globalLore) });
       const memory = await hypaMemory(ctx2.chat, ctx2.char, [input3, ...people].join("\n"), settings, Math.min(settings.hypaCap, 6e3)).catch(() => []);
-      const b = buildDirector(ctx2.chat, store, people, input3, settings, Object.fromEntries(people.map((n3) => [n3, valuesOf(n3)])), memory, directorBase());
+      const b = buildDirector(ctx2.chat, store2, people, input3, settings, Object.fromEntries(people.map((n3) => [n3, valuesOf(n3)])), memory, directorBase());
       if (b) out.director = [{ role: "system", content: b.system }, { role: "user", content: JSON.stringify(b.data) }];
     }
     if (settings.when === "turn") {
@@ -297,9 +631,9 @@ Return the JSON object.` }
         const itemsOn = itemAutoOn(ctx2.chat.scriptstate);
         const itemsNow = itemsOn ? itemsNowOf(ctx2.chat) : null;
         const usedNow = itemsOn && list4[last2] ? usedItemsAt(readItems(ctx2.chat.scriptstate), [messageKey(list4[last2], last2)], aliveAnchors(ctx2.chat)) : [];
-        const memory = await hypaMemory(ctx2.chat, ctx2.char, [messageText(String(list4[last2]?.data ?? "")), ...Object.keys(store.people)].join("\n"), settings).catch(() => []);
+        const memory = await hypaMemory(ctx2.chat, ctx2.char, [messageText(String(list4[last2]?.data ?? "")), ...Object.keys(store2.people)].join("\n"), settings).catch(() => []);
         const shopOnNow = shopOn(ctx2.chat.scriptstate) && shopJudgeBy(ctx2.chat.scriptstate).by === "updater";
-        const inp = buildUpdate(ctx2.chat, store, [last2], { shop: shopOnNow ? { at: last2, self: [...exclude, userInfo().name] } : null, settings, system: "", values: Object.fromEntries(input0Names(store).map((n3) => [n3, valuesOf(n3)])), names: names4, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx2.char.globalLore), wallet: balance, points: pointsOn(ctx2.chat) ? walletBalance(readPoints(ctx2.chat.scriptstate), aliveAnchors(ctx2.chat)) : null, items: itemsNow, used: usedNow });
+        const inp = buildUpdate(ctx2.chat, store2, [last2], { shop: shopOnNow ? { at: last2, self: [...exclude, userInfo().name] } : null, settings, system: "", values: Object.fromEntries(input0Names(store2).map((n3) => [n3, valuesOf(n3)])), names: names4, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx2.char.globalLore), wallet: balance, points: pointsOn(ctx2.chat) ? walletBalance(readPoints(ctx2.chat.scriptstate), aliveAnchors(ctx2.chat)) : null, items: itemsNow, used: usedNow });
         const sections3 = enabledSections(settings);
         if (inp.tidy.length) sections3.add("tidy");
         if (walletOn2) sections3.add("wallet");
@@ -354,16 +688,16 @@ Return the JSON object.` }
       out.push({
         key: `${t.id}:main`,
         kind: "main",
-        title: "본편 요청 조립",
-        meta: `Risu 본편 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n3]) => `${r} ${n3}`).join(", ")}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(", ")}` : ""}`,
+        title: "메인 요청 조립",
+        meta: `Risu 메인 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n3]) => `${r} ${n3}`).join(", ")}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(", ")}` : ""}`,
         ok: m.failed.length ? false : true,
         // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
         body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg gw-copyto" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, false)}><summary><small>[${esc31(r.role)}]</small> ${esc31(r.content.replace(/\s+/g, " ").trim().slice(0, 80))}${r.content.length > 80 ? "…" : ""} <i>${chars(r.content.length)}</i>${copyBtn()}</summary><textarea readonly rows="8">${esc31(r.content)}</textarea></details>`).join("")}</div>`
       });
     }
     for (const [c, i] of before) out.push(call(c, i));
-    if (t.reply) out.push({ key: `${t.id}:reply`, kind: "reply", title: "본편 응답", meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}${tok(t.reply.tokens)}`, ok: true, body: `<div class="gw-flow-io gw-copyto"><b>받은 글 ${copyBtn()}</b><textarea readonly rows="10">${esc31(t.reply.text)}</textarea></div>` });
-    else if (t.main) out.push({ key: `${t.id}:reply`, kind: "reply", title: "본편 응답", meta: "아직 없음 (응답 전이거나 Risu 가 응답을 붙이지 않음)", ok: null, body: "" });
+    if (t.reply) out.push({ key: `${t.id}:reply`, kind: "reply", title: "메인 응답", meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}${tok(t.reply.tokens)}`, ok: true, body: `<div class="gw-flow-io gw-copyto"><b>받은 글 ${copyBtn()}</b><textarea readonly rows="10">${esc31(t.reply.text)}</textarea></div>` });
+    else if (t.main) out.push({ key: `${t.id}:reply`, kind: "reply", title: "메인 응답", meta: "아직 없음 (응답 전이거나 Risu 가 응답을 붙이지 않음)", ok: null, body: "" });
     for (const [c, i] of after) out.push(call(c, i));
     for (const [c, i] of manual) out.push({ ...call(c, i), title: `${c.label} (수동)` });
     return out;
@@ -389,8 +723,8 @@ Return the JSON object.` }
   }
   function tracePage(head3, confirmRow) {
     const list4 = traceUi.turns;
-    const body5 = list4 ? list4.length ? [...list4].reverse().map((t, i) => turnHtml(t, i, list4.length)).join("") : '<section class="ps-group"><div class="ps-rows"><p class="ps-note">아직 기록이 없어요. 본편을 한 번 보내면 그 턴의 흐름이 여기 쌓여요.</p></div></section>' : '<section class="ps-group"><div class="ps-rows"><p class="ps-note">읽는 중…</p></div></section>';
-    return `<div class="gw-page gw-set">${head3("", "호출 기록", "최근 턴마다 플러그인이 모델을 어떤 순서로 불렀는지. 본편 요청 조립 → 본편 전 보조 호출(라우터·디렉터) → 본편 응답 → 본편 뒤 보조 호출(갱신기·괴담넷·괴담톡·위키…). 칸을 펼치면 요청과 받은 값 원문이에요(긴 글은 가운데를 줄여요). 시각은 이 기기 시간.")}
+    const body5 = list4 ? list4.length ? [...list4].reverse().map((t, i) => turnHtml(t, i, list4.length)).join("") : '<section class="ps-group"><div class="ps-rows"><p class="ps-note">아직 기록이 없어요. 메시지를 한 번 보내면 그 턴의 흐름이 여기 쌓여요.</p></div></section>' : '<section class="ps-group"><div class="ps-rows"><p class="ps-note">읽는 중…</p></div></section>';
+    return `<div class="gw-page gw-set">${head3("", "호출 기록", "최근 턴마다 플러그인이 모델을 어떤 순서로 불렀는지. 메인 요청 조립 → 메인 요청 전 보조 호출(라우터·디렉터) → 메인 응답 → 메인 응답 뒤 보조 호출(갱신기·괴담넷·괴담톡·위키…). 칸을 펼치면 요청과 받은 값 원문이에요(긴 글은 가운데를 줄여요). 시각은 이 기기 시간.")}
     <div class="gx-settings gw-setbody">
     <div class="ps-row gw-rel-foot gw-flow-tools">${list4?.length ? confirmRow : ""}</div>
     ${body5}
@@ -541,34 +875,7 @@ Return the JSON object.` }
     }
     return { pre, main, post, manual };
   }
-  var tokLabel = (n3) => {
-    if (n3.kind === "plain") return "";
-    if (n3.tok === void 0) return flowTok.pending ? "세는 중…" : "";
-    if (n3.tok === null) return n3.name === "상점" ? "지금 열 수 있는 상점 없음" : n3.name.endsWith(" 진열") ? "쇼핑몰 꺼짐" : "지금은 보낼 것 없음";
-    return `요청 ${tokenizerName() ? "" : "약 "}${n3.tok.toLocaleString("ko-KR")}토큰`;
-  };
-  function nodeHtml2(n3) {
-    const tl = tokLabel(n3);
-    return `<div class="pp-fn${n3.on ? " on" : ""} k-${n3.kind}"><div class="pp-fn-name"><b>${esc32(n3.name)}</b>${n3.model ? `<span class="pp-fn-chip">${esc32(n3.model)}</span>` : ""}<small>${esc32(n3.sub)}</small></div><span class="pp-fn-calls">${esc32(n3.calls)}${tl ? `<small class="pp-fn-tok">${esc32(tl)}</small>` : ""}</span><div class="pp-fn-ctl"></div>${n3.page ? `<button class="gx-mini pp-fn-go" data-action="ed-flow-go" data-value="${esc32(n3.page)}|${esc32(n3.to ?? "")}">설정 →</button>` : "<span></span>"}</div>`;
-  }
-  function flowPage(ctx2, head3) {
-    const { pre, main, post, manual } = flowNodes(ctx2);
-    const all = [...pre, main, ...post];
-    const sure = all.reduce((n3, x) => n3 + x.sure, 0);
-    const maybe = all.reduce((n3, x) => n3 + x.maybe, 0);
-    const auxTok = [...pre, ...post].filter((x) => x.on && typeof x.tok === "number").reduce((n3, x) => n3 + x.tok, 0);
-    const tokNote = flowTok.pending ? " 요청 토큰을 세는 중이에요…" : flowTok.error ? ` 토큰 셈 실패: ${esc32(flowTok.error)}` : flowTok.map ? ` 켜진 보조 호출의 요청 합계 ${tokenizerName() ? "" : "약 "}<b>${auxTok.toLocaleString("ko-KR")}토큰</b> (지금 설정·채팅으로 조립, 응답 토큰은 제외).` : "";
-    const arrow = '<i class="pp-fn-arrow" aria-hidden="true">↓</i>';
-    const group4 = (title2, note, nodes2) => `<section class="ps-group"><h3>${title2} <small>${esc32(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes2.map(nodeHtml2).join(arrow)}</div></div></section>`;
-    return `<div class="gw-page gw-set">${head3("", "호출 흐름", "지금 설정으로 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.")}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ""} · 메인 <b>1회</b>.${jointOn(ctx2.chat.scriptstate) ? "" : " 인터넷 「한 번에 요청」이 꺼져 있어 괴담톡·게시판(괴담넷·괴담갤·세정게·연어 마켓)은 따로 불러요."} 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
-    ${group4("메인 요청 전", "유저 메시지 → 요청 조립", pre)}
-    ${group4("메인 응답", "", [main])}
-    ${group4("메인 응답 뒤", "응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·게시판·관전·위키·쇼핑몰은 인물 갱신이 끝난 뒤)", post)}
-    ${group4("턴과 무관", "누르거나 열 때만", manual)}
-    </div></div>`;
-  }
+  var flowTokState = () => ({ ready: !!flowTok.map, pending: flowTok.pending, error: flowTok.error });
   function wa(word) {
     const c = word.trim().slice(-1).charCodeAt(0);
     return c >= 44032 && c <= 55203 && (c - 44032) % 28 ? "과" : "와";
@@ -578,13 +885,13 @@ Return the JSON object.` }
     if (page === "people") return `<p class="gw-calls">${FLOW_BACK}</p>`;
     const { pre, post, manual } = flowNodes(ctx2);
     if (page === "net") return "";
-    const mine = [...pre, ...post, ...manual].filter((n3) => n3.page === `set:${page}`);
-    if (!mine.length) return "";
-    const auto = mine.filter((n3) => n3.on);
+    const mine2 = [...pre, ...post, ...manual].filter((n3) => n3.page === `set:${page}`);
+    if (!mine2.length) return "";
+    const auto = mine2.filter((n3) => n3.on);
     const sure = auto.reduce((s8, n3) => s8 + n3.sure, 0);
     const maybe = auto.reduce((s8, n3) => s8 + n3.maybe, 0);
     const lead = auto.length ? `매 턴 보조 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 ${sure + maybe}회)` : ""}` : "매 턴 자동 호출 없음";
-    const parts = mine.map((n3) => `<span class="gw-call${n3.on ? " on" : ""}">${esc32(n3.name)}<small>${esc32(n3.calls)}</small></span>`).join("");
+    const parts = mine2.map((n3) => `<span class="gw-call${n3.on ? " on" : ""}">${esc32(n3.name)}<small>${esc32(n3.calls)}</small></span>`).join("");
     return `<p class="gw-calls"><span class="gw-call-lead">이 기능의 호출 · ${lead}</span>${parts}${FLOW_BACK}</p>`;
   }
 
@@ -802,9 +1109,9 @@ Return the JSON object.` }
     );
     const s0 = set2.shop;
     const R = (label2, ctl, lead = "", items = []) => setRow(label2, ctl, lead || items.length ? helpBox(lead, items) : "");
-    const sw = (k, on3) => setSeg("fam-set", `s:shop:${k}`, on3 ? "1" : "0", ONOFF2, busy6);
+    const sw2 = (k, on3) => setSeg("fam-set", `s:shop:${k}`, on3 ? "1" : "0", ONOFF2, busy6);
     const give = setGroup("모델에 넘기는 것", [
-      R("맥락 반영", sw("ctx", s0.context), "켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요."),
+      R("맥락 반영", sw2("ctx", s0.context), "켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요."),
       R("챗로그 포함", numCtl("s:shop:turns", { n: s0.turns, lo: 1, hi: 8 }, "챗로그 포함", "턴", busy6), "맥락 반영이 켜져 있을 때 넘기는 최근 턴의 수예요. 꺼져 있어도 참조 로어북을 고를 때는 이만큼 읽어요."),
       R("참조 로어북", numCtl("s:shop:refs", { n: s0.refs, lo: 0, hi: 12 }, "참조 로어북", "개", busy6), "봇 설명, 켜진 로어북, 가게 이름이 걸리는 로어북 가운데 넘기는 수예요.")
     ].join(""));
@@ -813,11 +1120,11 @@ Return the JSON object.` }
         ["속으로만", "정리하되 적지 않게 해요."],
         ["적고 지움", "짧게 적게 한 뒤 플러그인이 지워요. 응답이 느려져요."]
       ]),
-      R("다양성 강화", sw("diverse", s0.diverse), "켜면 싼 것, 비싼 것, 흔한 것, 특이한 것을 섞어 받아요."),
-      R("지난 목록 피하기", sw("prev", s0.avoidPrev), "켜면 지난번에 나온 물건을 다시 내지 않게 해요.")
+      R("다양성 강화", sw2("diverse", s0.diverse), "켜면 싼 것, 비싼 것, 흔한 것, 특이한 것을 섞어 받아요."),
+      R("지난 목록 피하기", sw2("prev", s0.avoidPrev), "켜면 지난번에 나온 물건을 다시 내지 않게 해요.")
     ].join(""));
     const note = blocked2 ? `<p class="gx-hint">${blocked2 === "both" ? "소지품과 가계부가" : blocked2 === "items" ? "소지품이" : "가계부가"} 꺼져 있어 기본 상점과 쇼핑몰 둘을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>` : "";
-    const own = s0.on ? `<h2 class="fam-h">기본 상점에만 있는 값</h2>${setGroup("", R("거래 끊음", sw("kick", s0.kick), "켜면 주인이 모욕이나 끝없는 흥정에 거래를 끊을 수 있어요."))}` : "";
+    const own = s0.on ? `<h2 class="fam-h">기본 상점에만 있는 값</h2>${setGroup("", R("거래 끊음", sw2("kick", s0.kick), "켜면 주인이 모욕이나 끝없는 흥정에 거래를 끊을 수 있어요."))}` : "";
     return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf2], L, busy6)}${price}</div><h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${give}${write}${own}`;
   }
 
@@ -1026,11 +1333,11 @@ Return the JSON object.` }
     { key: "perception", title: "인식", help: "인식 기능의 전용 칸. 관찰 성향·현재 손상·장면 조건·단서 읽기·비밀", slots: FEATURE_SLOTS.filter((s8) => s8.startsWith("perception.")) },
     { key: "openness", title: "음란도 조건", help: "음란도 기능의 전용 칸. 친밀한 상황에서 실제로 보인 태도·조건", slots: FEATURE_SLOTS.filter((s8) => s8.startsWith("openness.")) }
   ];
-  var SRC_LABEL = { seed: "시트", story: "본편", field: "기록", manual: "수동" };
+  var SRC_LABEL = { seed: "시트", story: "메인 응답", field: "기록", manual: "수동" };
   var SRC_HELP = {
     seed: "출처: 시트 — 로어북 시트·대사 자료에서 가져온 시작값",
-    story: "출처: 본편 — 본편 응답을 보조 모델이 읽어 기록한 것 (근거 메시지·인용이 있어요)",
-    field: "출처: 본편 밖에서 기록된 것",
+    story: "출처: 메인 응답 — 메인 응답을 보조 모델이 읽어 기록한 것 (근거 메시지·인용이 있어요)",
+    field: "출처: 메인 응답 밖에서 기록된 것",
     manual: "출처: 수동 — 이 화면에서 직접 고친 것"
   };
   var SRC_ICON2 = { seed: ICONS.book, story: ICONS.pen, field: ICONS.pen, manual: ICONS.person };
@@ -1042,14 +1349,14 @@ Return the JSON object.` }
     identity: "신분: 주인공의 소속·직급이 바뀐 기록",
     taste: "취향 띠(첫인상): 주인공이 이 인물의 취향에 맞는 정도 −3~+3. 호감과 다른 축",
     openness: "음란도: 시작값 또는 새 반응의 변화량. 값·단계·피임 태도는 코드가 계산해요",
-    note: "메모: 다음 턴 본편에 끼워 넣을 짧은 메모"
+    note: "메모: 다음 턴 메인 요청에 끼워 넣을 짧은 메모"
   };
   var SEEDED_LABEL = { lore: "시트", dialogue: "대사", none: "빈 기록" };
   var SEEDED_HELP = { lore: "시작값: 로어북 시트(Identity·Character 절)에서 만들었어요", dialogue: "시작값: 대사 자료에서 만들었어요", none: "시작값 없이 이야기에서 등장해 빈 기록으로 시작했어요" };
   var seededOf = (p2) => p2.seeded.from === "lore" ? "lore" : p2.seeded.from === "dialogue" ? "dialogue" : "none";
   function seg3(key, cur, items, action = "pp-set") {
-    const sw = onOffSwitch(items, cur, action, (v) => `${key}=${v}`);
-    if (sw) return sw;
+    const sw2 = onOffSwitch(items, cur, action, (v) => `${key}=${v}`);
+    if (sw2) return sw2;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${esc34(`${key}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   var row4 = (label2, control3, help = "") => setRow(label2, control3, help);
@@ -1071,12 +1378,12 @@ Return the JSON object.` }
     }
     return /* @__PURE__ */ new Set();
   }
-  function changedPeople(store, chat, live) {
+  function changedPeople(store2, chat, live) {
     const keys = lastBotKeys(chat);
     const out = /* @__PURE__ */ new Set();
     if (!keys.size) return out;
-    for (const c of store.log) if (keys.has(c.anchor) && isAlive(c, live) && c.who !== "@user") out.add(c.who);
-    for (const p2 of Object.values(store.people)) for (const s8 of SLOTS) if ((p2.slots[s8] ?? []).some((e) => keys.has(e.anchor) && isAlive(e, live))) out.add(p2.name);
+    for (const c of store2.log) if (keys.has(c.anchor) && isAlive(c, live) && c.who !== "@user") out.add(c.who);
+    for (const p2 of Object.values(store2.people)) for (const s8 of SLOTS) if ((p2.slots[s8] ?? []).some((e) => keys.has(e.anchor) && isAlive(e, live))) out.add(p2.name);
     return out;
   }
   function factionName2(ctx2, code2) {
@@ -1138,10 +1445,10 @@ Return the JSON object.` }
       return { toggle: "", body: '<p class="ps-note">진단을 읽는 중…</p>' };
     }
     const here = chatId(ctx2);
-    const mine = (peopleUi.diagAll ? list4 : list4.filter((r) => r.chat === here)).slice(-40).reverse();
+    const mine2 = (peopleUi.diagAll ? list4 : list4.filter((r) => r.chat === here)).slice(-40).reverse();
     const toggle = `<label class="pp-check"><input type="checkbox" data-change="pp-diag-all" ${peopleUi.diagAll ? "checked" : ""}> 전부 ${list4.length}건 중 이 채팅 ${list4.filter((r) => r.chat === here).length}건</label>`;
-    if (!mine.length) return { toggle, body: `<p class="ps-note">${peopleUi.diagAll ? "아직 갱신 기록이 없어요." : "이 채팅의 갱신 기록이 아직 없어요."}</p>` };
-    const rows3 = mine.map((r) => {
+    if (!mine2.length) return { toggle, body: `<p class="ps-note">${peopleUi.diagAll ? "아직 갱신 기록이 없어요." : "이 채팅의 갱신 기록이 아직 없어요."}</p>` };
+    const rows3 = mine2.map((r) => {
       const id2 = `${r.at}|${r.indexes.join(",")}`;
       const open3 = peopleUi.diagOpen.has(id2);
       const rep = r.report;
@@ -1182,16 +1489,13 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   function updateBar(ctx2, canChat = true) {
     const st = peopleStatus();
-    const store = peopleStore(ctx2.chat);
-    const { newer, older } = splitUnread(ctx2.chat, store);
+    const store2 = peopleStore(ctx2.chat);
+    const { newer, older } = splitUnread(ctx2.chat, store2);
     const dis = st.busy || peopleUi.busy || !canChat ? "disabled" : "";
     const label2 = !canChat ? "채팅을 시작한 뒤에 갱신할 수 있어요" : st.busy ? st.label || "갱신 중…" : newer.length ? `새 응답 ${newer.length}개` : "새 응답 없음";
     const now2 = `<span class="pp-upgrp"><span class="pp-upst${st.busy ? " busy" : ""}">${st.busy ? '<i class="pp-spin"></i>' : ""}${esc34(label2)}</span><button class="gx-mini ps-save" data-action="pp-update" title="마지막으로 읽은 응답 뒤의 새 응답을 지금 읽어요" ${dis || (newer.length ? "" : "disabled")}>${ICONS.refresh}새 응답 읽기</button></span>`;
     const back = older.length && canChat ? `<span class="pp-upgrp pp-backfill"><span class="pp-upst">지난 응답 ${older.length}개 안 읽음</span><select class="gx-select" data-change="pp-backfill-turns" aria-label="읽을 범위">${[["10", "최근 10개"], ["30", "최근 30개"], ["0", "전부"]].map(([v, l]) => `<option value="${v}" ${peopleUi.backfillTurns === v ? "selected" : ""}>${l}</option>`).join("")}</select><button class="gx-mini" data-action="pp-backfill" title="기능을 중간에 켰거나 끄고 지나간 구간의 응답을 읽어요. 보조 호출이 묶음마다 1회" ${dis}>지난 응답 읽기</button></span>` : "";
     return `<div class="pp-upbar">${now2}${back}</div>`;
-  }
-  function idBox(stage2, value) {
-    return `<div class="ps-row pp-mid"><div class="ps-label"><b>전용 모델 ID</b><small>Risu 모델 ID를 적으면 이 호출만 그 모델로 불러요. 비우면 위 모델 선택대로</small></div><div class="ps-ctl pp-mid-ctl"><input class="gx-search" name="pp-mid-${stage2}" data-input="pp-mid-${stage2}" maxlength="120" placeholder="예: openai::gpt-x" value="${esc34(value)}" aria-label="전용 모델 ID"><button class="gx-mini ps-save" data-action="pp-mid-save-${stage2}" data-take="pp-mid-${stage2}">저장</button></div></div>`;
   }
   function ruleBox2(name, label2, value, help, max, placeholder, saveAction) {
     return `<div class="pp-rule"><b>${label2}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" data-autosave="${saveAction}" rows="4" maxlength="${max}" placeholder="${esc34(placeholder)}">${esc34(value)}</textarea><small>${help}</small></div>`;
@@ -1202,8 +1506,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const s8 = peopleSettings(state);
     const onoff = (k) => seg3(k, v(k) === "1" ? "1" : "0", [["1", "ON"], ["0", "OFF"]]);
     const blk = (id2, title2, body5, note = "") => `<section class="ps-group pp-blk" id="${id2}">${title2 ? `<h3>${title2}</h3>` : ""}${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
-    const modelOf = (st) => s8.stageModelId[st] ? `ID ${s8.stageModelId[st].slice(0, 18)}` : s8.stageModel[st] === "main" ? "메인 모델" : "보조 모델";
-    const stageModel = (st, help) => ppRow("stage_model", "", { ctl: seg3(`model_${st}`, v(`model_${st}`), [["same", "갱신과 같게"], ["main", "메인 모델"], ["aux", "보조 모델"]]), help }) + idBox(st, v(`model_id_${st}`));
+    const modelOf2 = (st) => s8.stageModel[st] === "main" ? "메인 모델" : "보조 모델";
+    const stageModel = (st, help) => ppRow("stage_model", "", { ctl: seg3(`model_${st}`, v(`model_${st}`), [["same", "갱신과 같게"], ["main", "메인 모델"], ["aux", "보조 모델"]]), help });
     const routerOn = s8.on && s8.router === "model";
     const sceneOn = s8.on && (s8.director === "scene" || s8.director === "facts");
     const updateOn = s8.on && s8.when === "turn";
@@ -1211,11 +1515,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const preCalls = (routerOn ? 1 : 0) + (sceneOn ? 1 : 0);
     const nodes2 = [
       { name: "입력", sub: "유저 메시지", kind: "plain", on: s8.on, calls: "" },
-      { name: "Router", sub: "장면 인물 고르기", kind: "aux", on: routerOn, model: modelOf("router"), calls: routerOn ? "보조 1회" : "호출 없음 (코드가 고름)", control: seg3("router", s8.router, [["code", "OFF"], ["model", "ON"]]), block: "pp-blk-router" },
-      { name: "Director", sub: "이번 턴 연기 지시", kind: "aux", on: sceneOn, model: modelOf("director"), calls: sceneOn ? s8.directorSearch ? "보조 1회 (검색 땐 2회)" : "보조 1회" : s8.director === "note" ? "호출 없음 (갱신에 얹음)" : "호출 없음", control: seg3("director", s8.director, [["off", "사용 안 함"], ["note", "메모형"], ["facts", "사실형"], ["scene", "연출형"]]), block: "pp-blk-director" },
+      { name: "Router", sub: "장면 인물 고르기", kind: "aux", on: routerOn, model: modelOf2("router"), calls: routerOn ? "보조 1회" : "호출 없음 (코드가 고름)", control: seg3("router", s8.router, [["code", "OFF"], ["model", "ON"]]), block: "pp-blk-router" },
+      { name: "Director", sub: "이번 턴 연기 지시", kind: "aux", on: sceneOn, model: modelOf2("director"), calls: sceneOn ? s8.directorSearch ? "보조 1회 (검색 땐 2회)" : "보조 1회" : s8.director === "note" ? "호출 없음 (갱신에 얹음)" : "호출 없음", control: seg3("director", s8.director, [["off", "사용 안 함"], ["note", "메모형"], ["facts", "사실형"], ["scene", "연출형"]]), block: "pp-blk-director" },
       { name: "메인", sub: "응답 생성", kind: "main", on: true, model: "메인 모델", calls: "메인 1회" },
-      { name: "갱신", sub: "응답을 읽어 기록", kind: "aux", on: updateOn, model: modelOf("update"), calls: updateOn ? `${s8.model === "main" ? "메인" : "보조"} 1회` : s8.on ? "수동 (누를 때만)" : "호출 없음", control: seg3("when", s8.when, [["manual", "수동"], ["turn", "매 턴"]]), block: "pp-blk-update" },
-      { name: "정리", sub: "상한 넘긴 기록 합치기", kind: "aux", on: tidyOn, model: modelOf("tidy"), calls: tidyOn ? "넘긴 인물마다 1회" : "호출 없음 (갱신에 얹음)", control: seg3("tidy", s8.tidy, [["same", "OFF"], ["separate", "ON"]]), block: "pp-blk-tidy" }
+      { name: "갱신", sub: "응답을 읽어 기록", kind: "aux", on: updateOn, model: modelOf2("update"), calls: updateOn ? `${s8.model === "main" ? "메인" : "보조"} 1회` : s8.on ? "수동 (누를 때만)" : "호출 없음", control: seg3("when", s8.when, [["manual", "수동"], ["turn", "매 턴"]]), block: "pp-blk-update" },
+      { name: "정리", sub: "상한 넘긴 기록 합치기", kind: "aux", on: tidyOn, model: modelOf2("tidy"), calls: tidyOn ? "넘긴 인물마다 1회" : "호출 없음 (갱신에 얹음)", control: seg3("tidy", s8.tidy, [["same", "OFF"], ["separate", "ON"]]), block: "pp-blk-tidy" }
     ];
     const flowNode = (n3) => `<div class="pp-fn${n3.on ? " on" : ""} k-${n3.kind}"><div class="pp-fn-name"><b>${n3.name}</b>${n3.model ? `<span class="pp-fn-chip">${esc34(n3.model)}</span>` : ""}<small>${n3.sub}</small></div><span class="pp-fn-calls">${n3.calls}</span><div class="pp-fn-ctl">${(n3.control ?? "").replace('<button class="gx-switch" role="switch"', `<button class="gx-switch" role="switch" aria-label="${esc34(n3.name)}"`)}</div>${n3.block ? `<button class="gx-mini pp-fn-go" data-action="pp-goto" data-value="${n3.block}">설정 →</button>` : "<span></span>"}</div>`;
     const flow2 = `<div class="pp-flow">${nodes2.map(flowNode).join('<i class="pp-fn-arrow" aria-hidden="true">↓</i>')}</div>
@@ -1263,7 +1567,6 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     ].join("");
     const update = [
       ppRow("model", s8.model),
-      idBox("update", v("model_id_update")),
       ppRow("prompt", s8.prompt),
       ppRow("lang", s8.lang),
       `<div class="pp-rules one">${ruleBox2("pp-rules", "갱신에 덧붙일 지침", v("rules"), "응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.", 4e3, "예: 관리국 요원은 서로를 직급으로 부른다", "pp-rules-save")}</div>`,
@@ -1361,19 +1664,19 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return `<span class="gx-badge pp-stage s-${idx}" title="호감 단계 「${esc34(st.label)}」 (${stageRange(idx)}). 8단계 중 ${idx + 1}번째, 무관심이 기준">${esc34(st.label)}</span>`;
   };
   function peopleListView(ctx2) {
-    const store = peopleStore(ctx2.chat);
+    const store2 = peopleStore(ctx2.chat);
     const live = liveness(ctx2.chat);
-    const changes = liveChanges(store, live);
-    const changed = changedPeople(store, ctx2.chat, live);
+    const changes = liveChanges(store2, live);
+    const changed = changedPeople(store2, ctx2.chat, live);
     const facs = factionList(ctx2.char.globalLore);
     const groups = /* @__PURE__ */ new Map();
-    for (const p2 of Object.values(store.people).sort((a, b) => a.name.localeCompare(b.name, "ko"))) {
+    for (const p2 of Object.values(store2.people).sort((a, b) => a.name.localeCompare(b.name, "ko"))) {
       const key = facs.some((f) => f.code === p2.faction) ? p2.faction : "";
       (groups.get(key) ?? groups.set(key, []).get(key)).push(p2);
     }
     const order2 = [...facs.map((f) => f.code).filter((c) => groups.has(c)), ...groups.has("") ? [""] : []];
     const item2 = (p2) => {
-      const aff = affinityView(p2, changes, store.folded[p2.name] ?? 0, affOpts(ctx2, p2.name));
+      const aff = affinityView(p2, changes, store2.folded[p2.name] ?? 0, affOpts(ctx2, p2.name));
       const addr = addressOf(p2, changes);
       const facName = facs.some((f) => f.code === p2.faction) ? "" : p2.faction;
       const sd = seededOf(p2);
@@ -1387,14 +1690,14 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       const title2 = code2 ? factionName2(ctx2, code2) : "그 밖";
       return `<section class="nw-hsec pp-sec"><h3>${esc34(title2)}<b>${list4.length}</b></h3><ul class="ph-list">${list4.map(item2).join("")}</ul></section>`;
     }).join("");
-    const pending2 = Object.entries(store.pending);
+    const pending2 = Object.entries(store2.pending);
     const pendingHtml = pending2.length ? `<section class="nw-hsec pp-sec"><h3>등록 대기<b>${pending2.length}</b></h3><p class="ps-note">이름이 나왔지만 아직 기록을 만들지 않은 사람이에요. 등록하면 다음 갱신부터 기록해요.</p><ul class="ph-list">${pending2.map(([name, v]) => `<li class="ph-row"><div class="ph-main"><span class="ph-avatar nw-ava">${esc34(name.slice(0, 1))}</span><span class="ph-who"><b>${esc34(name)}</b><small>${esc34([v.aliases.length ? `별명: ${v.aliases.join(", ")}` : "", msgNo(v.anchor, live) ? `처음 ${msgNo(v.anchor, live)}` : ""].filter(Boolean).join(" · "))}</small></span></div>
           <button class="gx-mini ps-save" data-action="pp-register" data-value="${esc34(name)}" ${peopleUi.busy ? "disabled" : ""}>등록</button><button class="gx-mini" data-action="pp-ignore" data-value="${esc34(name)}" ${peopleUi.busy ? "disabled" : ""}>무시</button></li>`).join("")}</ul></section>` : "";
-    const docsN = Object.values(store.docs).reduce((a, d) => a + liveEntries(d.entries, live).length, 0);
-    const empty2 = !Object.keys(store.people).length && !pending2.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>본편에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : "";
-    const undoN = store.lastRun ? store.lastRun.entries.length + store.lastRun.docs.length + store.lastRun.changes.length + store.lastRun.observations.length + store.lastRun.newPeople.length : 0;
+    const docsN = Object.values(store2.docs).reduce((a, d) => a + liveEntries(d.entries, live).length, 0);
+    const empty2 = !Object.keys(store2.people).length && !pending2.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>메인 응답에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : "";
+    const undoN = store2.lastRun ? store2.lastRun.entries.length + store2.lastRun.docs.length + store2.lastRun.changes.length + store2.lastRun.observations.length + store2.lastRun.newPeople.length : 0;
     const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목은 변경 기록에서 다시 살릴 수 있어요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? "disabled" : ""}>↶</button>` : "";
-    return `<div class="ph-room nw-pane pp-pane">${head("이 채팅의 인물", `${Object.keys(store.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
+    return `<div class="ph-room nw-pane pp-pane">${head("이 채팅의 인물", `${Object.keys(store2.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc34(peopleUi.notice)}</div>` : ""}
       ${updateBar(ctx2)}
@@ -1405,31 +1708,31 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     })}</div>`;
   }
   function factionListView(ctx2) {
-    const store = peopleStore(ctx2.chat);
+    const store2 = peopleStore(ctx2.chat);
     const live = liveness(ctx2.chat);
-    const changes = liveChanges(store, live);
+    const changes = liveChanges(store2, live);
     const s8 = peopleSettings(ctx2.chat.scriptstate);
     const names4 = Object.fromEntries(factionList(ctx2.char.globalLore).map((f) => [f.code, f.name]));
-    const n3 = s8.features.has("faction_rep") ? knownFactionCodes(store, names4).length : 0;
-    const body5 = s8.features.has("faction_rep") ? factionSection(ctx2, store, changes) || '<div class="ph-blank"><p>아직 평판이 기록된 세력이 없어요.</p></div>' : '<div class="ph-blank"><p>세력 평판 기능이 꺼져 있어요.<br>설정 → 인물 기록 → 기능에서 「세력 평판」을 켜면 여기에 쌓여요.</p></div>';
+    const n3 = s8.features.has("faction_rep") ? knownFactionCodes(store2, names4).length : 0;
+    const body5 = s8.features.has("faction_rep") ? factionSection(ctx2, store2, changes) || '<div class="ph-blank"><p>아직 평판이 기록된 세력이 없어요.</p></div>' : '<div class="ph-blank"><p>세력 평판 기능이 꺼져 있어요.<br>설정 → 인물 기록 → 기능에서 「세력 평판」을 켜면 여기에 쌓여요.</p></div>';
     return `<div class="ph-room nw-pane pp-pane">${head("세력", n3 ? `${n3}곳` : "", "", false)}
     <article class="nw-doc pp-doc">${peopleUi.notice ? `<div class="gx-err" role="alert">${esc34(peopleUi.notice)}</div>` : ""}${body5}</article>${toast("pp", peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = "";
     })}</div>`;
   }
-  function factionSection(ctx2, store, changes) {
+  function factionSection(ctx2, store2, changes) {
     const s8 = peopleSettings(ctx2.chat.scriptstate);
     if (!s8.features.has("faction_rep")) return "";
     const names4 = Object.fromEntries(factionList(ctx2.char.globalLore).map((f) => [f.code, f.name]));
-    const uf = userFactionOf(store, ctx2.chat);
-    const rows3 = knownFactionCodes(store, names4).map((code2) => {
-      const f = factionNow(store, code2, changes, uf, s8, names4);
-      const mine = store.log.filter((c) => c.who === factionWho(code2)).length;
+    const uf = userFactionOf(store2, ctx2.chat);
+    const rows3 = knownFactionCodes(store2, names4).map((code2) => {
+      const f = factionNow(store2, code2, changes, uf, s8, names4);
+      const mine2 = store2.log.filter((c) => c.who === factionWho(code2)).length;
       return `<li class="ph-row"><button class="ph-main nw-row" data-action="rec-faction" data-value="${esc34(code2)}">
       <span class="ph-avatar nw-ava k-fac">${esc34(f.name.slice(0, 1))}</span>
-      <span class="ph-who"><span class="ph-who-top"><b>${esc34(f.name)}</b><span class="gx-badge fs-${f.stage.id}">${esc34(f.stage.label)}</span></span><small>${s8.factionQual ? esc34(f.note ?? "시작 단계 (조직×조직 표)") : `${f.value} · 시작값 ${f.base}`}${code2 === uf ? " · 주인공 소속" : ""}${mine ? ` · 기록 ${mine}` : ""}</small></span></button></li>`;
+      <span class="ph-who"><span class="ph-who-top"><b>${esc34(f.name)}</b><span class="gx-badge fs-${f.stage.id}">${esc34(f.stage.label)}</span></span><small>${s8.factionQual ? esc34(f.note ?? "시작 단계 (조직×조직 표)") : `${f.value} · 시작값 ${f.base}`}${code2 === uf ? " · 주인공 소속" : ""}${mine2 ? ` · 기록 ${mine2}` : ""}</small></span></button></li>`;
     }).join("");
-    return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 바뀔 만한 일인지는 갱신기 모델이 판단해요">세력 평판<b>${knownFactionCodes(store, names4).length}</b></h3><ul class="ph-list">${rows3}</ul></section>`;
+    return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 바뀔 만한 일인지는 갱신기 모델이 판단해요">세력 평판<b>${knownFactionCodes(store2, names4).length}</b></h3><ul class="ph-list">${rows3}</ul></section>`;
   }
   var factionStageLabel = (ctx2, value) => FACTION_STAGES[factionStageId(value, peopleSettings(ctx2.chat.scriptstate).factionBounds)].label;
   function factionBar(value, bounds) {
@@ -1439,21 +1742,21 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const lo = Math.min(cur, base);
     const hi = Math.max(cur, base);
     const ranges = [`${FACTION_MIN}~${bounds[3] - 1}`, `${bounds[3]}~${bounds[2] - 1}`, `${bounds[2]}~${bounds[1] - 1}`, `${bounds[1]}~${bounds[0] - 1}`, `${bounds[0]}~${FACTION_MAX}`];
-    const cells = ids.map((id2, i) => `<i class="pp-cell${i === base ? " base" : ""}${i >= lo && i <= hi && i !== base ? i < base ? " on neg" : " on pos" : ""}${i === cur ? " cur" : ""}" title="${esc34(FACTION_STAGES[id2].label)} (${ranges[i]}) · ${esc34(FACTION_STAGES[id2].mob)}"></i>`).join("");
-    return `<div class="pp-aff"><div class="pp-aff-top"><b>${esc34(FACTION_STAGES[ids[cur]].label)}</b><span class="pp-aff-num">${value} <small>· 범위 ${FACTION_MIN}~${FACTION_MAX}</small></span></div><div class="pp-cells" role="img" aria-label="세력 평판 ${value}">${cells}</div><div class="pp-aff-ends" aria-hidden="true"><span>적대</span><span>우호</span></div></div>`;
+    const cells2 = ids.map((id2, i) => `<i class="pp-cell${i === base ? " base" : ""}${i >= lo && i <= hi && i !== base ? i < base ? " on neg" : " on pos" : ""}${i === cur ? " cur" : ""}" title="${esc34(FACTION_STAGES[id2].label)} (${ranges[i]}) · ${esc34(FACTION_STAGES[id2].mob)}"></i>`).join("");
+    return `<div class="pp-aff"><div class="pp-aff-top"><b>${esc34(FACTION_STAGES[ids[cur]].label)}</b><span class="pp-aff-num">${value} <small>· 범위 ${FACTION_MIN}~${FACTION_MAX}</small></span></div><div class="pp-cells" role="img" aria-label="세력 평판 ${value}">${cells2}</div><div class="pp-aff-ends" aria-hidden="true"><span>적대</span><span>우호</span></div></div>`;
   }
   var factionStageId = (value, b) => value >= b[0] ? "friendly" : value >= b[1] ? "favorable" : value >= b[2] ? "neutral" : value >= b[3] ? "wary" : "hostile";
   function factionView2(ctx2, code2) {
-    const store = peopleStore(ctx2.chat);
+    const store2 = peopleStore(ctx2.chat);
     const s8 = peopleSettings(ctx2.chat.scriptstate);
     const names4 = Object.fromEntries(factionList(ctx2.char.globalLore).map((f2) => [f2.code, f2.name]));
     const live = liveness(ctx2.chat);
-    const changes = liveChanges(store, live);
-    const uf = userFactionOf(store, ctx2.chat);
-    const f = factionNow(store, code2, changes, uf, s8, names4);
+    const changes = liveChanges(store2, live);
+    const uf = userFactionOf(store2, ctx2.chat);
+    const f = factionNow(store2, code2, changes, uf, s8, names4);
     const who = factionWho(code2);
     const last2 = [...changes].reverse().find((c) => c.who === who && c.kind === "cue" && c.pin === void 0);
-    const mine = store.log.filter((c) => c.who === who).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
+    const mine2 = store2.log.filter((c) => c.who === who).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
     const qual = s8.factionQual;
     const stageIds = ["hostile", "wary", "neutral", "favorable", "friendly"];
     const edit = peopleUi.affEdit ? `<div class="pp-edit"><div class="pp-edit-row">${qual ? `<label>단계 <select class="gx-select" data-change="pp-aff-stage">${stageIds.map((id2) => `<option value="${id2}" ${(peopleUi.affStage || f.stage.id) === id2 ? "selected" : ""}>${esc34(FACTION_STAGES[id2].label)}</option>`).join("")}</select></label>` : `<label>숫자 <input class="gx-search ph-pct" type="number" min="${FACTION_MIN}" max="${FACTION_MAX}" data-input="pp-aff-num" name="pp-aff-num" value="${esc34(peopleUi.affNum)}" placeholder="${f.value}"></label>`}</div>
@@ -1465,7 +1768,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc34(peopleUi.notice)}</div>` : ""}
       <section class="pp-card"><h4 title="${qual ? "세력이 주인공을 어떻게 보는지 (정성 모드: 단계와 이유). 갱신기 모델이 판단해요" : "세력이 주인공을 어떻게 보는지 (−100~100). 갱신기 모델이 판단한 일로 바뀌어요"}">평판</h4><div class="pp-card-body">${standing}${edit}</div></section>
-      <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
+      <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary>변경 기록<b>${mine2.length}</b></summary>${mine2.length ? `<ul class="pp-entries">${mine2.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast("pp", peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = "";
     })}</div>`;
@@ -1476,13 +1779,13 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const idx = STAGES.indexOf(st);
     const lo = Math.min(idx, BASE_STAGE);
     const hi = Math.max(idx, BASE_STAGE);
-    const cells = STAGES.map((s8, i) => {
+    const cells2 = STAGES.map((s8, i) => {
       const fill3 = i >= lo && i <= hi && i !== BASE_STAGE ? i < BASE_STAGE ? " on neg" : " on pos" : "";
       return `<i class="pp-cell s-${i}${i === BASE_STAGE ? " base" : ""}${fill3}${i === idx ? " cur" : ""}" title="${esc34(s8.label)} (${stageRange(i)})${i === BASE_STAGE ? " · 기준" : ""}${i === idx ? " · 지금" : ""}"></i>`;
     }).join("");
     const num7 = peopleUi.showNum ? `<span class="pp-aff-num" title="호감 숫자. 범위는 ${AFF_MIN}~${AFF_MAX}, 무관심이 ${stageRange(BASE_STAGE)}">${value} <small>· 범위 ${AFF_MIN}~${AFF_MAX}, 무관심 ${stageRange(BASE_STAGE)}</small></span>` : "";
     return `<div class="pp-aff" data-pp-hold="num"><div class="pp-aff-top"><b title="지금 호감 단계 (${stageRange(idx)}). 계기(작은친절·도움·배신…)가 쌓여 바뀌어요">${esc34(st.label)}</b>${num7}<button class="ph-tool sm" data-action="pp-num-toggle" title="호감 숫자와 범위 보기" aria-label="호감 숫자와 범위 보기" aria-pressed="${peopleUi.showNum}">${ICONS.info}</button></div>
-    <div class="pp-cells" role="img" aria-label="호감 ${value}, ${esc34(st.label)}">${cells}</div>
+    <div class="pp-cells" role="img" aria-label="호감 ${value}, ${esc34(st.label)}">${cells2}</div>
     <div class="pp-aff-ends" aria-hidden="true"><span>${esc34(STAGES[0].label)}</span><span>${esc34(STAGES[STAGES.length - 1].label)}</span></div></div>`;
   }
   function evidenceButton(key, no) {
@@ -1510,12 +1813,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const old = sorted.filter((e) => states.get(e.id) !== "alive");
     const main = cur.length ? `<ul class="pp-entries">${cur.map((e) => row8(e, "alive")).join("")}</ul>` : '<p class="ps-note">살아 있는 항목이 없어요.</p>';
     const showAll = peopleUi.oldAll.has(key);
-    const shown3 = showAll ? old : old.slice(0, 20);
-    const rest = old.length ? `<details class="pp-oldbox" data-keep="${esc34(key)}"${keepOpen(key)}><summary title="새 항목으로 바뀌었거나 합쳐졌거나 취소된 항목. 전부 저장돼 있고 되살릴 수 있어요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${shown3.map((e) => row8(e, states.get(e.id))).join("")}</ul>${old.length > shown3.length ? `<button class="gx-mini nw-more-btn" data-action="pp-old-more" data-value="${esc34(key)}">${old.length - shown3.length}개 더 보기</button>` : ""}</details>` : "";
+    const shown4 = showAll ? old : old.slice(0, 20);
+    const rest = old.length ? `<details class="pp-oldbox" data-keep="${esc34(key)}"${keepOpen(key)}><summary title="새 항목으로 바뀌었거나 합쳐졌거나 취소된 항목. 전부 저장돼 있고 되살릴 수 있어요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${shown4.map((e) => row8(e, states.get(e.id))).join("")}</ul>${old.length > shown4.length ? `<button class="gx-mini nw-more-btn" data-action="pp-old-more" data-value="${esc34(key)}">${old.length - shown4.length}개 더 보기</button>` : ""}</details>` : "";
     return main + rest;
   }
-  var VOIDED = '<span class="pp-gone" title="사용자가 취소한 항목. 본편에 넣지 않아요">취소됨</span>';
-  var voidBtn = (action, value, voided) => `<button class="gx-mini pp-mini${voided ? "" : " danger"}" data-action="${action}" data-value="${esc34(value)}" title="${voided ? "취소를 풀어 다시 기록으로 쳐요" : "이 항목을 기록에서 빼요 (본편에 넣지 않음). 다시 누르면 되살려요"}">${voided ? "되살리기" : "취소"}</button>`;
+  var VOIDED = '<span class="pp-gone" title="사용자가 취소한 항목. 메인 요청에 넣지 않아요">취소됨</span>';
+  var voidBtn = (action, value, voided) => `<button class="gx-mini pp-mini${voided ? "" : " danger"}" data-action="${action}" data-value="${esc34(value)}" title="${voided ? "취소를 풀어 다시 기록으로 쳐요" : "이 항목을 기록에서 빼요 (메인 요청에 넣지 않음). 다시 누르면 되살려요"}">${voided ? "되살리기" : "취소"}</button>`;
   function entryRow(ctx2, who, slot2, e, live, st) {
     const no = msgNo(e.anchor, live);
     const dead = st !== "alive" && !e.void;
@@ -1549,7 +1852,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   function axesCard(ctx2, p2, live) {
     if (!peopleSettings(ctx2.chat.scriptstate).features.has("axes")) return "";
     const bars = axesView(p2.axes).map((a) => `<div class="pp-axis" title="${esc34(a.band)}"><div><b>${esc34(a.label)}</b><span>${a.value}</span></div><span class="pp-axis-bar"><i style="width:${a.value}%"></i></span><small>${esc34(a.band)}</small></div>`).join("");
-    const from = p2.axesFrom === "default" ? "시작값: 아직 모델이 정하지 않음 (표현 정도만 반영된 기본값)" : p2.axesFrom === "model" ? "시작값: 갱신기가 시트·본편에서 정함" : "사용자가 승인·수정한 값";
+    const from = p2.axesFrom === "default" ? "시작값: 아직 모델이 정하지 않음 (표현 정도만 반영된 기본값)" : p2.axesFrom === "model" ? "시작값: 갱신기가 시트·메인 응답에서 정함" : "사용자가 승인·수정한 값";
     const all = Object.values(p2.candidates ?? {});
     const withStats = all.map((c) => ({ c, st: candidateStats(c, live) }));
     const review = withStats.filter((x) => x.c.status === "collecting" && x.st.ready);
@@ -1594,12 +1897,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   </li>`;
   }
   function personView(ctx2, name) {
-    const store = peopleStore(ctx2.chat);
-    const p2 = store.people[name];
+    const store2 = peopleStore(ctx2.chat);
+    const p2 = store2.people[name];
     if (!p2) return `<div class="ph-room nw-pane pp-pane">${head(name, "")}<div class="ph-blank"><p>「${esc34(name)}」의 기록이 없어요.</p></div></div>`;
     const live = liveness(ctx2.chat);
-    const changes = liveChanges(store, live);
-    const aff = affinityView(p2, changes, store.folded[p2.name] ?? 0, affOpts(ctx2, p2.name));
+    const changes = liveChanges(store2, live);
+    const aff = affinityView(p2, changes, store2.folded[p2.name] ?? 0, affOpts(ctx2, p2.name));
     const addr = addressOf(p2, changes);
     const seededFrom = seededOf(p2) === "lore" ? "로어북 시트" : seededOf(p2) === "dialogue" ? "대사 자료" : "빈 기록(이야기에서 등장)";
     const chars2 = recordChars(p2, live);
@@ -1614,7 +1917,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const addrEdit = peopleUi.addrEdit ? `<div class="pp-edit"><div class="pp-edit-row"><input class="gx-search" data-input="pp-addr-to" name="pp-addr-to" maxlength="40" placeholder="호칭 (예: 선배, 요원님)" value="${esc34(peopleUi.addrTo)}">
         ${seg3("reg", peopleUi.addrReg, REGISTERS.map((r) => [r, r]), "pp-addr-reg")}</div>
         <label class="pp-check"><input type="checkbox" data-change="pp-addr-pin" ${peopleUi.addrPin ? "checked" : ""}> 고정 (갱신기가 바꾸지 못하게)</label>
-        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-addr-save" data-value="${esc34(name)}" ${peopleUi.busy ? "disabled" : ""}>저장</button><button class="gx-mini" data-action="pp-addr-cancel">취소</button></div></div>` : `<div class="pp-addr">${addr.toUser ? `<b title="이 인물이 주인공을 부르는 말">「${esc34(addr.toUser)}」</b>` : '<span class="pp-addr-none">아직 없음 — 본편에서 부르는 말이 확인되면 기록돼요</span>'}<span class="gx-badge" title="주인공에게 쓰는 말투">${esc34(addr.register)}</span>${p2.address.pin ? `<span class="gx-badge live" title="고정: 갱신기가 호칭·말투를 바꾸지 못해요">${ICONS.pin}고정</span>` : ""}<button class="gx-mini" data-action="pp-addr-edit" data-value="${esc34(name)}" title="호칭과 말투를 직접 적어요">직접 수정</button></div>`;
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-addr-save" data-value="${esc34(name)}" ${peopleUi.busy ? "disabled" : ""}>저장</button><button class="gx-mini" data-action="pp-addr-cancel">취소</button></div></div>` : `<div class="pp-addr">${addr.toUser ? `<b title="이 인물이 주인공을 부르는 말">「${esc34(addr.toUser)}」</b>` : '<span class="pp-addr-none">아직 없음 — 메인 응답에서 부르는 말이 확인되면 기록돼요</span>'}<span class="gx-badge" title="주인공에게 쓰는 말투">${esc34(addr.register)}</span>${p2.address.pin ? `<span class="gx-badge live" title="고정: 갱신기가 호칭·말투를 바꾸지 못해요">${ICONS.pin}고정</span>` : ""}<button class="gx-mini" data-action="pp-addr-edit" data-value="${esc34(name)}" title="호칭과 말투를 직접 적어요">직접 수정</button></div>`;
     const ps = peopleSettings(ctx2.chat.scriptstate);
     const enabledSlots = new Set(slotsFor(ps.features, ps.qualitative));
     const slotSection = (s8) => {
@@ -1629,8 +1932,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     }).join("");
     const hiddenN = FEATURE_SLOTS.filter((s8) => !enabledSlots.has(s8) && (p2.slots[s8]?.length ?? 0) > 0).length;
     const slots = CORE_SLOTS.map(slotSection).join("") + groups + (hiddenN ? `<p class="ps-note">꺼진 기능의 칸 ${hiddenN}개는 숨겨져 있어요 (기능을 켜면 돌아와요).</p>` : "");
-    const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
-    const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
+    const mine2 = store2.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
+    const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine2.length}</b></summary>${mine2.length ? `<ul class="pp-entries">${mine2.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
     const busyNow = peopleUi.busy || peopleStatus().busy ? "disabled" : "";
     const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc34(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[["10", "최근 10개"], ["20", "최근 20개"], ["50", "최근 50개"], ["0", "전부"]].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? "selected" : ""}>${l}</option>`).join("")}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc34(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
     return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
@@ -1645,10 +1948,10 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     })}</div>`;
   }
   function peopleDocsView(ctx2) {
-    const store = peopleStore(ctx2.chat);
+    const store2 = peopleStore(ctx2.chat);
     const live = liveness(ctx2.chat);
     const byType = /* @__PURE__ */ new Map();
-    for (const d of Object.values(store.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)).push(d);
+    for (const d of Object.values(store2.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)).push(d);
     const docEntry = (docKey, e, st) => {
       const no = msgNo(e.anchor, live);
       const key = `doc|${docKey}|${e.id}`;
@@ -1664,7 +1967,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       return `<section class="nw-hsec pp-sec"><h3>${DOC_LABEL[t]}<b>${docs.length}</b></h3>${inner}</section>`;
     }).join("");
     return `<div class="ph-room nw-pane pp-pane">${head("기록 문서", "사건 · 장소 · 세력 · 물건")}
-    <article class="nw-doc pp-doc">${sections3 || '<div class="ph-blank"><p>아직 기록된 문서가 없어요.<br>본편에서 사건·장소·세력·물건이 바뀌면 여기에 쌓여요.</p></div>'}</article></div>`;
+    <article class="nw-doc pp-doc">${sections3 || '<div class="ph-blank"><p>아직 기록된 문서가 없어요.<br>메인 응답에서 사건·장소·세력·물건이 바뀌면 여기에 쌓여요.</p></div>'}</article></div>`;
   }
   async function mutate3(ctx2, env3, fn2) {
     peopleUi.busy = true;
@@ -1672,8 +1975,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     env3.render();
     try {
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        const store = peopleStore(chat);
-        return fn2(store, chat) ? withPeople(chat, store) : null;
+        const store2 = peopleStore(chat);
+        return fn2(store2, chat) ? withPeople(chat, store2) : null;
       });
     } catch (error) {
       peopleUi.notice = error instanceof Error ? error.message : String(error);
@@ -1681,13 +1984,13 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     peopleUi.busy = false;
     await env3.refresh();
   }
-  function findEntry(store, key) {
+  function findEntry(store2, key) {
     const [who, slot2, id2] = key.split("|");
-    const list4 = store.people[who]?.slots[slot2];
+    const list4 = store2.people[who]?.slots[slot2];
     return list4?.find((e) => e.id === id2) ?? null;
   }
-  function nextSeq(store, anchor) {
-    return store.log.filter((c) => c.anchor === anchor).reduce((m, c) => Math.max(m, c.seq), -1) + 1;
+  function nextSeq(store2, anchor) {
+    return store2.log.filter((c) => c.anchor === anchor).reduce((m, c) => Math.max(m, c.seq), -1) + 1;
   }
   function userFaction2(chat) {
     const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
@@ -1711,20 +2014,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       case "pp-director-rules":
         return true;
       default:
-        if (name.startsWith("pp-mid-")) return true;
     }
     return false;
   }
   async function handlePeople(action, value, ctx2, env3) {
     const v = value ?? "";
-    if (action.startsWith("pp-mid-save-")) {
-      const stage2 = action.slice("pp-mid-save-".length);
-      if (!["update", "director", "router", "tidy"].includes(stage2)) return true;
-      await setVars3(ctx2, env3, { [PP(`model_id_${stage2}`)]: v.trim().slice(0, 120) });
-      peopleUi.info = v.trim() ? "전용 모델 ID를 저장했어요." : "전용 모델 ID를 비웠어요.";
-      env3.render();
-      return true;
-    }
     if (action.startsWith("pp-def-")) {
       try {
         const msg = await defaultsAction("pp", action, v, ctx2, env3.refresh);
@@ -1760,9 +2054,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
           peopleUi.info = k === "model" ? "응답마다 메인 모델을 한 번 더 불러요." : "응답마다 보조 모델을 한 번 더 불러요.";
         }
         await setVars3(ctx2, env3, { [PP(k)]: val });
-        if (k === "explicit_style") await mutate3(ctx2, env3, (store) => {
+        if (k === "explicit_style") await mutate3(ctx2, env3, (store2) => {
           let n3 = 0;
-          for (const p2 of Object.values(store.people)) if (p2.sexual && p2.sexual.explicit !== null) {
+          for (const p2 of Object.values(store2.people)) if (p2.sexual && p2.sexual.explicit !== null) {
             p2.sexual.explicit = null;
             n3++;
           }
@@ -1772,7 +2066,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       }
       case "pp-undo-run": {
         let n3 = 0;
-        await mutate3(ctx2, env3, (store) => (n3 = undoLastRun(store)) > 0);
+        await mutate3(ctx2, env3, (store2) => (n3 = undoLastRun(store2)) > 0);
         peopleUi.info = n3 ? `마지막 갱신을 되돌렸어요 (${n3}개 취소).` : "되돌릴 갱신이 없어요.";
         env3.render();
         return true;
@@ -1823,12 +2117,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         return true;
       case "pp-register": {
         const sheet = sheetOf(ctx2);
-        await mutate3(ctx2, env3, (store, chat) => {
-          const pend = store.pending[v];
-          if (!pend || store.people[v]) return false;
-          const base = seedBaseFor(v, userFaction2(chat), store.identity);
-          store.people[v] = seedPerson(v, sheet(v), { ...base, aliases: [.../* @__PURE__ */ new Set([...base.aliases ?? [], ...pend.aliases ?? []])] });
-          delete store.pending[v];
+        await mutate3(ctx2, env3, (store2, chat) => {
+          const pend = store2.pending[v];
+          if (!pend || store2.people[v]) return false;
+          const base = seedBaseFor(v, userFaction2(chat), store2.identity);
+          store2.people[v] = seedPerson(v, sheet(v), { ...base, aliases: [.../* @__PURE__ */ new Set([...base.aliases ?? [], ...pend.aliases ?? []])] });
+          delete store2.pending[v];
           return true;
         });
         peopleUi.info = `「${v}」을(를) 등록했어요.`;
@@ -1836,16 +2130,16 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         return true;
       }
       case "pp-ignore":
-        await mutate3(ctx2, env3, (store) => {
-          if (!store.pending[v]) return false;
-          delete store.pending[v];
-          if (!store.ignored.includes(v)) store.ignored.push(v);
+        await mutate3(ctx2, env3, (store2) => {
+          if (!store2.pending[v]) return false;
+          delete store2.pending[v];
+          if (!store2.ignored.includes(v)) store2.ignored.push(v);
           return true;
         });
         return true;
       case "pp-pin":
-        await mutate3(ctx2, env3, (store) => {
-          const e = findEntry(store, v);
+        await mutate3(ctx2, env3, (store2) => {
+          const e = findEntry(store2, v);
           if (!e) return false;
           if (e.pin) delete e.pin;
           else e.pin = true;
@@ -1858,8 +2152,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         const key = action === "pp-sex-save" ? peopleUi.sexEdit : v;
         const text5 = action === "pp-sex-save" ? v : "";
         const [who, f] = key.split("|");
-        await mutate3(ctx2, env3, (store) => {
-          const p2 = store.people[who];
+        await mutate3(ctx2, env3, (store2) => {
+          const p2 = store2.people[who];
           if (!p2 || !SEXUAL_FIELDS.includes(f)) return false;
           const sx = ensureSexual(p2);
           if (action === "pp-sex-on") {
@@ -1877,8 +2171,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         return true;
       }
       case "pp-sex-style": {
-        await mutate3(ctx2, env3, (store) => {
-          const p2 = store.people[v];
+        await mutate3(ctx2, env3, (store2) => {
+          const p2 = store2.people[v];
           if (!p2) return false;
           ensureSexual(p2).explicit = !explicitOn(p2, peopleSettings(ctx2.chat.scriptstate));
           return true;
@@ -1899,20 +2193,20 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       case "pp-speech-approve":
       case "pp-speech-reject": {
         const approve = action === "pp-speech-approve";
-        await mutate3(ctx2, env3, (store) => {
+        await mutate3(ctx2, env3, (store2) => {
           const [who, slot2] = v.split("|");
-          const e = findEntry(store, v);
+          const e = findEntry(store2, v);
           if (!e || slot2 !== "speech" || speechState(e.text) !== "pending") return false;
           const text5 = decideSpeechPending(e.text, approve);
-          const seq4 = nextSeq(store, e.anchor);
-          return putEntry(store, who, "speech", { id: entryId(who, "speech", e.anchor, seq4, `${approve ? "+" : "-"}${e.id}`), text: text5, src: "manual", anchor: e.anchor, seq: seq4, replaces: e.id, ...e.target ? { target: e.target } : {} });
+          const seq4 = nextSeq(store2, e.anchor);
+          return putEntry(store2, who, "speech", { id: entryId(who, "speech", e.anchor, seq4, `${approve ? "+" : "-"}${e.id}`), text: text5, src: "manual", anchor: e.anchor, seq: seq4, replaces: e.id, ...e.target ? { target: e.target } : {} });
         });
         peopleUi.info = approve ? "다음 턴에 갱신기가 말투를 바꿀 수 있어요." : "말투 변경을 거절했어요. 조짐을 지웠어요.";
         return true;
       }
       case "pp-void":
-        await mutate3(ctx2, env3, (store) => {
-          const e = findEntry(store, v);
+        await mutate3(ctx2, env3, (store2) => {
+          const e = findEntry(store2, v);
           if (!e) return false;
           if (e.void) delete e.void;
           else e.void = true;
@@ -1925,8 +2219,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         const i = v.indexOf("|");
         const who = v.slice(0, i);
         const id2 = v.slice(i + 1);
-        await mutate3(ctx2, env3, (store, chat) => {
-          const p2 = store.people[who];
+        await mutate3(ctx2, env3, (store2, chat) => {
+          const p2 = store2.people[who];
           if (!p2) return false;
           const now2 = (/* @__PURE__ */ new Date()).toISOString();
           const err = action === "pp-axis-approve" ? approveCandidate(p2, id2, liveness(chat), now2) : action === "pp-axis-reject" ? rejectCandidate(p2, id2, now2) : revertCandidate(p2, id2, now2);
@@ -1938,8 +2232,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         return true;
       }
       case "pp-change-void":
-        await mutate3(ctx2, env3, (store) => {
-          const c = store.log.find((x) => x.id === v);
+        await mutate3(ctx2, env3, (store2) => {
+          const c = store2.log.find((x) => x.id === v);
           if (!c) return false;
           if (c.void) delete c.void;
           else c.void = true;
@@ -1971,11 +2265,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         }
         const pin2 = Math.max(FACTION_MIN, Math.min(FACTION_MAX, Math.round(raw)));
         const who = factionWho(v);
-        await mutate3(ctx2, env3, (store, chat) => {
-          if (!store.factions[v]) store.factions[v] = { code: v, name: factionName2(ctx2, v), seeded: { at: (/* @__PURE__ */ new Date()).toISOString() } };
+        await mutate3(ctx2, env3, (store2, chat) => {
+          if (!store2.factions[v]) store2.factions[v] = { code: v, name: factionName2(ctx2, v), seeded: { at: (/* @__PURE__ */ new Date()).toISOString() } };
           const anchor = anchorOf(chat);
-          const seq4 = nextSeq(store, anchor);
-          return putChange(store, { id: changeId(who, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
+          const seq4 = nextSeq(store2, anchor);
+          return putChange(store2, { id: changeId(who, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
         });
         peopleUi.affEdit = false;
         peopleUi.info = qualStage ? `세력 평판을 「${FACTION_STAGES[qualStage].label}」로 고정했어요.` : `세력 평판을 ${pin2}으로 고정했어요.`;
@@ -2003,11 +2297,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
           return true;
         }
         const pin2 = Math.max(AFF_MIN, Math.min(AFF_MAX, Math.round(raw)));
-        await mutate3(ctx2, env3, (store, chat) => {
-          if (!store.people[v]) return false;
+        await mutate3(ctx2, env3, (store2, chat) => {
+          if (!store2.people[v]) return false;
           const anchor = anchorOf(chat);
-          const seq4 = nextSeq(store, anchor);
-          return putChange(store, { id: changeId(v, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who: v, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
+          const seq4 = nextSeq(store2, anchor);
+          return putChange(store2, { id: changeId(v, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who: v, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
         });
         peopleUi.affEdit = false;
         peopleUi.info = `호감을 ${pin2}(${stageOf(pin2).label})으로 고정했어요.`;
@@ -2015,9 +2309,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         return true;
       }
       case "pp-addr-edit": {
-        const store = peopleStore(ctx2.chat);
-        const p2 = store.people[v];
-        const cur = p2 ? addressOf(p2, liveChanges(store, liveness(ctx2.chat))) : null;
+        const store2 = peopleStore(ctx2.chat);
+        const p2 = store2.people[v];
+        const cur = p2 ? addressOf(p2, liveChanges(store2, liveness(ctx2.chat))) : null;
         Object.assign(peopleUi, { addrEdit: true, addrTo: cur?.toUser ?? "", addrReg: cur?.register ?? "존댓말", addrPin: !!p2?.address.pin, notice: "" });
         env3.render();
         return true;
@@ -2069,8 +2363,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         const toUser = plain(peopleUi.addrTo, 40);
         const register = peopleUi.addrReg;
         const pinIt = peopleUi.addrPin;
-        await mutate3(ctx2, env3, (store, chat) => {
-          const p2 = store.people[v];
+        await mutate3(ctx2, env3, (store2, chat) => {
+          const p2 = store2.people[v];
           if (!p2) return false;
           if (pinIt) {
             p2.address = { toUser, register, pin: true };
@@ -2078,8 +2372,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
           }
           if (p2.address.pin) delete p2.address.pin;
           const anchor = anchorOf(chat);
-          const seq4 = nextSeq(store, anchor);
-          return putChange(store, { id: changeId(v, "address", anchor, seq4, `${toUser}|${register}`), anchor, seq: seq4, src: "manual", who: v, kind: "address", toUser: toUser || p2.address.toUser, register, reason: "직접 수정" });
+          const seq4 = nextSeq(store2, anchor);
+          return putChange(store2, { id: changeId(v, "address", anchor, seq4, `${toUser}|${register}`), anchor, seq: seq4, src: "manual", who: v, kind: "address", toUser: toUser || p2.address.toUser, register, reason: "직접 수정" });
         });
         peopleUi.addrEdit = false;
         peopleUi.info = "호칭을 저장했어요.";
@@ -2156,377 +2450,196 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return Math.round((lo + max) / 2);
   }
 
-  // src/core/setdef/settings.ts
-  var SETTINGS_SET = {
-    id: "set",
-    flat: true,
-    groups: [
-      {
-        title: "화면",
-        rows: [
-          { key: "theme", label: "테마", ctl: { t: "seg", opts: [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]] } },
-          { key: "nav", label: "메뉴 위치", ctl: { t: "seg", opts: [["left", "왼쪽"], ["right", "오른쪽"]] }, help: "PC 창에서 메뉴 목록을 놓을 쪽이에요.", scope: "device" },
-          { key: "wiki-side", label: "위키 목록 위치", ctl: { t: "seg", opts: [["left", "왼쪽"], ["right", "오른쪽"]] }, help: "위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 폰의 「목록」 책갈피도 같은 쪽으로 가요.", scope: "device" },
-          { key: "agents", label: "요원 칸", ctl: { t: "seg", opts: [["wall", "모니터"], ["list", "목록"]] }, help: "상황판 요원 칸 모양이에요.", scope: "device" },
-          { key: "dim", label: "창 바깥 불투명도", ctl: { t: "custom" }, help: "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.", scope: "device" },
-          { key: "progress", label: "호출 진행 창", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "채팅을 보내면 채팅 화면 오른쪽 위에 지금 도는 단계(라우터·디렉터·메인·갱신기·인터넷)와 모델·토큰·경과 시간을 보여 줘요. PC는 카드로 펼쳐졌다 끝나면 단추로 접히고, 폰은 점 다섯 개짜리 막대예요. 눌러서 지난 턴을 다시 볼 수 있어요.", scope: "device" },
-          { key: "frame", label: "외부 프레임", ctl: { t: "seg", opts: [["none", "없음"], ["tablet", "일반 태블릿"], ["tactical", "전술 태블릿"]] }, scope: "device" },
-          { key: "editor-width", label: "설정 창 폭", ctl: { t: "seg", opts: [["60", "60%"], ["70", "70%"], ["80", "80%"], ["90", "90%"], ["100", "100%"]] }, help: "이 설정 창이 화면 가로의 몇 %를 쓸지예요. 높이는 늘 화면의 90%. 폰에서는 늘 전체 화면이에요.", scope: "device" }
-        ]
-      },
-      {
-        title: "캐릭터 이미지",
-        rows: [
-          { key: "asset", label: "사용", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요." },
-          { key: "img-size", label: "크기", ctl: { t: "custom" }, help: "채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요.", scope: "device" },
-          { key: "img-foldon", label: "접기", ctl: { t: "seg", opts: [["1", "접기"], ["0", "펼침"]] }, help: "이미지를 위쪽만 보이게 접어 두고 누르거나 마우스를 올리면 펼칠지, 늘 펼쳐 둘지예요.", scope: "device" },
-          { key: "img-foldlock", label: "접힌 그림 펼치기", ctl: { t: "seg", opts: [["1", "펼치기"], ["0", "안 펼침"]] }, help: "접힌 그림을 누르거나 마우스를 올렸을 때 펼칠지, 늘 접힌 채 둘지예요.", scope: "device" },
-          { key: "img-fold", label: "접힌 높이", ctl: { t: "custom" }, help: "접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 68%면 정사각형으로 보여요.", scope: "device" },
-          { key: "img-show", label: "표시 범위", ctl: { t: "custom" }, help: "이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요. 바꾼 값은 메시지를 다시 그릴 때 반영돼요.", scope: "device" },
-          { key: "img-send", label: "요청 속 이미지 태그", ctl: { t: "custom" }, help: "모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요.", scope: "device" },
-          { key: "asset-model", label: "모델", ctl: { t: "seg", opts: [["main", "메인 모델"], ["aux", "보조 모델"]] }, help: "메인 모델은 본문과 함께 적고, 보조 모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요." },
-          { key: "asset-player", label: "주인공 이미지", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요." },
-          { key: "asset-limit", label: "캐릭터당 이미지 수", ctl: { t: "seg", opts: [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]] }, help: "보조 모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수" }
-        ]
-      },
-      {
-        title: "상황판",
-        rows: [
-          { key: "anomaly", label: "괴이 발생 · 요원 시스템", ctl: { t: "custom" } },
-          { key: "agent", label: "요원 표시 인원", ctl: { t: "custom" } },
-          { key: "support", label: "지원 투입", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요." }
-        ]
-      },
-      {
-        title: "상태창",
-        rows: [
-          { key: "status", label: "배색", ctl: { t: "seg", opts: [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]] }, help: "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.", scope: "device" }
-        ]
-      },
-      {
-        title: "가계부",
-        rows: [
-          { key: "wallet-on", label: "사용", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 상태창에 잔고 칸을 두고, 본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 끄면 잔고 칸과 거래 기록이 빠져요. 소지품·상점과 따로 켜고 꺼요." },
-          { key: "wallet-start", label: "시작 잔고", ctl: { t: "custom" } },
-          { key: "wallet-edit", label: "잔고 직접 수정", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워요." },
-          { key: "wallet-sync", label: "상태창 잔고 따르기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 모델이 상태창 잔고 칸을 바꿨을 때 가계부를 그 값에 맞춰요. 끄면 가계부 값만 믿고, 다음 요청에 넘기는 지난 상태창의 잔고를 가계부 값으로 덮어 모델이 고치게 해요." },
-          { key: "wallet-loose", label: "거래 읽는 기준", ctl: { t: "seg", opts: [["0", "금액이 적힌 것만"], ["1", "어림도 받기"]] }, help: "금액이 적힌 것만이면 「3만 원을 냈다」처럼 금액이 글에 있는 거래만 적어요. 어림도 받기면 「밥을 사 먹었다」처럼 금액이 없는 거래도 보조 모델이 서울 물가로 어림해 메모에 「(어림)」을 붙여 적어요." },
-          { key: "wallet-recent", label: "컨텍스트 포함", ctl: { t: "custom" } }
-        ]
-      },
-      {
-        title: "소지품",
-        rows: [
-          { key: "inv-on", label: "사용", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "끄면 소지품 화면·[Inventory] 글·보조 모델 읽기·「다음 메시지에 사용」이 다 빠지고, 소지품에 딸린 상점도 같이 꺼져요. 가계부는 그대로예요." },
-          { key: "items-auto", label: "갱신기가 읽기", ctl: { t: "custom" }, help: "켜면 인물 기록 갱신기가 응답을 읽어 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 갱신기가 돌아야 하니 인물 기록이 켜져 있어야 해요. 끄면 직접 넣기와 상점으로만 바뀌어요." },
-          { key: "items-slots", label: "칸 수", ctl: { t: "custom" } },
-          { key: "items-carry", label: "소지 한도", ctl: { t: "custom" } },
-          { key: "items-edit", label: "고치기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요." },
-          { key: "items-limit", label: "지닐 수 있는 한계", ctl: { t: "custom" }, help: "모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요." },
-          { key: "items-alias", label: "그림 대체 말", ctl: { t: "custom" }, help: "물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 한 줄에 「외투 → 코트」처럼 적어요. 칸에 들어 있는 글이 지금 쓰는 표이고, 줄을 더하거나 고치면 돼요. 전부 지우면 기본 표로 돌아가요. 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 전체에서 찾아요. 그래도 없으면 상자 그림이에요." },
-          { key: "items-pool", label: "분류 그림 섞기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "물건 이름이 「과자·다과·간식」처럼 세부 이름이 아니라 분류 말이면 그 분류의 그림 가운데 하나를 물건마다 뽑아 보여 줘요. 한 번 정해진 그림은 그 물건에 그대로 남아요. 끄면 분류마다 대표 그림 한 장만 나와요." },
-          { key: "items-misses", label: "그림 못 찾은 말", ctl: { t: "custom" }, help: "이번에 앱을 켠 뒤로 제 그림을 못 찾아 상자로 간 물건이에요. 그림을 더 뽑을 때 참고해요." },
-          { key: "items-detail", label: "넘길 내용", ctl: { t: "seg", opts: [["full", "전부"], ["state", "이름·판정"], ["name", "이름만"]] }, help: "[Inventory] 한 줄에 무엇을 넣을지예요. 전부 = 이름·설명·효과·장착·남은 횟수·상태, 이름·판정 = 설명·효과를 빼고, 이름만 = 이름뿐. 물건이 많을 때 줄이면 토큰이 덜 들어요." },
-          { key: "items-state", label: "상태 바꾸기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 갱신기가 응답을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요." },
-          { key: "items-spent", label: "다 쓴 물건", ctl: { t: "seg", opts: [["remove", "목록에서 빼기"], ["keep", "남겨 두기"]] }, help: "남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 메인 요청에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼)." },
-          { key: "items-logturns", label: "사용·처분 기록 넘기기", ctl: { t: "custom" } },
-          { key: "items-start", label: "시작 소지품", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 무기·장비를 장착할지예요. 새 채팅을 시작할 때만 쓰여요." }
-        ]
-      },
-      {
-        title: "상점",
-        rows: [
-          { key: "shop-on-locked", label: "사용", ctl: { t: "custom" } },
-          { key: "shop-on", label: "사용", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 지금 장면에 살 수 있는 곳이 있는지 판단해(아래 「상점 판단」), 있으면 그 응답 아래에 「상점 열기」가 붙어요. 물건은 열 때 보조 모델이 맥락대로 지어요. 잔고·소지품은 모델에 넘기지 않아요." },
-          { key: "shop-judge", label: "판단", ctl: { t: "seg", opts: [["auto", "자동"], ["main", "메인 모델"], ["updater", "갱신기"]] } },
-          { key: "shop-model", label: "모델", ctl: { t: "seg", opts: [["main", "메인 모델"], ["aux", "보조 모델"]] }, help: "진열대와 주인 대사를 지을 모델이에요." },
-          { key: "shop-min", label: "상품 수", ctl: { t: "custom" } },
-          { key: "shop-feature", label: "희귀·특가 구획", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 진열대마다 희귀 물건 단 하나와 특가 물건 1~3개를 따로 받아, 희귀는 진열장에, 특가는 원래 값에 줄을 긋고 할인율을 붙여 따로 보여 줘요. 끄면 한 격자에 늘어놓아요." },
-          { key: "shop-ctx", label: "맥락 반영", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 주인공 신분·상태창(시각·장소)·진행 중 괴이와 사건·최근 챗로그를 넘겨 지금 상황에 맞는 물건이 나와요. 끄면 가게 이름·주인·가게 정체와 아래 참조 로어북만 넘겨요. 로어북은 이 설정과 상관없이 넘어가요. 잔고·소지품·페르소나·작가 노트는 어느 쪽이든 넘기지 않아요." },
-          { key: "shop-price", label: "값 기준", ctl: { t: "custom" }, help: "모델에 알려 주는 값 기준 한 줄이에요. 비우면 그 가게에 어울리는 실제 물가로 지어요." },
-          { key: "shop-diverse", label: "다양성 강화", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 뻔한 물건만 늘어놓지 않고 싼 것·비싼 것·흔한 것·특이한 것을 섞어요." },
-          { key: "shop-thoughts", label: "생각 단계", ctl: { t: "seg", opts: [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]] }, help: "물건을 짓기 전에 가게·장면·주인을 먼저 정리하게 해요. 적고 지움은 응답이 길어져요." },
-          { key: "shop-prev", label: "지난 목록 피하기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "새로고침할 때 이번 방문에 이미 보였던 물건을 피해요." },
-          { key: "shop-kick", label: "거래 끊음", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 주인이 모욕·끝없는 흥정 같은 일에 거래를 끊을 수 있어요. 끊기면 진열대가 잠기고 다음 턴 메인 요청에 넘어가요. 끄면 주인이 아무리 화나도 가게는 열려 있어요." },
-          { key: "shop-where", label: "열리는 자리", ctl: { t: "seg", opts: [["any", "어디서든"], ["shop", "가게 장면만"]] }, help: "어디서든이면 판매자가 있는 가게뿐 아니라 온라인몰·홈쇼핑·카탈로그·자판기처럼 주인이 없는 곳에서도 「상점 열기」가 붙어요. 가게 장면만이면 판매자가 그 자리에 있는 가게·노점에서만 붙어요." },
-          { key: "shop-turns", label: "챗로그 포함", ctl: { t: "custom" }, help: "진열대와 주인 대사를 지을 때 넘기는 최근 턴 수예요(1~8). 맥락 반영이 켜져 있을 때만 쓰여요." },
-          { key: "shop-refs", label: "참조 로어북", ctl: { t: "custom" }, help: "봇 설명·지금 켜진 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서 가운데 최대 몇 개를 넘길지예요(0~12)." }
-        ]
-      }
-    ]
-  };
-
-  // src/ui/reportpng.ts
-  var FONT_SANS = '"IBM Plex Sans KR", "Pretendard", system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
-  var FONT_MONO = '"JetBrains Mono", "IBM Plex Sans KR", ui-monospace, Menlo, monospace';
-  function paintColors(root3) {
-    const p2 = PALETTES[currentTheme()];
-    const cs = root3 ? getComputedStyle(root3) : null;
-    const v = (name, fallback) => {
-      const x = cs?.getPropertyValue(name).trim();
-      return x || fallback;
-    };
-    return {
-      void: v("--void", p2.void),
-      panel: v("--panel", p2.panel),
-      line: v("--line", p2.line),
-      text: v("--text", p2.text),
-      sub: v("--sub", p2.sub),
-      dim: v("--dim", p2.sub),
-      signal: v("--signal", p2.signal),
-      amber: v("--amber", "#F5B544"),
-      danger: v("--danger", "#FF7A6B"),
-      accentBg: v("--accent-bg", p2.accentBg)
-    };
-  }
-  async function waitFonts() {
-    const fonts = document.fonts;
-    if (!fonts?.load) return;
-    const t = new Promise((r) => setTimeout(r, 2e3));
-    await Promise.race([Promise.all([fonts.load('700 32px "IBM Plex Sans KR"'), fonts.load('500 14px "JetBrains Mono"')]).then(() => void 0).catch(() => void 0), t]);
-  }
-  async function loadArt(url) {
-    if (!url || !/^(?:blob:|data:)/.test(url)) return null;
-    try {
-      const img = new Image();
-      img.src = url;
-      await (img.decode ? img.decode() : new Promise((res, rej) => {
-        img.onload = () => res();
-        img.onerror = () => rej(new Error("img"));
-      }));
-      return img.naturalWidth > 0 ? { img, w: img.naturalWidth, h: img.naturalHeight } : null;
-    } catch {
-      return null;
-    }
-  }
-  async function reportPng(ctx2, r, root3, org = "") {
-    await waitFonts();
-    const art2 = await loadArt(r.kind === "fd" ? null : evArt(ctx2, r.head.name, r.kind).pic);
-    const canvas2 = document.createElement("canvas");
-    canvas2.width = PNG_W;
-    canvas2.height = PNG_H;
-    const g2 = canvas2.getContext("2d");
-    if (!g2) throw new Error("캔버스를 만들지 못했어요");
-    const paint = () => paintReport(g2, r, { colors: paintColors(root3), sans: FONT_SANS, mono: FONT_MONO, art: art2, org });
-    paint();
-    let blob = await new Promise((res) => canvas2.toBlob(res, "image/png"));
-    if (!blob && art2) {
-      g2.clearRect(0, 0, PNG_W, PNG_H);
-      paintReport(g2, r, { colors: paintColors(root3), sans: FONT_SANS, mono: FONT_MONO, art: null, org });
-      blob = await new Promise((res) => canvas2.toBlob(res, "image/png"));
-    }
-    if (!blob) throw new Error("PNG 로 바꾸지 못했어요");
-    const name = `관리국_보고서_${r.no.replace(/[^\w-]/g, "")}.png`;
-    return { blob, url: URL.createObjectURL(blob), name };
-  }
-  function downloadPng(p2) {
-    const a = document.createElement("a");
-    a.href = p2.url;
-    a.download = p2.name;
-    a.rel = "noopener";
-    a.click();
-  }
-
-  // src/ui/records.ts
+  // src/ui/editor/flowpage.ts
   var esc35 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var rec = {
-    sub: "journal",
-    view: "list",
-    id: "",
-    filter: "all",
-    q: "",
-    notice: "",
-    info: "",
-    busy: false,
-    toast: null,
-    /** 연대기에서 끈 종류 (2026-11-06 사용자: 자잘한 것까지 다 쌓이면 곤란 → 종류별 칩) */
-    chronOff: [],
-    /** 「이미지로 저장」 뒤 미리보기 (내려받기가 막힌 곳은 길게 눌러 저장) */
-    png: null
-  };
-  function dropPng() {
-    if (rec.png) {
-      try {
-        URL.revokeObjectURL(rec.png.url);
-      } catch {
-      }
+  var ONOFF3 = [["1", "ON"], ["0", "OFF"]];
+  var MODEL2 = [["main", "메인 모델"], ["aux", "보조 모델"]];
+  var MODEL3 = [["same", "갱신과 같게"], ["main", "메인 모델"], ["aux", "보조 모델"]];
+  var fmt2 = (v) => v.toLocaleString("ko-KR");
+  var DASH = '<span class="fl-dim">–</span>';
+  var FLOW_DO = "fl-do";
+  var pick3 = (id2, label2, cur, opts, to, hide = false) => ({ id: id2, label: label2, kind: "pick", cur, opts, act: (v) => [to(v)], hide });
+  var sw = (id2, label2, on3, to) => pick3(id2, label2, on3 ? "1" : "0", ONOFF3, to);
+  var doBtn = (cls, a, on3, text5, more = "") => `<button class="${cls}${on3 ? " on" : ""}" data-action="${FLOW_DO}" data-value="${esc35(a)}" aria-pressed="${on3}"${more}>${text5}</button>`;
+  function ctlHtml(c, aria) {
+    if (c.kind === "step") {
+      const n3 = Number(c.cur) || 0;
+      const shown4 = n3 === 0 && c.zero ? c.zero : `${n3}${c.unit ?? ""}`;
+      const b = (to, sign, word, off) => `<button class="gx-step" data-action="${FLOW_DO}" data-value="${esc35(c.act(String(to))[0] ?? "")}" ${off ? "disabled" : ""} aria-label="${esc35(aria)} ${word}">${sign}</button>`;
+      return `<div class="st-step">${b(n3 - 1, "−", "줄이기", n3 <= (c.lo ?? 0))}<b>${esc35(shown4)}</b>${b(n3 + 1, "+", "늘리기", n3 >= (c.hi ?? n3))}</div>`;
     }
-    rec.png = null;
+    const opts = c.opts ?? [];
+    if (isOnOff(opts)) {
+      const on3 = c.cur === "1";
+      return switchHtml({ action: FLOW_DO, value: c.act(on3 ? "0" : "1")[0], on: on3, label: aria });
+    }
+    return `<div class="gx-segs gx-segs-sm">${opts.map(([v, l]) => doBtn("gx-seg", c.act(v)[0], c.cur === v, esc35(l))).join("")}</div>`;
   }
-  function resetRecords() {
-    dropPng();
-    Object.assign(rec, { sub: "journal", view: "list", id: "", filter: "all", q: "", notice: "", info: "", busy: false });
-    closeToast();
+  var go2 = (g2) => g2 ? `<button class="gx-mini fl-go" data-action="ed-flow-go" data-value="${esc35(g2[0])}|${esc35(g2[1])}">설정 →</button>` : "";
+  function lastTurn() {
+    return [...traceUi.turns ?? []].reverse().find((t) => t.main || t.calls.some((c) => c.phase !== "manual"));
   }
-  var recordsNav = () => ({ sub: rec.sub, view: rec.view, id: rec.id });
-  function applyRecordsNav(r) {
-    Object.assign(rec, { sub: r.sub, view: r.view, id: r.id, notice: "" });
+  function real(match) {
+    const t = lastTurn();
+    if (!t) return "";
+    const cs = t.calls.filter((c) => match(c.label));
+    if (!cs.length) return "";
+    const sent = cs.reduce((s8, c) => s8 + (c.requestTokens ?? 0), 0);
+    return cs.some((c) => !c.ok) ? `<em class="fl-fail" title="실패">${fmt2(sent)}</em>` : fmt2(sent);
   }
-  var two7 = (n3) => String(n3).padStart(2, "0");
-  var WEEK5 = "일월화수목금토";
-  function dayOf4(at) {
-    if (at === null) return "";
-    const d = new Date(at * 6e4);
-    return `${d.getUTCFullYear()}.${two7(d.getUTCMonth() + 1)}.${two7(d.getUTCDate())} (${WEEK5[d.getUTCDay()]})`;
+  var is = (...labels) => (l) => labels.includes(l);
+  var shown2 = (r) => r.ctls.filter((c) => !c.hide);
+  var pairs = (r) => shown2(r).map((c) => `<span class="fl-pair">${c.label ? `<span class="fl-l">${esc35(c.label)}</span>` : ""}${ctlHtml(c, c.label ? `${r.name} ${c.label}` : r.name)}</span>`).join("");
+  var stat = (r, v) => `<div class="fl-st">${r.call ? v || DASH : ""}</div>`;
+  var said2 = (r) => r.calls ? `<span class="fl-said${r.on ? " on" : ""}">${esc35(r.calls)}</span>` : "";
+  function cells(r, cols) {
+    return cols.map((g2, gi) => g2.opts.map((o, i) => {
+      const c = r.grid?.[gi];
+      const opt = c?.opts?.find(([, l]) => l === o);
+      const inner = c && opt ? doBtn("ck-m round", c.act(opt[0])[0], c.cur === opt[0], "", ` aria-label="${esc35(`${r.name} ${g2.group} ${o}`)}"`) : '<span class="ck-x" aria-label="없음">–</span>';
+      return `<span class="ck-cell${i === 0 ? " ck-first" : ""}">${inner}</span>`;
+    }).join("")).join("");
   }
-  var hhmm4 = (at) => at === null ? "--:--" : journalClock(at).slice(6);
-  var ymd3 = (at) => at === null ? "" : journalClock(at).slice(0, 5);
-  var longDur = (min) => min === null ? "" : `${Math.floor(min / 60) ? `${Math.floor(min / 60)}시간 ` : ""}${min % 60}분`;
-  function gmark(kind, grade) {
-    const g2 = kind === "an" && grade && /^[A-Za-z]+$/.test(grade) ? grade : "";
-    const cls = kind === "fd" ? "ms" : kind;
-    const mark2 = kind === "an" ? "?" : kind === "in" ? ICONS.siren : kind === "ms" ? ICONS.spook : ICONS.game;
-    return `<i class="gx-gmark ${cls}${g2 ? ` g-${g2.toLowerCase()}` : ""}" title="${JOURNAL_KIND_LABEL[kind]}${g2 ? ` ${esc35(g2)}등급` : ""}">${g2 ? esc35(g2) : mark2}</i>`;
+  function pcRow(r, cols) {
+    const ctl = cols ? cells(r, cols) : `<div class="fl-ctl">${pairs(r)}${said2(r)}${r.help ? `<small class="fl-help">${esc35(r.help)}</small>` : ""}</div>`;
+    const line2 = `<div class="fl-line fl-row${cols ? "" : " fl-plain"}${r.on ? " on" : ""}${r.sub ? " sub" : ""}"><b class="fl-name">${esc35(r.name)}</b>${ctl}${cols ? `<div class="fl-gsaid">${said2(r)}</div>` : ""}${stat(r, r.est)}${stat(r, r.real)}${go2(r.go) || "<span></span>"}</div>`;
+    const note = cols && r.help ? `<div class="fl-line fl-plain fl-note${r.on ? " on" : ""}"><span></span><div class="fl-ctl"><small class="fl-help">${esc35(r.help)}</small></div><div class="fl-st"></div><div class="fl-st"></div><span></span></div>` : "";
+    return line2 + note + (r.after ?? []).map((a) => pcRow({ ...a, sub: true }, null)).join("");
   }
-  var whoText = (r) => [...r.mine ? ["나"] : [], ...r.agents.map((a) => a.name)].filter(Boolean).join(" · ");
-  var mineBadge = (r) => r.mine ? '<span class="gx-badge live">내 사건</span>' : '<span class="gx-badge">그 외</span>';
-  function nowMinute(ctx2, rows3) {
-    const w = worldOn(ctx2.chat) ? readWorld(ctx2.chat) : null;
-    if (w && w.minute !== null) return w.minute;
-    for (let i = rows3.length - 1; i >= 0; i--) if (rows3[i].at !== null) return rows3[i].at;
-    return null;
+  function pcHead(cols) {
+    const opts = cols.flatMap((g2) => g2.opts.map((o, i) => ({ o, first: i === 0 })));
+    const tail2 = "<span></span><span></span><span></span><span></span>";
+    return `<div class="fl-line fl-h1"><span></span>${cols.map((g2) => `<b class="ck-first" style="grid-column: span ${g2.opts.length}">${esc35(g2.group)}</b>`).join("")}${tail2}</div>
+    <div class="fl-line fl-h2"><span></span>${opts.map((c) => `<span class="${c.first ? "ck-first" : ""}">${esc35(c.o)}</span>`).join("")}${tail2}</div>`;
   }
-  var SUBS = [["journal", "일지"], ["chronicle", "연대기"], ["people", "인물"], ["factions", "세력"]];
-  function recordsTab(ctx2) {
-    const tabs2 = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec.sub === v ? " on" : ""}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join("")}</div>`;
-    const notice2 = rec.notice ? `<div class="gx-err" role="alert">${esc35(rec.notice)}</div>` : "";
-    const note = toast("rec", rec.info, (t) => {
-      if (rec.info === t) rec.info = "";
+  function card2(r, cols) {
+    const list4 = cols ? cols.flatMap((g2, gi) => {
+      const c = r.grid?.[gi];
+      return c ? [[g2.group === "모델" ? g2.group : "", ctlHtml(c, `${r.name} ${g2.group}`)]] : [];
+    }) : shown2(r).map((c) => [c.label, ctlHtml(c, c.label ? `${r.name} ${c.label}` : r.name)]);
+    const swOnly = list4.length === 1 && /gx-switch/.test(list4[0][1]);
+    const tag = swOnly && list4[0][0] ? `<span class="flc-tag">${esc35(list4[0][0])}</span>` : "";
+    const ctl = ([l, c]) => `<div class="flc-c${l ? "" : " nol"}">${l ? `<span class="flc-l">${esc35(l)}</span>` : ""}${c}</div>`;
+    const body5 = (swOnly ? "" : list4.length > 1 || cols ? `<div class="flc-side">${list4.map(ctl).join("")}</div>` : list4.map(ctl).join("")) + (r.help ? `<small class="fl-help">${esc35(r.help)}</small>` : "");
+    const nums = r.call && (r.est || r.real) ? `<div class="flc-num">예상 <b>${r.est || "–"}</b> · 지난 턴 <b>${r.real || "–"}</b></div>` : "";
+    const calls = r.calls ? `<small class="flc-calls">${esc35(r.calls)}</small>` : "";
+    const self = `<div class="flc${r.on ? " on" : ""}${r.sub ? " sub" : ""}"><div class="flc-top"><span class="flc-nm"><b class="fl-name">${esc35(r.name)}</b>${tag}${calls}</span>${swOnly ? list4[0][1] : ""}${go2(r.go)}</div>${nums}${body5}</div>`;
+    return self + (r.after ?? []).map((a) => card2({ ...a, sub: true }, null)).join("");
+  }
+  function table(t) {
+    const cols = t.cols ?? null;
+    const leads = t.leads ?? [];
+    return `<section class="ps-group fl${cols ? ` fl-grid fl-g${cols.reduce((n3, g2) => n3 + g2.opts.length, 0)}` : ""}">${t.title ? `<h3>${esc35(t.title)}</h3>` : ""}
+    <div class="ps-rows fl-pc">${leads.map((l) => pcRow(l, null)).join("")}${cols ? pcHead(cols) : ""}${t.rows.map((r) => pcRow(r, cols)).join("")}</div>
+    <div class="ps-rows fl-ph">${leads.map((l) => card2(l, null)).join("")}${t.rows.map((r) => card2(r, cols)).join("")}</div></section>`;
+  }
+  function flowView(ctx2, started) {
+    const feat = ctx2.chat.scriptstate ?? {};
+    if (started) return { feat, scope: feat, ctx: ctx2 };
+    const scope = { ...basicVars(basicDefaults(ctx2.char.globalLore)), ...getPrefs().vars ?? {} };
+    return { feat, scope, ctx: { ...ctx2, chat: { ...ctx2.chat, scriptstate: { ...scope, ...feat } } } };
+  }
+  function flowSections(real0, started) {
+    const view2 = flowView(real0, started);
+    const ctx2 = view2.ctx;
+    const fs = view2.feat;
+    const ds = view2.scope;
+    const ps = ctx2.chat.scriptstate;
+    const nodes2 = flowNodes(ctx2);
+    const { pre, post, manual, main } = nodes2;
+    const all = [...pre, ...post];
+    const node = (name) => [...all, ...manual].find((x) => x.name === name);
+    const same4 = (t) => t.replace(/^(창|괴담톡) 열 때 1회$/, "창을 열 때 1회").replace(/^위키 열 때$/, "창을 열 때 1회");
+    const calls = (name) => same4(node(name)?.calls ?? "");
+    const est = (name) => {
+      const x = node(name);
+      return x && x.on && typeof x.tok === "number" ? fmt2(x.tok) : "";
+    };
+    const pp = peopleSettings(fs);
+    const pv = (k) => ppValue(fs, k);
+    const ph = phoneSettings(fs);
+    const vw = viewSettings(fs);
+    const nw = wikiSettings(fs);
+    const basic = basicSettings(ctx2.char.globalLore, ds);
+    const shop = shopSettings(ds);
+    const hs = hsSettings(ds);
+    const hsF = hsSettings(fs);
+    const desk = deskSettings(fs);
+    const gen = genSettings(ds);
+    const walletUsed = colConfig(ds).wallet !== "off";
+    const boards = BOARD_SITES.map((site) => ({ site, g: gnetSettings(boardView(real0.chat, site).scriptstate) }));
+    const P = (k) => (v) => `pp-set|${k}=${v}`;
+    const routerOn = pp.on && pp.router === "model";
+    const dirOn = pp.on && (pp.director === "scene" || pp.director === "facts");
+    const updOn = pp.on && pp.when === "turn";
+    const tidySep = pp.tidy === "separate";
+    const peoplePre = [
+      { name: "사용", on: pp.on, ctls: [sw("pp.on", "", pp.on, P("on"))], help: "응답을 읽어 인물·세력·문서 기록을 쓰는 기능이에요. 끄면 Router·Director와 메인 응답 뒤의 갱신기·정리를 모두 부르지 않아요.", go: ["set:people", "r:사용"] },
+      { name: "Router", on: routerOn, call: true, ctls: [pick3("pp.router", "", pp.router, [["code", "코드가 고름"], ["model", "모델이 고름"]], P("router")), pick3("pp.model_router", "모델", pv("model_router"), MODEL3, P("model_router"), !routerOn)], calls: routerOn ? "1회" : pp.on ? "호출 없음" : "호출 없음 (인물 기록 끔)", help: "장면에 나오는 인물을 고르는 단계예요. 모델이 고르면 호출이 1회 늘어요.", est: est("인물 Router"), real: real(is("라우터")), go: ["set:people", "r:Router"] },
+      { name: "Director", on: dirOn, call: true, ctls: [pick3("pp.director", "", pp.director, [["off", "사용 안 함"], ["note", "메모형(뒤)"], ["facts", "사실형(앞)"], ["scene", "연출형(앞)"]], P("director")), pick3("pp.model_director", "모델", pv("model_director"), MODEL3, P("model_director"), !dirOn)], calls: calls("인물 Director"), help: "이번 턴에 인물이 어떻게 연기할지 지시를 만드는 단계예요. 메모형은 갱신 호출에 얹고(호출 없음), 사실형·연출형은 메인 요청 전에 따로 불러요(1회).", est: est("인물 Director"), real: real(is("디렉터")), go: ["set:people", "r:Director"] },
+      ...dirOn ? [
+        { name: "재사용", sub: true, on: pp.directorReuse, ctls: [sw("pp.director_reuse", "", pp.directorReuse, P("director_reuse"))], calls: "장면이 그대로면 지난 지시를 다시 써요 (호출 없음).", go: ["set:people", "r:재사용"] },
+        { name: "2차 검색", sub: true, on: pp.directorSearch, ctls: [sw("pp.director_search", "", pp.directorSearch, P("director_search"))], help: "자료가 모자라면 Director가 채팅·로어북·위키 검색을 요청하고, 코드가 찾아 한 번 더 불러요 (그 턴만 1회 추가)", go: ["set:people", "r:2차 검색"] }
+      ] : []
+    ];
+    const mainTok = lastTurn()?.main?.totalTokens;
+    const mainRow = { name: "메인 모델", on: true, call: true, ctls: [], calls: main.calls, est: "", real: mainTok ? fmt2(mainTok) : "", go: null };
+    const capOpts = [["5000", "5,000"], ["10000", "10,000"], ["20000", "20,000"]];
+    const cap = String(pp.personCap);
+    const peoplePost = [
+      { name: "갱신기", on: updOn, call: true, ctls: [pick3("pp.when", "자동 호출", pp.when, [["manual", "수동"], ["turn", "매 턴"]], P("when")), pick3("pp.model", "모델", pp.stageModel.update, MODEL2, P("model"))], calls: calls("인물 갱신").replace(" (정리 얹음)", ""), help: "응답을 읽고 기록을 쓰는 단계예요.", est: est("인물 갱신"), real: real(is("갱신기")), go: ["set:people", "r:자동 호출"] },
+      { name: "상점 판단", sub: true, on: shopOn(ps), ctls: [pick3("shop.judge", "", shop.judge, [["auto", "자동"], ["main", "메인 모델"], ["updater", "갱신기"]], (v) => `set-shop-judge|${v}`)], calls: calls("상점 판단"), help: "지금 장면에 상점이 있는지 누가 볼지예요. 어느 쪽이어도 호출은 늘지 않아요.", go: ["set:shop", "r:판단"] },
+      { name: "정리", on: pp.on && tidySep, call: true, ctls: [pick3("pp.tidy", "정리 방식", pp.tidy, [["same", "같은 호출에 얹기"], ["separate", "별도 호출"]], P("tidy")), pick3("pp.model_tidy", "모델", pv("model_tidy"), MODEL3, P("model_tidy"), !tidySep)], calls: pp.on && tidySep ? "넘긴 인물마다 1회" : "호출 없음", help: "저장 상한을 넘긴 인물의 기록을 합쳐요. 별도 호출이면 넘긴 인물마다 호출이 1회 늘어요.", est: "", real: real(is("정리")), go: ["set:people", "r:정리 방식"] },
+      { name: "인물당 저장 상한", sub: true, on: pp.on, ctls: [pick3("pp.person_cap", "", cap, capOpts.some(([v]) => v === cap) ? capOpts : [...capOpts, [cap, fmt2(pp.personCap)]], P("person_cap"))], calls: "한 인물의 기록 글자 수예요. 넘으면 정리로 합쳐요.", go: ["set:people", "r:인물당 저장 상한"] }
+    ];
+    const imgOn = basic.assetOn && basic.assetModel === "aux";
+    const image = { name: "이미지 태그", on: imgOn, call: true, ctls: [sw("img.on", "", basic.assetOn, (v) => `set-asset|${v}`), pick3("img.model", "모델", basic.assetModel, MODEL2, (v) => `set-asset-model|${v}`)], calls: imgOn ? "1회" : basic.assetOn ? "호출 없음" : "호출 없음 (이미지 끔)", help: "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 메인 모델은 본문과 함께 적고, 보조 모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.", est: est("이미지 태그 보충"), real: real(is("이미지 태그 보충")), go: ["set:image", "r:사용"] };
+    const joint = { name: "한 번에 요청", on: jointOn(fs), ctls: [sw("net.joint", "", jointOn(fs), (v) => `fam-set|b:gn:joint=${v}`)], help: "켜면 자동 호출이 「매 턴」이고 모델이 같은 게시판과 괴담톡을 한 요청으로 묶어요.", go: ["set:net", "r:한 번에 요청"] };
+    const COLS = [{ group: "자동 호출", opts: ["수동", "창을 열 때", "매 턴"] }, { group: "모델", opts: ["메인", "보조"] }];
+    const auto3 = (id2, cur, vals, to) => pick3(id2, "자동 호출", cur, COLS[0].opts.map((o, i) => [vals[i], o]), to);
+    const model2 = (id2, cur, vals, to) => pick3(id2, "모델", cur, COLS[1].opts.map((o, i) => [vals[i], o]), to);
+    const jointFirst = (name) => (l) => l.endsWith(" 통합") && l.split(" ")[0].split("+")[0] === name;
+    const wikiOn = nw.auto === "turn";
+    const grid = [
+      {
+        name: "괴담톡",
+        on: ph.auto,
+        call: true,
+        ctls: [],
+        grid: [auto3("ph.auto", ph.auto ? "1" : ph.autoOpen ? "open" : "0", ["0", "open", "1"], (v) => `ph-cfg|auto=${v}`), model2("ph.model", ph.model === "main" ? "main" : "aux", ["main", "aux"], (v) => `ph-cfg|model=${v}`)],
+        calls: calls("괴담톡 확인"),
+        est: est("괴담톡 확인"),
+        real: real((l) => l === "괴담톡 확인" || l === "괴담톡 답장" || jointFirst(JOINT_LABEL.phone)(l)),
+        go: ["set:phone", "r:자동 호출"],
+        after: [{ name: "선톡·초대", on: ph.auto && (ph.incoming || ph.invites), ctls: [sw("ph.incoming", "선톡 받기", ph.incoming, (v) => `ph-cfg|incoming=${v}`), sw("ph.group_invites", "단톡방 초대 받기", ph.invites, (v) => `ph-cfg|group_invites=${v}`)], help: "인물이 먼저 보내는 메시지와 단톡방 초대를 받을지예요. 둘 다 끄면, 확인할 방이 없는 턴에는 괴담톡 호출을 건너뛰어요.", go: ["set:phone", "r:선톡 받기"] }]
+      },
+      ...boards.map(({ site, g: g2 }) => ({ name: BOARD_NAME[site], on: g2.enabled && g2.auto, call: true, ctls: [], grid: [auto3(`board.${site}.auto`, g2.auto ? "0" : g2.autoOpen ? "open" : "1", ["1", "open", "0"], (v) => `fam-set|b:${site}:lazy=${v}`), model2(`board.${site}.model`, g2.model === "main" ? "1" : "2", ["1", "2"], (v) => `fam-set|b:${site}:mode=${v}`)], calls: calls(`${BOARD_NAME[site]} 새로고침`), est: est(`${BOARD_NAME[site]} 새로고침`), real: real((l) => l === BOARD_NAME[site] || jointFirst(BOARD_NAME[site])(l)), go: ["set:net", "r:자동 호출"] })),
+      /** 관전은 모델 설정이 따로 없다 (괴담톡 모델을 씀, flow.ts 관전 줄) */
+      { name: "관전", on: vw.auto === "turn", call: true, ctls: [], grid: [auto3("view.auto", vw.auto, ["manual", "open", "turn"], (v) => `ph-cfg|view_auto=${v}`), null], calls: calls("관전"), help: "메인 응답에 안 나온 대화나 속마음을 보기 전용 방으로 만들어요.", est: est("관전"), real: real(is("관전")), go: ["set:phone", "r:자동 호출@보기 전용 방"] },
+      {
+        name: "위키",
+        on: wikiOn,
+        call: true,
+        ctls: [],
+        grid: [auto3("wiki.auto", nw.auto, ["0", "open", "turn"], (v) => `wiki-auto|${v}`), model2("wiki.model", nw.model === "main" ? "main" : "aux", ["main", "aux"], (v) => `wiki-model|${v}`)],
+        calls: calls("위키 자동 작성"),
+        est: est("위키 자동 작성"),
+        real: real(is("위키 글", "위키 제목")),
+        go: ["set:wiki", "r:자동 호출"],
+        after: [{ name: "자동 작성 제목", on: wikiOn && nw.autoTitle === "model", ctls: [pick3("wiki.auto_title", "", nw.autoTitle, [["model", "모델이 고름"], ["input", "직접 입력"]], (v) => `wiki-auto_title|${v}`)], help: "저절로 쓰는 문서의 제목을 정하는 방법이에요. 「모델이 고름」이면 명부 항목 가운데 이번 이야기에 맞는 것을 써요. 호출이 1회 늘어요.", go: ["set:wiki", "r:자동 작성 제목"] }]
+      }
+    ];
+    const mallLeads = [
+      { name: "가계부", on: walletUsed, ctls: [sw("wallet.on", "", walletUsed, (v) => `set-wallet-on|${v}`)], go: ["set:wallet", "r:사용"] },
+      { name: "소지품", on: invOn(ds), ctls: [sw("items.on", "", invOn(ds), (v) => `set-inv-on|${v}`)], help: "가계부나 소지품을 끄면 쇼핑몰과 상점을 부르지 않아요.", go: ["set:items", "r:사용"] }
+    ];
+    const malls = ["cos", "bm"].map((site) => {
+      const m = mallSettings(ds, site);
+      const n3 = node(`${MALL_NAME[site]} 진열`);
+      return { name: MALL_NAME[site], on: !!n3?.on, call: true, ctls: [], grid: [auto3(`mall.${site}.auto`, m.auto, ["manual", "open", "turn"], (v) => `fam-set|s:${site}:auto=${v}`), model2(`mall.${site}.model`, m.model === "main" ? "main" : "aux", ["main", "aux"], (v) => `fam-set|s:${site}:model=${v}`)], calls: same4(n3?.calls ?? ""), est: est(`${MALL_NAME[site]} 진열`), real: real((l) => l.startsWith(`${MALL_NAME[site]} `) && !l.includes("1:1 상담")), go: ["set:shop", "r:자동 호출"] };
     });
-    const tools = rec.view !== "list" ? "" : rec.sub === "wallet" ? walletTools(ctx2) : rec.sub === "journal" ? journalTools() : rec.sub === "chronicle" ? chronicleTools() : "";
-    const drawer = tools && isPhone() ? drawerBox(tools, "gx-rdrawer") : "";
-    const rpt = rec.view === "report" ? `<div class="gx-agpop gx-rptpop" data-action="rec-back" role="dialog" aria-label="보고서"><div class="gx-agpop-card gx-rptcard" data-action="rec-png-keep"><button class="gx-agpop-x" data-action="rec-back" aria-label="닫기">${ICONS.close}</button>${reportPage(ctx2, rec.id)}</div></div>` : "";
-    return `<main class="gx-body gx-records">${tabs2}${notice2}${pane(ctx2)}${note}</main>${rpt}${pngModal()}${drawer}`;
-  }
-  function pngModal() {
-    if (!rec.png) return "";
-    return `<div class="gx-agpop gx-pngpop" data-action="rec-png-x" role="dialog" aria-label="보고서 이미지">
-    <div class="gx-agpop-card gx-pngcard" data-action="rec-png-keep">
-      <button class="gx-agpop-x" data-action="rec-png-x" aria-label="닫기">${ICONS.close}</button>
-      <b class="gx-png-title">${esc35(rec.png.no)} · 900×1200</b>
-      <img class="gx-png-img" src="${esc35(rec.png.url)}" alt="보고서 이미지">
-      <p class="ps-note">내려받기를 시작했어요. 저장이 안 되는 기기(아이폰 등)는 그림을 길게 눌러 저장하세요.</p>
-      <span class="gx-png-acts"><button class="gx-mini primary" data-action="rec-png-dl">${ICONS.down}다시 내려받기</button><button class="gx-mini" data-action="rec-png-x">닫기</button></span>
-    </div></div>`;
-  }
-  function pane(ctx2) {
-    if (rec.view === "report") return rec.sub === "chronicle" ? chroniclePane(ctx2) : journalPane(ctx2);
-    if (rec.view === "person") return `<div class="gx-rec-pane">${personView(ctx2, rec.id)}</div>`;
-    if (rec.view === "docs") return `<div class="gx-rec-pane">${peopleDocsView(ctx2)}</div>`;
-    if (rec.view === "faction") return `<div class="gx-rec-pane">${factionView2(ctx2, rec.id)}</div>`;
-    switch (rec.sub) {
-      case "chronicle":
-        return chroniclePane(ctx2);
-      case "wallet":
-        return walletPane(ctx2);
-      case "people":
-        return `<div class="gx-rec-pane">${peopleListView(ctx2)}</div>`;
-      case "factions":
-        return `<div class="gx-rec-pane">${factionListView(ctx2)}</div>`;
-      default:
-        return journalPane(ctx2);
-    }
-  }
-  function monitor(tag, title2, clock4, cells, o = {}) {
-    return `<section class="gx-mon${o.cls ? ` ${o.cls}` : ""}"><div class="gx-mon-osd"><span><span class="gx-mon-tag${o.live ? " live" : ""}"><i></i>${esc35(tag)}</span>${title2 ? `<span class="gx-mon-title">${esc35(title2)}</span>` : ""}</span>${clock4 ? `<span>${esc35(clock4)}</span>` : ""}</div>
-    <div class="gx-mon-cells">${cells.map((c) => `<div class="gx-mon-cell${c.cls ? ` ${c.cls}` : ""}"><small>${esc35(c.label)}</small><b class="${c.tone ?? ""}">${c.value}</b><span>${esc35(c.sub)}</span></div>`).join("")}</div></section>`;
-  }
-  var camNo = (loc) => String(Array.from(loc).reduce((h, ch) => h * 31 + ch.charCodeAt(0) >>> 0, 7) % 40 + 1).padStart(2, "0");
-  var region = (loc) => (locName(loc) || loc).split(/\s+/)[0] || "";
-  function shot(ctx2, name, kind, loc, at, cls = "gx-shot") {
-    const art2 = kind === "fd" ? null : evArt(ctx2, name, kind).pic;
-    return `<span class="${cls}">${art2 ? `<img src="${esc35(art2)}" alt="" loading="lazy">` : ""}<span class="gx-shot-t">CAM-${camNo(loc)}${region(loc) ? ` · ${esc35(region(loc))}` : ""}</span><span class="gx-shot-end">END ${esc35(hhmm4(at))}</span></span>`;
-  }
-  var faceCat = null;
-  function faces(ctx2, names4) {
-    if (!faceCat || faceCat.lore !== ctx2.char.globalLore) {
-      let map = /* @__PURE__ */ new Map();
-      try {
-        map = new Map(parseCatalog(ctx2.char.globalLore).people.map((p2) => [p2.name, p2.english]));
-      } catch {
-      }
-      faceCat = { lore: ctx2.char.globalLore, map };
-    }
-    return names4.slice(0, 4).map((n3) => avatar(ctx2.char, faceCat.map.get(n3), n3, "gx-face")).join("");
-  }
-  var FILTERS = [["all", "전체"], ["mine", "내 사건"], ["bg", "그 외"]];
-  function journalTools() {
-    const chips3 = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? " on" : ""}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join("");
-    return `<div class="gx-rec-tools gx-wt-tools">${chips3}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc35(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>`;
-  }
-  function journalPane(ctx2) {
-    const rows3 = readJournal(ctx2.chat).rows;
-    const reports2 = readReports(ctx2.chat).items;
-    const now2 = nowMinute(ctx2, rows3);
-    const todayKey = now2 === null ? "" : dayOf4(now2);
-    const todayRows = todayKey ? rows3.filter((r) => dayOf4(r.at) === todayKey) : [];
-    const mineN = rows3.filter((r) => r.mine).length;
-    const kinds = (list4) => [["an", "괴이"], ["in", "사건"], ["ms", "특수"]].map(([k, l]) => [l, list4.filter((r) => r.kind === k).length]).filter(([, n3]) => n3).map(([l, n3]) => `${l} ${n3}`).join(" · ");
-    const durs = todayRows.map((r) => r.at !== null && r.since !== null ? Math.max(0, r.at - r.since) : null).filter((d) => d !== null);
-    const avg = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
-    const clockText = now2 === null ? "" : journalClock(now2).replace(/^(\d\d)\.(\d\d)/, `${new Date(now2 * 6e4).getUTCFullYear()}.$1.$2`);
-    const mon = monitor("일지", "", clockText, [
-      { label: "종료 전체", value: String(rows3.length), sub: kinds(rows3) || "아직 없음", tone: "mint" },
-      { label: "내 사건", value: String(mineN), sub: `보고서 ${reports2.filter((r) => r.mine).length}건`, tone: "amb" },
-      { label: "그 외", value: String(rows3.length - mineN), sub: "참여 없이 종료" },
-      { label: "오늘", value: String(todayRows.length), sub: avg !== null ? `평균 ${longDur(avg)}` : todayRows.length ? "소요 미상" : "없음" }
-    ], { cls: "gx-jr-tiles" });
-    return `${mon}
-    ${isPhone() ? "" : journalTools()}
-    <div class="gx-jr-list">${journalList(ctx2)}</div>`;
-  }
-  function journalList(ctx2) {
-    const rows3 = readJournal(ctx2.chat).rows;
-    const q = rec.q.trim().toLowerCase();
-    const pass = (r) => (rec.filter === "mine" ? r.mine : rec.filter === "bg" ? !r.mine : true) && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(" ")} ${r.result}`.toLowerCase().includes(q));
-    const shown3 = rows3.filter(pass).reverse();
-    if (!shown3.length) return `<p class="gx-wt-empty">${rows3.length ? "맞는 줄이 없어요." : "아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요."}</p>`;
-    const groups = [];
-    for (const r of shown3) {
-      const day = dayOf4(r.at);
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.day === day) g2.rows.push(r);
-      else groups.push({ day, rows: [r] });
-    }
-    groups.sort((a, b) => a.day === "" ? 1 : b.day === "" ? -1 : 0);
-    const cnt = (list4) => [["an", "괴이"], ["in", "사건"], ["ms", "특수"]].map(([k, l]) => [l, list4.filter((r) => r.kind === k).length]).filter(([, n3]) => n3).map(([l, n3]) => `${l} ${n3}`).join(" · ");
-    return groups.map((g2) => `<section class="gx-jr-day"><h3><span>${esc35(g2.day || "시각 없음")}</span><em>${esc35(cnt(g2.rows))}</em></h3><ul>${g2.rows.map((r) => journalRow(ctx2, r)).join("")}</ul></section>`).join("");
-  }
-  function journalRow(ctx2, r) {
-    const dur2 = r.at !== null && r.since !== null ? longDur(Math.max(0, r.at - r.since)) : "";
-    const names4 = r.agents.map((a) => a.name).filter(Boolean);
-    const rep = r.rpt ? readReports(ctx2.chat).items.find((x) => x.id === r.rpt) : void 0;
-    const sum = rep ? `${peopleSum(rep)}${walletSum(rep)}` : "";
-    const inner = `${shot(ctx2, r.name, r.kind, r.loc, r.at)}
-    <span class="gx-jr-main"><span class="gx-jr-l1">${gmark(r.kind, r.grade)}<b>${esc35(r.name)}</b>${r.mine ? '<span class="gx-badge live">내 사건</span>' : ""}${rep?.pin ? `<i class="gx-jr-pin" title="고정">${ICONS.pin}</i>` : ""}</span>
-      <small>${[JOURNAL_KIND_LABEL[r.kind], locName(r.loc), dur2 ? `소요 ${dur2}` : ""].filter(Boolean).map(esc35).join(" · ")}</small>
-      <span class="gx-jr-who">${faces(ctx2, names4)}${esc35(whoText(r) || "투입 없음")}${r.result ? ` <em>— ${esc35(r.result)}</em>` : ""}</span>
-      ${sum ? `<span class="gx-rcard-sum">${sum}</span>` : ""}</span>
-    `;
-    const cls = `gx-jr-row${r.mine ? " mine" : ""}`;
-    return `<li>${rep ? `<button class="${cls}" data-action="rec-open" data-value="${esc35(r.rpt)}" aria-label="${esc35(r.name)} 보고서">${inner}</button>` : `<div class="${cls}">${inner}</div>`}</li>`;
-  }
-  var CHRON_KINDS = Object.entries(CHRON_KIND_LABEL);
-  function chronicleTools() {
-    return `<div class="gx-rec-tools gx-wt-tools">${CHRON_KINDS.map(([k, l]) => `<button class="gx-chip${rec.chronOff.includes(k) ? "" : " on"}" data-action="rec-chron" data-value="${k}" aria-pressed="${!rec.chronOff.includes(k)}">${l}</button>`).join("")}</div>`;
-  }
-  function chroniclePane(ctx2) {
-    const all = buildChronicle(ctx2.chat, ctx2.char.globalLore);
-    const shown3 = all.filter((e) => !rec.chronOff.includes(e.kind)).reverse();
-    const n3 = (k) => all.filter((e) => e.kind === k).length;
-    const mon = monitor("연대기", "", "", [
-      { label: "사건", value: String(n3("event")), sub: "내가 나간 종료", tone: "mint" },
-      { label: "인물", value: String(n3("person")), sub: "호감 단계 변화", tone: "amb" },
-      { label: "세력", value: String(n3("faction")), sub: "평판 구간 변화" },
-      { label: "신분", value: String(n3("rank")), sub: "소속·직급" }
-    ], { cls: "gx-jr-tiles" });
-    const tools = isPhone() ? "" : chronicleTools();
-    if (!shown3.length) return `${mon}${tools}<p class="gx-wt-empty">${all.length ? "켠 종류에 해당하는 줄이 없어요." : "아직 쌓인 것이 없어요. 내가 나간 사건이 끝나거나, 인물 호감·세력 평판의 단계가 바뀌면 여기에 한 줄씩 쌓여요."}</p>`;
-    const groups = [];
-    for (const e of shown3) {
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.day === e.day) g2.rows.push(e);
-      else groups.push({ day: e.day, rows: [e] });
-    }
-    const line2 = (e) => {
-      const act2 = e.rpt && readReports(ctx2.chat).items.some((r) => r.id === e
+    const retry2 = Math.max(HS_RETRY[0], Math.min(HS_RETRY[1], Math.round(Number(fs?.["$hs_retry"] ?? 1)) || 0));
+    const off = [
+      { name: "상점", on: shopOn(ps), call: true, ctls: [sw("shop.on", "", shop.on, (v) => `set-shop-on|${v}`), pick3("shop.model", "모델", shop.model, MODEL2, (v) => `set-shop-model|${v}`)], calls: "열 때·새로고침·말 걸 때마다 1회", est: "", real: real(is("상점 진열", "상점 대화")), go: ["set:shop", "r:사용"] },
+      { name: HS_NAME, on: hs.on, call: true, ctls: [sw("hs.on", "", hs.on, (v) => `fam-set|s:hs:on=${v}`), pick3("hs.auto", "자동 호출", hs.auto, [["manual", "수동"], ["open", "창을 열 때"]], (v) => `fam-set|s:hs:auto=${v}`), pick3("hs.model", "모델", hs.shop.model, MODEL2, (v) => `fam-set|s:hs:model=${v}`)], calls: hs.on ? hs.auto === "open" ? "창을 열 때 1회" : "수동 (새로고침 때만)" : "호출 없음", est: "", real: real((l) => l.startsWith(`${HS_NAME} `)), go: ["set:shop", "r:사용"] },
+      // 망상홈쇼핑의 사용·자동 호출·모델은 상점 페이지 

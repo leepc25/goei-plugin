@@ -1,4 +1,70 @@
-ailure.message : String(failure);
+Greetings: char.alternateGreetings,
+      assets: char.additionalAssets,
+      iconOurs: !!note && note.ours === String(char.image ?? ""),
+      wikiPack: packInLore || !!storedWikiPack(),
+      tokenizer: !!tokenizerName()
+    });
+    return { state, iconPrev: note?.prev ?? "" };
+  }
+  async function installLoreAndGreetings(charIndex, o = {}) {
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
+    const planted = plantGreetings(char.alternateGreetings);
+    const lore = installLore(char.globalLore, planted.index);
+    const first = char.firstMessage;
+    const landing = isLanding(first) ? {} : { firstMessage: installData().greetings.first };
+    if (!isLanding(first) && typeof first === "string" && first.trim() && !planted.greetings.includes(first)) planted.greetings.push(first);
+    const ls = installLoreSettings(char.loreSettings);
+    await risuai.setCharacterToIndex(charIndex, {
+      ...char,
+      ...o.name ? { name: o.name } : {},
+      ...landing,
+      ...ls ? { loreSettings: ls } : {},
+      globalLore: lore,
+      alternateGreetings: planted.greetings
+    });
+  }
+  async function installPictures(charIndex, progress4) {
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
+    const { state } = await checkInstall(charIndex);
+    const all = state.pictures.missing;
+    if (!all.length) return 0;
+    const WORKERS = 8;
+    const COMMIT = 300;
+    let saved = 0;
+    let assets = char.additionalAssets;
+    const commit = async (list4) => {
+      if (!list4.length) return;
+      assets = mergePictures(assets, list4);
+      const fresh3 = await risuai.getCharacterFromIndex(charIndex) ?? char;
+      await risuai.setCharacterToIndex(charIndex, { ...fresh3, additionalAssets: assets });
+      saved += list4.length;
+    };
+    for (let i = 0; i < all.length; i += COMMIT) {
+      const get = all.slice(i, i + COMMIT);
+      const done3 = [];
+      let next = 0;
+      let failure = null;
+      const worker = async () => {
+        while (next < get.length && !failure) {
+          const p2 = get[next++];
+          try {
+            const path = await risuai.saveAsset(await fetchPicture(p2));
+            if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
+            done3.push([p2, path]);
+          } catch (error) {
+            failure ??= error;
+            return;
+          }
+          const n3 = saved + done3.length;
+          if (n3 % 10 === 0 || n3 === all.length) progress4(`사진 받는 중 ${n3}/${all.length}`);
+        }
+      };
+      await Promise.all(Array.from({ length: WORKERS }, worker));
+      await commit(done3);
+      if (failure) {
+        const why = failure instanceof Error ? failure.message : String(failure);
         throw new Error(saved ? `${saved}/${all.length}장까지 받았어요. ${why}` : why);
       }
     }
@@ -674,16 +740,16 @@ ailure.message : String(failure);
   var genderOf = (rows3, id2) => rows3?.find((r) => r.id === id2)?.g ?? "";
   function chooser(sel, g2, withSegs) {
     const rows3 = lookRows();
-    const shown3 = g2 || genderOf(rows3, sel);
-    const segs = !withSegs ? "" : `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === shown3 ? " on" : ""}" data-action="look-g" data-value="${x}" aria-pressed="${x === shown3}">${x}</button>`).join("")}</div>`;
+    const shown4 = g2 || genderOf(rows3, sel);
+    const segs = !withSegs ? "" : `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === shown4 ? " on" : ""}" data-action="look-g" data-value="${x}" aria-pressed="${x === shown4}">${x}</button>`).join("")}</div>`;
     if (!rows3) {
       const st = looksStatus();
       const msg = st.failed ? `아바타 그림을 받지 못했어요. ${esc22(st.failed)} <button class="gx-chip" data-action="look-retry">다시 받기</button>` : `아바타 그림을 받는 중…${st.progress ? ` ${esc22(st.progress)}` : ""}`;
       return `${segs}<div class="gx-hint">${msg}</div>`;
     }
-    if (!shown3) return `${segs}<div class="gx-hint">성별을 고르면 고를 수 있는 아바타가 보여요.</div>`;
-    const cells = looksOf(rows3, shown3).map((r) => `<button class="gx-whoc gx-lookc${r.id === sel ? " on" : ""}" data-action="look" data-value="${esc22(r.id)}" aria-pressed="${r.id === sel}" aria-label="아바타 ${esc22(r.id)}">${lookSprite(idleOf(r))}</button>`).join("");
-    return `${segs}<div class="gx-lookg">${cells}</div>`;
+    if (!shown4) return `${segs}<div class="gx-hint">성별을 고르면 고를 수 있는 아바타가 보여요.</div>`;
+    const cells2 = looksOf(rows3, shown4).map((r) => `<button class="gx-whoc gx-lookc${r.id === sel ? " on" : ""}" data-action="look" data-value="${esc22(r.id)}" aria-pressed="${r.id === sel}" aria-label="아바타 ${esc22(r.id)}">${lookSprite(idleOf(r))}</button>`).join("");
+    return `${segs}<div class="gx-lookg">${cells2}</div>`;
   }
   function lookPopup(sel, lockedName = "", g2 = "") {
     if (!lookUi.open) return "";
@@ -789,13 +855,13 @@ ailure.message : String(failure);
     if (!now2) return "";
     const other = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode2 === "risu" ? "plugin" : "risu"));
     const names4 = (l) => new Set(l.map((p2) => p2.entry.name));
-    const mine = names4(now2.picks);
+    const mine2 = names4(now2.picks);
     const theirs = names4(other.picks);
     const size = now2.picks.reduce((n3, p2) => n3 + tokens(p2.entry.content), 0);
     const list4 = now2.picks.length ? now2.picks.map((p2) => item(p2, mode2 === "risu")).join("") : '<p class="ps-note">지금은 켤 로어북이 없어요.</p>';
     const only = (l, not, risu) => l.filter((p2) => !not.has(p2.entry.name)).map((p2) => item(p2, risu)).join("");
     const otherIf = mode2 === "risu" ? "플러그인이 고르면" : "Risu가 직접 켜면";
-    const more = only(other.picks, mine, mode2 !== "risu");
+    const more = only(other.picks, mine2, mode2 !== "risu");
     const less = only(now2.picks, theirs, mode2 === "risu");
     const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
     const body5 = `
@@ -2274,12 +2340,12 @@ ailure.message : String(failure);
     let y0 = 0;
     let id2 = null;
     let dragging = false;
-    let shown3 = 0;
+    let shown4 = 0;
     let ready = false;
     const paint = () => {
-      track2.style.transform = shown3 ? `translateX(${shown3}px)` : "";
+      track2.style.transform = shown4 ? `translateX(${shown4}px)` : "";
       const was = ready;
-      ready = Math.abs(shown3) >= closeW();
+      ready = Math.abs(shown4) >= closeW();
       track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
       if (ready && !was) navigator.vibrate?.(8);
     };
@@ -2289,7 +2355,7 @@ ailure.message : String(failure);
       if (!dragging) return;
       const close3 = ready;
       track2.classList.add("back");
-      shown3 = 0;
+      shown4 = 0;
       paint();
       setTimeout(() => track2.classList.remove("back"), 260);
       if (close3) onClose();
@@ -2310,7 +2376,7 @@ ailure.message : String(failure);
         dragging = true;
         bar.setPointerCapture?.(e.pointerId);
       }
-      shown3 = rubber(dx, closeW());
+      shown4 = rubber(dx, closeW());
       paint();
     });
     bar.addEventListener("pointerup", end);
@@ -2871,7 +2937,7 @@ ailure.message : String(failure);
 .gw .mx-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 20px; padding: 10px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--dim); font-size: 13px; }
 .gw .mx-note { margin: 0; padding: 10px var(--pad); border-bottom: 1px solid var(--hair); font-size: 13px; line-height: 1.5; color: var(--dim); }
 .gw .ck { margin-bottom: 20px; }
-.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) repeat(var(--ck-n), minmax(0, 1fr)); align-items: center; padding: 0 10px; }
+.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) var(--ck-cols, repeat(var(--ck-n), minmax(0, 1fr))); align-items: center; padding: 0 10px; }
 .gw .ck-h1 { padding-top: 8px; font-size: 13px; color: var(--text); }
 .gw .ck-h1 b { padding: 2px 4px; font-weight: 700; text-align: center; word-break: keep-all; }
 .gw .ck-h2 { padding-bottom: 6px; border-bottom: 1px solid var(--hair); font-size: 12.5px; color: var(--dim); }
@@ -3003,59 +3069,12 @@ ailure.message : String(failure);
 .gw .ck { --ck-n: 1; }
 /* 잠긴 체크 칸 (다른 설정 때문에 지금 못 바꾸는 값) */
 .gw .ck-m:disabled { opacity: .45; cursor: default; }
-`;
 
-  // src/ui/editor/record.ts
-  var esc27 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var recUi = {
-    /** 괴이 공통 머리말 칸 펼침 */
-    noteOpen: false,
-    preview: false,
-    importOpen: false,
-    importText: "",
-    importResult: null,
-    adding: false,
-    newExtra: { name: "", kind: "block" },
-    variant: "",
-    tokensHtml: (ctx2, kind, over) => {
-      const name = edUi.sel[kind] ?? "";
-      const rec2 = name ? worldRecord(kind, name, over) : null;
-      if (!rec2) return '<span class="gw-tokens"></span>';
-      return `<span class="gw-tokens">조립 ${tokenizerName() ? "" : "약 "}${tokens(recordText(kind, name, rec2, directoryDraft(ctx2))).toLocaleString()}토큰</span>`;
-    }
-  };
-  function recordCount(ctx2, kind, over) {
-    return rowsOf3(ctx2, kind, over).filter((r) => r.state !== "deleted").length;
-  }
-  function presetOf(d, kind, name) {
-    if (kind !== "anomaly" && kind !== "site") return null;
-    const p2 = (kind === "anomaly" ? d.anomalies : d.sites).find((x) => x.lore === name);
-    return p2 ? !!p2.preset : null;
-  }
-  var presetToggle = (kind, name, on3) => on3 === null ? "" : `<button class="gw-pre${on3 ? " on" : ""}" data-action="dir-set" data-value="${esc27(`preset|${on3 ? 0 : 1}|${name}`)}" title="무작위 발생 후보 ${on3 ? "ON → OFF" : "OFF → ON"}" aria-pressed="${on3}">${on3 ? "발생 ON" : "발생 OFF"}</button>`;
-  function rowsOf3(ctx2, kind, over) {
-    const d = directoryDraft(ctx2);
-    const recs = worldRecords(kind, over);
-    const bucket = over[kind] ?? {};
-    const names4 = [];
-    if (kind === "agent") names4.push(...d.agents.map((a) => a.lore));
-    else if (kind === "anomaly") names4.push(...d.anomalies.map((p2) => p2.lore));
-    else if (kind === "site") names4.push(...d.sites.map((p2) => p2.lore));
-    else if (kind === "org") names4.push(...d.orgs.map((o) => o.name).filter((n3) => !PLACEHOLDER_ORGS.has(n3)));
-    else names4.push(...d.appendices.map((r) => r.lore));
-    for (const n3 of recs.keys()) if (!names4.includes(n3)) names4.push(n3);
-    for (const n3 of Object.keys(bucket)) if (!names4.includes(n3)) names4.push(n3);
-    return names4.map((name) => {
-      const rec2 = recs.get(name);
-      const sub = kind === "agent" ? d.agents.find((a) => a.lore === name)?.english ?? "" : kind === "org" ? d.orgs.find((o) => o.name === name)?.spec.english ?? "" : (d.anomalies.find((p2) => p2.lore === name) ?? d.sites.find((p2) => p2.lore === name))?.english ?? "";
-      const state = bucket[name]?.deleted ? "deleted" : !isDefaultRecord(kind, name) ? "new" : bucket[name] ? "edited" : "default";
-      const place3 = kind === "anomaly" || kind === "site" ? (kind === "anomaly" ? d.anomalies : d.sites).find((p2) => p2.lore === name) : void 0;
-      const outside = place3 && !place3.inFolder ? `다른 폴더에서 온 후보${loreSourceOf(ctx2, name) ? ` · ${loreSourceOf(ctx2, name)}` : ""}` : "";
-      return { name, sub: [sub, outside].filter(Boolean).join(" · ") || (rec2 ? "" : "로어 칸 없음"), state, preset: presetOf(d, kind, name) };
-    });
-  }
-  function recordList(ctx2, kind, over, q) {
-    const rows3 = rowsOf3(ctx2, kind, over).filter((r) => !q || r.name.toLowerCase().includes(q.toLowerCase()) || r.sub.toLowerCase().includes(q.toLowerCase()));
-    const sel = edUi.sel[kind] ?? "";
-    const badge3 = { default: "", edited: '<i class="gw-badge">고침</i>', new: '<i class="gw-badge new">추가</i>', deleted: '<i class="gw-badge del">지움</i>' };
-    return rows3.length ? rows3.map((r) => `<div class="gw-rowbox${r.name === sel ? " on" : ""}${r.state === "deleted" ? " deleted" : ""}"><button class="gw-row" data-action
+/* ── 시안: AI 상담 창. 설정 창 옆(PC) · 아래에서 올라오는 판(폰). 설정 창과 같은 색·조작 규격 ── */
+.gw.ai-on { gap: 12px; }
+.gw-ai { position: relative; width: 380px; height: min(90%, calc(100% - 24px)); flex: none; display: flex; flex-direction: column; background: var(--void); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 48px rgba(0, 0, 0, .35); overflow: hidden; }
+.gw-ai-top { display: flex; align-items: center; gap: 8px; height: 52px; flex: none; padding: 0 10px 0 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.gw-ai-top > b { font-size: 15px; font-weight: 700; }
+.gw-ai-top .gw-brand { margin-right: 0; }
+.gw-ai-top .ai-model { margin-left: 2px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; color: var(--dim); }
+.gw-ai-top .gx-x { marg

@@ -1,4 +1,46 @@
-|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
+, c.mine])])]);
+  }
+  var postHead = (p2) => JSON.stringify([p2.id, p2.nick, p2.title, p2.body, p2.date, p2.mine]);
+  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
+  function postKey(p2) {
+    return p2 ? JSON.stringify([p2.id, p2.nick, p2.title, p2.body, p2.date, p2.mine, p2.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
+  }
+  function findPost(st, id2) {
+    return st.posts.find((p2) => p2.id === id2);
+  }
+  var shelf = (st) => st.archive ??= [];
+  var findAnyPost = (st, id2) => findPost(st, id2) ?? shelf(st).find((p2) => p2.id === id2);
+  var archived = (st, id2) => shelf(st).some((p2) => p2.id === id2);
+  function shelve(st, dropped) {
+    const keep2 = dropped.filter((p2) => (p2.mine || p2.scrap) && !archived(st, p2.id));
+    for (const p2 of keep2) delete p2.back;
+    if (keep2.length) st.archive = [...keep2, ...shelf(st)];
+  }
+  function revivePost(st, id2, turn2) {
+    const live = findPost(st, id2);
+    if (live) {
+      if (live.back !== void 0) live.back = turn2;
+      return live;
+    }
+    const i = shelf(st).findIndex((p3) => p3.id === id2);
+    if (i < 0) return void 0;
+    const [p2] = st.archive.splice(i, 1);
+    p2.back = turn2;
+    st.posts.unshift(p2);
+    return p2;
+  }
+  function dateNow(chat) {
+    const minute = readWorld(chat).minute;
+    const p2 = (n3) => String(n3).padStart(2, "0");
+    if (minute !== null && minute > 0) {
+      const d = new Date(minute * 6e4);
+      return `${d.getUTCFullYear()}.${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
+    }
+    const msgs4 = chat.message ?? [];
+    for (let i = msgs4.length - 1; i >= 0; i--) {
+      const m = msgs4[i];
+      if (m.role !== "char" || typeof m.data !== "string") continue;
+      const t = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
       if (t) {
         let h = Number(t[4]) % 12;
         if (t[6].toUpperCase() === "PM") h += 12;
@@ -422,23 +464,23 @@
       }
       const hi = nowMin ?? Number.POSITIVE_INFINITY;
       const base = lo ?? nowMin - 24 * 60;
-      let pick3 = null;
+      let pick4 = null;
       for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
         const t = day * 1440 + clock4;
         if (t >= base && t <= hi) {
-          pick3 = t;
+          pick4 = t;
           break;
         }
       }
-      if (pick3 === null) {
+      if (pick4 === null) {
         const ahead = 1 + i % 3;
         const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock4 > nowMin;
-        if (future && (lo === null || lo <= nowMin)) pick3 = nowMin;
-        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick3 = lo + ahead;
-        else pick3 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
+        if (future && (lo === null || lo <= nowMin)) pick4 = nowMin;
+        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick4 = lo + ahead;
+        else pick4 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
       }
-      settle2(pick3);
-      c.time = minutesStamp(pick3);
+      settle2(pick4);
+      c.time = minutesStamp(pick4);
     }
     settle2(null);
   }
@@ -603,11 +645,11 @@ ${JSON.stringify(body5)}`;
     }
     const list4 = Array.isArray(rows3) ? rows3 : isObj(rows3) ? [rows3] : null;
     if (!list4) throw new GnetError("선쪽지 형식이 올바르지 않아요.");
-    let pick3 = null;
+    let pick4 = null;
     const reasons = [];
     let quiet2 = 0;
     list4.forEach((c, i) => {
-      if (pick3) return;
+      if (pick4) return;
       if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
       const nick = str2(c.nick).trim();
       const body5 = trimTokens(stripForged(str2(c.body)).trim(), LIMITS.dm_tokens);
@@ -616,13 +658,13 @@ ${JSON.stringify(body5)}`;
       if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
       if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
       if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet2++;
-      pick3 = { nick, body: body5 };
+      pick4 = { nick, body: body5 };
     });
-    if (!pick3) {
+    if (!pick4) {
       if (!reasons.length) return false;
       throw new GnetError(`선쪽지 형식을 확인해 주세요 (${reasons.join("; ")}).`);
     }
-    const chosen = pick3;
+    const chosen = pick4;
     const post = postOverride ? findPost(st, postOverride.id) : findPost(st, plan.post.id);
     if (!post) return false;
     const comment = plan.commentIndex ? post.comments[plan.commentIndex - 1] : void 0;
@@ -1715,7 +1757,7 @@ ${c}`)]).join("\n\n");
     relationship: { feature: null, label: "인간관계", help: "주인공·다른 인물에 대한 감정과 관계. 「→ 이름」은 그 대상에 대한 것", hint: "stance toward each target; one entry per target", targeted: true },
     speech: { feature: null, label: "말투", help: "말투·호칭 습관(존댓말·반말, 자주 쓰는 표현)", hint: "how this person talks to each target; one entry per target", targeted: true },
     behavior: { feature: null, label: "행동 경향", help: "자주 보이는 행동 패턴과 반응 경향", hint: "habits and patterns of action" },
-    knowledge: { feature: null, label: "아는 정보", help: "이 인물이 알게 된 것·모르는 것. 본편에서 비밀을 함부로 누설하지 않게 해요", hint: "what this person actually knows or does not know" },
+    knowledge: { feature: null, label: "아는 정보", help: "이 인물이 알게 된 것·모르는 것. 메인 응답에서 비밀을 함부로 누설하지 않게 해요", hint: "what this person actually knows or does not know" },
     threads: { feature: null, label: "목표·미해결", help: "이 인물의 목표와 아직 풀리지 않은 일", hint: "open promises, goals, unresolved matters" },
     history: { feature: null, label: "주요 행적", help: "이야기 속에서 한 주요 행동·겪은 일 (오래된 것부터 접혀요)", hint: "notable past events with this person, oldest first" },
     scene: { feature: null, label: "현재 장면", help: "지금 장면에서의 위치·행동 (짧게 유지돼요)", hint: "present scene facts" },
@@ -1946,7 +1988,7 @@ ${c}`)]).join("\n\n");
     }
     return out;
   }
-  var withPeople = (chat, store) => ({ ...chat, [PEOPLE_KEY]: store });
+  var withPeople = (chat, store2) => ({ ...chat, [PEOPLE_KEY]: store2 });
   var msgs = (chat) => Array.isArray(chat.message) ? chat.message : [];
   function anchorPositions(chat) {
     const at = /* @__PURE__ */ new Map();
@@ -1990,40 +2032,40 @@ ${c}`)]).join("\n\n");
     for (const e of list4) out.set(e.id, alive.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
     return out;
   }
-  function liveChanges(store, live) {
-    return store.log.filter((c) => isAlive(c, live)).map((c) => ({ c, pos: live.at.get(c.anchor) ?? -1 })).sort((a, b) => a.pos - b.pos || a.c.seq - b.c.seq).map((x) => x.c);
+  function liveChanges(store2, live) {
+    return store2.log.filter((c) => isAlive(c, live)).map((c) => ({ c, pos: live.at.get(c.anchor) ?? -1 })).sort((a, b) => a.pos - b.pos || a.c.seq - b.c.seq).map((x) => x.c);
   }
   var entryId = (who, slot2, anchor, seq4, text5) => `e${hash(`${who}|${slot2}|${anchor}|${seq4}|${text5}`)}`;
   var changeId = (who, kind, anchor, seq4, text5) => `c${hash(`${who}|${kind}|${anchor}|${seq4}|${text5}`)}`;
   var plain = (s8, max = 200) => String(s8 ?? "").replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％").replace(/\s+/g, " ").trim().slice(0, max);
-  function putEntry(store, who, slot2, entry3) {
-    const p2 = store.people[who];
+  function putEntry(store2, who, slot2, entry3) {
+    const p2 = store2.people[who];
     if (!p2) return false;
     const list4 = p2.slots[slot2] ??= [];
     if (list4.some((e) => e.id === entry3.id)) return false;
     list4.push({ ...entry3, text: plain(entry3.text, slot2 === "speech" ? 600 : 300), ...entry3.quote ? { quote: plain(entry3.quote, 60) } : {} });
     return true;
   }
-  function putDoc(store, type, key, entry3) {
+  function putDoc(store2, type, key, entry3) {
     const k = `${type}:${key}`;
-    const d = store.docs[k] ??= { type, key, entries: [] };
+    const d = store2.docs[k] ??= { type, key, entries: [] };
     if (d.entries.some((e) => e.id === entry3.id)) return false;
     d.entries.push({ ...entry3, text: plain(entry3.text) });
     return true;
   }
-  function snapshotRun(store) {
+  function snapshotRun(store2) {
     const entries2 = /* @__PURE__ */ new Set();
     const observations = /* @__PURE__ */ new Set();
-    for (const p2 of Object.values(store.people)) {
+    for (const p2 of Object.values(store2.people)) {
       for (const [slot2, list4] of Object.entries(p2.slots)) for (const e of list4 ?? []) entries2.add(`${p2.name}|${slot2}|${e.id}`);
       for (const c of Object.values(p2.candidates ?? {})) for (const o of c.evidence) observations.add(`${p2.name}|${c.id}|${o.id}`);
     }
     const docs = /* @__PURE__ */ new Set();
-    for (const d of Object.values(store.docs)) for (const e of d.entries) docs.add(`${d.key}|${e.id}`);
-    return { entries: entries2, docs, changes: new Set(store.log.map((c) => c.id)), observations, people: new Set(Object.keys(store.people)) };
+    for (const d of Object.values(store2.docs)) for (const e of d.entries) docs.add(`${d.key}|${e.id}`);
+    return { entries: entries2, docs, changes: new Set(store2.log.map((c) => c.id)), observations, people: new Set(Object.keys(store2.people)) };
   }
-  function recordRun(store, before, at) {
-    const after = snapshotRun(store);
+  function recordRun(store2, before, at) {
+    const after = snapshotRun(store2);
     const diff = (a, b) => [...b].filter((x) => !a.has(x));
     const run6 = {
       at,
@@ -2043,52 +2085,52 @@ ${c}`)]).join("\n\n");
       newPeople: diff(before.people, after.people)
     };
     const n3 = run6.entries.length + run6.docs.length + run6.changes.length + run6.observations.length + run6.newPeople.length;
-    if (n3) store.lastRun = run6;
-    else delete store.lastRun;
-    return store.lastRun;
+    if (n3) store2.lastRun = run6;
+    else delete store2.lastRun;
+    return store2.lastRun;
   }
-  function undoLastRun(store) {
-    const run6 = store.lastRun;
+  function undoLastRun(store2) {
+    const run6 = store2.lastRun;
     if (!run6) return 0;
     let n3 = 0;
     for (const x of run6.entries) {
-      const e = store.people[x.who]?.slots[x.slot]?.find((e2) => e2.id === x.id);
+      const e = store2.people[x.who]?.slots[x.slot]?.find((e2) => e2.id === x.id);
       if (e && !e.void) {
         e.void = true;
         n3++;
       }
     }
     for (const x of run6.docs) {
-      const e = Object.values(store.docs).find((d) => d.key === x.key)?.entries.find((e2) => e2.id === x.id);
+      const e = Object.values(store2.docs).find((d) => d.key === x.key)?.entries.find((e2) => e2.id === x.id);
       if (e && !e.void) {
         e.void = true;
         n3++;
       }
     }
     for (const id2 of run6.changes) {
-      const c = store.log.find((c2) => c2.id === id2);
+      const c = store2.log.find((c2) => c2.id === id2);
       if (c && !c.void) {
         c.void = true;
         n3++;
       }
     }
     for (const x of run6.observations) {
-      const o = store.people[x.who]?.candidates?.[x.cand]?.evidence.find((o2) => o2.id === x.id);
+      const o = store2.people[x.who]?.candidates?.[x.cand]?.evidence.find((o2) => o2.id === x.id);
       if (o && !o.void) {
         o.void = true;
         n3++;
       }
     }
-    for (const name of run6.newPeople) if (store.people[name]) {
-      delete store.people[name];
+    for (const name of run6.newPeople) if (store2.people[name]) {
+      delete store2.people[name];
       n3++;
     }
-    delete store.lastRun;
+    delete store2.lastRun;
     return n3;
   }
-  function putChange(store, c) {
-    if (store.log.some((x) => x.id === c.id)) return false;
-    store.log.push({ ...c, reason: plain(c.reason, 80), ...c.quote ? { quote: plain(c.quote, 60) } : {} });
+  function putChange(store2, c) {
+    if (store2.log.some((x) => x.id === c.id)) return false;
+    store2.log.push({ ...c, reason: plain(c.reason, 80), ...c.quote ? { quote: plain(c.quote, 60) } : {} });
     return true;
   }
   var messageKey = (m, index) => {
@@ -2098,29 +2140,29 @@ ${c}`)]).join("\n\n");
   var messageHash = (m) => hash(
     messageText(str3(m.data)).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\[\s*shop\s*[:：][^\]]*\]/giu, "").replace(/\s+/g, " ").trim()
   );
-  function unreadIndexes(chat, store) {
+  function unreadIndexes(chat, store2) {
     const out = [];
     msgs(chat).forEach((m, i) => {
       if (m.role !== "char") return;
-      if (store.read[messageKey(m, i)] !== messageHash(m)) out.push(i);
+      if (store2.read[messageKey(m, i)] !== messageHash(m)) out.push(i);
     });
     return out;
   }
-  function splitUnread(chat, store) {
-    const all = unreadIndexes(chat, store);
+  function splitUnread(chat, store2) {
+    const all = unreadIndexes(chat, store2);
     const list4 = msgs(chat);
-    const lastRead = Math.max(-1, ...list4.map((m, i) => store.read[messageKey(m, i)] !== void 0 ? i : -1));
+    const lastRead = Math.max(-1, ...list4.map((m, i) => store2.read[messageKey(m, i)] !== void 0 ? i : -1));
     const newer = lastRead < 0 ? all.slice(-1) : all.filter((i) => i > lastRead);
     return { newer, older: all.filter((i) => !newer.includes(i)) };
   }
-  function markRead(store, chat, indexes) {
+  function markRead(store2, chat, indexes) {
     const list4 = msgs(chat);
     for (const i of indexes) {
       const m = list4[i];
-      if (m) store.read[messageKey(m, i)] = messageHash(m);
+      if (m) store2.read[messageKey(m, i)] = messageHash(m);
     }
     const keep2 = new Set(list4.map((m, i) => messageKey(m, i)));
-    for (const k of Object.keys(store.read)) if (!keep2.has(k)) delete store.read[k];
+    for (const k of Object.keys(store2.read)) if (!keep2.has(k)) delete store2.read[k];
   }
 
   // src/core/journal/mine.ts
@@ -2186,9 +2228,9 @@ ${c}`)]).join("\n\n");
   function sumCues(who, base, changes, folded, min, max, o = {}) {
     let value = clamp(base + folded, min, max);
     let pinned = false;
-    const mine = changes.filter((c) => c.who === who && c.kind === "cue");
+    const mine2 = changes.filter((c) => c.who === who && c.kind === "cue");
     const groups = /* @__PURE__ */ new Map();
-    for (const c of mine) {
+    for (const c of mine2) {
       const k = c.group ?? c.anchor;
       (groups.get(k) ?? groups.set(k, []).get(k)).push(c);
     }
@@ -2232,10 +2274,10 @@ ${c}`)]).join("\n\n");
     return last2 ? clamp(Math.round(last2.band), TASTE_MIN, TASTE_MAX) : null;
   }
   function opennessOf(person, changes) {
-    const mine = changes.filter((c) => c.who === person.name && c.kind === "openness");
+    const mine2 = changes.filter((c) => c.who === person.name && c.kind === "openness");
     let value = null;
     const groups = /* @__PURE__ */ new Map();
-    for (const c of mine) (groups.get(c.anchor) ?? groups.set(c.anchor, []).get(c.anchor)).push(c);
+    for (const c of mine2) (groups.get(c.anchor) ?? groups.set(c.anchor, []).get(c.anchor)).push(c);
     for (const [, list4] of groups) {
       let net = 0;
       for (const c of list4) {
@@ -2286,14 +2328,10 @@ ${c}`)]).join("\n\n");
     always: "",
     recent_msgs: "4",
     router_rules: "",
-    /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
+    /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게 */
     model_director: "same",
     model_router: "same",
     model_tidy: "same",
-    model_id_update: "",
-    model_id_director: "",
-    model_id_router: "",
-    model_id_tidy: "",
     /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
     hypa: "0",
     hypa_cap: "3000",
@@ -2391,10 +2429,11 @@ ${c}`)]).join("\n\n");
       routerRules: v("router_rules").slice(0, 2e3),
       stageModel: (() => {
         const base = v("model") === "main" ? "main" : "aux";
-        const pick3 = (k) => v(k) === "main" ? "main" : v(k) === "aux" ? "aux" : base;
-        return { update: base, director: pick3("model_director"), router: pick3("model_router"), tidy: pick3("model_tidy") };
+        const pick4 = (k) => v(k) === "main" ? "main" : v(k) === "aux" ? "aux" : base;
+        return { update: base, director: pick4("model_director"), router: pick4("model_router"), tidy: pick4("model_tidy") };
       })(),
-      stageModelId: { update: v("model_id_update").trim().slice(0, 120), director: v("model_id_director").trim().slice(0, 120), router: v("model_id_router").trim().slice(0, 120), tidy: v("model_id_tidy").trim().slice(0, 120) },
+      // 전용 모델 ID: 없앤 기능 (2026-11-12 사용자). 늘 비어 있다 → 메인·보조 설정대로
+      stageModelId: { update: "", director: "", router: "", tidy: "" },
       hypa: v("hypa") === "1",
       hypaCap: num7("hypa_cap", 500, 24e3),
       hypaItems: num7("hypa_items", 1, 64),
@@ -2448,21 +2487,21 @@ ${c}`)]).join("\n\n");
   var SELF = "{{source::user}}";
   var ADDED_EMOTIONS = ["suspicious", "worried", "relieved", "disgusted", "determined", "jealous", "pleading", "forced smiling", "indifferent", "guilty", "pouting", "angry smile", "expressionless", "tormented", "crazy smile"];
   var EMOTIONS = /* @__PURE__ */ new Set([..."default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking".split(" "), ...ADDED_EMOTIONS]);
-  var tagName = (who, expr, pick3, self) => {
+  var tagName = (who, expr, pick4, self) => {
     const name = who.trim();
     const want = `${name}_${expr.trim()}`;
-    if (self && name === self.trim()) return pick3?.(want) ?? SELF;
-    if (pick3) return pick3(want);
+    if (self && name === self.trim()) return pick4?.(want) ?? SELF;
+    if (pick4) return pick4(want);
     return EMOTIONS.has(expr.trim().toLowerCase()) ? want : null;
   };
-  function imgTagsKnown(text5, pick3, self) {
-    if (!pick3) return false;
+  function imgTagsKnown(text5, pick4, self) {
+    if (!pick4) return false;
     const all = [...text5.matchAll(TAG2)];
-    return all.length > 0 && all.some((m) => !!tagName(m[1], m[2], pick3, self));
+    return all.length > 0 && all.some((m) => !!tagName(m[1], m[2], pick4, self));
   }
-  function renderImgTags(text5, pick3, recent = IMG_RECENT.def, self) {
+  function renderImgTags(text5, pick4, recent = IMG_RECENT.def, self) {
     return text5.replace(TAG2, (_m, who, expr) => {
-      const name = tagName(who, expr, pick3, self);
+      const name = tagName(who, expr, pick4, self);
       if (!name || name !== SELF && /[{}'"<>\\]/.test(name)) return "\n\n";
       const url = name === SELF ? SELF : `{{raw::${name}}}`;
       const box3 = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
@@ -2556,7 +2595,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var cache4 = /* @__PURE__ */ new WeakMap();
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-(gn|gal|wpf|sm)\.[a-z_]+|\$(gn|gal|wpf|sm)_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet|points)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+|\$(cos|bm|hs)_sh_[a-z_]+|\$hs_on|\$net_joint)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-(gn|gal|wpf|sm)\.[a-z_]+|\$(gn|gal|wpf|sm)_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet|points)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+|\$(cos|bm|hs)_sh_[a-z_]+|\$hs_on|\$net_joint|\$ph_(habits|reactions|banter|banter_chance|banter_min|banter_max|view_(auto|preset|pov|speak|scope|size))|\$nw_(auto|auto_title|auto_query|footnotes|images)|\$it_(carry|edit|icon_alias|icon_pool)|\$(cos|bm)_roll_(on|genres|tiers|useful|gmode|tmode)|\$bm_desk_(on|axes|again|avoid)|\$cos_(ready|truth|fixed)|\$hs_(net|chat_min|chat_max|chat_gap|cue_min|cue_max|speed|hold|frame|fx_cut|fx_bulb|fx_tear|tear_p|fx_scan|fill_lo|fill_hi|fill_cool|rare_p|rare_cool|clips|scale_pc|scale_ph|next|turn|lock|left|call_lo|call_hi|forms|aud_on|peek|say|barter|tel|retry))$/;
   function getPrefs() {
     return prefs;
   }
@@ -2628,7 +2667,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const relationsSym = o.relationsSym === false ? false : void 0;
     const frame = o.frame === "none" || o.frame === "tactical" ? o.frame : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...o.progress === false ? { progress: false } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold !== null ? { imgFold: fold } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
+    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...o.progress === false ? { progress: false } : {}, ...o.consultModel === "main" ? { consultModel: "main" } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold !== null ? { imgFold: fold } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -2898,10 +2937,10 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return Number.isFinite(d.getTime()) ? `${two2(d.getUTCMonth() + 1)}${two2(d.getUTCDate())}` : "0000";
   }
   function peopleDelta(chat, from, to) {
-    const store = peopleStore(chat);
-    if (!store.log.length) return [];
+    const store2 = peopleStore(chat);
+    if (!store2.log.length) return [];
     const live = liveness(chat);
-    const all = liveChanges(store, live);
+    const all = liveChanges(store2, live);
     const ps = peopleSettings(chat.scriptstate);
     const o = { speed: ps.speed, turnCap: ps.turnCap };
     const pos = (c) => live.at.get(c.anchor) ?? -1;
@@ -2913,8 +2952,8 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       const delta = sumCues(who, 0, list4, 0, -1e9, 1e9, o);
       if (!delta) continue;
       const top = [...list4].sort((a, b) => Math.abs(cueDelta(b, o)) - Math.abs(cueDelta(a, o)))[0];
-      const person = store.people[who];
-      const stage2 = person ? stageOf(affinityOf(person, all.filter((c) => pos(c) <= to), store.folded[who] ?? 0, o)).label : void 0;
+      const person = store2.people[who];
+      const stage2 = person ? stageOf(affinityOf(person, all.filter((c) => pos(c) <= to), store2.folded[who] ?? 0, o)).label : void 0;
       out.push({ who, delta, ...top?.cue ? { cue: top.cue } : {}, ...top?.quote || top?.reason ? { quote: cut2(top.quote || top.reason, 60) } : {}, ...stage2 ? { stage: stage2 } : {} });
     }
     return out.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, PEOPLE_MAX);
@@ -2940,7 +2979,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const prefix = ev.cleared ? "클리어 · " : "";
     const result = prefix + (lastText || "처리 완료");
     const { from, to } = periodOf(chat, index, e);
-    const mine = isMine(chat, from, to, { name, presetName: an?.presetName || void 0, agentNames: agents.map((a) => a.name), touched: e.touched });
+    const mine2 = isMine(chat, from, to, { name, presetName: an?.presetName || void 0, agentNames: agents.map((a) => a.name), touched: e.touched });
     const id2 = journalHash(`${ev.kind}|${name}|${e.loc}|${e.born ?? ""}|${ev.epoch}`);
     const tags = findStatusTags(text2(chat.message?.[index]));
     const last2 = tags[tags.length - 1];
@@ -2957,7 +2996,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       born: e.born,
       idx: index,
       anchor,
-      mine,
+      mine: mine2,
       cause: ev.cause,
       agents: agents.map(({ id: aid, name: an2, st }) => ({ id: aid, name: an2, st })),
       result: cut2(result, RESULT_ROW_MAX),
@@ -2967,8 +3006,8 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const report = {
       id: `r${id2}`,
       no: "",
-      full: mine,
-      mine,
+      full: mine2,
+      mine: mine2,
       kind: ev.kind,
       cause: ev.cause,
       head: { name, ...grade ? { grade } : {}, loc: e.loc, ...last2?.place ? { place: cut2(last2.place, 60) } : {}, born: e.born, since: e.since, at, duration: at !== null && e.since !== null ? Math.max(0, at - e.since) : null, ...ev.cleared ? { cleared: true } : {} },
@@ -2980,7 +3019,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       ...last2 ? { statusKey: last2.raw.trim() } : {},
       savedAt: now2
     };
-    if (mine) {
+    if (mine2) {
       report.people = peopleDelta(chat, from, to);
       const w = walletSpan(chat, from, to, input3.walletStart);
       report.wallet = w.trades;
@@ -3159,15 +3198,15 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     text3(g2, status2, tx, y, { size: 13, weight: 500, color: c.dim, family: mono });
     const badge3 = r.mine ? "내가 출동" : "요원 처리";
     g2.font = `500 13px ${mono}`;
-    const sw = g2.measureText(status2).width;
+    const sw2 = g2.measureText(status2).width;
     const bw = g2.measureText(badge3).width + 20;
-    roundRect(g2, tx + sw + 12, y - 4, bw, 24, 12);
+    roundRect(g2, tx + sw2 + 12, y - 4, bw, 24, 12);
     g2.fillStyle = r.mine ? c.accentBg : c.panel;
     g2.fill();
     g2.strokeStyle = r.mine ? c.signal : c.line;
     g2.lineWidth = 1;
     g2.stroke();
-    text3(g2, badge3, tx + sw + 12 + bw / 2, y, { size: 13, weight: 500, color: r.mine ? c.signal : c.sub, family: mono, align: "center" });
+    text3(g2, badge3, tx + sw2 + 12 + bw / 2, y, { size: 13, weight: 500, color: r.mine ? c.signal : c.sub, family: mono, align: "center" });
     g2.font = `700 32px ${sans}`;
     const nameLines = wrapText(g2, h.name, W2 - 72, 1);
     text3(g2, nameLines[0] ?? "", tx, y + 22, { size: 32, weight: 700, color: c.text, family: sans });
@@ -4064,54 +4103,3 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       },
       "데드폴>로제몬": {
         aff: 150,
-        src: "대사 JSON close. 위키 데드폴 「로제몬」: 반말에 담긴 걱정을 정확히 알아들음"
-      },
-      "고르고디오>큐라스": {
-        aff: 150,
-        src: "대사 JSON close. 위키 고르고디오 「큐라스」: 고정 파트너, 상시 중화력 대응조"
-      },
-      "큐라스>고르고디오": {
-        aff: 150,
-        src: "대사 JSON close. 위키 큐라스 「고르고디오」: 형님이라 부름, 보고서 두 장이 형님 칭찬"
-      },
-      "큐라스>스팡달": {
-        aff: -25,
-        src: "위키 큐라스 「스팡달」: 유일한 천적, 다가오면 얼굴이 하얗게 질림(공포·기피)"
-      },
-      "콘쥬스>에일린": {
-        aff: 90,
-        src: "대사 JSON close. 위키 콘쥬스 「에일린」: 머리 위로 자기 얘기를 안 하는 반응을 은근히 좋아함"
-      },
-      "에일린>콘쥬스": {
-        aff: 90,
-        src: "위키 에일린 「콘쥬스」: 출발점이 닮아 현장에서 최대한 멀리 두려 함"
-      },
-      "콘쥬스>잼트리": {
-        aff: 90,
-        src: "대사 JSON close. 위키 콘쥬스 「팀의 어른들」: 잼트리가 「막내」라 부르며 우유를 타 줌"
-      },
-      "잼트리>콘쥬스": {
-        aff: 90,
-        src: "위키 콘쥬스 「팀의 어른들」: 「막내」라 부르며 연유 커피 대신 우유"
-      },
-      "에일린>데드폴": {
-        aff: 90,
-        src: "위키 에일린 「데드폴」: 데드폴의 죽음이 든 계획표는 다시 짜라고 돌려보냄"
-      },
-      "데드폴>에일린": {
-        aff: 90,
-        src: "위키 에일린 「데드폴」: 그 처우를 꽤 좋아하는 눈치"
-      },
-      "잼트리>에일린": {
-        aff: 90,
-        src: "위키 에일린 「잼트리」: 총 손질하는 손 옆에 커피를 내려놓고 그걸로 충분하다는 표정"
-      },
-      "에일린>잼트리": {
-        aff: 90,
-        src: "위키 에일린 「잼트리」: 고맙다는 말 없이 마심(둘 사이 대화는 그걸로 끝). 근거 약함"
-      },
-      "잼트리>데드폴": {
-        aff: 90,
-        src: "위키 데드폴 「사무실」: 남이 커피 타는 걸 허락하는 드문 예외라는 소문. 근거 약함"
-      },
-      "이도형>고
