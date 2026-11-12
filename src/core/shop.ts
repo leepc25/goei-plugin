@@ -18,6 +18,7 @@ import { craftMessages, type CraftMessage, type ThoughtsMode } from './craft';
 import { genSettings } from './advanced';
 import { fillGuide, guideDefault, guideSections, type GuideName } from './guides';
 import { peopleSettings } from './people/settings';
+import { capLines, shopMain, shopMainLines } from './shopctx';
 
 export const SHOP_VAR = '$st_shop';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars) */
@@ -839,11 +840,14 @@ export function shopEvents(chat: Chat): string[] {
   const out: string[] = [];
   const lastOwner = [...st.talk].reverse().find((l) => l.who === 'owner');
   const spoke = st.talk.some((l) => l.who === 'me');
-  if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} ${st.identity.points ? 'Baekilmong points' : 'won'})`).join(', ')} to the owner of ${st.shop}`);
+  // 설정 「메인 요청에 붙이는 것」(core/shopctx.ts): 팔기 · 문의(주인과 나눈 말, 거래 끊김)를 따로 거른다. 대화는 「최대 양」 줄까지 (0 = 전부)
+  const main = shopMain(chat.scriptstate, 'shop');
+  if (main.has('sell') && st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} ${st.identity.points ? 'Baekilmong points' : 'won'})`).join(', ')} to the owner of ${st.shop}`);
+  if (!main.has('ask')) return out;
   if (st.closed) out.push(`was refused service and sent out of ${st.shop}${lastOwner ? ` ("${lastOwner.text.slice(0, 80)}")` : ''}`);
   else if (spoke && lastOwner) {
     // 주인과 나눈 말: 이번 방문 대화 전부 (2026-11-07 사용자: 6줄이 아니라 전부). 그 턴 한 번만 넘어가고, 다음 응답에 표식이 없으면 상점 상태와 함께 비운다
-    const tail = st.talk.map((l) => `${l.who === 'me' ? 'protagonist' : 'owner'}: "${l.text}"`).join(' / ');
+    const tail = capLines(st.talk, shopMainLines(chat.scriptstate)).map((l) => `${l.who === 'me' ? 'protagonist' : 'owner'}: "${l.text}"`).join(' / ');
     out.push(`talked with the owner of ${st.shop} — ${tail}`);
   }
   return out;

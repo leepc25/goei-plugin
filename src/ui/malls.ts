@@ -258,7 +258,7 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
       // 흥정으로 붙은 다른 대가(it.pay)도 기록에 남긴다 (일반 상점 ui/shop.ts 와 같게, 릴리스 점검 11-09)
       const extra = it.pay ? ` + ${it.pay}` : '';
       const paid = p ? { paidWith: `${it.price.toLocaleString('en-US')} Baekilmong points at ${MALL_NAME[site]}${extra}` } : { price: it.price, ...(walletId ? { walletId } : {}), paidWith: `bank transfer to ${MALL_NAME[site]}${extra}` };
-      items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, ...paid });
+      items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', store: site, anchor, ...paid });
       st = markSold(st, it.id, anchor);
     }
     got = list;
@@ -387,7 +387,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         const anchor = lastBot(chat)?.key ?? '';
         const walletId = freshWalletId(w, `${site}_note_${n.id}`, anchor);
         w = addWalletEntry(w, { id: walletId, anchor, amount: -n.price, memo: `쪽지: ${n.title} (${MALL_NAME[site]})`, src: 'store' });
-        const items = addItem(readItems(chat.scriptstate), alive, { name: `쪽지: ${n.title}`, desc: `${MALL_NAME[site]} 운영자가 보낸 쪽지`, text: n.body, use: false, icon: 'note paper', weight: 0.01, from: 'store', anchor, price: n.price, walletId, paidWith: `bank transfer to ${MALL_NAME[site]}` });
+        const items = addItem(readItems(chat.scriptstate), alive, { name: `쪽지: ${n.title}`, desc: `${MALL_NAME[site]} 운영자가 보낸 쪽지`, text: n.body, use: false, icon: 'note paper', weight: 0.01, from: 'store', store: site, anchor, price: n.price, walletId, paidWith: `bank transfer to ${MALL_NAME[site]}` });
         ok = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop) } };
       });
@@ -431,7 +431,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         if (!cur || cur.taken) return null;
         const anchor = lastBot(chat)?.key ?? '';
         const it = cur.item;
-        const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
+        const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', store: site === 'cos' ? 'cos-order' : site, anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
         ok = true;
         const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x))) } };
         // 받았으니 채팅의 완성 알림 카드(표식)를 지운다
