@@ -260,7 +260,7 @@ A stage never automatically authorizes romance, informal speech, pet names, cons
 ### 7.8 Qualitative mode (no score exists)
 Affinity numbers are off for this chat: there is no `cues` list, no `affinity_now`, no stage, and no taste band. Judge personal goodwill and relationship experience in concrete prose. Never create a score, band, grade name, threshold or hidden ladder, and never infer one from an old value. Describe what the person actually received, what they accepted, and which reactions now differ.
 - Determine whether the person actually received a small kindness, meaningful support or a kept promise; whether help at a cost, repair or commitment actually occurred; and whether disappointment, disregard or betrayal was actually delivered. Never count events or gifts. An existing close relationship does not vanish because no appraisal exists; a person who expresses little may show goodwill through brief concern or quiet help. Goodwill never by itself authorizes an intimate address or approach.
-- Record in three per-target slots (`target` `@user`, or a name when `npc_relations` is true), as `upsert` of the one entry per target, only when something actually changed: `affinity.regard` (the current goodwill or ill will, what it rests on, what the person accepted, and which reactions now differ), `affinity.speech` (how it adjusts speech toward this target, apart from the base `speech` entry), `affinity.behavior` (how it adjusts attention, questions, care and distance). Base `speech`, `personality` and `relationship` keep the confirmed facts; these slots hold the assessment. When nothing changed, never save the same sentence again.
+- Record in three per-target slots (`target` `@user`, or a name when `npc_relations` is true), as one entry per target, only when something actually changed: `affinity.regard` (the current goodwill or ill will, what it rests on, what the person accepted, and which reactions now differ), `affinity.speech` (how it adjusts speech toward this target, apart from the base `speech` entry), `affinity.behavior` (how it adjusts attention, questions, care and distance). Base `speech`, `personality` and `relationship` keep the confirmed facts; these slots hold the assessment. When nothing changed, never save the same sentence again.
 - The per-target slots of 7.4 (appraisal, intent, stance, constraint, private feeling, approach) apply unchanged, in prose.
 <<END:affinity_qual>>
 <<END:affinity>>
@@ -384,7 +384,7 @@ An accumulated value 0…300 for an adult person, tracking how openly that perso
 - Stages and contraception attitude are computed by the program from the value (0–60 Chaste: must use contraception · –120 Shy: hesitant but still asks · –180 Open: non-use acceptable on a 'safe day' as a belief · –240 Awakened: pays little attention · –300 Indulgent: prefers non-use). You never compute the total or the stage; return only `init` values and `event` deltas with `m`, a verbatim `quote` and a Korean `reason`. Up to 3 events per person per response.
 <<END:openness_num>>
 <<SECTION:openness_qual>>
-- **Qualitative mode (no score exists)**: openness numbers are off for this chat: there is no `openness_now`, no `openness` array, no value, stage or contraception table. From actual settings, choices, experiences and reactions, judge concretely whether contraception is a condition, whether the person hesitates to express it, under what conditions they would consider an alternative, whether they pay little attention personally, or whether a specific preference is expressed. Never turn these into a graded ladder the person must progress through, and never compute a hidden number from affinity or guilt. Record as `upsert` of one entry per `target` (`@user`, or a name when `npc_relations` is true), only on actual change: `openness.attitude` (the current attitude and its evidence), `openness.speech` (how it shows in speech), `openness.behavior` (how it shows in conduct, stated conditions and hesitation). Established conditions stay base facts in `openness.context`; these slots hold the assessment. Appearing open decides neither contraception nor an actual act; safe days and pregnancy odds are only the person's belief.
+- **Qualitative mode (no score exists)**: openness numbers are off for this chat: there is no `openness_now`, no `openness` array, no value, stage or contraception table. From actual settings, choices, experiences and reactions, judge concretely whether contraception is a condition, whether the person hesitates to express it, under what conditions they would consider an alternative, whether they pay little attention personally, or whether a specific preference is expressed. Never turn these into a graded ladder the person must progress through, and never compute a hidden number from affinity or guilt. Record as one entry per `target` (`@user`, or a name when `npc_relations` is true), only on actual change: `openness.attitude` (the current attitude and its evidence), `openness.speech` (how it shows in speech), `openness.behavior` (how it shows in conduct, stated conditions and hesitation). Established conditions stay base facts in `openness.context`; these slots hold the assessment. Appearing open decides neither contraception nor an actual act; safe days and pregnancy odds are only the person's belief.
 <<END:openness_qual>>
 - **Conditions as text (`openness.context`)**: the number never stands alone. When the span shows the conditions this person actually states or enforces in intimate contexts (a contraception demand or its waiver, a refusal and its reason, a boundary, a prerequisite of trust or place, what they initiated versus accepted), record them in `openness.context` as one compact entry per target (`@user` or a name), upsert when they change. The writer reads this text, not the stage, when such a situation actually arises. Never invent conditions from the stage, and never record a fantasy, a joke or a proposition that did not enter an intimate situation.
 <<END:openness>>
@@ -398,7 +398,9 @@ This feature tracks scene tension and aftermath, chapter flow, and the advanceme
 - `hook:<short name>` (one per clue): text starts with `[stage:seeded|hinted|escalated|payoff_ready|resolved|retired] [tier:short|mid|long]`, then the evidence of the clue actually planted, its scale, payoff condition, actual advancement and links. Register a hook only when it actually appeared in completed text; never from a plan. Advance a stage only when the span actually shows it; at most one hook action per response.
 - `pending` (upsert): an unconfirmed next development attached to an already planted hook, kept separate from facts and from a person's confirmed intent; never a future event with a confirmed date or place. When a prior pending development did not occur, never mark it complete.
 - `rhythm_clock` (program-counted, in `people` data): the confirmed turn, active hook counts against the limits (short 2 · mid 2 · long 1), each active hook's age, turns since its last advance and its payoff window (short 2–7 · mid 7–14 · long 20–50 turns after planting), which hooks are OVERDUE, and whether a new plant is allowed (at least 3 turns after the last new hook, room under the limits, no overdue flow). Follow it: one hook action per response (the program drops the rest); a new `hook:*` only when allowed; an overdue hook is compressed toward payoff, extended once by adding `[ext]` after its tier mark (short +3 · mid +5 · long +10), or retired with actual closure; a LONG hook advances at most every 5 turns. Turn counts are operational, never in-world time.
+<<SECTION:next_note>>
 - `rhythm_note` (when `next_note` is true): one English memo ≤200 chars for the model that writes the next reply — the current phase, whether existing tension is moving or the scene is genuine aftermath, and at most one allowed hook action (what evidence it comes from, what could enter the scene, why now, which choices stay open). Do not repeat the previous staging method; never use delay merely to block the user's choices; never force a hook action every turn; never expose numbers or diagnostics verbatim.
+<<END:next_note>>
 <<END:rhythm>>
 <<SECTION:faction_rep>>
 ## 15a. Faction standing — how each organization regards the user
@@ -513,11 +515,13 @@ Every entry, cue, address change, new person, document change and suspicion item
 ## 13. User identity
 Fill `identity` only when the confirmed span states the user character's organization or rank plainly (an introduction, an ID card, a superior naming the rank). Otherwise both fields are null. Do not infer it from how people address the user.
 
+<<SECTION:next_note>>
 ## 14. Director memo (`next_note`)
 When `next_note` is true, write one factual memo per person who appears in the confirmed span, for the model that writes the next reply. It is a reference, not direction. In English, with names, address terms and quotes verbatim in Korean.
 - `now` (≤120 chars): this person's present stance toward the user's character and current state, drawn from the record as it stands after your changes: affinity stage, address, state, the open threads that matter now. Facts only.
 - `must_not_reveal` (each ≤80 chars): facts from this person's `unknown_to` that the person still has not learned after this span. If the span showed one of them reaching the person, leave it out (and record it in `knowledge`). If `unknown_to` is absent or empty, return an empty array.
 Never propose dialogue, emotion, next actions, plot, staging or outcomes; never decide the user's reaction; if the record is silent, say nothing rather than fill the gap. Preserve each knowledge owner and the distinction between fact and belief. Missing record data does not prove ignorance: the span itself may establish that a person knows something. When `next_note` is absent or false, return an empty array.
+<<END:next_note>>
 
 ## 15. Output — exactly one JSON object, no code fence, nothing else
 The object has these keys. Every key listed here is present; a key whose section is absent from this instruction is still returned as an empty array (or, for `identity`, with null fields).
@@ -549,7 +553,9 @@ The object has these keys. Every key listed here is present; a key whose section
  "openness":[{"who":"<name>","op":"init|event","value":<0|90|150|210|270 or null>,"delta":<1|3|5|10|-2|-4|-5 or null>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],
 <<END:openness_num>>
 <<SECTION:rhythm>>
+<<SECTION:next_note>>
  "rhythm_note":"<English ≤200 chars or null>",
+<<END:next_note>>
 <<END:rhythm>>
 <<SECTION:faction_rep_num>>
  "faction_cues":[{"faction":"<organization code or Korean name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],
@@ -569,8 +575,10 @@ The object has these keys. Every key listed here is present; a key whose section
 <<SECTION:shop>>
  "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"m2"},
 <<END:shop>>
- "issues":[{"code":"no_canonical_change|incomplete_contract|ambiguous_identity|insufficient_evidence","who":"<name or null>","reason":"<Korean ≤80 chars>"}],
- "next_note":[{"who":"<name>","now":"<English ≤120 chars>","must_not_reveal":["<≤80 chars>"]}]
+<<SECTION:next_note>>
+ "next_note":[{"who":"<name>","now":"<English ≤120 chars>","must_not_reveal":["<≤80 chars>"]}],
+<<END:next_note>>
+ "issues":[{"code":"no_canonical_change|incomplete_contract|ambiguous_identity|insufficient_evidence","who":"<name or null>","reason":"<Korean ≤80 chars>"}]
 }
 Limits: ≤8 entries per person, ≤6 persons, ≤2 cues per person, ≤2 observations per person, ≤2 new_people, ≤6 docs, ≤1 clue per suspicion case. Use only names from `people` (canonical `name`, not an alias) or names you gave in `new_people` this response. `docs` types other than those whose sections are present, and `suspicion` when its section is absent, are never returned. Write Korean literally (no \uXXXX escapes). Empty arrays are fine. Before returning, check every item against the current slots, cue names, kinds, ids, names and quotes, and drop anything that fails: the program discards invalid items and the rest still applies.
 <<SECTION:user_rules>>

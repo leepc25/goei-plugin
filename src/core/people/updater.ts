@@ -740,8 +740,17 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     let replaces: string | undefined;
-    if (op === 'upsert') {
-      const target = cur.find((x) => x.id === e.replace);
+    // replace 없는 upsert (전수검사 11-13: 안내서대로 처음 쓰는 항목이 버려졌다): 같은 대상의 항목이 없으면 add, 대상 칸에 하나뿐이면 그것을 고친다
+    const rid = typeof e.replace === 'string' ? e.replace.trim() : '';
+    let opx = op;
+    let found: (typeof cur)[number] | undefined;
+    if (op === 'upsert' && !rid) {
+      const same = meta.targeted ? cur.filter((x) => (x.target ?? '@user') === (target ?? '@user')) : cur;
+      if (!same.length) opx = 'add';
+      else if (meta.targeted && target && same.length === 1) found = same[0];
+    } else if (op === 'upsert') found = cur.find((x) => x.id === rid);
+    if (opx === 'upsert') {
+      const target = found;
       if (!target) {
         drop('entry', e, 'replace 가 실제 항목이 아님', who);
         continue;
@@ -764,7 +773,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         continue;
       }
       replaces = target.id;
-    } else if (op === 'add') {
+    } else if (opx === 'add') {
       if (slot === 'speech') text = applySpeechSign('', text, variety);
       if (cur.some((x) => similar(x.text, text))) {
         drop('entry', e, '같은 뜻의 항목이 이미 있음', who);
@@ -1091,8 +1100,11 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     let replaces: string | undefined;
-    if (d.op === 'upsert' || d.op === 'remove') {
-      const target = cur.find((x) => x.id === d.replace);
+    // replace 없는 upsert: 문서가 비어 있으면 add, 항목이 하나뿐이면 그것을 고친다 (전수검사 11-13)
+    const drid = typeof d.replace === 'string' ? d.replace.trim() : '';
+    const dop = d.op === 'upsert' && !drid && cur.length === 0 ? 'add' : d.op;
+    if (dop === 'upsert' || dop === 'remove') {
+      const target = drid ? cur.find((x) => x.id === drid) : dop === 'upsert' && cur.length === 1 ? cur[0] : undefined;
       if (!target) {
         drop('doc', d, 'replace 가 실제 항목이 아님');
         continue;
@@ -1103,16 +1115,16 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       }
       replaces = target.id;
     }
-    if (d.op !== 'remove' && !text) {
+    if (dop !== 'remove' && !text) {
       drop('doc', d, '본문 없음');
       continue;
     }
-    if (d.op === 'add' && cur.some((x) => similar(x.text, text))) {
+    if (dop === 'add' && cur.some((x) => similar(x.text, text))) {
       drop('doc', d, '같은 뜻의 항목이 이미 있음');
       continue;
     }
     const seq = nextSeq(ev.anchor);
-    const body = d.op === 'remove' ? `(해소) ${cur.find((x) => x.id === replaces)!.text}`.slice(0, 200) : text;
+    const body = dop === 'remove' ? `(해소) ${cur.find((x) => x.id === replaces)!.text}`.slice(0, 200) : text;
     if (putDoc(store, type, key, { id: entryId(`${type}:${key}`, 'doc', ev.anchor, seq, body), text: body, src: 'story', anchor: ev.anchor, seq, ...(norm(str(d.quote)).length >= 3 ? { quote: d.quote } : {}), ...(replaces ? { replaces } : {}), ...(d.date ? { date: plain(d.date, 20) } : {}), ...(d.place ? { place: plain(d.place, 40) } : {}), ...(Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {}) })) report.applied.docs++;
   }
 

@@ -40,6 +40,14 @@ test('기본 지침으로 만든 요청문 = 옮기기 전 코드가 만들던 �
   const LATER = [
     ['장비 (worn or carried on the body: clothes, armor, bags, accessories)', '장비 (worn or strapped on the body: clothes, armor, bags, accessories; not something merely kept in a pocket or bag)'],
     ['소모N (used up; N is how many uses this one item holds, judged from what it is and how it is sold)', '소모N (anything spent by using it — medicine, dressings, food and drink, ammunition, tape, batteries, single-use talismans — must be 소모N; N is how many uses this one item holds, counting everything in a set or pack, judged from what it is and how it is sold)'],
+    // 전수검사 11-13: 괴담넷 보호 글은 최대 개수에 안 센다(코드와 맞춤)
+    ["Total target maximum including protected posts: ", "Target maximum, not counting protected posts: "],
+    // 전수검사 11-13: 같은 뜻
+    ["\\nOn regeneration:\\n- Replace unprotected NPC posts with new topics.\\n- Preserve the specified protected categories with original IDs/text.\\n- Count protected posts toward the maximum. If they fill it, add no new posts.\\n- Protected records may exceed the maximum; never delete them automatically.\\n- Do not invent user actions or mine=true ownership.", ""],
+    // 전수검사 11-13: DC 말투 기본은 괴담갤 갈래에만
+    ["Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. Include serious firsthand accounts too. Vary ages, interests, sentence lengths and endings; do not make everyone a polite adviser or an exposition narrator. Strong criticism and disagreement need not be immediately moderated or resolved.\\nDo not use civilian DC meme speech.", "Include serious firsthand accounts too. Vary ages, interests, sentence lengths and endings; do not make everyone a polite adviser or an exposition narrator. Strong criticism and disagreement need not be immediately moderated or resolved.\\nDo not use civilian DC meme speech."],
+    // 전수검사 11-13: 같은 뜻
+    ["Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. Include serious firsthand accounts too. Vary ages, interests, sentence lengths and endings; do not make everyone a polite adviser or an exposition narrator. Strong criticism and disagreement need not be immediately moderated or resolved.\\nThis is not a DC gallery", "Include serious firsthand accounts too. Vary ages, interests, sentence lengths and endings; do not make everyone a polite adviser or an exposition narrator. Strong criticism and disagreement need not be immediately moderated or resolved.\\nThis is not a DC gallery"],
   ];
   const later = (t) => LATER.reduce((x, [a, b]) => x.split(a).join(b), t);
   for (const k of names) assert.equal(BASE[k], later(OLD.calls[k]), k);

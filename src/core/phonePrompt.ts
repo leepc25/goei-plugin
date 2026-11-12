@@ -396,7 +396,8 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
     const packet = roomPacket(r, set.reactions, history);
     packet.action = { type: 'refresh' };
     packet.receiveMessages = refreshAllowed(chat, r, set, incomingOn)[0];
-    rooms.push(packet);
+    // 대화가 없는 연락처 방은 빈 칸(대화 상태·참여자·pov·action 등)을 싣지 않는다
+    rooms.push(packet.candidateOnly && !packet.messages.length ? ({ id: packet.id, kind: packet.kind, name: packet.name, activeMembers: packet.activeMembers, messages: packet.messages, candidateOnly: true, receiveMessages: packet.receiveMessages } as RoomPacket) : packet);
     selected.set(r.id, r);
     receive.set(r.id, packet.receiveMessages);
     for (const cid of r.members) {
