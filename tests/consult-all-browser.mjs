@@ -9,12 +9,14 @@
 // 사용법: node tests/consult-all-browser.mjs <fixture.json> [결과 폴더]
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { boot, chatOf, clickSel, goNode, launch, loadFixture, openEditor, openWin, setChat, sleep } from './qc-settings-harness.mjs';
+import { boot, chatOf, clickSel, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, setChat, sleep } from './qc-settings-harness.mjs';
 
 const fx = loadFixture(process.argv[2]);
 const OUT = process.argv[3] || '';
 if (OUT) mkdirSync(OUT, { recursive: true });
-const browser = await launch();
+let browser = await launch();
+// 절마다 브라우저를 새로 띄운다 (전수 두 번 뒤 같은 브라우저로 이어 가면 Chromium 탭이 죽는 일이 있었다)
+const renew = async () => { await browser.close().catch(() => {}); browser = await launch(); };
 const MARK = 'ZZ메인본문표식';
 const started = (extra = {}) => ({ message: [{ role: 'user', data: 'hi' }, { role: 'char', data: `${MARK}\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]` }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fixed_theme: 'dark', $st_anomaly_on: '1', ...extra } });
 const fresh = () => ({ message: [], scriptstate: {} });
@@ -88,6 +90,7 @@ const FORM = {
   'ms-roll.bm:tiers': (c) => `${c}\\n시험가|test tier|1|2|1`,
   'ms-desk.axes': (c) => `${c}\\n시험: 가, 나`,
   'pp-bounds': () => '70,30,-10,-50',
+  'set-wallet-start': () => '12345',
 };
 /** 그 줄을 바꿀 새 값 (모델이 적을 글) */
 function target(r, alt = false) {
@@ -239,6 +242,7 @@ if (PART.includes('sweep')) {
 
 /* ── 3. 시작 전(새 채팅 기본 설정): 모든 메뉴 ── */
 if (PART.includes('fresh')) {
+  await renew();
   const { page, errors } = await boot(browser, fx, fresh(), PC);
   await openWin(page);
   await openEditor(page, 'set:screen');
@@ -256,6 +260,7 @@ if (PART.includes('fresh')) {
 
 /* ── 4·5. 통로·글 칸·못 바꾸는 줄·<open>·<go>·대화 지우기·상한·증상 지식 ── */
 if (PART.includes('misc')) {
+  await renew();
   const { page, errors } = await boot(browser, fx, started(), PC);
   await openWin(page);
   await openEditor(page, 'set:people');
@@ -416,21 +421,17 @@ if (PART.includes('misc')) {
   await send(page, '응', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   eq((await chatOf(page)).scriptstate.$pp_director, 'note', '지우기 전: 상담이 바꾼 값');
   const chatA = await chatOf(page);
-  // 다른 채팅으로 가서 한마디
+  // 다른 채팅으로 가서 한마디 (창을 닫았다 열어야 플러그인이 바뀐 채팅을 읽는다)
+  const reopen = async () => { await closeEditor(page, true); await closeWin(page); await sleep(300); await openWin(page); await openEditor(page, 'set:people'); await sleep(300); await openConsult(page); };
   await setChat(page, { ...started(), id: 'other-chat', name: '다른 채팅' });
-  await sleep(600);
-  if (await page.evaluate(() => document.querySelector('.gw')?.hidden !== false)) { await openWin(page); await openEditor(page, 'set:people'); }
-  await openConsult(page);
-  const otherLog = await logOf(page);
-  if (otherLog.some((l) => l.includes('Director를 메모형으로'))) report.notes.push('시험 틀의 setChat 이 같은 채팅으로 읽혀 「다른 채팅의 대화는 그대로」는 저장소 글로만 확인했다');
+  await reopen();
   await send(page, '다른채팅표식말', [SAY('다른채팅답')]);
   await setChat(page, chatA);
-  await sleep(600);
-  if (await page.evaluate(() => document.querySelector('.gw')?.hidden !== false)) { await openWin(page); await openEditor(page, 'set:people'); }
-  await openConsult(page);
+  await reopen();
   const sBefore = await snap(page);
   const stored0 = await page.evaluate(() => window.__store['p:goei:consult'] ?? '');
   ok(stored0.includes('Director를 메모형으로'), '지우기 전: 저장소에 이 채팅의 대화');
+  ok(stored0.includes('다른채팅표식말') && !(await logOf(page)).some((l) => l.includes('다른채팅표식말')) && (await logOf(page)).some((l) => l.includes('Director를 메모형으로')), '다른 채팅에서 한 말은 그 채팅의 대화로 따로 있다 (이 채팅 창에는 안 보인다)');
   await clickSel(page, '.gw-ai [data-action="ai-clear"]');
   await page.waitForSelector('.gw-ai [data-action="ai-clear-yes"]');
   eq(await page.evaluate(() => document.querySelector('.gw-ai .gw-confirm-box p')?.textContent), '이 채팅의 상담 대화를 지울까요? 바꾼 설정은 그대로 둬요.', '대화 지우기: 한 번 묻는다');
@@ -449,7 +450,7 @@ if (PART.includes('misc')) {
   same(sBefore, await snap(page), '대화를 지워도 바꾼 설정은 그대로');
   const stored1 = await page.evaluate(() => window.__store['p:goei:consult'] ?? '');
   ok(!stored1.includes('Director를 메모형으로'), '저장소에서도 이 채팅의 대화가 지워졌다');
-  if (stored0.includes('다른채팅표식말') && !otherLog.some((l) => l.includes('Director를 메모형으로'))) ok(stored1.includes('다른채팅표식말'), '다른 채팅의 대화는 그대로');
+  ok(stored1.includes('다른채팅표식말') && stored1.includes('다른채팅답'), '다른 채팅의 대화는 그대로');
   // 지운 뒤 <apply> 가 와도 적어 둔 것이 없다
   await send(page, '응', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   same(sBefore, await snap(page), '지운 뒤의 <apply> 는 아무것도 바꾸지 않는다');
@@ -465,6 +466,28 @@ if (PART.includes('misc')) {
     for (const w of [...words, 'KNOWLEDGE', '[설정 목록]']) ok(!sent.includes(w), `${mode} 요청에 상담 글 없음: ${w}`);
   }
   eq(errors.length, 0, `콘솔 오류 없음(통로·글): ${errors.slice(0, 3).join(' / ')}`);
+  await page.close();
+}
+
+/* ── 지난 턴 실제: 숫자만 넘긴다 (요청·응답 원문은 안 넘긴다) ── */
+if (PART.includes('misc')) {
+  const RAW = 'ZZ기록원문표식';
+  await renew();
+  const call = (label, phase, model, rq, rs, ms) => ({ id: label, at: '2026-11-12T10:00:00.000Z', label, model, ok: true, request: `system: ${RAW}`, requestChars: 100, requestTokens: rq, response: RAW, responseChars: 50, responseTokens: rs, phase, ms });
+  const turn = { id: 't1', at: '2026-11-12T10:00:00.000Z', main: { at: '2026-11-12T10:00:00.000Z', shape: [{ role: 'user', chars: 10 }], tail: [{ role: 'user', content: RAW }], failed: [], totalChars: 90000, totalTokens: 31234 }, reply: { at: '2026-11-12T10:00:30.000Z', text: RAW, chars: 2000, tokens: 1234 }, calls: [call('Director', 'before', 'aux', 5210, 310, 4200), call('인물 갱신', 'after', 'aux', 30120, 890, 15300), call('AI 상담', 'manual', 'aux', 4000, 100, 900)] };
+  const { page, errors } = await boot(browser, fx, started(), PC, { store: { 'p:goei-trace': JSON.stringify([turn]) } });
+  await openWin(page);
+  await openEditor(page, 'manage:flow');
+  await sleep(500);
+  await openConsult(page);
+  await send(page, '왜 느려', [SAY('네')]);
+  const u = (await lastReq(page))[1];
+  const last = u.slice(u.indexOf('[지난 턴 실제]'), u.indexOf('[메뉴]'));
+  ok(last.includes('31,234') && last.includes('1,234') && last.includes('Director') && last.includes('5,210') && last.includes('인물 갱신') && last.includes('30,120'), `지난 턴 실제: 호출마다 숫자 (${last.replace(/\n/g, ' / ').slice(0, 300)})`);
+  ok(!last.includes('AI 상담'), '지난 턴 실제: 턴 밖에서 누른 호출(AI 상담 자신 등)은 넣지 않는다');
+  ok(!(await lastReq(page)).join('\n').includes(RAW), '지난 턴 실제: 요청·응답 원문은 넘기지 않는다');
+  report.lastTurn = last;
+  eq(errors.length, 0, `콘솔 오류 없음(지난 턴): ${errors.slice(0, 3).join(' / ')}`);
   await page.close();
 }
 
@@ -522,7 +545,7 @@ async function shots(vp, tag) {
   eq(errors.length, 0, `콘솔 오류 없음(${tag}): ${errors.slice(0, 3).join(' / ')}`);
   await page.close();
 }
-if (PART.includes('shots')) { await shots(PC, 'pc'); await shots(PHONE, 'phone'); }
+if (PART.includes('shots')) { await renew(); await shots(PC, 'pc'); await shots(PHONE, 'phone'); }
 
 await browser.close();
 console.log(`consult-all: ${checks} checks passed`);
