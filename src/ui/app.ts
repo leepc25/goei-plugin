@@ -153,6 +153,14 @@ function gnActionSite(action: string): BoardSite {
 const tabBoard = (): BoardSite => { const s = curTab().site; return isBoardSite(s) ? s : 'gn'; };
 /** 폰 공용 서랍(위키·괴담넷·설정) 펼침 (2026-11-07 사용자: 메뉴별 도구 줄은 늘 보이고, 서랍은 전 메뉴 공통) */
 let cdrOpen = false;
+/** 서랍 열림·닫힘을 화면에 맞춘다. 요소를 갈지 않고 class 만 바꿔서 미끄러짐이 돈다 */
+function syncDrawer(): void {
+  const el = root?.querySelector<HTMLElement>('.gx-cdr');
+  if (!el) return;
+  void el.offsetHeight; // 앞 모습을 한 번 계산시켜야 바꿀 때 미끄러진다
+  el.classList.toggle('open', cdrOpen);
+  el.querySelector('.gx-cgrip')?.setAttribute('aria-expanded', String(cdrOpen));
+}
 let lastForm: HTMLFormElement | null = null;
 let tab: Tab = 'board';
 /** 카드에서 고유 상점 사이트로 접속: 인터넷 창만 (닫으면 풀린다) */
@@ -963,8 +971,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close() }))) return;
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
-    root?.querySelector('.gx-cdr')?.classList.toggle('open', cdrOpen);
-    root?.querySelector('.gx-cgrip')?.setAttribute('aria-expanded', String(cdrOpen));
+    syncDrawer();
     return;
   }
   // 기록 메뉴(일지·보고서·인물·세력)와 설정 「기록」 묶음. 상황판 종료 줄·알림의 보고서 지름길(rec-open)·「기록에서 전부 보기」(rec-journal)는 기록 탭으로 넘어간다
@@ -1895,9 +1902,14 @@ function commonDrawer(ctx: ChatContext | null): string {
   const site = (id: SiteId) =>
     `<button class="ph-tool${here === id ? ' on' : ''}" data-action="br-site" data-value="${id}">${siteLogo(id, 'gx-cdr-logo')}<span class="ph-tool-l">${esc(SITES.find((x) => x.id === id)!.name)}</span></button>`;
   const set = `<button class="ph-tool${tab === 'settings' ? ' on' : ''}" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span class="ph-tool-l">설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>`;
-  return `<div class="gx-cdr${cdrOpen ? ' open' : ''}">
-    <div class="gx-cpanel ph-tools gx-cpanel2">${browserSites(ctx).map(site).join('')}${set}</div>
-    <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
+  // 다시 그리는 사이에 열림이 바뀌었으면(메뉴·사이트를 골라 닫힘 등) 지금 화면에 있는 모습으로 그린 뒤 다음 장에 바꿔서, 서랍이 뚝 사라지지 않고 바 뒤로 미끄러져 내려가게 한다
+  const drawn = !!root?.querySelector('.gx-cdr.open');
+  if (drawn !== cdrOpen) requestAnimationFrame(syncDrawer);
+  return `<div class="gx-cdr${drawn ? ' open' : ''}">
+    <div class="gx-cslide">
+      <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
+      <div class="gx-cpanel ph-tools gx-cpanel2">${browserSites(ctx).map(site).join('')}${set}</div>
+    </div>
   </div>`;
 }
 

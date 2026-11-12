@@ -3522,16 +3522,21 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .sh-drawer .sh-dlg-box { flex: 1; min-height: 0; max-height: none; overflow-y: auto; padding: 12px 14px; }
   .sh-drawer .sh-dlg-box p { font-size: 14.5px; line-height: 1.7; }
 }
-/* 폰 공용 서랍 (2026-11-07 사용자): 하단 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색·테두리만 선 색). 열면 위키·괴담넷·설정 한 줄이 도구 줄을 덮는다 */
+/* 폰 공용 서랍 (2026-11-07 사용자): 하단 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색·테두리만 선 색). 열면 사이트·설정 줄이 도구 줄을 덮는다.
+   2026-11-12 사용자: 서랍은 하단 바 「뒤에서」 올라온다. 그릇(.gx-cdr)이 바 윗선에서 잘라서 바를 덮는 일이 없고, 흐려졌다 나타나지 않고 미끄러지기만 한다.
+   손잡이는 서랍 윗선에 붙어 같이 오르내린다. 마지막 줄과 바 사이는 --cdr-pad 만큼 띄운다. 값은 여기 한 곳 */
 .gx-cdr { display: none; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gx-nav { position: relative; }
-  .gx-cdr { display: block; position: absolute; left: 0; right: 0; bottom: 100%; z-index: 4; pointer-events: none; }
-  .gx-cgrip { position: absolute; z-index: 2; left: 50%; bottom: 0; transform: translateX(-50%); width: 48px; height: 8px; padding: 0; border: 1px solid var(--line); border-bottom: 0; border-radius: 5px 5px 0 0; background: var(--sunk); display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; touch-action: none; }
+  .gx-cdr { --cdr-grip: 8px; --cdr-pad: 10px; --cdr-move: .26s; display: block; position: absolute; left: 0; right: 0; bottom: calc(100% + 1px); height: 0; z-index: 4; pointer-events: none; clip-path: inset(-100vh 0 0 0); }
+  .gx-cslide { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateY(calc(100% - var(--cdr-grip))); transition: transform var(--cdr-move) cubic-bezier(.22, .8, .3, 1); will-change: transform; }
+  .gx-cdr.open .gx-cslide { transform: none; }
+  .gx-cgrip { flex: none; position: relative; z-index: 2; width: 48px; height: var(--cdr-grip); padding: 0; border: 1px solid var(--line); border-bottom: 0; border-radius: 5px 5px 0 0; background: var(--sunk); display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; touch-action: none; }
   .gx-cgrip i { width: 18px; height: 2px; border-radius: 2px; background: var(--dim); }
   .gx-cdr.open .gx-cgrip i { background: var(--signal); }
-  .gx-cpanel { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; padding: 6px 8px 4px; box-sizing: border-box; display: flex; gap: 4px; background: var(--panel); border-top: 1px solid var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .6); transform: translateY(100%); opacity: 0; transition: transform .18s ease, opacity .18s ease; pointer-events: none; }
-  .gx-cdr.open .gx-cpanel { transform: none; opacity: 1; pointer-events: auto; }
+  .gx-cpanel { align-self: stretch; flex: none; height: 56px; padding: 6px 8px var(--cdr-pad); box-sizing: border-box; display: flex; gap: 4px; background: var(--panel); border-top: 1px solid var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, 0); visibility: hidden; transition: visibility 0s linear var(--cdr-move), box-shadow var(--cdr-move) ease-out; pointer-events: none; }
+  .gx-cdr.open .gx-cpanel { visibility: visible; box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .6); transition-delay: 0s; pointer-events: auto; }
+  @media (prefers-reduced-motion: reduce) { .gx-cslide, .gx-cpanel { transition: none; } }
   .gx-cpanel .ph-tool { flex: 1; height: 44px; gap: 4px; }
   .gx-cpanel .ph-tool svg { width: 20px; height: 20px; }
   .gx-cpanel .ph-tool-l { font-size: 11px; }
