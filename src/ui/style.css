@@ -4852,16 +4852,15 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-tb-err { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--danger); }
 .ms-tb-foot { display: flex; gap: 8px; padding-top: 2px; }
 .ms-axs .ms-tb-h, .ms-ax { display: grid; grid-template-columns: 148px minmax(0, 1fr) 34px; column-gap: 8px; align-items: center; }
-.ms-cl { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-.ms-cl-add { display: flex; gap: 6px; align-items: center; }
-.ms-cl-add > input.gx-search { width: 200px; max-width: 100%; }
-.gw .ms-cl .gx-chip small { color: var(--dim); font-size: 13px; }
 .ms-clips .ms-tb-h, .ms-clip.ms-tb-r { grid-template-columns: 150px 220px minmax(0, 1fr) 34px; }
 .ms-clip select { width: 100%; }
 .ms-pairs .ms-pg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; row-gap: 6px; }
 .ms-pairs .ms-tb-h, .ms-pairs .ms-tb-r { grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) 34px; }
-.ms-fold { display: flex; align-items: center; gap: 10px; min-height: 34px; }
-.ms-fold > span { font-size: 13px; color: var(--sub); }
+/* 쉼표 목록 한 칸: 주사위 칸의 값 칸과 같은 글꼴, 내용만큼 높이 */
+.gw textarea.ms-list { font: inherit; font-size: 13px; line-height: 1.5; field-sizing: content; min-height: 34px; resize: none; }
+/* 그림 대체 말: 기존 접는 양식(.ps-adv) 안의 표 */
+.gw .ps-adv-body > .ms-pairs { padding: 12px 14px 4px; }
+.gw .ps-adv-body > .ms-pairs + .ps-note { margin: 0; padding: 8px 14px 14px; }
 .ms-arrow { font-style: normal; color: var(--dim); text-align: center; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .ms-tb { gap: 8px; }
@@ -4886,7 +4885,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .ms-ax { padding: 8px 10px; }
   .ms-pairs .ms-pg { grid-template-columns: minmax(0, 1fr); }
   .ms-pairs .ms-pg > .ms-tb-h:nth-child(2) { display: none; }
-  .ms-cl-add > input.gx-search { flex: 1; width: auto; min-width: 0; }
 }
 .ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
 .ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }

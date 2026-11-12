@@ -892,9 +892,6 @@ function tierTable(vars: Record<string, unknown> | undefined, site: MallSite): s
   }).join('');
   return `<div class="ms-tb"><div class="ms-tb-h"><span>이름</span><span>설명(영어)</span><span>하한</span><span>상한</span><span>가중치</span><span></span></div>${body}<div class="ms-tb-foot"><button class="gx-mini primary" data-action="ms-tier-add" data-value="${site}" ${rows.length >= 12 ? 'disabled' : ''}>등급 추가</button></div></div>`;
 }
-/** 쉼표 목록 → 칩 + 추가 칸 (칩을 누르면 그 항목이 빠진다) */
-const chipList = (items: string[], del: string, key: string, add: string, name: string, ph: string) =>
-  `<div class="ms-cl"><div class="gx-chips">${items.map((g, i) => `<button class="gx-chip" data-action="${del}" data-value="${key}${i}" aria-label="${esc(g)} 지우기">${esc(g)}<small>×</small></button>`).join('')}</div><div class="ms-cl-add"><input class="gx-search" name="${name}" maxlength="40" placeholder="${ph}" aria-label="${ph}"><button class="gx-mini" data-action="${add}" data-take="${name}">추가</button></div></div>`;
 /** 상담사 주사위 칸: 한 줄에 칸 이름 + 값(쉼표로 나눈 글 한 칸) + × (v2: 값마다 칩으로 쪼개면 높이가 3.7배가 돼서 한 칸으로) */
 interface AxisRaw { name: string; values: string[] }
 const axesRaw = (text: string): AxisRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes(':')).map((l) => { const i = l.indexOf(':'); return { name: l.slice(0, i).trim(), values: l.slice(i + 1).split(/[,，]/).map((x) => x.trim()).filter(Boolean) }; });
@@ -948,11 +945,10 @@ function cosRollGroup(ctx: ChatContext, site: MallSite): string {
   const money = (x: CosTier) => (bm ? `${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}p` : `₩${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}`);
   const sample = r.on ? cosDraw(n, s.context, r).map((x, i) => `<li><b>${i + 1}칸</b> ${esc(x.genre)} · ${esc(x.tier.name)} ${money(x.tier)}${x.useful ? ' · <i>상황용</i>' : ''}</li>`).join('') : '';
   const word = bm ? '분류' : '장르';
-  const listText = String(vars?.$mock_list ?? '') === 'text'; // 시안: 쉼표 목록 두 안 견주기 (text = 지금 같은 글 상자)
   const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 ${word}를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — ${bm ? 'CATEGORY' : 'GENRE'} · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, ${word}·등급을 바꾸지 못해요.${bm ? ' 로어북의 가격 예시 물건을 그대로 되풀이하기 어렵게 하는 장치예요.' : ''}</p>`;
   return group('진열 배정', how + [
     row('사용', mseg(site, 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요).'),
-    listText ? row(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres">${esc(genresText(r.genres))}</textarea>`, `쉼표로 나눠요. 다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, mark(gSet)) : row(`${word} 목록`, chipList(r.genres, 'ms-gen-del', `${site}:`, `ms-gen-add:${site}`, `ms-gen-${site}`, word), `다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, `ms-wide ${mark(gSet)}`),
+    row(`${word} 목록`, `<textarea class="gx-search ms-area ms-list" rows="2" data-change="ms-roll" data-key="${site}:genres">${esc(genresText(r.genres))}</textarea>`, `쉼표로 나눠요. 다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, `ms-wide ${mark(gSet)}`),
     row(`${word} 뽑기`, mseg(site, 'roll_gmode', r.gmode, [['uniq', '칸마다 다르게'], ['any', '겹쳐도 됨'], ['one', `한 ${word}로`]]), r.gmode === 'uniq' ? '목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시.' : r.gmode === 'any' ? `칸마다 따로 무작위. 같은 ${word}가 여러 칸에 나올 수 있어요.` : `한 판에 ${word} 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).`),
     row('값 등급', tierTable(vars, site), bm ? '가중치는 뽑힐 비율이에요(0이면 안 뽑혀요). 다 지우면 기본 5단계(30~9,999p, 싼 쪽에 가중치)로 돌아가요.' : '가중치는 뽑힐 비율이에요(0이면 안 뽑혀요). 다 지우면 기본 5단계(₩999,999~49,999,999, 모두 1)로 돌아가요.', `ms-wide ${mark(String(vars?.[K.tiers] ?? '').trim() !== '')}`),
     row('등급 뽑기', mseg(site, 'roll_tmode', r.tmode, [['weight', '가중치대로'], ['even', '골고루'], ['same', '한 등급으로']]), r.tmode === 'weight' ? '칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요.' : r.tmode === 'even' ? '등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요.' : '한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요.'),
@@ -1161,7 +1157,6 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     // 시안: 값 등급 칸 단위 고치기·목록 칩 (저장 글 꼴 그대로. 못 쓰는 줄도 남겨 두고 읽는 쪽이 거른다)
     const vars = ctx.chat.scriptstate;
     const saveT = (site: MallSite, t: TierRaw[]) => { const x = tiersRawText(t); return set({ [rollKeys(site).tiers]: !t.length || x === tiersText(rollDefaults(site).tiers) ? '' : x }); };
-    const saveG = (site: MallSite, g: string[]) => set({ [rollKeys(site).genres]: defStored(genresText(g), genresText(rollDefaults(site).genres), genresNorm) });
     const clean = (v: string, n: number) => v.replace(/[|\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
     if (action === 'ms-tier') {
       const m = /^(cos|bm):(\d+):(name|desc|lo|hi)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true;
@@ -1171,8 +1166,6 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     if (action === 'ms-tier-w') { const m = /^(cos|bm):(\d+):([+-])$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveT(site, tierRows(vars, site).map((x, i) => { if (i !== Number(m[2])) return x; const w = x.w === '' || !Number.isFinite(Number(x.w)) ? 1 : Math.trunc(Number(x.w)); return { ...x, w: String(Math.max(0, Math.min(99, w + (m[3] === '+' ? 1 : -1)))) }; })); }
     if (action === 'ms-tier-del') { const m = /^(cos|bm):(\d+)$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveT(site, tierRows(vars, site).filter((_, i) => i !== Number(m[2]))); }
     if (action === 'ms-tier-add') { const site = (value === 'bm' ? 'bm' : 'cos') as MallSite; return saveT(site, [...tierRows(vars, site), { name: '', desc: '', lo: '', hi: '', w: '1' }]); }
-    if (action === 'ms-gen-del') { const m = /^(cos|bm):(\d+)$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveG(site, mallRoll(vars, site).genres.filter((_, i) => i !== Number(m[2]))); }
-    if (action.startsWith('ms-gen-add:')) { const site = (action.slice(11) === 'bm' ? 'bm' : 'cos') as MallSite; const v = (value ?? '').replace(/[,\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40); return v ? saveG(site, [...mallRoll(vars, site).genres, v]) : true; }
   }
   if (action === 'ms-roll') {
     const m = /^(?:(cos|bm):)?(genres|tiers)=([\s\S]*)$/.exec(value ?? '');
