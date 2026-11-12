@@ -11,7 +11,8 @@ export type SetCtl =
   /** 수 한 칸 */
   | { t: 'num'; lo: number; hi: number; unit: string; act?: 'num' | 'shnum' }
   /** 글 한 줄 */
-  | { t: 'text'; ph: string; max?: number }
+  /** def = 기본값 글. 있으면 저장값이 없을 때 칸에 그 글이 진짜 값으로 들어 있다 (회색 안내 글 ph 는 「비우면 …」 같은 안내에만) */
+  | { t: 'text'; ph: string; max?: number; def?: string }
   /** 줄이기·늘리기 단추. 버튼 값은 「열쇠:-」「열쇠:+」 */
   | { t: 'step'; lo: number; hi: number; unit: string; action?: string; vkey?: string }
   /** 글 여러 줄. 이름 없이 줄 전체를 쓴다 */

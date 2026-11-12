@@ -20,7 +20,7 @@ export const HOMESHOP_SET: SetPage = {
         row('net', '인터넷에 상시 노출', on, '켜면 인터넷 즐겨찾기에 늘 보여요. 꺼도 메인 응답의 카드로 접속하면 열려요(설정 → 소지품 → 고유 상점).'),
         row('auto', '자동 호출', { t: 'seg', opts: [['manual', '수동'], ['open', '창을 열 때']] }, { manual: '새로 고침을 눌렀을 때만 새 편성을 받아요.', open: '사이트를 열 때, 지난 편성이 끝났거나 턴이 진행됐으면 한 번 새로 받아요.' }, { common: 'auto' }),
         row('retry', '자동 다시 연결', { t: 'step', lo: 0, hi: 3, unit: '회', action: 'hs-retry', vkey: 'n' }, '편성을 받지 못하면 「신호 없음」 화면에서 스스로 다시 연결하는 횟수예요(0~3).'),
-        row('tel', '주문 전화번호', { t: 'text', ph: HS_TEL_DEFAULT, max: 20 }, '방송 화면과 머리에 보이는 번호예요.'),
+        row('tel', '주문 전화번호', { t: 'text', ph: '', def: HS_TEL_DEFAULT, max: 20 }, '방송 화면과 머리에 보이는 번호예요.'),
       ],
     },
     {
@@ -58,7 +58,7 @@ export const HOMESHOP_SET: SetPage = {
       rows: [
         row('barter', '물건 맞교환', on, '전화 주문에서 가진 물건 하나로 결제할 수 있어요. 맞교환은 할부 장부에 오르지 않아요.'),
         row('call', '할부 호출 간격', pair('callLo', 'callHi'), '주문한 뒤 이만큼 턴이 지날 때마다 메인 요청에 출연 호출을 한 번 넘기고 1회 납부로 쳐요. 평소에는 메인 요청에 아무것도 보내지 않아요.'),
-        row('forms', '출연 형태', { t: 'text', ph: HS_FORMS_DEFAULT, max: 200 }, '호출 때 이 가운데 하나를 골라 넘겨요. 쉼표로 나눠요. 호출 글은 지침 → 망상홈쇼핑의 CALL 절에서 고쳐요.'),
+        row('forms', '출연 형태', { t: 'text', ph: '', def: HS_FORMS_DEFAULT, max: 200 }, '호출 때 이 가운데 하나를 골라 넘겨요. 쉼표로 나눠요. 호출 글은 지침 → 망상홈쇼핑의 CALL 절에서 고쳐요.'),
         row('peek', '스티커 들추기', on, '상품 스티커 창에서 모서리를 들춰 아래 한 줄을 볼 수 있어요.'),
         row('aud', '방청 신청', on, '신청하면 다음 턴 메인 요청에 한 줄만 넘겨요. 글은 지침의 AUDIENCE 절에서 고쳐요.'),
       ],

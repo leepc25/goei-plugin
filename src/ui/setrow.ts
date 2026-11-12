@@ -2,6 +2,7 @@
 // 페이지는 정의표(core/setdef)와 「선」(Wire: 지금 값 읽기·버튼 이름)을 주고, 줄 HTML 을 직접 쓰지 않는다.
 import { onOffSwitch } from './controls';
 import type { SetDef, SetGroup, SetPage } from '../core/setdef/types';
+import { defChanged, defShown } from '../core/deftext';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -105,7 +106,7 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
   }
   if (c.t === 'text') {
     const v = w.cur(d.key);
-    return { ctl: `<input class="gx-search ps-text" data-change="${page.flat ? `${page.id}-${d.key}"` : `${act(page, 'text')}" data-key="${sk(w, d.key)}"`} value="${esc(v === '-' ? '' : v)}"${c.max ? ` maxlength="${c.max}"` : ''} placeholder="${esc(c.ph)}">`, cur: v };
+    return { ctl: `<input class="gx-search ps-text" data-change="${page.flat ? `${page.id}-${d.key}"` : `${act(page, 'text')}" data-key="${sk(w, d.key)}"`} value="${esc(c.def !== undefined ? defShown(v, c.def) : v === '-' ? '' : v)}"${c.max ? ` maxlength="${c.max}"` : ''}${c.def !== undefined ? '' : ` placeholder="${esc(c.ph)}"`}>`, cur: v };
   }
   if (c.t === 'minmax') {
     const [a, b] = w.minmax!(d.key);
@@ -154,7 +155,9 @@ export function defRow(page: SetPage, d: SetDef, w: Wire): string {
   }
   const { ctl, cur } = control(page, d, w);
   const help = w.help?.[d.key]?.() ?? (typeof d.help === 'string' ? d.help : d.help ? (d.help[cur] ?? '') : '');
-  return setRow(d.label, ctl, help, '', d.scope);
+  // 기본값이 든 글 칸: 다르게 고친 줄만 「바꾼 줄」 점 (세부 값 줄과 같은 표시)
+  const changed = d.ctl.t === 'text' && d.ctl.def !== undefined && defChanged(cur, d.ctl.def);
+  return setRow(d.label, ctl, help, changed ? 'ps-changed' : '', d.scope);
 }
 /** 정의표의 묶음 하나 */
 export const defGroup = (page: SetPage, g: SetGroup, w: Wire): string =>

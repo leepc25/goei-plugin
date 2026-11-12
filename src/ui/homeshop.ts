@@ -14,7 +14,8 @@ import { addItem, addItemLog, itemId, liveItemsOf, readItems, itemsVars, removeI
 import { userTurns } from '../core/request';
 import { userInfo } from '../host/user';
 import { fillGuide, guideSections } from '../core/guides';
-import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
+import { defStored } from '../core/deftext';
+import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_FORMS_DEFAULT, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
 import { mountPlayer, playerCut, playerSay, playerState, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
@@ -597,9 +598,10 @@ async function homeshopSettingsAction(action: string, value: string | undefined,
     return set({ [hsKey(SH[k])]: val, ...extra });
   }
   // hs-text
-  if (k === 'tel') return set({ [HS_TEL_KEY]: v.replace(/\s+/g, ' ').trim().slice(0, 20) });
+  // 기본값이 든 칸: 기본값과 같거나 비우면 저장하지 않는다 (core/deftext)
+  if (k === 'tel') return set({ [HS_TEL_KEY]: defStored(v.replace(/\s+/g, ' '), HS_TEL_DEFAULT, undefined, 20) });
   if (k === 'clips') return set({ [HS_KEY.clips]: v.trim().slice(0, 2000) });
-  if (k === 'forms') return set({ [HS_KEY.forms]: v.replace(/\s+/g, ' ').trim().slice(0, 200) });
+  if (k === 'forms') return set({ [HS_KEY.forms]: defStored(v.replace(/\s+/g, ' '), HS_FORMS_DEFAULT, undefined, 200) });
   if (k === 'sh:price') return set({ [hsKey('$sh_price')]: v.replace(/\s+/g, ' ').trim().slice(0, 80) });
   return true;
 }

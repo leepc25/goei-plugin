@@ -1817,7 +1817,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .adv-row .ps-ctl { align-items: center; gap: 4px; }
 .adv-numrow { flex-wrap: nowrap; }
 .adv-numrow .ps-label { flex: 1 1 auto; }
-.adv-row.changed .ps-label b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
+.adv-row.changed .ps-label b::before, .ps-changed .ps-label b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
 .adv-step { gap: 6px; }
 .adv-step input.adv-val { width: 6.2em; min-height: 32px; height: 32px; padding: 0 6px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 14px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
 .adv-step input.adv-val:focus { outline: none; border-color: var(--line); background: var(--void); }
