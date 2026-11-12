@@ -121,7 +121,7 @@ export function homeshopPackText() {
   const files = {};
   const add = (f) => { if (f && !files[f]) files[f] = readFileSync(new URL(`game-src/homeshop/${f}`, ROOT)).toString('base64'); };
   for (const c of Object.values(meta.cuts)) {
-    add(c.plate); add(c.off); add(c.host);
+    add(c.plate); add(c.off); add(c.host); add(c.mask);
     for (const k of c.clips) add(k.file);
   }
   // 글꼴: Neo둥근모(OFL), woff2 로 줄인 것(650KB → 37KB, 글자 모양 그대로). 방송 그래픽·사이트 글자를 도트 결로 (11-10 사용자: 도트 시안)

@@ -21,6 +21,8 @@ import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, player
 import { shopSource } from './shop';
 import { itemPic } from './items';
 import { isPhone } from './media';
+import { playerFlush } from './hsplayer';
+import { appendLog, sameProgram, type HsLogEntry } from '../core/hslog';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -92,14 +94,14 @@ function showSource(ctx: ChatContext, show: HsShow, s: HsSettings) {
 /** 지침에 채우는 낱말 (컷·표정·화면 사건) */
 function cueWords(): Record<string, string> {
   const art = homeshopArt();
-  const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.ko))];
+  const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.name))];
   const a = names('A');
   const b = names('B').filter((x) => !a.includes(x));
-  return { cuts: Object.values(CUE_CUT_WORD).join(', '), moods: a.join(', ') || '말하기', moods_b: b.join(', ') || '-', moods_all: [...a, ...b].join(', ') || '말하기', events: Object.values(CUE_EVENT_WORD).join(', ') };
+  return { cuts: Object.values(CUE_CUT_WORD).join(', '), moods: a.join(', ') || 'talk', moods_b: b.join(', ') || '-', moods_all: [...a, ...b].join(', ') || 'talk', events: Object.values(CUE_EVENT_WORD).join(', ') };
 }
 /** 편성 요청문: 방송 전용 지침(첫 절·물건 줄·방송 꼴·시청자 절·생각 단계). 상점 진열 지침은 빌리지 않는다 (11-12 사용자) */
+const range = (r: [number, number]) => (r[0] === r[1] ? `${r[0]}` : `${r[0]} to ${r[1]}`);
 function showPrompt(ctx: ChatContext, show: HsShow, s: HsSettings): LlmMessage[] {
-  const range = (r: [number, number]) => (r[0] === r[1] ? `${r[0]}` : `${r[0]} to ${r[1]}`);
   return programPrompt(showSource(ctx, show, s), s.shop, { ...cueWords(), cue: range(s.cue), chat: range(s.chat) }) as LlmMessage[];
 }
 
@@ -248,11 +250,27 @@ function advance(at: number): void {
   const env = liveEnv;
   const ctx = env?.current();
   if (!env || !ctx) return;
+  // 부가 넘어가기 전에 지금까지 본 것을 적는다 (시청 기록)
+  playerFlush();
   void updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     const show = readShow(chat.scriptstate);
     if (!show.loaded || show.at >= at) return null;
     return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...showVars({ ...show, at: Math.min(at, show.parts.length) }) } };
   }).then(() => env.refresh());
+}
+
+/**
+ * 시청 기록 저장 (core/hslog.ts): 재생기가 모아 준 「화면에 나온 줄」 묶음을 그 채팅의 `$hs_log` 에 덧붙인다. 본편 요청이 참고 기록으로 읽는다 (body.ts moduleContext).
+ * 줄마다가 아니라 묶음으로만 부른다 (재생기 playerFlush). 그 채팅의 편성이 그사이 바뀌었으면 버린다
+ */
+function saveLog(charIndex: number, chatIndex: number, entries: HsLogEntry[], show: HsShow): void {
+  if (!entries.length) return;
+  void updateChat(charIndex, chatIndex, (chat) => {
+    const cur = readShow(chat.scriptstate);
+    if (!sameProgram(cur, show)) return null;
+    const vars = appendLog(chat.scriptstate, cur, entries);
+    return Object.keys(vars).length ? { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } } : null;
+  }).catch((error) => console.log(`[goei] ${HS_NAME} 시청 기록 저장 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 // ── 주문·상자·방청·채팅 (설계 8-4 ~ 8-10) ──
@@ -277,6 +295,9 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
   if (ui.pay === 'barter' && (!s.barter || !barterId)) return;
   let ok = false;
   let usedBarter = false;
+  // 시청 기록: 주문 전에 본 것을 먼저 적고, 주문 줄은 아래 저장에 같이 적는다
+  playerFlush();
+  const buyer = userInfo().name || '나';
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     const show = readShow(chat.scriptstate);
     const part = show.loaded ? show.parts[show.at] : null;
@@ -298,7 +319,9 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
     o.boxId = itemId(anchor, name);
     ok = true;
     usedBarter = !!gave;
-    return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars([...readOrders(chat.scriptstate).filter((x) => x.id !== o.id), o]) } };
+    // 시청 기록의 주문 줄 (본편 참고 기록, core/hslog.ts). 주문 id 를 달아 두어 주문이 없던 일이 되면 본편에도 안 간다
+    const bought = appendLog(chat.scriptstate, show, [{ k: 'buy', p: show.at, who: buyer, text: `전화 주문: 「${part.item.name}」 · ${gave ? `「${gave.name}」 맞교환` : o.n ? `무이자 할부 ${o.n}회` : part.item.pay || '방송 특가'}`, ref: o.id }]);
+    return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars([...readOrders(chat.scriptstate).filter((x) => x.id !== o.id), o]), ...bought } };
   });
   if (ok) {
     const ops = readShow(ctx.chat.scriptstate).ops;
@@ -357,7 +380,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
     const art = homeshopArt();
     const g = guideSections('Hs');
     const w = cueWords();
-    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: '1 to 3', say_chat: '2 to 5', cuts: w.cuts, moods: w.moods_all, events: w.events }), fillGuide(g.VIEWERS ?? '', {})].filter(Boolean).join('\n\n');
+    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: range(s.sayCue), say_chat: range(s.sayChat), cuts: w.cuts, moods: w.moods_all, events: w.events }), fillGuide(g.HOST ?? '', {}), fillGuide(g.VIEWERS ?? '', {})].filter(Boolean).join('\n\n');
     const st = playerState();
     const recent = part.cues.slice(Math.max(0, (st?.cue ?? 0) - 3), (st?.cue ?? 0) + 1).map((c) => `진행자: ${c.text}`).join('\n');
     // 방금까지 흐른 채팅 (내 줄은 playerSay 로 이미 맨 끝에 있다): 같은 닉네임·말투를 잇게
@@ -367,8 +390,8 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
     const moods = moodMap(art?.pack ?? null);
     const { value } = await generate([{ role: 'system', content: system }, { role: 'user', content: user }] as LlmMessage[], s.shop.model, (raw) => {
       const cueText = /<cue[^>]*>([\s\S]*?)<\/cue\s*>/i.exec(raw)?.[1] ?? '';
-      const cues = cueText.split('\n').map((l) => parseCue(l, moods)).filter((c): c is HsCue => !!c).slice(0, 3);
-      const chat = (/<chat[^>]*>([\s\S]*?)<\/chat\s*>/i.exec(raw)?.[1] ?? '').split('\n').map((l) => { const k = l.indexOf('|'); return k > 0 ? { nick: l.slice(0, k).trim().slice(0, 16), text: l.slice(k + 1).trim().slice(0, 80) } : null; }).filter((c): c is { nick: string; text: string } => !!c && !!c.text).slice(0, 6);
+      const cues = cueText.split('\n').map((l) => parseCue(l, moods)).filter((c): c is HsCue => !!c).slice(0, s.sayCue[1]);
+      const chat = (/<chat[^>]*>([\s\S]*?)<\/chat\s*>/i.exec(raw)?.[1] ?? '').split('\n').map((l) => { const k = l.indexOf('|'); return k > 0 ? { nick: l.slice(0, k).trim().slice(0, 16), text: l.slice(k + 1).trim().slice(0, 80) } : null; }).filter((c): c is { nick: string; text: string } => !!c && !!c.text).slice(0, s.sayChat[1]);
       if (!cues.length && !chat.length) throw new Error('응답에 <cue>·<chat> 블록이 없어요.');
       return { cues, chat };
     }, { retries: gs.retries, retryModel: gs.retryModel, concurrent: gs.concurrent, state: ctx.chat.scriptstate, label: `${HS_NAME} 채팅` });
@@ -378,6 +401,8 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
   } finally {
     ui.saying = false;
     playerHold(false);
+    // 시청 기록: 내 줄과 그때까지 본 것을 바로 적는다 (반응 줄은 화면에 다 나온 뒤 재생기가 넘긴다)
+    playerFlush();
   }
   env.render();
 }
@@ -502,7 +527,7 @@ export function homeshopTab(ctx: ChatContext, env: HsEnv): string {
   const stt = homeshopStatus();
   const art = homeshopArt();
   const note = !s.on ? '방송 없음' : stt.failed ? '신호 없음' : !art ? stt.progress || '방송 준비 중' : ui.loading ? '방송 연결 중' : ui.notice ? '신호 없음' : show.loaded ? '' : '신호 없음';
-  setPlayerFeed({ art, show: s.on && !ui.loading ? show : { ...show, loaded: false }, s, note, scale: scaleOf(s, mobile), tel: telOf(ctx) }, { advance, redraw: () => liveEnv?.render() });
+  setPlayerFeed({ art, show: s.on && !ui.loading ? show : { ...show, loaded: false }, s, note, scale: scaleOf(s, mobile), tel: telOf(ctx) }, { advance, redraw: () => liveEnv?.render(), log: (entries, shown) => saveLog(ctx.charIndex, ctx.chatIndex, entries, shown) });
   const pending = liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat)).length;
   const tabs: [View['page'], string][] = [['', 'ON AIR'], ['sched', '편성표'], ['orders', `주문 조회${pending ? ` ${pending}` : ''}`]];
   const menu = `<nav class="hs-menu">${tabs.map(([k, l]) => `<button class="${ui.page === k ? 'on' : ''}" data-action="hs-page" data-value="${k}" aria-pressed="${ui.page === k}">${l}</button>`).join('')}${s.aud ? '<button data-action="hs-pop" data-value="aud">방청 신청</button>' : ''}</nav>`;

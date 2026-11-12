@@ -1012,7 +1012,7 @@ export const genLanguage = (vars: Vars): string | null => genSettings(vars).lang
 export function programPrompt(src: ShopSource, s: ShopSettings, fill: Record<string, string>): CraftMessage[] {
   const g = G('Hs');
   const v = { ...fill, line: lineOf('Hs') };
-  const system = [fillGuide(g.COMMON, v), SHELF_RULES(g, s, src.st, 'Hs'), fillGuide(g.BROADCAST, v), fillGuide(g.VIEWERS ?? '', v), src.language ?? ''].filter(Boolean).join('\n\n');
+  const system = [fillGuide(g.COMMON, v), SHELF_RULES(g, s, src.st, 'Hs'), fillGuide(g.BROADCAST, v), fillGuide(g.HOST ?? '', v), fillGuide(g.VIEWERS ?? '', v), src.language ?? ''].filter(Boolean).join('\n\n');
   const head = `[채널]\n${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ''}`;
   return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s, head)}\n\n[현재 작업]\n오늘 편성 (상품·상품마다 큐시트와 채팅)` }], s, fillGuide(g.THOUGHTS_PROGRAM ?? '', v));
 }

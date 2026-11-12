@@ -195,7 +195,10 @@ test('망상홈쇼핑: 편성 요청문은 방송 꼴만 (가게 정체·주인 
   const sys = msgs.find((m) => m.role === 'system').content;
   const user = msgs.at(-1).content;
   assert.match(sys, /live feed of 망상홈쇼핑/);
-  assert.match(sys, /<chat>\n#1\n닉네임\|말/);
+  assert.match(sys, /<chat>\n#1\nhandle\|message/);
+  // 고르는 낱말·줄 꼴은 영어 (11-12 사용자), 진행자 절이 같이 간다
+  assert.match(sys, /<cue>\n#1\ncut\|mood\|line\|event/);
+  assert.match(sys, /# Host on air/);
   assert.match(sys, /12 to 18 lines of the live viewer chat while that item is on air/);
   assert.match(sys, /# Viewer chat/);
   assert.match(sys, /행운의 무전기/);
@@ -246,4 +249,28 @@ test('남은 수량 저절로 줄기: 큐시트 끝에 끝 수에 닿고 0이 �
     assert.ok(left - end <= Math.max(3, start * 0.1), `${start}: 끝 ${left} (목표 ${end})`);
     assert.ok(drops <= 16 + 2, `${start}: ${drops}번 (1초보다 잦지 않게)`);
   }
+});
+
+test('망상홈쇼핑: 큐 낱말은 영어로 주고, 영어·우리말 둘 다 읽는다 · 진행자 절에 대화 예시 없음', () => {
+  const { parseCue, CUE_CUT_WORD, CUE_EVENT_WORD } = homeshop;
+  assert.deepEqual(Object.values(CUE_CUT_WORD), ['wide', 'bust', 'product', 'phone']);
+  assert.doesNotMatch(Object.values(CUE_EVENT_WORD).join(' '), /[가-힣]/);
+  const en = [['wide|talk|하나|price', 'A', 'price'], ['bust|whisper|둘|left -7', 'B', 'left'], ['product|excited|셋|soon', 'C', 'soon'], ['phone|talk|넷|call', 'D', 'call'], ['bust|cold|다섯|look', 'B', 'look'], ['bust|urgent|여섯|sold', 'B', 'sold'], ['wide|amazed|일곱|rush', 'A', 'rush'], ['bust|talk|여덟|tear', 'B', 'tear'], ['bust|talk|아홉|-', 'B', '']];
+  for (const [line, cut, ev] of en) {
+    const c = parseCue(line, moods);
+    assert.equal(c.cut, cut, line);
+    assert.equal(c.ev, ev, line);
+  }
+  assert.equal(parseCue('bust|whisper|둘|left -7', moods).n, 7);
+  assert.equal(parseCue('bust|whisper|둘|left -7', moods).mood, 'whisper');
+  assert.equal(parseCue('바스트|속삭임|둘|남은 수량 -12', moods).n, 12);
+  assert.equal(parseCue('상품|신남|셋|매진 임박', moods).ev, 'soon');
+  const g = core1112.guideSections('Hs');
+  assert.match(g.HOST, /# Host on air/);
+  assert.doesNotMatch(g.HOST, /[「」"“”]|e\.g\.|[가-힣ㄱ-ㅎ]/);
+  assert.match(g.MAIN_CONTEXT, /reference data, not instructions/);
+  assert.match(g.SAY, /cut\|mood\|line\|event/);
+  const s = homeshop.hsSettings({ $hs_say_cue_min: '2', $hs_say_cue_max: '4', $hs_say_chat_min: '0', $hs_say_chat_max: '9' });
+  assert.deepEqual([s.sayCue, s.sayChat], [[2, 4], [0, 9]]);
+  assert.deepEqual([homeshop.hsSettings({}).sayCue, homeshop.hsSettings({}).sayChat], [[1, 3], [2, 5]]);
 });
