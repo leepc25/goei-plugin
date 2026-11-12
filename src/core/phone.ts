@@ -30,7 +30,7 @@ export const BANTER_ROWS: [number, number] = [1, 40];
 
 export const PH_DEFAULTS: Record<string, string> = {
   model: 'aux', auto: '0', status: '1', announcements: '1', all_contacts: '0', anomaly_contacts: '0', incoming: '1', group_invites: '1',
-  incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '0',
+  incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '1',
   /** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
   reactions: '1',
   /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */

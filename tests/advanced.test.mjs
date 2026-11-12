@@ -18,7 +18,7 @@ test('advanced: defaults match the original, invalid values fall back, changed k
   assert.equal(advValue({ '$ph_adv_turns': '3' }, 'ph', 'turns'), '3');
   assert.equal(advValue({ '$lb_cfg_lb-gn.incoming_chance': '35' }, 'gn', 'incoming_chance'), '35', '원래 있던 변수');
   assert.deepEqual(advChanged({ '$nw_adv_secondary': '0', '$nw_adv_ref_count': '20' }, 'nw'), ['secondary']);
-  assert.deepEqual(refToggles({}, 'gn'), { description: true, authors: true, persona: true, active: true, related: false, secondary: false });
+  assert.deepEqual(refToggles({}, 'gn'), { description: true, authors: true, persona: true, active: true, related: true, secondary: false });
   // 기능 상한이 0이면 공통 상한
   assert.equal(budgetFor({ '$gen_budget': '9000' }, 'ph'), 9000);
   assert.equal(budgetFor({ '$gen_budget': '9000', '$ph_adv_budget': '5000' }, 'ph'), 5000);

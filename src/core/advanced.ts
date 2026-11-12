@@ -75,7 +75,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     craftGroup(),
     {
       title: '참조',
-      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 0), chip('secondary', '2차 참조', 0)],
+      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 1), chip('secondary', '2차 참조', 0)],
       items: [
         turns(8),
         num('refresh_posts', '새로고침에 참조할 글', 10, 1, 200, '개'),
@@ -121,7 +121,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     craftGroup(),
     {
       title: '참조',
-      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '인물 로어북', 0, '$ph_related'), chip('secondary', '2차 참조', 0)],
+      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '인물 로어북', 1, '$ph_related'), chip('secondary', '2차 참조', 0)],
       items: [turns(8), num('room_history', '방마다 참조할 말풍선', 100, 10, 1000, '개'), budget],
     },
     {
