@@ -429,8 +429,10 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag', 'Main', 'Common'] as GuideName[]).map(guideItem) },
-      { title: '기능별 지침', items: (['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Wiki', 'Shop', 'Phone', 'Image', 'Asset', 'Consult'] as (GuideName | 'Image')[]).map(guideItem) },
+      // 기능 탭과 같은 순서 (2026-11-13 사용자 「그래」): 이미지 → 인터넷 넷 → 괴담톡 → 위키 → 상점 → 쇼핑몰 → 망상홈쇼핑. AI 상담은 설정 창의 것이라 따로 맨 아래
+      { title: '기능별 지침', items: (['Image', 'Asset', 'GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki', 'Shop', 'Cos', 'Bm', 'BmDesk', 'Hs'] as (GuideName | 'Image')[]).map(guideItem) },
       { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'UpdaterExtra', 'Director', 'Router'] as GuideName[]).map(guideItem) },
+      { title: '설정 창', items: (['Consult'] as GuideName[]).map(guideItem) },
     ];
     // 11-09 사용자: 설치·업데이트는 하나로, 아이콘은 서로 다르게, 다음 호출 로어북은 따로(펼친 채), 이름은 무엇을 보는지 바로 알게
     case 'manage': return [{ title: '점검', items: [['install', '설치·업데이트', ICONS.refresh], ['manage:diag', '상태 점검', ICONS.info], ['manage:trace', '호출 기록', ICONS.records], ['manage:log', '실패 기록', ICONS.siren], ['manage:people', '인물 기록 점검', ICONS.group], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
@@ -713,7 +715,8 @@ function treeGroups(counts: Partial<Record<EditorNode, number>>, on: Partial<Rec
 /** 지침 탭의 페이지: 절 단위 글칸 (guides.ts) 또는 이미지 지침 설정 */
 function guideNodePage(ctx: ChatContext, n: GuideNode): string {
   const g = n.slice(6) as GuideName | 'Image';
-  const crumb = `지침 / ${g === 'RP' || g === 'Directive' || g === 'Tag' || g === 'Main' || g === 'Common' ? '기본 지침' : '기능별 지침'}`;
+  // 길 표시는 메뉴의 묶음 이름 그대로 (전에는 인물 기록 지침도 「기능별 지침」으로 나왔다)
+  const crumb = `지침 / ${treeOf('guide').find((gr) => gr.items.some((i) => i[0] === n))?.title ?? '기능별 지침'}`;
   if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody gw-imgp">${imgPromptPane(ctx)}</div></div>`;
   return guidePage(g, crumb);
 }
