@@ -10,6 +10,7 @@
    "x": -6,
    "y": 65,
    "over": 297,
+   "mask": "a_over.webp",
    "screen": [
     175,
     128,

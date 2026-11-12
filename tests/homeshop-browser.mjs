@@ -86,7 +86,7 @@ for (const [vp, size] of VPS) {
   await shot('connecting');
   await page.waitForSelector('.hs-l3', { timeout: 15000 });
   const call = await page.evaluate(() => window.__calls.llm.at(-1).messages.map((m) => m.content).join('\n'));
-  assert.ok(call.includes('<cue>') && call.includes('와이드'), '방송 절이 요청문에 들어감');
+  assert.ok(call.includes('<cue>') && call.includes('wide'), '방송 절이 요청문에 들어감');
   if (process.env.GIF) {
     // 움직임 확인용: 방송 칸을 0.2초마다 찍는다 (GIF=장수)
     const box = await page.locator(vp !== 'phone' ? '.hs-bd' : '.hs-main').boundingBox();

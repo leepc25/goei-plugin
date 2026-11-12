@@ -45,6 +45,8 @@ export interface HsCutArt {
   y: number;
   /** 이 줄부터 아래는 배경 판을 진행자 위에 다시 덮는다 (진열대) */
   over?: number;
+  /** 가림 판: 배경 판과 같은 크기, 진행자를 가리는 곳(진열대 윤곽 그대로)만 판의 점이 있다. 진행자를 다 그린 뒤 덮는다. 없으면 over 줄로 (tools/homeshop/over_mask.py) */
+  mask?: string;
   /** 뒷벽 화면 칸 [x0,y0,x1,y1] */
   screen?: [number, number, number, number];
   /** 전구 [x, y, 반지름] */
@@ -80,6 +82,7 @@ export function parseHomeshopPack(text: string): HsPack {
       plate: v.plate, host: v.host, x: Number(v.x) || 0, y: Number(v.y) || 0, clips,
       ...(typeof v.off === 'string' ? { off: v.off } : {}),
       ...(typeof v.over === 'number' ? { over: v.over } : {}),
+      ...(typeof v.mask === 'string' && typeof files[v.mask] === 'string' ? { mask: v.mask } : {}),
       ...(Array.isArray(v.screen) && v.screen.length === 4 ? { screen: v.screen.map(Number) as [number, number, number, number] } : {}),
       ...(Array.isArray(v.bulbs) ? { bulbs: (v.bulbs as unknown[]).filter(Array.isArray).map((b) => [Number(b[0]), Number(b[1]), Number(b[2]) || 4] as [number, number, number]) } : {}),
     };
@@ -104,6 +107,7 @@ export const HS_KEY = {
   on: '$hs_on', net: '$hs_net', auto: '$hs_sh_auto',
   chatMin: '$hs_chat_min', chatMax: '$hs_chat_max', chatGap: '$hs_chat_gap',
   cueMin: '$hs_cue_min', cueMax: '$hs_cue_max',
+  sayCueMin: '$hs_say_cue_min', sayCueMax: '$hs_say_cue_max', sayChatMin: '$hs_say_chat_min', sayChatMax: '$hs_say_chat_max',
   speed: '$hs_speed', hold: '$hs_hold', frame: '$hs_frame',
   cut: '$hs_fx_cut', bulb: '$hs_fx_bulb', tear: '$hs_fx_tear', tearP: '$hs_tear_p', scan: '$hs_fx_scan',
   fillLo: '$hs_fill_lo', fillHi: '$hs_fill_hi', fillCool: '$hs_fill_cool', rareP: '$hs_rare_p', rareCool: '$hs_rare_cool',
@@ -119,6 +123,10 @@ export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: 
   chatGap: { key: HS_KEY.chatGap, lo: 5, hi: 100, def: 22, unit: '×0.1초' },
   cueMin: { key: HS_KEY.cueMin, lo: 2, hi: 20, def: 12, unit: '줄' },
   cueMax: { key: HS_KEY.cueMax, lo: 2, hi: 20, def: 16, unit: '줄' },
+  sayCueMin: { key: HS_KEY.sayCueMin, lo: 1, hi: 6, def: 1, unit: '줄' },
+  sayCueMax: { key: HS_KEY.sayCueMax, lo: 1, hi: 6, def: 3, unit: '줄' },
+  sayChatMin: { key: HS_KEY.sayChatMin, lo: 0, hi: 12, def: 2, unit: '줄' },
+  sayChatMax: { key: HS_KEY.sayChatMax, lo: 0, hi: 12, def: 5, unit: '줄' },
   speed: { key: HS_KEY.speed, lo: 3, hi: 40, def: 11, unit: '자/초' },
   hold: { key: HS_KEY.hold, lo: 0, hi: 50, def: 12, unit: '×0.1초' },
   frame: { key: HS_KEY.frame, lo: 50, hi: 250, def: 110, unit: 'ms' },
@@ -177,6 +185,9 @@ export interface HsSettings {
   /** 채팅 한 줄 간격 (초) */
   chatGap: number;
   cue: [number, number];
+  /** 내 채팅 한 번에 돌아오는 진행자 줄 수 · 다른 시청자 줄 수 */
+  sayCue: [number, number];
+  sayChat: [number, number];
   /** 자막 속도 (글자/초) · 대사 뒤 쉼 (초) · 동작 한 장 길이 (ms) */
   speed: number;
   hold: number;
@@ -221,6 +232,8 @@ export function hsSettings(vars: Vars): HsSettings {
     chat: pair(n(vars, 'chatMin'), n(vars, 'chatMax')),
     chatGap: n(vars, 'chatGap') / 10,
     cue: pair(n(vars, 'cueMin'), n(vars, 'cueMax')),
+    sayCue: pair(n(vars, 'sayCueMin'), n(vars, 'sayCueMax')),
+    sayChat: pair(n(vars, 'sayChatMin'), n(vars, 'sayChatMax')),
     speed: n(vars, 'speed'),
     hold: n(vars, 'hold') / 10,
     frame: n(vars, 'frame'),
@@ -264,10 +277,13 @@ export function clipsOf(art: HsCutArt, cut: CutId, over: Record<string, ClipGrou
 
 /** 큐시트의 컷: A 와이드 · B 바스트 · C 상품 클로즈업(A 를 코드로 2배) · D 전화 연결(B 위 그래픽) */
 export type CueCut = 'A' | 'B' | 'C' | 'D';
-export const CUE_CUT_WORD: Record<CueCut, string> = { A: '와이드', B: '바스트', C: '상품', D: '전화' };
+/** 모델에 주고 받는 컷 낱말 (11-12 사용자: 고르는 낱말은 영어로. 읽을 때는 우리말도 받는다) */
+export const CUE_CUT_WORD: Record<CueCut, string> = { A: 'wide', B: 'bust', C: 'product', D: 'phone' };
 export type CueEvent = '' | 'price' | 'left' | 'rush' | 'soon' | 'sold' | 'call' | 'tear' | 'look';
 /** 화면 사건 낱말 (모델에 주는 것과 읽는 것이 같게) */
-export const CUE_EVENT_WORD: Record<Exclude<CueEvent, ''>, string> = { price: '가격 공개', left: '남은 수량 -N', rush: '주문 폭주', soon: '매진 임박', sold: '매진', call: '전화 연결', tear: '신호 찢김', look: '응시' };
+export const CUE_EVENT_WORD: Record<Exclude<CueEvent, ''>, string> = { price: 'price', left: 'left -N', rush: 'rush', soon: 'soon', sold: 'sold', call: 'call', tear: 'tear', look: 'look' };
+/** 화면에 띄우는 사건 딱지 글 */
+export const CUE_EVENT_LABEL: Record<Exclude<CueEvent, ''>, string> = { price: '가격 공개', left: '남은 수량', rush: '주문 폭주', soon: '매진 임박', sold: '매진', call: '전화 연결', tear: '신호 찢김', look: '응시' };
 export interface HsCue {
   cut: CueCut;
   /** 표정 = 동작 이름 (팩의 name. 모르는 말이면 talk) */
@@ -308,17 +324,17 @@ export const emptyShow = (): HsShow => ({ loaded: false, key: '', title: '', par
 
 const CUT_IN: [RegExp, CueCut][] = [[/^(a|와이드|wide|전체|스튜디오)/i, 'A'], [/^(b|바스트|bust|정면|진행자)/i, 'B'], [/^(c|상품|클로즈|close|product)/i, 'C'], [/^(d|전화|call|phone)/i, 'D']];
 function eventOf(cell: string): { ev: CueEvent; n?: number } {
-  const s = cell.replace(/\s+/g, '');
+  const s = cell.replace(/\s+/g, '').toLowerCase();
   if (!s || s === '-') return { ev: '' };
-  const left = /남은수량[-−–]?(\d+)|수량[-−–](\d+)/.exec(s);
-  if (left) return { ev: 'left', n: Math.max(1, Math.min(99, Number(left[1] ?? left[2]))) };
-  if (/가격공개|가격/.test(s)) return { ev: 'price' };
-  if (/주문폭주|폭주/.test(s)) return { ev: 'rush' };
-  if (/매진임박|임박/.test(s)) return { ev: 'soon' };
-  if (/매진|완판/.test(s)) return { ev: 'sold' };
-  if (/전화/.test(s)) return { ev: 'call' };
-  if (/찢김|신호|끊김/.test(s)) return { ev: 'tear' };
-  if (/응시|시선|쳐다/.test(s)) return { ev: 'look' };
+  const left = /(?:left|남은수량|수량)[-−–]?(\d+)/.exec(s);
+  if (left) return { ev: 'left', n: Math.max(1, Math.min(99, Number(left[1]))) };
+  if (/price|가격/.test(s)) return { ev: 'price' };
+  if (/rush|폭주/.test(s)) return { ev: 'rush' };
+  if (/soon|임박/.test(s)) return { ev: 'soon' };
+  if (/sold|매진|완판/.test(s)) return { ev: 'sold' };
+  if (/call|phone|전화/.test(s)) return { ev: 'call' };
+  if (/tear|찢김|신호|끊김/.test(s)) return { ev: 'tear' };
+  if (/look|stare|응시|시선|쳐다/.test(s)) return { ev: 'look' };
   return { ev: '' };
 }
 /** 큐 한 줄 「컷|표정|대사|화면 사건」. 대사가 없으면 null */
@@ -374,7 +390,7 @@ export function parseShow(raw: string, moods: Map<string, string>): ShowReply {
     cur.push(c);
   }
   const items = shelf.items.slice(0, cues.length || shelf.items.length);
-  if (items.some((_, i) => !cues[i]?.length)) throw new HsError(`<cue> 블록에 상품마다 큐 줄이 있어야 해요 (#1 … #${shelf.items.length}, 줄 꼴: 컷|표정|대사|화면 사건).`);
+  if (items.some((_, i) => !cues[i]?.length)) throw new HsError(`<cue> 블록에 상품마다 큐 줄이 있어야 해요 (#1 … #${shelf.items.length}, 줄 꼴: cut|mood|line|event).`);
   const { shared: chat, parts: chats } = parseChat(block(raw, 'chat'));
   const peeks = block(raw, 'peek').split('\n').map((x) => clean(x.replace(/^\s*#?\d+\s*[.)|:]?\s*/, ''), 80)).filter(Boolean);
   const opLine = (re: RegExp) => clean(block(raw, 'operator').split('\n').map((x) => re.exec(x)?.[1] ?? '').find(Boolean) ?? '', 120);

@@ -66,6 +66,7 @@ import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
 import { withHomeshop } from './core/homeshop';
+import { hsMainContext, hsMainOn, hsMainRules, hsMainSettings } from './core/hslog';
 import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
@@ -390,7 +391,7 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
   return [...out, { role: 'system', content: buildImgPrompt(cfg, names, s.assetPlayer) } as M];
 }
 
-/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
+/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서, 망상홈쇼핑 시청 기록을 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
  *  지침·명부는 요청마다 다시 읽는다 (캐릭터 번호로 캐시하면 지침·명부를 고쳐도 옛것이 남았다. 명부 읽기는 10ms 안쪽. QC 2026-10-28) */
 function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const ss = chat.scriptstate;
@@ -399,7 +400,9 @@ function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const wantGnet = boardsOn.length > 0;
   const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
   const wantWiki = wikiContextOn(ss);
-  if (!wantGnet && !wantPhone && !wantWiki) return [];
+  // 망상홈쇼핑 시청 기록 (core/hslog.ts): 방송에서 실제로 본 것·친 채팅·주문. 기록이 있고 「본편에 넘기기」($hs_main)가 켜져 있을 때
+  const wantHs = hsMainOn(ss);
+  if (!wantGnet && !wantPhone && !wantWiki && !wantHs) return [];
   applyAdvanced(ss);
   const src = { char: { globalLore: char.globalLore }, chat };
   const rules = { phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
@@ -421,6 +424,7 @@ function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
     }
   }
   if (wantWiki && rules.wiki) parts.push({ cap: advNum(ss, 'nw', 'ctx_tokens'), build: (cap) => wikiMainContext(chat, rules.wiki!, focus, cap) });
+  if (wantHs) parts.push({ cap: hsMainSettings(ss).tokens, build: (cap) => hsMainContext(chat, hsMainRules(), focus, cap) });
   return fitTotal(parts, advNum(ss, 'gen', 'ctx_total')).filter(Boolean);
 }
 
