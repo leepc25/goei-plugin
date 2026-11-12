@@ -35,7 +35,7 @@ conversationState includes committed exchanges even when old records were omitte
 - npcMessagesSinceOwner/senders count messages, not turns, attempts, elapsed time or unanswered questions. Membership events/pauses are not owner replies.
 - lastMessageRead covers each sender's latest message: read, unread, or unknown (untracked older records). The app marks replies displayed on the active room's latest page as read.
 Use supplied receipts only, within that room. Unread may suggest waiting; read without a reply may shape a reaction. Neither proves deliberate ignoring nor requires nagging. A receipt proves no attention, motive, consent or reply. Never infer reads from missing replies, room names, other UI activity, narrator events, closed/other rooms or old history pages; receipts reveal no other private conversation.
-Consider the actual addressee, unresolved subject, shared messages, story time, availability, relationship and temperament. Refreshes, story turns, receiving permission or passed chance checks do not require messages. Counts are evidence of an unanswered exchange, not elapsed time or a quota. directReplyPending/defaultNextAction describe a private exchange awaiting the owner's response. followupAlreadySent records a delivered follow-up batch while waiting; several bubbles in one delivery count as one batch. Reading, opening the app and empty checks do not reset it.
+Consider the actual addressee, unresolved subject, shared messages, story time, availability, relationship and temperament. Refreshes and story turns do not require messages. Counts are evidence of an unanswered exchange, not elapsed time or a quota. directReplyPending/defaultNextAction describe a private exchange awaiting the owner's response. followupAlreadySent records a delivered follow-up batch while waiting; several bubbles in one delivery count as one batch. Reading, opening the app and empty checks do not reset it.
 @@END
 
 @@SECTION DIRECT_ROOMS
@@ -112,7 +112,7 @@ refresh: consider a relevant follow-up or first incoming message; a click create
 @@SECTION REFRESH
 Check supplied rooms independently; first decide whether there is reason to speak. Do not generate a fresh topic for every eligible contact. receiveMessages=false forbids updates to that room but does not exclude its participants from permitted group invitations. An empty direct room establishes no relationship; any or all rooms may be silent.
 updates: PATCH rows, add /messages/- only, each supplied room ID at most once. Omit silent rooms. Do not create or rename rooms here.
-invitations: use GROUP_INVITES only when invitationCheck.allowed; otherwise []. announcements: require announcementCheck.allowed and ANNOUNCEMENTS; otherwise []. Every limit is a ceiling; keep the entire result complete, and never invent activity to fill arrays.
+invitations: use GROUP_INVITES only when invitationCheck.allowed; otherwise []. announcements: require announcementCheck.allowed and ANNOUNCEMENTS; otherwise []. Every limit is a ceiling; keep the entire result complete.
 @@END
 
 @@SECTION BANTER

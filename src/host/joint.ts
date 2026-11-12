@@ -30,7 +30,7 @@ function instruction(keys: string[]): string {
     + (boards.length > 1 ? `The board tasks (${boards.join(', ')}) are DIFFERENT websites with different communities, voices and rules: write each strictly from its own messages, and never carry posts, nicknames, topics, slang or tone from one board into another. ` : '')
     + 'Never use phone contacts, private messages, notices, invitations, relationship evidence or phone-only narrator data to create board public posts or private messages. '
     + 'Never let any task infer private facts from another task\'s inputs or outputs. Preserve each task\'s permissions, chance decisions, cooldown eligibility, source boundaries and ownership. '
-    + 'Finish every object compactly: preserve each board\'s quantity and topic-dependent discussion; shorten prose instead of making threads silent. Phone activity counts and text lengths remain ceilings, not targets.';
+    + 'Finish every object compactly: preserve each board\'s quantity and topic-dependent discussion; shorten prose instead of making threads silent. Phone text lengths remain ceilings, not targets.';
 }
 
 /** 여러 요청을 하나로. 둘 이상의 요청에 똑같이 들어 있는 긴 문단(256자 이상)은 한 번만 싣고 자리표로 가리킨다 (원본 combinedPrompts) */

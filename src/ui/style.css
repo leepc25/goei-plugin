@@ -1385,7 +1385,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-agpop-txt .gx-acard-top b { font-size: 16px; }
 .gx-agpop-txt small { font-size: 13px; color: var(--dim); }
 .gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
-.gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
+.gx-agpop-x { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); } /* 그림은 상자 한가운데 (2026-11-13 사용자: X 가 삐뚤어짐 — 단추 기본 안쪽 여백 때문) */
+.gx-agpop-x svg { display: block; }
 
 /* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
    요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
@@ -3224,6 +3225,10 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 /* 팝업 */
 .it-card { align-items: stretch; width: 380px; gap: 0; padding: 16px; }
 .it-ph { display: flex; gap: 10px; align-items: center; padding-right: 30px; }
+/* 삭제(빨간 휴지통): 닫기 바로 왼쪽. 휴지통이 있으면 이름 줄이 두 단추만큼 비켜 선다 */
+.it-del { right: 46px; color: var(--danger, #e5484d); }
+.it-del svg { width: 18px; height: 18px; }
+.it-del ~ .it-ph { padding-right: 66px; }
 .it-ph .it-ic { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 10px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-ph .it-ic svg { width: 26px; height: 26px; }
 .it-ph b { display: block; font-size: 15px; }

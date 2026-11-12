@@ -12,7 +12,7 @@ import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
   addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
-  readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
+  purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
 import { findStatusTags } from '../core/world/status';
@@ -41,7 +41,7 @@ export const itemsUi = {
   logFilter: 'all' as 'all' | 'get' | 'out',
   q: '',
   open: '',
-  mode: 'view' as 'view' | 'edit' | 'merge' | 'add' | 'drop',
+  mode: 'view' as 'view' | 'edit' | 'merge' | 'add' | 'drop' | 'purge',
   /** 버리기 띠에 끌어다 놓아 연 확인창: 취소하면 물건 팝업으로 가지 않고 닫는다 (2026-11-08 사용자) */
   dragDrop: false,
   notice: '',
@@ -317,6 +317,9 @@ function popup(ctx: ChatContext): string {
   if (itemsUi.mode === 'drop') {
     return shell('버리기', `${head}<p>버릴까요? 목록에서 빠지고 기록에 남아요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-drop" data-value="${esc(it.id)}">버리기</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
   }
+  if (itemsUi.mode === 'purge') {
+    return shell('삭제', `${head}<p>삭제할까요? 목록과 기록에서 지워지고 되돌릴 수 없어요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-purge" data-value="${esc(it.id)}">삭제</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
+  }
   const queued = useQueue(ctx).find((u) => u.id === it.id)?.n ?? 0;
   const left = leftOf(ctx, it);
   const more = canUse(it) && (left === undefined ? !queued : queued < left);
@@ -337,10 +340,11 @@ function popup(ctx: ChatContext): string {
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc(it.id)}">버리기</button>
     </div>
     ${queued ? '<p class="dim">다음 메시지를 보낼 때 메인 요청에 「이번 턴 사용」으로 넘어가요.</p>' : ''}`;
-  return shell(it.name, body);
+  return shell(it.name, body, it.id);
 }
 
-const shell = (label: string, inner: string) => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc(label)}"><div class="gx-agpop-card it-card" data-action="items-keep"><button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
+/** del = 물건 id 를 주면 닫기 왼쪽에 빨간 휴지통(삭제) 단추 (2026-11-13 사용자) */
+const shell = (label: string, inner: string, del = '') => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc(label)}"><div class="gx-agpop-card it-card" data-action="items-keep">${del ? `<button class="gx-agpop-x it-del" data-action="items-purge-ask" data-value="${esc(del)}" aria-label="삭제" title="삭제">${ICONS.trash}</button>` : ''}<button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
 
 function form(it: Item | null, left?: number): string {
   const eq = it?.equip ?? '';
@@ -465,6 +469,24 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       itemsUi.dragDrop = false;
       env.render();
       return true;
+    case 'items-purge-ask':
+      if (!value) return true;
+      itemsUi.open = value;
+      itemsUi.mode = 'purge';
+      itemsUi.dragDrop = false;
+      env.render();
+      return true;
+    case 'items-purge': {
+      if (!value) return true;
+      await write((it) => purgeItem(it, value));
+      await dropFromUse(ctx, value);
+      itemsUi.open = '';
+      itemsUi.mode = 'view';
+      itemsUi.dragDrop = false;
+      itemsUi.info = '삭제했어요.';
+      await env.refresh();
+      return true;
+    }
     case 'items-drop': {
       if (!value) return true;
       // 숨기기만 한다 (지우지 않음): 버린 뒤의 본문이 다시 줍는다고 쓰면 같은 물건으로 돌아온다. 버린 때의 마지막 메시지를 적어 둔다

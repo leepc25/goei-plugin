@@ -221,7 +221,7 @@ __SITE_PICS__
 @@END
 
 @@SECTION INCOMING.COMBINED
-incomingAllowed=true permits incoming=[] or [{"nick":"NPC handle","body":"private message"}], body at most __LIMIT_dm_tokens__ tokens. Use incomingOrigin (or the finished new post), not unrelated new posts. Never use the user handle or repeat previousIncoming. No plausible message means []; never return D|... or an __NONE__ sender. Its private contents cannot inform public comments.
+incomingAllowed=true permits incoming=[] or [{"nick":"NPC handle","body":"private message"}], body at most __LIMIT_dm_tokens__ tokens. Use incomingOrigin (or the finished new post), not unrelated new posts. Never use the user handle or repeat previousIncoming. Never return D|... or an __NONE__ sender. Its private contents cannot inform public comments.
 @@END
 
 @@SECTION INCOMING.DISABLED

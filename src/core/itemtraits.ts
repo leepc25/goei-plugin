@@ -22,8 +22,8 @@ export const itemWeight = (v: unknown): number | undefined => {
   const n = typeof v === 'string' ? Number(v.trim().replace(/,/g, '.').replace(/\s*(kg|킬로그램|킬로)$/i, '')) : typeof v === 'number' ? v : NaN;
   return Number.isFinite(n) && n >= 0 ? Math.min(9999, Math.round(n * 1000) / 1000) : undefined;
 };
-/** 무게 글: 1kg 밑은 g, 그 위는 소수 한 자리 kg (「250g」「1.2kg」「12kg」) */
-export const weightText = (kg: number): string => (kg < 1 ? `${Math.max(1, Math.round(kg * 1000))}g` : `${Number(kg.toFixed(kg < 10 ? 1 : 0))}kg`);
+/** 무게 글: 1kg 밑은 g, 그 위는 10g 단위까지 kg (「250g」「1.24kg」「12.4kg」). 2026-11-13 사용자: 어림수로만 보여 현실감이 없다 */
+export const weightText = (kg: number): string => (kg < 1 ? `${Math.max(1, Math.round(kg * 1000))}g` : `${Number(kg.toFixed(2))}kg`);
 
 /** 판정 칸 (상점 줄·보조 모델·시작 소지품·직접 넣기가 같은 꼴로) */
 export interface ItemTraits {

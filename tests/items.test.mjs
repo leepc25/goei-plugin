@@ -124,8 +124,8 @@ test('무게: 1개당 무게 × 개수·합계(장착 포함)·소지 한도(명
   assert.equal(itemWeight(-1), undefined);
   assert.equal(itemWeight('abc'), undefined);
   assert.equal(weightText(0.25), '250g');
-  assert.equal(weightText(1.23), '1.2kg');
-  assert.equal(weightText(12.4), '12kg');
+  assert.equal(weightText(1.23), '1.23kg');
+  assert.equal(weightText(12.4), '12.4kg');
   let it = addItem(empty, alive, { name: '권총', equip: 'weapon', weight: 1.2, wear: true, from: 'manual', anchor: '' });
   it = addItem(it, alive, { name: '물병', uses: 2, weight: 1, from: 'manual', anchor: '' });
   it = addItem(it, alive, { name: '물병', uses: 1, weight: 0.5, from: 'manual', anchor: '' });

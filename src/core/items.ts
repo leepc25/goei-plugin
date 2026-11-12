@@ -420,6 +420,13 @@ export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLog
   return addItemLog({ ...it, list: it.list.map((x) => (x.id === id ? out : x)) }, log);
 }
 
+/** 삭제 (2026-11-13 사용자: 잘못 들어온 물건을 없애는 단추. 「버리기」와 다르다): 목록에서 줄을 지우고 그 물건의 기록 줄도 지운다.
+ *  기록이 없으니 메인 요청에도 넘어가지 않는다 (버린 것·잃은 것으로 치지 않는다) */
+export function purgeItem(it: Items, id: string): Items {
+  if (!it.list.some((x) => x.id === id)) return it;
+  return { ...it, list: it.list.filter((x) => x.id !== id), log: it.log.filter((l) => l.item !== id) };
+}
+
 /** 상점에 팔기: 목록에서 지우지 않고 판 응답(anchor)에 묶어 숨긴다 → 기록에 sell 한 줄. 판 돈(가계부)도 같은 응답에 묶이니,
  *  응답을 다시 굴리거나 지우면 물건과 돈이 같이 돌아온다 (11-08 전수점검: 지우면 물건만 사라지고 돈은 없어졌다). 장착 칸에서도 뺀다 */
 export function sellItem(it: Items, id: string, anchor: string, note?: string): Items {
