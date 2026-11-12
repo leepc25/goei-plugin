@@ -42,15 +42,19 @@ const SRC_NAME: Record<WalletEntry['src'], string> = { story: '본문', field: '
 const WEEK = '일월화수목금토';
 
 /** 메시지마다 그때까지의 마지막 상태창 날짜 (거래를 날짜별로 묶는 데 쓴다. 장부에는 날짜가 없다) */
-function datesOf(ctx: ChatContext): { at: Map<string, string>; today: string } {
+function datesOf(ctx: ChatContext): { at: Map<string, string>; time: Map<string, string>; today: string } {
   const at = new Map<string, string>();
+  // 그 메시지의 상태창 시각 (2026-11-13 사용자: 소지품 기록처럼 줄마다 시각이 보여야 한다)
+  const time = new Map<string, string>();
   let cur = '';
+  let curTime = '';
   (ctx.chat.message ?? []).forEach((m, i) => {
     const tags = findStatusTags(String((m as { data?: unknown }).data ?? ''));
-    if (tags.length) cur = tags[tags.length - 1].date.trim() || cur;
+    if (tags.length) { cur = tags[tags.length - 1].date.trim() || cur; curTime = (tags[tags.length - 1].time ?? '').trim() || curTime; }
     at.set(messageKey(m, i), cur);
+    time.set(messageKey(m, i), curTime);
   });
-  return { at, today: cur };
+  return { at, time, today: cur };
 }
 function dayLabel(date: string): string {
   const m = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(date);
@@ -59,7 +63,7 @@ function dayLabel(date: string): string {
   return `${m[1]}.${m[2].padStart(2, '0')}.${m[3].padStart(2, '0')} (${WEEK[d.getUTCDay()]})`;
 }
 
-interface Row { e: WalletEntry; after: number; date: string }
+interface Row { e: WalletEntry; after: number; date: string; time: string }
 
 /** 상태창 날짜 → 「2025.01」 (못 읽으면 '') */
 function monthOf(date: string): string {
@@ -78,7 +82,7 @@ function monthLine(month: string, rows: Row[]): string {
 function rowsOf(ctx: ChatContext): { rows: Row[]; today: string; start: number } {
   const w = ledgerOf(ctx);
   const live = liveWallet(w, aliveAnchors(ctx.chat));
-  const { at, today } = datesOf(ctx);
+  const { at, time, today } = datesOf(ctx);
   let bal = w.start;
   let last = '';
   const rows = live.map((e) => {
@@ -86,7 +90,7 @@ function rowsOf(ctx: ChatContext): { rows: Row[]; today: string; start: number }
     // 기준 메시지가 없는 수동 수정은 앞 거래 날짜에 붙인다
     const date = e.anchor ? at.get(e.anchor) ?? '' : last;
     last = date;
-    return { e, after: bal, date };
+    return { e, after: bal, date, time: e.anchor ? time.get(e.anchor) ?? '' : '' };
   });
   return { rows, today, start: w.start };
 }
@@ -124,9 +128,10 @@ export function walletList(ctx: ChatContext): string {
     lastMonth = month;
     return `${head}<section class="gx-wt-day">
     <h3><span>${esc(dayLabel(g.date))}</span><em>${esc(formatDelta(g.rows.filter((r) => r.e.src !== 'manual').reduce((n, r) => n + r.e.amount, 0)))}</em></h3>
-    <ul>${g.shown.map(({ e, after }) => {
+    <ul>${g.shown.map(({ e, after, time: when }) => {
       const open = walletUi.open === e.id;
-      const sub = subOf(e);
+      // 줄 둘째 칸 맨 앞에 그때 시각 (필드 거래는 제 시각이 이미 들어 있다)
+      const sub = [e.src === 'field' ? '' : when, subOf(e)].filter(Boolean).join(' · ');
       return `<li class="gx-wt-row${open ? ' open' : ''}">
         <button class="gx-wt-main" data-action="wallet-open" data-value="${esc(e.id)}" aria-expanded="${open}" aria-label="${esc(`${SRC_NAME[e.src]} · ${e.memo} ${formatDelta(e.amount)}`)}">
           <span class="gx-wt-ic ${e.src}" title="${SRC_NAME[e.src]}">${SRC_ICON[e.src]}</span>
