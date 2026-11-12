@@ -24,6 +24,7 @@ import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, COS_READY_KEY, cosReadyMode,
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { shopSource } from './shop';
+import { shopGive } from '../core/shopfn';
 import { itemPic } from './items';
 import { siteLogo } from './browser';
 import { isPhone } from './media';
@@ -133,9 +134,10 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
   if (kind === 'talk') await env.refresh();
   else env.render();
   try {
-    const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st0, s);
+    const give = shopGive(ctx.chat.scriptstate, site, kind);
+    const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st0, s, give);
     // 우주몰 진열: 칸마다 장르·값 등급을 굴려 넣는다 (11-09 사용자: 새로고침해도 같은 물건)
-    if (kind === 'shelf') src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site); // 포인트몰도 (11-09 사용자)
+    if (kind === 'shelf') src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), give.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site); // 포인트몰도 (11-09 사용자)
     if (site === 'cos') src.truthMode = cosTruthMode(ctx.chat.scriptstate);
     if (site === 'cos') { const od = ordersText(liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat)), worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? ''); if (od) src.orders = od; }
     const g = genSettings(ctx.chat.scriptstate);
@@ -228,8 +230,9 @@ export function previewMallShelf(ctx: ChatContext, site: MallSite): LlmMessage[]
   const s = mallSettings(ctx.chat.scriptstate, site);
   if (!s.on) return null;
   const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
-  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st, s);
-  src.assign = cosAssignment(s.size[1], s.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site);
+  const give = shopGive(ctx.chat.scriptstate, site, 'shelf');
+  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st, s, give);
+  src.assign = cosAssignment(s.size[1], give.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site);
   if (site === 'cos') src.truthMode = cosTruthMode(ctx.chat.scriptstate);
   return shelfPrompt(src, s, MALL_GUIDE[site]);
 }
@@ -525,12 +528,12 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
 
 // ── 포인트몰 1:1 상담 (2026-11-09 사용자: 기능 없이 상담사와 대화하는 재미, 상담마다 다른 백일몽 직원) ──
 
-/** 상담사 모델에 넘길 자료: 백일몽 로어북·위키(참고 로어북 수는 포인트몰 설정), 지금 진열, 남은 포인트, 사내 계정 */
-function deskSource(ctx: ChatContext): DeskSource {
+/** 상담사 모델에 넘길 자료: 백일몽 로어북·위키(넘길 내용·수는 설정 → 상점의 가게 표·기능 표·양 표 「1:1 상담」 줄), 지금 진열, 남은 포인트, 사내 계정 */
+export function deskSource(ctx: ChatContext): DeskSource {
   const vars = ctx.chat.scriptstate;
   const s = mallSettings(vars, 'bm');
   const st = readMall(vars, 'bm', aliveAnchors(ctx.chat));
-  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(vars, 'bm') as typeof ctx.chat.scriptstate } }, { ...st, shop: '백일몽', owner: '' }, s);
+  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(vars, 'bm') as typeof ctx.chat.scriptstate } }, { ...st, shop: '백일몽', owner: '' }, s, shopGive(vars, 'bm', 'desk'));
   return { refs: src.refs, shelf: onShelf(st).map((x) => `${x.name}|${x.price}p|${x.desc}`).join('\n'), points: balanceOf(ctx, 'bm'), nick: loggedNick(ctx), language: src.language };
 }
 

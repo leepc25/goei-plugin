@@ -9,6 +9,7 @@ import { SHOP_SIZE_HI, SHOP_SIZE_LO, shopBlocked, shopSettings, type ShopSetting
 import { SHOP_MAIN_ALL, SHOP_MAIN_KINDS, SHOP_MAIN_LABEL, SHOP_MAIN_LINES, SHOP_PLACES, shopMain, shopMainLines, type ShopPlace } from '../core/shopctx';
 import { advChipsCtl, advCtl } from './advanced';
 import { advValue } from '../core/advanced';
+import { GIVE_SHOPS, SHOP_AMOUNTS, SHOP_FNS, SHOP_GIVE_KEYS, shopFnNone, shopFnNum, shopFnOn, shopGiveOn, type GiveShop } from '../core/shopfn';
 import { siteLogo } from './browser';
 import { ICONS } from './icons';
 import { ckWide, helpBox, mxGrid, numCtl, numSet, setGroup, setRow, setSeg, stepSize, type CkBand } from './setrow';
@@ -172,7 +173,7 @@ const SHOP_ROWS: { id: ShopCol; name: string; icon: string }[] = [
 ];
 const isShopCol = (v: string): v is ShopCol => SHOP_ROWS.some((r) => r.id === v);
 
-/** 설정 → 상점: 상점마다 따로 정하는 값(격자) + 네 곳이 같이 쓰는 값 + 기본 상점에만 있는 값의 머리.
+/** 설정 → 상점: 상점마다 따로 정하는 값(격자) + 기능마다 따로 정하는 값(격자) + 네 곳이 같이 쓰는 값 + 기본 상점에만 있는 값의 머리.
  *  vars = 그 페이지의 범위(이 채팅 · 시작 전에는 새 채팅 기본값)의 변수 */
 export function shopTable(vars: State, busy = false): string {
   const v = vars as never;
@@ -224,16 +225,38 @@ export function shopTable(vars: State, busy = false): string {
   const lines = shopMainLines(v);
   const lineBox = `<div class="st-step adv-step${stepSize(SHOP_MAIN_LINES.max, '줄', '제한 없음')}"><button class="gx-step" data-action="fam-num" data-value="s:shop:main_lines=${Math.max(SHOP_MAIN_LINES.min, lines - 1)}" ${lines <= SHOP_MAIN_LINES.min || busy ? 'disabled' : ''} aria-label="최대 양 대화 줄이기">−</button><input class="adv-val" type="number" inputmode="numeric" min="${SHOP_MAIN_LINES.min}" max="${SHOP_MAIN_LINES.max}" step="1" data-change="fam-num" data-key="s:shop:main_lines" value="${lines === 0 ? '' : lines}" placeholder="제한 없음" aria-label="최대 양 대화"${busy ? ' disabled' : ''}><span>줄</span><button class="gx-step" data-action="fam-num" data-value="s:shop:main_lines=${Math.min(SHOP_MAIN_LINES.max, lines + 1)}" ${lines >= SHOP_MAIN_LINES.max || busy ? 'disabled' : ''} aria-label="최대 양 대화 늘리기">+</button></div>`;
   const attachMax = setGroup('', setRow('최대 양', numSet([['대화', lineBox]]), helpBox('「문의」와 「1:1 상담」으로 붙이는 대화의 줄 수예요. 넘으면 최근 줄만 붙여요.')));
+  /* ── 1-2. 가게 표: 줄 = 가게 셋(망상홈쇼핑은 제 설정을 따로 쓴다), 칸 = 넘길 내용 여섯 + 맥락 반영 (core/shopfn.ts) ── */
+  const GIVE_OPTS = ['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영'];
+  const giveRows = SHOP_ROWS.filter((r) => (GIVE_SHOPS as string[]).includes(r.id));
+  const giveShop: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: GIVE_OPTS, kind: 'check' }],
+    marks: giveRows.map((r) => SHOP_GIVE_KEYS.map((k) => shopGiveOn(v, r.id as GiveShop, k))),
+    acts: giveRows.map((r) => SHOP_GIVE_KEYS.map((k) => `s:${r.id}:${k === 'ctx' ? 'ctx' : `give_${k}`}=${shopGiveOn(v, r.id as GiveShop, k) ? '0' : '1'}`)),
+    foot: helpBox('가게 표와 기능 표에서 모두 켠 것만 넘겨요.', [
+      ['상시 로어북', '조건 없이 늘 넘기는 로어북이에요.'],
+      ['관련 로어북', '가게 이름과 최근 챗로그에 이름이 나온 로어북이에요. 토큰을 더 써요.'],
+      ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
+      ['맥락 반영', '켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'],
+    ]) };
+  /* ── 2. 기능마다 따로 정하는 값: 줄 = 진열·문의·1:1 상담. 세 가게가 한 값을 같이 쓴다 ($sh_fn_*) ── */
+  const FL = SHOP_FNS.map((f) => nm('', f.label));
+  const giveFn: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: GIVE_OPTS, kind: 'check' }],
+    marks: SHOP_FNS.map((f) => SHOP_GIVE_KEYS.map((k) => (shopFnNone(f.key, k) ? null : shopFnOn(v, f.key, k)))),
+    acts: SHOP_FNS.map((f) => SHOP_GIVE_KEYS.map((k) => (shopFnNone(f.key, k) ? null : `s:shop:fn_${f.key}_${k}=${shopFnOn(v, f.key, k) ? '0' : '1'}`))),
+    foot: helpBox('가게 표와 기능 표에서 모두 켠 것만 넘겨요. 「–」는 그곳에 없는 값이에요.') };
+  const AMT = ['turns', 'refs'] as const;
+  const amountFn: CkBand = { title: '넘길 양', groups: AMT.map((k) => ({ name: SHOP_AMOUNTS[k].label, opts: [SHOP_AMOUNTS[k].unit], kind: 'num' as const })),
+    marks: SHOP_FNS.map((f) => AMT.map((k) => ({ n: shopFnNum(v, f.key, k), lo: SHOP_AMOUNTS[k].min, hi: SHOP_AMOUNTS[k].max }))),
+    acts: SHOP_FNS.map((f) => AMT.map((k) => `s:shop:fn_${f.key}_${k}`)),
+    foot: helpBox('', [
+      ['챗로그', '맥락 반영이 켜져 있을 때 넘기는 최근 턴의 수예요. 꺼져 있어도 관련 로어북을 고를 때는 이만큼 읽어요.'],
+      ['참조 로어북', '관련 로어북과 2차 참조 가운데 넘기는 수예요.'],
+    ]) };
+  const fnPart = `<h2 class="fam-h">기능마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([giveFn], FL, busy)}${ckWide([amountFn], FL, busy)}</div>`;
 
-  /* ── 2. 네 곳이 같이 쓰는 값: 기본 상점 자리의 값 하나 (core/shop.ts SHOP_SHARED_VARS) ── */
+  /* ── 3. 네 곳이 같이 쓰는 값: 기본 상점 자리의 값 하나 (core/shop.ts SHOP_SHARED_VARS) ── */
   const s0 = set.shop;
   const R = (label: string, ctl: string, lead = '', items: [string, string][] = []) => setRow(label, ctl, lead || items.length ? helpBox(lead, items) : '');
   const sw = (k: string, on: boolean) => setSeg('fam-set', `s:shop:${k}`, on ? '1' : '0', ONOFF, busy);
-  const give = setGroup('모델에 넘기는 것', [
-    R('맥락 반영', sw('ctx', s0.context), '켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'),
-    R('챗로그 포함', numCtl('s:shop:turns', { n: s0.turns, lo: 1, hi: 8 }, '챗로그 포함', '턴', busy), '맥락 반영이 켜져 있을 때 넘기는 최근 턴의 수예요. 꺼져 있어도 참조 로어북을 고를 때는 이만큼 읽어요.'),
-    R('참조 로어북', numCtl('s:shop:refs', { n: s0.refs, lo: 0, hi: 12 }, '참조 로어북', '개', busy), '봇 설명, 켜진 로어북, 가게 이름이 걸리는 로어북 가운데 넘기는 수예요.'),
-  ].join(''));
   const write = setGroup('모델이 쓰는 방식', [
     R('생각 단계', setSeg('fam-set', 's:shop:thoughts', s0.thoughts, THOUGHTS, busy), '모델이 결과를 쓰기 전에 상황을 먼저 정리하게 해요.', [
       ['속으로만', '정리하되 적지 않게 해요.'],
@@ -245,5 +268,5 @@ export function shopTable(vars: State, busy = false): string {
   const note = blocked ? `<p class="gx-hint">${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 기본 상점과 쇼핑몰 둘을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>` : '';
   /* ── 3. 기본 상점에만 있는 값: 거래 끊음 + (ui/settings.ts 가 잇는) 열리는 조건 ── */
   const own = s0.on ? `<h2 class="fam-h">기본 상점에만 있는 값</h2>${setGroup('', R('거래 끊음', sw('kick', s0.kick), '켜면 주인이 모욕이나 끝없는 흥정에 거래를 끊을 수 있어요.'))}` : '';
-  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}${ckWide([attach], places.map(({ name, icon }) => nm(icon, name)), busy)}${attachMax}</div><h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${give}${write}${own}`;
+  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}${ckWide([giveShop], giveRows.map(({ name, icon }) => nm(icon, name)), busy)}${ckWide([attach], places.map(({ name, icon }) => nm(icon, name)), busy)}${attachMax}</div>${fnPart}<h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${write}${own}`;
 }
