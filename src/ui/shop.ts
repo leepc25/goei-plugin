@@ -191,7 +191,7 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
   const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : `<p class="gx-wt-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
   if (isPhone()) return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
   // PC (2026-11-08 사용자: 장착 띠를 따로 두면 소지품이 가려 안 보임): 상자 하나에 왼쪽 아바타(자르지 않음, 세로로 섬),
-  // 오른쪽 첫 줄 장착 6칸, 그 아래부터 소지품 격자. 소지품이 많으면 아바타 아래까지 전체 너비로 이어진다
+  // 오른쪽 첫 줄 장착 8칸(무기 2 · 장비 6), 그 아래부터 소지품 격자. 소지품이 많으면 아바타 아래까지 전체 너비로 이어진다
   const { av, slots } = equipParts(ctx, 'sell', st.sell?.itemId ?? '');
   const cells = mine.map((it) => pickCell(it, st)).join('');
   const empty = mine.length ? '' : `<p class="gx-wt-empty sh-sell-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
