@@ -895,7 +895,7 @@ function tierTable(vars: Record<string, unknown> | undefined, site: MallSite): s
 /** 쉼표 목록 → 칩 + 추가 칸 (칩을 누르면 그 항목이 빠진다) */
 const chipList = (items: string[], del: string, key: string, add: string, name: string, ph: string) =>
   `<div class="ms-cl"><div class="gx-chips">${items.map((g, i) => `<button class="gx-chip" data-action="${del}" data-value="${key}${i}" aria-label="${esc(g)} 지우기">${esc(g)}<small>×</small></button>`).join('')}</div><div class="ms-cl-add"><input class="gx-search" name="${name}" maxlength="40" placeholder="${ph}" aria-label="${ph}"><button class="gx-mini" data-action="${add}" data-take="${name}">추가</button></div></div>`;
-/** 상담사 주사위 칸: 줄마다 칸 이름 + 값 칩. 같은 값을 여러 번 넣으면 「n번」 */
+/** 상담사 주사위 칸: 한 줄에 칸 이름 + 값(쉼표로 나눈 글 한 칸) + × (v2: 값마다 칩으로 쪼개면 높이가 3.7배가 돼서 한 칸으로) */
 interface AxisRaw { name: string; values: string[] }
 const axesRaw = (text: string): AxisRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes(':')).map((l) => { const i = l.indexOf(':'); return { name: l.slice(0, i).trim(), values: l.slice(i + 1).split(/[,，]/).map((x) => x.trim()).filter(Boolean) }; });
 const axesRawText = (a: AxisRaw[]): string => a.map((x) => `${x.name}: ${x.values.join(', ')}`).join('\n');
@@ -903,13 +903,11 @@ const axisRows = (vars: Record<string, unknown> | undefined): AxisRaw[] => { con
 function axisTable(vars: Record<string, unknown> | undefined): string {
   const rows = axisRows(vars);
   const body = rows.map((a, i) => {
-    const uniq = [...new Set(a.values)];
     const bad = !a.name ? '칸 이름이 비어 있어 이 칸은 안 뽑아요.' : !a.values.length ? '값이 없어 이 칸은 안 뽑아요.' : '';
-    const chips = uniq.map((v, j) => { const n = a.values.filter((x) => x === v).length; return `<button class="gx-chip" data-action="ms-axv-del" data-value="${i}:${j}" aria-label="${esc(v)} 지우기">${esc(v)}${n > 1 ? `<b>${n}번</b>` : ''}<small>×</small></button>`; }).join('');
     return `<div class="ms-ax${bad ? ' bad' : ''}">
       <label class="ms-tb-c n"><span>칸 이름</span><input class="gx-search" data-change="ms-ax-name" data-key="${i}" value="${esc(a.name)}" maxlength="20" placeholder="칸 이름" aria-label="칸 이름"></label>
+      <label class="ms-tb-c v"><span>값</span><input class="gx-search" data-change="ms-ax-vals" data-key="${i}" value="${esc(a.values.join(', '))}" maxlength="900" placeholder="값, 값" aria-label="값"></label>
       <button class="gx-mini danger ms-tb-x" data-action="ms-ax-del" data-value="${i}" aria-label="지우기">×</button>
-      <div class="ms-ax-v"><div class="gx-chips">${chips}</div><div class="ms-cl-add"><input class="gx-search" name="ms-axv-${i}" maxlength="60" placeholder="값" aria-label="값"><button class="gx-mini" data-action="ms-axv-add:${i}" data-take="ms-axv-${i}">추가</button></div></div>
       ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
     </div>`;
   }).join('');
@@ -971,7 +969,7 @@ function deskGroup(ctx: ChatContext): string {
   const reset = aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
   return group('1:1 상담', how + [
     row('사용', mseg('bm', 'desk_on', d.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요.'),
-    row('상담사 주사위 칸', axisTable(ctx.chat.scriptstate), '칸마다 값을 하나씩 뽑아요. 같은 값을 또 추가하면 그만큼 잘 뽑혀요. 다 지우면 기본 칸으로 돌아가요.', `ms-wide ${aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? 'ps-changed' : ''}`),
+    row('상담사 주사위 칸', axisTable(ctx.chat.scriptstate), '칸마다 값을 하나씩 뽑아요. 값은 쉼표로 나눠요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 다 지우면 기본 칸으로 돌아가요.', `ms-wide ${aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? 'ps-changed' : ''}`),
     row('지난 상담사 다시 만나기', mseg('bm', 'desk_again', d.again ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요.'),
     row('겹치지 않게 넘길 수', `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
   ].join('') + reset);
@@ -1072,8 +1070,7 @@ async function deskSettingsAction(action: string, value: string | undefined, ctx
     if (action === 'ms-ax-name') { const m = /^(\d+)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true; return save(rows().map((a, i) => (i === Number(m[1]) ? { ...a, name: clean(m[2], 20) } : a))); }
     if (action === 'ms-ax-del') return save(rows().filter((_, i) => i !== Number(value)));
     if (action === 'ms-ax-add') return save([...rows(), { name: '', values: [] }]);
-    if (action === 'ms-axv-del') { const [i, j] = String(value).split(':').map(Number); return save(rows().map((a, k) => { if (k !== i) return a; const v = [...new Set(a.values)][j]; const at = a.values.lastIndexOf(v); return { ...a, values: a.values.filter((_, x) => x !== at) }; })); }
-    if (action.startsWith('ms-axv-add:')) { const i = Number(action.slice(11)); const v = clean(value ?? '', 60); return v ? save(rows().map((a, k) => (k === i ? { ...a, values: [...a.values, v] } : a))) : true; }
+    if (action === 'ms-ax-vals') { const m = /^(\d+)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true; return save(rows().map((a, i) => (i === Number(m[1]) ? { ...a, values: m[2].replace(/[:\n]/g, ' ').split(/[,，]/).map((x) => x.replace(/\s+/g, ' ').trim().slice(0, 60)).filter(Boolean) } : a))); }
   }
   if (action === 'ms-desk') {
     const m = /^axes=([\s\S]*)$/.exec(value ?? '');
