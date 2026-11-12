@@ -154,7 +154,7 @@ export function scanStatus(text: string): StatusLine {
   const tags = findStatusTags(text);
   const first = tags[0];
   const minute = first ? statusMinute(first.date, first.time) : null;
-  const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
+  const target = tags.length === 1 && (first.target || first.hasTarget) ? first.target : null;
   return { minute, target };
 }
 

@@ -1023,7 +1023,7 @@ export async function autoRefreshGnet(base: ChatContext, messageIndex: number, o
   const env = liveEnv ?? quietEnv;
   const showing = env.current();
   // 창이 다른 채팅을 보고 있으면 그 화면의 알림은 건드리지 않는다
-  const target = showing && chatKey(showing) === chatKey(ctx) ? env : { ...quietEnv };
+  const target = showing && showing.charIndex === ctx.charIndex && showing.chatIndex === ctx.chatIndex ? env : { ...quietEnv }; // 사이트는 비교하지 않는다 (전수검사 11-13: 괴담갤·세정게·연어 마켓 자동 새로고침이 화면에 안 나왔다)
   const notice = gnet.notice;
   await refreshBoard({ ...ctx, chat: saved }, target, true, joint);
   if (target !== env) gnet.notice = notice;

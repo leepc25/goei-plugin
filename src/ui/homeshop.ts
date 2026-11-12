@@ -18,7 +18,7 @@ import { userInfo } from '../host/user';
 import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
 import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
-import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
+import { ensureHomeshop, homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
 import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
 import { itemPic } from './items';
@@ -123,6 +123,8 @@ async function ask(ctx: ChatContext, env: HsEnv): Promise<void> {
   env.render();
   let failed = false;
   try {
+    // 그림 팩을 아직 안 받았으면 기다린다: 없으면 표정 목록이 talk 하나로 나간다 (전수검사 11-13)
+    if (!homeshopArt() && !homeshopStatus().failed) await ensureHomeshop();
     const show = readShow(ctx.chat.scriptstate);
     const g = genSettings(ctx.chat.scriptstate);
     const moods = moodMap(homeshopArt()?.pack ?? null);
@@ -377,6 +379,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
   playerSay(nick, text.slice(0, 80), 'me');
   env.render();
   try {
+    if (!homeshopArt() && !homeshopStatus().failed) await ensureHomeshop();
     const art = homeshopArt();
     const g = guideSections('Hs');
     const w = cueWords();

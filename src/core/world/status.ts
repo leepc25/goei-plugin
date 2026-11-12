@@ -13,6 +13,8 @@ export interface StatusTag {
   place: string;
   /** '없음'이면 빈 문자열 */
   target: string;
+  /** 이 줄에 목표 칸이 있었는가 (값이 없음이어도 true. 목표 칸을 끈 구성이거나 칸이 모자라면 false) */
+  hasTarget: boolean;
   /** 지금 주인공과 같이 있는 이름 있는 인물들 (8칸 상태창의 동행 칸. 칸이 없거나 없음이면 빈 목록) */
   companions: string[];
   /** 투입 칸: 투입이면 true, 없음이면 false, 칸이 없는 옛 6칸 상태창이면 null */
@@ -52,11 +54,11 @@ function extras(x: string[]): { companions: string[]; deployed: boolean | null; 
 }
 
 /** 위치 뒤 칸들: 목표(괴이), 동행, 투입, 신분, 잔고. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
-function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
+function tail(rest: string[]): { target: string; hasTarget: boolean; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
   const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
   const after = rest.slice(1);
-  if (after.length <= 1) return { target: clean(after[0] ?? ''), ...extras([]) };
-  return { target: clean(after[0]), ...extras(after.slice(1, 6)) };
+  if (after.length <= 1) return { target: clean(after[0] ?? ''), hasTarget: after.length >= 1, ...extras([]) };
+  return { target: clean(after[0]), hasTarget: true, ...extras(after.slice(1, 6)) };
 }
 
 /** 칸 구성대로 이름 붙이기 (구성에 없는 칸은 빈 값, 투입 칸이 없으면 null) */
@@ -68,6 +70,7 @@ function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
   };
   const d = get('deployed');
   return {
+    hasTarget: shape.includes('target'),
     date: get('date'),
     time: get('time'),
     weather: clean(get('weather')),
