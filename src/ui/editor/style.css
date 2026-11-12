@@ -782,10 +782,10 @@
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .fl-pc { display: none; }
   .gw .fl-ph { display: flex; }
-  .gw .fl-bar { position: static; grid-template-columns: minmax(0, 1fr) auto auto; padding: 6px 4px 6px 11px; margin-bottom: 14px; }
+  /* 폰: 오른쪽 숫자 칸은 왼쪽 두 줄(메인 + 보조 = 합)에 이미 있어 숨긴다. 글이 한 줄씩 들어가게 */
+  .gw .fl-bar { position: static; grid-template-columns: minmax(0, 1fr); padding: 8px 11px; margin-bottom: 14px; }
   .gw .fl-bar > p { font-size: 12.5px; line-height: 1.35; }
-  .gw .fl-bar > div { padding: 0 9px; }
-  .gw .fl-bar > p + div { display: none; }
+  .gw .fl-bar > div { display: none; }
   .gw .fl-bar > div > span { font-size: 11.5px; }
   .gw .fl-bar > div > b { font-size: 14px; }
   .gw .fl-bar > i { display: none; }
