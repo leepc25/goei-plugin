@@ -83,12 +83,12 @@ function filesHtml(f: Files): string {
 // 저장 칸 고르기·불러오기는 게임 안 본부가 맡는다(hq 모듈, bridge.saves). 여기서는 시작 버튼과 마지막 저장만 보인다
 function startHtml(slots: SlotInfo[], last: SlotId | null, ready: boolean): string {
   const s = slots.find((x) => x.slot === last) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-  const help = (ready && msgOf()) || (s ? `마지막 저장 · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.');
+  const help = (ready && msgOf()) || (s ? `마지막 저장 · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '요원들을 만나 대화해요. 나눈 말은 다음 메인 요청에 막간으로 들어가요.');
   return group('필드', row('본부', help, `<button class="gx-mini primary" data-g="play"${ready ? '' : ' disabled'}>들어가기</button>`));
 }
 
 function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: number): string {
-  if (!card) return group('본편 연동', row('채팅 연결 안 됨', '괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요.'));
+  if (!card) return group('RP 연동', row('채팅 연결 안 됨', '괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요.'));
   const n = (k: string) => card.events.filter((e) => e.kind === k).length;
   const free = card.agents.filter((a) => !a.locked).length;
   const reps = reports.map((p) => row(
@@ -97,7 +97,7 @@ function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: n
     `<button class="gx-mini primary" data-g="record" data-at="${p.at}"${p.recorded || busy ? ' disabled' : ''}>${p.recorded ? '기록함' : '기록 로어북에 남기기'}</button>
      <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`,
   )).join('');
-  return group('본편 연동', [
+  return group('RP 연동', [
     row('이 채팅에서 읽은 것', `요원 ${card.agents.length}명(편성 가능 ${free}) · 괴이 ${n('an')} · 사건 ${n('in')} · 특수 ${n('ms')}`),
     reps || '',
     record ? row(`「${esc(RECORD_COMMENT)}」 로어북`, `${record}줄`, '<button class="gx-mini" data-g="unrecord">지우기</button>') : '',

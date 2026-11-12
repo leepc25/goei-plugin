@@ -1,4 +1,7 @@
- "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
+ const rank3 = get("직급") || (dice.find(([k]) => k === "직급")?.[1] ?? "");
+    return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank: rank3, dept: get("부서"), intro: get("소개"), voice: get("말투"), dice }, say: say2 };
+  }
+  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
   function parseSay(raw) {
     const say2 = bubbles(block3(raw, "say"));
     if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
@@ -65,9 +68,9 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
   var mallAutoKey = (site) => `$${site}_sh_auto`;
   function mallVars(vars, site) {
     const out = {};
-    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_")) out[k] = v;
+    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_") || SHOP_SHARED_VARS.includes(k)) out[k] = v;
     const pre = `$${site}_sh_`;
-    for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith(pre)) out[`$sh_${k.slice(pre.length)}`] = v;
+    for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith(pre) && !SHOP_SHARED_VARS.includes(`$sh_${k.slice(pre.length)}`)) out[`$sh_${k.slice(pre.length)}`] = v;
     return out;
   }
   function mallSettings(vars, site) {
@@ -126,9 +129,9 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
   ];
   var rollDefaults = (site) => site === "cos" ? { genres: COS_GENRES_DEFAULT, tiers: COS_TIERS_DEFAULT } : { genres: BM_GENRES_DEFAULT, tiers: BM_TIERS_DEFAULT };
   var tiersText = (t) => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join("\n");
-  function parseTiers(text4) {
+  function parseTiers(text5) {
     const out = [];
-    for (const line2 of String(text4 ?? "").split(/\r?\n/)) {
+    for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const [name = "", desc = "", lo = "", hi = "", w = ""] = line2.split("|").map((x) => x.trim());
       const a = Number(lo.replace(/[^\d]/g, ""));
       const b = Number(hi.replace(/[^\d]/g, ""));
@@ -139,11 +142,11 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
     return out;
   }
   var genresText = (g2) => g2.join(", ");
-  var parseGenres = (text4) => [...new Set(String(text4 ?? "").split(/[,\n]/).map((x) => x.trim().slice(0, 40)).filter(Boolean))];
+  var parseGenres = (text5) => [...new Set(String(text5 ?? "").split(/[,\n]/).map((x) => x.trim().slice(0, 40)).filter(Boolean))];
   function mallRoll(vars, site) {
     const K = rollKeys(site);
     const D = rollDefaults(site);
-    const on2 = String(vars?.[K.on] ?? "") !== "0";
+    const on3 = String(vars?.[K.on] ?? "") !== "0";
     const g2 = parseGenres(String(vars?.[K.genres] ?? ""));
     const t = parseTiers(String(vars?.[K.tiers] ?? ""));
     const u = String(vars?.[K.useful] ?? "");
@@ -151,7 +154,7 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
     const tm = String(vars?.[K.tmode] ?? "");
     const tiers = t.length ? t : D.tiers;
     return {
-      on: on2,
+      on: on3,
       genres: g2.length ? g2 : D.genres,
       tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
       useful: u === "0" || u === "1" || u === "2" ? u : "auto",
@@ -178,9 +181,9 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
     }
     return g2;
   };
-  function cosDraw(count3, context, roll, rnd = Math.random) {
+  function cosDraw(count2, context, roll, rnd = Math.random) {
     if (!roll.on) return [];
-    const n3 = Math.max(1, Math.trunc(count3));
+    const n3 = Math.max(1, Math.trunc(count2));
     let genres;
     if (roll.gmode === "one") {
       const g2 = roll.genres[Math.floor(rnd() * roll.genres.length)];
@@ -202,8 +205,8 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
     while (useful.size < want) useful.add(Math.floor(rnd() * n3));
     return genres.map((genre, i) => ({ genre, tier: tiers[i], useful: useful.has(i) }));
   }
-  function cosAssignment(count3, context, roll, rnd = Math.random, site = "cos") {
-    const slots = cosDraw(count3, context, roll, rnd);
+  function cosAssignment(count2, context, roll, rnd = Math.random, site = "cos") {
+    const slots = cosDraw(count2, context, roll, rnd);
     if (!slots.length) return "";
     const want = slots.some((s8) => s8.useful);
     const G3 = site === "bm" ? "CATEGORY" : "GENRE";
@@ -278,12 +281,11 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
   var ITEM_ICON_ALIAS_VAR = "$it_icon_alias";
   var ITEM_ICON_POOL_VAR = "$it_icon_pool";
   var itemIconPoolOn = (vars) => vars?.[ITEM_ICON_POOL_VAR] !== "0";
-  var ITEM_PUSH_VAR = "$it_push";
   var ITEM_AUTO_VAR = "$it_auto";
   var ITEM_SLOTS_DEFAULT = 16;
   var ITEM_SLOTS_MIN = 8;
   var ITEM_SLOTS_MAX = 40;
-  var ITEM_LIMIT_DEFAULT = "가방 하나와 주머니, 두 손";
+  var ITEM_LIMIT_DEFAULT = "one bag, pockets, and two hands";
   var ITEM_CARRY_VAR = "$it_carry";
   var ITEM_CARRY_PC_VAR = "$it_carry_pc";
   var ITEM_CARRY_DEFAULT = 25;
@@ -380,9 +382,9 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     return { ...it, list: it.list.map((x) => x.id === id2 ? rest : x) };
   }
   var liveItemsOf = (it, chat) => liveItems(it, aliveAnchors(chat));
-  var hash4 = (text4) => {
+  var hash4 = (text5) => {
     let h = 2166136261;
-    for (const ch of text4) {
+    for (const ch of text5) {
       h ^= ch.codePointAt(0);
       h = Math.imul(h, 16777619);
     }
@@ -425,7 +427,7 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     const desc = clean4(e.desc, 80);
     const effect = clean4(e.effect, 60);
     const truth = e.truth ? clean4(e.truth, 60) : "";
-    const text4 = e.text ? clean4(e.text, 400) : "";
+    const text5 = e.text ? clean4(e.text, 400) : "";
     const quote = e.quote ? clean4(e.quote, 120) : void 0;
     const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
     if (found) {
@@ -439,7 +441,7 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     }
     const id2 = e.id ?? itemId2(e.anchor, name);
     if (it.list.some((x) => x.id === id2)) return it;
-    const row11 = withTraits({
+    const row8 = withTraits({
       id: id2,
       name,
       desc,
@@ -453,12 +455,12 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
       ...e.walletId ? { walletId: e.walletId } : {},
       ...e.paidWith ? { paidWith: clean4(e.paidWith, 60) } : {},
       ...truth ? { truth } : {},
-      ...text4 ? { text: text4 } : {},
+      ...text5 ? { text: text5 } : {},
       ...quote ? { quote } : {}
     }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
-    const got = addItemLog(it, { name, item: id2, ...row11.icon ? { icon: row11.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...paidNote(e) ? { note: paidNote(e) } : {}, at: row11.at });
-    const out = { ...got, list: [...got.list, row11].slice(-200) };
-    return e.wear && row11.equip ? equipItem(out, alive, id2) : out;
+    const got = addItemLog(it, { name, item: id2, ...row8.icon ? { icon: row8.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...paidNote(e) ? { note: paidNote(e) } : {}, at: row8.at });
+    const out = { ...got, list: [...got.list, row8].slice(-200) };
+    return e.wear && row8.equip ? equipItem(out, alive, id2) : out;
   }
   function updateItem(it, id2, patch) {
     const cur = it.list.find((x) => x.id === id2);
@@ -482,8 +484,8 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
   function addItemLog(it, l) {
     const id2 = l.id ?? logId(l.what, l.anchor, l.name, it.log.length);
     if (it.log.some((x) => x.id === id2)) return it;
-    const row11 = { ...l, id: id2, name: clean4(l.name, 30), at: l.at ?? (/* @__PURE__ */ new Date()).toISOString(), ...l.quote ? { quote: clean4(l.quote, 120) } : {}, ...l.note ? { note: clean4(l.note, 60) } : {} };
-    return { ...it, log: [...it.log, row11].slice(-400) };
+    const row8 = { ...l, id: id2, name: clean4(l.name, 30), at: l.at ?? (/* @__PURE__ */ new Date()).toISOString(), ...l.quote ? { quote: clean4(l.quote, 120) } : {}, ...l.note ? { note: clean4(l.note, 60) } : {} };
+    return { ...it, log: [...it.log, row8].slice(-400) };
   }
   function removeItem(it, id2, what, by, anchor = "", extra2 = {}) {
     const cur = it.list.find((x) => x.id === id2);
@@ -503,17 +505,17 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     return words(b.name).some((w) => wa2.has(w));
   }
   function mergeItems(it, alive, keepId, otherId, anchor = "") {
-    const keep = it.list.find((x) => x.id === keepId);
+    const keep2 = it.list.find((x) => x.id === keepId);
     const other = it.list.find((x) => x.id === otherId);
-    if (!keep || !other || !canMerge(keep, other)) return it;
-    const weight = keep.weight ?? other.weight;
+    if (!keep2 || !other || !canMerge(keep2, other)) return it;
+    const weight = keep2.weight ?? other.weight;
     const merged = {
-      ...keep,
-      uses: Math.min(999, keep.uses + (itemLeft(it, other, alive) ?? 0)),
+      ...keep2,
+      uses: Math.min(999, keep2.uses + (itemLeft(it, other, alive) ?? 0)),
       ...weight !== void 0 ? { weight } : {},
       // 직접 넣은 줄과 합치면 늘 사는 쪽(anchor '')으로
-      anchor: keep.anchor && other.anchor ? keep.anchor : "",
-      from: keep.anchor && other.anchor ? keep.from : "manual"
+      anchor: keep2.anchor && other.anchor ? keep2.anchor : "",
+      from: keep2.anchor && other.anchor ? keep2.from : "manual"
     };
     const list4 = it.list.filter((x) => x.id !== otherId).map((x) => x.id === keepId ? merged : x);
     return addItemLog({ ...it, list: list4 }, { name: other.name, item: other.id, ...other.icon ? { icon: other.icon } : {}, what: "merge", by: "manual", anchor, note: `${merged.name}와 합침` });
@@ -545,7 +547,7 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     return !(chat.message ?? []).slice(at).some((m) => m.role === "char");
   }
   var RESUMED_EVENT = "item tracking was switched off for a while and just came back on — this list may not match what happened in the story since; follow the story and treat the list as a starting point";
-  var itemPushOn = (vars) => invOn(vars) && vars?.[ITEM_PUSH_VAR] !== "0";
+  var itemPushOn = (vars) => invOn(vars);
   var itemAutoOn = (vars) => invOn(vars) && vars?.[ITEM_AUTO_VAR] !== "0";
   var ITEM_START_VAR = "$it_start";
   var ITEM_SPENT_VAR = "$it_spent";
@@ -555,9 +557,12 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
   var itemDetail = (vars) => vars?.[ITEM_DETAIL_VAR] === "state" || vars?.[ITEM_DETAIL_VAR] === "name" ? vars[ITEM_DETAIL_VAR] : "full";
   var ITEM_LOGTURNS_VAR = "$it_logturns";
   var ITEM_LOGTURNS_MAX = 10;
+  var ITEM_LOGTURNS_DEFAULT = 3;
   var itemLogTurns = (vars) => {
-    const n3 = Number(vars?.[ITEM_LOGTURNS_VAR]);
-    return Number.isInteger(n3) && n3 >= 0 ? Math.min(ITEM_LOGTURNS_MAX, n3) : 0;
+    const raw = vars?.[ITEM_LOGTURNS_VAR];
+    if (raw === void 0 || raw === null || raw === "") return ITEM_LOGTURNS_DEFAULT;
+    const n3 = Number(raw);
+    return Number.isInteger(n3) && n3 >= 0 ? Math.min(ITEM_LOGTURNS_MAX, n3) : ITEM_LOGTURNS_DEFAULT;
   };
   var itemStartOn = (vars) => invOn(vars) && vars?.[ITEM_START_VAR] !== "0";
   function readItemUse(vars) {
@@ -687,15 +692,8 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
   function inventoryText(chat) {
     const vars = chat.scriptstate;
     if (!itemPushOn(vars)) {
-      const it2 = readItems(vars);
-      const soldOff2 = [...soldNow(it2, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
-      if (!shopOn(vars)) return soldOff2.length ? [SHOP_HEAD, `This turn: ${soldOff2.join("; ")}`].join("\n") : "";
-      const live2 = liveItems(it2, aliveAnchors(chat));
-      const bought = newlyBought(live2, lastBotKey(chat)).map(boughtLine);
-      const events = [...bought.length ? [`just bought ${bought.join(", ")}`] : [], ...soldOff2, ...shopEvents(chat)];
-      const guide2 = shopGuide(vars);
-      if (!events.length && !guide2) return "";
-      return [SHOP_HEAD, ...events.length ? [`This turn: ${events.join("; ")}`] : [], ...guide2 ? [guide2] : []].join("\n");
+      const soldOff2 = [...soldNow(readItems(vars), lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
+      return soldOff2.length ? [SHOP_HEAD, `This turn: ${soldOff2.join("; ")}`].join("\n") : "";
     }
     const it = readItems(vars);
     const userKey = lastUserKey(chat);
@@ -714,7 +712,7 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     });
     const resumed = invJustResumed(chat);
     const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
-    const text4 = itemsBlock(live, {
+    const text5 = itemsBlock(live, {
       slots: itemSlots(vars),
       limit: itemLimit(vars),
       carry: itemCarry(vars),
@@ -727,7 +725,7 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
       recent: recentItemLog(chat, it, itemLogTurns(vars))
     });
     const guide = shop ? shopGuide(vars) : "";
-    return text4 ? `${text4}
+    return text5 ? `${text5}
 ${INVENTORY_NOTE}${guide ? `
 ${guide}` : ""}` : "";
   }
@@ -743,10 +741,10 @@ ${guide}` : ""}` : "";
   }
   function withInventory(messages, chat) {
     if (messages.some((m) => typeof m?.content === "string" && (m.content.startsWith(INVENTORY_HEAD) || m.content.startsWith(SHOP_HEAD)))) return messages;
-    const text4 = inventoryText(chat);
-    if (!text4) return messages;
+    const text5 = inventoryText(chat);
+    if (!text5) return messages;
     const at = messages.map((m) => m?.role).lastIndexOf("user");
-    const block5 = { role: "system", content: text4 };
+    const block5 = { role: "system", content: text5 };
     return at < 0 ? [...messages, block5] : [...messages.slice(0, at), block5, ...messages.slice(at)];
   }
   function settleItemUse(chat, responseIndex) {
@@ -934,16 +932,16 @@ ${guide}` : ""}` : "";
 ${joined}
 ${SEED_CLOSE}` : "", missing };
   }
-  function seedBody(text4, env3) {
-    const inner = String(text4 ?? "").replace(SEED_MARKER, "");
+  function seedBody(text5, env3) {
+    const inner = String(text5 ?? "").replace(SEED_MARKER, "");
     if (!inner.trim()) return "";
     return evaluate(inner, env3).split("\n").filter((l) => !/^\s*@@[\w-]+(?:\s.*)?$/.test(l)).join("\n").replace(/\n{3,}/g, "\n\n").trim();
   }
   var SEED_BLOCK = /%%SEED%%[\s\S]*?%%\/SEED%%\n?/g;
   var SEED_MARKER = /%%\/?SEED%%\n?/g;
-  function applySeedLifetime(text4, keep) {
-    if (!text4.includes(SEED_OPEN)) return text4;
-    return keep ? text4.replace(SEED_MARKER, "") : text4.replace(SEED_BLOCK, "");
+  function applySeedLifetime(text5, keep2) {
+    if (!text5.includes(SEED_OPEN)) return text5;
+    return keep2 ? text5.replace(SEED_MARKER, "") : text5.replace(SEED_BLOCK, "");
   }
 
   // src/core/start.ts
@@ -959,10 +957,10 @@ ${SEED_CLOSE}` : "", missing };
   }
   function unsentOpening(chat) {
     const m = chat.message ?? [];
-    const text4 = String(m[0]?.data ?? "");
+    const text5 = String(m[0]?.data ?? "");
     if (m.length !== 1) return false;
-    if (m[0]?.role === "char") return isSceneMessage(text4);
-    return m[0]?.role === "user" && (hasSceneCard(text4) || text4.includes(UNSENT_MARK));
+    if (m[0]?.role === "char") return isSceneMessage(text5);
+    return m[0]?.role === "user" && (hasSceneCard(text5) || text5.includes(UNSENT_MARK));
   }
   var sceneStaged = (chat) => (chat.message ?? []).length === 1 && chat.message[0]?.role === "char" && isSceneMessage(chat.message[0].data);
   function chatPhase(chat) {
@@ -1056,8 +1054,8 @@ ${SEED_CLOSE}` : "", missing };
     }
     return -1;
   }
-  function sceneChatMessage(text4, id2) {
-    return { role: "char", data: sceneMessage(text4), time: Date.now(), chatId: id2 };
+  function sceneChatMessage(text5, id2) {
+    return { role: "char", data: sceneMessage(text5), time: Date.now(), chatId: id2 };
   }
   function applyStart(chat, plan, sceneId = "") {
     const message = unsentOpening(chat) ? [] : [...chat.message ?? []];
@@ -1090,8 +1088,8 @@ ${SEED_CLOSE}` : "", missing };
   function openRepick() {
     opener?.();
   }
-  function wantsOpeningHint(text4) {
-    return !!marker && text4.includes(marker);
+  function wantsOpeningHint(text5) {
+    return !!marker && text5.includes(marker);
   }
   async function refreshOpeningHint(charIndex, chatIndex) {
     if (charIndex < 0 || chatIndex < 0) return void (marker = "");
@@ -1102,9 +1100,9 @@ ${SEED_CLOSE}` : "", missing };
   onChatClick("opening", async (doc2, x, y) => {
     const list4 = await elements(doc2, "[data-goei-repick]");
     if (!list4.length) return "idle";
-    let on2 = false;
-    for (const el of list4) if (await hit2(el, x, y)) on2 = true;
-    if (!on2 || busy) return false;
+    let on3 = false;
+    for (const el of list4) if (await hit2(el, x, y)) on3 = true;
+    if (!on3 || busy) return false;
     busy = true;
     try {
       opener?.();
@@ -1138,21 +1136,21 @@ ${SEED_CLOSE}` : "", missing };
     if (busy2) return false;
     const list4 = await elements(_doc, "[data-goei-cancel]");
     if (!list4.length) return "idle";
-    let on2 = false;
-    for (const el of list4) if (await hit2(el, x, y)) on2 = true;
-    if (!on2 || isWaiting()) return false;
+    let on3 = false;
+    for (const el of list4) if (await hit2(el, x, y)) on3 = true;
+    if (!on3 || isWaiting()) return false;
     busy2 = true;
     try {
       const charIndex = await risuai.getCurrentCharacterIndex();
       const chatIndex = await risuai.getCurrentChatIndex();
-      const saved2 = await updateChat(charIndex, chatIndex, (chat) => {
+      const saved = await updateChat(charIndex, chatIndex, (chat) => {
         const msgs4 = chat.message ?? [];
         const last2 = msgs4[msgs4.length - 1];
         if (!last2 || last2.role !== "user" || typeof last2.data !== "string" || !isUnsent(last2.data)) return null;
         chat.message = msgs4.slice(0, -1);
         return chat;
       });
-      if (saved2 && !(saved2.message ?? []).length) openRepick();
+      if (saved && !(saved.message ?? []).length) openRepick();
     } catch (error) {
       console.log(`[goei] 요청 취소 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -1227,19 +1225,19 @@ ${SEED_CLOSE}` : "", missing };
   };
   function wikiSettings(state) {
     const s8 = state ?? {};
-    const pick3 = (key, allowed, def) => allowed.includes(s8[key]) ? s8[key] : def;
+    const pick4 = (key, allowed, def) => allowed.includes(s8[key]) ? s8[key] : def;
     return {
       ...WIKI_DEFAULTS,
-      mode: pick3("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
-      model: pick3("$nw_model", ["main", "aux"], WIKI_DEFAULTS.model),
-      length: pick3("$nw_length", ["short", "standard", "detailed"], WIKI_DEFAULTS.length),
+      mode: pick4("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
+      model: pick4("$nw_model", ["main", "aux"], WIKI_DEFAULTS.model),
+      length: pick4("$nw_length", ["short", "standard", "detailed"], WIKI_DEFAULTS.length),
       refreshPrevious: s8["$nw_refresh_previous"] !== "0",
       chatTurns: advNum(s8, "nw", "turns"),
       referenceCount: advNum(s8, "nw", "ref_count"),
-      footnotes: pick3("$nw_footnotes", ["pop", "inline"], WIKI_DEFAULTS.footnotes),
-      images: pick3("$nw_images", ["off", "infobox", "body"], WIKI_DEFAULTS.images),
-      auto: pick3("$nw_auto", ["0", "open", "turn"], WIKI_DEFAULTS.auto),
-      autoTitle: pick3("$nw_auto_title", ["model", "input"], WIKI_DEFAULTS.autoTitle),
+      footnotes: pick4("$nw_footnotes", ["pop", "inline"], WIKI_DEFAULTS.footnotes),
+      images: pick4("$nw_images", ["off", "infobox", "body"], WIKI_DEFAULTS.images),
+      auto: pick4("$nw_auto", ["0", "open", "turn"], WIKI_DEFAULTS.auto),
+      autoTitle: pick4("$nw_auto_title", ["model", "input"], WIKI_DEFAULTS.autoTitle),
       autoQuery: String(s8["$nw_auto_query"] ?? "").trim().slice(0, 80)
     };
   }
@@ -1304,8 +1302,8 @@ ${SEED_CLOSE}` : "", missing };
   var WIKI_PACK_HEAD = "GOEIWIKI1:";
   var pack = null;
   var stored = null;
-  function setStoredWikiPack(text4) {
-    stored = text4 && text4.startsWith(WIKI_PACK_HEAD) ? text4 : null;
+  function setStoredWikiPack(text5) {
+    stored = text5 && text5.startsWith(WIKI_PACK_HEAD) ? text5 : null;
   }
   var storedWikiPack = () => stored;
   function packEntry(lore) {
@@ -1322,8 +1320,8 @@ ${SEED_CLOSE}` : "", missing };
     const bin = atob(src.slice(WIKI_PACK_HEAD.length));
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    const text4 = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
-    const map = JSON.parse(text4);
+    const text5 = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    const map = JSON.parse(text5);
     const docs = [];
     for (const [title2, body5] of Object.entries(map)) {
       const doc2 = typeof body5 === "string" ? parseDocContent(title2, body5) : null;
@@ -1347,10 +1345,10 @@ ${SEED_CLOSE}` : "", missing };
     return docs;
   }
   function listDocs(chat, lore) {
-    const mine = docsIn(localLore(chat));
-    if (lore === void 0) return mine;
-    const have = new Set(mine.map((d) => d.title));
-    return [...mine, ...baseDocs(lore).filter((d) => !have.has(d.title))];
+    const mine2 = docsIn(localLore(chat));
+    if (lore === void 0) return mine2;
+    const have = new Set(mine2.map((d) => d.title));
+    return [...mine2, ...baseDocs(lore).filter((d) => !have.has(d.title))];
   }
   function findDoc(chat, title2, lore) {
     return listDocs(chat, lore).find((d) => d.title === title2) ?? null;
@@ -1463,11 +1461,11 @@ ${req.docRequest.trim()}`;
   }
   var ARROW = /➡️|➡︎|➡/g;
   function acceptArticle(raw, title2, canon2) {
-    const text4 = raw.trim();
-    if (!text4) throw new WikiError("모델이 빈 응답을 보냈어요.");
-    const m = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(text4);
+    const text5 = raw.trim();
+    if (!text5) throw new WikiError("모델이 빈 응답을 보냈어요.");
+    const m = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(text5);
     if (!m) {
-      if (/<lightboard-namuwiki[\s>]/.test(text4)) throw new WikiError("문서가 끝까지 오지 않았어요 (닫는 태그 없음). 응답 길이 한도에 걸렸을 수 있어요. 분량을 줄이거나 다시 시도해 주세요.");
+      if (/<lightboard-namuwiki[\s>]/.test(text5)) throw new WikiError("문서가 끝까지 오지 않았어요 (닫는 태그 없음). 응답 길이 한도에 걸렸을 수 있어요. 분량을 줄이거나 다시 시도해 주세요.");
       throw new WikiError("위키 형식(<lightboard-namuwiki>)이 아닌 응답이에요.");
     }
     let body5 = m[0];
@@ -1493,16 +1491,16 @@ ${req.docRequest.trim()}`;
     });
   }
   function portraitMood(body5) {
-    const open4 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
-    const m = attrs(open4).portrait_mood ?? "";
+    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
+    const m = attrs(open3).portrait_mood ?? "";
     return /^[a-z][a-z ]{0,20}$/i.test(m) ? m.trim().toLowerCase() : "";
   }
   var SPOILER_HEADING = /탈출|출구|금기|공략|해법|해결|클리어|생환|대처|수칙|정답|파훼|봉인|퇴치|살아남|빠져나|규칙|격리 ?(?:방법|절차)|약점/;
   var esc2 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var escText = (s8) => esc2(s8.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
-  function attrs(open4) {
+  function attrs(open3) {
     const out = {};
-    for (const m of open4.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
+    for (const m of open3.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
     return out;
   }
   function splitFields(s8, sep = "|") {
@@ -1525,8 +1523,8 @@ ${req.docRequest.trim()}`;
     return i < 0 ? ["", f.trim()] : [f.slice(0, i).trim(), f.slice(i + 1).trim()];
   }
   function renderArticle(body5, o) {
-    const open4 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
-    const a = attrs(open4);
+    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
+    const a = attrs(open3);
     const color = /^#[0-9a-fA-F]{3,8}$/.test(a.main_color ?? "") ? a.main_color : "#27685b";
     const notes = [];
     const inline = (s8) => escText(s8).replace(/➡️([^➡]+?)➡️/g, (_all, t) => {
@@ -1619,8 +1617,8 @@ ${line2}`;
           const tc = /^#[0-9a-fA-F]{3,8}$/.test(c2 ?? "") ? c2 : color;
           const head3 = fields3.find(([k]) => k === "Head")?.[1];
           const rows3 = fields3.filter(([k]) => k === "Row" || k === "RowHead");
-          const cells = (v, tagName3) => v.split(";;").map((x) => `<${tagName3}>${inline(x.trim())}</${tagName3}>`).join("");
-          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
+          const cells2 = (v, tagName3) => v.split(";;").map((x) => `<${tagName3}>${inline(x.trim())}</${tagName3}>`).join("");
+          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells2(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${cells2(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
           break;
         }
         default:
@@ -1638,12 +1636,12 @@ ${line2}`;
   var wikiContextOn = (state) => String(state?.[NW_CONTEXT] ?? "") === "1";
   function wikiMainContext(chat, rules2, focus, capOverride) {
     const s8 = chat.scriptstate;
-    const count3 = advNum(s8, "nw", "ctx_count");
+    const count2 = advNum(s8, "nw", "ctx_count");
     const cap = capOverride ?? advNum(s8, "nw", "ctx_tokens");
     const onlyMentioned = advOn(s8, "nw", "ctx_focus");
     const withLore = advOn(s8, "nw", "ctx_lore");
     const created = advOn(s8, "nw", "ctx_created");
-    const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count3);
+    const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count2);
     const kept = [];
     const payload = () => `[MODULE_CONTEXT_BEGIN]
 ${rules2}
@@ -1660,9 +1658,9 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
   }
   function docSummary(body5, max = 150) {
     const para = /^\[Paragraph\](.+)$/m.exec(body5)?.[1] ?? "";
-    const text4 = para.replace(/📌[^📌]*?📌/gu, "").replace(/✂️[^✂]*?✂️/g, "").replace(/➡️([^➡]+?)➡️/g, "$1").replace(/❗([^❗]+?)❗/g, "$1").replace(/\*\*([^*]+?)\*\*/g, "$1").replace(/\s+/g, " ").trim();
-    if ([...text4].length <= max) return text4;
-    const cut3 = [...text4].slice(0, max).join("");
+    const text5 = para.replace(/📌[^📌]*?📌/gu, "").replace(/✂️[^✂]*?✂️/g, "").replace(/➡️([^➡]+?)➡️/g, "$1").replace(/❗([^❗]+?)❗/g, "$1").replace(/\*\*([^*]+?)\*\*/g, "$1").replace(/\s+/g, " ").trim();
+    if ([...text5].length <= max) return text5;
+    const cut3 = [...text5].slice(0, max).join("");
     const end = Math.max(cut3.lastIndexOf(". "), cut3.lastIndexOf("다. "), cut3.lastIndexOf("."));
     return end > max * 0.5 ? cut3.slice(0, end + 1) : `${cut3}…`;
   }
@@ -1688,15 +1686,15 @@ ${story}`;
     ];
   }
   function acceptTitle(raw, candidates) {
-    const text4 = raw.replace(/<(think|thoughts|lb-process)\b[^>]*>[\s\S]*?<\/\1>/gi, "").trim();
-    const m = /\{[\s\S]*\}/.exec(text4);
+    const text5 = raw.replace(/<(think|thoughts|lb-process)\b[^>]*>[\s\S]*?<\/\1>/gi, "").trim();
+    const m = /\{[\s\S]*\}/.exec(text5);
     let title2 = "";
     try {
       title2 = String(JSON.parse(m?.[0] ?? "{}").title ?? "").trim();
     } catch {
       title2 = "";
     }
-    if (!title2) title2 = text4.replace(/^["'\s]+|["'\s]+$/g, "").split("\n")[0].trim();
+    if (!title2) title2 = text5.replace(/^["'\s]+|["'\s]+$/g, "").split("\n")[0].trim();
     const hit4 = candidates.find((c) => c === title2) ?? candidates.find((c) => c.includes(title2) || title2.includes(c));
     if (!hit4) throw new WikiError(`후보에 없는 제목이에요: ${title2.slice(0, 40)}`);
     return hit4;
@@ -1713,10 +1711,10 @@ ${story}`;
     const meta = [place3, h.at !== null ? `종료 ${journalClock(h.at).slice(6)}` : "", h.duration !== null ? `소요 ${dur(h.duration)}` : ""].filter(Boolean).join(" · ");
     const who = r.agents.map((a) => a.name).filter(Boolean).join(" · ");
     const badge3 = r.mine ? "내가 출동" : "요원 처리";
-    const box4 = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
+    const box3 = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
     const chip3 = `display:inline-block;padding:0 8px;border-radius:999px;border:1px solid ${r.mine ? p2.signal : p2.accentLine};color:${r.mine ? p2.signal : p2.sub};font-size:.85em;line-height:1.6;margin-left:6px;vertical-align:middle;`;
     const mark2 = `display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;border:1px solid ${p2.accentLine};background:${p2.panel};color:${p2.signal};font-weight:700;font-size:.95em;margin-right:8px;vertical-align:middle;`;
-    return `<div data-goei-card="report" data-goei-report="${esc3(r.id)}" style="${box4}"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:${p2.signal};font-weight:600"><span>📄 사건 보고서</span><span style="font-weight:500;opacity:.8;font-size:.85em">${esc3(r.no)}</span></span><span style="display:flex;align-items:center;margin-top:6px;color:${p2.text}"><span style="${mark2}">${esc3(grade)}</span><b>${esc3(h.name)}</b><span style="${chip3}">${badge3}</span><span style="margin-left:6px;opacity:.7;font-size:.85em">${JOURNAL_KIND_LABEL[r.kind]} · 종료</span></span>` + (meta ? `<span style="display:block;margin-top:4px">${esc3(meta)}</span>` : "") + (who ? `<span style="display:block">투입 ${esc3(who)}</span>` : "") + `<span style="display:block;color:${p2.text}">${esc3(r.result)}</span><span data-goei-rec="${esc3(r.id)}" style="display:inline-block;margin-top:6px;color:${p2.signal};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">기록에서 보기 ›</span></div>`;
+    return `<div data-goei-card="report" data-goei-report="${esc3(r.id)}" style="${box3}"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:${p2.signal};font-weight:600"><span>📄 사건 보고서</span><span style="font-weight:500;opacity:.8;font-size:.85em">${esc3(r.no)}</span></span><span style="display:flex;align-items:center;margin-top:6px;color:${p2.text}"><span style="${mark2}">${esc3(grade)}</span><b>${esc3(h.name)}</b><span style="${chip3}">${badge3}</span><span style="margin-left:6px;opacity:.7;font-size:.85em">${JOURNAL_KIND_LABEL[r.kind]} · 종료</span></span>` + (meta ? `<span style="display:block;margin-top:4px">${esc3(meta)}</span>` : "") + (who ? `<span style="display:block">투입 ${esc3(who)}</span>` : "") + `<span style="display:block;color:${p2.text}">${esc3(r.result)}</span><span data-goei-rec="${esc3(r.id)}" style="display:inline-block;margin-top:6px;color:${p2.signal};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">기록에서 보기 ›</span></div>`;
   }
 
   // src/host/statusview.ts
@@ -1747,9 +1745,9 @@ ${story}`;
     }
     return map;
   }
-  function chatCardsAt(chat, index3) {
+  function chatCardsAt(chat, index) {
     const out = [];
-    for (const list4 of collectCards(chat).values()) for (const r of list4) if (r.idx === index3) out.push(r);
+    for (const list4 of collectCards(chat).values()) for (const r of list4) if (r.idx === index) out.push(r);
     return out;
   }
   async function refreshStatusContext(charIndex, chatIndex, known) {
@@ -1767,11 +1765,11 @@ ${story}`;
     ctx = { timeline: statusTimeline(texts), terms, hide: hiddenCols(colConfig(chat.scriptstate)) };
     cards = collectCards(chat);
   }
-  function renderStatus(text4) {
-    const tags = findStatusTags(text4);
-    if (!tags.length) return text4;
+  function renderStatus(text5) {
+    const tags = findStatusTags(text5);
+    if (!tags.length) return text5;
     armChatClick("status");
-    let out = text4;
+    let out = text5;
     for (const t of tags) {
       const list4 = cards.get(t.raw.trim());
       let extra2 = "";
@@ -1792,13 +1790,13 @@ ${story}`;
     const tips = await elements(doc2, "[data-gst-tip]");
     let hitTip = false;
     for (const el of tips) {
-      const on2 = inside2 && await hit2(el, x, y);
-      const open4 = await el.hasClass("open").catch(() => false);
-      if (on2 && !open4) {
+      const on3 = inside2 && await hit2(el, x, y);
+      const open3 = await el.hasClass("open").catch(() => false);
+      if (on3 && !open3) {
         await el.addClass("open");
         hitTip = true;
-      } else if (open4) await el.removeClass("open");
-      if (on2) hitTip = true;
+      } else if (open3) await el.removeClass("open");
+      if (on3) hitTip = true;
     }
     if (hitTip || !inside2) return hitTip;
     for (const el of await elements(doc2, "[data-goei-wiki]")) {
@@ -1846,9 +1844,9 @@ ${story}`;
   }
   var unescape = (s8) => s8.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
   function assetPathOf(src) {
-    const sw = src.match(/\/sw\/img\/([0-9a-f]+)/i);
-    if (sw) {
-      const hex3 = sw[1];
+    const sw2 = src.match(/\/sw\/img\/([0-9a-f]+)/i);
+    if (sw2) {
+      const hex3 = sw2[1];
       const bytes = new Uint8Array(hex3.length / 2);
       for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex3.slice(i * 2, i * 2 + 2), 16);
       const path = new TextDecoder().decode(bytes);
@@ -1879,8 +1877,8 @@ ${story}`;
     let photo = cached.photo;
     try {
       const doc2 = await risuai.getRootDocument();
-      const box4 = await doc2.querySelector("[data-goei-user]");
-      const html = box4 ? await box4.getInnerHTML() : "";
+      const box3 = await doc2.querySelector("[data-goei-user]");
+      const html = box3 ? await box3.getInnerHTML() : "";
       const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
       if (shownName2 && shownName2 !== "{{user}}") {
         if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
@@ -1967,10 +1965,10 @@ ${story}`;
     ].filter(Boolean).join("\n");
   }
   function resolveSitePic(char, raw) {
-    const text4 = raw.trim();
-    const cut3 = text4.lastIndexOf("_");
-    const expr = cut3 > 0 ? text4.slice(cut3 + 1).trim().toLowerCase() : "";
-    const name = cut3 > 0 && EMOTIONS.has(expr) ? text4.slice(0, cut3).trim() : text4;
+    const text5 = raw.trim();
+    const cut3 = text5.lastIndexOf("_");
+    const expr = cut3 > 0 ? text5.slice(cut3 + 1).trim().toLowerCase() : "";
+    const name = cut3 > 0 && EMOTIONS.has(expr) ? text5.slice(0, cut3).trim() : text5;
     const low = name.toLowerCase();
     const p2 = pics(char).find((x) => x.terms.some((t) => t && t.toLowerCase() === low));
     if (!p2) return null;
@@ -1978,7 +1976,7 @@ ${story}`;
     const want = `${p2.base}_${EMOTIONS.has(expr) ? expr : "default"}`;
     return has(char, want) ? want : `${p2.base}_default`;
   }
-  var fillSitePics = (text4, char) => text4.includes("__SITE_PICS__") ? text4.replace(/__SITE_PICS__/g, sitePicList(char)) : text4;
+  var fillSitePics = (text5, char) => text5.includes("__SITE_PICS__") ? text5.replace(/__SITE_PICS__/g, sitePicList(char)) : text5;
 
   // src/core/gnetPrompt.ts
   var REQUIRED_GNET = [
@@ -2213,11 +2211,11 @@ ${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames3), activity, suppl
     for (const { p: p2 } of ranked) {
       if (rows3.length >= 8) break;
       const comments = p2.comments.slice(-12).map((c, j, arr) => ({ id: p2.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
-      const row11 = { id: p2.id, title: p2.title, author: p2.nick, date: p2.date, content: trimTokens(p2.body, LIMITS.origin_tokens), comments };
-      while (JSON.stringify(row11).length > (cap - used) * 2 && row11.comments.length) row11.comments.shift();
-      const n3 = Math.ceil(JSON.stringify(row11).length / 2);
+      const row8 = { id: p2.id, title: p2.title, author: p2.nick, date: p2.date, content: trimTokens(p2.body, LIMITS.origin_tokens), comments };
+      while (JSON.stringify(row8).length > (cap - used) * 2 && row8.comments.length) row8.comments.shift();
+      const n3 = Math.ceil(JSON.stringify(row8).length / 2);
       if (used + n3 <= cap) {
-        rows3.push(row11);
+        rows3.push(row8);
         used += n3;
       }
     }
@@ -2299,12 +2297,12 @@ ${RETRY_ANALYZE}
     return userTurns(chat) < 2;
   }
   function processRequest(messages, chat) {
-    const keep = shouldKeepSeed(chat);
+    const keep2 = shouldKeepSeed(chat);
     let changed = false;
     const out = messages.map((m) => {
       if (typeof m.content !== "string" || !m.content.includes(SEED_OPEN)) return m;
       changed = true;
-      return { ...m, content: applySeedLifetime(m.content, keep) };
+      return { ...m, content: applySeedLifetime(m.content, keep2) };
     });
     return { messages: out, changed };
   }
@@ -2593,14 +2591,14 @@ ${next.content.trim()}`;
     const next = books.map((e) => {
       if (!managedHere(e, kinds) || isVirtual(e)) return e;
       const content = str6(e.content);
-      const on2 = hasDontActivate(content);
-      const keep = mode2 === "plugin" || kinds.get(str6(e.folder)) === "appendix" && locked.has(str6(e.comment));
-      if (keep && !on2) {
+      const on3 = hasDontActivate(content);
+      const keep2 = mode2 === "plugin" || kinds.get(str6(e.folder)) === "appendix" && locked.has(str6(e.comment));
+      if (keep2 && !on3) {
         n3++;
         return { ...e, content: `${DONT_ACTIVATE}
 ${content}` };
       }
-      if (!keep && on2) {
+      if (!keep2 && on3) {
         n3++;
         return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
       }
@@ -2627,25 +2625,25 @@ ${content}` };
       return a ? [...new Set([a.name, a.lore, a.english, ...a.aliases].filter(Boolean))] : [name];
     };
     const out = [];
-    books.forEach((e, index3) => {
+    books.forEach((e, index) => {
       const folderKind = kinds.get(str6(e.folder));
       const content = str6(e.content);
       if (!folderKind || e.mode === "folder" || e.alwaysActive) return;
       let kind;
       let order2 = Number(e.insertorder ?? 0);
-      let rank3 = index3;
+      let rank3 = index;
       let appendix;
       if (folderKind === "appendix") {
-        const row11 = apps.get(str6(e.comment));
-        if (!row11 || (!str6(e.key).trim() || !row11.keys) && !otherTriggers(row11)) return;
-        const at = row11.parent ? parentAt(row11.parent) : -1;
+        const row8 = apps.get(str6(e.comment));
+        if (!row8 || (!str6(e.key).trim() || !row8.keys) && !otherTriggers(row8)) return;
+        const at = row8.parent ? parentAt(row8.parent) : -1;
         const p2 = at >= 0 ? books[at] : void 0;
         kind = p2 ? kinds.get(str6(p2.folder)) : "org";
         if (p2) {
           order2 = Number(p2.insertorder ?? 0);
-          rank3 = at + 0.5 + index3 / 1e7;
+          rank3 = at + 0.5 + index / 1e7;
         }
-        appendix = { parent: p2 ? row11.parent : "", parentNames: p2 ? [row11.parent, ...keysOf3(p2)] : row11.parent ? [row11.parent] : [], when: row11, agentNames: row11.agents.map(agentNames) };
+        appendix = { parent: p2 ? row8.parent : "", parentNames: p2 ? [row8.parent, ...keysOf3(p2)] : row8.parent ? [row8.parent] : [], when: row8, agentNames: row8.agents.map(agentNames) };
       } else {
         if (!managedHere(e, kinds)) return;
         kind = folderKind;
@@ -2653,27 +2651,27 @@ ${content}` };
       const raw = appendix && !appendix.when.keys ? [] : keysOf3(e);
       const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
       const keys = [];
-      for (const text4 of raw) {
-        const en2 = !hangul(text4);
-        const re = keyRegex(text4, en2, kind === "agent");
+      for (const text5 of raw) {
+        const en2 = !hangul(text5);
+        const re = keyRegex(text5, en2, kind === "agent");
         if (!re) continue;
-        const alias = kind === "agent" && !en2 && syllables(text4) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text4));
-        keys.push({ text: text4, en: en2, rule: CONFIRM_KEYS.has(text4) ? "confirm" : alias ? "alias" : "plain", re });
+        const alias = kind === "agent" && !en2 && syllables(text5) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text5));
+        keys.push({ text: text5, en: en2, rule: CONFIRM_KEYS.has(text5) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str6(e.comment), order: order2, index: index3, content, keys, rawKeys: raw, groups: groups.get(str6(e.comment)) ?? [], rank: rank3, ...appendix ? { appendix } : {} });
+      out.push({ kind, name: str6(e.comment), order: order2, index, content, keys, rawKeys: raw, groups: groups.get(str6(e.comment)) ?? [], rank: rank3, ...appendix ? { appendix } : {} });
     });
     cache7.set(books, out);
     return out;
   }
-  function around(text4, start3, end) {
+  function around(text5, start3, end) {
     let a = start3;
-    for (let n3 = 0; a > 0 && n3 < 2; ) if (/\s/.test(text4[--a])) n3++;
+    for (let n3 = 0; a > 0 && n3 < 2; ) if (/\s/.test(text5[--a])) n3++;
     let b = end;
-    for (let n3 = 0; b < text4.length && n3 < 2; b++) if (/\s/.test(text4[b])) n3++;
-    return text4.slice(a, b).replace(/\s+/g, " ").trim();
+    for (let n3 = 0; b < text5.length && n3 < 2; b++) if (/\s/.test(text5[b])) n3++;
+    return text5.slice(a, b).replace(/\s+/g, " ").trim();
   }
-  function rightOk(text4, end) {
-    const tail2 = text4.slice(end);
+  function rightOk(text5, end) {
+    const tail2 = text5.slice(end);
     if (!isLetter(tail2[0])) {
       const next = tail2.replace(/^\s+/, "");
       const honorAt = (h) => next.startsWith(h) && (!isLetter(next[h.length]) || JOSA.some((j) => next.startsWith(j, h.length)));
@@ -2683,9 +2681,9 @@ ${content}` };
     if (!sfx) return { ok: false, honor: false };
     return { ok: true, honor: HONOR2.includes(sfx) || sfx === "아" || sfx === "야" };
   }
-  function findHits(text4, entries2) {
-    if (!text4) return [];
-    const lower = text4.toLowerCase();
+  function findHits(text5, entries2) {
+    if (!text5) return [];
+    const lower = text5.toLowerCase();
     const hits = [];
     entries2.forEach((e, ei) => {
       for (const key of e.keys) {
@@ -2699,7 +2697,7 @@ ${content}` };
           const quoted = OPEN.includes(lower[start3 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
           const before = lower.slice(Math.max(0, start3 - 20), start3).trimEnd();
           const marked = quoted || MARKERS2.some((w) => tail2.startsWith(w)) || e.groups.some((g2) => g2 && before.endsWith(g2.toLowerCase()));
-          hits.push({ entry: ei, key, start: start3, end, marked, honor: r.honor, snippet: around(text4, start3, end) });
+          hits.push({ entry: ei, key, start: start3, end, marked, honor: r.honor, snippet: around(text5, start3, end) });
         }
       }
     });
@@ -2716,13 +2714,13 @@ ${content}` };
     }
   }
   var unlockedValue = (names4) => JSON.stringify([...new Set(names4)]);
-  var hasUnlockTag = (text4) => typeof text4 === "string" && text4.includes("🔓") && new RegExp(UNLOCK_TAG.source, "u").test(text4);
-  function unlockTags(text4) {
-    return hasUnlockTag(text4) ? [...text4.matchAll(UNLOCK_TAG)].map((m) => m[1].trim()) : [];
+  var hasUnlockTag = (text5) => typeof text5 === "string" && text5.includes("🔓") && new RegExp(UNLOCK_TAG.source, "u").test(text5);
+  function unlockTags(text5) {
+    return hasUnlockTag(text5) ? [...text5.matchAll(UNLOCK_TAG)].map((m) => m[1].trim()) : [];
   }
-  function stripUnlockTags(text4) {
-    if (!hasUnlockTag(text4)) return text4;
-    return text4.replace(new RegExp(`^[ \\t]*${UNLOCK_TAG.source}[ \\t]*\\r?\\n?`, "gmu"), "").replace(UNLOCK_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
+  function stripUnlockTags(text5) {
+    if (!hasUnlockTag(text5)) return text5;
+    return text5.replace(new RegExp(`^[ \\t]*${UNLOCK_TAG.source}[ \\t]*\\r?\\n?`, "gmu"), "").replace(UNLOCK_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
   }
   var DEFAULT_DEPTH = 10;
   var DEFAULT_BUDGET = 99999;
@@ -2777,16 +2775,16 @@ ${content}` };
     pickAppendices(entries2, picks, state, add);
     let list4 = [...picks.values()];
     if (o.budget > 0) {
-      const keep = [];
+      const keep2 = [];
       let used = 0;
       for (const p2 of list4.slice().sort((a, b) => Number(!!a.entry.appendix) - Number(!!b.entry.appendix) || b.score - a.score)) {
         const n3 = tokens(p2.entry.content);
         if (used + n3 > o.budget) continue;
         used += n3;
-        keep.push(p2);
+        keep2.push(p2);
       }
-      const on2 = new Set(keep.map((p2) => p2.entry.name));
-      list4 = keep.filter((p2) => !p2.entry.appendix?.when.needParent || on2.has(p2.entry.appendix.parent));
+      const on3 = new Set(keep2.map((p2) => p2.entry.name));
+      list4 = keep2.filter((p2) => !p2.entry.appendix?.when.needParent || on3.has(p2.entry.appendix.parent));
     }
     return sortPicks(list4);
   }
@@ -2802,15 +2800,15 @@ ${content}` };
       if (a.when.target && state.target && a.parentNames.some((n3) => sameName(n3, state.target))) add(i, "status", state.target, state.target, 100);
       const w = place3 ? a.when.places.find((x) => squash2(x) && place3.includes(squash2(x))) : void 0;
       if (w) add(i, "place", w, state.place ?? "", 40);
-      for (const group7 of a.agentNames) {
-        const who = present.find((p2) => group7.some((n3) => sameName(n3, p2)));
-        if (who) add(i, "agent", group7[0], who, 20);
+      for (const group4 of a.agentNames) {
+        const who = present.find((p2) => group4.some((n3) => sameName(n3, p2)));
+        if (who) add(i, "agent", group4[0], who, 20);
       }
     });
-    const on2 = new Set([...picks.values()].map((p2) => p2.entry.name));
+    const on3 = new Set([...picks.values()].map((p2) => p2.entry.name));
     entries2.forEach((e, i) => {
       const a = e.appendix;
-      if (a?.when.withParent && a.parent && on2.has(a.parent)) add(i, "parent", a.parent, a.parent, 10);
+      if (a?.when.withParent && a.parent && on3.has(a.parent)) add(i, "parent", a.parent, a.parent, 10);
     });
     const parentOn = new Set([...picks.values()].filter((p2) => !p2.entry.appendix).map((p2) => p2.entry.name));
     const unlocked = new Set(state.unlocked ?? []);
@@ -2821,9 +2819,9 @@ ${content}` };
     }
   }
   function lockedAppendices(entries2, picks, unlocked) {
-    const on2 = new Set(picks.map((p2) => p2.entry.name));
+    const on3 = new Set(picks.map((p2) => p2.entry.name));
     const done3 = new Set(unlocked);
-    return entries2.filter((e) => e.appendix?.when.unlock && !done3.has(e.name) && e.appendix.parent && on2.has(e.appendix.parent));
+    return entries2.filter((e) => e.appendix?.when.unlock && !done3.has(e.name) && e.appendix.parent && on3.has(e.appendix.parent));
   }
   function unlockHint(e) {
     return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix.when.unlock}
@@ -2847,8 +2845,8 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
   function slotTexts(picks, env3) {
     const out = { org: [], site: [], anomaly: [], agent: [] };
     for (const p2 of picks) {
-      const text4 = stripDecorators(evaluate(p2.entry.content, env3)).trim();
-      if (text4) out[p2.entry.kind].push(text4);
+      const text5 = stripDecorators(evaluate(p2.entry.content, env3)).trim();
+      if (text5) out[p2.entry.kind].push(text5);
     }
     return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
   }
@@ -2887,7 +2885,7 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
     let out = messages;
     const vars = LORE_KINDS.map(slotVar);
     const cur = vars.map((k) => String(old?.[k] ?? ""));
-    const find = (text4) => text4 ? out.findIndex((m) => typeof m?.content === "string" && m.content.includes(text4)) : -1;
+    const find = (text5) => text5 ? out.findIndex((m) => typeof m?.content === "string" && m.content.includes(text5)) : -1;
     const swap = (at, from, to) => {
       out = out.map((m, i) => i === at ? { ...m, content: m.content.replace(from, () => to) } : m);
     };
@@ -2993,8 +2991,8 @@ ${block5.trim()}` };
     }
     const n3 = userName.trim();
     if (n3 && agentName && n3 !== agentName && n3.length >= 2 && !/^(?:user|나|유저)$/i.test(n3)) {
-      const esc44 = n3.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n3) ? `\\b${esc44}\\b` : esc44, "g");
+      const esc46 = n3.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n3) ? `\\b${esc46}\\b` : esc46, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m);
     }
     return out;
@@ -3030,18 +3028,18 @@ ${block5.trim()}` };
     const p2 = sections2(src);
     const keys = ["COMMON"];
     let direct = false;
-    let group7 = false;
+    let group4 = false;
     for (const r of body5.rooms ?? (body5.room ? [body5.room] : [])) {
       if (r.receiveMessages === false) continue;
-      if (r.kind === "group") group7 = true;
+      if (r.kind === "group") group4 = true;
       else direct = true;
     }
-    if (body5.invitationCheck?.allowed) group7 = true;
+    if (body5.invitationCheck?.allowed) group4 = true;
     const manual = body5.participants.some((x) => x.manuallySavedContact);
-    if (direct || group7) {
+    if (direct || group4) {
       keys.push("CONVERSATION");
       if (direct) keys.push("DIRECT_ROOMS");
-      if (group7) keys.push("GROUP_ROOMS");
+      if (group4) keys.push("GROUP_ROOMS");
       if (body5.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
       if (body5.crossRoomMessages?.length || (body5.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
       if (hasAttachment(JSON.stringify(body5))) keys.push("ATTACHMENT_READ");
@@ -3060,7 +3058,7 @@ ${block5.trim()}` };
     }
     if (manual) keys.push("MANUAL_CONTACT", "CONTACT_CONTEXT", "SINGLE_PASS_CONTACT");
     keys.push(`OUTPUT_${manual ? "CONTACT_" : ""}${mode2}`);
-    if ((direct || group7) && phoneSettings(src.chat.scriptstate).habits && p2.HABITS !== void 0) keys.push("HABITS");
+    if ((direct || group4) && phoneSettings(src.chat.scriptstate).habits && p2.HABITS !== void 0) keys.push("HABITS");
     const br2 = phoneSettings(src.chat.scriptstate).banterRows;
     return [...keys.map((k) => fillSitePics(section(p2, k), src.char).replace(/__PH_BANTER_RANGE__/g, br2[0] === br2[1] ? String(br2[0]) : `${br2[0]}-${br2[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE2].join("\n\n");
   }
@@ -3128,7 +3126,7 @@ ${block5.trim()}` };
     const a = playerAgent(src.char.globalLore, src.chat.scriptstate);
     return a ? { character: a.name, ...a.rank ? { rank: a.rank } : {} } : {};
   }
-  function narrator(src, names4, related2, text4) {
+  function narrator(src, names4, related2, text5) {
     applyAdvanced(src.chat.scriptstate);
     const n3 = trimTurns(HISTORY2.turns);
     const turns3 = n3 ? recentTurns(src.chat, n3, genSettings(src.chat.scriptstate).userMessages) : [];
@@ -3142,7 +3140,7 @@ ${block5.trim()}` };
     const t = refToggles(src.chat.scriptstate, "ph");
     const rows3 = collectRefs(src, {
       scope: "phone",
-      text: `${text4}
+      text: `${text5}
 ${recentStory.map((m) => m.text).join("\n")}`,
       description: t.description,
       authors: t.authors,
@@ -3212,8 +3210,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   }
   function contactSources(body5) {
     const out = [];
-    const add = (kind, text4, sender) => {
-      const t = String(text4 ?? "").trim();
+    const add = (kind, text5, sender) => {
+      const t = String(text5 ?? "").trim();
       if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...sender ? { sender } : {} });
     };
     const u = body5.narratorOnly.universe;
@@ -3392,16 +3390,338 @@ ${JSON.stringify(previousRoom ?? "")}`)
     if (!isOnOff(items)) return null;
     const onV = items.find(([, l]) => l === "ON")[0];
     const offV = items.find(([, l]) => l === "OFF")[0];
-    const on2 = cur === onV;
-    return switchHtml({ action, value: valueOf(on2 ? offV : onV), on: on2, disabled });
+    const on3 = cur === onV;
+    return switchHtml({ action, value: valueOf(on3 ? offV : onV), on: on3, disabled });
   }
   function labelSwitches(root3) {
     root3.querySelectorAll('button.gx-switch[role="switch"]:not([aria-label])').forEach((b) => {
-      const row11 = b.closest(".ps-row, .dir-line, .st-col-row, .dir-in");
-      const name = row11?.querySelector(".ps-label > b, .st-col-name > b, :scope > span:first-child")?.textContent?.replace(/\s+/g, " ").trim();
+      const row8 = b.closest(".ps-row, .dir-line, .st-col-row, .dir-in");
+      const name = row8?.querySelector(".ps-label > b, .st-col-name > b, :scope > span:first-child")?.textContent?.replace(/\s+/g, " ").trim();
       if (name) b.setAttribute("aria-label", name);
     });
   }
+
+  // src/ui/setrow.ts
+  var esc5 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var SCOPE_BADGE = { device: "이 기기", chat: "이 채팅", defaults: "새 채팅 기본값" };
+  var setRow = (label2, control3, help = "", cls = "", scope) => `<div class="ps-row${cls ? ` ${cls}` : ""}"><div class="ps-label"><b>${label2}${scope ? `<i class="gx-scope${scope === "device" ? "" : ` ${scope}`}">${SCOPE_BADGE[scope]}</i>` : ""}</b>${help ? `<small>${helpFmt(help)}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
+  var HELP_TERM = "[^=.,:]{1,18}";
+  var helpFmt = (h) => {
+    if (!h || h.includes("<")) return h;
+    const end = (s8) => {
+      const t = s8.trim().replace(/,$/, "");
+      return /[.!?)」…]$/.test(t) ? t : `${t}.`;
+    };
+    const parts = h.split(new RegExp(`\\s+·\\s+(?=${HELP_TERM} = )|(?<=[.,)])\\s+(?=${HELP_TERM} = )`)).map((s8) => s8.trim()).filter(Boolean);
+    const item2 = new RegExp(`^(${HELP_TERM}) = (.+)$`, "s");
+    const items = [];
+    let lead = "";
+    for (const [i, p2] of parts.entries()) {
+      const m = item2.exec(p2);
+      if (m) items.push([m[1].trim(), end(m[2])]);
+      else if (i === 0) lead = end(p2);
+      else if (items.length) items[items.length - 1][1] += ` ${end(p2)}`;
+    }
+    if (!items.length) return end(h);
+    return `<span class="hb">${lead ? `<span class="hb-lead">${lead}</span>` : ""}<span class="hb-list">${items.map(([t, d]) => `<span class="hb-i"><b>${t}</b><span>${d}</span></span>`).join("")}</span></span>`;
+  };
+  var setGroup = (title2, rows3, note = "") => `<section class="ps-group">${title2 ? `<h3>${title2}</h3>` : ""}${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${rows3}</div></section>`;
+  function setSeg(action, key, cur, items, disabled = false) {
+    const val = (v) => key ? `${key}=${v}` : v;
+    const sw2 = onOffSwitch(items, cur, action, val, disabled);
+    if (sw2) return sw2;
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${val(v)}" aria-pressed="${cur === v}"${disabled ? " disabled" : ""}>${label2}</button>`).join("")}</div>`;
+  }
+  var act = (page, kind) => `${page.id}-${kind}`;
+  var sk = (w, key) => w.scope ? `${w.scope}:${key}` : key;
+  var numBox = (page, key, cur, lo, hi, unit, aria, kind = "num", busy6 = false) => stepBox(act(page, kind), key, cur, lo, hi, unit, aria, busy6);
+  var numWidth = (hi) => `${Math.max(2, String(Math.min(hi, 9999999)).length) * 0.62 + 1.1}em`;
+  var stepBox = (action, key, cur, lo, hi, unit, aria, busy6 = false) => {
+    const raw = String(cur ?? "").trim();
+    const n3 = Math.max(lo, Math.min(hi, Number(raw) || 0));
+    const st = hi - lo >= 1e4 ? 500 : hi - lo >= 1e3 ? 50 : hi - lo >= 200 ? 10 : 1;
+    const b = (to, on3, sign, name) => `<button class="gx-step" data-action="${action}" data-value="${esc5(key)}=${to}" ${on3 && !busy6 ? "" : "disabled"} aria-label="${esc5(aria)} ${name}">${sign}</button>`;
+    return `<div class="st-step adv-step">${b(Math.max(lo, n3 - st), n3 > lo, "−", "줄이기")}<input class="adv-val" type="number" inputmode="numeric" min="${lo}" max="${hi}" step="${st}" data-change="${action}" data-key="${esc5(key)}" value="${raw === "" ? "" : n3}" style="width:${numWidth(hi)}" aria-label="${esc5(aria)}"${busy6 ? " disabled" : ""}>${unit ? `<span>${esc5(unit)}</span>` : ""}${b(Math.min(hi, n3 + st), n3 < hi, "+", "늘리기")}</div>`;
+  };
+  function control(page, d, w) {
+    const c = d.ctl;
+    if (c.t === "seg") {
+      const raw = w.cur(d.key);
+      const cur = c.fb !== void 0 && !c.opts.some(([v]) => v === raw) ? c.fb : raw;
+      const seg6 = page.flat ? setSeg(`${page.id}-${d.key}`, "", cur, c.opts, w.busy) : setSeg(page.segAct ?? act(page, "cfg"), sk(w, d.key), cur, c.opts, w.busy);
+      const i = d.inline;
+      if (!i) return { ctl: seg6, cur };
+      const on3 = c.opts.find(([, l]) => l === "ON")?.[0];
+      return { ctl: `<span class="ph-inline">${seg6}${!i.whenOn || cur === on3 ? `<span class="ph-inline">${numBox(page, i.key, w.cur(i.key), i.lo, i.hi, i.unit, i.aria ?? d.label)}</span>` : ""}</span>`, cur };
+    }
+    if (c.t === "num") {
+      const v = w.cur(d.key);
+      const box3 = numBox(page, sk(w, d.key), v, c.lo, c.hi, c.unit, d.aria ?? d.label, c.act ?? "num");
+      return { ctl: `<span class="ph-inline">${box3}</span>`, cur: v };
+    }
+    if (c.t === "text") {
+      const v = w.cur(d.key);
+      return { ctl: `<input class="gx-search ps-text" data-change="${page.flat ? `${page.id}-${d.key}"` : `${act(page, "text")}" data-key="${sk(w, d.key)}"`} value="${esc5(v === "-" ? "" : v)}"${c.max ? ` maxlength="${c.max}"` : ""} placeholder="${esc5(c.ph)}">`, cur: v };
+    }
+    if (c.t === "minmax") {
+      const [a, b] = w.minmax(d.key);
+      if (c.keys) {
+        const one2 = (key, n3, name) => numBox(page, sk(w, key), n3, c.lo, c.hi, c.unit, `${d.aria ?? d.label} ${name}`, c.act ?? "num");
+        return { ctl: `<span class="ph-inline"><span>최소</span>${one2(c.keys[0], a, "최소")}<span>최대</span>${one2(c.keys[1], b, "최대")}</span>`, cur: `${a}~${b}` };
+      }
+      const box3 = (side, n3, name) => stepBox(act(page, c.act ?? "count"), `${d.key}_${side}`, n3, c.lo, c.hi, c.unit, `${d.label} ${name}`, w.busy);
+      return { ctl: `<span class="ph-inline"><span>최소</span>${box3("min", a, "최소")}<span>최대</span>${box3("max", b, "최대")}</span>`, cur: `${a}~${b}` };
+    }
+    if (c.t === "step") {
+      const n3 = Number(w.cur(d.key));
+      const b = (dir2, on3, name) => `<button class="gx-step" data-action="${c.action ?? act(page, "step")}" data-value="${sk(w, c.vkey ?? d.key)}:${dir2}" ${on3 ? "" : "disabled"} aria-label="${esc5(d.label)} ${name}">${dir2 === "-" ? "−" : "+"}</button>`;
+      return { ctl: `<div class="st-step">${b("-", n3 > c.lo, "줄이기")}<b>${esc5(`${n3}${c.unit}`)}</b>${b("+", n3 < c.hi, "늘리기")}</div>`, cur: String(n3) };
+    }
+    return { ctl: "", cur: "" };
+  }
+  function ckCols(isNum) {
+    const nums = isNum.filter(Boolean).length;
+    const wide2 = nums > 0 && isNum.length - nums > nums;
+    return isNum.map((n3) => wide2 && n3 ? "minmax(126px, 1.35fr)" : "minmax(0, 1fr)").join(" ");
+  }
+  function defRow(page, d, w) {
+    for (const c of d.show ? Array.isArray(d.show) ? d.show : [d.show] : []) {
+      if ("eq" in c ? w.cur(c.key) !== c.eq : w.cur(c.key) === c.ne) return "";
+    }
+    if (d.ctl.t === "adv") return w.adv?.(d.ctl.item) ?? "";
+    if (d.ctl.t === "advchips") return w.advChips?.(d.ctl.items, d.label) ?? "";
+    if (d.ctl.t === "advset") return w.advSet?.(d.label, d.ctl.items, typeof d.help === "string" ? d.help : "") ?? "";
+    if (d.ctl.t === "custom") {
+      const c = w.custom?.[d.key]?.();
+      if (!c) return "";
+      return setRow(d.label, c.ctl, c.help ?? w.help?.[d.key]?.() ?? (typeof d.help === "string" ? d.help : ""), "", d.scope);
+    }
+    if (d.ctl.t === "area" && d.ctl.labeled) {
+      const help2 = w.help?.[d.key]?.() ?? (typeof d.help === "string" ? d.help : "");
+      return setRow(d.label, `<textarea class="gx-search ${d.ctl.cls}" rows="${d.ctl.rows}" data-change="${act(page, "text")}" data-key="${sk(w, d.key)}" placeholder="${esc5(d.ctl.ph)}">${esc5(w.cur(d.key))}</textarea>`, help2);
+    }
+    if (d.ctl.t === "area") {
+      return `<div class="ps-row"><textarea class="gx-search ${d.ctl.cls}" data-change="${page.id}-${d.key}" rows="${d.ctl.rows}" placeholder="${esc5(d.ctl.ph)}">${esc5(w.cur(d.key))}</textarea></div>`;
+    }
+    const { ctl, cur } = control(page, d, w);
+    const help = w.help?.[d.key]?.() ?? (typeof d.help === "string" ? d.help : d.help ? d.help[cur] ?? "" : "");
+    return setRow(d.label, ctl, help, "", d.scope);
+  }
+  var defGroup = (page, g2, w) => setGroup(g2.title === "@page" ? w.pageTitle ?? "" : g2.title, (g2.note ? `<p class="ps-note">${g2.note}</p>` : "") + (w.lead?.[g2.title] ?? "") + g2.rows.map((d) => defRow(page, d, w)).join(""));
+  var defGroups = (page, w) => page.groups.map((g2) => defGroup(page, g2, w)).join("\n      ");
+  var mxCell = (col, html, i) => `<div class="mx-cell mx-c${i}${html === null ? " none" : ""}"><span class="mx-site">${esc5(col.name)}</span>${html === null ? '<span class="mx-none">없음</span>' : html}</div>`;
+  var mxRow = (cols, r) => `<div class="mx-row${r.label ? "" : " nolabel"}"><b class="mx-label">${r.label}</b>${r.one !== void 0 ? `<div class="mx-cell mx-all">${r.one}${r.oneNote ? `<span class="mx-shared">${esc5(r.oneNote)}</span>` : ""}</div>` : cols.map((c, i) => mxCell(c, r.cells?.[i] ?? null, i)).join("")}${r.help ? `<small class="mx-help">${r.help}</small>` : ""}</div>`;
+  var helpList = (t) => {
+    const items = [];
+    for (const raw of t.split(/(?<=\.)\s+/)) {
+      const sent = raw.trim();
+      if (!sent) continue;
+      const m = /^(?:([^=:]{1,14}): )?([^=]{1,26}?) = (.+)$/.exec(sent);
+      if (m) items.push({ head: m[1], term: m[2], desc: m[3] });
+      else if (items.length && items[items.length - 1].term) items[items.length - 1].desc += ` ${sent}`;
+      else items.push({ desc: sent });
+    }
+    return `<span class="hl">${items.map((i) => `${i.head ? `<span class="hl-h">${esc5(i.head)}</span>` : ""}<span class="hl-i">${i.term ? `<b>${esc5(i.term)}</b>` : ""}<span>${i.desc}</span></span>`).join("")}</span>`;
+  };
+  var FAM_ACTS = { set: "fam-set", num: "fam-num" };
+  var ckActs = FAM_ACTS;
+  var ckCtl = (m, act2, aria, round, busy6) => {
+    if (typeof m === "boolean" && !act2) return `<button class="ck-m ${round ? "round" : "box"}${m ? " on" : ""}" aria-pressed="${m}" aria-label="${aria} (잠김)" disabled></button>`;
+    if (m === null || m === void 0 || !act2) return '<span class="ck-x" aria-label="없음">–</span>';
+    const off = busy6 ? " disabled" : "";
+    if (typeof m === "boolean") return `<button class="ck-m ${round ? "round" : "box"}${m ? " on" : ""}" data-action="${ckActs.set}" data-value="${esc5(act2)}" aria-pressed="${m}" aria-label="${aria}"${off}></button>`;
+    const st = m.step ?? 1;
+    const b = (to, on3, sign, name) => `<button class="gx-step" data-action="${ckActs.num}" data-value="${esc5(act2)}${ckActs.rel ? `:${sign === "+" ? "+" : "-"}` : `=${to}`}" ${on3 && !busy6 ? "" : "disabled"} aria-label="${aria} ${name}">${sign}</button>`;
+    return `<div class="st-step adv-step">${b(Math.max(m.lo, m.n - st), m.n > m.lo, "−", "줄이기")}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="${ckActs.num}" data-key="${esc5(act2)}" value="${m.n}" style="width:${numWidth(m.hi)}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, "+", "늘리기")}</div>`;
+  };
+  var numCtl = (act2, m, aria, unit = "", busy6 = false, acts = FAM_ACTS) => {
+    ckActs = acts;
+    const html = ckCtl(m, act2, esc5(aria), false, busy6);
+    ckActs = FAM_ACTS;
+    return unit ? html.replace(/(<input[^>]*>)/, `$1<span>${esc5(unit)}</span>`) : html;
+  };
+  var ckGrid = (groups, rows3, foot = "", title2 = "", busy6 = false) => {
+    const flat = groups.flatMap((g2) => g2.opts.map((o, i) => ({ g: g2, o, first: i === 0, band: i === 0 && !!g2.band, pair: g2.kind === "num" && g2.opts.length === 2 ? i === 0 ? " ck-pl" : " ck-pr" : "" })));
+    const named2 = groups.some((g2) => g2.name);
+    const head1 = named2 ? `<div class="ck-line ck-h1"><span></span>${groups.map((g2) => `<b class="ck-first${g2.band ? " ck-band" : ""}" style="grid-column: span ${g2.opts.length}">${esc5(g2.name)}</b>`).join("")}</div>` : "";
+    const head22 = `<div class="ck-line ck-h2${named2 ? "" : " solo"}"><span></span>${flat.map((c) => `<span class="${c.first ? "ck-first" : ""}${c.band ? " ck-band" : ""}">${esc5(c.o)}</span>`).join("")}</div>`;
+    const body5 = rows3.map((r) => `<div class="ck-line ck-row"><b class="ck-name">${r.label}</b>${flat.map((c, i) => `<span class="ck-cell${c.first ? " ck-first" : ""}${c.band ? " ck-band" : ""}${c.pair}">${ckCtl(r.marks[i], r.acts[i], `${esc5(c.g.name)} ${esc5(c.o)}`, c.g.kind === "one", busy6)}</span>`).join("")}</div>`).join("");
+    return `<section class="ps-group ck${groups.some((g2) => g2.kind === "num") ? " ck-hasnum" : ""}" style="--ck-n:${flat.length};--ck-cols:${ckCols(flat.map((c) => c.g.kind === "num"))}">${title2 ? `<h3>${esc5(title2)}</h3>` : ""}<div class="ps-rows">${head1}${head22}${body5}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ""}</section>`;
+  };
+  var ckWide = (bands, labels, busy6 = false, acts = FAM_ACTS) => {
+    ckActs = acts;
+    try {
+      return ckWide0(bands, labels, busy6);
+    } finally {
+      ckActs = FAM_ACTS;
+    }
+  };
+  var numSet = (items) => `<div class="fam-set">${items.map(([l, c]) => `<span class="fam-set1"><span class="fam-l">${esc5(l)}</span>${c}</span>`).join("")}</div>`;
+  var ckWide0 = (bands, labels, busy6 = false) => {
+    const groups = bands.flatMap((b) => b.groups.map((g2, i) => ({ ...g2, name: g2.name || b.title, band: i === 0 })));
+    const rows3 = labels.map((label2, r) => ({ label: label2, marks: bands.flatMap((b) => b.marks[r]), acts: bands.flatMap((b) => b.acts[r]) }));
+    const foot = bands.filter((b) => b.foot).map((b) => `<span class="ck-foot1">${b.foot}</span>`).join("");
+    const pc = ckGrid(groups, rows3, foot, bands.map((b) => b.title).join(" · "), busy6).replace('class="ps-group ck', 'class="ps-group ck ck-pc');
+    const stack = (b) => {
+      let at = 0;
+      const cols = b.groups.map((g2) => ({ g: g2, from: (at += g2.opts.length) - g2.opts.length }));
+      return `<div class="mx mx-grid ck-ph" style="--mx-n:${cols.length}"><section class="ps-group"><h3>${esc5(b.title)}</h3><div class="ps-rows">${labels.map((label2, r) => `<div class="mx-row"><b class="mx-label">${label2}</b>${cols.map(({ g: g2, from }) => `<div class="mx-cell"><span class="mx-site">${esc5(g2.name)}</span><span class="fam-set">${g2.opts.map((o, i) => {
+        const m = b.marks[r][from + i];
+        return m === null || m === void 0 ? "" : `<span class="fam-set1">${g2.opts.length > 1 || o !== "켬" ? `<span>${esc5(o)}</span>` : ""}${ckCtl(m, b.acts[r][from + i], `${esc5(g2.name)} ${esc5(o)}`, false, busy6)}</span>`;
+      }).join("")}</span></div>`).join("")}</div>`).join("")}</div>${b.foot ? `<small class="mx-foot">${b.foot}</small>` : ""}</section></div>`;
+    };
+    const hasNum = (b) => b.marks.some((row8) => row8.some((m) => m !== null && typeof m === "object"));
+    const ph = bands.map((b) => hasNum(b) ? stack(b) : ckGrid(b.groups, labels.map((label2, r) => ({ label: label2, marks: b.marks[r], acts: b.acts[r] })), b.foot, b.title, busy6).replace('class="ps-group ck', 'class="ps-group ck ck-ph')).join("");
+    return pc + ph;
+  };
+  var mxHead = (cols, id2 = "") => `<div class="mx-head"><span></span>${cols.map((c, i) => `<label for="${id2}-${i}">${c.icon ?? ""}<span>${esc5(c.name)}</span></label>`).join("")}</div>`;
+  var mxGrid = (cols, rows3, foot = "", title2 = "") => `<div class="mx mx-grid" style="--mx-n:${cols.length}"><section class="ps-group">${title2 ? `<h3>${esc5(title2)}</h3>` : ""}<div class="ps-rows">${mxHead(cols)}${rows3.map((r) => mxRow(cols, r)).join("")}</div>${foot ? `<small class="mx-foot">${foot.includes("<") ? foot : helpList(foot)}</small>` : ""}</section></div>`;
+  var helpBox = (lead, items = []) => `<span class="hb">${lead ? `<span class="hb-lead">${lead}</span>` : ""}${items.length ? `<span class="hb-list">${items.map(([t, d]) => `<span class="hb-i"><b>${esc5(t)}</b><span>${d}</span></span>`).join("")}</span>` : ""}</span>`;
+
+  // src/core/setdef/types.ts
+  var ONOFF = [["1", "ON"], ["0", "OFF"]];
+  var onOff = (fb = "0", on3 = "1") => ({ t: "seg", opts: on3 === "1" ? ONOFF : [["0", "ON"], ["1", "OFF"]], fb });
+  function findDef(page, key) {
+    for (const g2 of page.groups) for (const r of g2.rows) if (r.key === key) return r;
+    return void 0;
+  }
+
+  // src/core/setdef/phone.ts
+  var KEEP_HELP = "최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요";
+  var keep = (k, label2) => ({
+    key: `storage_auto_${k}`,
+    label: label2,
+    ctl: onOff("0"),
+    help: KEEP_HELP,
+    inline: { key: `storage_limit_${k}`, lo: 1, hi: STORAGE_MAX2, unit: "개", aria: `storage_limit_${k}`, whenOn: true }
+  });
+  var pct2 = (key) => ({ key, lo: 0, hi: 100, unit: "%", aria: "확률" });
+  var PHONE_SET = {
+    id: "ph",
+    groups: [
+      {
+        title: "",
+        rows: [
+          {
+            key: "auto",
+            label: "자동 호출",
+            common: "auto",
+            ctl: { t: "seg", opts: [["0", "수동"], ["open", "창을 열 때"], ["1", "매 턴"]], fb: "0" },
+            help: { "0": "새로고침 버튼을 누를 때만 확인해요", open: "턴이 진행된 뒤 괴담톡을 열면 한 번 확인해요", "1": "메인 응답이 끝날 때마다 모델을 한 번 더 불러요" }
+          },
+          {
+            key: "joint",
+            label: "한 번에 요청",
+            common: "joint",
+            ctl: { t: "custom" },
+            help: "켜면 자동 호출이 「매 턴」이고 모델이 같은 게시판과 괴담톡을 한 요청으로 묶어요. 인터넷 설정의 같은 줄과 한 값이에요."
+          },
+          {
+            key: "model",
+            label: "모델",
+            common: "model",
+            ctl: { t: "seg", opts: [["main", "메인 모델"], ["aux", "보조 모델"]], fb: "aux" },
+            help: "답장·선톡·공지를 만들 때 부를 모델이에요."
+          }
+        ]
+      },
+      {
+        title: "참조",
+        rows: [
+          { key: "adv_turns", label: "챗로그 포함", ctl: { t: "adv", item: "turns" } },
+          { key: "adv_refs", label: "넘길 내용", ctl: { t: "advchips", items: ["desc", "authors", "persona", "active", "related", "secondary"] } },
+          { key: "status", label: "요원 상태 참조", ctl: onOff("0"), help: "켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 요청에 넣어요. 출동 중인 요원은 그에 맞게 답해요" },
+          { key: "adv_room_history", label: "방마다 참조할 말풍선", ctl: { t: "adv", item: "room_history" } },
+          { key: "adv_budget", label: "요청 토큰 상한", ctl: { t: "adv", item: "budget" } }
+        ]
+      },
+      {
+        title: "컨텍스트 포함",
+        rows: [
+          { key: "context", label: "사용", common: "ctx", ctl: onOff("0"), help: "지금 장면과 관련된 괴담톡 대화가 메인 요청에 붙어요" },
+          { key: "adv_ctx", label: "붙일 것", ctl: { t: "advchips", items: ["ctx_focus", "ctx_messages", "ctx_notices_on"] } },
+          { key: "adv_ctx_history", label: "넣을 말풍선", ctl: { t: "adv", item: "ctx_history" } },
+          { key: "adv_ctx_notices", label: "넣을 공지", ctl: { t: "adv", item: "ctx_notices" } },
+          { key: "adv_ctx_tokens", label: "컨텍스트 토큰 상한", ctl: { t: "adv", item: "ctx_tokens" } }
+        ]
+      },
+      {
+        title: "답장",
+        rows: [
+          { key: "habits", label: "말버릇 기록", ctl: onOff("0"), help: "연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요" },
+          { key: "reactions", label: "이모지 반응", ctl: onOff("0"), help: "메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요" }
+        ]
+      },
+      {
+        title: "새 메시지",
+        rows: [
+          { key: "incoming", label: "선톡 받기", ctl: onOff("0"), inline: pct2("incoming_chance") },
+          { key: "adv_cd_incoming", label: "선톡 받은 뒤 쉬는 턴", ctl: { t: "adv", item: "cd_incoming" } },
+          { key: "group_invites", label: "단톡방 초대 받기", ctl: onOff("0"), inline: pct2("group_invite_chance") },
+          { key: "adv_cd_invite", label: "초대 받은 뒤 쉬는 턴", ctl: { t: "adv", item: "cd_invite" } },
+          { key: "banter", label: "단톡 수다", ctl: onOff("0"), inline: pct2("banter_chance"), help: "새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요" },
+          { key: "banter", label: "단톡 수다 줄 수", ctl: { t: "minmax", lo: BANTER_ROWS[0], hi: BANTER_ROWS[1], unit: "줄", act: "num" }, help: `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요` }
+        ]
+      },
+      {
+        title: "공지",
+        rows: [
+          { key: "announcements", label: "소속 공지 받기", ctl: onOff("0"), help: "내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요" },
+          { key: "announcement_gap", label: "공지 대기 턴", ctl: { t: "num", lo: 1, hi: 100, unit: "턴" }, help: "공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요" },
+          { key: "announcement_history", label: "공지 참조 수", ctl: { t: "num", lo: 1, hi: 50, unit: "개" }, help: "새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요" },
+          { key: "announcement_page_size", label: "페이지당 공지", ctl: { t: "seg", opts: NOTICE_PAGE_SIZES.map((n3) => [String(n3), String(n3)]) } }
+        ]
+      },
+      {
+        title: "보기 전용 방",
+        rows: [
+          { key: "view_auto", label: "자동 호출", ctl: { t: "seg", opts: [["manual", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]] }, help: "매 턴이면 메인 응답마다 방을 하나 더 만들어요(모델 호출 +1)" },
+          {
+            key: "view_preset",
+            label: "종류",
+            ctl: { t: "seg", opts: [["side", "사이드스토리"], ["mono", "혼잣말"], ["multi", "다중인격 혼잣말"]] },
+            help: "사이드스토리 = 메인 응답에 안 나온 짧은 대화 · 혼잣말 = 시점 인물의 속마음 · 다중인격 혼잣말 = 마음속 여러 갈래가 단톡처럼 주고받아요"
+          },
+          { key: "view_pov", label: "시점 인물", ctl: { t: "text", ph: "비우면 주인공" } },
+          { key: "view_speak", label: "시점 인물 대사", ctl: onOff("0"), help: "켜면 시점 인물의 말도 모델이 써요. 끄면 시점 인물은 조용히 있어요" },
+          { key: "view_scope", label: "등장인물 범위", show: { key: "view_preset", eq: "side" }, ctl: { t: "seg", opts: [["0", "주요 인물"], ["1", "장면 안"], ["2", "장면 안 주요 인물"], ["3", "자율"]] } },
+          { key: "view_size", label: "방 크기", show: { key: "view_preset", eq: "side" }, ctl: { t: "seg", opts: [["0", "자동"], ["1", "둘이서"], ["2", "여럿"]] } }
+        ]
+      },
+      {
+        title: "연락처",
+        rows: [
+          { key: "all_contacts", label: "모든 연락처 공개", ctl: onOff("0"), help: "내 소속과 관계없이 모든 탭을 보여요" },
+          { key: "anomaly_contacts", label: "괴이 연락처 공개", ctl: onOff("0"), help: "켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만" }
+        ]
+      },
+      {
+        title: "보관",
+        rows: [
+          keep("dm", "1:1 대화 정리"),
+          keep("group", "단톡방 정리"),
+          keep("notice", "공지 정리")
+        ]
+      },
+      {
+        title: "생성 방식",
+        rows: [
+          { key: "adv_thoughts", label: "생각 단계", ctl: { t: "adv", item: "thoughts" } },
+          { key: "adv_memo", label: "비망록", ctl: { t: "adv", item: "memo" } },
+          { key: "adv_reiterate", label: "다시 보기", ctl: { t: "adv", item: "reiterate" } }
+        ]
+      },
+      {
+        title: "길이·개수 상한",
+        rows: [
+          { key: "adv_set_bubble", label: "말풍선", ctl: { t: "advset", items: [["reply_tokens", "상대 말풍선"], ["events", "한 번에 받을 수"], ["input_tokens", "내가 보낼 글"], ["pause_tokens", "대기 설명"]] } },
+          { key: "adv_set_group", label: "단톡방", ctl: { t: "advset", items: [["topic_tokens", "주제"], ["members", "최대 상대"], ["room_name", "이름"], ["invitations", "한 번에 받을 초대"]] } },
+          { key: "adv_set_notice", label: "공지 글", ctl: { t: "advset", items: [["notices", "한 번에 받을 수"], ["notice_tokens", "본문"], ["notice_title", "제목"], ["notice_issuer", "발신처"]] } },
+          { key: "adv_memo_tokens", label: "", ctl: { t: "adv", item: "memo_tokens" } }
+        ]
+      }
+    ]
+  };
 
   // src/host/photo.ts
   var UPLOAD_SIDE = 1280;
@@ -3488,7 +3808,7 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
 
   // src/ui/attach.ts
-  var esc5 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc6 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var svg = (d) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   var ICON = {
     image: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>'),
@@ -3500,8 +3820,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
   };
   function attachEditor(prefix, items, kinds, disabled = false, giftNote = "", showMenu = true) {
     const rows3 = items.map(
-      (a, i) => `<div class="at-item${a.kind === "image" ? " at-item-image" : ""}">${a.kind === "image" ? `<img class="at-thumb" src="${esc5(a.preview ?? "")}" data-asset="${a.preview ? "" : esc5(a.asset ?? "")}" alt="보낼 사진">` : `<span class="at-kind">${ICON[a.kind]}${ATTACH_LABELS[a.kind]}</span>`}
-      <input class="gx-search" data-input="${prefix}-att" data-key="${i}" value="${esc5(a.content)}" placeholder="${esc5(ATTACH_HINTS[a.kind])}" maxlength="2000" aria-label="${ATTACH_LABELS[a.kind]} 내용" ${disabled ? "disabled" : ""}>
+      (a, i) => `<div class="at-item${a.kind === "image" ? " at-item-image" : ""}">${a.kind === "image" ? `<img class="at-thumb" src="${esc6(a.preview ?? "")}" data-asset="${a.preview ? "" : esc6(a.asset ?? "")}" alt="보낼 사진">` : `<span class="at-kind">${ICON[a.kind]}${ATTACH_LABELS[a.kind]}</span>`}
+      <input class="gx-search" data-input="${prefix}-att" data-key="${i}" value="${esc6(a.content)}" placeholder="${esc6(ATTACH_HINTS[a.kind])}" maxlength="2000" aria-label="${ATTACH_LABELS[a.kind]} 내용" ${disabled ? "disabled" : ""}>
       <button class="gx-mini" data-action="${prefix}-att-del" data-value="${i}" aria-label="${ATTACH_LABELS[a.kind]} 첨부 빼기" ${disabled ? "disabled" : ""}>✕</button></div>`
     ).join("");
     const full = items.length >= ATTACH_MAX;
@@ -3510,15 +3830,15 @@ ${JSON.stringify(previousRoom ?? "")}`)
       const blocked2 = !kinds.includes(k);
       if (k === "image") return `<button class="at-add at-add-image" data-pick-photo="${prefix}" ${disabled || full ? "disabled" : ""} title="붙여넣기(Ctrl+V)나 끌어놓기로도 올릴 수 있어요">${ICON.image}<span>사진 올리기</span></button>`;
       const label2 = k === "photo" && kinds.includes("image") ? "사진 묘사" : ATTACH_LABELS[k];
-      return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc5(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
+      return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc6(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
     }).join("");
     if (!rows3 && !showMenu) return "";
     return `<div class="at-editor" data-drop-photo="${prefix}">${rows3}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
   }
   function attachInput(items, key, value) {
-    const row11 = items[Number(key)];
-    if (!row11) return false;
-    row11.content = value;
+    const row8 = items[Number(key)];
+    if (!row8) return false;
+    row8.content = value;
     return true;
   }
   function attachAction(items, op, value, kinds) {
@@ -3561,510 +3881,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
         if (url) img.src = url;
         else img.closest(".at-card-image")?.classList.add("broken");
       };
-      if (photos.has(asset)) fill3(photos.get(asset));
-      else void loadPhoto(asset).then(fill3);
-    });
-  }
-  function zoomPhoto(src, alt) {
-    const box4 = document.createElement("div");
-    box4.className = "gx at-zoom";
-    box4.setAttribute("role", "dialog");
-    box4.setAttribute("aria-label", "사진 크게 보기");
-    box4.innerHTML = `<img src="${esc5(src)}" alt="${esc5(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
-    const close3 = () => {
-      box4.remove();
-      document.removeEventListener("keydown", key, true);
-    };
-    const key = (ev) => {
-      if (ev.key !== "Escape") return;
-      ev.stopPropagation();
-      close3();
-    };
-    box4.addEventListener("click", close3);
-    document.addEventListener("keydown", key, true);
-    document.body.appendChild(box4);
-  }
-  function card(kind, text4, asset) {
-    const label2 = ATTACH_LABELS[kind];
-    if (kind === "image") {
-      const src = asset ? photos.get(asset) : null;
-      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc5(src ?? "")}" data-asset="${esc5(asset ?? "")}" alt="${esc5(text4 || label2)}" loading="lazy"></button>
-      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text4.trim() ? `<figcaption>${esc5(text4)}</figcaption>` : ""}</figure>`;
-    }
-    if (kind === "file") {
-      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc5(text4)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
-    }
-    if (kind === "link") {
-      const url = attachUrl(text4);
-      const go2 = url ? `<a class="at-go" href="${esc5(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
-      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc5(text4)}</b>${go2}</div></div>`;
-    }
-    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc5(text4)}</b><small>선물이 도착했습니다</small></div></div>`;
-    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc5(text4).replace(/\n/g, "<br>")}</span></div></div>`;
-  }
-  var sitePic = null;
-  function setSitePicSource(fn2) {
-    sitePic = fn2;
-  }
-  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
-  var camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-  function boardCard(kind, text4, asset, url) {
-    if (kind === "image" || url) {
-      const src = url ?? (asset ? photos.get(asset) : null);
-      const data3 = url ? "" : ` data-asset="${esc5(asset ?? "")}"`;
-      return `<figure class="ax ax-img at-card-image${!url && asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc5(src ?? "")}"${data3} alt="${esc5(text4)}" loading="lazy"><span class="zm" aria-hidden="true">⤢</span></button>
-      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${kind === "image" && text4.trim() ? `<figcaption>${esc5(text4)}</figcaption>` : ""}</figure>`;
-    }
-    if (kind === "photo") return `<figure class="ax ax-ph"><div class="fr">${camera}<p>${esc5(text4).replace(/\n/g, "<br>")}</p></div></figure>`;
-    if (kind === "video") return `<figure class="ax ax-vd"><div class="fr"><span class="pl" aria-hidden="true">▶</span><p>${esc5(text4).replace(/\n/g, "<br>")}</p><div class="bar" aria-hidden="true"><span>▶</span><i></i><span>0:00</span></div></div></figure>`;
-    return card(kind, text4, asset);
-  }
-  function textWithPics(text4, board2) {
-    const out = [];
-    let last2 = 0;
-    const para = (t) => t.trim() ? out.push(`<p>${esc5(t.trim()).replace(/\n/g, "<br>")}</p>`) : 0;
-    for (const m of text4.matchAll(SITE_PIC)) {
-      para(text4.slice(last2, m.index));
-      const url = sitePic?.(m[1]) ?? null;
-      out.push(url ? board2 ? boardCard("image", "", void 0, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc5(url)}" alt="" loading="lazy"></button></figure>` : board2 ? boardCard("photo", m[1].replace(/_[a-z ]+$/i, "")) : card("photo", m[1]));
-      last2 = m.index + m[0].length;
-    }
-    para(text4.slice(last2));
-    return out;
-  }
-  function boardFiles(text4) {
-    return bodyParts(text4).filter((p2) => p2.kind === "file" || p2.kind === "link").map((p2) => ({ kind: p2.kind, text: p2.text, url: p2.kind === "link" ? attachUrl(p2.text) : null }));
-  }
-  function boardThumb(text4) {
-    let desc = false;
-    for (const p2 of bodyParts(text4)) {
-      if (p2.kind === "image" && p2.asset && photos.get(p2.asset)) return { url: photos.get(p2.asset) };
-      if (p2.kind === "text") {
-        for (const m of p2.text.matchAll(SITE_PIC)) {
-          const url = sitePic?.(m[1]) ?? null;
-          if (url) return { url };
-          desc = true;
-        }
-      }
-      if (p2.kind === "photo" || p2.kind === "image") desc = true;
-    }
-    return desc ? { url: null } : null;
-  }
-  function attachBody(text4, board2 = false, noFiles = false) {
-    const out = [];
-    const files = [];
-    for (const p2 of bodyParts(text4)) {
-      if (p2.kind === "text") out.push(...textWithPics(p2.text, board2));
-      else if (board2 && (p2.kind === "file" || p2.kind === "link")) {
-        if (noFiles) continue;
-        const url = p2.kind === "link" ? attachUrl(p2.text) : null;
-        files.push(`<div class="r"><span class="ic" aria-hidden="true">${p2.kind === "file" ? "📎" : "🔗"}</span>${url ? `<a href="${esc5(url)}" target="_blank" rel="noopener noreferrer">${esc5(p2.text)}</a>` : `<span>${esc5(p2.text)}</span>`}</div>`);
-      } else out.push(board2 ? boardCard(p2.kind, p2.text, p2.asset) : card(p2.kind, p2.text, p2.asset));
-    }
-    if (files.length) out.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join("")}</div>`);
-    return out.join("");
-  }
-
-  // src/host/assets.ts
-  var MIME2 = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
-  var cache8 = /* @__PURE__ */ new Map();
-  function toBytes3(data3) {
-    if (data3 instanceof Uint8Array) return data3;
-    if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
-    if (Array.isArray(data3)) return new Uint8Array(data3);
-    if (data3 && typeof data3 === "object") {
-      const values = Object.values(data3);
-      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
-    }
-    return null;
-  }
-  async function load(path, ext) {
-    try {
-      const data3 = await risuai.readImage(path);
-      if (typeof data3 === "string") return data3.startsWith("data:") || data3.startsWith("blob:") || data3.startsWith("http") ? data3 : null;
-      const bytes = toBytes3(data3);
-      if (!bytes?.length) return null;
-      return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
-    } catch (error) {
-      console.log(`[goei] 이미지를 읽지 못했어요 (${path}): ${error instanceof Error ? error.message : String(error)}`);
-      return null;
-    }
-  }
-  var isRow2 = (a) => Array.isArray(a) && typeof a[0] === "string" && typeof a[1] === "string";
-  var modRows = [];
-  var modVer = 0;
-  var modBusy = null;
-  function loadModuleAssets() {
-    modBusy ??= (async () => {
-      let rows3 = [];
-      try {
-        const idx = await risuai.getCurrentCharacterIndex();
-        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
-        rows3 = (char?.additionalAssets ?? []).filter(isRow2);
-      } catch {
-      }
-      try {
-        const db = await risuai.getDatabase(["modules", "enabledModules"]);
-        const on2 = new Set(db?.enabledModules ?? []);
-        const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
-        rows3 = rows3.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow2) : []));
-      } catch {
-      }
-      const changed = JSON.stringify(rows3) !== JSON.stringify(modRows);
-      if (changed) modRows = rows3, modVer++;
-      return changed;
-    })().finally(() => {
-      modBusy = null;
-    });
-    return modBusy;
-  }
-  var moduleAssetStamp = () => modVer;
-  var modIndex = null;
-  var modIndexVer = -1;
-  function modRow(name) {
-    if (!modIndex || modIndexVer !== modVer) {
-      modIndex = { exact: /* @__PURE__ */ new Map(), lower: /* @__PURE__ */ new Map() };
-      for (const r of modRows) {
-        if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
-        if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
-      }
-      modIndexVer = modVer;
-    }
-    return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
-  }
-  function modulePicker() {
-    if (!modRows.length) return void 0;
-    return (name) => modRow(name)?.[0] ?? null;
-  }
-  function findRow(char, name) {
-    const lower = name.toLowerCase();
-    const card2 = (char.additionalAssets ?? []).filter(isRow2);
-    return card2.find((a) => a[0] === name) ?? card2.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
-  }
-  function assetNames(char) {
-    const card2 = (char.additionalAssets ?? []).filter(isRow2);
-    return [...new Set([...card2, ...modRows].map((r) => r[0]))].filter((n3) => !/^map\d+$/i.test(n3));
-  }
-  var DEFAULT_CROP = "50,16,44";
-  var AGENT_CROPS = {
-    "Aestheticism": "53,18,40",
-    "Aileen": "43,21,46",
-    "Baek Sa-heon": "50,18,44",
-    "Cha Yeo-jin": "54,18,44",
-    "Cho Seong-choon": "48,18,44",
-    "Do Pil-heon": "48,16,44",
-    "Go Young-eun": "46,16,44",
-    "Jang Heo-un": "52,18,44",
-    "Jay": "53,16,44",
-    "Jyaldi": "56,18,44",
-    "Kwak Je-gang": "56,19,44",
-    "Kyuras": "49,19,44",
-    "Lee Do-hyeong": "61,16,44",
-    "Ma Deok-hee": "49,19,44",
-    "Mun Hye-ran": "46,18,44",
-    "Secriem": "54,16,44",
-    "Seo Yun-ji": "46,18,44",
-    "Spangdal": "52,18,44"
-  };
-  var personCrop = (p2) => parseCrop(p2.crop) ?? parseCrop(!p2.photo && AGENT_CROPS[p2.english ?? ""] || DEFAULT_CROP);
-  function parseCrop(s8) {
-    const n3 = String(s8 ?? "").split(",").map(Number);
-    if (n3.length !== 3 || n3.some((x) => !Number.isFinite(x))) return null;
-    const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
-    return [c(n3[0], 0, 100), c(n3[1], 0, 100), c(n3[2], 5, 100)];
-  }
-  function splitPic(pic3) {
-    const at = pic3.lastIndexOf("#");
-    const [cut3, t] = at > 0 ? pic3.slice(at + 1).split("~") : ["", ""];
-    const crop = at > 0 ? parseCrop(cut3) : null;
-    const tall = Number(t);
-    return crop ? { name: pic3.slice(0, at), crop, ...tall > 1 && tall <= 4 ? { tall } : {} } : { name: pic3, crop: null };
-  }
-  function mainPic(char, p2) {
-    const en2 = p2.english ?? "";
-    if (p2.photo) return p2.photo;
-    if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
-    if (en2 && hasAsset(char, en2)) return en2;
-    return p2.shared?.find((n3) => hasAsset(char, n3)) ?? "";
-  }
-  function facePic(char, p2, person = false) {
-    if (p2.face) return p2.face;
-    const en2 = p2.english ?? "";
-    if (person && !p2.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p2).join(",")}`;
-    if (en2 && hasAsset(char, en2)) return en2;
-    const main = mainPic(char, p2);
-    const crop = person ? personCrop(p2) : parseCrop(p2.crop);
-    return main && crop ? `${main}#${crop.join(",")}` : main;
-  }
-  var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
-  function assetUrl(char, name) {
-    const row11 = findRow(char, name);
-    if (!row11) return Promise.resolve(null);
-    const key = `${String(char.chaId ?? char.name ?? "")}|${row11[1]}`;
-    let hit4 = cache8.get(key);
-    if (!hit4) {
-      hit4 = load(row11[1], String(row11[2] ?? row11[1].split(".").pop() ?? ""));
-      cache8.set(key, hit4);
-      void hit4.then((url) => {
-        if (!url) cache8.delete(key);
-      });
-    }
-    return hit4;
-  }
-  setAssetCheck(hasAsset);
-
-  // src/ui/images.ts
-  var urls = /* @__PURE__ */ new Map();
-  var redraw = () => {
-  };
-  var queued = false;
-  function forgetImages() {
-    urls.clear();
-    schedule();
-  }
-  function setImageRedraw(fn2) {
-    redraw = fn2;
-  }
-  function schedule() {
-    if (queued) return;
-    queued = true;
-    setTimeout(() => {
-      queued = false;
-      redraw();
-    }, 30);
-  }
-  var MAX_SIDE = 720;
-  var FACE_SIDE = 256;
-  async function shrink(url, crop = null, tall = 1) {
-    try {
-      const im = new Image();
-      im.src = url;
-      await im.decode();
-      const W3 = im.naturalWidth;
-      const H2 = im.naturalHeight;
-      let [sx, sy, sw, sh] = [0, 0, W3, H2];
-      if (crop) {
-        const side = Math.min(W3, H2, crop[2] / 100 * W3);
-        sx = Math.min(W3 - side, Math.max(0, crop[0] / 100 * W3 - side / 2));
-        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
-        sw = sh = side;
-        if (tall > 1) sh = Math.max(side, Math.min(H2 - sy, side * tall));
-      }
-      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
-      if (!crop && !(scale < 1)) return url;
-      const canvas2 = document.createElement("canvas");
-      canvas2.width = Math.max(1, Math.round(sw * scale));
-      canvas2.height = Math.max(1, Math.round(sh * scale));
-      const g2 = canvas2.getContext("2d");
-      if (!g2) return url;
-      g2.imageSmoothingQuality = "high";
-      g2.drawImage(im, sx, sy, sw, sh, 0, 0, canvas2.width, canvas2.height);
-      const blob = await new Promise((res) => canvas2.toBlob(res, "image/webp", 0.88));
-      return blob ? URL.createObjectURL(blob) : url;
-    } catch {
-      return url;
-    }
-  }
-  function imageUrl(char, pic3) {
-    if (!pic3) return null;
-    const key = `${String(char.chaId ?? char.name ?? "")}|${pic3}`;
-    const hit4 = urls.get(key);
-    if (hit4 === void 0) {
-      urls.set(key, "loading");
-      const { name, crop, tall } = splitPic(pic3);
-      void assetUrl(char, name).then(async (raw) => {
-        const url = raw ? await shrink(raw, crop, tall) : null;
-        urls.set(key, url);
-        if (url) schedule();
-      });
-      return null;
-    }
-    return hit4 === "loading" ? null : hit4;
-  }
-  var escAttr = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function agentFace(char, english) {
-    if (!english) return "";
-    const a = readDirectory(char.globalLore ?? []).agents.find((x) => x.english === english);
-    return facePic(char, a ?? { english }, true);
-  }
-  function factionPic(char, f, slot2 = "main") {
-    const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
-    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
-    return slot2 === "face" ? facePic(char, src) : mainPic(char, src);
-  }
-  function picAvatar(char, pic3, name, cls = "") {
-    const url = imageUrl(char, pic3);
-    const first = escAttr(Array.from(name.trim())[0] ?? "?");
-    return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
-  }
-  var avatar = (char, english, name, cls = "") => picAvatar(char, agentFace(char, english), name, cls);
-  function prefetchFactions(char) {
-    for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
-  }
-  var stLabel = (st) => st === "작전투입" ? "작전" : st;
-  var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
-  var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
-  function agentInner(char, p2, st, situation = "", act = "") {
-    const role = [p2.department, p2.rank].filter(Boolean).join(" · ");
-    return `<span class="gx-acard-side">${avatar(char, p2.english, p2.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p2.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
-  }
-  function showIdCard(html, act, cls = "") {
-    document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
-    const box4 = document.createElement("div");
-    box4.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
-    box4.setAttribute("role", "dialog");
-    box4.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
-    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box4.setAttribute("data-theme", theme);
-    box4.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-action]");
-      if (btn && act && box4.contains(btn)) {
-        box4.remove();
-        act(btn.dataset.action, btn.dataset.value);
-        return;
-      }
-      if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
-      box4.remove();
-    });
-    document.body.appendChild(box4);
-  }
-
-  // src/core/josa.ts
-  function josa(word, withBatchim, without) {
-    const last2 = word.trim().slice(-1);
-    const code2 = last2.charCodeAt(0) - 44032;
-    if (!(code2 >= 0 && code2 <= 11171)) return `${word}${withBatchim}(${without})`;
-    return `${word}${code2 % 28 ? withBatchim : without}`;
-  }
-
-  // src/host/prefs.ts
-  var KEY = "goei:prefs";
-  async function loadPrefs() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY);
-      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
-    } catch (error) {
-      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      return getPrefs();
-    }
-  }
-  async function saveVarDefaults(prefixes, state) {
-    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
-    await savePrefs((p2) => {
-      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(p2.vars ?? {})])].filter(mine);
-      const vars = { ...p2.vars ?? {} };
-      for (const k of keys) {
-        const v = state?.[k];
-        if (v === void 0 || v === null || v === "" || v === "null") delete vars[k];
-        else vars[k] = String(v);
-      }
-      return { ...p2, vars };
-    });
-  }
-  function loadVarDefaults(prefixes, state) {
-    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
-    const saved2 = getPrefs().vars ?? {};
-    const out = {};
-    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved2)])].filter(mine)) out[k] = String(saved2[k] ?? "");
-    return out;
-  }
-  async function savePrefs(change) {
-    const next = setPrefs(change(structuredClone(getPrefs())));
-    await risuai.pluginStorage.setItem(KEY, JSON.stringify(next));
-    return next;
-  }
-
-  // src/ui/defaults.ts
-  var PREFIXES = {
-    ph: ["$ph_"],
-    /** 게시판 사이트 넷 (괴담넷·괴담갤·세정게·연어 마켓, 2026-11-08 사이트마다 따로) */
-    gn: ["$lb_cfg_lb-gn.", "$gn_storage_", "$lb_cfg_lb-gal.", "$gal_storage_", "$lb_cfg_lb-wpf.", "$wpf_storage_", "$lb_cfg_lb-sm.", "$sm_storage_"],
-    wiki: ["$nw_"],
-    /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
-    pp: ["$pp_"],
-    /** 기록 (core/journal/settings.ts JR): 채팅에 보고서 표시·일지 컨텍스트·상한 둘 */
-    jr: ["$jr_"]
-  };
-  var MAIN_PREFIXES = ["$gen_", "$pp_", "$it_"];
-  var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, "$st_col_", "$st_wallet_", "$sh_", ...Object.values(PREFIXES).flat()])];
-  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", pp: "인물 기록", jr: "기록" };
-  var defaultsAsk = { pane: "", what: "" };
-  var defaultsButtons = (pane2, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane2}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="${pane2}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}기본값 불러오기</button></span>`;
-  function defaultsConfirm(pane2) {
-    if (defaultsAsk.pane !== pane2 || !defaultsAsk.what) return "";
-    const save4 = defaultsAsk.what === "save";
-    const text4 = save4 ? `지금 ${NAME[pane2]} 설정을 새 채팅 기본값으로 저장할까요?` : `저장해 둔 ${NAME[pane2]} 기본값을 이 채팅에 불러올까요?`;
-    return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text4}</p><div class="gx-row-btns"><button class="gx-mini${save4 ? " ps-save" : " danger"}" data-action="${pane2}-def-yes">${save4 ? "저장" : "불러오기"}</button><button class="gx-mini" data-action="${pane2}-def-no">취소</button></div></div>`;
-  }
-  async function defaultsAction(pane2, action, value, ctx2, refresh3) {
-    const sub = action.slice(pane2.length + 1);
-    if (sub === "def-ask") {
-      defaultsAsk.pane = pane2;
-      defaultsAsk.what = value === "save" || value === "load" ? value : "";
-      return "";
-    }
-    if (sub === "def-no") {
-      defaultsAsk.pane = "";
-      defaultsAsk.what = "";
-      return "";
-    }
-    if (sub !== "def-yes") return null;
-    const what = defaultsAsk.pane === pane2 ? defaultsAsk.what : "";
-    defaultsAsk.pane = "";
-    defaultsAsk.what = "";
-    if (what === "save") {
-      await saveVarDefaults(PREFIXES[pane2], ctx2.chat.scriptstate);
-      return `지금 ${NAME[pane2]} 설정을 새 채팅 기본값으로 저장했어요.`;
-    }
-    if (what === "load") {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane2], chat.scriptstate) } }));
-      await refresh3();
-      return `새 채팅 기본값을 지금 ${NAME[pane2]}에 불러왔어요.`;
-    }
-    return "";
-  }
-
-  // src/ui/toast.ts
-  var esc6 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var timers = /* @__PURE__ */ new Map();
-  function toast(key, text4, clear) {
-    if (!text4) return "";
-    const cur = timers.get(key);
-    if (!cur || cur.text !== text4) {
-      if (cur) clearTimeout(cur.id);
-      const ms = Math.min(8e3, 2500 + [...text4].length * 50);
-      const id2 = setTimeout(() => {
-        timers.delete(key);
-        clear(text4);
-        const el = document.querySelector(`.gx-toast[data-toast="${key}"]`);
-        if (!el) return;
-        el.classList.add("out");
-        setTimeout(() => {
-          if (el.matches(`.gx-toast[data-toast="${key}"]`)) el.remove();
-        }, 300);
-      }, ms);
-      timers.set(key, { text: text4, id: id2 });
-    }
-    return `<div class="gx-toast gn-notice" data-toast="${key}" role="status">${esc6(text4)}</div>`;
-  }
-
-  // src/ui/drawer.ts
-  var opened = /* @__PURE__ */ new Map();
-  function shell(key, cls, inner) {
-    return `<div class="ph-drawer open${cls ? ` ${cls}` : ""}" data-drawer="${key}">${inner}</div>`;
-  }
-  function drawerHtml(tools, above = "", cls = "", key = cls || "tools") {
-    return shell(key, cls, `${above}<div class="ph-tools">${tools}</div>`);
-  }
-  function drawerBox(content, cls = "", after = "", key = cls || "box") {
-    return shell(key, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
-  }
-  function set(box4, on2) {
-    opened.set(box4.dataset.drawer ?? "tools", on2);
-    box4.classList.toggle("open", on2);
-    const grip = box4.querySelector(".ph-grip");
-    grip?.setAttribute("aria-expanded", String(on2));
-    grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
-  }
-  function bindDrawer(root3) {
-    const box
+      if (photos.has(asset))

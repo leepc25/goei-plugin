@@ -33,7 +33,7 @@ const c = chat(['user', '출근', 'u1'], ['char', '가짜 관리국이 공문으
 
 test('기본 켬: 시작값은 조직×조직 표, 유저 소속 기준. 구간은 설정 경계로, 되감기·고정은 인물과 같은 엔진', () => {
   const s = settings();
-  assert.ok(s.features.has('faction_rep') && s.factionInject);
+  assert.ok(s.features.has('faction_rep'));
   assert.deepEqual(s.factionBounds, [61, 21, -20, -60]);
   assert.deepEqual(St.parseBounds('70,30,0,-50'), [70, 30, 0, -50]);
   assert.deepEqual(St.parseBounds('10,20,30,40'), [61, 21, -20, -60], '내림차순 아니면 기본값');
@@ -136,8 +136,6 @@ test('본편 주입: 장면 세력 가운데 중립이 아닌 것만, 주입 끄
   assert.match(out.text, /## Factions → \{\{user\}\}/);
   assert.match(out.text, /- 가짜 관리국 → \{\{user\}\}: Hostile\./, '격자: 가짜 관리국 → 관리국 적대');
   assert.ok(!/- 관리국 → /.test(out.text), '관리국은 중립이라 생략');
-  const off = settings({ factionInject: false });
-  assert.ok(!R.peopleBlockFor(c2, { settings: off, store, sheetOf: () => null }).text.includes('Factions'));
   const block = F.factionsBlock([{ code: 'A00', name: '관리국', value: 0, stage: T.factionStage(0), base: 0 }], '주인공');
   assert.equal(block, '', '중립뿐이면 절 자체가 없음');
 });
@@ -178,7 +176,6 @@ test('필드 상한 묶음: 같은 메시지 뒤 여러 방문·장면은 상한
 test('정성 모드(11-07): 수치 끄면 faction_stance 로 단계·이유만, 숫자 없는 자료·주입, 구간·몹 목격 안 씀', () => {
   const s = settings({ ...St.peopleSettings({ $pp_num_faction_rep: '0' }) });
   assert.equal(s.factionQual, true);
-  assert.equal(s.mobWeight, 'off', '정성 모드에서는 필드 몹 목격 계기를 쌓지 않는다');
   const on = U.enabledSections(s);
   assert.ok(on.has('faction_rep_qual') && !on.has('faction_rep_num'));
   for (const prompt of ['detailed', 'compact']) {

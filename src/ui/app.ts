@@ -8,7 +8,6 @@ import { NavHistory, type RecordsNav } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, effectiveFaction, planStart, readManifest, StartError } from '../core/start';
 import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
-import { handleVersus, setVsRender } from './versus';
 import type { Faction, FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
   activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, worldOn,
@@ -22,7 +21,8 @@ import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
 import { bindNeedFill } from './needfill';
 import { chatLookPopup, flashPick, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
-import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
+import { editorOnSettings, editorOpen, isFeatPage, openEditor, render as editorRender, type EditorNode } from './editor/index';
+import { consultAllowed } from './editor/catalog';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { frameHtml, frameState } from './frame';
@@ -65,7 +65,8 @@ import { boardMapUrl, field, handleField, mapTab, mapSuggestFor, missionList, mi
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
-import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
+import { handleSettings, resetSettings, settingsTab, settingsUi, shopFamSet, type SettingsEnv } from './settings';
+import { famAction } from './famtable';
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
 import { handleImgPrompt, imgInput } from './imgprompt';
 import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
@@ -182,7 +183,6 @@ const wikiEnv: WikiEnv = {
 
 const gnetEnv: GnetEnv = wikiEnv;
 const settingsEnv: SettingsEnv = { render: () => render(), refresh: () => refresh() };
-setVsRender(() => render());
 const peopleEnv: PeopleEnv = settingsEnv;
 const recordsEnv: RecordsEnv = settingsEnv;
 
@@ -792,12 +792,6 @@ export async function openShop(site = ''): Promise<void> {
   if (view.kind === 'started') await handle('shop-open');
 }
 
-/** 대전 자료가 없을 때 게임패드 단추: 설정 「대전」으로 (11-08 사용자) */
-export async function openVersusSettings(): Promise<void> {
-  await openApp({ quietIfNotLite: true });
-  if (view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening') await handle('ed-open', 'set:versus');
-}
-
 /** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
 export async function openRecords(id: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
@@ -893,6 +887,43 @@ async function handle(action: string, value?: string): Promise<void> {
   // 상황 상세 창 안의 버튼(위키·지도·목표)이나 다른 조작을 하면 창은 닫는다. 종료는 두 번 눌러야 해서 그대로 둔다
   if (evUi.pop && action !== 'ev-pop' && action !== 'end-event') evUi.pop = '';
   if (agUi.pop && action !== 'agent-info') agUi.pop = '';
+  if (action === 'fl-do') {
+    // 관제 화면(호출 흐름)·AI 상담의 조작 「동작|값」: 그 설정의 원래 동작을 그대로 부른다 (값을 따로 저장하지 않는다).
+    // 시작 뒤엔 이 채팅 값. 시작 전엔 기능 페이지가 열려 있지 않아도 기능 동작(pp-·ph-·wiki-·hs-·ms-)이 이 채팅에 닿게 한다
+    const cut = (value ?? '').indexOf('|');
+    const inner = cut > 0 ? (value ?? '').slice(0, cut) : '';
+    if (!/^(pp-set|ph-cfg|wiki-(auto|model|auto_title)|fam-set|hs-(cfg|retry)|ms-cfg|adv-set|set-(asset|asset-model|shop-on|shop-model|shop-judge|wallet-on|inv-on))$/.test(inner)) return;
+    if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
+    const keep = { scope: settingsUi.scope, page: settingsUi.page };
+    if (view.kind === 'started') settingsUi.scope = 'chat';
+    if (!settingsUi.page) settingsUi.page = 'people';
+    try {
+      await handle(inner, (value ?? '').slice(cut + 1));
+    } finally {
+      settingsUi.scope = view.kind === 'started' ? keep.scope : settingsUi.scope;
+      settingsUi.page = keep.page;
+    }
+    return;
+  }
+  if (action === 'ai-do') {
+    // AI 상담 전용 통로 「메뉴|동작|값」: 그 메뉴 화면의 조작이 보내는 동작만 받는다 (ui/editor/catalog.ts consultAllowed —
+    // 화면에 지금 있는, 잠기지 않은 조작과 값까지 같아야 한다. 지우기·초기화·추가·저장·불러오기·업데이트는 이름으로도 한 번 더 막는다).
+    // 그 메뉴 화면을 열어 둔 것처럼 두고(기능 페이지는 그 페이지, 시작 뒤엔 이 채팅) 원래 처리기를 그대로 부른다 (값을 따로 저장하지 않는다)
+    const [page = '', inner = '', ...rest] = (value ?? '').split('|');
+    const v = rest.join('|');
+    if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
+    if (!consultAllowed(page, inner, v)) return;
+    const keep = { scope: settingsUi.scope, page: settingsUi.page };
+    if (view.kind === 'started') settingsUi.scope = 'chat';
+    settingsUi.page = isFeatPage(page) ? page : '';
+    try {
+      await handle(inner, v);
+    } finally {
+      settingsUi.scope = view.kind === 'started' ? keep.scope : settingsUi.scope;
+      settingsUi.page = keep.page;
+    }
+    return;
+  }
   if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
     // 범위: 시작 뒤엔 설정 창 범위(이 채팅/새 채팅 기본값). 시작 전엔 「고급」(gen)은 새 채팅 기본값, 기능 페이지(괴담넷·괴담톡·위키·필드)의
     // 고급 칸은 그 페이지의 다른 값처럼 이 채팅 (2026-10-28 QC: 시작 전 기능 페이지에서 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
@@ -960,6 +991,18 @@ async function handle(action: string, value?: string): Promise<void> {
     const ms = curTab().site;
     if (isMallSite(ms) && (await mallAction(action, value, featCtx, wikiEnv, ms))) return;
   }
+  // 설정 → 인터넷·상점의 격자와 그 아래 줄 (fam-*). 게시판 값은 늘 이 채팅에, 상점 값은 그 페이지의 범위(시작 전 = 새 채팅 기본값)에
+  if (action.startsWith('fam-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
+    const fctx = view.ctx;
+    const scope = view.kind === 'started' ? 'chat' : 'defaults';
+    if (settingsUi.busy) return;
+    await famAction(action, value, {
+      render,
+      board: (a, v, site) => handleGnet(a, v, fctx, gnetEnv, site),
+      shop: (col, key, v) => shopFamSet(fctx, settingsEnv, scope, col, key, v),
+    });
+    return;
+  }
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action)))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
@@ -989,7 +1032,7 @@ async function handle(action: string, value?: string): Promise<void> {
     return render();
   }
   // 어디서 「설정」을 누르든 설정 창 하나 (2026-10-27 사용자): 괴담넷·괴담톡·위키 판의 설정 단추는 그 기능 페이지로
-  const FEAT_SET: Record<string, string> = { 'gn-settings': 'set:gnet', 'ph-settings': 'set:phone', 'wiki-settings': 'set:wiki' };
+  const FEAT_SET: Record<string, string> = { 'gn-settings': 'set:net', 'ph-settings': 'set:phone', 'wiki-settings': 'set:wiki' };
   if (FEAT_SET[action]) return handle('ed-open', FEAT_SET[action]);
   if (action === 'prefs-open' || action === 'prefs-close') {
     // 시작 전 「새 채팅 기본 설정」: 설정 창을 연다 (패널 안 설정 탭은 없앴다)
@@ -1000,8 +1043,6 @@ async function handle(action: string, value?: string): Promise<void> {
     pickerPrefs = false;
     return render();
   }
-  // 설정 「대전」 (11-08): 이 기기 값·데이터 받기라 채팅 범위와 상관없다
-  if (action.startsWith('vs-') && (await handleVersus(action, value ?? '', () => render()))) return;
   if ((view.kind === 'started' || (view.kind === 'picker' && pickerPrefs)) && action.startsWith('dir-')) {
     if (action === 'dir-save' || action === 'dir-reset') settingsUi.confirm = '';
     await handleDirectory(action, value, view.ctx, settingsEnv);

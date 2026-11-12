@@ -172,7 +172,7 @@ export function paintReport(g: PaintCtx, r: Report, o: PaintOpts): PaintResult {
   text(g, `INCIDENT REPORT · ${r.no}`, PNG_W - PAD, y + 2, { size: 14, weight: 500, color: c.dim, family: mono, align: 'right' });
   const day = dayText(h.at, r.savedAt);
   text(g, [day, o.org].filter(Boolean).join('   '), PNG_W - PAD, y + 24, { size: 13, weight: 400, color: c.sub, family: sans, align: 'right' });
-  text(g, kindLabel === '필드 출동' ? 'FIELD OPERATION' : 'AFTER-ACTION', PAD, y + 28, { size: 12, weight: 500, color: c.dim, family: mono });
+  text(g, 'AFTER-ACTION', PAD, y + 28, { size: 12, weight: 500, color: c.dim, family: mono });
   y += 52;
   sections.push('head');
 
@@ -214,7 +214,7 @@ export function paintReport(g: PaintCtx, r: Report, o: PaintOpts): PaintResult {
   const tx = PAD + 72;
   const status = `${kindLabel} · 종료${h.cleared ? ' · 클리어' : ''}`;
   text(g, status, tx, y, { size: 13, weight: 500, color: c.dim, family: mono });
-  const badge = r.kind === 'fd' ? '필드 출동' : r.mine ? '내가 출동' : '요원 처리';
+  const badge = r.mine ? '내가 출동' : '요원 처리';
   g.font = `500 13px ${mono}`;
   const sw = g.measureText(status).width;
   const bw = g.measureText(badge).width + 20;

@@ -3,6 +3,7 @@
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
+import { setGroup, setRow, stepSizeText } from './setrow';
 import { needAttr } from './needfill';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
@@ -17,8 +18,9 @@ import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, s
 import { turnKey, acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
-import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
-import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, COS_READY_KEY, cosReadyMode, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
+import { defChanged, defStored } from '../core/deftext';
+import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseAxes, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
+import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, COS_READY_KEY, cosReadyMode, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, parseGenres, parseTiers, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { shopSource } from './shop';
@@ -848,21 +850,71 @@ export function mallTab(ctx: ChatContext, env: MallEnv, site: MallSite): string 
 
 // ── 설정 페이지 (2026-11-08 사용자: 사이트마다 값 따로. 상점 설정 쪽 항목, 우주몰만 문의) ──
 
-const row = (label: string, control: string, hint = '') =>
-  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
+const row = setRow;
+/** 기본값과 견줄 때의 모양 (읽는 쪽이 알아듣는 줄만 남긴다 — 쓸 수 있는 줄이 없으면 빈 글 = 기본 따름) */
+const genresNorm = (t: string) => genresText(parseGenres(t));
+const tiersNorm = (t: string) => tiersText(parseTiers(t));
+const axesNorm = (t: string) => parseAxes(t).map((a) => `${a.name}: ${a.values.join(', ')}`).join('\n');
+const group = (title: string, rows: string) => setGroup(title, rows);
+
+// ── 칸 입력 (11-12 사용자: 「이름|설명|하한|상한|가중치」처럼 치게 하지 말고 칸마다 입력칸을): 저장 글 꼴은 그대로, 화면만 칸으로 ──
+interface TierRaw { name: string; desc: string; lo: string; hi: string; w: string }
+const tiersRaw = (text: string): TierRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes('|')).map((l) => { const [name = '', desc = '', lo = '', hi = '', w = ''] = l.split('|').map((x) => x.trim()); return { name, desc, lo, hi, w }; });
+const tiersRawText = (t: TierRaw[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join('\n');
+const tierRows = (vars: Record<string, unknown> | undefined, site: MallSite): TierRaw[] => { const st = String(vars?.[rollKeys(site).tiers] ?? ''); return tiersRaw(st.trim() ? st : tiersText(rollDefaults(site).tiers)); };
+const tierBad = (x: TierRaw): string => {
+  const a = Number(x.lo.replace(/[^\d]/g, '')); const b = Number(x.hi.replace(/[^\d]/g, ''));
+  if (!x.name) return '이름이 비어 있어 이 줄은 안 뽑혀요.';
+  if (!x.lo || a <= 0) return '하한이 비어 있어 이 줄은 안 뽑혀요.';
+  if (!x.hi || b < a) return '상한이 하한보다 작아 이 줄은 안 뽑혀요.';
+  return '';
+};
+const stepBox = (action: string, key: string, text: string, down: boolean, up: boolean) => `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${down ? '' : 'disabled'} aria-label="줄이기">−</button><b>${text}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${up ? '' : 'disabled'} aria-label="늘리기">+</button></div>`;
+/** 값 등급 표: PC 는 제목 줄 + 줄마다 칸, 폰은 줄마다 카드 (같은 DOM, 배치만 CSS) */
+function tierTable(vars: Record<string, unknown> | undefined, site: MallSite): string {
+  const unit = site === 'bm' ? 'p' : '원';
+  const rows = tierRows(vars, site);
+  const cell = (cls: string, label: string, inner: string) => `<label class="ms-tb-c ${cls}"><span>${label}</span>${inner}</label>`;
+  const body = rows.map((x, i) => {
+    const k = `${site}:${i}`;
+    const bad = tierBad(x);
+    const w = x.w === '' || !Number.isFinite(Number(x.w)) || Number(x.w) < 0 ? 1 : Math.min(99, Math.trunc(Number(x.w)));
+    const num = (f: 'lo' | 'hi', label: string) => `<span class="ph-inline"><input class="gx-search ms-num" type="number" min="1" max="1000000000000" data-change="ms-tier" data-key="${k}:${f}" value="${esc(x[f].replace(/[^\d]/g, ''))}" aria-label="${label}"><span>${unit}</span></span>`;
+    return `<div class="ms-tb-r${bad ? ' bad' : ''}">
+      ${cell('n', '이름', `<input class="gx-search" data-change="ms-tier" data-key="${k}:name" value="${esc(x.name)}" maxlength="20" aria-label="이름">`)}
+      ${cell('d', '설명(영어)', `<input class="gx-search" data-change="ms-tier" data-key="${k}:desc" value="${esc(x.desc)}" maxlength="120" aria-label="설명(영어)">`)}
+      ${cell('lo', '하한', num('lo', '하한'))}
+      ${cell('hi', '상한', num('hi', '상한'))}
+      <div class="ms-tb-c w"><span>가중치</span>${stepBox('ms-tier-w', k, String(w), w > 0, w < 99)}</div>
+      <button class="gx-mini danger ms-tb-x" data-action="ms-tier-del" data-value="${k}" aria-label="지우기">×</button>
+      ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="ms-tb"><div class="ms-tb-h"><span>이름</span><span>설명(영어)</span><span>하한</span><span>상한</span><span>가중치</span><span></span></div>${body}<div class="ms-tb-foot"><button class="gx-mini primary" data-action="ms-tier-add" data-value="${site}" ${rows.length >= 12 ? 'disabled' : ''}>등급 추가</button></div></div>`;
+}
+/** 상담사 주사위 칸: 한 줄에 칸 이름 + 값(쉼표로 나눈 글 한 칸) + × (v2: 값마다 칩으로 쪼개면 높이가 3.7배가 돼서 한 칸으로) */
+interface AxisRaw { name: string; values: string[] }
+const axesRaw = (text: string): AxisRaw[] => String(text ?? '').split(/\r?\n/).filter((l) => l.includes(':')).map((l) => { const i = l.indexOf(':'); return { name: l.slice(0, i).trim(), values: l.slice(i + 1).split(/[,，]/).map((x) => x.trim()).filter(Boolean) }; });
+const axesRawText = (a: AxisRaw[]): string => a.map((x) => `${x.name}: ${x.values.join(', ')}`).join('\n');
+const axisRows = (vars: Record<string, unknown> | undefined): AxisRaw[] => { const st = String(vars?.[DESK_KEY.axes] ?? ''); return axesRaw(st.trim() ? st : DESK_AXES_DEFAULT); };
+function axisTable(vars: Record<string, unknown> | undefined): string {
+  const rows = axisRows(vars);
+  const body = rows.map((a, i) => {
+    const bad = !a.name ? '칸 이름이 비어 있어 이 칸은 안 뽑아요.' : !a.values.length ? '값이 없어 이 칸은 안 뽑아요.' : '';
+    return `<div class="ms-ax${bad ? ' bad' : ''}">
+      <label class="ms-tb-c n"><span>칸 이름</span><input class="gx-search" data-change="ms-ax-name" data-key="${i}" value="${esc(a.name)}" maxlength="20" placeholder="칸 이름" aria-label="칸 이름"></label>
+      <label class="ms-tb-c v"><span>값</span><input class="gx-search" data-change="ms-ax-vals" data-key="${i}" value="${esc(a.values.join(', '))}" maxlength="900" placeholder="값, 값" aria-label="값"></label>
+      <button class="gx-mini danger ms-tb-x" data-action="ms-ax-del" data-value="${i}" aria-label="지우기">×</button>
+      ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="ms-tb ms-axs"><div class="ms-tb-h"><span>칸 이름</span><span>값</span><span></span></div>${body}<div class="ms-tb-foot"><button class="gx-mini primary" data-action="ms-ax-add" ${rows.length >= 12 ? 'disabled' : ''}>칸 추가</button></div></div>`;
+}
 function mseg(site: MallSite, key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'ms-cfg', (v) => `${site}:${key}=${v}`);
   if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, l]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="ms-cfg" data-value="${site}:${key}=${v}" aria-pressed="${cur === v}">${l}</button>`).join('')}</div>`;
 }
-const step = (site: MallSite, key: string, shown: string, down: boolean, up: boolean, label: string) =>
-  `<div class="st-step"><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:-" ${down ? '' : 'disabled'} aria-label="${esc(label)} 줄이기">−</button><b>${esc(shown)}</b><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:+" ${up ? '' : 'disabled'} aria-label="${esc(label)} 늘리기">+</button></div>`;
-
-/** 숫자 직접 입력 칸 (개수 최소·최대) */
-const numBox = (site: MallSite, key: string, cur: number, unit: string, label: string) =>
-  `<input class="gx-search ph-pct" type="number" min="${MS_RANGE[key][0]}" max="${MS_RANGE[key][1]}" data-change="ms-num" data-key="${site}:${key}" value="${cur}" aria-label="${esc(label)}"><span>${unit}</span>`;
-
 /** 상점 설정 이름 (사이트 앞붙이 없이) */
 const MS_KEY: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', feature: '$sh_feature', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
 const MS_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
@@ -871,19 +923,8 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
   const s = mallSettings(ctx.chat.scriptstate, site);
   const name = MALL_NAME[site];
   const blocked = s.on ? '' : `<p class="gx-hint">소지품이나 가계부가 꺼져 있어 ${name}을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>`;
-  const rows = `${blocked}${group(name, [
-    row('자동 호출', mseg(site, 'auto', s.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), s.auto === 'manual' ? '새로 고침을 눌렀을 때만 물건 목록을 새로 받아요.' : s.auto === 'open' ? '사이트를 열 때, 지난번에 받은 뒤로 본편이 진행됐으면 한 번 새로 받아요.' : '본편 응답마다 물건 목록을 새로 받아요(모델 호출 +1).'),
-    row('모델', mseg(site, 'model', s.model, [['main', '메인 모델'], ['aux', '보조 모델']]), `물건 목록${site === 'cos' ? '과 운영자 답' : ''}을 지을 모델이에요.`),
-    row('컨텍스트에 포함', mseg(site, 'ctx', s.context ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'),
-    row('상품 수', `<span class="ph-inline"><span>최소</span>${numBox(site, 'min', s.size[0], '개', '상품 수 최소')}<span>최대</span>${numBox(site, 'max', s.size[1], '개', '상품 수 최대')}</span>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
-    row(site === 'cos' ? '추천·할인 구획' : '한정·특가 구획', mseg(site, 'feature', s.feature ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), site === 'cos' ? '켜면 「강하게 추천」 물건 하나와 ※할인!※ 물건을 받아 같은 목록 칸에 딱지로 표시해요.' : '켜면 「이달의 한정」 하나와 특가 상품을 따로 받아 분류에 보여 줘요.'),
-    row('값 기준', `<input class="gx-search ps-text" data-change="ms-text" data-key="${site}:price" value="${esc(s.price)}" maxlength="80" placeholder="비우면 사이트에 어울리는 값">`),
-    row('다양성 강화', mseg(site, 'diverse', s.diverse ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 싼 것·비싼 것·흔한 것·특이한 것을 섞어요.'),
-    row('지난 목록 피하기', mseg(site, 'prev', s.avoidPrev ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '새로 받을 때 이미 보였던 물건을 피해요.'),
-    row('생각 단계', mseg(site, 'thoughts', s.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
-    row('최근 본문 턴 수', step(site, 'turns', `${s.turns}턴`, s.turns > 1, s.turns < 8, '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8).'),
-    row('참고 로어북 수', step(site, 'refs', `${s.refs}개`, s.refs > 0, s.refs < 12, '참고 로어북 수'), '봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).'),
-  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
+  // 자동 호출·모델·상품 수·구획·값 기준과 상점 넷이 같이 쓰는 값은 설정 → 상점에 있다 (ui/famtable.ts shopTable)
+  const rows = `${blocked}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -895,21 +936,21 @@ function cosRollGroup(ctx: ChatContext, site: MallSite): string {
   const K = rollKeys(site);
   const D = rollDefaults(site);
   const bm = site === 'bm';
-  const reset = rollChanged(vars, site) ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset" data-value="${site}">기본값으로</button></div>` : '';
-  const gSet = String(vars?.[K.genres] ?? '') !== '';
-  const tSet = String(vars?.[K.tiers] ?? '') !== '';
+  const reset = rollChanged(vars, site) || String(vars?.[K.tiers] ?? '').trim() ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset" data-value="${site}">기본값으로</button></div>` : '';
+  // 기본값은 칸에 진짜 글로 들어 있다 (11-12 사용자: 회색 안내 글이면 한 글자만 쳐도 다 사라진다). 다르게 고친 줄만 「바꾼 줄」 점
+  const gSet = defChanged(String(vars?.[K.genres] ?? ''), genresText(D.genres), genresNorm);
+  const mark = (on: boolean) => (on ? 'ps-changed' : '');
   // 지금 설정으로 한 번 뽑아 본 예 (열 때마다 달라짐)
   const n = Math.round((s.size[0] + s.size[1]) / 2);
   const money = (x: CosTier) => (bm ? `${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}p` : `₩${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}`);
   const sample = r.on ? cosDraw(n, s.context, r).map((x, i) => `<li><b>${i + 1}칸</b> ${esc(x.genre)} · ${esc(x.tier.name)} ${money(x.tier)}${x.useful ? ' · <i>상황용</i>' : ''}</li>`).join('') : '';
   const word = bm ? '분류' : '장르';
   const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 ${word}를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — ${bm ? 'CATEGORY' : 'GENRE'} · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, ${word}·등급을 바꾸지 못해요.${bm ? ' 로어북의 가격 예시 물건을 그대로 되풀이하기 어렵게 하는 장치예요.' : ''}</p>`;
-  const tierHelp = bm ? `한 줄에 「이름|설명(영어)|하한|상한|가중치」(포인트). 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(30~9,999p, 싼 쪽에 가중치).` : '한 줄에 「이름|설명(영어)|하한|상한|가중치」. 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(₩999,999~49,999,999, 모두 1).';
   return group('진열 배정', how + [
     row('사용', mseg(site, 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요).'),
-    row(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres" placeholder="${esc(genresText(D.genres))}">${esc(gSet ? genresText(r.genres) : '')}</textarea>`, `쉼표로 나눠요. 비우면 기본 ${D.genres.length}종(회색 글).`),
+    row(`${word} 목록`, `<textarea class="gx-search ms-area ms-list" rows="2" data-change="ms-roll" data-key="${site}:genres">${esc(genresText(r.genres))}</textarea>`, `쉼표로 나눠요. 다 지우면 기본 ${D.genres.length}종으로 돌아가요.`, `ms-wide ${mark(gSet)}`),
     row(`${word} 뽑기`, mseg(site, 'roll_gmode', r.gmode, [['uniq', '칸마다 다르게'], ['any', '겹쳐도 됨'], ['one', `한 ${word}로`]]), r.gmode === 'uniq' ? '목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시.' : r.gmode === 'any' ? `칸마다 따로 무작위. 같은 ${word}가 여러 칸에 나올 수 있어요.` : `한 판에 ${word} 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).`),
-    row('값 등급', `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="${site}:tiers" placeholder="${esc(tiersText(D.tiers))}">${esc(tSet ? tiersText(r.tiers) : '')}</textarea>`, tierHelp),
+    row('값 등급', tierTable(vars, site), bm ? '가중치는 뽑힐 비율이에요(0이면 안 뽑혀요). 다 지우면 기본 5단계(30~9,999p, 싼 쪽에 가중치)로 돌아가요.' : '가중치는 뽑힐 비율이에요(0이면 안 뽑혀요). 다 지우면 기본 5단계(₩999,999~49,999,999, 모두 1)로 돌아가요.', `ms-wide ${mark(String(vars?.[K.tiers] ?? '').trim() !== '')}`),
     row('등급 뽑기', mseg(site, 'roll_tmode', r.tmode, [['weight', '가중치대로'], ['even', '골고루'], ['same', '한 등급으로']]), r.tmode === 'weight' ? '칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요.' : r.tmode === 'even' ? '등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요.' : '한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요.'),
     row('상황용 칸', mseg(site, 'roll_useful', r.useful, [['auto', '자동'], ['0', '없음'], ['1', '1칸'], ['2', '2칸']]), '「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위.'),
     r.on ? row('뽑기 예', `<ul class="ms-sample">${sample}</ul>`, `지금 설정으로 ${n}칸을 한 번 뽑아 본 거예요. 열 때마다 달라져요.`) : '',
@@ -919,28 +960,29 @@ function cosRollGroup(ctx: ChatContext, site: MallSite): string {
 /** 포인트몰 1:1 상담 (11-09 사용자: 상담마다 다른 백일몽 직원. 주사위 칸·다시 만나기·겹치지 않기는 설정에서, 말투·업무 지침은 지침 「포인트몰 1:1 상담」에서) */
 function deskGroup(ctx: ChatContext): string {
   const d = deskSettings(ctx.chat.scriptstate);
-  const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 본편이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
-  const reset = d.axesText ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
+  const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 턴이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
+  const aSet = defChanged(d.axesText, DESK_AXES_DEFAULT, axesNorm);
+  const reset = aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
   return group('1:1 상담', how + [
     row('사용', mseg('bm', 'desk_on', d.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요.'),
-    row('상담사 주사위 칸', `<textarea class="gx-search ms-area" rows="7" data-change="ms-desk" data-key="axes" placeholder="${esc(DESK_AXES_DEFAULT)}">${esc(d.axesText)}</textarea>`, '한 줄에 「칸 이름: 값, 값, …」. 칸마다 하나씩 뽑아요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 비우면 기본 칸(회색 글).'),
+    row('상담사 주사위 칸', axisTable(ctx.chat.scriptstate), '칸마다 값을 하나씩 뽑아요. 값은 쉼표로 나눠요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 다 지우면 기본 칸으로 돌아가요.', `ms-wide ${aSet || String(ctx.chat.scriptstate?.[DESK_KEY.axes] ?? '').trim() ? 'ps-changed' : ''}`),
     row('지난 상담사 다시 만나기', mseg('bm', 'desk_again', d.again ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요.'),
-    row('겹치지 않게 넘길 수', `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
+    row('겹치지 않게 넘길 수', `<div class="st-step${stepSizeText(`${DESK_AVOID_RANGE[1]}명`)}"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
   ].join('') + reset);
 }
 
 /** 맞춤 주문 완성 알림 (11-11 사용자) */
 function cosReadyGroup(ctx: ChatContext): string {
   const m = cosReadyMode(ctx.chat.scriptstate);
-  return group('맞춤 주문', row('완성 알림', mseg('cos', 'ready', m, [['both', '카드 + 본편'], ['card', '카드만'], ['off', '사용 안 함']]),
-    m === 'both' ? '완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 본편에 완성 사실을 한 번 넘겨요.' : m === 'card' ? '채팅에 카드만 떠요. 본편 모델은 완성된 줄 몰라요.' : '알리지 않아요. 사이트의 「주문 조회」에서만 보여요.'));
+  return group('맞춤 주문', row('완성 알림', mseg('cos', 'ready', m, [['both', '카드 + 메인 요청'], ['card', '카드만'], ['off', '사용 안 함']]),
+    m === 'both' ? '완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 메인 요청에 완성 사실을 한 번 넘겨요.' : m === 'card' ? '카드만 떠요. 메인 모델은 완성된 줄 몰라요.' : '알리지 않아요. 사이트의 「주문 조회」에서만 보여요.'));
 }
 
 /** 진짜 효과 (11-09 사용자: 보이는 효과는 광고 문구, 진짜는 숨김 · 미리 정한 것과 「아무도 모름」을 섞음) */
 function cosTruthGroup(ctx: ChatContext): string {
   const m = cosTruthMode(ctx.chat.scriptstate);
-  return group('진짜 효과', `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 본편 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row('진실 미리 정하기', mseg('cos', 'truth', m, [['all', '전부'], ['mix', '섞음'], ['none', '안 함']]),
-    m === 'all' ? '우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과.' : m === 'mix' ? '절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 본편 모델이 정해요.' : '전부 「아무도 모름」. 처음 쓸 때 본편 모델이 그 자리에서 정해요.'));
+  return group('진짜 효과', `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 메인 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row('진실 미리 정하기', mseg('cos', 'truth', m, [['all', '전부'], ['mix', '섞음'], ['none', '안 함']]),
+    m === 'all' ? '우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과.' : m === 'mix' ? '절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 메인 모델이 정해요.' : '전부 「아무도 모름」. 처음 쓸 때 메인 모델이 그 자리에서 정해요.'));
 }
 
 /** 시그니처 상품 (11-09 사용자: 구버전 「우리가 도움!」·「착한 친구」를 직접 넣고 고치게) */
@@ -956,9 +998,9 @@ function cosFixedGroup(ctx: ChatContext): string {
       <div class="ms-fx-row"><span class="ph-inline"><span>값</span>${num(f.id, 'price', f.price, '999999', '값')}<span>원</span></span><span class="ph-inline"><span>할인 전</span>${num(f.id, 'was', f.was, '비우면 할인 없음', '할인 전 값')}<span>원</span></span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text(f.id, 'desc', f.desc, '겉보기 설명 (???·검열됨처럼 숨겨도 돼요)', '설명', 200)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text(f.id, 'effect', f.effect, '화면에 보이는 광고 문구 (모호·검열·거짓·뚱딴지…)', '보이는 효과', 200)}</span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 본편 모델만 봐요. 비우면 「아무도 모름」', '진짜 효과', 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 메인 모델만 봐요. 비우면 「아무도 모름」', '진짜 효과', 200)}</span></div>
     </div>`).join('');
-  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>추가</button></div>`;
+  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>상품 추가</button></div>`;
   return group('시그니처 상품', `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요. 「효과」는 화면에 보이는 광고 문구이고 「진실」은 숨긴 진짜 효과예요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
 }
 
@@ -1016,9 +1058,19 @@ async function deskSettingsAction(action: string, value: string | undefined, ctx
     if (!m) return false;
     return m[1] === 'desk_on' ? set({ [DESK_KEY.on]: m[2] === '0' ? '0' : '' }) : set({ [DESK_KEY.again]: m[2] === '1' ? '1' : '' });
   }
+  {
+    // 주사위 칸 줄 단위 고치기 (저장 글 꼴 「칸 이름: 값, 값」 그대로)
+    const rows = () => axisRows(ctx.chat.scriptstate);
+    const save = (a: AxisRaw[]) => { const t = axesRawText(a); return set({ [DESK_KEY.axes]: !a.length || t === DESK_AXES_DEFAULT ? '' : t }); };
+    const clean = (v: string, n: number) => v.replace(/[:,，\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+    if (action === 'ms-ax-name') { const m = /^(\d+)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true; return save(rows().map((a, i) => (i === Number(m[1]) ? { ...a, name: clean(m[2], 20) } : a))); }
+    if (action === 'ms-ax-del') return save(rows().filter((_, i) => i !== Number(value)));
+    if (action === 'ms-ax-add') return save([...rows(), { name: '', values: [] }]);
+    if (action === 'ms-ax-vals') { const m = /^(\d+)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true; return save(rows().map((a, i) => (i === Number(m[1]) ? { ...a, values: m[2].replace(/[:\n]/g, ' ').split(/[,，]/).map((x) => x.replace(/\s+/g, ' ').trim().slice(0, 60)).filter(Boolean) } : a))); }
+  }
   if (action === 'ms-desk') {
     const m = /^axes=([\s\S]*)$/.exec(value ?? '');
-    return m ? set({ [DESK_KEY.axes]: m[1].trim().slice(0, 4000) }) : true;
+    return m ? set({ [DESK_KEY.axes]: defStored(m[1], DESK_AXES_DEFAULT, axesNorm) }) : true;
   }
   if (action === 'ms-desk-step') {
     const d = deskSettings(ctx.chat.scriptstate);
@@ -1101,11 +1153,27 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));
   }
+  {
+    // 값 등급 칸 단위 고치기 (저장 글 꼴 그대로. 못 쓰는 줄도 남겨 두고 읽는 쪽이 거른다)
+    const vars = ctx.chat.scriptstate;
+    const saveT = (site: MallSite, t: TierRaw[]) => { const x = tiersRawText(t); return set({ [rollKeys(site).tiers]: !t.length || x === tiersText(rollDefaults(site).tiers) ? '' : x }); };
+    const clean = (v: string, n: number) => v.replace(/[|\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+    if (action === 'ms-tier') {
+      const m = /^(cos|bm):(\d+):(name|desc|lo|hi)=([\s\S]*)$/.exec(value ?? ''); if (!m) return true;
+      const site = m[1] as MallSite; const f = m[3] as 'name' | 'desc' | 'lo' | 'hi';
+      return saveT(site, tierRows(vars, site).map((x, i) => (i === Number(m[2]) ? { ...x, [f]: f === 'name' ? clean(m[4], 20) : f === 'desc' ? clean(m[4], 120) : m[4].replace(/[^\d]/g, '').slice(0, 13) } : x)));
+    }
+    if (action === 'ms-tier-w') { const m = /^(cos|bm):(\d+):([+-])$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveT(site, tierRows(vars, site).map((x, i) => { if (i !== Number(m[2])) return x; const w = x.w === '' || !Number.isFinite(Number(x.w)) ? 1 : Math.trunc(Number(x.w)); return { ...x, w: String(Math.max(0, Math.min(99, w + (m[3] === '+' ? 1 : -1)))) }; })); }
+    if (action === 'ms-tier-del') { const m = /^(cos|bm):(\d+)$/.exec(value ?? ''); if (!m) return true; const site = m[1] as MallSite; return saveT(site, tierRows(vars, site).filter((_, i) => i !== Number(m[2]))); }
+    if (action === 'ms-tier-add') { const site = (value === 'bm' ? 'bm' : 'cos') as MallSite; return saveT(site, [...tierRows(vars, site), { name: '', desc: '', lo: '', hi: '', w: '1' }]); }
+  }
   if (action === 'ms-roll') {
     const m = /^(?:(cos|bm):)?(genres|tiers)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return true;
-    const K = rollKeys((m[1] ?? 'cos') as MallSite);
-    return set({ [m[2] === 'genres' ? K.genres : K.tiers]: m[3].trim().slice(0, 4000) });
+    const site = (m[1] ?? 'cos') as MallSite;
+    const K = rollKeys(site);
+    const D = rollDefaults(site);
+    return set(m[2] === 'genres' ? { [K.genres]: defStored(m[3], genresText(D.genres), genresNorm) } : { [K.tiers]: defStored(m[3], tiersText(D.tiers), tiersNorm) });
   }
   if (action === 'ms-roll-reset') return set(Object.fromEntries(Object.values(rollKeys(value === 'bm' ? 'bm' : 'cos')).map((k) => [k, ''])));
   if (action === 'ms-fx') {

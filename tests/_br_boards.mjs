@@ -53,14 +53,14 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   await go('sm'); assert.equal((await list()).at(-1), '연어 글'); await shot('sm');
   await go('gn'); assert.equal((await list()).at(-1), '괴담넷 글');
   // 설정: 괴담갤 페이지에서 바꾼 값은 괴담갤에만
-  await openEditor(page, 'set:gal'); await shot('set-gal');
-  await click('.gw [data-action="gn-cfg"][data-value="keepown=0"]');
+  await openEditor(page, 'set:net'); await shot('set-gal');
+  await click('.gw [data-action="fam-set"][data-value="b:gn:keepown=0"]');
   await page.waitForTimeout(400);
   const ss = await page.evaluate(() => window.__chat.scriptstate);
   assert.equal(ss['$lb_cfg_lb-gal.keepown'], '0');
   assert.equal(ss['$lb_cfg_lb-gn.keepown'], undefined);
   assert.equal(ss.$gn_site, undefined);
-  await goNode(page, 'set:gnet'); await shot('set-gn');
+  await goNode(page, 'set:net'); await shot('set-gn');
   await goNode(page, 'guide:Gal'); await shot('guide-gal');
   if (errors.length) console.log(vp, 'page errors:', errors.slice(0, 5));
   assert.deepEqual(errors, []);

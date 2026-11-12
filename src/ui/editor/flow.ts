@@ -1,5 +1,5 @@
-// 점검 탭 「전체 호출 흐름」 (11-07 사용자: 인물 설정 위의 호출 흐름 도식처럼, 지금 설정 기준으로 한 턴에 어떤 보조 호출이 몇 번 가는지 한 페이지에서).
-// 자료는 각 기능의 설정(인물 기록·이미지·괴담톡·괴담넷·관전·위키·보고서). 모양은 인물 설정 도식(.pp-flow/.pp-fn)을 그대로 쓴다.
+// 호출 흐름의 셈: 지금 설정으로 한 턴에 어떤 보조 호출이 몇 번 가는지(flowNodes)와 요청 토큰 미리 계산(ensureFlow).
+// 화면은 flowpage.ts(관제 화면), 기능 페이지 맨 위 한 줄은 callSummary.
 // 실제로 간 호출의 원문은 「호출 흐름」(trace.ts)에서 본다.
 import type { ChatContext } from '../../host/risu';
 import { basicSettings, getPrefs } from '../../core/settings';
@@ -10,7 +10,6 @@ import { viewSettings, VIEW_PRESETS } from '../../core/phoneView';
 import { gnetSettings } from '../../core/gnet';
 import { wikiSettings } from '../../core/wiki';
 import { promptTokens } from '../../core/budget';
-import { tokenizerName } from '../../core/tokenizer';
 import type { LlmMessage } from '../../host/llm';
 import { previewPeopleCalls } from '../../host/people';
 import { previewAsset } from '../../host/asset';
@@ -140,7 +139,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '인물 Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: routerOn ? ppModel('router') : undefined, calls: routerOn ? '보조 1회' : pp.on ? '호출 없음 (코드가 고름)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:Router', sure: routerOn ? 1 : 0, maybe: 0 },
     { name: '인물 Director', sub: '이번 턴 연기 지시', kind: 'aux', on: directorOn, model: directorOn ? ppModel('director') : undefined, calls: directorOn ? (pp.directorSearch ? '1회 (자료 부족 땐 2회)' : '1회') : pp.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', page: 'set:people', to: 'r:Director', sure: directorOn ? 1 : 0, maybe: directorOn && pp.directorSearch ? 1 : 0 },
   ];
-  const main: Node = { name: '본편', sub: 'Risu 가 응답 생성', kind: 'main', on: true, model: '메인', calls: '메인 1회', sure: 0, maybe: 0 };
+  const main: Node = { name: '메인 응답', sub: 'Risu 가 응답 생성', kind: 'main', on: true, model: '메인', calls: '메인 1회', sure: 0, maybe: 0 };
   const assetOn = basic.assetOn && basic.assetModel === 'aux';
   const phoneModel = id(featureModel(ss, 'ph')) || mm(ph.model);
   const gnetModel = id(featureModel(ss, 'gn')) || mm(gn.model);
@@ -165,18 +164,18 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
       const j = shopJudgeBy(ss);
       const on = shopOn(ss);
       const calls = !on ? '판단 안 함 (상점 꺼짐)' : j.by === 'updater' ? '인물 갱신에 얹음 (추가 호출 없음)' : j.fallback ? '메인 모델이 대신 (갱신기가 매 턴 돌지 않음)' : '메인 모델이 응답 끝에 표식 (추가 호출 없음)';
-      return { name: '상점 판단', sub: `지금 장면에 상점이 있는지 · ${j.by === 'updater' ? '갱신기' : '메인 모델'}`, kind: 'aux', on: on && j.by === 'updater', model: on && j.by === 'updater' ? ppModel('update') : undefined, calls, page: 'set:items', to: 'r:상점 판단', sure: 0, maybe: 0 } as Node;
+      return { name: '상점 판단', sub: `지금 장면에 상점이 있는지 · ${j.by === 'updater' ? '갱신기' : '메인 모델'}`, kind: 'aux', on: on && j.by === 'updater', model: on && j.by === 'updater' ? ppModel('update') : undefined, calls, page: 'set:shop', to: 'r:판단', sure: 0, maybe: 0 } as Node;
     })(),
     { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
-    { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
+    { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:모델', sure: assetOn ? 1 : 0, maybe: 0 },
     { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? jointText('phone').calls : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? jointText('phone').sure : 0, maybe: 0 },
-    { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? jointText('gn').calls : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', to: 'r:자동 호출', sure: gn.auto ? jointText('gn').sure : 0, maybe: 0 },
+    { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? jointText('gn').calls : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:net', to: 'r:자동 호출', sure: gn.auto ? jointText('gn').sure : 0, maybe: 0 },
     // 다른 게시판 셋·쇼핑몰 둘 (11-09 사용자: 괴담넷만 있고 통째로 빠져 있었다). 사이트마다 설정 변수가 따로라 그 사이트로 비춘 상태값으로 읽는다
     ...(['gal', 'wpf', 'sm'] as const).map((site): Node => {
       const sv = boardView(ctx.chat, site).scriptstate;
       const g = gnetSettings(sv);
       const on = g.enabled && g.auto;
-      return { name: `${BOARD_NAME[site]} 새로고침`, sub: site === 'sm' ? '매물·댓글·쪽지' : '게시판 글·댓글·쪽지', kind: 'aux', on, model: on ? id(featureModel(sv, 'gn')) || mm(g.model) : undefined, calls: !g.enabled ? '호출 없음 (사이트 끔)' : g.auto ? jointText(site).calls : g.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? jointText(site).sure : 0, maybe: 0 };
+      return { name: `${BOARD_NAME[site]} 새로고침`, sub: site === 'sm' ? '매물·댓글·쪽지' : '게시판 글·댓글·쪽지', kind: 'aux', on, model: on ? id(featureModel(sv, 'gn')) || mm(g.model) : undefined, calls: !g.enabled ? '호출 없음 (사이트 끔)' : g.auto ? jointText(site).calls : g.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:net', to: 'r:자동 호출', sure: on ? jointText(site).sure : 0, maybe: 0 };
     }),
     { name: '관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
     { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 호출', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
@@ -184,17 +183,16 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
       const m = mallSettings(ss, site);
       const login = site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1';
       const on = m.on && m.auto === 'turn' && login;
-      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (login ? '1회' : '로그인했을 때 1회 (지금 로그아웃)') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
+      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (login ? '1회' : '로그인했을 때 1회 (지금 로그아웃)') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:shop', to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
     }),
   ];
   const manual: Node[] = [
-    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
-    { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: '사이트별 설정', calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:gnet', to: 'r:모델', sure: 0, maybe: 0 },
-    { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:cos', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:shop', to: 'r:사용', sure: 0, maybe: 0 },
+    { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: '사이트별 설정', calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:net', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:shop', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '상담사 연결 1회 + 보낼 때마다 1회', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
     { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
-    { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
   ];
   const map = flowTok.map;
   if (map) for (const n of [...pre, ...post, ...manual]) if (n.name in map) n.tok = map[n.name];
@@ -207,41 +205,8 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   return { pre, main, post, manual };
 }
 
-const tokLabel = (n: Node): string => {
-  if (n.kind === 'plain') return '';
-  if (n.tok === undefined) return flowTok.pending ? '세는 중…' : '';
-  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : n.name.endsWith(' 진열') ? '쇼핑몰 꺼짐' : '지금은 보낼 것 없음';
-  return `요청 ${tokenizerName() ? '' : '약 '}${n.tok.toLocaleString('ko-KR')}토큰`;
-};
-function nodeHtml(n: Node): string {
-  const tl = tokLabel(n);
-  return `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${esc(n.name)}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${esc(n.sub)}</small></div><span class="pp-fn-calls">${esc(n.calls)}${tl ? `<small class="pp-fn-tok">${esc(tl)}</small>` : ''}</span><div class="pp-fn-ctl"></div>${n.page ? `<button class="gx-mini pp-fn-go" data-action="ed-flow-go" data-value="${esc(n.page)}|${esc(n.to ?? '')}">설정 →</button>` : '<span></span>'}</div>`;
-}
-
-export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, desc: string) => string): string {
-  const { pre, main, post, manual } = flowNodes(ctx);
-  const all = [...pre, main, ...post];
-  const sure = all.reduce((n, x) => n + x.sure, 0);
-  const maybe = all.reduce((n, x) => n + x.maybe, 0);
-  const auxTok = [...pre, ...post].filter((x) => x.on && typeof x.tok === 'number').reduce((n, x) => n + (x.tok as number), 0);
-  const tokNote = flowTok.pending
-    ? ' 요청 토큰을 세는 중이에요…'
-    : flowTok.error
-      ? ` 토큰 셈 실패: ${esc(flowTok.error)}`
-      : flowTok.map
-        ? ` 켜진 보조 호출의 요청 합계 ${tokenizerName() ? '' : '약 '}<b>${auxTok.toLocaleString('ko-KR')}토큰</b> (지금 설정·채팅으로 조립, 응답 토큰은 제외).`
-        : '';
-  const arrow = '<i class="pp-fn-arrow" aria-hidden="true">↓</i>';
-  const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
-  return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>.${jointOn(ctx.chat.scriptstate) ? '' : ' 인터넷 「한 번에 요청」이 꺼져 있어 괴담톡·게시판(괴담넷·괴담갤·세정게·연어 마켓)은 따로 불러요.'} 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
-    ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
-    ${group('본편', '', [main])}
-    ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·게시판·관전·위키·쇼핑몰은 인물 갱신이 끝난 뒤)', post)}
-    ${group('턴과 무관', '누르거나 열 때만', manual)}
-    </div></div>`;
-}
+/** 토큰 셈 상태 (관제 화면 맨 위 띠: 세는 중·실패·끝남) */
+export const flowTokState = (): { ready: boolean; pending: boolean; error: string } => ({ ready: !!flowTok.map, pending: flowTok.pending, error: flowTok.error });
 
 /** 받침에 따라 「와/과」 (릴리스 점검 11-09: 「괴담톡와」) */
 function wa(word: string): string {
@@ -256,6 +221,8 @@ export function callSummary(ctx: ChatContext, page: string): string {
   // 인물 페이지는 맨 위에 자기 도식이 있어 호출 칩은 겹친다. 「호출 흐름 →」 단추만 (2026-11-08 사용자: 어디는 있고 어디는 없다)
   if (page === 'people') return `<p class="gw-calls">${FLOW_BACK}</p>`;
   const { pre, post, manual } = flowNodes(ctx);
+  // 인터넷 페이지는 호출 줄을 두지 않는다 (격자의 「자동 호출」이 그 내용)
+  if (page === 'net') return '';
   const mine = [...pre, ...post, ...manual].filter((n) => n.page === `set:${page}`);
   if (!mine.length) return '';
   const auto = mine.filter((n) => n.on);

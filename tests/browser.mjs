@@ -99,7 +99,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null }
 const browser = await chromium.launch();
 // 실패하면 브라우저를 닫고 바로 끝낸다 (열린 브라우저 때문에 멈춘 채 남지 않게)
 process.on('unhandledRejection', async (e) => { console.error('FAIL', e); await browser.close().catch(() => {}); process.exit(1); });
-async function boot(char, chat, viewport = process.env.VP ? { width: +process.env.VP.split('x')[0], height: +process.env.VP.split('x')[1] } : { width: 1100, height: 900 }, opts = {}) {
+async function boot(char, chat, viewport = process.env.VP ? { width: +process.env.VP.split('x')[0], height: +process.env.VP.split('x')[1] } : { width: 1920, height: 1080 }, opts = {}) {
   const page = await browser.newPage({ viewport, ...(opts.touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -238,8 +238,8 @@ async function leaveField(page) {
   await page.waitForFunction(() => document.querySelector('.st-won')?.value === '1,200,000');
   // 괴이 발생 설정은 「상황판」 페이지 (상태창 칸은 2026-10-29 부터 「상태창」 페이지)
   await page.click('[data-action="ed-node"][data-value="set:board"]');
-  await page.waitForSelector('[data-action="set-world"][data-value="incident_cap:+"]');
-  await page.click('[data-action="set-world"][data-value="incident_cap:+"]');
+  await page.waitForSelector('.ck-pc [data-action="set-world"][data-value="incident_cap:+"]');
+  await page.click('.ck-pc [data-action="set-world"][data-value="incident_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_cap === 2);
   await page.click('[data-action="ed-node"][data-value="set:screen"]');
   await page.waitForSelector('.gw-set [data-action="set-theme"]');
@@ -1516,13 +1516,13 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(!tight.some((m) => String(m.content).includes('[MODULE_CONTEXT_BEGIN]')), '총 상한 안에 못 들면 빼기');
   await page.evaluate(() => { delete window.__chat.scriptstate.$gen_ctx_total; });
   // 설정: 본편 반영 빼기
-  await featSet(page, 'set:gnet');
-  await page.click('.gw [data-action="gn-cfg"][data-value="context=1"]');
+  await featSet(page, 'set:net');
+  await page.click('.gw .ck-pc [data-action="fam-set"][data-value="b:gn:context=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.context'] === '1');
   const off = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.ok(!off.some((m) => String(m.content).includes('[MODULE_CONTEXT_BEGIN]')), '본편 반영 끔');
   // 내 글 삭제 (두 번 눌러야)
-  await featSet(page, 'set:gnet'); // 설정 창 닫기
+  await featSet(page, 'set:net'); // 설정 창 닫기
   await page.waitForSelector('.gn');
   if (!(await page.locator('[data-action="gn-del-post"]').count())) await page.click('.gn-row-main[data-value="1846003"]');
   await page.waitForSelector('[data-action="gn-del-post"]');
@@ -1744,8 +1744,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'paper');
   await page.waitForFunction(() => document.querySelector('.gw [data-action="set-theme"][data-value="paper"]')?.getAttribute('aria-pressed') === 'true');
   await edGo(page, 'set:board');
-  const kinds = await page.textContent('.gw .ps-cards');
-  assert.ok(kinds.includes('2개') && kinds.includes('100%') && kinds.includes('48시간'), kinds);
+  // 2026-11-12 설정 개편: 괴이 발생은 격자 하나 (줄 = 종류, 칸 = 수 상자)
+  const kinds = await page.evaluate(() => [...document.querySelectorAll('.gw .ck-pc .ck-row:first-of-type input.adv-val, .gw .ck-pc .ck-row input.adv-val')].slice(0, 3).map((e) => e.value).join(','));
+  assert.equal(kinds, '2,100,48', kinds);
   // 괴이 생성 수치: 이 채팅에만 ($wg_*). 2026-10-27: 접힘(.st-world) 없이 상황판 페이지의 「괴이 발생」 묶음
   await page.click('.gw [data-action="set-world"][data-value="preset_cap:+"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_preset_cap === '3');
@@ -1768,7 +1769,8 @@ if (fixture.globalLore.some(packed)) {
   await edGo(page, 'set:board');
   // 저장: 괴이 발생(이 채팅 preset_cap 3·incident_p 40)·테마(paper)·기능 페이지 변수($pp_on 끔·$ph_auto 창을 열 때)가 한 번에 기본값으로.
   // 변수는 플러그인이 보는 채팅(ctx)에 들어가야 하니 화면으로 바꾼다 (window.__chat 을 직접 고치면 ctx 는 모른다)
-  await page.click('.gw [data-action="set-people"][data-value="0"]');
+  await edGo(page, 'set:people'); // 인물 기록 켬·끔은 인물 페이지의 「사용」 줄 (설정 개편)
+  await page.click('.gw [data-action="pp-set"][data-value="on=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$pp_on === '0');
   await edGo(page, 'set:phone');
   await page.click('.gw [data-action="ph-cfg"][data-value="auto=open"]');
@@ -1790,7 +1792,8 @@ if (fixture.globalLore.some(packed)) {
   // 불러오기: 이 채팅 값을 바꾼 뒤(incident_p 30·인물 기록 켬·괴담톡 수동) 기본값을 불러오면 전부 되돌아온다
   await page.click('.gw [data-action="set-world"][data-value="incident_p:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '30');
-  await page.click('.gw [data-action="set-people"][data-value="1"]');
+  await edGo(page, 'set:people'); // 인물 기록 켬·끔은 인물 페이지의 「사용」 줄 (설정 개편)
+  await page.click('.gw [data-action="pp-set"][data-value="on=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$pp_on === '1');
   await edGo(page, 'set:phone');
   await page.click('.gw [data-action="ph-cfg"][data-value="auto=0"]');
@@ -1808,9 +1811,11 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gw [data-action="ph-cfg"][data-value="auto=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === '0');
   await edGo(page, 'set:board');
-  await page.waitForFunction(() => document.querySelector('.gw [data-action="set-world"][data-value="incident_p:-"]')?.closest('.st-step')?.textContent.includes('40'));
-  await page.click('.gw [data-action="set-people"][data-value="1"]');
+  await page.waitForFunction(() => document.querySelector('.gw [data-action="set-world"][data-value="incident_p:-"]')?.closest('.st-step')?.querySelector('input')?.value === '40');
+  await edGo(page, 'set:people'); // 인물 기록 켬·끔은 인물 페이지의 「사용」 줄 (설정 개편)
+  await page.click('.gw [data-action="pp-set"][data-value="on=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$pp_on === '1');
+  await edGo(page, 'set:board');
   // 요원 표시 인원: 줄이면 상황판 요원 수와 요원 보고가 함께 바뀐다
   await page.click('.gw [data-action="set-agent"][data-value="n:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_agent_limit === '11');
@@ -2048,20 +2053,20 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.gn-post .axf a[href="https://example.com/sora"]').count(), 1, '링크는 「첨부 N」 목록, 주소면 누를 수 있음');
   if (shots) await page.screenshot({ path: `${shots}/18-gnet-attach.png` });
   // 괴담넷에 끄기는 없다 (2026-11-05 사용자: 괴담톡·위키와 같게) → 모델은 메인·보조만, 「게시판 사용」 단추 없음
-  await featSet(page, 'set:gnet');
-  await page.click('.gw [data-action="gn-cfg"][data-value="mode=1"]');
+  await featSet(page, 'set:net');
+  await page.click('.gw .ck-pc [data-action="fam-set"][data-value="b:gn:mode=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '1');
   assert.equal(await page.locator('.gw [data-action="gn-cfg"][data-value^="power="]').count(), 0, '게시판 사용 켬·끔 없음');
-  assert.equal(await page.locator('.gw .gw-tree-item[data-value="set:gnet"] .gw-tree-badge').count(), 0, '괴담넷 켬·끔 배지 없음');
+  assert.equal(await page.locator('.gw .gw-tree-item[data-value="set:net"] .gw-tree-badge').count(), 0, '괴담넷 켬·끔 배지 없음');
   // 쪽지 보관 한도
-  await page.waitForSelector('.gw [data-change="gn-keep"]');
-  await page.fill('.gw [data-change="gn-keep"]', '3');
-  await page.dispatchEvent('.gw [data-change="gn-keep"]', 'change');
+  await page.waitForSelector('.gw [data-change="fam-num"][data-key="b:gn:dmkeep"]');
+  await page.fill('.gw [data-change="fam-num"][data-key="b:gn:dmkeep"]', '3');
+  await page.dispatchEvent('.gw [data-change="fam-num"][data-key="b:gn:dmkeep"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_limit_dm === '3');
   // 본편 응답마다 새로고침: 응답이 끝나면 게시판을 한 번 새로 불러온다
-  await page.click('.gw [data-action="gn-cfg"][data-value="lazy=0"]');
+  await page.click('.gw .ck-pc [data-action="fam-set"][data-value="b:gn:lazy=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.lazy'] === '0');
-  await featSet(page, 'set:gnet'); // 설정 창 닫기 (아래는 괴담넷 판 조작)
+  await featSet(page, 'set:net'); // 설정 창 닫기 (아래는 괴담넷 판 조작)
   const n0 = await page.evaluate(() => window.__calls.llm.length);
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ posts: [{ author: '새벽', id: 1846100, title: '자동으로 온 글', time: '03:00', views: 1, upvotes: 0, content: '방금', comments: [] }], incoming: [] }) }]; });
   await page.evaluate(async () => {
@@ -2492,11 +2497,11 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     assert.equal(await page.evaluate(() => document.querySelector('.gw .gw-tab')?.dataset.value), 'set', '기능 탭이 맨 앞');
     await edGo(page, 'set:wiki');
     await page.waitForSelector('.gw .nw-setpane');
-    await edGo(page, 'set:gnet');
-    await page.waitForSelector('.gw [data-action="gn-cfg"]');
+    await edGo(page, 'set:net');
+    await page.waitForSelector('.gw [data-action="fam-set"]', { state: 'attached' });
     if (shots) {
       await edGo(page, 'set:board');
-      await page.evaluate(() => document.querySelector('.gw .ps-cards').scrollIntoView({ block: 'start' }));
+      await page.evaluate(() => document.querySelector('.gw .ck-pc').scrollIntoView({ block: 'start' }));
       await page.screenshot({ path: `${shots}/16-settings-lower.png` });
     }
   }
@@ -2893,7 +2898,7 @@ if (fixture.globalLore.some(packed)) {
   await edOpen(page, 'set:journal');
   await page.waitForSelector('.gw .gw-setbody');
   const st = await page.textContent('.gw .gw-setbody');
-  for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
+  for (const t of ['보고서 카드 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
   assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 0, '머리에 저장 단추 없음 (2026-11-08 사용자)');
   // 채팅에 보고서 표시 3단계: 끄면 이미 그려진 카드도 사라지고(열쇠 표 비움 + 채팅 그대로 다시 저장), 「전부」면 요원 처리 보고서도, 「내가 출동한 사건만」이면 그것만
   const saves0 = await page.evaluate(() => window.__calls.setChat.length);

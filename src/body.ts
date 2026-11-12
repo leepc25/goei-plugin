@@ -48,8 +48,7 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { appShown, openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
-import { closeVersus, toggleVersus, vsDevice, vsOpen } from './host/vs';
+import { appShown, openApp, openInstall, openRecords, openShop, openWiki } from './ui/app';
 import { isGoeiLore, isLanding } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
@@ -71,7 +70,7 @@ import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
 import { cosReadyMode } from './core/malls';
-import { hideUseBox, refreshUseBox } from './host/usebox';
+import { hideUseBox, markUseSent, refreshUseBox, USE_SLOT } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
@@ -175,6 +174,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
         // 소지품 [Inventory]: 지금 가진 것·한계·이번 턴 사건(사용·새로 산 것·넘침)을 마지막 유저 메시지 앞에 (core/items.ts, 설정 「소지품 → 본편에 넘기기」)
         messages = step('소지품', () => withInventory(messages, c.chat), messages);
+        // 「다음 메시지에 사용」 칩: 요청에 실려 나갔으니 바로 숨긴다 (host/usebox.ts markUseSent, 2026-11-12 사용자: 보냈는데 안 없어짐)
+        await stepAsync('사용 상자', () => markUseSent(c.charIndex, c.chatIndex, c.chat), undefined);
         // 망상홈쇼핑: 할부 호출 턴·방청 신청 턴에만 한 번 (core/homeshop.ts, 평소엔 아무것도 안 넣는다)
         messages = step('망상홈쇼핑', () => withHomeshop(messages, c.chat), messages);
         // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
@@ -349,7 +350,7 @@ function knownIdentity({ chat }: ChatContext): string {
 /** 인물 기록 블록: 마지막 사용자 메시지 앞에 (core/people/request.ts). 채팅은 바꾸지 않는다 */
 async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): Promise<M[]> {
   const settings = peopleSettings(chat.scriptstate);
-  if (!settings.on || settings.inject === 'off') return messages;
+  if (!settings.on) return messages;
   const store = peopleStore(chat);
   if (!Object.keys(store.people).length) return messages;
   const me = playerAgent(char.globalLore, chat.scriptstate);
@@ -774,6 +775,8 @@ function displayNow(text: string): string {
   }
   // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만
   if (ours && !out.includes('data-goei-user')) out += USER_MARK;
+  // 「다음 메시지에 사용」 칩이 들어갈 빈 자리 (host/usebox.ts). 마지막 메시지의 것만 본 화면 style 이 채워 보인다
+  if (ours && !isLanding(text) && !out.includes('data-goei-card="use"')) out += USE_SLOT;
   return out;
 }
 
@@ -816,19 +819,8 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
   if (changed && currentTheme() === before) repaintTheme();
 }
 
-/** 대전: 지금 채팅, 대전을 연 채팅, 단추 상태 (같은 값이면 본 화면을 다시 만지지 않는다) */
-let vsChat = '';
-let vsShownChat = '';
-let vsPadKey = '';
 let prog: ProgWin | null = null;
 let progKey = '';
-async function onVersusPad(fab: Fab | null): Promise<void> {
-  if (!vsChat) return;
-  vsShownChat = vsChat;
-  await toggleVersus(vsChat, () => void openVersusSettings());
-  vsPadKey = '';
-  await fab?.setVersus(true, vsOpen()).catch(() => {});
-}
 
 // 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과.
 // fab 이 없어도(본 화면 접근 권한 거부) 감시는 돈다: liteNow 가 있어야 요청 손질·로어북 고르기·표시가 된다
@@ -866,12 +858,6 @@ function startWatcher(fab: Fab | null): () => void {
       shownChat = chatKey;
       // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
       if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
-      // 대전 단추 (설정 「대전」을 켠 PC, 11-08): 채팅을 옮기거나 괴이 채팅을 벗어나면 떠 있던 대전은 멈추고 닫는다
-      vsChat = chatKey;
-      if (vsOpen() && (!next.fabVisible || chatKey !== vsShownChat)) await closeVersus().catch(() => {});
-      const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
-      const padKey = `${pad}:${vsOpen()}`;
-      if (fab && padKey !== vsPadKey) { vsPadKey = padKey; await fab.setVersus(pad, vsOpen()).catch(() => {}); }
       // 호출 진행 창 (11-09): 유령 단추와 같은 화면에서만, 설정 「화면 → 호출 진행 창」이 켜져 있을 때
       // 상황판이 떠 있어도 그 위에 보인다 (11-11 사용자: 보조 기능은 대부분 상황판을 연 채로 쓰니 숨기면 의미가 없다). 닫기 X 를 덮지 않게 기본 자리를 내렸고 단추를 끌어 옮길 수 있다 (host/progwin.ts)
       // 상황판이 떠 있는 동안에는 유령 단추 판정(fabVisible)이 꺼져 있어도 보이게 한다
@@ -939,7 +925,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {
-    fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })), () => void onVersusPad(fab));
+    fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
     const f = fab;
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));

@@ -1,4 +1,4 @@
-lternateGreetings,
+Greetings: char.alternateGreetings,
       assets: char.additionalAssets,
       iconOurs: !!note && note.ours === String(char.image ?? ""),
       wikiPack: packInLore || !!storedWikiPack(),
@@ -32,14 +32,14 @@ lternateGreetings,
     if (!all.length) return 0;
     const WORKERS = 8;
     const COMMIT = 300;
-    let saved2 = 0;
+    let saved = 0;
     let assets = char.additionalAssets;
     const commit = async (list4) => {
       if (!list4.length) return;
       assets = mergePictures(assets, list4);
       const fresh3 = await risuai.getCharacterFromIndex(charIndex) ?? char;
       await risuai.setCharacterToIndex(charIndex, { ...fresh3, additionalAssets: assets });
-      saved2 += list4.length;
+      saved += list4.length;
     };
     for (let i = 0; i < all.length; i += COMMIT) {
       const get = all.slice(i, i + COMMIT);
@@ -57,7 +57,7 @@ lternateGreetings,
             failure ??= error;
             return;
           }
-          const n3 = saved2 + done3.length;
+          const n3 = saved + done3.length;
           if (n3 % 10 === 0 || n3 === all.length) progress4(`사진 받는 중 ${n3}/${all.length}`);
         }
       };
@@ -65,11 +65,11 @@ lternateGreetings,
       await commit(done3);
       if (failure) {
         const why = failure instanceof Error ? failure.message : String(failure);
-        throw new Error(saved2 ? `${saved2}/${all.length}장까지 받았어요. ${why}` : why);
+        throw new Error(saved ? `${saved}/${all.length}장까지 받았어요. ${why}` : why);
       }
     }
     forgetImages();
-    return saved2;
+    return saved;
   }
   async function installIcon(charIndex, progress4) {
     const icon = installData().icon;
@@ -109,25 +109,25 @@ lternateGreetings,
   async function installWikiPack(progress4) {
     if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
     progress4("위키 기본 문서 목록 받는 중…");
-    let index3 = null;
+    let index = null;
     try {
-      index3 = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
+      index = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
     } catch {
       throw new Error("위키 기본 문서 목록을 받지 못했어요.");
     }
-    if (!index3 || !Array.isArray(index3.parts)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
-    let text4 = "";
+    if (!index || !Array.isArray(index.parts)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
+    let text5 = "";
     let n3 = 0;
-    for (const name of index3.parts) {
+    for (const name of index.parts) {
       if (typeof name !== "string" || !/^wiki-base\.\d+\.txt$/.test(name)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
-      text4 += await getText(name);
-      progress4(`위키 기본 문서 받는 중 ${++n3}/${index3.parts.length}`);
+      text5 += await getText(name);
+      progress4(`위키 기본 문서 받는 중 ${++n3}/${index.parts.length}`);
     }
-    if (typeof index3.length === "number" && text4.length !== index3.length) throw new Error(`위키 기본 문서를 끝까지 받지 못했어요. (${text4.length}/${index3.length}자)`);
-    if (!text4.startsWith(WIKI_PACK_HEAD)) throw new Error("위키 기본 문서 묶음 형식이 달라요.");
-    await risuai.pluginStorage.setItem(WIKI_KEY, text4);
-    setStoredWikiPack(text4);
-    return text4.length;
+    if (typeof index.length === "number" && text5.length !== index.length) throw new Error(`위키 기본 문서를 끝까지 받지 못했어요. (${text5.length}/${index.length}자)`);
+    if (!text5.startsWith(WIKI_PACK_HEAD)) throw new Error("위키 기본 문서 묶음 형식이 달라요.");
+    await risuai.pluginStorage.setItem(WIKI_KEY, text5);
+    setStoredWikiPack(text5);
+    return text5.length;
   }
   async function loadStoredTokenizer() {
     try {
@@ -139,23 +139,23 @@ lternateGreetings,
   async function installTokenizer(progress4) {
     if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
     progress4("토크나이저 목록 받는 중…");
-    let index3 = null;
+    let index = null;
     try {
-      index3 = JSON.parse((await getText("tok-o200k.json")).replace(/^\uFEFF/, ""));
+      index = JSON.parse((await getText("tok-o200k.json")).replace(/^\uFEFF/, ""));
     } catch {
       throw new Error("토크나이저 목록을 받지 못했어요.");
     }
-    if (!index3 || !Array.isArray(index3.parts)) throw new Error("토크나이저 목록 형식이 달라요.");
-    let text4 = "";
+    if (!index || !Array.isArray(index.parts)) throw new Error("토크나이저 목록 형식이 달라요.");
+    let text5 = "";
     let n3 = 0;
-    for (const name of index3.parts) {
+    for (const name of index.parts) {
       if (typeof name !== "string" || !/^tok-o200k\.\d+\.txt$/.test(name)) throw new Error("토크나이저 목록 형식이 달라요.");
-      text4 += await getText(name);
-      progress4(`토크나이저 받는 중 ${++n3}/${index3.parts.length}`);
+      text5 += await getText(name);
+      progress4(`토크나이저 받는 중 ${++n3}/${index.parts.length}`);
     }
-    if (typeof index3.length === "number" && text4.length !== index3.length) throw new Error(`토크나이저를 끝까지 받지 못했어요. (${text4.length}/${index3.length}자)`);
-    if (!setTokenizerRanks(text4, "o200k_base")) throw new Error("토크나이저 순위표 형식이 달라요.");
-    await risuai.pluginStorage.setItem(TOK_KEY, text4);
+    if (typeof index.length === "number" && text5.length !== index.length) throw new Error(`토크나이저를 끝까지 받지 못했어요. (${text5.length}/${index.length}자)`);
+    if (!setTokenizerRanks(text5, "o200k_base")) throw new Error("토크나이저 순위표 형식이 달라요.");
+    await risuai.pluginStorage.setItem(TOK_KEY, text5);
   }
   async function dropTokenizer() {
     await risuai.pluginStorage.removeItem(TOK_KEY).catch(() => {
@@ -209,7 +209,7 @@ lternateGreetings,
       p2.then((v) => (clearTimeout(t), resolve(v)), (e) => (clearTimeout(t), reject(e)));
     });
   }
-  async function getText3(name) {
+  async function getText2(name) {
     try {
       return await withTimeout(getTextOnce(name), 4e4, name);
     } catch {
@@ -237,34 +237,34 @@ lternateGreetings,
   }
   var lastDirect = "";
   async function getJson(name) {
-    const text4 = await getText3(name);
-    let body5 = text4;
+    const text5 = await getText2(name);
+    let body5 = text5;
     try {
       for (let i = 0; i < 2 && typeof body5 === "string"; i++) body5 = JSON.parse(body5.replace(/^\uFEFF/, ""));
     } catch {
-      throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text4 ?? "").length}자)`);
+      throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text5 ?? "").length}자)`);
     }
     return body5;
   }
   async function loadPayload(onPart) {
-    const index3 = await getJson("card-update.json");
-    if (index3 && "card" in index3) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
-    if (!Array.isArray(index3?.parts)) return index3;
-    let text4 = "";
+    const index = await getJson("card-update.json");
+    if (index && "card" in index) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
+    if (!Array.isArray(index?.parts)) return index;
+    let text5 = "";
     let n3 = 0;
-    onPart?.(0, index3.parts.length);
-    for (const name of index3.parts) {
+    onPart?.(0, index.parts.length);
+    for (const name of index.parts) {
       if (typeof name !== "string" || !/^card-update\.\d+\.txt$/.test(name)) throw new Error("카드 업데이트 목록 형식이 달라요.");
-      text4 += await getText3(name);
-      onPart?.(++n3, index3.parts.length);
+      text5 += await getText2(name);
+      onPart?.(++n3, index.parts.length);
     }
-    if (typeof index3.length === "number" && text4.length !== index3.length) {
-      throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text4.length}/${index3.length}자)`);
+    if (typeof index.length === "number" && text5.length !== index.length) {
+      throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text5.length}/${index.length}자)`);
     }
     try {
-      return JSON.parse(text4);
+      return JSON.parse(text5);
     } catch {
-      throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text4.length}자)`);
+      throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text5.length}자)`);
     }
   }
   function describe2(x) {
@@ -316,19 +316,19 @@ lternateGreetings,
     const cur = cardVersion(ctx2.char.globalLore);
     const lite = !!readManifest(ctx2.char.globalLore);
     const L = updateUi.latest;
-    const row11 = (label2, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
+    const row8 = (label2, value, help = "") => setRow(label2, value, help);
     if (!UPDATE_BASE) {
-      return section2(row11("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
+      return section2(row8("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
     }
     const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
-    rows3.push(row11(
+    rows3.push(row8(
       "플러그인",
       `<span class="upd-ver">v${esc20(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc20(L.plugin)}</b>` : ""}</span>`,
       pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
     ));
     const cardNew = lite && L && compareVersions(L.card, cur) > 0;
     const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
-    rows3.push(row11(
+    rows3.push(row8(
       "카드",
       `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc20(cur)}`}${cardNew ? ` → <b>v${esc20(L.card)}</b>` : ""}</span>`,
       !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
@@ -483,7 +483,7 @@ lternateGreetings,
   }
   var mark = (b) => b ? '<span class="gw-inst-ok">✓ 있음</span>' : '<span class="gw-inst-no">✗ 없음</span>';
   function statusList(s8) {
-    const li = (ok, label2, note) => `<div class="ps-row"><div class="ps-label"><b>${label2}</b><small>${note}</small></div><div class="ps-ctl">${mark(ok)}</div></div>`;
+    const li = (ok, label2, note) => setRow(label2, mark(ok), note);
     const loreOk = s8.settingsFolder && s8.directory && s8.manifest;
     const pics2 = s8.pictures;
     return `<section class="ps-group"><h3>점검</h3><div class="ps-rows gw-inst-list">
@@ -540,9 +540,9 @@ lternateGreetings,
       env3.render();
       return true;
     }
-    const step2 = action.slice(8);
-    if (step2 !== "all" && step2 !== "icon-back") return true;
-    instUi.busy = step2;
+    const step = action.slice(8);
+    if (step !== "all" && step !== "icon-back") return true;
+    instUi.busy = step;
     instUi.notice = "";
     instUi.info = "";
     instUi.progress = "";
@@ -562,7 +562,7 @@ lternateGreetings,
       }
     };
     const s8 = instUi.state;
-    if (step2 === "all") {
+    if (step === "all") {
       await run6("로어북·인사말", async () => {
         progress4("로어북·첫 메시지·인사말 심는 중…");
         await installLoreAndGreetings(ctx2.charIndex, instUi.setName ? { name: BRAND.name } : {});
@@ -576,7 +576,7 @@ lternateGreetings,
       if (!s8?.icon) await run6("아이콘", async () => (await installIcon(ctx2.charIndex, progress4), "아이콘"));
       if (!s8?.wikiPack) await run6("위키 기본 문서", async () => (await installWikiPack(progress4), "위키 기본 문서"));
       if (!s8?.tokenizer) await run6("토크나이저", async () => (await installTokenizer(progress4), "토크나이저"));
-    } else if (step2 === "icon-back") {
+    } else if (step === "icon-back") {
       await run6("이전 아이콘", async () => await restoreIcon(ctx2.charIndex) ? "이전 아이콘" : null);
     }
     if (done3.length) instUi.info = `${done3.join(" · ")} — 끝났어요.`;
@@ -590,87 +590,6 @@ lternateGreetings,
     return true;
   }
 
-  // src/ui/versus.ts
-  var rerender = () => {
-  };
-  var setVsRender = (f) => void (rerender = f);
-  var vsUi = { busy: false, progress: "", err: "", state: null, loading: false };
-  var esc22 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var mb3 = (b) => `${(b / 1024 / 1024).toFixed(1)}MB`;
-  var row6 = (label2, ctl, help, device = false) => `<div class="ps-row"><div class="ps-label"><b>${label2}${device ? '<i class="gx-scope">이 기기</i>' : ""}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${ctl}</div></div>`;
-  function versusGroup(seg10) {
-    const render3 = () => rerender();
-    const on2 = getPrefs().versus === true;
-    const s8 = vsUi.state;
-    if (!s8 && !vsUi.loading) {
-      vsUi.loading = true;
-      void vsDataState().then((v) => {
-        vsUi.state = v;
-      }, (e) => {
-        vsUi.err = e instanceof Error ? e.message : String(e);
-      }).finally(() => {
-        vsUi.loading = false;
-        render3();
-      });
-    }
-    const busy6 = vsUi.busy;
-    const btn = (action, label2, primary = false) => `<button class="gx-mini${primary ? " primary" : ""}" data-action="${action}" ${busy6 ? "disabled" : ""}>${esc22(label2)}</button>`;
-    const rows3 = [];
-    rows3.push(row6(
-      "대전",
-      seg10("vs-on", on2 ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6),
-      "PC에서 유령 단추 아래에 게임패드 단추를 표시해요. 누르면 채팅 본문 위에서 대전이 열리고, 다시 누르거나 Esc를 누르면 일시정지 후 닫혀요. 폰에서는 표시하지 않아요.",
-      true
-    ));
-    const common = !s8 ? vsUi.loading ? "확인 중…" : "—" : s8.common === "ready" ? "받음" : s8.common === "old" ? "새 판 있음" : "없음";
-    rows3.push(row6(
-      "대전 데이터",
-      `<span class="upd-ver">${esc22(common)}</span>${s8 && s8.common !== "ready" ? btn("vs-get", busy6 ? vsUi.progress || "받는 중…" : `받기 (${mb3(s8.commonBytes)})`, true) : ""}`,
-      "대전 코드·이펙트·인물 얼굴판·명단이에요. 한 번 받으면 이 기기에 저장돼요. 인물은 대전 시작 화면에서 고른 인물만 그때 받아요."
-    ));
-    if (s8 && s8.common === "ready") {
-      rows3.push(row6(
-        "인물 데이터",
-        `<span class="upd-ver">이름 있는 인물 ${s8.named[0]}/${s8.named[1]} · NPC ${s8.npc[0]}/${s8.npc[1]}</span>` + (s8.named[0] < s8.named[1] ? btn("vs-get-named", busy6 ? vsUi.progress || "받는 중…" : `이름 있는 인물 전부 (${mb3(s8.namedBytes)})`) : "") + (s8.npc[0] < s8.npc[1] ? btn("vs-get-all", busy6 ? vsUi.progress || "받는 중…" : `NPC까지 전부 (${mb3(s8.namedBytes + s8.npcBytes)})`) : ""),
-        "미리 받아 두면 대전 시작 화면에서 기다리지 않아요. NPC는 서바이벌 상대로 나와요."
-      ));
-    }
-    if (vsUi.err) rows3.push(`<div class="gx-err" role="alert">${esc22(vsUi.err)}</div>`);
-    return `<section class="ps-group"><h3>대전</h3><div class="ps-rows">${rows3.join("")}</div></section>`;
-  }
-  async function handleVersus(action, value, render3) {
-    if (!action.startsWith("vs-")) return false;
-    if (action === "vs-on") {
-      await savePrefs((p2) => ({ ...p2, versus: value === "1" ? true : void 0 }));
-      render3();
-      return true;
-    }
-    if (vsUi.busy) return true;
-    const run6 = async (job) => {
-      vsUi.busy = true;
-      vsUi.err = "";
-      vsUi.progress = "받는 중…";
-      render3();
-      try {
-        await job((d, t) => {
-          vsUi.progress = `받는 중 ${d}/${t}`;
-          render3();
-        });
-      } catch (e) {
-        vsUi.err = e instanceof Error ? e.message : String(e);
-      } finally {
-        vsUi.busy = false;
-        vsUi.progress = "";
-        vsUi.state = await vsDataState().catch(() => vsUi.state);
-        render3();
-      }
-    };
-    if (action === "vs-get") await run6((p2) => downloadVsCommon(p2));
-    else if (action === "vs-get-named") await run6((p2) => downloadVsChars("named", p2));
-    else if (action === "vs-get-all") await run6((p2) => downloadVsChars("all", p2));
-    return true;
-  }
-
   // src/core/looks.ts
   var LOOKS_PACK = { name: "goei-data-looks", label: "인물 모습", expect: expectOf(true ? '{"hash":"e90597bc","sha256":"4dd71a661c7b15c33a900d4377a41ae5a8311f87f16f608cbdda19b69159095c","length":1202941}' : void 0) };
   var LOOK_KEY = "$st_look";
@@ -678,10 +597,10 @@ lternateGreetings,
   var LOOK_GENDERS = ["남", "여"];
   var obj7 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
   var num6 = (v) => typeof v === "number" && Number.isFinite(v) ? v : NaN;
-  function parseLooksPack(text4) {
+  function parseLooksPack(text5) {
     let j;
     try {
-      j = JSON.parse(text4);
+      j = JSON.parse(text5);
     } catch {
       throw new Error("인물 모습 팩이 JSON 이 아니에요.");
     }
@@ -730,26 +649,26 @@ lternateGreetings,
     loading5 = (async () => {
       failed3 = "";
       try {
-        let saved2 = null;
+        let saved = null;
         try {
-          saved2 = await risuai.pluginStorage.getItem(LOOKS_KEY);
+          saved = await risuai.pluginStorage.getItem(LOOKS_KEY);
         } catch {
         }
-        if (typeof saved2 === "string" && packMatches(saved2, LOOKS_PACK.expect)) {
+        if (typeof saved === "string" && packMatches(saved, LOOKS_PACK.expect)) {
           try {
-            rows2 = parseLooksPack(saved2);
+            rows2 = parseLooksPack(saved);
             return;
           } catch (error) {
             console.log(`[goei] 저장된 인물 모습을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
           }
         }
-        const text4 = await fetchPack(LOOKS_PACK, (t) => {
+        const text5 = await fetchPack(LOOKS_PACK, (t) => {
           progress3 = t;
           redraw4();
         });
-        rows2 = parseLooksPack(text4);
+        rows2 = parseLooksPack(text5);
         try {
-          await risuai.pluginStorage.setItem(LOOKS_KEY, text4);
+          await risuai.pluginStorage.setItem(LOOKS_KEY, text5);
         } catch (error) {
           console.log(`[goei] 인물 모습을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -797,22 +716,22 @@ lternateGreetings,
   }
 
   // src/ui/looks.ts
-  var esc23 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc22 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var lookUi = { open: false, g: "", notice: "" };
-  var rerender2 = () => {
+  var rerender = () => {
   };
   function setLookRender(fn2) {
-    rerender2 = fn2;
+    rerender = fn2;
   }
   function openLookPicker() {
     lookUi.open = true;
     lookUi.notice = "";
     lookUi.g = "";
-    rerender2();
+    rerender();
   }
   function closeLookPicker() {
     lookUi.open = false;
-    rerender2();
+    rerender();
   }
   function lookSprite(look, cls = "") {
     const style = `--lw:${look.w}px;--lh:${look.h}px;--ln:${look.frames};--ld:${(look.frames * look.sec).toFixed(2)}s;background-image:url('${look.url}')`;
@@ -821,23 +740,23 @@ lternateGreetings,
   var genderOf = (rows3, id2) => rows3?.find((r) => r.id === id2)?.g ?? "";
   function chooser(sel, g2, withSegs) {
     const rows3 = lookRows();
-    const shown3 = g2 || genderOf(rows3, sel);
-    const segs = !withSegs ? "" : `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === shown3 ? " on" : ""}" data-action="look-g" data-value="${x}" aria-pressed="${x === shown3}">${x}</button>`).join("")}</div>`;
+    const shown4 = g2 || genderOf(rows3, sel);
+    const segs = !withSegs ? "" : `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === shown4 ? " on" : ""}" data-action="look-g" data-value="${x}" aria-pressed="${x === shown4}">${x}</button>`).join("")}</div>`;
     if (!rows3) {
       const st = looksStatus();
-      const msg = st.failed ? `아바타 그림을 받지 못했어요. ${esc23(st.failed)} <button class="gx-chip" data-action="look-retry">다시 받기</button>` : `아바타 그림을 받는 중…${st.progress ? ` ${esc23(st.progress)}` : ""}`;
+      const msg = st.failed ? `아바타 그림을 받지 못했어요. ${esc22(st.failed)} <button class="gx-chip" data-action="look-retry">다시 받기</button>` : `아바타 그림을 받는 중…${st.progress ? ` ${esc22(st.progress)}` : ""}`;
       return `${segs}<div class="gx-hint">${msg}</div>`;
     }
-    if (!shown3) return `${segs}<div class="gx-hint">성별을 고르면 고를 수 있는 아바타가 보여요.</div>`;
-    const cells = looksOf(rows3, shown3).map((r) => `<button class="gx-whoc gx-lookc${r.id === sel ? " on" : ""}" data-action="look" data-value="${esc23(r.id)}" aria-pressed="${r.id === sel}" aria-label="아바타 ${esc23(r.id)}">${lookSprite(idleOf(r))}</button>`).join("");
-    return `${segs}<div class="gx-lookg">${cells}</div>`;
+    if (!shown4) return `${segs}<div class="gx-hint">성별을 고르면 고를 수 있는 아바타가 보여요.</div>`;
+    const cells2 = looksOf(rows3, shown4).map((r) => `<button class="gx-whoc gx-lookc${r.id === sel ? " on" : ""}" data-action="look" data-value="${esc22(r.id)}" aria-pressed="${r.id === sel}" aria-label="아바타 ${esc22(r.id)}">${lookSprite(idleOf(r))}</button>`).join("");
+    return `${segs}<div class="gx-lookg">${cells2}</div>`;
   }
   function lookPopup(sel, lockedName = "", g2 = "") {
     if (!lookUi.open) return "";
-    const inner = lockedName ? `<p class="gx-hint">${esc23(lockedName)}(으)로 플레이 중이라 그 인물 모습을 써요.</p>` : chooser(sel, g2 || lookUi.g, !g2);
+    const inner = lockedName ? `<p class="gx-hint">${esc22(lockedName)}(으)로 플레이 중이라 그 인물 모습을 써요.</p>` : chooser(sel, g2 || lookUi.g, !g2);
     return `<div class="gx-agpop gx-lookpop" data-action="look-close" role="dialog" aria-label="아바타"><div class="gx-agpop-card gx-lookpop-card" data-action="look-keep">
     <div class="gx-lookpop-head"><b>아바타</b><button class="gx-x" data-action="look-close" aria-label="닫기">${ICONS.close}</button></div>
-    ${inner}${lookUi.notice ? `<div class="gx-err" role="alert">${esc23(lookUi.notice)}</div>` : ""}
+    ${inner}${lookUi.notice ? `<div class="gx-err" role="alert">${esc22(lookUi.notice)}</div>` : ""}
   </div></div>`;
   }
   function chatLookPopup(ctx2) {
@@ -857,11 +776,11 @@ lternateGreetings,
         return true;
       case "look-retry":
         void ensureLooks();
-        rerender2();
+        rerender();
         return true;
       case "look-g":
         if (value === "남" || value === "여") lookUi.g = value;
-        rerender2();
+        rerender();
         return true;
     }
     return false;
@@ -869,9 +788,9 @@ lternateGreetings,
   var LOOK_CLOSE_MS = 350;
   function flashPick(value, then) {
     document.querySelectorAll(".gx-lookc").forEach((b) => {
-      const on2 = b.dataset.value === value;
-      b.classList.toggle("on", on2);
-      b.setAttribute("aria-pressed", String(on2));
+      const on3 = b.dataset.value === value;
+      b.classList.toggle("on", on3);
+      b.setAttribute("aria-pressed", String(on3));
     });
     setTimeout(() => void then(), LOOK_CLOSE_MS);
   }
@@ -899,7 +818,7 @@ lternateGreetings,
     const r = player ? rows3?.find((x) => x.unique && x.name === player) : sel ? rows3?.find((x) => x.id === sel) : void 0;
     const face3 = r ? `<span class="gx-ava gx-lookface">${lookSprite(idleOf(r))}</span>` : `<span class="gx-ava"><span>${ICONS.person}</span></span>`;
     const label2 = player ? `${player} 모습` : r ? "바꾸기" : "눌러서 고르기";
-    return `<div class="gx-who"><button class="gx-whoc gx-lookchip${r ? " on" : ""}" data-action="look-open" data-look="${r?.id ?? ""}" ${player ? "disabled" : ""} aria-pressed="${!!r}">${face3}<span class="gx-whot"><b>아바타</b><small>${esc23(label2)}</small></span></button></div>`;
+    return `<div class="gx-who"><button class="gx-whoc gx-lookchip${r ? " on" : ""}" data-action="look-open" data-look="${r?.id ?? ""}" ${player ? "disabled" : ""} aria-pressed="${!!r}">${face3}<span class="gx-whot"><b>아바타</b><small>${esc22(label2)}</small></span></button></div>`;
   }
   var LOOK_CSS = `
 .gx-look { display: block; flex: none; width: var(--lw); height: var(--lh); background-repeat: no-repeat; background-position: 0 0; image-rendering: pixelated; animation: gx-look var(--ld) steps(var(--ln)) infinite; }
@@ -921,13 +840,13 @@ lternateGreetings,
 `;
 
   // src/ui/lorecheck.ts
-  var esc24 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc23 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증", place: "위치", agent: "동행·투입", parent: "본 항목" };
   function item(p2, risu = false) {
     const r = p2.reasons[0];
     const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
     const kind = `${SLOTS2[p2.entry.kind].label}${p2.entry.appendix ? " 부록" : ""}`;
-    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc24(p2.entry.name)}</b><small>${esc24(why)}</small></div><span class="lc-kind">${kind}</span></div>`;
+    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc23(p2.entry.name)}</b><small>${esc23(why)}</small></div><span class="lc-kind">${kind}</span></div>`;
   }
   function loreCheckBox(ctx2, plain2 = false) {
     const mode2 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
@@ -936,43 +855,43 @@ lternateGreetings,
     if (!now2) return "";
     const other = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode2 === "risu" ? "plugin" : "risu"));
     const names4 = (l) => new Set(l.map((p2) => p2.entry.name));
-    const mine = names4(now2.picks);
+    const mine2 = names4(now2.picks);
     const theirs = names4(other.picks);
     const size = now2.picks.reduce((n3, p2) => n3 + tokens(p2.entry.content), 0);
     const list4 = now2.picks.length ? now2.picks.map((p2) => item(p2, mode2 === "risu")).join("") : '<p class="ps-note">지금은 켤 로어북이 없어요.</p>';
     const only = (l, not, risu) => l.filter((p2) => !not.has(p2.entry.name)).map((p2) => item(p2, risu)).join("");
     const otherIf = mode2 === "risu" ? "플러그인이 고르면" : "Risu가 직접 켜면";
-    const more = only(other.picks, mine, mode2 !== "risu");
+    const more = only(other.picks, mine2, mode2 !== "risu");
     const less = only(now2.picks, theirs, mode2 === "risu");
     const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
     const body5 = `
     <section class="ps-group"><h3>${mode2 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
-    ${now2.locked.length ? `<section class="ps-group"><h3>해금 전 부록</h3><div class="ps-rows">${now2.locked.map((e) => `<div class="ps-row lc-row"><div class="ps-label"><b>${esc24(e.name)}</b><small>${esc24(`해금 조건: ${e.appendix?.when.unlock ?? ""}`)}</small></div><span class="lc-kind">잠김</span></div>`).join("")}</div><p class="ps-note">모델에게는 해금 조건만 알려요. 조건이 맞으면 응답 끝에 해금 표시를 남기고, 다음 요청부터 내용이 들어가요.</p></section>` : ""}
+    ${now2.locked.length ? `<section class="ps-group"><h3>해금 전 부록</h3><div class="ps-rows">${now2.locked.map((e) => `<div class="ps-row lc-row"><div class="ps-label"><b>${esc23(e.name)}</b><small>${esc23(`해금 조건: ${e.appendix?.when.unlock ?? ""}`)}</small></div><span class="lc-kind">잠김</span></div>`).join("")}</div><p class="ps-note">모델에게는 해금 조건만 알려요. 조건이 맞으면 응답 끝에 해금 표시를 남기고, 다음 요청부터 내용이 들어가요.</p></section>` : ""}
     <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>`;
     if (plain2) return `<p class="ps-note">${now2.picks.length}개 · 약 ${size.toLocaleString()}토큰</p>${body5}`;
     return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>다음 호출 로어북</b><span class="adv-count">${now2.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">${body5}</div></details>`;
   }
 
   // src/ui/editor/start.ts
-  var esc25 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc24 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var stUi = {
     /** 펼친 칸 코드 */
     sel: "",
     /** 묶음 지우기 확인 중인 코드 */
     confirm: ""
   };
-  var input = (key, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc25(key)}" value="${esc25(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
-  var area = (key, value, label2, rows3 = 6, help = "") => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc25(key)}" rows="${rows3}">${esc25(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
-  var seg5 = (action, value, on2, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on2 ? " on" : ""}" data-action="${action}" data-value="${esc25(`1|${value}`)}">${a}</button><button class="gx-seg${!on2 ? " on" : ""}" data-action="${action}" data-value="${esc25(`0|${value}`)}">${b}</button></div>`;
+  var input = (key, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc24(key)}" value="${esc24(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
+  var area = (key, value, label2, rows3 = 6, help = "") => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc24(key)}" rows="${rows3}">${esc24(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
+  var seg = (action, value, on3, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on3 ? " on" : ""}" data-action="${action}" data-value="${esc24(`1|${value}`)}">${a}</button><button class="gx-seg${!on3 ? " on" : ""}" data-action="${action}" data-value="${esc24(`0|${value}`)}">${b}</button></div>`;
   function slotRow(s8) {
-    const open4 = stUi.sel === s8.code;
+    const open3 = stUi.sel === s8.code;
     const kind = s8.kind === "builtin" ? "기본 세력" : s8.kind === "group" ? "묶음" : "플레이 조직";
-    return `<div class="dir-row${open4 ? " open" : ""}" data-slot-row="${esc25(s8.code)}">
-    <div class="dir-head st-slot" data-action="dir-start-open" data-value="${esc25(s8.code)}" role="button" aria-expanded="${open4}">
-      <span class="gw-grip" data-drag-slot="${esc25(s8.code)}" title="끌어서 순서 바꾸기">${ICONS.grip}</span>
-      <span class="dir-name"><b>${esc25(s8.name)}</b><small>${kind} · ${esc25(s8.code)}${s8.count ? ` · ${s8.count}명` : ""}</small></span>
-      ${seg5("dir-start-show", s8.code, !s8.hidden, "보임", "숨김")}
-      <span class="st-caret">${open4 ? ICONS.up : ICONS.down}</span>
+    return `<div class="dir-row${open3 ? " open" : ""}" data-slot-row="${esc24(s8.code)}">
+    <div class="dir-head st-slot" data-action="dir-start-open" data-value="${esc24(s8.code)}" role="button" aria-expanded="${open3}">
+      <span class="gw-grip" data-drag-slot="${esc24(s8.code)}" title="끌어서 순서 바꾸기">${ICONS.grip}</span>
+      <span class="dir-name"><b>${esc24(s8.name)}</b><small>${kind} · ${esc24(s8.code)}${s8.count ? ` · ${s8.count}명` : ""}</small></span>
+      ${seg("dir-start-show", s8.code, !s8.hidden, "보임", "숨김")}
+      <span class="st-caret">${open3 ? ICONS.up : ICONS.down}</span>
     </div>
   </div>`;
   }
@@ -980,39 +899,39 @@ lternateGreetings,
     const rows3 = factionScenes(code2, d.scenes);
     const list4 = rows3.map((r) => {
       const k = (f) => `scene:${code2}|${r.fm}|${f}`;
-      const keep = `st-scene:${code2}|${r.fm}`;
-      return `<details class="st-scene${r.hidden ? " off" : ""}" data-keep="${esc25(keep)}"${keepOpen(keep)}><summary><b>${esc25(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? "새 장면" : "기본 장면"} ${r.fm}${r.hidden ? " · 숨김" : ""}</small></summary>
+      const keep2 = `st-scene:${code2}|${r.fm}`;
+      return `<details class="st-scene${r.hidden ? " off" : ""}" data-keep="${esc24(keep2)}"${keepOpen(keep2)}><summary><b>${esc24(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? "새 장면" : "기본 장면"} ${r.fm}${r.hidden ? " · 숨김" : ""}</small></summary>
         <div class="dir-line"><span>${r.custom ? "새 장면" : "기본 장면"} ${r.fm}</span>
-          <span class="gx-row-btns">${seg5("dir-scene-show", `${code2}|${r.fm}`, !r.hidden, "보임", "숨김")}${r.custom ? `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc25(`${code2}|${r.fm}`)}">지우기</button>` : ""}</span></div>
+          <span class="gx-row-btns">${seg("dir-scene-show", `${code2}|${r.fm}`, !r.hidden, "보임", "숨김")}${r.custom ? `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc24(`${code2}|${r.fm}`)}">지우기</button>` : ""}</span></div>
         ${input(k("label"), r.label, "이름")}
         ${area(k("ko"), r.ko, "한국어", 6, r.hasDefault ? "비우면 기본 글로 돌아가요" : "")}
         ${area(k("en"), r.en, "English", 6, r.hasDefault ? "비우면 기본 글로 돌아가요" : "")}
       </details>`;
     }).join("");
     const tail2 = (BUILTIN.includes(code2) ? SCENARIOS.factions.find((f) => f.code === code2)?.scenarios ?? [] : []).filter((s8) => s8.kind !== "opening").map((s8) => s8.label);
-    return `<div class="dir-line"><span>첫 장면</span><button class="gx-mini" data-action="dir-scene-add" data-value="${esc25(code2)}">${ICONS.plus} 장면 추가</button></div>
+    return `<div class="dir-line"><span>첫 장면</span><button class="gx-mini" data-action="dir-scene-add" data-value="${esc24(code2)}">${ICONS.plus} 장면 추가</button></div>
     <p class="gx-muted">내 페르소나로 시작할 때 고르는 공용 장면이에요. 인물로 시작하면 그 인물의 첫 장면(요원 기록 · 묶음 구성원 칸)과 직접 입력·커스텀 임무만 보여요.${tail2.length ? ` 직접 입력·커스텀 임무는 늘 있어요.` : ""}</p>
     ${list4 || '<p class="gx-muted">공용 장면이 없어요. 직접 입력·커스텀 임무로 시작해요.</p>'}`;
   }
   function agentSceneState(id2, d) {
-    const saved2 = agentSceneSaved(id2, d.scenes);
-    return saved2?.ko || saved2?.en || saved2?.label ? "직접 고친 글" : agentScene(id2, void 0) ? "기본 글" : "첫 장면 없음";
+    const saved = agentSceneSaved(id2, d.scenes);
+    return saved?.ko || saved?.en || saved?.label ? "직접 고친 글" : agentScene(id2, void 0) ? "기본 글" : "첫 장면 없음";
   }
   function agentSceneFields(id2, d) {
-    const saved2 = agentSceneSaved(id2, d.scenes);
+    const saved = agentSceneSaved(id2, d.scenes);
     const def = agentScene(id2, void 0);
     const hasDefault = !!def;
     const k = (f) => `ascene:${id2}|${f}`;
-    return `${input(k("label"), saved2?.label ?? def?.label ?? "", "제목", "시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」")}
-    ${area(k("ko"), saved2?.ko ?? def?.ko ?? "", "한국어", 10, hasDefault ? "기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요")}
-    ${area(k("en"), saved2?.en ?? def?.en ?? "", "English", 10, hasDefault ? "기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "")}
-    ${input(k("lore"), (saved2?.lore ?? def?.lore ?? []).join(", "), "시작 로어", "이 장면으로 시작할 때 첫 턴에 넣을 로어북 이름 (쉼표로). 첫 장면 글은 키워드로 불리지 않아요")}`;
+    return `${input(k("label"), saved?.label ?? def?.label ?? "", "제목", "시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」")}
+    ${area(k("ko"), saved?.ko ?? def?.ko ?? "", "한국어", 10, hasDefault ? "기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요")}
+    ${area(k("en"), saved?.en ?? def?.en ?? "", "English", 10, hasDefault ? "기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "")}
+    ${input(k("lore"), (saved?.lore ?? def?.lore ?? []).join(", "), "시작 로어", "이 장면으로 시작할 때 첫 턴에 넣을 로어북 이름 (쉼표로). 첫 장면 글은 키워드로 불리지 않아요")}`;
   }
   function membersBlock(code2, d) {
     const all = d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name);
     const members = all.filter((a) => a.rosterFor.includes(code2));
-    const chips3 = all.map((a) => `<button class="gx-chip${a.rosterFor.includes(code2) ? " on" : ""}" data-action="dir-group-member" data-value="${esc25(`${code2}|${a.id}`)}" aria-pressed="${a.rosterFor.includes(code2)}">${esc25(a.name)}</button>`).join("");
-    const scenes = members.map((a) => `<details class="st-member" data-keep="${esc25(`st-member:${a.id}`)}"${keepOpen(`st-member:${a.id}`)}><summary><b>${esc25(a.name)}</b><small>${esc25(a.id)} · ${agentSceneState(a.id, d)}</small></summary>${agentSceneFields(a.id, d)}</details>`).join("");
+    const chips3 = all.map((a) => `<button class="gx-chip${a.rosterFor.includes(code2) ? " on" : ""}" data-action="dir-group-member" data-value="${esc24(`${code2}|${a.id}`)}" aria-pressed="${a.rosterFor.includes(code2)}">${esc24(a.name)}</button>`).join("");
+    const scenes = members.map((a) => `<details class="st-member" data-keep="${esc24(`st-member:${a.id}`)}"${keepOpen(`st-member:${a.id}`)}><summary><b>${esc24(a.name)}</b><small>${esc24(a.id)} · ${agentSceneState(a.id, d)}</small></summary>${agentSceneFields(a.id, d)}</details>`).join("");
     return `<div class="dir-line"><span>구성원 ${members.length}명</span></div><div class="dir-chips">${chips3}</div>
     <p class="gx-muted">묶음으로 시작하면 내 페르소나 없이 구성원 한 명을 골라 그 인물로 시작해요. 사원증·괴담톡 탭·소속은 그 인물의 원래 조직을 따르고, 묶음 이름은 모델에게 알리지 않아요.</p>
     <div class="dir-line"><span>구성원별 첫 장면</span></div>${scenes || '<p class="gx-muted">구성원을 고르면 인물별 첫 장면을 고칠 수 있어요.</p>'}`;
@@ -1022,7 +941,7 @@ lternateGreetings,
       const g2 = d.startGroups.find((x) => x.code === s8.code);
       if (!g2) return "";
       const k2 = (f) => `group:${f}|${g2.code}`;
-      const del = stUi.confirm === g2.code ? `<div class="gx-hint">「${esc25(g2.name)}」 묶음을 지울까요? 구성원 요원과 첫 장면 글은 남아요. <button class="gx-mini danger" data-action="dir-group-del" data-value="${esc25(`yes|${g2.code}`)}">지우기</button><button class="gx-mini" data-action="dir-group-del" data-value="${esc25(`no|${g2.code}`)}">취소</button></div>` : `<button class="gx-mini danger" data-action="dir-group-del" data-value="${esc25(`ask|${g2.code}`)}">${ICONS.trash} 묶음 지우기</button>`;
+      const del = stUi.confirm === g2.code ? `<div class="gx-hint">「${esc24(g2.name)}」 묶음을 지울까요? 구성원 요원과 첫 장면 글은 남아요. <button class="gx-mini danger" data-action="dir-group-del" data-value="${esc24(`yes|${g2.code}`)}">지우기</button><button class="gx-mini" data-action="dir-group-del" data-value="${esc24(`no|${g2.code}`)}">취소</button></div>` : `<button class="gx-mini danger" data-action="dir-group-del" data-value="${esc24(`ask|${g2.code}`)}">${ICONS.trash} 묶음 지우기</button>`;
       return `<div class="dir-panel">
       ${input(k2("name"), g2.name, "이름")}
       ${area(k2("blurb"), g2.blurb, "시작 화면 설명", 3)}
@@ -1036,7 +955,7 @@ lternateGreetings,
     const o = s8.org;
     if (!o) return "";
     const k = (f) => `org:${f}|${o.name}`;
-    const off = s8.kind === "extra" ? `<div class="dir-line"><span>플레이 조직 <b class="dir-code">${esc25(s8.code)}</b></span><button class="gx-mini" data-action="dir-fac-play" data-value="${esc25(`0|${o.name}`)}">시작 칸에서 빼기</button></div>` : "";
+    const off = s8.kind === "extra" ? `<div class="dir-line"><span>플레이 조직 <b class="dir-code">${esc24(s8.code)}</b></span><button class="gx-mini" data-action="dir-fac-play" data-value="${esc24(`0|${o.name}`)}">시작 칸에서 빼기</button></div>` : "";
     return `<div class="dir-panel">
     ${off}
     ${input(k("title"), o.spec.title ?? "", "시작 화면 이름", s8.kind === "builtin" ? "비우면 원래 이름" : "비우면 조직 이름")}
@@ -1051,13 +970,13 @@ lternateGreetings,
     const slots = startSlots(d);
     const sel = slots.find((s8) => s8.code === stUi.sel);
     const idle2 = d.orgs.filter((o) => !o.faction && !(o.spec.playable && o.spec.code));
-    const addOrg = idle2.length ? `<div class="dir-line"><span>조직을 시작 칸으로</span></div><div class="dir-chips">${idle2.map((o) => `<button class="gx-chip" data-action="dir-fac-play" data-value="${esc25(`1|${o.name}`)}">${ICONS.plus} ${esc25(o.name)}</button>`).join("")}</div>` : "";
+    const addOrg = idle2.length ? `<div class="dir-line"><span>조직을 시작 칸으로</span></div><div class="dir-chips">${idle2.map((o) => `<button class="gx-chip" data-action="dir-fac-play" data-value="${esc24(`1|${o.name}`)}">${ICONS.plus} ${esc24(o.name)}</button>`).join("")}</div>` : "";
     return `<div class="gw-page gw-startpage">
     <header class="gw-head"><h2>시작 화면</h2><p class="gx-muted">새 채팅의 「어느 쪽에 설까요?」에 보이는 칸이에요. 순서와 보임을 정하고, 칸을 열어 이름·설명·사진·첫 장면을 고쳐요. 묶음은 조직이 아니라 여러 조직의 인물을 한 칸에 모은 거예요.</p></header>
     <div class="dir-list st-slots">${slots.map((s8) => slotRow(s8)).join("")}</div>
     <div class="dir-line"><button class="gx-mini" data-action="dir-group-add">${ICONS.plus} 묶음 추가</button></div>
     ${addOrg}
-    ${sel ? `<h3 class="st-sel"><span>${esc25(sel.name)}</span><small>${esc25(sel.code)}</small></h3>${slotDetail(sel, ctx2, d)}` : ""}
+    ${sel ? `<h3 class="st-sel"><span>${esc24(sel.name)}</span><small>${esc24(sel.code)}</small></h3>${slotDetail(sel, ctx2, d)}` : ""}
   </div>`;
   }
 
@@ -1091,7 +1010,7 @@ lternateGreetings,
   function resetDirectory() {
     Object.assign(dirUi, { kind: "anomaly", q: "", open: "", draft: null, base: "", from: null, busy: false, notice: "", done: "", adding: false, addQ: "", help: false, pick: "", pickQ: "", crop: "" });
   }
-  var esc26 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc25 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var snapshot2 = (d) => JSON.stringify(directoryData(d));
   function directoryDraft(ctx2) {
     return draftOf(ctx2);
@@ -1132,8 +1051,8 @@ lternateGreetings,
     const a = r;
     return [a.lore, a.label, a.name, a.english, a.rank, a.department, ...a.aliases ?? []].some((t) => t && t.toLowerCase().includes(q));
   }
-  var input2 = (key, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc26(key)}" value="${esc26(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
-  var chip2 = (action, value, label2, on2) => `<button class="gx-chip${on2 ? " on" : ""}" data-action="${action}" data-value="${esc26(value)}" aria-pressed="${on2}">${esc26(label2)}</button>`;
+  var input2 = (key, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc25(key)}" value="${esc25(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
+  var chip2 = (action, value, label2, on3) => `<button class="gx-chip${on3 ? " on" : ""}" data-action="${action}" data-value="${esc25(value)}" aria-pressed="${on3}">${esc25(label2)}</button>`;
   var draftExtras = (d) => d.orgs.filter((o) => !o.faction && o.spec.playable && o.spec.code);
   var codesOf = (d) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code)];
   function namesOf(d, lore) {
@@ -1145,14 +1064,14 @@ lternateGreetings,
   var tabName = (o) => o.spec.tab || Array.from(o.name).slice(0, 2).join("");
   function startSlots(d) {
     const out = [];
-    const count3 = (code2) => d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name && a.rosterFor.includes(code2)).length;
+    const count2 = (code2) => d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name && a.rosterFor.includes(code2)).length;
     for (const code2 of BUILTIN) {
       const o = d.orgs.find((x) => x.faction === code2);
       const base = SCENARIOS.factions.find((f) => f.code === code2);
-      out.push({ code: code2, name: o?.spec.title || base?.name || code2, kind: "builtin", hidden: !!o?.spec.hidden, count: count3(code2), ...o ? { org: o } : {} });
+      out.push({ code: code2, name: o?.spec.title || base?.name || code2, kind: "builtin", hidden: !!o?.spec.hidden, count: count2(code2), ...o ? { org: o } : {} });
     }
-    for (const o of draftExtras(d)) out.push({ code: o.spec.code, name: o.spec.title || o.name, kind: "extra", hidden: false, count: count3(o.spec.code), org: o });
-    for (const g2 of d.startGroups) if (!out.some((x) => x.code === g2.code)) out.push({ code: g2.code, name: g2.name, kind: "group", hidden: g2.hidden, count: count3(g2.code) });
+    for (const o of draftExtras(d)) out.push({ code: o.spec.code, name: o.spec.title || o.name, kind: "extra", hidden: false, count: count2(o.spec.code), org: o });
+    for (const g2 of d.startGroups) if (!out.some((x) => x.code === g2.code)) out.push({ code: g2.code, name: g2.name, kind: "group", hidden: g2.hidden, count: count2(g2.code) });
     const at = (c) => {
       const i = d.startOrder.indexOf(c);
       return i < 0 ? Number.MAX_SAFE_INTEGER : i;
@@ -1164,7 +1083,7 @@ lternateGreetings,
     for (const o of draftExtras(d)) tabs2.push({ id: extraTabId(o.spec.code), name: tabName(o), visibleFor: [o.spec.code] });
     return tabs2;
   }
-  var area2 = (key, value, label2, help = "", rows3 = 3) => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc26(key)}" rows="${rows3}">${esc26(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
+  var area2 = (key, value, label2, help = "", rows3 = 3) => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc25(key)}" rows="${rows3}">${esc25(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
   var SEP = /^\s*-{2,}\s*(.*?)\s*-{2,}\s*$/;
   var sourceCache = /* @__PURE__ */ new WeakMap();
   function loreSources(lore) {
@@ -1197,7 +1116,7 @@ lternateGreetings,
     const q = dirUi.addQ.trim().toLowerCase();
     const list4 = [...loreSources(ctx2.char.globalLore)].filter(([name, src]) => src && !have.has(name) && !/설정|부록/.test(src) && src.replace(/[^\p{L}\p{N}]/gu, "") !== own && (!q || name.toLowerCase().includes(q) || src.toLowerCase().includes(q))).slice(0, 60);
     if (!list4.length) return '<p class="gx-muted dir-empty">고를 수 있는 로어북이 없어요.</p>';
-    return list4.map(([name, src]) => `<button class="dir-ext-item" data-action="dir-ext-add" data-value="${esc26(name)}"><b>${esc26(name)}</b><small>${esc26(src)}</small><span>＋ 후보로</span></button>`).join("");
+    return list4.map(([name, src]) => `<button class="dir-ext-item" data-action="dir-ext-add" data-value="${esc25(name)}"><b>${esc25(name)}</b><small>${esc25(src)}</small><span>＋ 후보로</span></button>`).join("");
   }
   function picOf(d, key) {
     const put = (o) => (slot2, v) => {
@@ -1243,18 +1162,18 @@ lternateGreetings,
       const url = pic3 ? imageUrl(ctx2.char, pic3) : null;
       const picking2 = dirUi.pick === `${slot2}>${key}`;
       return `<div class="dir-photo">
-      <span class="dir-pic-img">${url ? `<img src="${esc26(url)}" alt="">` : ICONS.spook}</span>
-      <span class="dir-photo-name"><b>${label2} · ${esc26(picked || "자동")}</b><small>${why}</small></span>
-      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc26(`|${slot2}>${key}`)}">자동으로</button>` : ""}${extra2}
-      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc26(`${slot2}>${key}`)}">${picking2 ? "닫기" : "고르기"}</button>
+      <span class="dir-pic-img">${url ? `<img src="${esc25(url)}" alt="">` : ICONS.spook}</span>
+      <span class="dir-photo-name"><b>${label2} · ${esc25(picked || "자동")}</b><small>${why}</small></span>
+      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc25(`|${slot2}>${key}`)}">자동으로</button>` : ""}${extra2}
+      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc25(`${slot2}>${key}`)}">${picking2 ? "닫기" : "고르기"}</button>
     </div>`;
     };
-    const mainWhy = p2.photo ? "직접 고름" : main ? `자동: ${esc26(main)}` : "「영문명_default」·「영문명」 이미지가 없어요";
-    const faceWhy = p2.face ? "직접 고름" : cut3 ? "대표 사진에서 잘라요" : face3 ? `자동: ${esc26(splitPic(face3).name)}` : "「영문명」 이미지가 없어요";
+    const mainWhy = p2.photo ? "직접 고름" : main ? `자동: ${esc25(main)}` : "「영문명_default」·「영문명」 이미지가 없어요";
+    const faceWhy = p2.face ? "직접 고름" : cut3 ? "대표 사진에서 잘라요" : face3 ? `자동: ${esc25(splitPic(face3).name)}` : "「영문명」 이미지가 없어요";
     const cropping = cut3 && dirUi.crop === key;
-    const cropBtn = cut3 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc26(key)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
+    const cropBtn = cut3 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc25(key)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
     const picking = dirUi.pick ? pickOf(dirUi.pick) : null;
-    const list4 = picking?.key === key ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc26(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
+    const list4 = picking?.key === key ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc25(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
     return `<div class="dir-in"><span>사진</span>
     ${line2("main", "대표", main, p2.photo, mainWhy)}
     ${line2("face", "얼굴", face3, p2.face, faceWhy, cropBtn)}
@@ -1264,12 +1183,12 @@ lternateGreetings,
   }
   function bindCropDrag(root3, done3) {
     root3.addEventListener("pointerdown", (ev) => {
-      const box4 = ev.target.closest?.("[data-crop]");
-      const img = box4?.querySelector("img");
-      if (!box4 || !img) return;
+      const box3 = ev.target.closest?.("[data-crop]");
+      const img = box3?.querySelector("img");
+      if (!box3 || !img) return;
       ev.preventDefault();
-      const key = box4.dataset.crop ?? "";
-      const frame2 = box4.querySelector(".dir-crop-frame");
+      const key = box3.dataset.crop ?? "";
+      const frame = box3.querySelector(".dir-crop-frame");
       const move = (e) => {
         const r = img.getBoundingClientRect();
         if (!r.width || !r.height) return;
@@ -1279,27 +1198,27 @@ lternateGreetings,
         const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
         const c = [px / r.width * 100, py / r.height * 100, w];
         setCrop(key, c);
-        if (frame2) Object.assign(frame2.style, { left: `${c[0]}%`, top: `${c[1]}%` });
+        if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
       };
       move(ev);
-      box4.setPointerCapture?.(ev.pointerId);
+      box3.setPointerCapture?.(ev.pointerId);
       const up = () => {
-        box4.removeEventListener("pointermove", move);
-        box4.removeEventListener("pointerup", up);
-        box4.removeEventListener("pointercancel", up);
+        box3.removeEventListener("pointermove", move);
+        box3.removeEventListener("pointerup", up);
+        box3.removeEventListener("pointercancel", up);
         done3();
       };
-      box4.addEventListener("pointermove", move);
-      box4.addEventListener("pointerup", up);
-      box4.addEventListener("pointercancel", up);
+      box3.addEventListener("pointermove", move);
+      box3.addEventListener("pointerup", up);
+      box3.addEventListener("pointercancel", up);
     });
   }
   function cropBox(ctx2, key, main) {
     const url = imageUrl(ctx2.char, main);
     const [x, y, w] = cropValue(key);
     return `<div class="dir-crop">
-    <div class="dir-crop-img" data-crop="${esc26(key)}">${url ? `<img src="${esc26(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ""}</div>
-    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc26(key)}" aria-label="얼굴 틀 크기"></label>
+    <div class="dir-crop-img" data-crop="${esc25(key)}">${url ? `<img src="${esc25(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ""}</div>
+    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc25(key)}" aria-label="얼굴 틀 크기"></label>
   </div>`;
   }
   function directoryPhotoList(ctx2) {
@@ -1316,22 +1235,22 @@ lternateGreetings,
     const more = list4.length > 30 ? `<p class="gx-muted dir-empty">${list4.length}장 중 30장만 보여요. 검색어를 더 적어 주세요.</p>` : "";
     return list4.slice(0, 30).map((n3) => {
       const url = imageUrl(ctx2.char, n3);
-      return `<button class="dir-pic${cur === n3 ? " on" : ""}" data-action="dir-photo-set" data-value="${esc26(`${n3}|${dirUi.pick}`)}" title="${esc26(n3)}"><span class="dir-pic-img">${url ? `<img src="${esc26(url)}" alt="" loading="lazy">` : ""}</span><small>${esc26(n3)}</small></button>`;
+      return `<button class="dir-pic${cur === n3 ? " on" : ""}" data-action="dir-photo-set" data-value="${esc25(`${n3}|${dirUi.pick}`)}" title="${esc25(n3)}"><span class="dir-pic-img">${url ? `<img src="${esc25(url)}" alt="" loading="lazy">` : ""}</span><small>${esc25(n3)}</small></button>`;
     }).join("") + more;
   }
   function placePanel(p2, ctx2) {
     const k = (f) => `${f}|${p2.lore}`;
     return `<div class="dir-panel">
     <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${p2.preset ? " on" : ""}" data-action="dir-set" data-value="${esc26(`preset|1|${p2.lore}`)}">ON</button>
-      <button class="gx-seg${!p2.preset ? " on" : ""}" data-action="dir-set" data-value="${esc26(`preset|0|${p2.lore}`)}">OFF</button></div></div>
+      <button class="gx-seg${p2.preset ? " on" : ""}" data-action="dir-set" data-value="${esc25(`preset|1|${p2.lore}`)}">ON</button>
+      <button class="gx-seg${!p2.preset ? " on" : ""}" data-action="dir-set" data-value="${esc25(`preset|0|${p2.lore}`)}">OFF</button></div></div>
     <p class="gx-muted">OFF여도 직접 고르거나 대화에 나오면 상황판에 기록돼요.</p>
     ${input2(k("label"), p2.label, "표시 이름", "상황판과 지도에 보이는 이름")}
     ${input2(k("english"), p2.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
     ${input2(k("aliases"), p2.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
     ${photoBlock(p2.lore, ctx2)}
-    <p class="gx-muted">로어북: ${esc26(p2.lore)}${p2.inFolder ? "" : " (폴더 밖)"}</p>
-    ${p2.inFolder ? "" : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc26(p2.lore)}">후보 목록에서 빼기</button>`}
+    <p class="gx-muted">로어북: ${esc25(p2.lore)}${p2.inFolder ? "" : " (폴더 밖)"}</p>
+    ${p2.inFolder ? "" : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc25(p2.lore)}">후보 목록에서 빼기</button>`}
   </div>`;
   }
   function agentPanel(a, ctx2, d) {
@@ -1355,7 +1274,7 @@ lternateGreetings,
     ${input2(k("aliases"), a.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
     ${input2(k("carry"), a.carry ? String(a.carry) : "", "소지 한도(kg)", "이 인물로 시작하면 이 무게가 소지 한도예요. 비우면 설정 「소지 한도」를 써요")}
     ${area2(k("items"), startItemsText(a.startItems ?? []), "시작 소지품", `이 인물로 시작하면 소지품에 넣고 무기·장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
-    <p class="gx-muted">로어북: ${esc26(a.lore)} · ID ${esc26(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
+    <p class="gx-muted">로어북: ${esc25(a.lore)} · ID ${esc25(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
   </div>`;
   }
   function factionBlock(o, ctx2) {
@@ -1367,28 +1286,28 @@ lternateGreetings,
     if (o.faction) {
       return `<div class="dir-fac">${link(o.spec.hidden ? "시작 화면: 숨김" : "시작 화면: 보임")}${start3}${builtinBlock(o.faction, dirUi.draft)}</div>`;
     }
-    const on2 = !!o.spec.playable;
+    const on3 = !!o.spec.playable;
     const ready = placeholdersReady(lore);
-    const head3 = link(on2 && o.spec.code ? `플레이 조직 <b class="dir-code">${esc26(o.spec.code)}</b>` : "시작 칸 아님");
-    if (!on2) return `<div class="dir-fac">${head3}<p class="gx-muted">시작 화면 페이지에서 이 조직을 시작 칸으로 켜면 이 조직으로 시작할 수 있어요.</p></div>`;
+    const head3 = link(on3 && o.spec.code ? `플레이 조직 <b class="dir-code">${esc25(o.spec.code)}</b>` : "시작 칸 아님");
+    if (!on3) return `<div class="dir-fac">${head3}<p class="gx-muted">시작 화면 페이지에서 이 조직을 시작 칸으로 켜면 이 조직으로 시작할 수 있어요.</p></div>`;
     const patch = ready ? "" : `<div class="gx-hint">이 카드의 🏷️Tag 로어북에 새 세력 자리가 없어서 아직 시작 화면에 안 보여요. <button class="gx-mini" data-action="dir-fac-patch">로어북에 자리 넣기</button></div>`;
     return `<div class="dir-fac">${head3}${patch}
     <div class="dir-line"><span>유형</span><div class="dir-chips">${FACTION_TYPES.map((x) => chip2("dir-fac-type", `${x.id}|${o.name}`, x.label, (o.spec.type ?? "org") === x.id)).join("")}</div></div>
-    <p class="gx-muted">${esc26(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
+    <p class="gx-muted">${esc25(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
     ${start3}
     ${input2(k("gm_name"), o.spec.gm_name ?? "", "모델용 영어 이름", "소속 변경 태그 목록과 세력 설명 제목에 써요. 비우면 조직 이름")}
     ${area2(k("gm_desc"), o.spec.gm_desc ?? "", "모델용 세력 설명", "📜Faction 로어북 끝에 붙어요. 영어로 적으면 다른 세력 설명과 어울려요")}
     ${input2(k("seed"), (o.spec.seed ?? [o.name]).join(", "), "시작 때 함께 넣을 로어북", "쉼표로 나눠 적어요. 첫 응답에 이 로어북들이 꼭 들어가요")}
-    ${input2(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc26(tabName(o))}」`)}
+    ${input2(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc25(tabName(o))}」`)}
   </div>`;
   }
   function builtinBlock(code2, d) {
     const viewers = [["none", "기본"], ...BUILTIN.map((f) => [f, `${d.display.none?.[f] || f} 소속`])];
     const fallback = d.display.none?.[code2] ?? "";
-    const names4 = viewers.map(([v, label2]) => `<label class="dir-in"><span>${esc26(label2)}</span><input data-input="dir" data-key="${esc26(`disp:${v}|${code2}`)}" value="${esc26(d.display[v]?.[code2] ?? "")}" placeholder="${esc26(fallback)}" autocomplete="off"></label>`).join("");
+    const names4 = viewers.map(([v, label2]) => `<label class="dir-in"><span>${esc25(label2)}</span><input data-input="dir" data-key="${esc25(`disp:${v}|${code2}`)}" value="${esc25(d.display[v]?.[code2] ?? "")}" placeholder="${esc25(fallback)}" autocomplete="off"></label>`).join("");
     const own = d.phoneTabs.tabs.find((t) => t.visible_for.length === 1 && t.visible_for[0] === code2);
     const tab2 = own ? input2(`ptab:${own.id}`, own.name, "괴담톡 전용 탭 이름") : "";
-    const scenes = (SCENARIOS.factions.find((f) => f.code === code2)?.scenarios ?? []).map((sc) => input2(`seed:${code2}-${sc.fm}`, (d.seeds[`${code2}-${sc.fm}`] ?? []).join(", "), `${sc.fm}. ${esc26(sc.label)}`)).join("");
+    const scenes = (SCENARIOS.factions.find((f) => f.code === code2)?.scenarios ?? []).map((sc) => input2(`seed:${code2}-${sc.fm}`, (d.seeds[`${code2}-${sc.fm}`] ?? []).join(", "), `${sc.fm}. ${esc25(sc.label)}`)).join("");
     return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names4}</div>
     ${tab2}
     <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
@@ -1405,23 +1324,23 @@ lternateGreetings,
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-org-toggle", `rosterFor|${f}|${o.name}`, names4[f], o.rosterFor.includes(f))).join("")}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-org-toggle", `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join("")}</div></div>
     <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
-    ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc26(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
+    ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc25(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
       <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc26(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
-    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc26(m.name)).join(", ")}</p>` : ""}
-    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc26(o.name)}">＋ 거점 추가</button></div></div>
+      <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc25(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
+    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc25(m.name)).join(", ")}</p>` : ""}
+    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc25(o.name)}">＋ 거점 추가</button></div></div>
   </div>`;
   }
   function orgRow(o, ctx2, d, names4) {
-    const open4 = dirUi.open === o.name;
+    const open3 = dirUi.open === o.name;
     const n3 = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
     const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
     const play = o.faction || o.spec.playable && o.spec.code;
-    return `<div class="dir-row${open4 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc26(o.name)}" aria-expanded="${open4}">
-      <span class="dir-name"><b>${esc26(o.name)}</b><small>${esc26(sub)}</small></span>
-      ${play ? `<span class="gx-badge live">플레이 ${esc26(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n3}명</span>
-    </button>${open4 ? orgPanel(o, ctx2, d) : ""}</div>`;
+    return `<div class="dir-row${open3 ? " open" : ""}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc25(o.name)}" aria-expanded="${open3}">
+      <span class="dir-name"><b>${esc25(o.name)}</b><small>${esc25(sub)}</small></span>
+      ${play ? `<span class="gx-badge live">플레이 ${esc25(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n3}명</span>
+    </button>${open3 ? orgPanel(o, ctx2, d) : ""}</div>`;
   }
   var REGIONS = MAP_CODES.filter((c) => c !== "01");
   var baseMaps = {};
@@ -1442,35 +1361,35 @@ lternateGreetings,
   function basePanel(b, ctx2, d) {
     const k = (f) => `base:${f}|${b.name}`;
     const url = baseMap(ctx2, b.sido, mapEnv);
-    const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? " selected" : ""}>${esc26(regionName(c))}</option>`).join("");
-    const gus = `<option value=""${b.gu ? "" : " selected"}>시군구 선택 안 함</option>` + (SIGUN[b.sido] ?? []).map((g2) => `<option value="${esc26(g2)}"${g2 === b.gu ? " selected" : ""}>${esc26(g2)}</option>`).join("");
-    const map = url ? `<div class="dir-map" data-base-pick="${esc26(b.name)}"><img src="${esc26(url)}" alt="${esc26(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>` : `<div class="dir-map ph">지도 불러오는 중…</div>`;
+    const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? " selected" : ""}>${esc25(regionName(c))}</option>`).join("");
+    const gus = `<option value=""${b.gu ? "" : " selected"}>시군구 선택 안 함</option>` + (SIGUN[b.sido] ?? []).map((g2) => `<option value="${esc25(g2)}"${g2 === b.gu ? " selected" : ""}>${esc25(g2)}</option>`).join("");
+    const map = url ? `<div class="dir-map" data-base-pick="${esc25(b.name)}"><img src="${esc25(url)}" alt="${esc25(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>` : `<div class="dir-map ph">지도 불러오는 중…</div>`;
     return `<div class="dir-panel">
     <div class="dir-line"><span>지도에 보이기</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc26(`1|${b.name}`)}">보임</button>
-      <button class="gx-seg${!b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc26(`0|${b.name}`)}">숨김</button></div></div>
+      <button class="gx-seg${b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc25(`1|${b.name}`)}">보임</button>
+      <button class="gx-seg${!b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc25(`0|${b.name}`)}">숨김</button></div></div>
     <div class="dir-line"><span>조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-base-org", `${o.name}|${b.name}`, o.name, b.org === o.name)).join("")}${chip2("dir-base-org", `|${b.name}`, "조직 없음", !b.org)}</div></div>
     <div class="dir-grid">
-      <label class="dir-in"><span>지역</span><select class="gx-select" data-change="dir-base-sido" data-key="${esc26(b.name)}">${sido}</select></label>
-      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc26(b.name)}">${gus}</select></label>
+      <label class="dir-in"><span>지역</span><select class="gx-select" data-change="dir-base-sido" data-key="${esc25(b.name)}">${sido}</select></label>
+      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc25(b.name)}">${gus}</select></label>
     </div>
     ${map}
     ${input2(k("label"), b.label, "지도 표시명", "비우면 거점 이름")}
     ${input2(k("lore"), b.lore, "위키 로어북", "이 거점을 설명하는 로어북 이름")}
     ${input2(k("english"), b.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
     ${input2(k("aliases"), b.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc26(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
+    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc25(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
       <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc26(b.name)}">지우기</button></div>
+      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc25(b.name)}">지우기</button></div>
   </div>`;
   }
   function baseRow(b, ctx2, d) {
-    const open4 = dirUi.open === b.name;
-    return `<div class="dir-row${open4 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc26(b.name)}" aria-expanded="${open4}">
-      <span class="dir-name"><b>${esc26(b.name)}</b><small>${esc26([b.org || "조직 없음", baseWhere(b)].join(" · "))}</small></span>
+    const open3 = dirUi.open === b.name;
+    return `<div class="dir-row${open3 ? " open" : ""}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc25(b.name)}" aria-expanded="${open3}">
+      <span class="dir-name"><b>${esc25(b.name)}</b><small>${esc25([b.org || "조직 없음", baseWhere(b)].join(" · "))}</small></span>
       ${b.show ? "" : '<span class="gx-badge">숨김</span>'}
-    </button>${open4 ? basePanel(b, ctx2, d) : ""}</div>`;
+    </button>${open3 ? basePanel(b, ctx2, d) : ""}</div>`;
   }
   function baseList(ctx2, d, q) {
     const rows3 = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
@@ -1485,24 +1404,24 @@ lternateGreetings,
     return name;
   }
   function placeRow(p2, ctx2, src = "") {
-    const open4 = dirUi.open === p2.lore;
-    return `<div class="dir-row${open4 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc26(p2.lore)}" aria-expanded="${open4}">
-      <span class="dir-name"><b>${esc26(p2.label)}</b><small>${esc26(p2.english || "영문명 없음")}</small></span>
-      ${p2.inFolder ? "" : `<span class="gx-badge wait">${esc26(src || "폴더 밖")}</span>`}
+    const open3 = dirUi.open === p2.lore;
+    return `<div class="dir-row${open3 ? " open" : ""}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc25(p2.lore)}" aria-expanded="${open3}">
+      <span class="dir-name"><b>${esc25(p2.label)}</b><small>${esc25(p2.english || "영문명 없음")}</small></span>
+      ${p2.inFolder ? "" : `<span class="gx-badge wait">${esc25(src || "폴더 밖")}</span>`}
       <span class="gx-badge${p2.preset ? " live" : ""}">${p2.preset ? "발생 후보" : "숨김"}</span>
-    </button>${open4 ? placePanel(p2, ctx2) : ""}</div>`;
+    </button>${open3 ? placePanel(p2, ctx2) : ""}</div>`;
   }
   function agentRow(a, ctx2, d, names4, order2) {
-    const open4 = dirUi.open === a.lore;
+    const open3 = dirUi.open === a.lore;
     const sub = [a.affiliation ? orgName(d, names4, a.affiliation) : "", a.rank, a.department].filter(Boolean).join(" · ");
-    const move = order2 ? `<span class="dir-move"><span class="dir-grip" data-drag-agent="${esc26(a.lore)}" title="끌어서 순서 바꾸기" aria-hidden="true">${ICONS.grip}</span><button class="dir-step" data-action="dir-move" data-value="up|${esc26(a.lore)}" aria-label="${esc26(a.name)} 위로" ${order2.first ? "disabled" : ""}>${ICONS.up}</button><button class="dir-step" data-action="dir-move" data-value="down|${esc26(a.lore)}" aria-label="${esc26(a.name)} 아래로" ${order2.last ? "disabled" : ""}>${ICONS.down}</button></span>` : "";
-    return `<div class="dir-row${open4 ? " open" : ""}"${order2 ? ` data-agent-row="${esc26(a.lore)}" data-agent-group="${esc26(agentGroup(a))}"` : ""}><div class="dir-headrow">
-    <button class="dir-head" data-action="dir-open" data-value="${esc26(a.lore)}" aria-expanded="${open4}">
+    const move = order2 ? `<span class="dir-move"><span class="dir-grip" data-drag-agent="${esc25(a.lore)}" title="끌어서 순서 바꾸기" aria-hidden="true">${ICONS.grip}</span><button class="dir-step" data-action="dir-move" data-value="up|${esc25(a.lore)}" aria-label="${esc25(a.name)} 위로" ${order2.first ? "disabled" : ""}>${ICONS.up}</button><button class="dir-step" data-action="dir-move" data-value="down|${esc25(a.lore)}" aria-label="${esc25(a.name)} 아래로" ${order2.last ? "disabled" : ""}>${ICONS.down}</button></span>` : "";
+    return `<div class="dir-row${open3 ? " open" : ""}"${order2 ? ` data-agent-row="${esc25(a.lore)}" data-agent-group="${esc25(agentGroup(a))}"` : ""}><div class="dir-headrow">
+    <button class="dir-head" data-action="dir-open" data-value="${esc25(a.lore)}" aria-expanded="${open3}">
       ${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}
-      <span class="dir-name"><b>${esc26(a.name)}</b><small>${esc26(sub || "소속 미정")}</small></span>
+      <span class="dir-name"><b>${esc25(a.name)}</b><small>${esc25(sub || "소속 미정")}</small></span>
       ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? "" : '<span class="gx-badge">목록 숨김</span>'}
-    </button>${move}</div>${open4 ? agentPanel(a, ctx2, d) : ""}</div>`;
+    </button>${move}</div>${open3 ? agentPanel(a, ctx2, d) : ""}</div>`;
   }
   var FOLDER_LABEL = { 세력: "세력", 조직: "세력", 파밍: "특수", 괴이: "괴이", 요원: "요원" };
   function parentSlot(r, ctx2) {
@@ -1514,37 +1433,37 @@ lternateGreetings,
     return [r.keys ? "키" : "", r.withParent ? "본 항목과 같이" : "", r.target ? "목표" : "", r.places.length ? `위치 ${r.places.length}` : "", r.agents.length ? `요원 ${r.agents.length}` : ""].filter(Boolean).join(" · ") || "켜질 조건 없음";
   }
   function appendixRow(r, ctx2, d) {
-    const open4 = dirUi.open === r.lore;
+    const open3 = dirUi.open === r.lore;
     const slot2 = parentSlot(r, ctx2);
     const lock = r.unlock ? unlockedHere(ctx2).has(r.lore) ? '<span class="gx-badge live">해금됨</span>' : '<span class="gx-badge wait">잠김</span>' : "";
-    return `<div class="dir-row${open4 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc26(r.lore)}" aria-expanded="${open4}">
-      <span class="dir-name"><b>${esc26(r.lore)}</b><small>${esc26(appendixWhen(r))}</small></span>
+    return `<div class="dir-row${open3 ? " open" : ""}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc25(r.lore)}" aria-expanded="${open3}">
+      <span class="dir-name"><b>${esc25(r.lore)}</b><small>${esc25(appendixWhen(r))}</small></span>
       ${slot2 ? "" : '<span class="gx-badge hot">본 항목 없음</span>'}${lock}
-    </button>${open4 ? appendixPanel(r, ctx2, d) : ""}</div>`;
+    </button>${open3 ? appendixPanel(r, ctx2, d) : ""}</div>`;
   }
   function appendixPanel(r, ctx2, d) {
     const k = (f) => `app:${f}|${r.lore}`;
     const e = (ctx2.char.globalLore ?? []).find((x) => x.mode !== "folder" && String(x.comment ?? "") === r.lore);
     const keys = String(e?.key ?? "").split(",").map((t) => t.trim()).filter(Boolean);
     const slot2 = parentSlot(r, ctx2);
-    const toggle = (f, label2, on2) => chip2("dir-app-toggle", `${f}|${r.lore}`, label2, on2);
+    const toggle = (f, label2, on3) => chip2("dir-app-toggle", `${f}|${r.lore}`, label2, on3);
     const bases = d.bases.map((b) => b.name).filter((n3) => !r.places.includes(n3));
     const unlocked = unlockedHere(ctx2).has(r.lore);
     return `<div class="dir-panel">
-    ${input2(k("parent"), r.parent, "본 항목", r.guess ? `이 부록이 붙는 원래 기록(이름 앞부분으로 찾음): ${esc26(r.guess)}` : "이 부록이 붙는 원래 기록(세력·괴이·파밍·요원)의 이름을 그대로 적어요")}
+    ${input2(k("parent"), r.parent, "본 항목", r.guess ? `이 부록이 붙는 원래 기록(이름 앞부분으로 찾음): ${esc25(r.guess)}` : "이 부록이 붙는 원래 기록(세력·괴이·파밍·요원)의 이름을 그대로 적어요")}
     <p class="${slot2 ? "gx-muted" : "gx-hint"}">${slot2 ? `모델에게 보낼 때 본 항목(${slot2}) 바로 뒤에 붙어요.` : "본 항목을 찾지 못했어요. 세력 기록 자리에 들어가요."}</p>
     <div class="dir-line"><span>모델에게 보내는 조건</span><small>아래 중 하나라도 맞으면 이 부록을 다음 요청에 넣어요</small><div class="dir-chips">
       ${toggle("keys", "호출 단어가 대화에 나오면", r.keys)}${toggle("withParent", "본 항목을 보낼 때 같이", r.withParent)}${toggle("target", "상태창 목표가 본 항목이면", r.target)}
     </div></div>
-    <p class="gx-muted">호출 단어: ${keys.length ? esc26(keys.join(", ")) : "없음"} · 세계 편집기의 부록 기록에서 고쳐요.</p>
+    <p class="gx-muted">호출 단어: ${keys.length ? esc25(keys.join(", ")) : "없음"} · 세계 편집기의 부록 기록에서 고쳐요.</p>
     ${input2(k("places"), r.places.join(", "), "위치", "상태창의 「위치」 칸에 이 말이 들어 있으면 보내요(주인공이 그 장소에 있을 때). 쉼표로 나눠 적어요")}
     ${bases.length ? `<div class="dir-line"><span>거점에서 넣기</span><small>등록된 거점(본부·지사 같은 장소) 이름을 위 「위치」 칸에 바로 넣는 단추예요</small><div class="dir-chips">${bases.slice(0, 24).map((n3) => chip2("dir-app-place", `${n3}|${r.lore}`, `＋ ${n3}`, false)).join("")}</div></div>` : ""}
     ${input2(k("agents"), r.agents.join(", "), "동행·투입 요원", "적은 요원이 주인공과 동행 중이거나(상태창 동행 칸) 상황판에서 작전에 투입돼 있으면 보내요. 쉼표로 나눠 적어요")}
     <div class="dir-line"><span>보내지 않는 조건</span><div class="dir-chips">${toggle("needParent", "본 항목을 보내지 않는 요청에는 이 부록도 빼기", r.needParent)}</div></div>
     ${area2(k("unlock"), r.unlock, "해금 조건", "비우면 위 조건만 맞으면 바로 보내요. 적으면 해금 전에는 본문 대신 이 조건 한 줄만 모델에게 알리고, 이야기에서 조건이 이루어지면 모델이 응답 끝에 해금 표시를 남겨요. 그 다음 요청부터 본문이 들어가요")}
     ${r.unlock ? `<div class="dir-line"><span>이 채팅</span><div class="dir-chips">${chip2("dir-app-unlock", r.lore, unlocked ? "해금됨 · 누르면 다시 잠금" : "잠김 · 누르면 해금", unlocked)}</div></div>` : ""}
-    <p class="gx-muted">로어북: ${esc26(r.lore)} · 약 ${tokens(String(e?.content ?? "")).toLocaleString()}토큰</p>
+    <p class="gx-muted">로어북: ${esc25(r.lore)} · 약 ${tokens(String(e?.content ?? "")).toLocaleString()}토큰</p>
   </div>`;
   }
   function appendixList(ctx2, d, q) {
@@ -1557,7 +1476,7 @@ lternateGreetings,
     return `${lost.length ? `<h3 class="dir-group warn">본 항목 없음<small>${lost.length}</small></h3>${lost.map((r) => appendixRow(r, ctx2, d)).join("")}` : ""}
     ${parents.map((p2) => {
       const list4 = rows3.filter((r) => r.parent === p2 && parentSlot(r, ctx2));
-      return `<h3 class="dir-group">${esc26(p2)}<small>${list4.length}</small></h3>${list4.map((r) => appendixRow(r, ctx2, d)).join("")}`;
+      return `<h3 class="dir-group">${esc25(p2)}<small>${list4.length}</small></h3>${list4.map((r) => appendixRow(r, ctx2, d)).join("")}`;
     }).join("")}`;
   }
   function searchAll(ctx2, d, q, names4) {
@@ -1603,14 +1522,14 @@ lternateGreetings,
     return groups.map((g2) => {
       const list4 = rows3.filter((r) => key(r) === g2);
       const body5 = list4.map((r, i) => agentRow(r, ctx2, d, names4, q ? void 0 : { first: i === 0, last: i === list4.length - 1 })).join("");
-      return `<h3 class="dir-group${g2 ? "" : " warn"}">${esc26(g2 || "소속 미정")}<small>${list4.length}</small></h3>${body5}`;
+      return `<h3 class="dir-group${g2 ? "" : " warn"}">${esc25(g2 || "소속 미정")}<small>${list4.length}</small></h3>${body5}`;
     }).join("");
   }
   var directoryDone = () => dirUi.done;
-  var directoryDoneClear = (text4) => {
-    if (dirUi.done === text4) dirUi.done = "";
+  var directoryDoneClear = (text5) => {
+    if (dirUi.done === text5) dirUi.done = "";
   };
-  var directorySearch = () => `<input class="dir-search" type="search" data-input="dir-q" value="${esc26(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점·부록)" aria-label="명부 전체 검색" autocomplete="off">`;
+  var directorySearch = () => `<input class="dir-search" type="search" data-input="dir-q" value="${esc25(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점·부록)" aria-label="명부 전체 검색" autocomplete="off">`;
   var barButtons = (off) => `<button class="st-act save" data-action="set-bar" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="set-bar" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button>`;
   function directoryBar() {
     return barButtons(!dirty() || dirUi.busy);
@@ -1644,7 +1563,7 @@ lternateGreetings,
       </ul>
       ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
     </div>` : ""}
-    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc26(dirUi.notice)}</div>` : ""}
+    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc25(dirUi.notice)}</div>` : ""}
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ""}
     <div class="dir-list">${directoryList(ctx2)}</div>
   </div>`;
@@ -1652,11 +1571,11 @@ lternateGreetings,
   var ADD_LABEL = { anomaly: "후보 추가", site: "후보 추가", agent: "", org: "조직 추가", base: "거점 추가", appendix: "" };
   function addPanel(ctx2) {
     if (dirUi.kind === "org" || dirUi.kind === "base") {
-      const [name, act, hint] = dirUi.kind === "org" ? ["dir-org-new", "dir-org-add", "새 조직 이름"] : ["dir-base-new", "dir-base-new", "새 거점 이름"];
-      return `<div class="dir-ext"><div class="dir-add"><input name="${name}" placeholder="${hint}" aria-label="${hint}" autocomplete="off" data-enter="${act}">
-      <button class="gx-mini" data-action="${act}" data-take="${name}">추가</button></div></div>`;
+      const [name, act2, hint] = dirUi.kind === "org" ? ["dir-org-new", "dir-org-add", "새 조직 이름"] : ["dir-base-new", "dir-base-new", "새 거점 이름"];
+      return `<div class="dir-ext"><div class="dir-add"><input name="${name}" placeholder="${hint}" aria-label="${hint}" autocomplete="off" data-enter="${act2}">
+      <button class="gx-mini" data-action="${act2}" data-take="${name}">추가</button></div></div>`;
     }
-    return `<div class="dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc26(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off">
+    return `<div class="dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc25(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off">
     <div class="dir-ext-list">${directoryExtList(ctx2)}</div></div>`;
   }
   var unassigned = (d) => d.agents.filter((a) => !a.affiliation).length;
@@ -1726,11 +1645,11 @@ lternateGreetings,
       const [code2, fm, field5] = key.slice(6).split("|");
       if (!code2 || !/^\d+$/.test(fm ?? "") || !(field5 === "label" || field5 === "ko" || field5 === "en")) return;
       const rows3 = (d.scenes.세력 ??= {})[code2] ??= {};
-      const row12 = rows3[fm] ??= {};
+      const row9 = rows3[fm] ??= {};
       const v = field5 === "label" ? value.trim() : value;
-      if (v.trim()) row12[field5] = v;
-      else delete row12[field5];
-      if (!Object.keys(row12).length) delete rows3[fm];
+      if (v.trim()) row9[field5] = v;
+      else delete row9[field5];
+      if (!Object.keys(row9).length) delete rows3[fm];
       dirUi.done = "";
       if (bar) bar.innerHTML = directoryBar();
       return;
@@ -1739,18 +1658,18 @@ lternateGreetings,
       const [id2, field5] = key.slice(7).split("|");
       if (!id2 || !(field5 === "ko" || field5 === "en" || field5 === "label" || field5 === "lore")) return;
       const rows3 = d.scenes.인물 ??= {};
-      const row12 = rows3[id2] ??= {};
+      const row9 = rows3[id2] ??= {};
       const def = agentScene(id2, void 0);
       if (field5 === "lore") {
         const names4 = splitList(value);
-        if (names4.length && names4.join(",") !== (def?.lore ?? []).join(",")) row12.lore = names4;
-        else delete row12.lore;
+        if (names4.length && names4.join(",") !== (def?.lore ?? []).join(",")) row9.lore = names4;
+        else delete row9.lore;
       } else {
         const same4 = def ? field5 === "label" ? value.trim() === def.label : value === def[field5] : false;
-        if (value.trim() && !same4) row12[field5] = value;
-        else delete row12[field5];
+        if (value.trim() && !same4) row9[field5] = value;
+        else delete row9[field5];
       }
-      if (!Object.keys(row12).length) delete rows3[id2];
+      if (!Object.keys(row9).length) delete rows3[id2];
       dirUi.done = "";
       if (bar) bar.innerHTML = directoryBar();
       return;
@@ -1769,26 +1688,26 @@ lternateGreetings,
     }
     const at = key.indexOf("|");
     const field4 = key.slice(0, at);
-    const row11 = findRow2(d, key.slice(at + 1));
-    if (!row11) return;
-    if (field4 === "aliases") row11.aliases = splitList(value);
+    const row8 = findRow2(d, key.slice(at + 1));
+    if (!row8) return;
+    if (field4 === "aliases") row8.aliases = splitList(value);
     else if (field4 === "items") {
       const items = parseStartItems(value);
-      if (items.length) row11.startItems = items;
-      else delete row11.startItems;
+      if (items.length) row8.startItems = items;
+      else delete row8.startItems;
     } else if (field4 === "carry") {
       const c = itemWeight(value);
-      if (c !== void 0 && c > 0) row11.carry = c;
-      else delete row11.carry;
-    } else if (field4 === "label") row11.label = value.trim() || row11.lore;
-    else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row11[field4] = value.trim();
+      if (c !== void 0 && c > 0) row8.carry = c;
+      else delete row8.carry;
+    } else if (field4 === "label") row8.label = value.trim() || row8.lore;
+    else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row8[field4] = value.trim();
     else return;
     dirUi.done = "";
     if (bar) bar.innerHTML = directoryBar();
   }
-  function setPlayable(d, o, on2) {
-    if (on2 === !!o.spec.playable) return;
-    if (on2 && !o.spec.code) {
+  function setPlayable(d, o, on3) {
+    if (on3 === !!o.spec.playable) return;
+    if (on3 && !o.spec.code) {
       const code3 = nextCode([...d.usedCodes, ...d.orgs.map((x) => x.spec.code ?? "")]);
       if (!code3) {
         dirUi.notice = "더 줄 수 있는 세력 코드가 없어요 (F00~Z00).";
@@ -1799,8 +1718,8 @@ lternateGreetings,
     }
     const code2 = o.spec.code;
     const tab2 = extraTabId(code2);
-    o.spec.playable = on2;
-    const edit = (xs, x) => on2 ? xs.includes(x) ? xs : [...xs, x] : xs.filter((y) => y !== x);
+    o.spec.playable = on3;
+    const edit = (xs, x) => on3 ? xs.includes(x) ? xs : [...xs, x] : xs.filter((y) => y !== x);
     o.rosterFor = edit(o.rosterFor, code2);
     o.phoneTabs = edit(o.phoneTabs, tab2);
     for (const a of d.agents) {
@@ -1845,13 +1764,13 @@ lternateGreetings,
       case "dir-set":
       case "dir-toggle": {
         const [field4, arg] = v.split("|", 2);
-        const row11 = findRow2(d, v.slice(field4.length + arg.length + 2));
-        if (!row11) break;
-        if (field4 === "preset") row11.preset = arg === "1";
-        else if (field4 === "affiliation") row11.affiliation = arg;
+        const row8 = findRow2(d, v.slice(field4.length + arg.length + 2));
+        if (!row8) break;
+        if (field4 === "preset") row8.preset = arg === "1";
+        else if (field4 === "affiliation") row8.affiliation = arg;
         else if (field4 === "rosterFor" || field4 === "phoneTabs") {
-          const cur = row11[field4];
-          row11[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
+          const cur = row8[field4];
+          row8[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
         }
         dirUi.done = "";
         break;
@@ -1891,19 +1810,19 @@ lternateGreetings,
       }
       case "dir-org-pick": {
         const at = v.indexOf("|");
-        const row11 = d.agents.find((a) => a.lore === v.slice(at + 1));
-        if (!row11) break;
-        assignOrg(row11, d.orgs.find((o) => o.name === v.slice(0, at)));
+        const row8 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        if (!row8) break;
+        assignOrg(row8, d.orgs.find((o) => o.name === v.slice(0, at)));
         dirUi.done = "";
         break;
       }
       case "dir-gender": {
         const at = v.indexOf("|");
-        const row11 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        const row8 = d.agents.find((a) => a.lore === v.slice(at + 1));
         const g2 = v.slice(0, at);
-        if (!row11 || g2 !== "F" && g2 !== "M" && g2 !== "X") break;
-        if (g2 === loreGender(ctx2.char.globalLore ?? [], row11.lore) || g2 === "X" && !loreGender(ctx2.char.globalLore ?? [], row11.lore)) delete row11.gender;
-        else row11.gender = g2;
+        if (!row8 || g2 !== "F" && g2 !== "M" && g2 !== "X") break;
+        if (g2 === loreGender(ctx2.char.globalLore ?? [], row8.lore) || g2 === "X" && !loreGender(ctx2.char.globalLore ?? [], row8.lore)) delete row8.gender;
+        else row8.gender = g2;
         dirUi.done = "";
         break;
       }
@@ -2042,11 +1961,11 @@ lternateGreetings,
         if (stUi.sel) requestAnimationFrame(() => document.querySelector(".gw .st-sel")?.scrollIntoView({ block: "start", behavior: "smooth" }));
         break;
       case "dir-start-show": {
-        const [on2, code2] = v.split("|");
+        const [on3, code2] = v.split("|");
         const g2 = d.startGroups.find((x) => x.code === code2);
         const o = d.orgs.find((x) => x.faction === code2);
-        if (g2) g2.hidden = on2 !== "1";
-        else if (o) o.spec.hidden = on2 !== "1";
+        if (g2) g2.hidden = on3 !== "1";
+        else if (o) o.spec.hidden = on3 !== "1";
         else {
           dirUi.notice = "플레이 조직은 「시작 칸에서 빼기」로 뺄 수 있어요.";
           break;
@@ -2126,13 +2045,13 @@ lternateGreetings,
         break;
       }
       case "dir-scene-show": {
-        const [on2, code2, fm] = v.split("|");
+        const [on3, code2, fm] = v.split("|");
         if (!code2 || !fm) break;
         const rows3 = (d.scenes.세력 ??= {})[code2] ??= {};
-        const row11 = rows3[fm] ??= {};
-        if (on2 === "1") delete row11.hidden;
-        else row11.hidden = true;
-        if (!Object.keys(row11).length) delete rows3[fm];
+        const row8 = rows3[fm] ??= {};
+        if (on3 === "1") delete row8.hidden;
+        else row8.hidden = true;
+        if (!Object.keys(row8).length) delete rows3[fm];
         dirUi.done = "";
         break;
       }
@@ -2238,12 +2157,12 @@ lternateGreetings,
         env3.render();
         try {
           const data3 = directoryData(d);
-          let saved2 = void 0;
-          await updateCharacterLore(ctx2.charIndex, (lore) => saved2 = withDirectory(lore, data3).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
+          let saved = void 0;
+          await updateCharacterLore(ctx2.charIndex, (lore) => saved = withDirectory(lore, data3).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
           dirUi.draft = null;
           dirUi.done = "카드 로어북에 저장했어요";
-          if (saved2 && (ctx2.chat.message ?? []).length) {
-            const lore = saved2;
+          if (saved && (ctx2.chat.message ?? []).length) {
+            const lore = saved;
             await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
               const vars = staleFactionVars(lore, chat.scriptstate);
               return vars ? { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } } : null;
@@ -2265,14 +2184,14 @@ lternateGreetings,
 
   // src/ui/copy.ts
   var copyBtn = (label2 = "복사") => `<button type="button" class="gx-mini icon gw-copy" data-copy aria-label="${label2}" title="${label2}">${ICONS.copy}</button>`;
-  async function copyText(text4) {
+  async function copyText(text5) {
     try {
-      await navigator.clipboard.writeText(text4);
+      await navigator.clipboard.writeText(text5);
       return true;
     } catch {
     }
     const ta = document.createElement("textarea");
-    ta.value = text4;
+    ta.value = text5;
     ta.setAttribute("readonly", "");
     ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
     document.body.appendChild(ta);
@@ -2295,8 +2214,8 @@ lternateGreetings,
       ev.stopPropagation();
       const el = b.closest(".gw-copyto")?.querySelector("textarea, pre, input[data-input]:not(.gw-xname):not(.gw-gtitle)");
       if (!el) return;
-      const text4 = (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement ? el.value : el.textContent ?? "").replace(/^\n/, "");
-      void copyText(text4).then((ok) => {
+      const text5 = (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement ? el.value : el.textContent ?? "").replace(/^\n/, "");
+      void copyText(text5).then((ok) => {
         if (!ok) return;
         b.classList.add("done");
         b.innerHTML = ICONS.check;
@@ -2309,7 +2228,7 @@ lternateGreetings,
   }
 
   // src/ui/imgprompt.ts
-  var esc27 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc26 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var imgUi = { template: null, extra: "", keywords: null, info: "", notice: "", preview: false };
   function imgPromptPane(ctx2) {
     const cfg = imgPromptConfig(getPrefs());
@@ -2320,21 +2239,21 @@ lternateGreetings,
     const picked = imgCharacters(ctx2.char.globalLore, cfg, { assetPlayer: s8.assetPlayer, playerEnglish: me?.english || void 0, userName: userInfo().name });
     const template = imgUi.template ?? cfg.template;
     const keywords = imgUi.keywords ?? cfg.keywords.join(", ");
-    const rows3 = cands.map((c) => `<label class="ip-name${off.has(c.name.toLowerCase()) ? " off" : ""}"><input type="checkbox" data-change="ip-toggle" data-key="${esc27(c.name)}" ${off.has(c.name.toLowerCase()) ? "" : "checked"}><span>${esc27(c.name)}</span>${c.korean ? `<small>${esc27(c.korean)}</small>` : ""}${c.source === "extra" ? `<button class="gx-mini pp-mini danger" data-action="ip-extra-del" data-value="${esc27(c.name)}" title="임의 추가 이름 지우기">지움</button>` : ""}</label>`).join("");
+    const rows3 = cands.map((c) => `<label class="ip-name${off.has(c.name.toLowerCase()) ? " off" : ""}"><input type="checkbox" data-change="ip-toggle" data-key="${esc26(c.name)}" ${off.has(c.name.toLowerCase()) ? "" : "checked"}><span>${esc26(c.name)}</span>${c.korean ? `<small>${esc26(c.korean)}</small>` : ""}${c.source === "extra" ? `<button class="gx-mini pp-mini danger" data-action="ip-extra-del" data-value="${esc26(c.name)}" title="임의 추가 이름 지우기">지움</button>` : ""}</label>`).join("");
     const state = !s8.assetOn ? "에셋 출력이 꺼져 있어 지침을 넣지 않아요." : s8.assetModel === "main" ? `메인 모델 요청 끝에 이 지침을 끼워요. 지금 대상 ${picked.length}명.` : `보조 모델이 태그를 붙여요. 이 목록과 표정 세트를 보조 모델 자료에도 써요. 지금 대상 ${picked.length}명.`;
-    const preview = imgUi.preview ? `<div class="gw-copyto gw-copybox"><pre class="ip-preview">${esc27(buildImgPrompt(cfg, picked, s8.assetPlayer))}</pre>${copyBtn("조립 결과 복사")}</div>` : "";
+    const preview = imgUi.preview ? `<div class="gw-copyto gw-copybox"><pre class="ip-preview">${esc26(buildImgPrompt(cfg, picked, s8.assetPlayer))}</pre>${copyBtn("조립 결과 복사")}</div>` : "";
     return `<article class="nw-doc pp-doc ip-pane">
-    ${imgUi.notice ? `<div class="gx-err" role="alert">${esc27(imgUi.notice)}</div>` : ""}
-    <p class="ps-note pp-intro">카드 로어북 「Asset」 대신 플러그인이 이 설정으로 지침을 만들어 요청에 넣어요. ${esc27(state)} 주인공 이미지 설정(${s8.assetPlayer ? "ON" : "OFF"})은 캐릭터 이미지 설정에서 바꿔요. 이 기기의 모든 채팅에 같이 적용돼요.</p>
+    ${imgUi.notice ? `<div class="gx-err" role="alert">${esc26(imgUi.notice)}</div>` : ""}
+    <p class="ps-note pp-intro">카드 로어북 「Asset」 대신 플러그인이 이 설정으로 지침을 만들어 요청에 넣어요. ${esc26(state)} 주인공 이미지 설정(${s8.assetPlayer ? "ON" : "OFF"})은 캐릭터 이미지 설정에서 바꿔요. 이 기기의 모든 채팅에 같이 적용돼요.</p>
     <section class="ps-group"><h3>지침 틀</h3><p class="ps-note">자리표 <code>{characters}</code> <code>{keywords}</code> 는 아래 목록으로 채워지고, <code>{user_skip}</code> <code>{user_rule}</code> 는 주인공 이미지 설정에 따라 채워져요. 비우면 기본 틀.</p>
-      <div class="gw-copyto gw-copybox"><textarea class="gx-search nw-reqbox ip-template" name="ip-template" data-input="ip-template" data-autosave="ip-template-save" rows="14" maxlength="${IMG_TEMPLATE_MAX}">${esc27(template)}</textarea>${copyBtn()}</div>
+      <div class="gw-copyto gw-copybox"><textarea class="gx-search nw-reqbox ip-template" name="ip-template" data-input="ip-template" data-autosave="ip-template-save" rows="14" maxlength="${IMG_TEMPLATE_MAX}">${esc26(template)}</textarea>${copyBtn()}</div>
       <div class="gx-row-btns"><button class="gx-mini" data-action="ip-preview">${imgUi.preview ? "미리보기 닫기" : "조립 결과 미리보기"}</button></div>${preview}</section>
     <section class="ps-group"><h3>출력 대상 캐릭터<b>${picked.length}</b></h3><p class="ps-note">명부의 요원 영문명을 자동으로 읽어요 (한글 이름·별칭도 명부에서 가져와 보조 모델 자료로 써요). 체크를 풀면 그 인물은 태그를 안 만들어요. 그림 에셋 이름(영문명_표정)과 같아야 해요.</p>
       <div class="ip-names">${rows3}</div>
-      <div class="ip-extra"><input class="gx-search" data-input="ip-extra" name="ip-extra" maxlength="40" placeholder="임의 추가 (영문명, 예: Avensha)" value="${esc27(imgUi.extra)}"><button class="gx-mini ps-save" data-action="ip-extra-add" data-take="ip-extra"${needAttr("ip-extra", imgUi.extra)}>추가</button></div></section>
+      <div class="ip-extra"><input class="gx-search" data-input="ip-extra" name="ip-extra" maxlength="40" placeholder="임의 추가 (영문명, 예: Avensha)" value="${esc26(imgUi.extra)}"><button class="gx-mini ps-save" data-action="ip-extra-add" data-take="ip-extra"${needAttr("ip-extra", imgUi.extra)}>추가</button></div></section>
     <section class="ps-group"><h3>표정 세트<b>${cfg.keywords.length}</b></h3><p class="ps-note">쉼표로 나눠요. 카드 그림(영문명_표정)에 있는 이름이어야 해요. 비우면 기본 27종.</p>
-      <div class="gw-copyto gw-copybox"><textarea class="gx-search nw-reqbox" name="ip-keywords" data-input="ip-keywords" data-autosave="ip-keywords-save" rows="3" maxlength="1200">${esc27(keywords)}</textarea>${copyBtn()}</div></section>
-    ${imgUi.info ? `<p class="gx-hint">${esc27(imgUi.info)}</p>` : ""}
+      <div class="gw-copyto gw-copybox"><textarea class="gx-search nw-reqbox" name="ip-keywords" data-input="ip-keywords" data-autosave="ip-keywords-save" rows="3" maxlength="1200">${esc26(keywords)}</textarea>${copyBtn()}</div></section>
+    ${imgUi.info ? `<p class="gx-hint">${esc26(imgUi.info)}</p>` : ""}
   </article>`;
   }
   function imgInput(name, value) {
@@ -2421,12 +2340,12 @@ lternateGreetings,
     let y0 = 0;
     let id2 = null;
     let dragging = false;
-    let shown3 = 0;
+    let shown4 = 0;
     let ready = false;
     const paint = () => {
-      track2.style.transform = shown3 ? `translateX(${shown3}px)` : "";
+      track2.style.transform = shown4 ? `translateX(${shown4}px)` : "";
       const was = ready;
-      ready = Math.abs(shown3) >= closeW();
+      ready = Math.abs(shown4) >= closeW();
       track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
       if (ready && !was) navigator.vibrate?.(8);
     };
@@ -2436,7 +2355,7 @@ lternateGreetings,
       if (!dragging) return;
       const close3 = ready;
       track2.classList.add("back");
-      shown3 = 0;
+      shown4 = 0;
       paint();
       setTimeout(() => track2.classList.remove("back"), 260);
       if (close3) onClose();
@@ -2457,7 +2376,7 @@ lternateGreetings,
         dragging = true;
         bar.setPointerCapture?.(e.pointerId);
       }
-      shown3 = rubber(dx, closeW());
+      shown4 = rubber(dx, closeW());
       paint();
     });
     bar.addEventListener("pointerup", end);
@@ -2477,11 +2396,11 @@ lternateGreetings,
    ─ 줄 = [이름 200][조작 바로 옆, 왼쪽 정렬] / 설명은 조작 아래. 글칸(여러 줄) 줄은 이름 위·글칸 아래 전체 폭.
    ─ 묶음 = 작은 제목 + 카드 하나(상자 한 겹). 카드 안 줄은 가는 선으로만 나뉨. 상자 속 상자 없음.
    ─ 색: 카드 panel, 입력칸(들어간 면) void, 단추(올린 면) panel2, 고른 것 accent-bg + accent-line. 그 밖의 색 없음.
-   폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%), 높이 92%, 760px 이하 전체 화면 */
+   폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%, 최대 1340px), 높이 90%, 760px 이하 전체 화면 */
 .gw { --h: 34px; --r: 8px; --gap: 8px; --pad: 14px; --label: 200px; --ctl: 320px; --hair: var(--panel2);
   position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 14px/1.5 var(--font); }
 .gw[hidden] { display: none; }
-.gw-win { position: relative; width: var(--gw-width, 90%); height: min(92%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.gw-win { position: relative; width: min(var(--gw-width, 90%), 1340px); height: min(90%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
 .gw * { box-sizing: border-box; }
 .gw button:focus-visible, .gw input:focus-visible, .gw select:focus-visible, .gw textarea:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; }
 
@@ -2993,111 +2912,169 @@ lternateGreetings,
 /* 추가 규칙: 규칙마다 접는 칸 한 페이지 (11-09) */
 .gw-rule { margin-bottom: 8px; }
 .gw-rule > summary.ps-adv-sum .gw-state { margin-left: 8px; }
-`;
 
-  // src/ui/editor/record.ts
-  var esc28 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var recUi = {
-    /** 괴이 공통 머리말 칸 펼침 */
-    noteOpen: false,
-    preview: false,
-    importOpen: false,
-    importText: "",
-    importResult: null,
-    adding: false,
-    newExtra: { name: "", kind: "block" },
-    variant: "",
-    tokensHtml: (ctx2, kind, over) => {
-      const name = edUi.sel[kind] ?? "";
-      const rec2 = name ? worldRecord(kind, name, over) : null;
-      if (!rec2) return '<span class="gw-tokens"></span>';
-      return `<span class="gw-tokens">조립 ${tokenizerName() ? "" : "약 "}${tokens(recordText(kind, name, rec2, directoryDraft(ctx2))).toLocaleString()}토큰</span>`;
-    }
-  };
-  function recordCount(ctx2, kind, over) {
-    return rowsOf3(ctx2, kind, over).filter((r) => r.state !== "deleted").length;
-  }
-  function presetOf(d, kind, name) {
-    if (kind !== "anomaly" && kind !== "site") return null;
-    const p2 = (kind === "anomaly" ? d.anomalies : d.sites).find((x) => x.lore === name);
-    return p2 ? !!p2.preset : null;
-  }
-  var presetToggle = (kind, name, on2) => on2 === null ? "" : `<button class="gw-pre${on2 ? " on" : ""}" data-action="dir-set" data-value="${esc28(`preset|${on2 ? 0 : 1}|${name}`)}" title="무작위 발생 후보 ${on2 ? "ON → OFF" : "OFF → ON"}" aria-pressed="${on2}">${on2 ? "발생 ON" : "발생 OFF"}</button>`;
-  function rowsOf3(ctx2, kind, over) {
-    const d = directoryDraft(ctx2);
-    const recs = worldRecords(kind, over);
-    const bucket = over[kind] ?? {};
-    const names4 = [];
-    if (kind === "agent") names4.push(...d.agents.map((a) => a.lore));
-    else if (kind === "anomaly") names4.push(...d.anomalies.map((p2) => p2.lore));
-    else if (kind === "site") names4.push(...d.sites.map((p2) => p2.lore));
-    else if (kind === "org") names4.push(...d.orgs.map((o) => o.name).filter((n3) => !PLACEHOLDER_ORGS.has(n3)));
-    else names4.push(...d.appendices.map((r) => r.lore));
-    for (const n3 of recs.keys()) if (!names4.includes(n3)) names4.push(n3);
-    for (const n3 of Object.keys(bucket)) if (!names4.includes(n3)) names4.push(n3);
-    return names4.map((name) => {
-      const rec2 = recs.get(name);
-      const sub = kind === "agent" ? d.agents.find((a) => a.lore === name)?.english ?? "" : kind === "org" ? d.orgs.find((o) => o.name === name)?.spec.english ?? "" : (d.anomalies.find((p2) => p2.lore === name) ?? d.sites.find((p2) => p2.lore === name))?.english ?? "";
-      const state = bucket[name]?.deleted ? "deleted" : !isDefaultRecord(kind, name) ? "new" : bucket[name] ? "edited" : "default";
-      const place3 = kind === "anomaly" || kind === "site" ? (kind === "anomaly" ? d.anomalies : d.sites).find((p2) => p2.lore === name) : void 0;
-      const outside = place3 && !place3.inFolder ? `다른 폴더에서 온 후보${loreSourceOf(ctx2, name) ? ` · ${loreSourceOf(ctx2, name)}` : ""}` : "";
-      return { name, sub: [sub, outside].filter(Boolean).join(" · ") || (rec2 ? "" : "로어 칸 없음"), state, preset: presetOf(d, kind, name) };
-    });
-  }
-  function recordList(ctx2, kind, over, q) {
-    const rows3 = rowsOf3(ctx2, kind, over).filter((r) => !q || r.name.toLowerCase().includes(q.toLowerCase()) || r.sub.toLowerCase().includes(q.toLowerCase()));
-    const sel = edUi.sel[kind] ?? "";
-    const badge3 = { default: "", edited: '<i class="gw-badge">고침</i>', new: '<i class="gw-badge new">추가</i>', deleted: '<i class="gw-badge del">지움</i>' };
-    return rows3.length ? rows3.map((r) => `<div class="gw-rowbox${r.name === sel ? " on" : ""}${r.state === "deleted" ? " deleted" : ""}"><button class="gw-row" data-action="ed-sel" data-value="${esc28(r.name)}"><b>${esc28(r.name)}</b>${r.sub ? `<small>${esc28(r.sub)}</small>` : ""}${badge3[r.state]}</button>${presetToggle(kind, r.name, r.preset)}</div>`).join("") : '<p class="gx-muted">맞는 기록이 없어요.</p>';
-  }
-  var basicPanel = (ctx2, kind, name, d) => {
-    if (kind === "agent") {
-      const a = d.agents.find((x) => x.lore === name);
-      return a ? agentPanel(a, ctx2, d) : "";
-    }
-    if (kind === "org") {
-      const o = d.orgs.find((x) => x.name === name);
-      return o ? orgPanel(o, ctx2, d) : "";
-    }
-    if (kind === "appendix") {
-      const r = d.appendices.find((x) => x.lore === name);
-      return r ? appendixPanel(r, ctx2, d) : "";
-    }
-    const p2 = (kind === "anomaly" ? d.anomalies : d.sites).find((x) => x.lore === name);
-    return p2 ? placePanel(p2, ctx2) : "";
-  };
-  function fieldRow(kind, rec2, def, name, auto = "") {
-    const v = recUi.variant ? rec2.variants?.[recUi.variant]?.[def.id] ?? "" : rec2.fields[def.id] ?? "";
-    const key = `${kind}|${name}|${def.id}`;
-    const tok3 = tokens(v);
-    const ph = recUi.variant ? "비우면 기본 글" : auto ? `자동: ${auto}` : "";
-    const ctl = def.type === "line" ? `<input data-input="ed-field" data-key="${esc28(key)}" value="${esc28(v)}" autocomplete="off" placeholder="${esc28(ph)}">` : `<textarea data-input="ed-field" data-key="${esc28(key)}" rows="3" placeholder="${esc28(ph)}">
-${esc28(v)}</textarea>`;
-    return `<div class="gw-field gw-copyto" data-field-row="${esc28(def.id)}">
-    <div class="gw-field-head"><span class="gw-grip" draggable="true" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc28(def.label)}</b><small class="gw-ftitle">${esc28(def.title)}</small>${def.hint ? `<button type="button" class="gw-fhint" data-action="ed-hint" data-hint="${esc28(def.hint)}" aria-label="설명">?</button>` : ""}<span class="gw-ftok">${tok3 ? `${tok3}토큰` : ""}</span>
-      <span class="gw-fmove">${copyBtn()}<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc28(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc28(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
-    ${ctl}</div>`;
-  }
-  function extraRow(kind, rec2, e, i, name) {
-    const key = `${kind}|${name}|${i}`;
-    const id2 = e.kind === "block" ? `x:${e.name}` : `xl:${i}`;
-    const place3 = e.kind === "line" ? `<small class="gw-ftitle">${e.sec === "appearance" ? "Appearance" : "Identity"} 절 · 한 줄${e.at ? ` · ${esc28(e.at)} 뒤` : " · 맨 앞"}</small>` : '<small class="gw-ftitle">절</small>';
-    const ctl = e.kind === "line" ? `<input data-input="ed-extra" data-key="${esc28(key)}" value="${esc28(e.value)}" autocomplete="off">` : `<textarea data-input="ed-extra" data-key="${esc28(key)}" rows="3">
-${esc28(e.value)}</textarea>`;
-    return `<div class="gw-field extra gw-copyto" data-field-row="${esc28(id2)}">
-    <div class="gw-field-head"><span class="gw-grip"${e.kind === "block" ? ' draggable="true" title="끌어서 순서 바꾸기"' : ""}>${e.kind === "block" ? ICONS.grip : ""}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc28(key)}" value="${esc28(e.name)}" aria-label="칸 이름">${place3}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ""}</span>
-      <span class="gw-fmove">${copyBtn()}${e.kind === "block" ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc28(id2)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc28(id2)}" aria-label="아래로">${ICONS.down}</button>` : ""}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
-    ${ctl}</div>`;
-  }
-  function basicCard(ctx2, kind, sel, d, rec2) {
-    const panel = basicPanel(ctx2, kind, sel, d);
-    const onoff = (action, on2) => switchHtml({ action, value: "", on: on2 });
-    let first = "";
-    if (rec2 && kind === "agent") first = `<div class="dir-line"><span>Roster 지침에 포함</span>${onoff("ed-roster-toggle", !rec2.rosterOff)}<small>${rec2.rosterOff ? "명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요." : "명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함."}</small></div>`;
-    if (rec2 && kind === "org") first = `<div class="dir-line"><span>세력 관계도에 포함</span>${onoff("ed-rel-member-toggle", !rec2.relOff)}<small>${rec2.relOff ? "관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직)." : "Faction 지침의 관계 표에 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요."}</small></div>`;
-    const body5 = panel ? first ? panel.replace('<div class="dir-panel">', `<div class="dir-panel">${first}`) : panel : `<div class="dir-panel"><p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p></div>`;
-    return `<section class="gw-sec gw-basic"><h3>기본 정보</h3>${body5}</section>`;
-  }
-  function keysRow(kind, sel, rec2) {
-    const ph = kind === "appendix" ? "비우면 키 없음 (다른 켜지는 조건만)" : "비우면 이름·영문명·별칭";
-    return `<div class="gw-keys"><span>호출 단어<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="이 말이 최근 대화에 나오면 로어북이 켜져요. 쉼표로 나눠 적어요. ${esc28(ph)}.">?</button></span><input data-input="ed-keys" data-key="${esc28(`${kind}|${sel}|keys`)}" value="${esc28(rec2.keys ?? "")}" placeholder="${esc28(p
+/* ── 표: [이름][사이트 칸 × N] 격자, 설명은 칸들 아래 (줄 규격 [이름][조작] 을 칸 여럿으로 늘린 것. 설정 개편 4단계) ── */
+.gw .mx { display: block; }
+.gw .mx-head, .gw .mx-row { display: grid; grid-template-columns: var(--label) repeat(var(--mx-n), minmax(0, 1fr)); column-gap: 16px; }
+.gw .mx-head { position: sticky; top: 0; z-index: 3; align-items: center; margin: 0 0 12px; padding: 8px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.gw .mx-head label { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
+.gw .mx-head label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw .mx-head label svg, .gw .mx-head label img { width: 18px; height: 18px; flex: 0 0 auto; }
+.gw .mx-row { row-gap: 4px; align-items: start; padding: 10px var(--pad); border-top: 1px solid var(--hair); }
+.gw .ps-rows > .mx-row:first-child { border-top: 0; }
+.gw .mx-label { grid-column: 1; display: flex; align-items: center; min-width: 0; min-height: var(--h); font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); }
+.gw .mx-cell { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--gap); min-width: 0; min-height: var(--h); }
+.gw .mx-cell + .mx-cell { box-shadow: -9px 0 0 -8px var(--hair); }
+.gw .mx-cell .gx-chips { margin: 0; gap: 4px; }
+.gw .mx-cell .ps-text, .gw .mx-cell > input.gx-search:not(.ph-pct) { width: 100%; }
+.gw .mx-cell .ph-pct { width: 56px; }
+.gw .mx-cell .adv-val { max-width: 100%; }
+.gw .mx-site, .gw .mx-r { display: none; }
+.gw .mx-none { color: var(--dim); font-size: 13px; opacity: .65; }
+.gw .mx-all { grid-column: 2 / -1; }
+.gw .mx-shared, .gw .mx-cap { color: var(--dim); font-size: 12.5px; white-space: nowrap; }
+.gw .mx-help { grid-column: 2 / -1; display: block; margin: 0; font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--dim); }
+.gw .mx-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 20px; padding: 10px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--dim); font-size: 13px; }
+.gw .mx-note { margin: 0; padding: 10px var(--pad); border-bottom: 1px solid var(--hair); font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .ck { margin-bottom: 20px; }
+.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) var(--ck-cols, repeat(var(--ck-n), minmax(0, 1fr))); align-items: center; padding: 0 10px; }
+.gw .ck-h1 { padding-top: 8px; font-size: 13px; color: var(--text); }
+.gw .ck-h1 b { padding: 2px 4px; font-weight: 700; text-align: center; word-break: keep-all; }
+.gw .ck-h2 { padding-bottom: 6px; border-bottom: 1px solid var(--hair); font-size: 12.5px; color: var(--dim); }
+.gw .ck-h2 > span { text-align: center; line-height: 1.25; word-break: keep-all; }
+.gw .ck-row { min-height: 38px; border-top: 1px solid var(--hair); }
+.gw .ck-h2 + .ck-row { border-top: 0; }
+.gw .ck-name { min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); }
+.gw .ck-cell { display: flex; align-items: center; justify-content: center; align-self: stretch; }
+.gw .ck-first { box-shadow: inset 1px 0 0 var(--hair); }
+.gw .ck-m { width: 22px; height: 22px; padding: 0; border: 1.5px solid var(--line); background: var(--void); cursor: pointer; }
+.gw .ck-m.round { border-radius: 50%; }
+.gw .ck-m.box { border-radius: 6px; }
+.gw .ck-m.on { border-color: var(--signal); background: var(--signal); box-shadow: inset 0 0 0 4px var(--panel); }
+.gw .ck-m.box.on { box-shadow: none; background: var(--signal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%230b1f1c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.gw .ck-x { color: var(--dim); opacity: .5; }
+.gw .ck > h3 { margin-bottom: 8px; }
+.gw .ck-ph { display: none; }
+.gw .ck-band { box-shadow: inset 2px 0 0 var(--line); }
+.gw .mx-foot:has(.ck-foot1) { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 12px 28px; }
+.gw .ck-foot1 { display: block; min-width: 0; }
+.gw .ck-foot1 > b { display: block; margin-bottom: 4px; color: var(--text); font-size: 13px; font-weight: 700; }
+.gw .hl { display: block; }
+.gw .hl-h { display: block; margin-top: 6px; color: var(--text); font-size: 12.5px; font-weight: 600; opacity: .8; }
+.gw .hl-h:first-child { margin-top: 0; }
+.gw .hl-i { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); column-gap: 10px; padding: 2px 0; line-height: 1.5; }
+.gw .hl-i > b { color: var(--dim); font-weight: 700; word-break: keep-all; }
+.gw .hl-i > span:only-child { grid-column: 1 / -1; }
+.gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 12.5px; }
+.gw .ck-h2.solo { padding-top: 8px; }
+.gw .ck-h2 > span { padding: 0 3px; }
+.gw .ck-n { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--void); overflow: hidden; }
+.gw .ck-n b { min-width: 32px; padding: 0 4px; font-size: 13px; font-weight: 600; text-align: center; color: var(--text); }
+.gw .ck-s { width: 22px; height: 26px; padding: 0; border: 0; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1; cursor: pointer; }
+.gw .mx-grid { margin-bottom: 20px; --label: var(--gname, 96px); }
+/* 격자의 이름 칸은 한 페이지 안에서 모두 같은 폭 (--gname). 이름이 긴 페이지(상점)는 페이지째 넓힌다 */
+.gw .fam-wide { --gname: 136px; }
+.gw .mx-grid .mx-row, .gw .mx-grid .mx-head { padding-left: 10px; padding-right: 10px; }
+.gw .mx-grid .mx-head { position: static; margin: 0; border: 0; border-bottom: 1px solid var(--hair); border-radius: 0; background: none; }
+.gw .mx-grid .mx-head label { font-size: 12.5px; font-weight: 600; color: var(--dim); cursor: default; }
+.gw .mx-grid .mx-row { align-items: center; }
+.gw .mx-grid .ps-rows > .mx-row:nth-child(2) { border-top: 0; }
+.gw .mx-name { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.gw .mx-name svg, .gw .mx-name img { width: 18px; height: 18px; flex: 0 0 auto; }
+.gw .mx-cell .mx-sel { width: auto; min-width: 7.5em; }
+.gw .mx-foot { display: block; padding: 10px var(--pad) 12px; border-top: 1px solid var(--hair); font-size: 13px; line-height: 1.55; color: var(--dim); }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .mx-head { display: flex; gap: 4px; top: 0; margin: 0 0 10px; padding: 4px; }
+  .gw .mx-head > span { display: none; }
+  .gw .mx-head label { flex: 1 1 0; flex-direction: column; justify-content: center; gap: 3px; min-height: 48px; padding: 4px 2px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--dim); text-align: center; cursor: pointer; }
+  .gw .mx-head label > span { white-space: normal; line-height: 1.2; }
+  .gw .mx-r:nth-of-type(1):checked ~ .mx-head label:nth-of-type(1), .gw .mx-r:nth-of-type(2):checked ~ .mx-head label:nth-of-type(2),
+  .gw .mx-r:nth-of-type(3):checked ~ .mx-head label:nth-of-type(3), .gw .mx-r:nth-of-type(4):checked ~ .mx-head label:nth-of-type(4) { background: var(--accent-bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--accent-line); }
+  .gw .mx-r:nth-of-type(1):checked ~ .ps-group .mx-cell:not(.mx-c0):not(.mx-all), .gw .mx-r:nth-of-type(2):checked ~ .ps-group .mx-cell:not(.mx-c1):not(.mx-all),
+  .gw .mx-r:nth-of-type(3):checked ~ .ps-group .mx-cell:not(.mx-c2):not(.mx-all), .gw .mx-r:nth-of-type(4):checked ~ .ps-group .mx-cell:not(.mx-c3):not(.mx-all) { display: none; }
+  .gw .mx-row { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; }
+  .gw .mx-label { grid-column: 1; white-space: nowrap; }
+  .gw .mx-cell { grid-column: 2; justify-content: flex-end; box-shadow: none; }
+  .gw .mx-cell + .mx-cell { box-shadow: none; }
+  .gw .mx-cell .gx-chips { justify-content: flex-end; }
+  .gw .mx-cell.wide, .gw .mx-cell.mx-all { grid-column: 1 / -1; justify-content: flex-start; }
+  .gw .mx-help { grid-column: 1 / -1; }
+  .gw .ck-pc { display: none; }
+  .gw .hl-i { grid-template-columns: 1fr; padding: 4px 0; }
+  .gw .ck-ph { display: block; }
+  .gw .ck-line { grid-template-columns: 74px repeat(var(--ck-n), minmax(0, 1fr)); padding: 0 6px; }
+  .gw .ck-name .mx-name svg, .gw .ck-name .mx-name img { width: 15px; height: 15px; }
+  .gw .ck-name { font-size: 12.5px; letter-spacing: -.3px; }
+  .gw .ck-h1 b { padding-left: 4px; font-size: 12px; text-align: center; white-space: normal; }
+  .gw .ck-h2 { font-size: 10.5px; letter-spacing: -.3px; }
+  .gw .ck-name { font-size: 13px; }
+  .gw .ck-name .mx-name { gap: 5px; }
+  .gw .ck-m { width: 24px; height: 24px; }
+  .gw .ck-n { flex-direction: column-reverse; width: 100%; max-width: 46px; margin: 6px 0; }
+  .gw .ck-n b { min-width: 0; padding: 3px 0; font-size: 12px; letter-spacing: -.3px; }
+  .gw .ck-s { width: 100%; height: 24px; }
+  .gw .ck-h1 b { padding: 2px 1px; font-size: 11px; letter-spacing: -.3px; }
+  .gw .ck-h2 > span { padding: 0 1px; }
+  .gw .mx-grid .mx-head { display: none; }
+  .gw .mx-grid .mx-row { display: block; padding: 12px var(--pad); }
+  .gw .mx-grid .mx-label { margin-bottom: 6px; font-size: 15px; }
+  .gw .mx-grid .mx-cell { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 10px; padding: 4px 0; }
+  .gw .mx-grid .mx-site { display: block; flex: 0 0 auto; white-space: nowrap; color: var(--dim); font-size: 13px; }
+  .gw .mx-help { margin-top: 6px; }
+}
+
+/* ── 시안 7 (인터넷 다시): 설명 한 가지 모양, 구역 제목, 두 칸 ── */
+.gw h2.fam-h { margin: 22px 0 12px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 16px; font-weight: 700; color: var(--text); }
+.gw h2.fam-h:first-of-type { margin-top: 6px; padding-top: 0; border-top: 0; }
+/* 설명: 제목·세로선 없음. 전부 흐린 13px. 항목 이름은 같은 색에 굵기만 */
+.gw .hb, .gw .hb-lead, .gw .hb-list { display: block; }
+.gw .hb { font-size: 13px; line-height: 1.5; color: var(--dim); font-weight: 400; }
+.gw .hb-lead + .hb-list { margin-top: 2px; }
+.gw .hb-i { display: grid; grid-template-columns: 7em minmax(0, 1fr); column-gap: 10px; }
+.gw .hb-i > b { font-weight: 700; color: var(--dim); word-break: keep-all; }
+.gw .mx-foot { padding: 8px var(--pad) 10px calc(var(--pad) - 4px); border-top: 0; font-size: 13px; }
+.gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 13px; }
+.gw .mx-foot:has(.ck-foot1) { display: block; }
+.gw .mx-grid .mx-foot { padding: 8px 10px 10px; }
+/* 격자 안 숫자: 공통 규격 ± 상자 그대로 */
+.gw .ck .st-step > b { min-width: 2.6em; }
+.gw .ck-row { min-height: 44px; }
+.gw .mx-grid.ck-ph { display: none; }
+/* 숫자가 든 격자(공통): 이름 칸은 모든 격자 96px(.ck-line·.mx-grid --label), 「최소·최대」 한 쌍은 붙이고 묶음 사이를 띄운다. 조작 크기는 그대로 */
+.gw .ck-hasnum .ck-cell.ck-pl { justify-content: flex-end; padding-right: 2px; }
+.gw .ck-hasnum .ck-cell.ck-pr { justify-content: flex-start; padding-left: 2px; }
+/* 같은 종류 수 여럿을 한 줄에: 「이름 + 상자」 짝이 나란히, 모자라면 다음 줄로 */
+.gw .fam-set { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.gw .fam-set1 { display: inline-flex; align-items: center; gap: 8px; }
+.gw .fam-l { font-size: 13px; color: var(--text); white-space: nowrap; }
+/* 격자 칸의 수 상자: 규격 그대로(높이·단추 폭). 가운데 수 칸 폭은 자릿수에 맞춘 값(setrow.ts numWidth) */
+/* 173줄의 입력 공통 규칙(안쪽 여백 12px)이 더 세서 수가 잘린다 → 수 칸만 여백을 줄인다 */
+.gw .adv-step > input.adv-val { padding: 0 4px !important; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .ps-ctl > .fam-set { flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
+  .gw .ps-ctl > .fam-set > .fam-set1 { justify-content: space-between; }
+  .gw .hb-i { grid-template-columns: 6.5em minmax(0, 1fr); }
+  .gw .mx-grid.ck-ph { display: block; }
+  .gw .mx-grid.ck-ph .mx-cell { flex-wrap: wrap; align-items: center; }
+  .gw .mx-grid.ck-ph .fam-set { display: flex; flex-wrap: nowrap; gap: 8px 12px; justify-content: flex-end; width: auto; }
+  .gw .mx-grid.ck-ph .fam-set1 { display: inline-flex; align-items: center; gap: 6px; }
+  .gw .mx-grid.ck-ph .fam-set1 > span { font-size: 13px; color: var(--text); white-space: nowrap; }
+  .gw .mx-grid.ck-ph .st-step > b { min-width: 2.4em; }
+}
+.gw .ps-row .hb-i > b, .gw .mx-foot .hb-i > b { font-size: 13px; font-weight: 700; color: var(--dim); }
+.gw .fam-set > .st-step { justify-self: start; }
+
+/* 격자 칸 수의 기본값 (실제 값은 격자마다 style 로 준다) */
+.gw .mx { --mx-n: 4; }
+.gw .ck { --ck-n: 1; }
+/* 잠긴 체크 칸 (다른 설정 때문에 지금 못 바꾸는 값) */
+.gw .ck-m:disabled { opacity: .45; cursor: default; }
+
+/* ── 시안: AI 상담 창. 설정 창 옆(PC) · 아래에서 올라오는 판(폰). 설정 창과 같은 색·조작 규격 ── */
+.gw.ai-on { gap: 12px; }
+.gw-ai { position: relative; width: 380px; height: min(90%, calc(100% - 24px)); flex: none; display: flex; flex-direction: column; background: var(--void); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 48px rgba(0, 0, 0, .35); overflow: hidden; }
+.gw-ai-top { display: flex; align-items: center; gap: 8px; height: 52px; flex: none; padding: 0 10px 0 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.gw-ai-top > b { font-size: 15px; font-weight: 700; }
+.gw-ai-top .gw-brand { margin-right: 0; }
+.gw-ai-top .ai-model { margin-left: 2px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; color: var(--dim); }
+.gw-ai-top .gx-x { marg

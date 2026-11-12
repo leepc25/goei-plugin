@@ -136,6 +136,13 @@ export function stripDecorators(content: string): string {
 
 const cache = new WeakMap<LoreEntry[], ManagedEntry[]>();
 
+/** 키 말고도 그 항목을 부르는 말: 로어북 이름과 명부의 이름·영문명·별칭 (한 글자는 뺀다) */
+function callNames(name: string, kind: LoreKind, called: Map<string, string[]>): string[] {
+  const all = [name, ...(called.get(`${kind}:${name}`) ?? [])].map((t) => (typeof t === 'string' ? t.trim() : '')).filter((t) => syllables(t) >= 2);
+  // 띄어쓰기만 다른 말(호이사·호 이사)도 따로 둔다: 사람 이름 키는 키에 없는 띄어쓰기를 봐주지 않는다
+  return all.filter((t, i) => all.findIndex((x) => x.toLowerCase() === t.toLowerCase()) === i);
+}
+
 /** 자리 항목 4개가 다 있는 카드인지 (없으면 고른 글이 들어갈 곳이 없어 아무것도 하지 않는다) */
 export function hasSlots(lore: LoreEntry[] | undefined): boolean {
   const names = new Set((lore ?? []).map((e) => str(e.comment)));
@@ -207,6 +214,10 @@ export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
     const a = dir.agents.find((x) => x.lore === name || x.name === name || x.aliases.includes(name));
     return a ? [...new Set([a.name, a.lore, a.english, ...a.aliases].filter(Boolean))] : [name];
   };
+  const called = new Map<string, string[]>();
+  for (const r of dir.agents) called.set(`agent:${r.lore}`, [r.name, r.english, ...r.aliases]);
+  for (const r of dir.anomalies) called.set(`anomaly:${r.lore}`, [r.english, ...r.aliases]);
+  for (const r of dir.sites) called.set(`site:${r.lore}`, [r.english, ...r.aliases]);
   const out: ManagedEntry[] = [];
   books.forEach((e, index) => {
     const folderKind = kinds.get(str(e.folder));
@@ -232,9 +243,12 @@ export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
       kind = folderKind;
     }
     const raw = appendix && !appendix.when.keys ? [] : keysOf(e);
-    const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
+    // 부르는 말: 키 + 로어북 이름 + 명부의 이름·영문명·별칭 (2026-11-12 사용자: 「착한 친구」가 브라우니 별칭인데 키에 없어 안 켜짐).
+    // 키에 빠져 있어도 명부에서 그 항목을 가리키는 말이면 켠다. 흔한 낱말은 아래 확증·두 글자 규칙이 그대로 거른다
+    const calls = appendix ? raw : [...raw, ...callNames(str(e.comment), kind, called).filter((t) => !raw.some((k) => k.toLowerCase() === t.toLowerCase()))];
+    const longKo = calls.filter((k) => hangul(k) && syllables(k) >= 3);
     const keys: LoreKey[] = [];
-    for (const text of raw) {
+    for (const text of calls) {
       const en = !hangul(text);
       const re = keyRegex(text, en, kind === 'agent');
       if (!re) continue;
@@ -400,11 +414,13 @@ export function loreState(chat: Chat): LoreState {
   return { target, board, deployed, place, companions, unlocked: readUnlocked(chat.scriptstate) };
 }
 
-const sameName = (a: string, b: string) => a.replace(/\s+/g, '').toLowerCase() === b.replace(/\s+/g, '').toLowerCase();
+function sameName(a: string, b: string): boolean {
+  return a.replace(/\s+/g, '').toLowerCase() === b.replace(/\s+/g, '').toLowerCase();
+}
 
 /** 항목 이름이나 키 중 하나가 이 이름과 같은지 */
 function names(e: ManagedEntry, name: string): boolean {
-  return !!name.trim() && (sameName(e.name, name) || e.rawKeys.some((k) => sameName(k, name)));
+  return !!name.trim() && (sameName(e.name, name) || e.rawKeys.some((k) => sameName(k, name)) || e.keys.some((k) => sameName(k.text, name)));
 }
 
 /**

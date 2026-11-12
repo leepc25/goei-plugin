@@ -33,9 +33,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   always: '',
   recent_msgs: '4',
   router_rules: '',
-  /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
+  /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게 */
   model_director: 'same', model_router: 'same', model_tidy: 'same',
-  model_id_update: '', model_id_director: '', model_id_router: '', model_id_tidy: '',
   /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
   hypa: '0',
   hypa_cap: '3000',
@@ -65,9 +64,7 @@ export const PP_DEFAULTS: Record<string, string> = {
   faction_rep: '1',
   /** 세력 평판 수치 (1) / 정성 모드 (0): 갱신기가 단계(적대…우호)와 이유만 판단, 계기 점수·구간 경계·몹 목격 무게 안 씀 (11-07 사용자: 호감·의심·음란도처럼 따라간다) */
   num_faction_rep: '1',
-  faction_inject: '1',
   faction_bounds: '61,21,-20,-60',
-  mob_weight: 'half',
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '0',
@@ -94,7 +91,8 @@ export interface PeopleSettings {
   when: 'turn' | 'manual';
   model: 'main' | 'aux';
   prompt: 'detailed' | 'compact';
-  inject: 'split' | 'append' | 'record' | 'off';
+  /** 메인 요청에 넣는 방식. 2026-11-11 사용자: 넣지 않는 선택지(off)는 뺌 — 안 넣을 거면 인물 기록을 끄면 된다 */
+  inject: 'split' | 'append' | 'record';
   director: 'off' | 'note' | 'facts' | 'scene';
   directorLang: 'en' | 'ko';
   directorLen: 'short' | 'normal';
@@ -142,11 +140,9 @@ export interface PeopleSettings {
   personCap: number;
   blockCap: number;
   tidy: 'same' | 'separate';
-  factionInject: boolean;
   /** 세력 평판 정성 모드 (num_faction_rep = 0) */
   factionQual: boolean;
   factionBounds: [number, number, number, number];
-  mobWeight: 'half' | 'full' | 'off';
   spanCap: number;
   rules: string;
   directorRules: string;
@@ -175,7 +171,7 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     when: one('when', ['turn', 'manual'] as const),
     model: v('model') === 'main' ? 'main' : 'aux',
     prompt: one('prompt', ['detailed', 'compact'] as const),
-    inject: one('inject', ['split', 'append', 'record', 'off'] as const),
+    inject: one('inject', ['split', 'append', 'record'] as const),
     director: one('director', ['off', 'note', 'facts', 'scene'] as const),
     directorLang: v('director_lang') === 'ko' ? 'ko' : 'en',
     directorLen: v('director_len') === 'normal' ? 'normal' : 'short',
@@ -193,7 +189,8 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
       const pick = (k: string): 'main' | 'aux' => (v(k) === 'main' ? 'main' : v(k) === 'aux' ? 'aux' : base);
       return { update: base, director: pick('model_director'), router: pick('model_router'), tidy: pick('model_tidy') };
     })(),
-    stageModelId: { update: v('model_id_update').trim().slice(0, 120), director: v('model_id_director').trim().slice(0, 120), router: v('model_id_router').trim().slice(0, 120), tidy: v('model_id_tidy').trim().slice(0, 120) },
+    // 전용 모델 ID: 없앤 기능 (2026-11-12 사용자). 늘 비어 있다 → 메인·보조 설정대로
+    stageModelId: { update: '', director: '', router: '', tidy: '' },
     hypa: v('hypa') === '1',
     hypaCap: num('hypa_cap', 500, 24000),
     hypaItems: num('hypa_items', 1, 64),
@@ -217,11 +214,8 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     personCap: num('person_cap', 2000, 40000),
     blockCap: num('block_cap', 4000, 64000),
     tidy: v('tidy') === 'separate' ? 'separate' : 'same',
-    factionInject: v('faction_inject') !== '0',
     factionQual: v('faction_rep') === '1' && v('num_faction_rep') === '0',
     factionBounds: parseBounds(v('faction_bounds')),
-    // 정성 모드에서는 필드 목격 계기를 쌓지 않는다 (단계는 갱신기 판단만)
-    mobWeight: v('num_faction_rep') === '0' ? 'off' : one('mob_weight', ['half', 'full', 'off'] as const),
     spanCap: num('span_cap', 3000, 40000),
     rules: v('rules').slice(0, 4000),
     directorRules: v('director_rules').slice(0, 2000),

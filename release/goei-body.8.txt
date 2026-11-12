@@ -1,4 +1,567 @@
-"#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/>'],
+otal: Object.keys(inst.greetings.index).length },
+      pictures: { missing: missingPics, bytes: missingPics.reduce((n3, p2) => n3 + (Number(p2[3]) || 0), 0), total: want.length },
+      icon: i.iconOurs,
+      wikiPack: i.wikiPack,
+      tokenizer: i.tokenizer
+    };
+  }
+  var uuid = () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
+  function plantGreetings(existing) {
+    const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
+    const index = {};
+    const at = /* @__PURE__ */ new Map();
+    out.forEach((g2, n3) => {
+      if (!at.has(g2)) at.set(g2, n3);
+    });
+    const inst = installData();
+    for (const [key, n3] of Object.entries(inst.greetings.index)) {
+      const text5 = inst.greetings.texts[n3] ?? "";
+      let hit4 = at.get(text5);
+      if (hit4 === void 0) {
+        hit4 = out.length;
+        out.push(text5);
+        at.set(text5, hit4);
+      }
+      index[key] = hit4;
+    }
+    return { greetings: out, index };
+  }
+  function buildManifest(o) {
+    const prev = o.prev ?? {};
+    const { wiki: _wiki, ...keys } = prev.keys ?? {};
+    return {
+      ...prev,
+      schema: 1,
+      plugin: "goei-plugin",
+      version: prev.version ?? PLUGIN_VERSION,
+      greetings: o.greetings,
+      pictures: pictures(prev).length ? pictures(prev) : installData().pictures,
+      keys: { ...keys, settings: o.settingsKey }
+    };
+  }
+  var entry2 = (comment, content, folder, extra2 = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra2 });
+  var folderEntry = (comment, key) => ({ key, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
+  var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
+  function fillDirectory(cur, def) {
+    const out = { ...cur };
+    let gaps = 0;
+    for (const [k, dv] of Object.entries(def)) {
+      if (k === "_help") continue;
+      const cv = out[k];
+      if (empty(cv)) {
+        if (!empty(dv)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (k === "괴담톡 탭") {
+        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (!isObj2(cv) || !isObj2(dv)) continue;
+      const sec2 = { ...cv };
+      for (const [name, de] of Object.entries(dv)) {
+        const ce = sec2[name];
+        if (ce === void 0) {
+          sec2[name] = de;
+          gaps++;
+        } else if (isObj2(ce) && isObj2(de)) {
+          const row8 = { ...ce };
+          for (const [f, fv] of Object.entries(de)) if (empty(row8[f]) && !empty(fv)) row8[f] = fv, gaps++;
+          sec2[name] = row8;
+        }
+      }
+      out[k] = sec2;
+    }
+    return { data: out, gaps };
+  }
+  function directoryGapCount(lore) {
+    const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
+    if (!parts.length) return 0;
+    const cur = readDirectoryData(lore);
+    if (!cur) return -1;
+    return data2 ? fillDirectory(cur, installData().directory).gaps : 0;
+  }
+  function installLore(lore, greetings) {
+    const out = [...lore ?? []];
+    let settings = findFolder(out);
+    if (!settings) {
+      settings = folderEntry(SETTINGS_FOLDER_NAME, `${FOLDER_PREFIX}${uuid()}`);
+      out.push(settings);
+    }
+    const settingsKey = str7(settings.key);
+    const dir2 = directoryEntries(out).filter((e) => typeof e.content === "string" && e.content.trim());
+    const cur = dir2.length ? readDirectoryData(out) : null;
+    if (!dir2.length || !cur) {
+      for (const e of dir2) e.comment = `${String(e.comment)} (읽을 수 없어 보관)`;
+      const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
+      const fresh4 = entry2(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
+      if (stale >= 0) out[stale] = fresh4;
+      else out.push(fresh4);
+    } else {
+      for (const e of dir2) if (!e.folder) e.folder = settingsKey;
+      const filled = fillDirectory(cur, installData().directory);
+      if (filled.gaps) {
+        const first = out.indexOf(dir2[0]);
+        out[first] = { ...dir2[0], comment: DIRECTORY_COMMENT, content: JSON.stringify(filled.data) };
+        for (let i = out.length - 1; i >= 0; i--) if (i !== first && dir2.includes(out[i])) out.splice(i, 1);
+      }
+    }
+    const prev = readManifest(out);
+    const manifest = buildManifest({ greetings, settingsKey, prev });
+    const old = manifestEntry(out);
+    const fresh3 = entry2(MANIFEST_COMMENT, JSON.stringify(manifest), settingsKey);
+    if (old) {
+      const at = out.indexOf(old);
+      out[at] = { ...old, content: fresh3.content, folder: old.folder || settingsKey };
+    } else out.push(fresh3);
+    return out;
+  }
+  function installSummary(s8) {
+    const out = [];
+    if (!s8.settingsFolder) out.push("⚙️설정 폴더 없음");
+    if (!s8.directory) out.push(s8.directoryGaps < 0 ? "명부(Directory)를 읽을 수 없음" : "명부(Directory) 없음");
+    else if (s8.directoryGaps > 0) out.push(`명부에 빠진 칸 ${s8.directoryGaps}개`);
+    if (!s8.manifest) out.push("Plugin manifest 없음");
+    if (!s8.firstMessage) out.push("첫 메시지(시작 안내) 없음");
+    if (!s8.loreSettings) out.push("로어북 설정 없음");
+    if (!s8.greetings.ok) out.push(`인사말 ${s8.greetings.missing.length}/${s8.greetings.total}개 없음`);
+    if (s8.pictures.missing.length) out.push(`카드 사진 ${s8.pictures.missing.length}/${s8.pictures.total}장 없음`);
+    if (!s8.wikiPack) out.push("위키 기본 문서 없음");
+    if (!s8.tokenizer) out.push("토크나이저 없음");
+    return out;
+  }
+
+  // src/core/texthash.ts
+  function textHash(text5) {
+    let h = 2166136261;
+    for (let i = 0; i < text5.length; i++) h = Math.imul(h ^ text5.charCodeAt(i), 16777619) >>> 0;
+    return h.toString(16).padStart(8, "0");
+  }
+  async function sha256Text(text5) {
+    try {
+      const subtle = globalThis.crypto?.subtle;
+      if (!subtle) return null;
+      const d = await subtle.digest("SHA-256", new TextEncoder().encode(text5));
+      return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    } catch {
+      return null;
+    }
+  }
+
+  // src/core/datapack.ts
+  function expectOf(raw) {
+    try {
+      const o = typeof raw === "string" ? JSON.parse(raw) : null;
+      if (o && typeof o.hash === "string" && typeof o.sha256 === "string" && typeof o.length === "number") return { hash: o.hash, sha256: o.sha256, length: o.length };
+    } catch {
+    }
+    return { hash: "", sha256: "", length: 0 };
+  }
+  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"b9688ee8","sha256":"a73e000d58b807f1d9f87d934856d79711928c1b493025118a54242f7b38de9c","length":1234781}' : void 0) };
+  var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"9541920f","sha256":"b4eae9d7a8120cf8642833cfa7df0f54bd7bc9cc660164ee8ed7b1e8c5e216bd","length":168812}' : void 0) };
+  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"0a3b1d71","sha256":"d86d034a4771dfb31658171e7573c8318e310886bfe6bdff15ae9939d256a569","length":8467376}' : void 0) };
+  function packMatches(text5, expect) {
+    return !!expect.hash && text5.length === expect.length && textHash(text5) === expect.hash;
+  }
+  var obj5 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  function applyWorldPack(text5) {
+    let j;
+    try {
+      j = JSON.parse(text5);
+    } catch {
+      throw new Error("세계 자료 팩이 JSON 이 아니에요.");
+    }
+    if (!obj5(j) || j.schema !== 1 || j.kind !== "world") throw new Error("세계 자료 팩 형식이 달라요 (schema·kind).");
+    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) if (!obj5(j[k])) throw new Error(`세계 자료 팩 형식이 달라요 (${k}).`);
+    const rel = j.relations;
+    if (!obj5(rel) || !obj5(rel.pairs) || typeof rel.common !== "string") throw new Error("세계 자료 팩 형식이 달라요 (relations).");
+    setWorldData({
+      agent: j.agent,
+      org: j.org,
+      anomaly: j.anomaly,
+      site: j.site,
+      appendix: j.appendix,
+      relations: { pairs: rel.pairs, common: rel.common },
+      // 첫 장면 기본값 (옛 팩에는 없다)
+      ...obj5(j.scenes) && obj5(j.scenes.세력) && obj5(j.scenes.인물) ? { scenes: j.scenes } : {}
+    });
+  }
+  function applyInstallPack(text5) {
+    let j;
+    try {
+      j = JSON.parse(text5);
+    } catch {
+      throw new Error("설치 자료 팩이 JSON 이 아니에요.");
+    }
+    if (!obj5(j) || j.schema !== 1 || j.kind !== "install") throw new Error("설치 자료 팩 형식이 달라요 (schema·kind).");
+    const g2 = j.greetings;
+    if (!obj5(g2) || !obj5(g2.index) || !Array.isArray(g2.texts) || typeof g2.first !== "string") throw new Error("설치 자료 팩 형식이 달라요 (greetings).");
+    if (!Array.isArray(j.pictures)) throw new Error("설치 자료 팩 형식이 달라요 (pictures).");
+    if (!obj5(j.directory)) throw new Error("설치 자료 팩 형식이 달라요 (directory).");
+    if (!obj5(j.icon)) throw new Error("설치 자료 팩 형식이 달라요 (icon).");
+    setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String), first: g2.first }, pictures: j.pictures, directory: j.directory, icon: j.icon });
+  }
+  function makeIconFind(table2, rep, base, same4, cats) {
+    return makeIconIndex(table2.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same: same4, cats });
+  }
+  function applyItemsPack(text5) {
+    let j;
+    try {
+      j = JSON.parse(text5);
+    } catch {
+      throw new Error("소지품 그림 팩이 JSON 이 아니에요.");
+    }
+    if (!obj5(j) || j.schema !== 1 || j.kind !== "items" || !Array.isArray(j.table) || !obj5(j.icons)) throw new Error("소지품 그림 팩 형식이 달라요.");
+    const icons2 = j.icons;
+    const strs = (v) => Array.isArray(v) ? v.map((x) => String(x)) : [];
+    const table2 = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons2[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...Array.isArray(r.u) ? { u: strs(r.u) } : {}, ...r.base ? { base: true } : {} }));
+    const rep = {};
+    if (obj5(j.rep)) {
+      for (const [k, f] of Object.entries(j.rep)) if (typeof f === "string" && typeof icons2[f] === "string") rep[normIcon(k)] = f;
+    }
+    const base = {};
+    for (const r of table2) if (r.base) base[r.kind] = r.f;
+    const same4 = {};
+    if (obj5(j.same)) {
+      for (const [k, v] of Object.entries(j.same)) if (typeof v === "string") same4[k] = v;
+    }
+    const hit4 = makeIconFind(table2, rep, base, same4, Array.isArray(j.cats) ? strs(j.cats) : void 0);
+    return { table: table2, rep, icons: icons2, base, hit: hit4, find: (name, icon) => hit4(name, icon)?.file ?? null };
+  }
+  function matchItemIcon(pack4, itemName, icon, seed2) {
+    const h = pack4.hit(itemName, icon);
+    if (h?.pool && seed2 !== void 0 && iconPoolOn()) return pickIconFromPool(h.pool.filter((f) => typeof pack4.icons[f] === "string"), seed2) ?? h.file;
+    return h?.file ?? pack4.base.misc ?? null;
+  }
+  var packWords = /* @__PURE__ */ new WeakMap();
+  function wordsOf(pack4) {
+    let m = packWords.get(pack4);
+    if (!m) {
+      m = /* @__PURE__ */ new Map();
+      const fts = /* @__PURE__ */ new Map();
+      for (const r of pack4.table) {
+        if (!fts.has(r.f)) fts.set(r.f, /* @__PURE__ */ new Set());
+        for (const t of r.ft) fts.get(r.f).add(normIcon(t));
+      }
+      for (const r of pack4.table) {
+        let x = m.get(r.f);
+        if (!x) m.set(r.f, x = { heads: /* @__PURE__ */ new Set(), mods: /* @__PURE__ */ new Set() });
+        const ft = fts.get(r.f);
+        for (const t of [...r.k, ...r.h]) {
+          const ws = normIcon(t.replace(/\([^)]*\)/g, " ")).split(" ").filter(Boolean);
+          ws.forEach((w, i) => (i === ws.length - 1 && !ft.has(w) ? x.heads : x.mods).add(w));
+        }
+      }
+      packWords.set(pack4, m);
+    }
+    return m;
+  }
+  function matchTitleIcon(pack4, title2) {
+    const words = normIcon(title2).split(" ").filter(Boolean);
+    if (!words.length) return null;
+    const table2 = wordsOf(pack4);
+    const pre = (a, b) => a.length >= 2 && b.startsWith(a) || b.length >= 2 && a.startsWith(b);
+    const backed = (file, last2) => {
+      const x = table2.get(file);
+      if (!x) return false;
+      for (const w of x.heads) if (w === last2 || pre(w, last2)) return true;
+      for (const w of x.mods) if (w !== last2 && pre(w, last2)) return true;
+      return false;
+    };
+    const at = (n3) => {
+      const h = pack4.hit(words.slice(0, n3).join(" "), void 0, true);
+      return h && h.score >= 1 && backed(h.file, words[n3 - 1]) ? h.file : null;
+    };
+    const whole = pack4.hit(words.join(" "), void 0, true);
+    const first = at(words.length);
+    if (first) return first;
+    for (let n3 = 1; n3 < words.length; n3++) {
+      const f = at(n3);
+      if (f) return f;
+    }
+    return whole?.file ?? null;
+  }
+
+  // src/core/fetchparts.ts
+  var PART_CONCURRENCY = 4;
+  async function fetchParts(names4, get, onDone, limit = PART_CONCURRENCY) {
+    const out = new Array(names4.length);
+    let next = 0;
+    let done3 = 0;
+    let failed4 = false;
+    const worker = async () => {
+      while (next < names4.length && !failed4) {
+        const i = next++;
+        try {
+          out[i] = await get(names4[i]);
+        } catch (error) {
+          failed4 = true;
+          throw error;
+        }
+        onDone?.(++done3);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(limit, names4.length) }, worker));
+    return out.join("");
+  }
+
+  // src/host/datapack.ts
+  var WORLD_KEY2 = "goei:data-world";
+  var INSTALL_KEY = "goei:data-install";
+  var DataPackError = class extends Error {
+  };
+  var TIMEOUT_MS = 4e4;
+  function timeout(p2, name) {
+    let t;
+    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${name}을 ${TIMEOUT_MS / 1e3}초 안에 받지 못했어요.`)), TIMEOUT_MS))]).finally(() => clearTimeout(t));
+  }
+  async function getText(name) {
+    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
+        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
+      } catch {
+      }
+    }
+    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
+    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
+    return String(await timeout(res.text(), name) ?? "");
+  }
+  async function getBytes(name) {
+    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
+        const b = r?.ok ? toBytes3(r.data) : null;
+        if (b?.length) return b;
+      } catch {
+      }
+    }
+    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
+    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
+    return new Uint8Array(await timeout(res.arrayBuffer(), name));
+  }
+  async function fetchPack(pack4, progress4) {
+    if (!UPDATE_BASE) throw new DataPackError("받을 곳이 정해지지 않은 빌드예요.");
+    if (!pack4.expect.hash) throw new DataPackError(`이 빌드에는 ${pack4.label} 지문이 없어요.`);
+    progress4?.(`${pack4.label} 목록 받는 중…`);
+    let index = null;
+    try {
+      index = JSON.parse((await getText(`${pack4.name}.json`)).replace(/^﻿/, ""));
+    } catch (error) {
+      throw new DataPackError(`${pack4.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
+    }
+    if (!index || !Array.isArray(index.parts) || typeof index.length !== "number") throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
+    if (index.hash !== pack4.expect.hash) throw new DataPackError(`아직 이 판의 ${pack4.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
+    const re = new RegExp(`^${pack4.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
+    for (const name of index.parts) {
+      if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
+    }
+    const parts = index.parts;
+    const t0 = Date.now();
+    const text5 = await fetchParts(parts, getText, (n3) => progress4?.(`${pack4.label} 받는 중 ${n3}/${parts.length}`));
+    console.log(`[goei] ${pack4.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
+    if (text5.length !== pack4.expect.length) throw new DataPackError(`${pack4.label}를 끝까지 받지 못했어요. (${text5.length}/${pack4.expect.length}자)`);
+    const got = await sha256Text(text5);
+    if (got !== null) {
+      if (got !== pack4.expect.sha256) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(sha256). 다시 받아 주세요.`);
+    } else if (textHash(text5) !== pack4.expect.hash) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(hash). 다시 받아 주세요.`);
+    return text5;
+  }
+  async function loadWorldData(force = false) {
+    let saved = null;
+    try {
+      saved = await risuai.pluginStorage.getItem(WORLD_KEY2);
+    } catch {
+    }
+    if (typeof saved === "string" && packMatches(saved, WORLD_PACK.expect)) {
+      try {
+        applyWorldPack(saved);
+        return "store";
+      } catch (error) {
+        console.log(`[goei] 저장된 세계 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+      }
+    } else if (typeof saved === "string") console.log("[goei] 저장된 세계 자료가 이 판과 달라 다시 받아요");
+    const g2 = globalThis;
+    if (!force && g2.__goeiWorldFail && Date.now() - g2.__goeiWorldFail.at < 6e4) throw new Error(g2.__goeiWorldFail.reason);
+    let text5;
+    try {
+      text5 = await fetchPack(WORLD_PACK);
+    } catch (error) {
+      const reason3 = `${WORLD_PACK.label}(${WORLD_PACK.name})를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      g2.__goeiWorldFail = { at: Date.now(), reason: reason3 };
+      throw new Error(reason3);
+    }
+    await keepWorldData(text5);
+    return "fetch";
+  }
+  async function keepWorldData(text5) {
+    const g2 = globalThis;
+    applyWorldPack(text5);
+    delete g2.__goeiWorldFail;
+    delete g2.__goeiWorldDismissed;
+    try {
+      await risuai.pluginStorage.setItem(WORLD_KEY2, text5);
+    } catch (error) {
+      console.log(`[goei] 세계 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  async function installWorldFile(raw) {
+    const text5 = raw.replace(/^\ufeff/, "");
+    if (!packMatches(text5, WORLD_PACK.expect)) {
+      let head3 = null;
+      try {
+        head3 = text5.length < 4e3 ? JSON.parse(text5) : null;
+      } catch {
+      }
+      if (head3 && typeof head3 === "object" && Array.isArray(head3.parts)) throw new DataPackError("그건 조각 목록(goei-data-world.json)이에요. 릴리스 zip 의 goei-data-world.txt 를 넣어 주세요.");
+      throw new DataPackError(`이 플러그인 판과 맞는 세계 자료(goei-data-world.txt)가 아니에요. (${text5.length.toLocaleString()}자, 기대 ${WORLD_PACK.expect.length.toLocaleString()}자)`);
+    }
+    await keepWorldData(text5);
+  }
+  var installPending = null;
+  async function ensureInstallData(progress4) {
+    if (installDataReady()) return;
+    installPending ??= (async () => {
+      let saved = null;
+      try {
+        saved = await risuai.pluginStorage.getItem(INSTALL_KEY);
+      } catch {
+      }
+      if (typeof saved === "string" && packMatches(saved, INSTALL_PACK.expect)) {
+        try {
+          applyInstallPack(saved);
+          return;
+        } catch (error) {
+          console.log(`[goei] 저장된 설치 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+        }
+      } else if (typeof saved === "string") console.log("[goei] 저장된 설치 자료가 이 판과 달라 다시 받아요");
+      const text5 = await fetchPack(INSTALL_PACK, progress4);
+      applyInstallPack(text5);
+      try {
+        await risuai.pluginStorage.setItem(INSTALL_KEY, text5);
+      } catch (error) {
+        console.log(`[goei] 설치 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+      }
+    })().finally(() => installPending = null);
+    await installPending;
+  }
+
+  // src/host/itemicons.ts
+  var ITEMS_KEY = "goei:data-items";
+  var pack3 = null;
+  var loading3 = null;
+  var failed = "";
+  var progress = "";
+  var redraw2 = () => {
+  };
+  var urls2 = /* @__PURE__ */ new Map();
+  function setItemIconRedraw(fn2) {
+    redraw2 = fn2;
+  }
+  var itemIconStatus = () => ({ ready: !!pack3, loading: !!loading3, progress, failed });
+  function ensureItemIcons() {
+    if (pack3 || loading3) return loading3 ?? Promise.resolve();
+    loading3 = (async () => {
+      failed = "";
+      try {
+        let saved = null;
+        try {
+          saved = await risuai.pluginStorage.getItem(ITEMS_KEY);
+        } catch {
+        }
+        if (typeof saved === "string" && packMatches(saved, ITEMS_PACK.expect)) {
+          try {
+            pack3 = applyItemsPack(saved);
+            return;
+          } catch (error) {
+            console.log(`[goei] 저장된 소지품 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+          }
+        }
+        const text5 = await fetchPack(ITEMS_PACK, (t) => {
+          progress = t;
+          redraw2();
+        });
+        pack3 = applyItemsPack(text5);
+        try {
+          await risuai.pluginStorage.setItem(ITEMS_KEY, text5);
+        } catch (error) {
+          console.log(`[goei] 소지품 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
+        }
+      } catch (error) {
+        failed = error instanceof DataPackError || error instanceof Error ? error.message : String(error);
+        console.log(`[goei] 소지품 그림 팩: ${failed}`);
+      } finally {
+        progress = "";
+        loading3 = null;
+        redraw2();
+      }
+    })();
+    return loading3;
+  }
+  function itemIconUrl(name, icon, seed2) {
+    if (!pack3) {
+      if (!failed) void ensureItemIcons();
+      return null;
+    }
+    return urlOf(matchItemIcon(pack3, name, icon, seed2));
+  }
+  function titleIconUrl(title2) {
+    if (!pack3) {
+      if (!failed) void ensureItemIcons();
+      return null;
+    }
+    return urlOf(matchTitleIcon(pack3, title2) ?? pack3.base.misc ?? null);
+  }
+  function urlOf(file) {
+    if (!pack3 || !file) return null;
+    let u = urls2.get(file);
+    if (!u) {
+      u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
+      urls2.set(file, u);
+    }
+    return u;
+  }
+
+  // src/ui/needfill.ts
+  var bound = false;
+  var needAttr = (name, value, busy6 = false) => ` data-need="${name}"${busy6 ? ' data-busy="1"' : ""}${busy6 || !value.trim() ? " disabled" : ""}`;
+  function bindNeedFill(doc2 = document) {
+    if (bound) return;
+    bound = true;
+    doc2.addEventListener(
+      "input",
+      (ev) => {
+        const el = ev.target;
+        const name = el?.getAttribute?.("name");
+        if (!name) return;
+        doc2.querySelectorAll(`button[data-need="${CSS.escape(name)}"]:not([data-busy])`).forEach((b) => {
+          b.disabled = !el.value.trim();
+        });
+      },
+      true
+    );
+  }
+
+  // src/ui/browser.ts
+  var esc11 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var SITES = [
+    { id: "gn", name: "괴담넷", title: "괴담넷 - 자유게시판", host: "goedam.net", path: "/board/free" },
+    { id: "gal", name: "괴담 갤러리", title: "괴담 갤러리 - 괴담갤", host: "gall.goedam.co.kr", path: "/board/lists/?id=horror" },
+    { id: "wpf", name: "세정게", title: "::: 世界政治 게시판 :::", host: "www.wpf.or.kr", path: "/zboard/zboard.php?id=politics" },
+    { id: "sm", name: "연어 마켓", title: "연어 마켓 | 이면의 중고거래", host: "salmon-market.kr", path: "" },
+    { id: "cos", name: "우주 쇼핑몰", title: "★우주 쇼핑몰★에 오는 것을 환영하는 것이다", host: "cosmic-mall.alien", path: "/~shop/index.html" },
+    { id: "wk", name: "괴이위키", title: "괴이위키", host: "goei.wiki", path: "/w/괴이위키:대문" },
+    { id: "bm", name: "백일몽 포인트몰", title: "백일몽 포인트몰", host: "point.baekilmong.intra", path: "/mall/main" },
+    { id: "hs", name: "망상홈쇼핑", title: "망상홈쇼핑 LIVE", host: "live.mangsang.tv", path: "/onair" }
+  ];
+  var siteOf = (id2) => SITES.find((s8) => s8.id === id2);
+  var isSite = (id2) => SITES.some((s8) => s8.id === id2);
+  var LOGO2 = {
+    gn: ["0 0 24 24", '<path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill="#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/>'],
     gal: ["0 0 24 24", '<path fill="#3b4890" d="M3 3h18a1 1 0 011 1v12a1 1 0 01-1 1H10l-5 4v-4H3a1 1 0 01-1-1V4a1 1 0 011-1z"/><path fill="#fff" d="M12 5.5c-2.5 0-4.3 1.9-4.3 4.2v5.1l1.4-1 1.4 1 1.5-1 1.5 1 1.4-1 1.4 1V9.7c0-2.3-1.8-4.2-4.3-4.2z"/><circle fill="#3b4890" cx="10.5" cy="9.6" r=".9"/><circle fill="#3b4890" cx="13.5" cy="9.6" r=".9"/>'],
     wpf: ["0 0 24 24", '<circle fill="#7a1010" cx="12" cy="12" r="11"/><circle fill="#1a5aa8" cx="12" cy="12" r="7.5"/><path fill="none" stroke="#ffd24a" stroke-width="1" d="M4.5 12h15M12 4.5v15M6 8.2h12M6 15.8h12"/><ellipse fill="none" stroke="#ffd24a" stroke-width="1" cx="12" cy="12" rx="3.4" ry="7.5"/><circle fill="none" stroke="#ffd24a" stroke-width="1.2" cx="12" cy="12" r="10"/>'],
     sm: ["0 0 32 20", '<path fill="#f26c4f" d="M2 10C5 3.5 13 1.8 20 4.5L26 1.5 24.5 10 26 18.5 20 15.5C13 18.2 5 16.5 2 10z"/><path fill="#ffb49b" d="M4 11.2c4 3.3 10.5 3.8 16 2.2-5.5.6-11-.2-16-2.2z"/><path fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round" d="M11 5.2l1.5 4M14.5 4.6l1.5 4.2M18 4.8l1.3 4"/><circle fill="#fff" cx="6.3" cy="8.6" r="1.4"/><circle fill="#2a1a14" cx="6.5" cy="8.6" r=".7"/>'],
@@ -127,10 +690,10 @@
   function chromeHtml(o) {
     const t = curTab();
     const s8 = t.site ? siteOf(t.site) : void 0;
-    const tabs2 = br.tabs.map((x, i) => `<div class="br-tab${i === br.cur ? " on" : ""}" role="tab" aria-selected="${i === br.cur}"><button class="br-tabb" data-action="br-tab" data-value="${i}">${siteLogo(x.site)}<span class="br-tt">${esc10(tabTitle(x, i, o))}</span></button><button class="br-tx" data-action="br-close" data-value="${i}" aria-label="탭 닫기">${ic(IC.x, "br-i s")}</button></div>`).join("");
-    const omni = s8 ? `<span class="br-ti">${ic(IC.tune)}</span><span class="br-u"><b>${esc10(s8.host)}</b>${esc10(o.path || s8.path)}</span>` : `<span class="br-ti">${ic(IC.srch)}</span><span class="br-u">검색어 또는 URL 입력</span>`;
-    const prof = o.nick ? o.photo ? `<img src="${esc10(o.photo)}" alt="">` : `<b>${esc10([...o.nick][0] ?? "")}</b>` : ic(IC.acct);
-    const bms = o.bookmarks.map((id2) => `<button class="br-bm" data-action="br-go" data-value="${id2}">${siteLogo(id2)}<span>${esc10(siteOf(id2).name)}</span></button>`).join("");
+    const tabs2 = br.tabs.map((x, i) => `<div class="br-tab${i === br.cur ? " on" : ""}" role="tab" aria-selected="${i === br.cur}"><button class="br-tabb" data-action="br-tab" data-value="${i}">${siteLogo(x.site)}<span class="br-tt">${esc11(tabTitle(x, i, o))}</span></button><button class="br-tx" data-action="br-close" data-value="${i}" aria-label="탭 닫기">${ic(IC.x, "br-i s")}</button></div>`).join("");
+    const omni = s8 ? `<span class="br-ti">${ic(IC.tune)}</span><span class="br-u"><b>${esc11(s8.host)}</b>${esc11(o.path || s8.path)}</span>` : `<span class="br-ti">${ic(IC.srch)}</span><span class="br-u">검색어 또는 URL 입력</span>`;
+    const prof = o.nick ? o.photo ? `<img src="${esc11(o.photo)}" alt="">` : `<b>${esc11([...o.nick][0] ?? "")}</b>` : ic(IC.acct);
+    const bms = o.bookmarks.map((id2) => `<button class="br-bm" data-action="br-go" data-value="${id2}">${siteLogo(id2)}<span>${esc11(siteOf(id2).name)}</span></button>`).join("");
     return `<div class="br-tabs" role="tablist">${tabs2}<button class="br-plus" data-action="br-new" aria-label="새 탭">${ic(IC.add, "br-i s")}</button></div>
   <div class="br-tool">
     <button class="br-tb pc" data-action="br-back" aria-label="뒤로" ${tabCan(-1) ? "" : "disabled"}>${ic(IC.back)}</button>
@@ -138,30 +701,30 @@
     <button class="br-tb pc" data-action="br-reload" aria-label="새로고침">${ic(IC.rel)}</button>
     <button class="br-tb mo" data-action="br-home" aria-label="새 탭">${ic(IC.home)}</button>
     <div class="br-omni">${omni}</div>
-    <button class="br-prof${o.nick ? " in" : ""}" data-action="br-login" aria-label="${o.nick ? `${esc10(o.nick)}(으)로 로그인됨` : "로그인"}">${prof}</button>
+    <button class="br-prof${o.nick ? " in" : ""}" data-action="br-login" aria-label="${o.nick ? `${esc11(o.nick)}(으)로 로그인됨` : "로그인"}">${prof}</button>
     <button class="br-tabn mo" data-action="br-list" aria-label="탭 ${br.tabs.length}개">${br.tabs.length}</button>
   </div>
   <div class="br-bms">${bms}</div>`;
   }
   function loginHtml(o) {
     if (!br.login) return "";
-    const face3 = o.photo ? `<img src="${esc10(o.photo)}" alt="">` : ic(IC.acct);
+    const face3 = o.photo ? `<img src="${esc11(o.photo)}" alt="">` : ic(IC.acct);
     const nick = o.nick || o.nickDefault;
     return `<div class="br-lgn" role="dialog" aria-label="로그인"><h4>로그인</h4><div class="br-face">${face3}</div>
-    <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc10(nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
+    <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc11(nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
     <button class="br-b1" data-action="br-login-save" data-take="br-nick"${needAttr("br-nick", nick)}>로그인</button><hr>
     <button class="br-b2" data-action="br-login-guest">${o.nick ? "로그아웃" : "닫기"}</button></div>`;
   }
   function tabListHtml(o) {
-    return `<div class="br-tlist">${br.tabs.map((t, i) => `<div class="br-tcard${i === br.cur ? " on" : ""}"><button class="br-tabb" data-action="br-tab" data-value="${i}">${siteLogo(t.site)}<span class="br-tt">${esc10(tabTitle(t, i, o))}</span></button><button class="br-tx" data-action="br-close" data-value="${i}" aria-label="탭 닫기">${ic(IC.x, "br-i s")}</button></div>`).join("")}<button class="br-tnew" data-action="br-new">${ic(IC.add, "br-i s")}새 탭</button></div>`;
+    return `<div class="br-tlist">${br.tabs.map((t, i) => `<div class="br-tcard${i === br.cur ? " on" : ""}"><button class="br-tabb" data-action="br-tab" data-value="${i}">${siteLogo(t.site)}<span class="br-tt">${esc11(tabTitle(t, i, o))}</span></button><button class="br-tx" data-action="br-close" data-value="${i}" aria-label="탭 닫기">${ic(IC.x, "br-i s")}</button></div>`).join("")}<button class="br-tnew" data-action="br-new">${ic(IC.add, "br-i s")}새 탭</button></div>`;
   }
   function homeHtml(sites) {
     return `<div class="br-ntp"><div class="br-ntp-lg"><span>G</span><span>o</span><span>e</span><span>i</span></div><div class="br-ntp-q">${ic(IC.srch)}검색어 또는 URL 입력</div>
-    <div class="br-ntp-sc">${sites.map((id2) => `<button class="br-ntp-s" data-action="br-go" data-value="${id2}"><i>${siteLogo(id2)}</i><span>${esc10(siteOf(id2).name)}</span></button>`).join("")}</div></div>`;
+    <div class="br-ntp-sc">${sites.map((id2) => `<button class="br-ntp-s" data-action="br-go" data-value="${id2}"><i>${siteLogo(id2)}</i><span>${esc11(siteOf(id2).name)}</span></button>`).join("")}</div></div>`;
   }
   function soonHtml(id2) {
     const s8 = siteOf(id2);
-    return `<div class="br-soon">${siteLogo(id2, "br-soon-lg")}<b>${esc10(s8.name)}</b><p>준비 중인 사이트예요.</p></div>`;
+    return `<div class="br-soon">${siteLogo(id2, "br-soon-lg")}<b>${esc11(s8.name)}</b><p>준비 중인 사이트예요.</p></div>`;
   }
 
   // src/ui/popwin.ts
@@ -260,11 +823,11 @@
   }
   async function upd(ctx2, f) {
     const site = siteOf2(ctx2);
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const r = f(boardView(chat, site));
       return r ? boardWrite(chat, r, site) : null;
     });
-    return saved2 ? boardView(saved2, site) : null;
+    return saved ? boardView(saved, site) : null;
   }
   var uiSite = "gn";
   var uiSaved = /* @__PURE__ */ new Map();
@@ -284,7 +847,7 @@
     if (!u) uiSaved.set(site, u = freshUi());
     return u;
   }
-  var esc11 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc12 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var retry = (chat) => {
     const site = chat.scriptstate?.[BOARD_SITE_VAR];
     return { ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, "gn").reiterate, staticModel: featureModel(chat.scriptstate, "gn"), state: chat.scriptstate, label: BOARD_NAME[isBoardSite(site) ? site : "gn"] };
@@ -466,26 +1029,26 @@
       return env3.render();
     }
     const nick = userNick(ctx2.chat.scriptstate);
-    let index3 = 0;
-    const saved2 = await upd(ctx2, (chat) => {
+    let index = 0;
+    const saved = await upd(ctx2, (chat) => {
       const st = readGnet(chat);
-      index3 = addUserComment(st, postId2, parent, nick, body5, dateNow(chat), storyTurns(chat));
-      return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId2, comment: index3 }) }), st);
+      index = addUserComment(st, postId2, parent, nick, body5, dateNow(chat), storyTurns(chat));
+      return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId2, comment: index }) }), st);
     });
     gnet.compose = null;
     gnet.draft = "";
     gnet.attach = [];
-    if (!saved2) return env3.refresh();
-    return run2({ ...ctx2, chat: saved2 }, env3, "댓글 반응을 기다리는 중이에요.", async () => {
-      const st = readGnet(saved2);
-      const s8 = gnetSettings(saved2.scriptstate);
+    if (!saved) return env3.refresh();
+    return run2({ ...ctx2, chat: saved }, env3, "댓글 반응을 기다리는 중이에요.", async () => {
+      const st = readGnet(saved);
+      const s8 = gnetSettings(saved.scriptstate);
       const target = findPost(st, postId2);
-      const plan = incomingPlan(saved2, st, s8, nick, Math.random, { post: target, commentIndex: index3 });
+      const plan = incomingPlan(saved, st, s8, nick, Math.random, { post: target, commentIndex: index });
       let value;
       let prompt;
       try {
-        prompt = fitPrompt(budgetFor(saved2.scriptstate, "gn"), () => commentPrompt(source3(ctx2, saved2), st, postId2, index3, body5, plan, nick, names3(ctx2)));
-        value = (await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(saved2))).value;
+        prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => commentPrompt(source3(ctx2, saved), st, postId2, index, body5, plan, nick, names3(ctx2)));
+        value = (await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(saved))).value;
       } catch (error) {
         throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
       }
@@ -498,7 +1061,7 @@
           note = "생성하는 동안 글이 바뀌어서 답글을 적용하지 않았어요. 내 댓글은 저장돼 있어요.";
           return null;
         }
-        const got = acceptComments(value.comments, p2.comments, { postId: postId2, replyTo: index3, total: prompt.total, supplied: prompt.supplied }, nick);
+        const got = acceptComments(value.comments, p2.comments, { postId: postId2, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
         pushComments(p2, got.comments, dateNow(chat));
         bumpStats(p2, got.comments.length);
         const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
@@ -523,7 +1086,7 @@
       gnet.notice = `나에게는 ${dmWo()} 보낼 수 없어요.`;
       return env3.render();
     }
-    const saved2 = await upd(ctx2, (chat) => {
+    const saved = await upd(ctx2, (chat) => {
       const st = readGnet(chat);
       addOutgoingDm(st, nick, body5, dateNow(chat), src);
       return writeGnet(chat, st);
@@ -535,14 +1098,14 @@
     gnet.to = "";
     gnet.sub = "dm";
     gnet.openDm = nick;
-    if (!saved2) return env3.refresh();
-    return run2({ ...ctx2, chat: saved2 }, env3, `${nick}의 답장을 기다리는 중이에요.`, async () => {
-      const st = readGnet(saved2);
-      const s8 = gnetSettings(saved2.scriptstate);
+    if (!saved) return env3.refresh();
+    return run2({ ...ctx2, chat: saved }, env3, `${nick}의 답장을 기다리는 중이에요.`, async () => {
+      const st = readGnet(saved);
+      const s8 = gnetSettings(saved.scriptstate);
       let reply;
       try {
-        const prompt = fitPrompt(budgetFor(saved2.scriptstate, "gn"), () => dmPrompt(source3(ctx2, saved2), st, nick, body5, me, names3(ctx2)));
-        reply = (await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved2), fix: (raw, reason3) => retryMessages(prompt, raw, reason3) })).value;
+        const prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => dmPrompt(source3(ctx2, saved), st, nick, body5, me, names3(ctx2)));
+        reply = (await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason3) => retryMessages(prompt, raw, reason3) })).value;
       } catch (error) {
         await upd(ctx2, (chat) => {
           const cur = readGnet(chat);
@@ -578,18 +1141,7 @@
     await upd(ctx2, (chat) => withVars(chat, vars));
     await env3.refresh();
   }
-  function countRow(ctx2, k, unit, label2) {
-    const [a, b] = gnetSettings(ctx2.chat.scriptstate).counts[k];
-    const [lo, hi] = COUNT_RANGE[k];
-    const box4 = (side, n3, name) => `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="gn-count" data-key="${k}_${side}" value="${n3}" aria-label="${label2} ${name}"><span>${unit}</span>`;
-    return `<span class="ph-inline"><span>최소</span>${box4("min", a, "최소")}<span>최대</span>${box4("max", b, "최대")}</span>`;
-  }
-  function seg3(key, cur, items) {
-    const sw = onOffSwitch(items, cur, "gn-cfg", (v) => `${key}=${v}`);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
-  }
-  var body2 = (text4) => attachBody(text4, true);
+  var body2 = (text5) => attachBody(text5, true);
   function time(date) {
     return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
   }
@@ -604,7 +1156,7 @@
     ${attachEditor("gn", gnet.attach, GN_KINDS, busy6, "", gnet.attachMenu)}
     <div class="ph-compose">
       <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
-      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc11(placeholder)}" ${busy6 ? "disabled" : ""}>${esc11(gnet.draft)}</textarea>
+      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc12(placeholder)}" ${busy6 ? "disabled" : ""}>${esc12(gnet.draft)}</textarea>
       <button class="ph-send${label2 ? " txt" : ""}" data-action="gn-send" aria-label="등록" title="등록" ${busy6 ? "disabled" : ""}>${label2 || ICONS.send}</button>
       <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
     </div>
@@ -612,36 +1164,36 @@
   }
   function composeView(c, busy6) {
     const post = c.kind === "post";
-    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc11(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc11(c.nick)}</b></p>` : "";
+    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc12(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc12(c.nick)}</b></p>` : "";
     const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : `${dmW()} 내용`;
-    return `<div class="ph-form gn-cpane">${paneHead3(post ? "새 글" : `새 ${dmW()}`, c.kind === "dm" ? esc11(c.label) : "")}
+    return `<div class="ph-form gn-cpane">${paneHead3(post ? "새 글" : `새 ${dmW()}`, c.kind === "dm" ? esc12(c.label) : "")}
     <div class="ph-form-body">${to}${post && uiSite === "sm" ? `<div class="cats gn-wtags" role="group" aria-label="거래 구분">${SM_TAGS.map((t) => `<button class="${(c.tag ?? SM_TAGS[0]) === t ? "on" : ""}" data-action="gn-wtag" data-value="${t}" aria-pressed="${(c.tag ?? SM_TAGS[0]) === t}">${t}</button>`).join("")}</div>` : ""}
-      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc11(ph)}" aria-label="내용">${esc11(gnet.draft)}</textarea>
+      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc12(ph)}" aria-label="내용">${esc12(gnet.draft)}</textarea>
       ${attachEditor("gn", gnet.attach, GN_KINDS, busy6)}
     </div>
     <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy6 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
   }
   function replyBox(label2, busy6, depth) {
-    const chip3 = `<div class="gn-replyto"><span>${esc11(label2)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
+    const chip3 = `<div class="gn-replyto"><span>${esc12(label2)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
     return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy6, "답글 입력", chip3)}</li>`;
   }
   function commentClock(_p, c) {
     if (!c.time) return "";
-    return `<time class="gn-c-time">${esc11(`${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
+    return `<time class="gn-c-time">${esc12(`${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
   }
   function dmPane(st, nick, busy6, inline = false) {
     const t = dmThreads(st).find((x) => x.nick === nick);
     if (!t) return "";
     const confirm = gnet.confirm === `d:${nick}`;
-    const right = confirm ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc11(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, `${dmW()} 삭제`, `data-value="${esc11(nick)}"`);
+    const right = confirm ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc12(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, `${dmW()} 삭제`, `data-value="${esc12(nick)}"`);
     const src = st.sources[nick];
     const c = gnet.compose;
     const ph = c?.kind === "dm" && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 ${dmW()}` : `${dmW()} 입력`;
-    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead3(esc11(nick), `${t.rows.length}통`, right)}
-    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc11(src.title)}」</div>` : ""}
+    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead3(esc12(nick), `${t.rows.length}통`, right)}
+    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc12(src.title)}」</div>` : ""}
       ${t.rows.map((d, i) => {
       const first = i === 0 || t.rows[i - 1].side !== d.side;
-      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc11(d.date)}</small>` : ""}</div></div>`;
+      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc12(d.date)}</small>` : ""}</div></div>`;
     }).join("")}
     </div>
     ${inline ? "" : composer(busy6, ph)}
@@ -651,46 +1203,35 @@
     const threads = dmThreads(st);
     if (!threads.length) return uiSite === "sm" ? '<div class="ph-blank"><p>주고받은 채팅이 없어요.<br>매물에서 「채팅하기」를 눌러 보내 보세요.</p></div>' : '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
     return `<ul class="ph-list gn-list">${threads.map((t) => {
-      const on2 = gnet.openDm === t.nick && !gnet.settings;
+      const on3 = gnet.openDm === t.nick && !gnet.settings;
       const last2 = t.rows[t.rows.length - 1];
       const confirm = gnet.confirm === `d:${t.nick}`;
-      const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc11(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc11(t.nick)}" aria-label="${esc11(t.nick)} ${dmW()} 삭제" title="삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc11(t.nick)}" aria-pressed="${on2}">
+      const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc12(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc12(t.nick)}" aria-label="${esc12(t.nick)} ${dmW()} 삭제" title="삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main gn-dmrow${on3 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc12(t.nick)}" aria-pressed="${on3}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc11(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc11(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
-        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc11([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy6, true) : ""}</li>`;
+        <span class="ph-who"><span class="ph-who-top"><b>${esc12(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc12(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
+        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc12([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on3 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy6, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
-  var row3 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group2 = (title2, rows3) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows3}</div></section>`;
   function settingsView3(ctx2, back = true) {
-    const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
-    const text4 = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc11(v(k) === "-" ? "" : v(k))}" placeholder="${esc11(ph)}">`;
-    const keep = gnetRetention(ctx2.chat.scriptstate);
-    const rows3 = `${group2(gnetLabel(ctx2.chat.scriptstate), [
-      row3("자동 호출", seg3("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
-      row3("한 번에 요청", seg3("joint", jointOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요."),
-      row3("모델", seg3("mode", v("mode") === "1" ? "1" : "2", [["1", "메인 모델"], ["2", "보조 모델"]]), "게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델"),
-      row3("컨텍스트에 포함", seg3("context", v("context") === "1" ? "1" : "0", [["0", "ON"], ["1", "OFF"]]), "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요"),
-      row3("다양성 강화", seg3("sampling", v("sampling") === "1" ? "1" : "0", [["0", "OFF"], ["1", "ON"]]), "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요")
-    ].join(""))}
-      ${group2("게시판", [
-      row3("게시글 수", countRow(ctx2, "post", "개", "게시글 수"), `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요`),
-      row3("새 글 댓글 수", countRow(ctx2, "cmt", "개", "새 글 댓글 수"), `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요`),
-      row3("활동 댓글 수", countRow(ctx2, "act", "개", "활동 댓글 수"), `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요`),
-      row3("사생활", seg3("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]]), "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
-      row3("주제", text4("subject", "비우면 세계관에 맞는 다양한 주제")),
-      row3("분위기·말투", text4("mood", "비우면 익명 커뮤니티 말투")),
-      row3("보호 대상", text4("protagonist", "비우면 주인공"), "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공"),
-      row3("주요 인물 닉네임", seg3("keyfigures", v("keyfigures") === "0" ? "0" : "1", [["1", "보존"], ["0", "안 함"]]), "주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요"),
-      row3("새로고침 시 내 글", seg3("keepown", v("keepown"), [["1", "유지"], ["0", "교체"]]), "새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요"),
-      row3("내 댓글 있는 글", seg3("keepreplied", v("keepreplied"), [["1", "유지"], ["0", "교체"]]), "내가 댓글을 단 남의 글도 새로고침 때 남길지예요")
-    ].join(""))}
-      ${group2("쪽지", [
-      row3("선쪽지 받기", seg3("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]]), "게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요"),
-      row3("쪽지 자동 정리", `<span class="ph-inline">${seg3("storage", keep.auto ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
-    ].join(""))}
-      ${advancedBox("gn", ctx2.chat.scriptstate)}`;
+    const state = ctx2.chat.scriptstate;
+    const keep2 = gnetRetention(state);
+    const counts = gnetSettings(state).counts;
+    const wire = {
+      cur: (k) => String(state?.[CFG(k)] ?? GN_DEFAULTS[k]),
+      minmax: (k) => counts[k],
+      pageTitle: gnetLabel(state),
+      custom: {
+        joint: () => ({ ctl: setSeg("gn-cfg", "joint", jointOn(state) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]) }),
+        storage: () => ({
+          ctl: `<span class="ph-inline">${setSeg("gn-cfg", "storage", keep2.auto ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}${keep2.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep2.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`,
+          help: `상대마다 최근 ${keep2.limit}통만 남겨요`
+        })
+      }
+    };
+    const own = ["privacy", "subject", "mood", "protagonist"];
+    const site = { ...GNET_SET, groups: [{ title: "", rows: GNET_SET.groups.flatMap((g2) => g2.rows).filter((r) => own.includes(r.key)) }] };
+    const rows3 = `${defGroups(site, wire)}`;
     return `<div class="ph-form">${paneHead3(`${gnetLabel(ctx2.chat.scriptstate)} 설정`, "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows3}</div></div>`;
   }
   var PAGE2 = 20;
@@ -733,23 +1274,23 @@ ${p2.body}`.toLowerCase().includes(q)));
     const n3 = pages(total);
     const cur = Math.min(gnet.page, n3);
     const nums = Array.from({ length: n3 }, (_, i) => i + 1).map((k) => k === cur ? `<b>${k}</b>` : `<button data-action="gn-page" data-value="${k}">${k}</button>`).join(" ");
-    const go2 = (label2, k, on2) => label2 ? on2 ? `<button data-action="gn-page" data-value="${k}">${label2}</button>` : `<span>${label2}</span>` : "";
-    return `<nav class="${cls}">${go2(prev, cur - 1, cur > 1)} ${nums} ${go2(next, cur + 1, cur < n3)}</nav>`;
+    const go3 = (label2, k, on3) => label2 ? on3 ? `<button data-action="gn-page" data-value="${k}">${label2}</button>` : `<span>${label2}</span>` : "";
+    return `<nav class="${cls}">${go3(prev, cur - 1, cur > 1)} ${nums} ${go3(next, cur + 1, cur < n3)}</nav>`;
   }
-  var searchInput = (ph) => `<input name="gn-q" data-enter="gn-search" value="${esc11(gnet.q)}" placeholder="${esc11(ph)}" aria-label="${esc11(ph)}">`;
+  var searchInput = (ph) => `<input name="gn-q" data-enter="gn-search" value="${esc12(gnet.q)}" placeholder="${esc12(ph)}" aria-label="${esc12(ph)}">`;
   var writeBtn = (cls, label2 = "글쓰기") => `<button class="${cls}" data-action="gn-write">${label2}</button>`;
-  var emptyList = (busy6, text4) => `<div class="bs-empty"><p>${text4}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy6 ? "disabled" : ""}>${busy6 ? "불러오는 중…" : "새로고침"}</button>${writeBtn("bs-w")}</div></div>`;
+  var emptyList = (busy6, text5) => `<div class="bs-empty"><p>${text5}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy6 ? "disabled" : ""}>${busy6 ? "불러오는 중…" : "새로고침"}</button>${writeBtn("bs-w")}</div></div>`;
   var none2 = (list4) => !list4.length ? '<p class="bs-none">해당하는 글이 없어요.</p>' : "";
   var dmTakes = () => gnet.sub === "dm" && narrow();
   var onCat = (v) => !dmTakes() && gnet.cat === v;
-  var catBtn = (v, label2, cls = "", extra2 = "", on2 = onCat(v)) => `<button class="${[cls, on2 ? "on" : ""].filter(Boolean).join(" ")}" data-action="gn-cat" data-value="${esc11(v)}" aria-pressed="${on2}">${esc11(label2)}${extra2}</button>`;
+  var catBtn = (v, label2, cls = "", extra2 = "", on3 = onCat(v)) => `<button class="${[cls, on3 ? "on" : ""].filter(Boolean).join(" ")}" data-action="gn-cat" data-value="${esc12(v)}" aria-pressed="${on3}">${esc12(label2)}${extra2}</button>`;
   var dmBtn = (st, unreadDm, label2 = "쪽지함", cls = "") => `<button class="${[cls, dmTakes() ? "on" : "", narrow() ? "" : "gn-dmpop"].filter(Boolean).join(" ")}" data-action="gn-sub" data-value="dm" ${narrow() ? `aria-pressed="${dmTakes()}"` : `aria-haspopup="dialog" aria-expanded="${gnet.sub === "dm"}"`}>${narrow() ? "" : ICONS.mail}${label2}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ""}</button>`;
   var ipOf = (id2) => `${id2 * 37 % 200 + 20}.${id2 * 101 % 250}`;
-  var nickIp = (nick, id2) => `${esc11(nick)}${nick === "ㅇㅇ" ? ` <span class="ip">(${ipOf(id2)})</span>` : ""}`;
+  var nickIp = (nick, id2) => `${esc12(nick)}${nick === "ㅇㅇ" ? ` <span class="ip">(${ipOf(id2)})</span>` : ""}`;
   function thumb(p2) {
     const t = boardThumb(p2.body);
     if (!t) return "<span></span>";
-    return `<span class="th">${t.url ? `<img src="${esc11(t.url)}" alt="">` : CAMERA}</span>`;
+    return `<span class="th">${t.url ? `<img src="${esc12(t.url)}" alt="">` : CAMERA}</span>`;
   }
   function priceOf2(p2) {
     const s8 = `${p2.title}
@@ -793,8 +1334,8 @@ ${previewText(p2.body)}`;
   function gnSide(st, unreadDm) {
     const posts = [...st.posts].sort((a, b) => b.id - a.id).slice(0, 60);
     const items = posts.map((p2) => {
-      const on2 = !dmTakes() && gnet.open === p2.id && !gnet.compose;
-      return `<button class="sp${on2 ? " on" : ""}" data-action="${on2 ? "gn-home" : "gn-open-side"}" data-value="${p2.id}" aria-pressed="${on2}" title="${esc11(p2.title)}">${p2.tag ? `<i>[${esc11(p2.tag)}]</i>` : ""}<span>${esc11(p2.title)}</span>${p2.comments.length ? `<em>[${p2.comments.length}]</em>` : ""}${dot(p2)}</button>`;
+      const on3 = !dmTakes() && gnet.open === p2.id && !gnet.compose;
+      return `<button class="sp${on3 ? " on" : ""}" data-action="${on3 ? "gn-home" : "gn-open-side"}" data-value="${p2.id}" aria-pressed="${on3}" title="${esc12(p2.title)}">${p2.tag ? `<i>[${esc12(p2.tag)}]</i>` : ""}<span>${esc12(p2.title)}</span>${p2.comments.length ? `<em>[${p2.comments.length}]</em>` : ""}${dot(p2)}</button>`;
     }).join("");
     const reading = gnet.open !== null && !gnet.compose;
     const cat = (v, label2) => catBtn(v, label2, "", "", onCat(v) && !reading);
@@ -809,16 +1350,16 @@ ${previewText(p2.body)}`;
     const top = [...st.posts].filter((p2) => p2.tag !== "공지").sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 10);
     if (!top.length) return "";
     const items = top.map((p2) => {
-      const on2 = !dmTakes() && gnet.open === p2.id && !gnet.compose;
-      return `<li><button class="${on2 ? "on" : ""}" data-action="gn-open-side" data-value="${p2.id}" title="${esc11(p2.title)}">${esc11(p2.title)}</button></li>`;
+      const on3 = !dmTakes() && gnet.open === p2.id && !gnet.compose;
+      return `<li><button class="${on3 ? "on" : ""}" data-action="gn-open-side" data-value="${p2.id}" title="${esc12(p2.title)}">${esc12(p2.title)}</button></li>`;
     }).join("");
     return `<div class="t top">인기글</div><ol class="top">${items}</ol>`;
   }
   function galSide(st) {
     const top = [...st.posts].filter((p2) => p2.tag !== "공지").sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 15);
     const items = top.map((p2) => {
-      const on2 = !dmTakes() && gnet.open === p2.id && !gnet.compose;
-      return `<li><button class="${on2 ? "on" : ""}" data-action="gn-open-side" data-value="${p2.id}" title="${esc11(p2.title)}"><span>${esc11(p2.title)}</span>${p2.comments.length ? `<em>[${p2.comments.length}]</em>` : ""}<small>${p2.views}</small></button></li>`;
+      const on3 = !dmTakes() && gnet.open === p2.id && !gnet.compose;
+      return `<li><button class="${on3 ? "on" : ""}" data-action="gn-open-side" data-value="${p2.id}" title="${esc12(p2.title)}"><span>${esc12(p2.title)}</span>${p2.comments.length ? `<em>[${p2.comments.length}]</em>` : ""}<small>${p2.views}</small></button></li>`;
     }).join("");
     return `<div class="hit"><h4>힛갤</h4>${items ? `<ol>${items}</ol>` : '<p class="none">아직 글이 없어요.</p>'}</div>`;
   }
@@ -833,23 +1374,23 @@ ${previewText(p2.body)}`;
         const heads = `<div class="hds">${catBtn("", "전체")}${catBtn("@mine", "내가 쓴 글")}${catBtn("@scrap", "스크랩")}</div>`;
         const ic2 = (p2) => `<span class="ii ${boardThumb(p2.body) ? "im" : "tx"}"></span>`;
         const ntc = (p2) => p2.tag === "공지";
-        const rows3 = list4.map((p2) => ntc(p2) ? `<tr class="ntc"><td><span class="sb">공지</span></td><td><span class="sb">공지</span></td><td class="t">${openBtn(p2, `${esc11(p2.title)}${dot(p2)}`)}</td><td class="n">${esc11(p2.nick)}<span class="fix"></span></td><td>${esc11(when(p2, now2))}</td><td>-</td><td>-</td></tr>` : `<tr${p2.mine ? ' class="mine"' : ""}><td>${p2.id}</td><td>${esc11(p2.tag ?? "일반")}</td><td class="t">${openBtn(p2, `${ic2(p2)}${esc11(p2.title)}<em>[${p2.comments.length}]</em>${dot(p2)}`)}</td><td class="n">${nickIp(p2.nick, p2.id)}</td><td>${esc11(when(p2, now2))}</td><td>${p2.views}</td><td>${p2.votes}</td></tr>`).join("");
-        const table = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
+        const rows3 = list4.map((p2) => ntc(p2) ? `<tr class="ntc"><td><span class="sb">공지</span></td><td><span class="sb">공지</span></td><td class="t">${openBtn(p2, `${esc12(p2.title)}${dot(p2)}`)}</td><td class="n">${esc12(p2.nick)}<span class="fix"></span></td><td>${esc12(when(p2, now2))}</td><td>-</td><td>-</td></tr>` : `<tr${p2.mine ? ' class="mine"' : ""}><td>${p2.id}</td><td>${esc12(p2.tag ?? "일반")}</td><td class="t">${openBtn(p2, `${ic2(p2)}${esc12(p2.title)}<em>[${p2.comments.length}]</em>${dot(p2)}`)}</td><td class="n">${nickIp(p2.nick, p2.id)}</td><td>${esc12(when(p2, now2))}</td><td>${p2.views}</td><td>${p2.votes}</td></tr>`).join("");
+        const table2 = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
         <tr><th>번호</th><th>말머리</th><th>제목</th><th>글쓴이</th><th>작성일</th><th>조회</th><th>추천</th></tr>${rows3}</table>`;
-        const mlist = `<div class="mlist">${list4.map((p2) => `<div class="it${ntc(p2) ? " ntc" : ""}">${openBtn(p2, `<div class="t">${ntc(p2) ? "" : `[${esc11(p2.tag ?? "일반")}] `}${esc11(p2.title)}${ntc(p2) ? "" : `<em>[${p2.comments.length}]</em>`}${dot(p2)}</div><div class="m">${ntc(p2) ? `${esc11(p2.nick)} · ${esc11(when(p2, now2))}` : `${esc11(p2.nick)}${p2.nick === "ㅇㅇ" ? `(${ipOf(p2.id)})` : ""} · ${esc11(when(p2, now2))} · 조회 ${p2.views} · 추천 ${p2.votes}`}</div>`)}</div>`).join("")}</div>`;
+        const mlist = `<div class="mlist">${list4.map((p2) => `<div class="it${ntc(p2) ? " ntc" : ""}">${openBtn(p2, `<div class="t">${ntc(p2) ? "" : `[${esc12(p2.tag ?? "일반")}] `}${esc12(p2.title)}${ntc(p2) ? "" : `<em>[${p2.comments.length}]</em>`}${dot(p2)}</div><div class="m">${ntc(p2) ? `${esc12(p2.nick)} · ${esc12(when(p2, now2))}` : `${esc12(p2.nick)}${p2.nick === "ㅇㅇ" ? `(${ipOf(p2.id)})` : ""} · ${esc12(when(p2, now2))} · 조회 ${p2.views} · 추천 ${p2.votes}`}</div>`)}</div>`).join("")}</div>`;
         if (empty2) return `<div class="body">${tabs2}${empty2}</div>`;
-        return `<div class="body">${tabs2}${heads}${table}${mlist}${none2(list4)}
+        return `<div class="body">${tabs2}${heads}${table2}${mlist}${none2(list4)}
         <div class="bt2">${catBtn("", "전체글")}${writeBtn("wr")}</div>${pager(all.length, "pager", "", "다음")}
         <label class="bsch"><span>제목+내용</span>${searchInput("검색어")}<button class="go" data-action="gn-search-go">검색</button></label></div>`;
       }
       case "wpf": {
         const ntc = (p2) => p2.tag === "공지";
-        const rows3 = list4.map((p2) => `<tr${ntc(p2) ? ' class="ntc"' : ""}><td>${ntc(p2) ? "공지" : p2.id % 1e5}</td><td class="t">${openBtn(p2, `${p2.tag && !ntc(p2) ? `[${esc11(p2.tag)}] ` : ""}${esc11(p2.title)}${p2.comments.length ? ` <span class="cm">[${p2.comments.length}]</span>` : ""}${postUnread(p2) ? '<span class="nw">N</span>' : ""}`)}</td><td>${esc11(p2.nick)}</td><td>${esc11(when(p2, now2).replace(".", "/"))}</td><td>${p2.views}</td></tr>`).join("");
-        const table = `<table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>${rows3}</table>`;
-        const wml = `<div class="wml">${list4.map((p2) => `<div class="it${ntc(p2) ? " ntc" : ""}">${openBtn(p2, `<div class="t">${esc11(p2.title)}${p2.comments.length ? ` <span class="cm">[${p2.comments.length}]</span>` : ""}${postUnread(p2) ? '<span class="nw">N</span>' : ""}</div><div class="m">${esc11(p2.nick)} · ${esc11(when(p2, now2).replace(".", "/"))} · 조회 ${p2.views}</div>`)}</div>`).join("")}</div>`;
+        const rows3 = list4.map((p2) => `<tr${ntc(p2) ? ' class="ntc"' : ""}><td>${ntc(p2) ? "공지" : p2.id % 1e5}</td><td class="t">${openBtn(p2, `${p2.tag && !ntc(p2) ? `[${esc12(p2.tag)}] ` : ""}${esc12(p2.title)}${p2.comments.length ? ` <span class="cm">[${p2.comments.length}]</span>` : ""}${postUnread(p2) ? '<span class="nw">N</span>' : ""}`)}</td><td>${esc12(p2.nick)}</td><td>${esc12(when(p2, now2).replace(".", "/"))}</td><td>${p2.views}</td></tr>`).join("");
+        const table2 = `<table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>${rows3}</table>`;
+        const wml = `<div class="wml">${list4.map((p2) => `<div class="it${ntc(p2) ? " ntc" : ""}">${openBtn(p2, `<div class="t">${esc12(p2.title)}${p2.comments.length ? ` <span class="cm">[${p2.comments.length}]</span>` : ""}${postUnread(p2) ? '<span class="nw">N</span>' : ""}</div><div class="m">${esc12(p2.nick)} · ${esc12(when(p2, now2).replace(".", "/"))} · 조회 ${p2.views}</div>`)}</div>`).join("")}</div>`;
         return `<div class="ct"><div class="warn">※ 경.고 : 이 게.시.판은 감.시.받.고 있.습.니.다. 사.진 올.리.지 마.세.요.</div>
         <div class="tot"><span>Total : ${st.posts.length} &nbsp; Page : ${Math.min(gnet.page, pages(all.length))}/${pages(all.length)}</span><span class="srt">${[["new", "최신"], ["hot", "인기"], ["cmt", "댓글"]].map(([k, l]) => `<button class="${gnet.sort === k ? "on" : ""}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(" · ")}</span></div>
-        ${empty2 || `${table}${wml}${none2(list4)}`}${pager(all.length, "pgn", "[이전 10개]", "[다음 10개]")}
+        ${empty2 || `${table2}${wml}${none2(list4)}`}${pager(all.length, "pgn", "[이전 10개]", "[다음 10개]")}
         <div class="nav2"><span>${catBtn("", "목록", "bb")}</span><label class="sch">${searchInput("제목·내용")} <button class="bb" data-action="gn-search-go">검색</button></label>${writeBtn("bb")}</div>
       </div>`;
       }
@@ -857,21 +1398,21 @@ ${previewText(p2.body)}`;
         const cards2 = list4.map((p2) => {
           const want = p2.tag === "삽니다";
           const u = smPicUrl(p2);
-          const img = u ? `<img src="${esc11(u)}" alt="">` : ICONS.bag;
-          const ph = want ? `<div class="ph want"><span class="tag">삽니다</span><p>${esc11([...previewText(p2.body)].slice(0, 70).join(""))}</p></div>` : `<div class="ph ${SM_BG[p2.id % SM_BG.length]}">${img}${p2.tag ? `<span class="tag${p2.tag === "나눔" ? " g" : ""}">${esc11(p2.tag)}</span>` : ""}</div>`;
+          const img = u ? `<img src="${esc12(u)}" alt="">` : ICONS.bag;
+          const ph = want ? `<div class="ph want"><span class="tag">삽니다</span><p>${esc12([...previewText(p2.body)].slice(0, 70).join(""))}</p></div>` : `<div class="ph ${SM_BG[p2.id % SM_BG.length]}">${img}${p2.tag ? `<span class="tag${p2.tag === "나눔" ? " g" : ""}">${esc12(p2.tag)}</span>` : ""}</div>`;
           const price = priceOf2(p2);
-          return openBtn(p2, `${ph}<div><div class="nm">${esc11(p2.title)}${dot(p2)}</div>${price ? `<div class="pr">${esc11(price)}</div>` : ""}<div class="mt">${esc11(ago2(p2, now2))} · 관심 ${p2.votes} · 댓글 ${p2.comments.length}</div></div>`, "c");
+          return openBtn(p2, `${ph}<div><div class="nm">${esc12(p2.title)}${dot(p2)}</div>${price ? `<div class="pr">${esc12(price)}</div>` : ""}<div class="mt">${esc12(ago2(p2, now2))} · 관심 ${p2.votes} · 댓글 ${p2.comments.length}</div></div>`, "c");
         }).join("");
         const cats = `<div class="cats">${["", ...tagsOf(st)].map((t) => catBtn(t, t || "전체")).join("")}${catBtn("@mine", "내 글")}${catBtn("@scrap", "관심 목록")}${dmBtn(st, unreadDm, "내 채팅")}</div>`;
         const sort = `<span class="sort">${[["hot", "인기순"], ["new", "최신순"]].map(([k, l]) => `<button class="${gnet.sort === k ? "on" : ""}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(" · ")}</span>`;
         return `<div class="sec"><div class="bar2"><span class="loc">근처 매물</span>${cats}${sort}</div>${empty2 || `<div class="grid">${cards2}</div>${none2(list4)}`}${pager(all.length, "pg")}</div>`;
       }
       default: {
-        const rows3 = list4.map((p2) => openBtn(p2, `<div>${p2.tag ? `<span class="c${p2.tag === "목격" ? " hot" : ""}">${esc11(p2.tag)}</span>` : ""}<span class="tt">${esc11(p2.title)}${p2.comments.length ? `<em>${p2.comments.length}</em>` : ""}${dot(p2)}</span><small>${esc11(p2.nick)} · ${esc11(ago2(p2, now2))} · 조회 ${p2.views.toLocaleString()}</small></div>${thumb(p2)}`, `row${p2.mine ? " mine" : ""}`)).join("");
+        const rows3 = list4.map((p2) => openBtn(p2, `<div>${p2.tag ? `<span class="c${p2.tag === "목격" ? " hot" : ""}">${esc12(p2.tag)}</span>` : ""}<span class="tt">${esc12(p2.title)}${p2.comments.length ? `<em>${p2.comments.length}</em>` : ""}${dot(p2)}</span><small>${esc12(p2.nick)} · ${esc12(ago2(p2, now2))} · 조회 ${p2.views.toLocaleString()}</small></div>${thumb(p2)}`, `row${p2.mine ? " mine" : ""}`)).join("");
         const title2 = gnet.cat === "@mine" ? "내가 쓴 글" : gnet.cat === "@scrap" ? "스크랩" : gnet.cat || (gnet.sort === "hot" ? "랭킹" : "전체");
         const sort = `<div class="sort">${[["new", "최신"], ["hot", "랭킹"], ["cmt", "댓글 많은"]].map(([k, l]) => `<button class="${gnet.sort === k ? "on" : ""}" data-action="gn-sort" data-value="${k}" aria-pressed="${gnet.sort === k}">${l}</button>`).join("")}</div>`;
         const chips3 = `<div class="mchips">${catBtn("", "전체")}${tagsOf(st).map((t) => catBtn(t, t)).join("")}${dmBtn(st, unreadDm)}${catBtn("@mine", "내가 쓴 글")}${catBtn("@scrap", "스크랩")}</div>`;
-        return `<div class="gmain"><div class="bh"><h2>${esc11(title2)}</h2>${writeBtn("w")}</div>${chips3}${sort}${empty2 || `${rows3}${none2(list4)}`}${pages(all.length) > 1 ? pager(all.length, "pg", "", "›") : ""}</div>`;
+        return `<div class="gmain"><div class="bh"><h2>${esc12(title2)}</h2>${writeBtn("w")}</div>${chips3}${sort}${empty2 || `${rows3}${none2(list4)}`}${pages(all.length) > 1 ? pager(all.length, "pg", "", "›") : ""}</div>`;
       }
     }
   }
@@ -890,8 +1431,8 @@ ${previewText(p2.body)}`;
         seen2.add(k);
         const c = p2.comments[k - 1];
         const confirm = gnet.confirm === `c:${p2.id}:${k}`;
-        const shown3 = site === "wpf" && c.nick === "ㅇㅇ" ? "익명" : c.nick;
-        const author = c.mine ? `<b class="gn-me">${esc11(shown3)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p2.id}:${k}" title="${dmW()} 보내기"><b>${esc11(shown3)}</b></button>`;
+        const shown4 = site === "wpf" && c.nick === "ㅇㅇ" ? "익명" : c.nick;
+        const author = c.mine ? `<b class="gn-me">${esc12(shown4)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p2.id}:${k}" title="${dmW()} 보내기"><b>${esc12(shown4)}</b></button>`;
         const ip = site === "gal" && c.nick === "ㅇㅇ" ? ` <span class="ip">(${ipOf(p2.id + k)})</span>` : "";
         const del = c.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p2.id}:${k}">정말 삭제</button>` : `<button class="gn-cdel" data-action="gn-del-comment" data-value="${p2.id}:${k}" aria-label="댓글 삭제" title="삭제">삭제</button>` : "";
         const re = depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : "";
@@ -914,19 +1455,19 @@ ${previewText(p2.body)}`;
     const c = gnet.compose;
     const reply = c?.kind === "comment" && c.post === p2.id && c.parent > 0 ? c : null;
     const confirm = gnet.confirm === `p:${p2.id}`;
-    const who = p2.mine ? `<b class="gn-me">${esc11(p2.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p2.id}:0" title="${dmW()} 보내기"><b>${esc11(p2.nick)}</b></button>`;
+    const who = p2.mine ? `<b class="gn-me">${esc12(p2.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p2.id}:0" title="${dmW()} 보내기"><b>${esc12(p2.nick)}</b></button>`;
     const del = (cls) => p2.mine ? `<button class="${cls}${confirm ? " danger" : ""}" data-action="gn-del-post" data-value="${p2.id}">${confirm ? "정말 삭제" : "삭제"}</button>` : "";
     const more = (cls) => `<button class="${cls}" data-action="gn-post-refresh" data-value="${p2.id}" ${busy6 ? "disabled" : ""}>새 댓글 보기</button>`;
     const back = (cls, label2 = "‹ 목록으로") => `<button class="${cls}" data-action="gn-back">${label2}</button>`;
-    const scrap = (cls, on2 = "★ 스크랩됨", off = "☆ 스크랩") => `<button class="${cls}${p2.scrap ? " on" : ""}" data-action="gn-scrap" data-value="${p2.id}" aria-pressed="${!!p2.scrap}">${p2.scrap ? on2 : off}</button>`;
+    const scrap = (cls, on3 = "★ 스크랩됨", off = "☆ 스크랩") => `<button class="${cls}${p2.scrap ? " on" : ""}" data-action="gn-scrap" data-value="${p2.id}" aria-pressed="${!!p2.scrap}">${p2.scrap ? on3 : off}</button>`;
     const vote = (cls, inner) => `<button class="${cls}${p2.voted ? " on" : ""}" data-action="gn-vote" data-value="${p2.id}" aria-pressed="${!!p2.voted}">${inner}</button>`;
     const list4 = p2.comments.length ? `<ul class="cms0 gn-comments">${commentTree(site, p2, busy6)}</ul>` : "";
     const cin = reply ? "" : composer(busy6, "댓글을 입력하세요", "", "등록");
     switch (site) {
       case "gal": {
         const files = boardFiles(p2.body);
-        const att = files.length ? `<div class="att"><b>원본 첨부파일 ${files.length}</b>${files.map((f) => f.url ? `<a href="${esc11(f.url)}" target="_blank" rel="noopener noreferrer">🔗 ${esc11(f.text)}</a>` : `<a>${f.kind === "file" ? "📎" : "🔗"} ${esc11(f.text)}</a>`).join("")}</div>` : "";
-        return `<article class="body dpost gn-post"><div class="vt"><h3>${p2.tag ? `<span>[${esc11(p2.tag)}]</span> ` : ""}<span class="gn-post-title">${esc11(p2.title)}</span></h3><div class="vm"><span>${who}${p2.nick === "ㅇㅇ" ? ` <span class="ip">(${ipOf(p2.id)})</span>` : ""} · ${esc11(p2.date)}</span><span>조회 ${p2.views} · 추천 ${p2.votes} · 댓글 ${p2.comments.length}</span></div></div>
+        const att = files.length ? `<div class="att"><b>원본 첨부파일 ${files.length}</b>${files.map((f) => f.url ? `<a href="${esc12(f.url)}" target="_blank" rel="noopener noreferrer">🔗 ${esc12(f.text)}</a>` : `<a>${f.kind === "file" ? "📎" : "🔗"} ${esc12(f.text)}</a>`).join("")}</div>` : "";
+        return `<article class="body dpost gn-post"><div class="vt"><h3>${p2.tag ? `<span>[${esc12(p2.tag)}]</span> ` : ""}<span class="gn-post-title">${esc12(p2.title)}</span></h3><div class="vm"><span>${who}${p2.nick === "ㅇㅇ" ? ` <span class="ip">(${ipOf(p2.id)})</span>` : ""} · ${esc12(p2.date)}</span><span>조회 ${p2.views} · 추천 ${p2.votes} · 댓글 ${p2.comments.length}</span></div></div>
         ${att}<div class="pb gn-post-body">${attachBody(p2.body, true, true)}</div>
         <div class="rec">${vote("b up", `<b>${p2.votes}</b><span>개념 추천</span>`)}<button class="b dn${p2.down ? " on" : ""}" data-action="gn-down" data-value="${p2.id}" aria-pressed="${!!p2.down}"><b>${p2.down ? 1 : 0}</b><span>비추</span></button></div>
         <div class="cmh">전체 댓글 <b>${p2.comments.length}</b>개</div>${list4}${cin}
@@ -934,7 +1475,7 @@ ${previewText(p2.body)}`;
       }
       case "wpf": {
         const files = boardFiles(p2.body);
-        return `<article class="ct wpost gn-post"><table class="vw"><tr><th>제 목</th><td class="tt gn-post-title" colspan="3">${esc11(p2.title)}</td></tr><tr><th>글쓴이</th><td>${who}</td><th>날 짜</th><td>${esc11(p2.date.slice(5).replace(".", "/"))}</td></tr><tr><th>조 회</th><td>${p2.views}</td><th>첨 부</th><td>${files.map((f) => f.url ? `<a href="${esc11(f.url)}" target="_blank" rel="noopener noreferrer">${esc11(f.text)}</a>` : `<a>${esc11(f.text)}</a>`).join("<br>")}</td></tr>
+        return `<article class="ct wpost gn-post"><table class="vw"><tr><th>제 목</th><td class="tt gn-post-title" colspan="3">${esc12(p2.title)}</td></tr><tr><th>글쓴이</th><td>${who}</td><th>날 짜</th><td>${esc12(p2.date.slice(5).replace(".", "/"))}</td></tr><tr><th>조 회</th><td>${p2.views}</td><th>첨 부</th><td>${files.map((f) => f.url ? `<a href="${esc12(f.url)}" target="_blank" rel="noopener noreferrer">${esc12(f.text)}</a>` : `<a>${esc12(f.text)}</a>`).join("<br>")}</td></tr>
         <tr><td class="bd gn-post-body" colspan="4">${attachBody(p2.body, true, true)}</td></tr></table>
         <div class="cms">${list4}${cin}</div>
         <div class="nav2">${back("bb", "목록")}<span>${scrap("bb", "스크랩됨", "스크랩")} ${more("bb")} ${del("bb")}</span>${writeBtn("bb")}</div></article>`;
@@ -943,16 +1484,16 @@ ${previewText(p2.body)}`;
         const price = priceOf2(p2);
         const want = p2.tag === "삽니다";
         const u = want ? null : smPicUrl(p2);
-        const pic3 = want ? '<div class="ph want"><span class="tag">삽니다</span></div>' : `<div class="ph ${SM_BG[p2.id % SM_BG.length]}">${u ? `<img src="${esc11(u)}" alt="">` : ICONS.bag}</div>`;
+        const pic3 = want ? '<div class="ph want"><span class="tag">삽니다</span></div>' : `<div class="ph ${SM_BG[p2.id % SM_BG.length]}">${u ? `<img src="${esc12(u)}" alt="">` : ICONS.bag}</div>`;
         return `<article class="detail gn-post"><div class="side">${pic3}<div class="seller"><i></i><div>${who}<small>관심 ${p2.votes} · 댓글 ${p2.comments.length} · 조회 ${p2.views}</small></div></div></div><div class="info">
-        <h2 class="gn-post-title">${esc11(p2.title)}</h2>${price ? `<div class="price">${esc11(price)}</div>` : ""}<div class="mt2">${p2.tag ? `${esc11(p2.tag)} · ` : ""}${esc11(p2.date)} · ${esc11(ago2(p2, now2))}</div>
+        <h2 class="gn-post-title">${esc12(p2.title)}</h2>${price ? `<div class="price">${esc12(price)}</div>` : ""}<div class="mt2">${p2.tag ? `${esc12(p2.tag)} · ` : ""}${esc12(p2.date)} · ${esc12(ago2(p2, now2))}</div>
         <div class="body gn-post-body">${body2(p2.body)}</div></div>
         <div class="qna">
         <div class="act">${scrap("", "♥", "♡")}${p2.mine ? "" : `<button class="chat" data-action="gn-dm-from" data-value="${p2.id}:0">채팅하기</button>`}${back("back")}${more("")}${del("")}</div>
         ${p2.comments.length ? `<div class="cmh">문의 <b>${p2.comments.length}</b></div>` : ""}${list4}${cin}</div></article>`;
       }
       default:
-        return `<article class="gmain gpost gn-post"><div class="ph1">${p2.tag ? `<span class="c">${esc11(p2.tag)}</span>` : ""}<h2 class="gn-post-title">${esc11(p2.title)}</h2><div class="mt">${who} · ${esc11(p2.date.slice(5))} · 조회 ${p2.views.toLocaleString()} · 추천 ${p2.votes}</div></div>
+        return `<article class="gmain gpost gn-post"><div class="ph1">${p2.tag ? `<span class="c">${esc12(p2.tag)}</span>` : ""}<h2 class="gn-post-title">${esc12(p2.title)}</h2><div class="mt">${who} · ${esc12(p2.date.slice(5))} · 조회 ${p2.views.toLocaleString()} · 추천 ${p2.votes}</div></div>
         <div class="pb gn-post-body">${body2(p2.body)}</div>
         <div class="acts">${vote("up", `▲ 추천 ${p2.votes}`)}${scrap("")}</div>
         <div class="cmh">댓글 <b>${p2.comments.length}</b></div>${list4}${cin}
@@ -970,7 +1511,7 @@ ${previewText(p2.body)}`;
     if (gnet.compose?.kind === "post") return composeView(gnet.compose, busy6);
     if (gnet.sub === "dm" && !popDm) return siteDm(st, busy6);
     const p2 = gnet.open !== null ? findAnyPost(st, gnet.open) : void 0;
-    if (p2) return (archived(st, p2.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 본편 참고에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : "") + sitePost(site, p2, busy6, now2);
+    if (p2) return (archived(st, p2.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 메인 요청에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : "") + sitePost(site, p2, busy6, now2);
     return siteList(site, st, now2, busy6, unreadDm);
   }
   function siteHtml(site, ctx2, st, busy6, mobile, extras2, note) {
@@ -978,14 +1519,14 @@ ${previewText(p2.body)}`;
     const popDm = gnet.sub === "dm" && !mobile;
     const main = siteMain(site, ctx2, st, busy6, unreadDm, popDm);
     const plain2 = gnet.sub === "dm" && !popDm || gnet.compose?.kind === "post";
-    const box4 = (inner2) => plain2 ? `<div class="bs-plain">${extras2}${inner2}</div>` : `${extras2 ? `<div class="bs-x">${extras2}</div>` : ""}${inner2}`;
+    const box3 = (inner2) => plain2 ? `<div class="bs-plain">${extras2}${inner2}</div>` : `${extras2 ? `<div class="bs-x">${extras2}</div>` : ""}${inner2}`;
     let inner;
     if (site === "gn") inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain2 ? `<div class="gmain">${extras2}${main}</div>` : `${extras2}${main}`}</div></div>`;
-    else if (site === "gal" && !mobile) inner = `<div class="gal-cols${st.posts.length ? "" : " solo"}"><div class="gal-main">${box4(main)}</div>${st.posts.length ? `<aside class="gal-side">${galSide(st)}</aside>` : ""}</div>`;
+    else if (site === "gal" && !mobile) inner = `<div class="gal-cols${st.posts.length ? "" : " solo"}"><div class="gal-main">${box3(main)}</div>${st.posts.length ? `<aside class="gal-side">${galSide(st)}</aside>` : ""}</div>`;
     else if (site === "wpf") {
       const lm = `<div class="lm"><div class="t">MENU</div>${wpfMenu(st, unreadDm)}${writeBtn("")}${wpfTop(st)}</div>`;
-      inner = `<div class="pg">${box4(`<div class="cols">${lm}<div class="colr">${main}</div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`)}</div>`;
-    } else inner = box4(main);
+      inner = `<div class="pg">${box3(`<div class="cols">${lm}<div class="colr">${main}</div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`)}</div>`;
+    } else inner = box3(main);
     const dmWin = popDm ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="${dmBox()}"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} ${dmBox()}</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy6)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>` : "";
     return `<main class="gx-body gn bs bs-${site}${mobile ? " bs-m" : ""}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}${note}</main>`;
   }
@@ -1019,9 +1560,9 @@ ${previewText(p2.body)}`;
     const job = jobs3.get(chatKey3(ctx2));
     const busy6 = !!job;
     const mobile = narrow();
-    const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc11(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
-    const fail4 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc11(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc11(gnet.failure.raw)}</textarea></details>` : "";
-    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc11(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc12(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
+    const fail4 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc12(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc12(gnet.failure.raw)}</textarea></details>` : "";
+    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc12(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("gn", gnet.notice, (t) => {
       if (gnet.notice === t) gnet.notice = "";
     });
@@ -1040,21 +1581,21 @@ ${previewText(p2.body)}`;
       return null;
     }
   }
-  async function autoRefreshGnet(base, messageIndex, open4 = false, joint, site = "gn") {
+  async function autoRefreshGnet(base, messageIndex, open3 = false, joint, site = "gn") {
     const ctx2 = siteCtx(base, site);
     const s8 = gnetSettings(ctx2.chat.scriptstate);
-    if (!s8.enabled || !(open4 ? s8.autoOpen : s8.auto) || jobs3.has(chatKey3(ctx2))) return;
+    if (!s8.enabled || !(open3 ? s8.autoOpen : s8.auto) || jobs3.has(chatKey3(ctx2))) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
     const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
-    const saved2 = await upd(ctx2, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
-    if (!saved2) return;
+    const saved = await upd(ctx2, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
+    if (!saved) return;
     const env3 = liveEnv3 ?? quietEnv3;
     const showing = env3.current();
     const target = showing && chatKey3(showing) === chatKey3(ctx2) ? env3 : { ...quietEnv3 };
     const notice2 = gnet.notice;
-    await refreshBoard({ ...ctx2, chat: saved2 }, target, true, joint);
+    await refreshBoard({ ...ctx2, chat: saved }, target, true, joint);
     if (target !== env3) gnet.notice = notice2;
   }
   function gnetOpenCheck(base, env3, site = "gn") {
@@ -1065,11 +1606,6 @@ ${previewText(p2.body)}`;
     if (at < 0) return;
     void autoRefreshGnet(ctx2, at, true, void 0, site).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
   }
-  var LAZY_HINT = {
-    "1": "새로고침 버튼을 누를 때만 불러요",
-    open: "채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요",
-    "0": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
-  };
   async function handleGnet(action, value, base, env3, site = uiSite) {
     if (!action.startsWith("gn-")) return false;
     liveEnv3 = env3;
@@ -1212,9 +1748,9 @@ ${previewText(p2.body)}`;
         gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
         gnet.attach = [];
         env3.render();
-        const box4 = document.querySelector('.gn-composer [data-input="gn-draft"]');
-        box4?.scrollIntoView({ block: "center", behavior: "smooth" });
-        box4?.focus({ preventScroll: true });
+        const box3 = document.querySelector('.gn-composer [data-input="gn-draft"]');
+        box3?.scrollIntoView({ block: "center", behavior: "smooth" });
+        box3?.focus({ preventScroll: true });
         return true;
       }
       case "gn-reply": {
@@ -1228,9 +1764,9 @@ ${previewText(p2.body)}`;
         }
         gnet.compose = { kind: "comment", post: a, parent: b, label: `${c.nick}에게 답글` };
         env3.render();
-        const box4 = document.querySelector('.gn-c-compose [data-input="gn-draft"]');
-        box4?.focus({ preventScroll: true });
-        box4?.closest(".gn-c-compose")?.scrollIntoView({ block: "nearest" });
+        const box3 = document.querySelector('.gn-c-compose [data-input="gn-draft"]');
+        box3?.focus({ preventScroll: true });
+        box3?.closest(".gn-c-compose")?.scrollIntoView({ block: "nearest" });
         return true;
       }
       case "gn-dm-from": {
@@ -1271,22 +1807,22 @@ ${previewText(p2.body)}`;
           gnet.notice = "첨부 내용을 입력하거나 ✕로 빼 주세요.";
           break;
         }
-        const text4 = composeBody(gnet.attach, gnet.draft);
+        const text5 = composeBody(gnet.attach, gnet.draft);
         const cap = c.kind === "post" ? LIMITS.post_tokens : c.kind === "comment" ? LIMITS.comment_tokens : LIMITS.dm_tokens;
-        if (tokens(describe(text4)) > cap) {
+        if (tokens(describe(text5)) > cap) {
           gnet.notice = `첨부 내용과 글이 작성 상한(${cap}토큰)을 넘었어요. 조금 줄여 주세요.`;
           break;
         }
-        if (c.kind === "post") void writePost(ctx2, env3, text4, siteOf2(ctx2) === "sm" ? c.tag ?? SM_TAGS[0] : "");
-        else if (c.kind === "comment") void writeComment(ctx2, env3, c.post, c.parent, text4);
-        else if (c.kind === "dm") void sendDm(ctx2, env3, c.nick, text4, c.source);
+        if (c.kind === "post") void writePost(ctx2, env3, text5, siteOf2(ctx2) === "sm" ? c.tag ?? SM_TAGS[0] : "");
+        else if (c.kind === "comment") void writeComment(ctx2, env3, c.post, c.parent, text5);
+        else if (c.kind === "dm") void sendDm(ctx2, env3, c.nick, text5, c.source);
         else {
           const to = gnet.to.trim().slice(0, 80);
           if (!to) {
             gnet.notice = "받는 사람 닉네임을 적어 주세요.";
             break;
           }
-          void sendDm(ctx2, env3, to, text4);
+          void sendDm(ctx2, env3, to, text5);
         }
         return true;
       }
@@ -1355,6 +1891,12 @@ ${previewText(p2.body)}`;
         await setVars2(ctx2, env3, vars);
         return true;
       }
+      case "gn-chance": {
+        const n3 = Math.round(Number(v));
+        if (v.trim() !== "" && Number.isFinite(n3)) await setVar2(ctx2, env3, CFG("incoming_chance"), String(Math.max(0, Math.min(100, n3))));
+        else env3.render();
+        return true;
+      }
       case "gn-keep": {
         const n3 = Math.floor(Number(v));
         if (Number.isFinite(n3) && n3 >= 1 && n3 <= STORAGE_MAX) await setVar2(ctx2, env3, GN_STORAGE_LIMIT, String(n3));
@@ -1400,17 +1942,27 @@ ${previewText(p2.body)}`;
   }
 
   // src/host/usebox.ts
-  var CSS2 = `
-${themeVars("[x-goei-usebox]")}
-[x-goei-usebox] { position: fixed; left: 16px; bottom: 96px; z-index: 44; display: none; max-width: min(72vw, 560px); font: 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; pointer-events: none; }
-[x-goei-usebox] [x-goei-uwrap] { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-[x-goei-usebox] [data-gu-label] { color: var(--g-sub); font-size: 11px; letter-spacing: .02em; margin-right: 2px; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
-[x-goei-usebox] [data-gu] { display: inline-flex; align-items: center; gap: 6px; padding: 6px 7px 6px 10px; border-radius: 999px; background: var(--g-panel); color: var(--g-text); border: 1px solid var(--g-line); box-shadow: 0 6px 14px -8px rgba(0,0,0,.6); }
-[x-goei-usebox] [data-gu] b { font-weight: 600; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-[x-goei-usebox] [data-gu-x] { width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--g-acc); color: var(--g-signal); border: 1px solid var(--g-acc-line); font-size: 11px; line-height: 1; pointer-events: auto; cursor: pointer; }
-`;
-  var esc12 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var SLOTS3 = 12;
+  var LAST2 = '.chat-message-container:first-child [data-goei-card="use"]';
+  var USE_SLOT = `<div data-goei-card="use" style="display:none"><span data-gu-label></span>${Array.from({ length: SLOTS3 }, (_, i) => `<span data-gu="${i}"><span data-gu-x="${i}" role="button" aria-label="빼기"></span></span>`).join("")}<span data-gu-more></span></div>`;
+  var cssStr = (s8) => `"${s8.replace(/[\r\n]+/g, " ").replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  function useBoxCss(names4) {
+    if (!names4.length) return "";
+    const show = names4.slice(0, names4.length > SLOTS3 ? SLOTS3 - 1 : SLOTS3);
+    const more = names4.length - show.length;
+    return [
+      `${LAST2} { display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px 8px; width: fit-content; min-width: min(100%, 420px); max-width: 100%; box-sizing: border-box; margin: 10px auto 0; padding: 10px 16px; border: 1px solid var(--goei-accentLine); border-radius: 14px; background: var(--goei-accentBg); color: var(--goei-sub); font-size: .92em; line-height: 1.5; }`,
+      `${LAST2} [data-gu-label]::before { content: "다음 메시지에 사용"; color: var(--goei-signal); font-weight: 600; margin-right: 4px; }`,
+      `${LAST2} [data-gu] { display: none; align-items: center; gap: 6px; max-width: 100%; padding: 2px 4px 2px 10px; border: 1px solid var(--goei-accentLine); border-radius: 999px; color: var(--goei-text); }`,
+      `${LAST2} [data-gu]::before { max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }`,
+      `${LAST2} [data-gu-x] { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--goei-accentLine); color: var(--goei-signal); line-height: 1; cursor: pointer; }`,
+      `${LAST2} [data-gu-x]::before { content: "×"; }`,
+      ...show.map((n3, i) => `${LAST2} [data-gu="${i}"] { display: inline-flex; } ${LAST2} [data-gu="${i}"]::before { content: ${cssStr(n3.label)}; }`),
+      more > 0 ? `${LAST2} [data-gu-more]::before { content: "외 ${more}개"; }` : ""
+    ].join("\n");
+  }
   var host = null;
+  var styleEl = null;
   var where = { charIndex: -1, chatIndex: -1 };
   var shown = [];
   var busy3 = false;
@@ -1423,10 +1975,10 @@ ${themeVars("[x-goei-usebox]")}
     });
   }
   async function ensure() {
-    if (host) return host;
     const root3 = await body();
     if (!root3) return null;
     const { doc: doc2 } = root3;
+    if (host && styleEl) return { doc: doc2, style: styleEl };
     try {
       for (const old of await elements(doc2, "[x-goei-usebox]")) await old.remove().catch(() => {
       });
@@ -1434,27 +1986,21 @@ ${themeVars("[x-goei-usebox]")}
     }
     const h = await doc2.createElement("div");
     await h.setAttribute("x-goei-usebox", "true");
-    await h.setAttribute("x-goei-theme", currentTheme());
     const style = await doc2.createElement("style");
-    await style.setTextContent(CSS2);
     await h.appendChild(style);
-    const wrap = await doc2.createElement("div");
-    await wrap.setAttribute("x-goei-uwrap", "true");
-    await h.appendChild(wrap);
     await root3.body.appendChild(h);
     host = h;
-    onThemeChange((t) => void h.setAttribute("x-goei-theme", t).catch(() => {
-    }));
-    await h.addEventListener("click", ((ev) => void onClick(doc2, ev.clientX ?? -1, ev.clientY ?? -1)), { passive: true });
-    return h;
+    styleEl = style;
+    return { doc: doc2, style };
   }
-  async function onClick(doc2, x, y) {
-    if (busy3 || !shown.length || where.charIndex < 0) return;
-    const xs = await elements(doc2, "[x-goei-usebox] [data-gu-x]");
+  onChatClick("use", async (doc2, x, y) => {
+    if (!shown.length || where.charIndex < 0) return "idle";
+    if (busy3) return false;
+    const xs = await elements(doc2, `${LAST2} [data-gu-x]`);
     for (let i = 0; i < xs.length; i++) {
       if (!await hit2(xs[i], x, y)) continue;
       const id2 = shown[i]?.id;
-      if (!id2) return;
+      if (!id2) return false;
       busy3 = true;
       try {
         const { charIndex, chatIndex } = where;
@@ -1468,8 +2014,23 @@ ${themeVars("[x-goei-usebox]")}
       } finally {
         busy3 = false;
       }
-      return;
+      return true;
     }
+    return false;
+  });
+  async function redrawLast(doc2, charIndex, chatIndex) {
+    if (!(await elements(doc2, ".chat-message-container")).length || (await elements(doc2, LAST2)).length) return;
+    const flip = (add) => updateChat(charIndex, chatIndex, (cur) => {
+      const list4 = cur.message ?? [];
+      const m = list4[list4.length - 1];
+      if (!m || typeof m.data !== "string" || cur.isStreaming) return null;
+      if (!add && !m.data.endsWith("\n")) return null;
+      return { ...cur, message: [...list4.slice(0, -1), { ...m, data: add ? `${m.data}
+` : m.data.slice(0, -1) }] };
+    }).catch(() => null);
+    if (!await flip(true)) return;
+    await new Promise((r) => setTimeout(r, 300));
+    await flip(false);
   }
   async function refreshUseBox(charIndex, chatIndex, known) {
     if (charIndex < 0 || chatIndex < 0) return hideUseBox();
@@ -1477,16 +2038,17 @@ ${themeVars("[x-goei-usebox]")}
     const names4 = useBoxNames(chat);
     where = { charIndex, chatIndex };
     if (!names4.length) return hideUseBox();
-    const h = await ensure();
-    if (!h) return;
-    shown = names4;
-    const wrap = await h.querySelector("[x-goei-uwrap]");
-    await wrap?.setInnerHTML(`<span data-gu-label>다음 메시지에 사용</span>${names4.map((n3) => `<span data-gu><b>${esc12(n3.label)}</b><span data-gu-x role="button" aria-label="${esc12(n3.label)} 빼기">×</span></span>`).join("")}`);
-    await h.setStyle("display", "block");
+    const e = await ensure();
+    if (!e) return;
+    shown = names4.slice(0, names4.length > SLOTS3 ? SLOTS3 - 1 : SLOTS3);
+    await e.style.setTextContent(useBoxCss(names4));
+    armChatClick("use");
+    await redrawLast(e.doc, charIndex, chatIndex).catch(() => {
+    });
   }
   async function hideUseBox() {
     shown = [];
-    if (host) await host.setStyle("display", "none").catch(() => {
+    if (styleEl) await styleEl.setTextContent("").catch(() => {
     });
   }
 
@@ -1592,8 +2154,8 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     if (!walletOn(ctx2) || here) return "";
     return `<button class="gx-hwallet" data-action="tab" data-value="wallet" aria-label="가계부 · 잔고 ${esc13(balanceText(ctx2))}">${esc13(balanceText(ctx2))}</button>`;
   }
-  var SRC_ICON = { story: ICONS.phone, field: ICONS.game, manual: ICONS.pen, store: ICONS.bag };
-  var SRC_NAME = { story: "본문", field: "필드", manual: "직접 수정", store: "상점" };
+  var SRC_ICON = { story: ICONS.phone, field: ICONS.phone, manual: ICONS.pen, store: ICONS.bag };
+  var SRC_NAME = { story: "본문", field: "거래", manual: "직접 수정", store: "상점" };
   var WEEK3 = "일월화수목금토";
   function datesOf(ctx2) {
     const at = /* @__PURE__ */ new Map();
@@ -1636,7 +2198,7 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     return { rows: rows3, today, start: w.start };
   }
   function subOf(e) {
-    if (e.src === "field") return [e.place, e.time].filter(Boolean).join(" ") || "필드";
+    if (e.src === "field") return [e.place, e.time].filter(Boolean).join(" ");
     if (e.src === "manual") return "직접 수정";
     return e.quote ? `「${e.quote}」` : "";
   }
@@ -1644,10 +2206,10 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     const { rows: rows3 } = rowsOf(ctx2);
     const editable = walletEditable(ctx2.chat.scriptstate);
     const q = walletUi.q.trim().toLowerCase();
-    const shown3 = rows3.filter(({ e }) => walletUi.filter === "in" ? e.amount > 0 : walletUi.filter === "out" ? e.amount < 0 : true).filter(({ e }) => !q || `${e.memo} ${e.quote ?? ""} ${e.place ?? ""}`.toLowerCase().includes(q)).reverse();
-    if (!shown3.length) return `<p class="gx-wt-empty">${rows3.length ? "맞는 거래가 없어요." : walletUi.kind === "p" ? "아직 포인트 거래가 없어요. 본문에 적힌 포인트 지급·사용이 여기에 쌓여요." : "아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요."}</p>`;
+    const shown4 = rows3.filter(({ e }) => walletUi.filter === "in" ? e.amount > 0 : walletUi.filter === "out" ? e.amount < 0 : true).filter(({ e }) => !q || `${e.memo} ${e.quote ?? ""} ${e.place ?? ""}`.toLowerCase().includes(q)).reverse();
+    if (!shown4.length) return `<p class="gx-wt-empty">${rows3.length ? "맞는 거래가 없어요." : walletUi.kind === "p" ? "아직 포인트 거래가 없어요. 본문에 적힌 포인트 지급·사용이 여기에 쌓여요." : "아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요."}</p>`;
     const groups = [];
-    for (const r of shown3) {
+    for (const r of shown4) {
       const g2 = groups[groups.length - 1];
       if (g2 && g2.date === r.date) g2.rows.push(r);
       else groups.push({ date: r.date, rows: [r] });
@@ -1660,10 +2222,10 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
       return `${head3}<section class="gx-wt-day">
     <h3><span>${esc13(dayLabel(g2.date))}</span><em>${esc13(formatDelta(g2.rows.filter((r) => r.e.src !== "manual").reduce((n3, r) => n3 + r.e.amount, 0)))}</em></h3>
     <ul>${g2.rows.map(({ e, after }) => {
-        const open4 = walletUi.open === e.id;
+        const open3 = walletUi.open === e.id;
         const sub = subOf(e);
-        return `<li class="gx-wt-row${open4 ? " open" : ""}">
-        <button class="gx-wt-main" data-action="wallet-open" data-value="${esc13(e.id)}" aria-expanded="${open4}" aria-label="${esc13(`${SRC_NAME[e.src]} · ${e.memo} ${formatDelta(e.amount)}`)}">
+        return `<li class="gx-wt-row${open3 ? " open" : ""}">
+        <button class="gx-wt-main" data-action="wallet-open" data-value="${esc13(e.id)}" aria-expanded="${open3}" aria-label="${esc13(`${SRC_NAME[e.src]} · ${e.memo} ${formatDelta(e.amount)}`)}">
           <span class="gx-wt-ic ${e.src}" title="${SRC_NAME[e.src]}">${SRC_ICON[e.src]}</span>
           <span class="gx-wt-memo"><b>${esc13(e.memo || "(메모 없음)")}</b>${sub ? `<small>${esc13(sub)}</small>` : ""}</span>
           <span class="gx-wt-amt"><b class="${e.amount < 0 ? "out" : "in"}">${esc13(formatDelta(e.amount))}</b><small>${esc13(after.toLocaleString("en-US"))}</small></span>
@@ -1686,12 +2248,12 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     }
     const { rows: rows3, today, start: start3 } = rowsOf(ctx2);
     const sum = (f) => rows3.filter(f).reduce((n3, r) => n3 + r.e.amount, 0);
-    const real = (r) => r.e.src !== "manual";
-    const income = sum((r) => real(r) && r.e.amount > 0);
-    const spend = -sum((r) => real(r) && r.e.amount < 0);
-    const inN = rows3.filter((r) => real(r) && r.e.amount > 0).length;
-    const outN = rows3.filter((r) => real(r) && r.e.amount < 0).length;
-    const todayRows = rows3.filter((r) => real(r) && today && r.date === today);
+    const real2 = (r) => r.e.src !== "manual";
+    const income = sum((r) => real2(r) && r.e.amount > 0);
+    const spend = -sum((r) => real2(r) && r.e.amount < 0);
+    const inN = rows3.filter((r) => real2(r) && r.e.amount > 0).length;
+    const outN = rows3.filter((r) => real2(r) && r.e.amount < 0).length;
+    const todayRows = rows3.filter((r) => real2(r) && today && r.date === today);
     const todayNet = todayRows.reduce((n3, r) => n3 + r.e.amount, 0);
     const balance = rows3.length ? rows3[rows3.length - 1].after : start3;
     const editable = walletEditable(ctx2.chat.scriptstate);
@@ -1727,10 +2289,10 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
   var CLIP_GROUPS = ["base", "filler", "event", "rare", "off"];
   var CLIP_GROUP_LABEL = { base: "기본", filler: "가끔", event: "대사·사건", rare: "드물게", off: "안 씀" };
   var obj6 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  function parseHomeshopPack(text4) {
+  function parseHomeshopPack(text5) {
     let j;
     try {
-      j = JSON.parse(text4);
+      j = JSON.parse(text5);
     } catch {
       throw new Error("방송 그림 팩이 JSON 이 아니에요.");
     }
@@ -1758,8 +2320,8 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
   var hsKey = (shKey) => `$hs_${shKey.slice(1)}`;
   function hsVars(vars) {
     const out = {};
-    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_")) out[k] = v;
-    for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith("$hs_sh_")) out[`$sh_${k.slice(7)}`] = v;
+    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_") || SHOP_SHARED_VARS.includes(k)) out[k] = v;
+    for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith("$hs_sh_") && !SHOP_SHARED_VARS.includes(`$sh_${k.slice(7)}`)) out[`$sh_${k.slice(7)}`] = v;
     return out;
   }
   var HS_KEY = {
@@ -1819,26 +2381,27 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     callLo: { key: HS_KEY.callLo, lo: 1, hi: 60, def: 6, unit: "턴" },
     callHi: { key: HS_KEY.callHi, lo: 1, hi: 60, def: 12, unit: "턴" }
   };
+  var HS_TEL_DEFAULT = "080-404-0000";
   var HS_FORMS_DEFAULT = "전화 출연, 엑스트라, 모델";
   var n = (vars, k) => numIn2(vars?.[HS_NUM[k].key], HS_NUM[k].def, HS_NUM[k].lo, HS_NUM[k].hi);
   var scaleOf = (v, def) => v === "0.5" || v === "1" || v === "2" || v === "auto" || v === "fit" ? v : def;
   function hsSettings(vars) {
     const shop = shopSettings(hsVars(vars));
-    const pair = (a, b) => [Math.min(a, b), Math.max(a, b)];
+    const pair2 = (a, b) => [Math.min(a, b), Math.max(a, b)];
     const size = vars?.[hsKey("$sh_min")] === void 0 && vars?.[hsKey("$sh_max")] === void 0 ? [3, 5] : shop.size;
     return {
       on: vars?.[HS_KEY.on] !== "0",
       net: vars?.[HS_KEY.net] !== "0",
       auto: vars?.[HS_KEY.auto] === "manual" ? "manual" : "open",
       shop: { ...shop, on: true, size, feature: false, kick: false },
-      chat: pair(n(vars, "chatMin"), n(vars, "chatMax")),
+      chat: pair2(n(vars, "chatMin"), n(vars, "chatMax")),
       chatGap: n(vars, "chatGap") / 10,
-      cue: pair(n(vars, "cueMin"), n(vars, "cueMax")),
+      cue: pair2(n(vars, "cueMin"), n(vars, "cueMax")),
       speed: n(vars, "speed"),
       hold: n(vars, "hold") / 10,
       frame: n(vars, "frame"),
       fx: { cut: vars?.[HS_KEY.cut] !== "0", bulb: vars?.[HS_KEY.bulb] !== "0", tear: vars?.[HS_KEY.tear] !== "0", scan: vars?.[HS_KEY.scan] !== "0", tearP: n(vars, "tearP") / 100 },
-      rules: { fill: pair(n(vars, "fillLo"), n(vars, "fillHi")), fillCool: n(vars, "fillCool"), rareP: n(vars, "rareP") / 100, rareCool: n(vars, "rareCool") },
+      rules: { fill: pair2(n(vars, "fillLo"), n(vars, "fillHi")), fillCool: n(vars, "fillCool"), rareP: n(vars, "rareP") / 100, rareCool: n(vars, "rareCool") },
       clipsText: String(vars?.[HS_KEY.clips] ?? ""),
       scalePc: scaleOf(vars?.[HS_KEY.scalePc], "auto"),
       scalePhone: scaleOf(vars?.[HS_KEY.scalePhone], "auto"),
@@ -1846,7 +2409,7 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
       turn: vars?.[HS_KEY.turn] !== "0",
       lock: vars?.[HS_KEY.lock] !== "0",
       left: n(vars, "left"),
-      call: pair(n(vars, "callLo"), n(vars, "callHi")),
+      call: pair2(n(vars, "callLo"), n(vars, "callHi")),
       forms: (() => {
         const f = String(vars?.[HS_KEY.forms] ?? "").split(/[,\n]/).map((x) => x.trim().slice(0, 30)).filter(Boolean);
         return f.length ? f : HS_FORMS_DEFAULT.split(",").map((x) => x.trim());
@@ -1858,9 +2421,9 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     };
   }
   var GROUP_WORD = { base: "base", 기본: "base", filler: "filler", 가끔: "filler", event: "event", 대사: "event", 사건: "event", rare: "rare", 드물게: "rare", off: "off", 안씀: "off" };
-  function parseClipGroups(text4) {
+  function parseClipGroups(text5) {
     const out = {};
-    for (const line2 of String(text4 ?? "").split(/\r?\n/)) {
+    for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const m = /^\s*([AB])\s*[:：]\s*([^=＝]+?)\s*[=＝]\s*(\S+)\s*$/i.exec(line2);
       const g2 = m ? GROUP_WORD[m[3].replace(/\s/g, "").toLowerCase()] : void 0;
       if (m && g2) out[`${m[1].toUpperCase()}:${m[2].trim().toLowerCase()}`] = g2;
@@ -1889,13 +2452,13 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     return { ev: "" };
   }
   function parseCue(line2, moods) {
-    const cells = line2.split("|").map((x) => x.trim());
-    if (cells.length < 3) return null;
-    const text4 = clean5(cells[2], 160);
-    if (!text4) return null;
-    const cut3 = CUT_IN.find(([re]) => re.test(cells[0]))?.[1] ?? "B";
-    const mood = moods.get(cells[1].replace(/\s+/g, "").toLowerCase()) ?? "talk";
-    return { cut: cut3, mood, text: text4, ...eventOf(cells[3] ?? "") };
+    const cells2 = line2.split("|").map((x) => x.trim());
+    if (cells2.length < 3) return null;
+    const text5 = clean5(cells2[2], 160);
+    if (!text5) return null;
+    const cut3 = CUT_IN.find(([re]) => re.test(cells2[0]))?.[1] ?? "B";
+    const mood = moods.get(cells2[1].replace(/\s+/g, "").toLowerCase()) ?? "talk";
+    return { cut: cut3, mood, text: text5, ...eventOf(cells2[3] ?? "") };
   }
   function moodMap(pack4) {
     const m = /* @__PURE__ */ new Map();
@@ -1938,8 +2501,8 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     for (const line2 of block4(raw, "chat").split("\n")) {
       const i = line2.indexOf("|");
       const nick = clean5(i >= 0 ? line2.slice(0, i) : "", 16);
-      const text4 = clean5(i >= 0 ? line2.slice(i + 1) : line2, 80);
-      if (text4) chat.push({ nick: nick || "익명", text: text4 });
+      const text5 = clean5(i >= 0 ? line2.slice(i + 1) : line2, 80);
+      if (text5) chat.push({ nick: nick || "익명", text: text5 });
     }
     const peeks = block4(raw, "peek").split("\n").map((x) => clean5(x.replace(/^\s*#?\d+\s*[.)|:]?\s*/, ""), 80)).filter(Boolean);
     const opLine = (re) => clean5(block4(raw, "operator").split("\n").map((x) => re.exec(x)?.[1] ?? "").find(Boolean) ?? "", 120);
@@ -2094,12 +2657,98 @@ ${lines3.join("\n")}` : "";
   }
   function withHomeshop(messages, chat) {
     if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(HS_BLOCK_HEAD))) return messages;
-    const text4 = homeshopBlock(chat);
-    if (!text4) return messages;
+    const text5 = homeshopBlock(chat);
+    if (!text5) return messages;
     const at = messages.map((m) => m?.role).lastIndexOf("user");
-    const b = { role: "system", content: text4 };
+    const b = { role: "system", content: text5 };
     return at < 0 ? [...messages, b] : [...messages.slice(0, at), b, ...messages.slice(at)];
   }
+
+  // src/core/setdef/homeshop.ts
+  var on2 = onOff("1");
+  var num4 = (k) => ({ t: "num", lo: HS_NUM[k].lo, hi: HS_NUM[k].hi, unit: HS_NUM[k].unit });
+  var pair = (a, b) => ({ t: "minmax", lo: HS_NUM[a].lo, hi: HS_NUM[a].hi, unit: HS_NUM[a].unit, act: "num", keys: [a, b] });
+  var SCALES = [["auto", "자동"], ["fit", "폭 맞춤"], ["0.5", "0.5배"], ["1", "1배"], ["2", "2배"]];
+  var sh = (lo, hi, unit) => ({ t: "num", lo, hi, unit, act: "shnum" });
+  var row2 = (key, label2, ctl, help, more = {}) => ({ key, label: label2, ctl, ...help ? { help } : {}, ...more });
+  var HOMESHOP_SET = {
+    id: "hs",
+    groups: [
+      {
+        title: HS_NAME,
+        rows: [
+          row2("on", "사용", on2, "끄면 방송이 나오지 않고 즐겨찾기에서도 빠져요."),
+          row2("net", "인터넷에 상시 노출", on2, "켜면 인터넷 즐겨찾기에 늘 보여요. 꺼도 메인 응답의 카드로 접속하면 열려요(설정 → 소지품 → 고유 상점)."),
+          row2("auto", "자동 호출", { t: "seg", opts: [["manual", "수동"], ["open", "창을 열 때"]] }, { manual: "새로 고침을 눌렀을 때만 새 편성을 받아요.", open: "사이트를 열 때, 지난 편성이 끝났거나 턴이 진행됐으면 한 번 새로 받아요." }, { common: "auto" }),
+          row2("retry", "자동 다시 연결", { t: "step", lo: 0, hi: 3, unit: "회", action: "hs-retry", vkey: "n" }, "편성을 받지 못하면 「신호 없음」 화면에서 스스로 다시 연결하는 횟수예요(0~3)."),
+          row2("tel", "주문 전화번호", { t: "text", ph: HS_TEL_DEFAULT, max: 20 }, "방송 화면과 머리에 보이는 번호예요.")
+        ]
+      },
+      {
+        title: "편성",
+        rows: [
+          row2("sh:model", "모델", { t: "seg", opts: [["main", "메인 모델"], ["aux", "보조 모델"]] }, "상품·큐시트·채팅을 지을 모델이에요. 한 번 호출로 다 받아요.", { common: "model" }),
+          row2("sh:ctx", "컨텍스트에 포함", on2, "켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨요.", { common: "ctx" }),
+          row2("size", "상품 수", { t: "minmax", lo: SHOP_SIZE_LO, hi: SHOP_SIZE_HI, unit: "개", act: "shnum", keys: ["min", "max"] }, `한 편성의 상품(부) 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
+          row2("cue", "상품마다 큐 줄 수", pair("cueMin", "cueMax"), "상품 하나에 진행자가 말하는 장면 수예요.", { aria: "큐 줄 수" }),
+          row2("chat", "채팅 줄 수", pair("chatMin", "chatMax"), "한 번에 받아 두고 방송 동안 흘리는 시청자 채팅 줄 수예요."),
+          row2("sh:price", "값 기준", { t: "text", ph: "비우면 방송에 어울리는 회차", max: 80 }),
+          row2("sh:diverse", "다양성 강화", on2, void 0, { common: "sampling" }),
+          row2("sh:prev", "지난 목록 피하기", on2, "새 편성을 받을 때 지난 편성의 상품을 피해요."),
+          row2("sh:thoughts", "생각 단계", { t: "seg", opts: [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]] }),
+          row2("turns", "최근 본문 턴 수", sh(1, 8, "턴"), "컨텍스트에 포함일 때 넘기는 턴 수예요(1~8)."),
+          row2("refs", "참고 로어북 수", sh(0, 12, "개"), "0~12.")
+        ]
+      },
+      {
+        title: "방송 흐름",
+        rows: [
+          row2("speed", "자막 속도", num4("speed"), "진행자 대사가 찍히는 빠르기예요. 대사 길이가 장면 길이를 정해요."),
+          row2("hold", "대사 뒤 쉼", num4("hold"), "대사가 다 찍힌 뒤 다음 장면으로 넘어가기까지예요(12 = 1.2초)."),
+          row2("frame", "동작 한 장 길이", num4("frame"), "진행자 동작이 한 장 넘어가는 시간이에요. 작을수록 빨라요."),
+          row2("chatGap", "채팅 간격", num4("chatGap"), "채팅 한 줄이 올라오는 평균 간격이에요(22 = 2.2초)."),
+          row2("next", "다음 부까지", num4("next"), "큐시트가 끝난 뒤 다음 상품으로 넘어가기까지예요. 0이면 스스로 넘어가지 않아요."),
+          row2("left", "남은 수량 시작 값", num4("left")),
+          row2("turn", "턴이 넘어가면 다음 부로", on2, "켜면 턴이 한 번 진행될 때마다 편성이 한 칸 넘어가요. 놓친 상품은 편성표에서 보기만 해요."),
+          row2("lock", "지난 부 잠그기", on2, "켜면 지난 부에 「매진」 딱지가 붙어요."),
+          row2("say", "채팅 보내기", on2, "내가 채팅을 쓰면 한 번 더 호출해 진행자와 시청자의 반응을 받아요.")
+        ]
+      },
+      {
+        title: "주문 · 할부",
+        rows: [
+          row2("barter", "물건 맞교환", on2, "전화 주문에서 가진 물건 하나로 결제할 수 있어요. 맞교환은 할부 장부에 오르지 않아요."),
+          row2("call", "할부 호출 간격", pair("callLo", "callHi"), "주문한 뒤 이만큼 턴이 지날 때마다 메인 요청에 출연 호출을 한 번 넘기고 1회 납부로 쳐요. 평소에는 메인 요청에 아무것도 보내지 않아요."),
+          row2("forms", "출연 형태", { t: "text", ph: HS_FORMS_DEFAULT, max: 200 }, "호출 때 이 가운데 하나를 골라 넘겨요. 쉼표로 나눠요. 호출 글은 지침 → 망상홈쇼핑의 CALL 절에서 고쳐요."),
+          row2("peek", "스티커 들추기", on2, "상품 스티커 창에서 모서리를 들춰 아래 한 줄을 볼 수 있어요."),
+          row2("aud", "방청 신청", on2, "신청하면 다음 턴 메인 요청에 한 줄만 넘겨요. 글은 지침의 AUDIENCE 절에서 고쳐요.")
+        ]
+      },
+      {
+        title: "진행자 동작",
+        note: "아무 일 없을 때는 「기본」 동작을 되풀이하다가, 정해진 횟수마다 「가끔」 동작을 하나 끼워요. 그 자리에서 확률로 「드물게」 동작이 대신 나와요. 「대사·사건」 동작은 큐시트의 표정에 맞춰서만 나와요. 같은 동작의 1·2판은 번갈아 써요.",
+        rows: [
+          row2("fill", "「가끔」 동작 간격", pair("fillLo", "fillHi"), "기본 동작을 이만큼 되풀이한 뒤 하나 끼워요.", { aria: "가끔 동작 간격" }),
+          row2("fillCool", "「가끔」 다시 나오기까지", num4("fillCool"), "같은 동작이 다시 나오기까지 기본 동작 되풀이 수예요.", { aria: "가끔 다시 나오기까지" }),
+          row2("rareP", "「드물게」 확률", num4("rareP"), "「가끔」 자리마다 이 확률로 섬뜩한 동작이 나와요.", { aria: "드물게 확률" }),
+          row2("rareCool", "「드물게」 다시 나오기까지", num4("rareCool"), void 0, { aria: "드물게 다시 나오기까지" }),
+          row2("clips", "동작 분류 고치기", { t: "area", ph: "B:찢어지는 미소=안씀\nB:웃음=드물게", rows: 4, cls: "ms-area", labeled: true })
+        ]
+      },
+      {
+        title: "화면 효과",
+        rows: [
+          row2("cut", "컷 전환", on2, "끄면 진행자 정면(바스트) 한 장면만 써요."),
+          row2("bulb", "전구 반짝임", on2),
+          row2("tear", "신호 찢김", on2, "0.2~0.4초 동안 화면이 찢기고 다른 얼굴이 끼어들어요."),
+          row2("tearP", "찢김 확률", num4("tearP"), "장면이 바뀔 때마다 저절로 찢길 확률이에요. 큐시트의 「신호 찢김」은 늘 나와요."),
+          row2("scan", "주사선", on2),
+          row2("scalePc", "PC 표시 배율", { t: "seg", opts: SCALES }, "자동 = 창이 넓으면 2배, 아니면 1배."),
+          row2("scalePh", "폰 표시 배율", { t: "seg", opts: SCALES }, "자동 = 화면 폭에 맞춤.")
+        ]
+      }
+    ]
+  };
 
   // src/host/homeshop.ts
   var HOMESHOP_KEY = "goei:data-homeshop";
@@ -2129,8 +2778,8 @@ ${lines3.join("\n")}` : "";
       im.src = url;
     });
   }
-  async function build(text4) {
-    const pack4 = parseHomeshopPack(text4);
+  async function build(text5) {
+    const pack4 = parseHomeshopPack(text5);
     const img = /* @__PURE__ */ new Map();
     await Promise.all(Object.entries(pack4.files).map(async ([name, b64]) => void img.set(name, await load3(b64))));
     if (pack4.font && typeof FontFace === "function") {
@@ -2149,26 +2798,26 @@ ${lines3.join("\n")}` : "";
     loading4 = (async () => {
       failed2 = "";
       try {
-        let saved2 = null;
+        let saved = null;
         try {
-          saved2 = await risuai.pluginStorage.getItem(HOMESHOP_KEY);
+          saved = await risuai.pluginStorage.getItem(HOMESHOP_KEY);
         } catch {
         }
-        if (typeof saved2 === "string" && packMatches(saved2, HOMESHOP_PACK.expect)) {
+        if (typeof saved === "string" && packMatches(saved, HOMESHOP_PACK.expect)) {
           try {
-            art = await build(saved2);
+            art = await build(saved);
             return;
           } catch (error) {
             console.log(`[goei] 저장된 방송 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
           }
         }
-        const text4 = await fetchPack(HOMESHOP_PACK, (t) => {
+        const text5 = await fetchPack(HOMESHOP_PACK, (t) => {
           progress2 = t;
           redraw3();
         });
-        art = await build(text4);
+        art = await build(text5);
         try {
-          await risuai.pluginStorage.setItem(HOMESHOP_KEY, text4);
+          await risuai.pluginStorage.setItem(HOMESHOP_KEY, text5);
         } catch (error) {
           console.log(`[goei] 방송 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
         }
@@ -2384,17 +3033,17 @@ ${lines3.join("\n")}` : "";
     }
     if (c.ev === "tear" && f.s.fx.tear) r.tearUntil = t + TEAR_MS[0] + Math.random() * (TEAR_MS[1] - TEAR_MS[0]);
   }
-  function pushChat(nick, text4, cls) {
+  function pushChat(nick, text5, cls) {
     if (!chatLog) return;
     const p2 = document.createElement("p");
     if (cls) p2.className = cls;
-    p2.innerHTML = `<span>${esc14(nick)}</span>${esc14(text4)}`;
+    p2.innerHTML = `<span>${esc14(nick)}</span>${esc14(text5)}`;
     const bottom = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight < 40;
     chatLog.appendChild(p2);
     while (chatLog.childElementCount > KEEP_CHAT) chatLog.firstElementChild.remove();
     if (bottom) chatLog.scrollTop = chatLog.scrollHeight;
   }
-  var playerSay = (nick, text4, cls = "me") => pushChat(nick, text4, cls);
+  var playerSay = (nick, text5, cls = "me") => pushChat(nick, text5, cls);
   function playerCut(cues, chat) {
     extra.push(...cues);
     extraChat.push(...chat);
@@ -2405,7 +3054,7 @@ ${lines3.join("\n")}` : "";
     if (g2) g2.imageSmoothingEnabled = false;
     return g2;
   }
-  function scene(g2, f, r, id2, clip2, frame2) {
+  function scene(g2, f, r, id2, clip2, frame) {
     const pack4 = f.art.pack;
     const a = pack4.cuts[id2];
     const img = (name) => name ? f.art.img.get(name) : void 0;
@@ -2422,7 +3071,7 @@ ${lines3.join("\n")}` : "";
     const sheet = clip2 ? img(clip2.file) : void 0;
     const host3 = img(a.host);
     const rows3 = a.over !== void 0 ? Math.max(0, Math.min(pack4.box, a.over - a.y)) : pack4.box;
-    if (sheet && clip2) g2.drawImage(sheet, Math.min(frame2, clip2.frames - 1) * pack4.box, 0, pack4.box, rows3, a.x, a.y, pack4.box, rows3);
+    if (sheet && clip2) g2.drawImage(sheet, Math.min(frame, clip2.frames - 1) * pack4.box, 0, pack4.box, rows3, a.x, a.y, pack4.box, rows3);
     else if (host3) g2.drawImage(host3, 0, 0, pack4.box, rows3, a.x, a.y, pack4.box, rows3);
     if (id2 === "A") {
       const part = f.show.parts[r.part];
@@ -2443,9 +3092,9 @@ ${lines3.join("\n")}` : "";
       const sg = ctx2d(scratch);
       if (!sg) return;
       scene(sg, f, r, "A", r.clip, r.frame);
-      const sw = pack4.w / 2;
-      const sh = pack4.h / 2;
-      g2.drawImage(scratch, Math.round(pack4.w / 2 - sw / 2), Math.round(TABLE_Y - 30 - sh / 2), sw, sh, 0, 0, pack4.w, pack4.h);
+      const sw2 = pack4.w / 2;
+      const sh2 = pack4.h / 2;
+      g2.drawImage(scratch, Math.round(pack4.w / 2 - sw2 / 2), Math.round(TABLE_Y - 30 - sh2 / 2), sw2, sh2, 0, 0, pack4.w, pack4.h);
     } else if (tearing) {
       const b = clipsOf(pack4.cuts.B, "B", {}).find((c) => c.name === "gape") ?? r.clip;
       scene(g2, f, r, "B", b, b ? Math.floor(b.frames / 2) : 0);
@@ -2522,9 +3171,9 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ""}
     const sub = cg.querySelector(".hs-sub");
     if (sub) {
       const chars2 = cue ? Array.from(cue.text) : [];
-      const shown3 = cue ? chars2.slice(0, Math.max(0, Math.floor((t - r.cueAt) / 1e3 * f.s.speed))).join("") : "";
-      if (sub.textContent !== shown3) sub.textContent = shown3;
-      sub.classList.toggle("on", !!shown3);
+      const shown4 = cue ? chars2.slice(0, Math.max(0, Math.floor((t - r.cueAt) / 1e3 * f.s.speed))).join("") : "";
+      if (sub.textContent !== shown4) sub.textContent = shown4;
+      sub.classList.toggle("on", !!shown4);
     }
   }
   var playerState = () => run3 ? { part: run3.part, cue: run3.cue, cut: run3.cut, clip: run3.clip?.name ?? "", left: run3.left, flags: { ...run3.flags } } : null;
@@ -2532,8 +3181,8 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ""}
   // src/ui/homeshop.ts
   var esc15 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var fresh = () => ({ loading: false, notice: "", failRaw: "", page: "", retried: 0, pop: "", pay: "inst", barter: "", done: "", lifted: false, agree: false, audNo: "", input: "", saying: false, info: "" });
-  function homeshopInput(text4) {
-    ui.input = text4;
+  function homeshopInput(text5) {
+    ui.input = text5;
   }
   var ui = fresh();
   var uiChat = "";
@@ -2552,7 +3201,6 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ""}
   }
   onHomeshopReady(() => liveEnv4?.render());
   var HS_TEL_KEY = "$hs_tel";
-  var HS_TEL_DEFAULT = "080-404-0000";
   var telOf = (ctx2) => String(ctx2.chat.scriptstate?.[HS_TEL_KEY] ?? "").trim() || HS_TEL_DEFAULT;
   var HS_RETRY_KEY = "$hs_retry";
   var retryOf = (ctx2) => {
@@ -2741,9 +3389,9 @@ ${ui.failRaw.slice(0, 1500)}`;
       if (barterId && !gave) return null;
       const o = newOrder(chat, part.item, s8, gave?.name ?? "");
       if (gave) items = anchor ? sellItem(items, gave.id, anchor, `${HS_NAME} 맞교환`) : removeItem(items, gave.id, "sell", "store", "", { note: `${HS_NAME} 맞교환` });
-      const mine = liveItemsOf(items, chat);
+      const mine2 = liveItemsOf(items, chat);
       let name = HS_BOX.name(part.item.name);
-      for (let k = 2; k < 20 && mine.some((x) => x.id === itemId2(anchor, name) || x.name === name); k++) name = `${HS_BOX.name(part.item.name).slice(0, 27)} ${k}`;
+      for (let k = 2; k < 20 && mine2.some((x) => x.id === itemId2(anchor, name) || x.name === name); k++) name = `${HS_BOX.name(part.item.name).slice(0, 27)} ${k}`;
       const paidWith = gave ? `「${gave.name}」 맞교환 (${HS_NAME})` : o.n ? `무이자 할부 ${o.n}회 (${HS_NAME})` : `${part.item.pay || "방송 특가"} (${HS_NAME})`;
       items = addItem(items, alive, { name, desc: HS_BOX.desc, icon: HS_BOX.icon, weight: part.item.weight, from: "store", anchor, paidWith });
       o.boxId = itemId2(anchor, name);
@@ -2764,12 +3412,12 @@ ${ui.failRaw.slice(0, 1500)}`;
       const o = boxOrder(chat.scriptstate, boxId, alive);
       if (!o) return null;
       let items = readItems(chat.scriptstate);
-      const box4 = items.list.find((x) => x.id === boxId);
-      if (!box4) return null;
+      const box3 = items.list.find((x) => x.id === boxId);
+      if (!box3) return null;
       const anchor = lastBot(chat)?.key ?? "";
-      items = anchor ? addItemLog({ ...items, list: items.list.map((x) => x.id === boxId ? { ...x, soldAt: anchor } : x) }, { name: box4.name, item: boxId, ...box4.icon ? { icon: box4.icon } : {}, what: "use", by: "manual", anchor, note: "상자를 열었다" }) : removeItem(items, boxId, "use", "manual", "", { note: "상자를 열었다" });
+      items = anchor ? addItemLog({ ...items, list: items.list.map((x) => x.id === boxId ? { ...x, soldAt: anchor } : x) }, { name: box3.name, item: boxId, ...box3.icon ? { icon: box3.icon } : {}, what: "use", by: "manual", anchor, note: "상자를 열었다" }) : removeItem(items, boxId, "use", "manual", "", { note: "상자를 열었다" });
       const it = o.item;
-      items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: "store", anchor, paidWith: box4.paidWith ?? HS_NAME });
+      items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: "store", anchor, paidWith: box3.paidWith ?? HS_NAME });
       const orders = readOrders2(chat.scriptstate).map((x) => x.id === o.id ? { ...x, openKey: anchor } : x);
       return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemsVars(items), ...ordersVars2(orders) } };
     });
@@ -2784,14 +3432,14 @@ ${ui.failRaw.slice(0, 1500)}`;
     playerSay("안내", `방청 신청 접수 · ${no}번`, "sys");
     await env3.refresh();
   }
-  async function say(ctx2, env3, text4) {
+  async function say(ctx2, env3, text5) {
     const s8 = hsSettings(ctx2.chat.scriptstate);
     const { show, part } = nowPart(ctx2);
-    if (!text4 || ui.saying || !s8.say || !part) return;
+    if (!text5 || ui.saying || !s8.say || !part) return;
     const nick = userInfo().name || "나";
     ui.input = "";
     ui.saying = true;
-    playerSay(nick, text4.slice(0, 80), "me");
+    playerSay(nick, text5.slice(0, 80), "me");
     env3.render();
     try {
       const art2 = homeshopArt();
@@ -2808,7 +3456,7 @@ ${part.item.desc}
 ${recent || "-"}
 
 [시청자 채팅]
-${nick}: ${text4.slice(0, 200)}`;
+${nick}: ${text5.slice(0, 200)}`;
       const gs = genSettings(ctx2.chat.scriptstate);
       const moods = moodMap(art2?.pack ?? null);
       const { value } = await generate([{ role: "system", content: system }, { role: "user", content: user }], s8.shop.model, (raw) => {
@@ -2845,10 +3493,10 @@ ${nick}: ${text4.slice(0, 200)}`;
     return `<div class="hs-lu${col ? " col" : ""}">${show.parts.map((p2, i) => {
       const past = i < show.at;
       const now2 = i === show.at;
-      const open4 = past || now2;
+      const open3 = past || now2;
       const state = now2 ? '<span class="st on">방송 중</span>' : past ? `<span class="st off">${s8.lock ? "매진" : "방송 종료"}</span>` : '<span class="st">곧 방송</span>';
-      const pic3 = open4 ? itemPic(p2.item) : '<span class="q">?</span>';
-      const body5 = `<span class="pic">${pic3}</span><span class="tx"><small>${i + 1}부</small><b>${open4 ? esc15(p2.item.name) : "방송에서 공개"}</b>${open4 ? `<em>${esc15(payText(p2.item))}</em>` : ""}${col && past ? `<i>${esc15(p2.item.desc)}</i>` : ""}</span>${state}`;
+      const pic3 = open3 ? itemPic(p2.item) : '<span class="q">?</span>';
+      const body5 = `<span class="pic">${pic3}</span><span class="tx"><small>${i + 1}부</small><b>${open3 ? esc15(p2.item.name) : "방송에서 공개"}</b>${open3 ? `<em>${esc15(payText(p2.item))}</em>` : ""}${col && past ? `<i>${esc15(p2.item.desc)}</i>` : ""}</span>${state}`;
       return now2 && col ? `<button class="hs-lc now" data-action="hs-page" data-value="">${body5}</button>` : `<div class="hs-lc${now2 ? " now" : past ? " past" : " soon"}">${body5}</div>`;
     }).join("")}</div>`;
   }
@@ -2901,343 +3549,8 @@ ${nick}: ${text4.slice(0, 200)}`;
     if (ui.done || ordered2) {
       return popShell("☎ 전화 주문", `${head3}${op(ui.done || "주문이 접수되었습니다.")}<p class="hs-ok">택배 상자가 소지품에 도착했습니다.</p>`, '<button class="pri" data-action="hs-pop" data-value="">확인</button><button data-action="hs-page" data-value="orders">주문 조회</button>');
     }
-    const mine = ui.pay === "barter" ? barterItems(ctx2) : [];
+    const mine2 = ui.pay === "barter" ? barterItems(ctx2) : [];
     const pays = `<div class="hs-pays"><button class="${ui.pay === "inst" ? "on" : ""}" data-action="hs-pay" data-value="inst" aria-pressed="${ui.pay === "inst"}"><b>${n3 ? `무이자 할부 ${n3}회` : esc15(part.item.pay || "방송 특가")}</b><small>지금 내는 돈 없음</small></button>${s8.barter ? `<button class="${ui.pay === "barter" ? "on" : ""}" data-action="hs-pay" data-value="barter" aria-pressed="${ui.pay === "barter"}"><b>물건 맞교환</b><small>가진 물건 하나로 결제</small></button>` : ""}</div>`;
-    const pick3 = ui.pay === "barter" ? mine.length ? `<div class="hs-pick">${mine.map((x) => `<button class="${ui.barter === x.id ? "on" : ""}" data-action="hs-barter" data-value="${esc15(x.id)}" aria-pressed="${ui.barter === x.id}"><span class="pic">${itemPic(x)}</span>${esc15(x.name)}</button>`).join("")}</div>` : '<p class="hs-none">맞교환할 물건이 없습니다.</p>' : "";
+    const pick4 = ui.pay === "barter" ? mine2.length ? `<div class="hs-pick">${mine2.map((x) => `<button class="${ui.barter === x.id ? "on" : ""}" data-action="hs-barter" data-value="${esc15(x.id)}" aria-pressed="${ui.barter === x.id}"><span class="pic">${itemPic(x)}</span>${esc15(x.name)}</button>`).join("")}</div>` : '<p class="hs-none">맞교환할 물건이 없습니다.</p>' : "";
     const can = ui.pay === "inst" || !!ui.barter;
-    return popShell("☎ 전화 주문", `${head3}${op(show.ops?.hello ?? "")}${pays}${pick3}`, `<button class="pri" data-action="hs-order" ${can ? "" : "disabled"}>주문 확정</button><button data-action="hs-pop" data-value="">끊기</button>`);
-  }
-  function peekPop(ctx2, s8) {
-    const { part } = nowPart(ctx2);
-    if (!part) return "";
-    const it = part.item;
-    const under = part.peek && s8.peek ? ui.lifted ? `<p class="hs-under">${esc15(part.peek)}</p>` : '<button class="hs-lift" data-action="hs-lift">스티커 모서리 들추기</button>' : "";
-    return popShell("상품 스티커", `<div class="hs-sticker"><span class="pic">${itemPic(it)}</span><b>${esc15(it.name)}</b><p>${esc15(it.desc)}</p>${it.effect ? `<p class="ef">${esc15(it.effect)}</p>` : ""}${under}</div>`);
-  }
-  function audPop() {
-    if (ui.audNo) return popShell("★ 방청 신청", `<p class="hs-ok">접수되었습니다.</p><p class="hs-no">접수번호 <b>${esc15(ui.audNo)}</b></p>`, '<button class="pri" data-action="hs-pop" data-value="">확인</button>');
-    return popShell("★ 방청 신청", `<label class="hs-f"><span>이름</span><input value="${esc15(userInfo().name || "")}" readonly></label>
-<button class="hs-chk${ui.agree ? " on" : ""}" data-action="hs-agree" aria-pressed="${ui.agree}"><i></i>객석 규칙에 동의합니다</button>`, `<button class="pri" data-action="hs-aud" ${ui.agree ? "" : "disabled"}>신청</button><button data-action="hs-pop" data-value="">취소</button>`);
-  }
-  function homeshopTab(ctx2, env3) {
-    liveEnv4 = env3;
-    sync(ctx2);
-    const mobile = isPhone();
-    const s8 = hsSettings(ctx2.chat.scriptstate);
-    const show = readShow(ctx2.chat.scriptstate);
-    const stt = homeshopStatus();
-    const art2 = homeshopArt();
-    const note = !s8.on ? "방송 없음" : stt.failed ? "신호 없음" : !art2 ? stt.progress || "방송 준비 중" : ui.loading ? "방송 연결 중" : ui.notice ? "신호 없음" : show.loaded ? "" : "신호 없음";
-    setPlayerFeed({ art: art2, show: s8.on && !ui.loading ? show : { ...show, loaded: false }, s: s8, note, scale: scaleOf2(s8, mobile), tel: telOf(ctx2) }, { advance, redraw: () => liveEnv4?.render() });
-    const pending2 = liveOrders2(ctx2.chat.scriptstate, aliveAnchors(ctx2.chat)).length;
-    const tabs2 = [["", "ON AIR"], ["sched", "편성표"], ["orders", `주문 조회${pending2 ? ` ${pending2}` : ""}`]];
-    const menu = `<nav class="hs-menu">${tabs2.map(([k, l]) => `<button class="${ui.page === k ? "on" : ""}" data-action="hs-page" data-value="${k}" aria-pressed="${ui.page === k}">${l}</button>`).join("")}${s8.aud ? '<button data-action="hs-pop" data-value="aud">방청 신청</button>' : ""}</nav>`;
-    const head3 = `<header class="hs-gnb"><span class="hs-logo">망상<i>홈쇼핑</i></span>${menu}<span class="hs-tel"><small>주문 전화</small>☎ ${esc15(telOf(ctx2))}</span></header>`;
-    const err = `${failBox()}${stt.failed ? `<div class="hs-err" role="alert"><span>방송 그림을 받지 못했어요. ${esc15(stt.failed)}</span></div>` : ""}`;
-    const page = ui.page === "sched" ? schedPage(show, s8) : ui.page === "orders" ? ordersPage(ctx2) : onAir(ctx2, show, s8, mobile);
-    const pop = ui.pop === "call" ? callPop(ctx2, s8) : ui.pop === "peek" ? peekPop(ctx2, s8) : ui.pop === "aud" && s8.aud ? audPop() : "";
-    return `<div class="hs${mobile ? " hs-m" : ""}">${head3}<div class="hs-wrap">${err}${page}</div>${pop}</div>`;
-  }
-  function homeshopMounted(root3) {
-    if (root3.querySelector('[data-hs-mount="stage"]')) mountPlayer(root3);
-    else stopPlayer();
-  }
-  function boxButton(ctx2, itemIdOf) {
-    return boxOrder(ctx2.chat.scriptstate, itemIdOf, aliveAnchors(ctx2.chat)) ? `<button class="gx-chip" data-action="hs-box-open" data-value="${esc15(itemIdOf)}">열기</button>` : "";
-  }
-  var row4 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group3 = (title2, rows3) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows3}</div></section>`;
-  function seg4(key, cur, items) {
-    const sw = onOffSwitch(items, cur, "hs-cfg", (v) => `${key}=${v}`);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, l]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="hs-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${l}</button>`).join("")}</div>`;
-  }
-  var stepper = (action, key, shown3, canDown, canUp, label2) => `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${canDown ? "" : "disabled"} aria-label="${esc15(label2)} 줄이기">−</button><b>${esc15(shown3)}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${canUp ? "" : "disabled"} aria-label="${esc15(label2)} 늘리기">+</button></div>`;
-  var ONOFF = [["1", "ON"], ["0", "OFF"]];
-  var num4 = (vars, k, label2) => {
-    const d = HS_NUM[k];
-    const raw = vars?.[d.key];
-    const cur = raw === void 0 || raw === "" ? d.def : Number(raw);
-    return `<input class="gx-search ph-pct" type="number" min="${d.lo}" max="${d.hi}" data-change="hs-num" data-key="${k}" value="${cur}" aria-label="${esc15(label2)}"><span>${d.unit}</span>`;
-  };
-  var pairBox = (vars, a, b, label2) => `<span class="ph-inline"><span>최소</span>${num4(vars, a, `${label2} 최소`)}<span>최대</span>${num4(vars, b, `${label2} 최대`)}</span>`;
-  var SH = { model: "$sh_model", ctx: "$sh_ctx", price: "$sh_price", diverse: "$sh_diverse", thoughts: "$sh_thoughts", prev: "$sh_prev", min: "$sh_min", max: "$sh_max", turns: "$sh_turns", refs: "$sh_refs" };
-  var SH_RANGE = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
-  var shNum = (key, cur, unit, label2) => `<input class="gx-search ph-pct" type="number" min="${SH_RANGE[key][0]}" max="${SH_RANGE[key][1]}" data-change="hs-shnum" data-key="${key}" value="${cur}" aria-label="${esc15(label2)}"><span>${unit}</span>`;
-  var FLAG = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
-  function homeshopSettingsPane(ctx2) {
-    const vars = ctx2.chat.scriptstate;
-    const s8 = hsSettings(vars);
-    const art2 = homeshopArt();
-    const clipHelp = art2 ? ["A", "B"].map((c) => `${c === "A" ? "와이드" : "바스트"}: ${[...new Map(art2.pack.cuts[c].clips.map((k) => [k.name, `${k.ko}(${CLIP_GROUP_LABEL[k.group]})`])).values()].join(", ")}`).join("<br>") : "방송 그림을 받으면 동작 목록이 보여요.";
-    const scales = [["auto", "자동"], ["fit", "폭 맞춤"], ["0.5", "0.5배"], ["1", "1배"], ["2", "2배"]];
-    const body5 = [
-      group3(HS_NAME, [
-        row4("사용", seg4("on", s8.on ? "1" : "0", ONOFF), "끄면 방송이 나오지 않고 즐겨찾기에서도 빠져요."),
-        row4("인터넷에 상시 노출", seg4("net", s8.net ? "1" : "0", ONOFF), "켜면 인터넷 즐겨찾기에 늘 보여요. 꺼도 본편에서 카드로 접속하면 열려요(설정 → 소지품 → 고유 상점)."),
-        row4("자동 호출", seg4("auto", s8.auto, [["manual", "수동"], ["open", "창을 열 때"]]), s8.auto === "manual" ? "새로 고침을 눌렀을 때만 새 편성을 받아요." : "사이트를 열 때, 지난 편성이 끝났거나 본편이 진행됐으면 한 번 새로 받아요."),
-        row4("자동 다시 연결", stepper("hs-retry", "n", `${retryOf(ctx2)}회`, retryOf(ctx2) > 0, retryOf(ctx2) < 3, "자동 다시 연결"), "편성을 받지 못하면 「신호 없음」 화면에서 스스로 다시 연결하는 횟수예요(0~3)."),
-        row4("주문 전화번호", `<input class="gx-search ps-text" data-change="hs-text" data-key="tel" value="${esc15(String(vars?.[HS_TEL_KEY] ?? ""))}" maxlength="20" placeholder="${HS_TEL_DEFAULT}">`, "방송 화면과 머리에 보이는 번호예요.")
-      ].join("")),
-      group3("편성", [
-        row4("모델", seg4("sh:model", s8.shop.model, [["main", "메인 모델"], ["aux", "보조 모델"]]), "상품·큐시트·채팅을 지을 모델이에요. 한 번 호출로 다 받아요."),
-        row4("컨텍스트에 포함", seg4("sh:ctx", s8.shop.context ? "1" : "0", ONOFF), "켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨요."),
-        row4("상품 수", `<span class="ph-inline"><span>최소</span>${shNum("min", s8.shop.size[0], "개", "상품 수 최소")}<span>최대</span>${shNum("max", s8.shop.size[1], "개", "상품 수 최대")}</span>`, `한 편성의 상품(부) 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
-        row4("상품마다 큐 줄 수", pairBox(vars, "cueMin", "cueMax", "큐 줄 수"), "상품 하나에 진행자가 말하는 장면 수예요."),
-        row4("채팅 줄 수", pairBox(vars, "chatMin", "chatMax", "채팅 줄 수"), "한 번에 받아 두고 방송 동안 흘리는 시청자 채팅 줄 수예요."),
-        row4("값 기준", `<input class="gx-search ps-text" data-change="hs-text" data-key="sh:price" value="${esc15(s8.shop.price)}" maxlength="80" placeholder="비우면 방송에 어울리는 회차">`),
-        row4("다양성 강화", seg4("sh:diverse", s8.shop.diverse ? "1" : "0", ONOFF)),
-        row4("지난 목록 피하기", seg4("sh:prev", s8.shop.avoidPrev ? "1" : "0", ONOFF), "새 편성을 받을 때 지난 편성의 상품을 피해요."),
-        row4("생각 단계", seg4("sh:thoughts", s8.shop.thoughts, [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]])),
-        row4("최근 본문 턴 수", shNum("turns", s8.shop.turns, "턴", "최근 본문 턴 수"), "컨텍스트에 포함일 때 넘기는 턴 수예요(1~8)."),
-        row4("참고 로어북 수", shNum("refs", s8.shop.refs, "개", "참고 로어북 수"), "0~12.")
-      ].join("")),
-      group3("방송 흐름", [
-        row4("자막 속도", num4(vars, "speed", "자막 속도"), "진행자 대사가 찍히는 빠르기예요. 대사 길이가 장면 길이를 정해요."),
-        row4("대사 뒤 쉼", num4(vars, "hold", "대사 뒤 쉼"), "대사가 다 찍힌 뒤 다음 장면으로 넘어가기까지예요(12 = 1.2초)."),
-        row4("동작 한 장 길이", num4(vars, "frame", "동작 한 장 길이"), "진행자 동작이 한 장 넘어가는 시간이에요. 작을수록 빨라요."),
-        row4("채팅 간격", num4(vars, "chatGap", "채팅 간격"), "채팅 한 줄이 올라오는 평균 간격이에요(22 = 2.2초)."),
-        row4("다음 부까지", num4(vars, "next", "다음 부까지"), "큐시트가 끝난 뒤 다음 상품으로 넘어가기까지예요. 0이면 스스로 넘어가지 않아요."),
-        row4("남은 수량 시작 값", num4(vars, "left", "남은 수량 시작 값")),
-        row4("본편 턴이 넘어가면 다음 부로", seg4("turn", s8.turn ? "1" : "0", ONOFF), "켜면 본편이 한 턴 진행될 때마다 편성이 한 칸 넘어가요. 놓친 상품은 편성표에서 보기만 해요."),
-        row4("지난 부 잠그기", seg4("lock", s8.lock ? "1" : "0", ONOFF), "켜면 지난 부에 「매진」 딱지가 붙어요."),
-        row4("채팅 보내기", seg4("say", s8.say ? "1" : "0", ONOFF), "내가 채팅을 쓰면 한 번 더 호출해 진행자와 시청자의 반응을 받아요.")
-      ].join("")),
-      group3("주문 · 할부", [
-        row4("물건 맞교환", seg4("barter", s8.barter ? "1" : "0", ONOFF), "전화 주문에서 가진 물건 하나로 결제할 수 있어요. 맞교환은 할부 장부에 오르지 않아요."),
-        row4("할부 호출 간격", pairBox(vars, "callLo", "callHi", "할부 호출 간격"), "주문한 뒤 이만큼 턴이 지날 때마다 본편에 출연 호출을 한 번 넘기고 1회 납부로 쳐요. 평소에는 본편에 아무것도 보내지 않아요."),
-        row4("출연 형태", `<input class="gx-search ps-text" data-change="hs-text" data-key="forms" value="${esc15(String(vars?.[HS_KEY.forms] ?? ""))}" maxlength="200" placeholder="${HS_FORMS_DEFAULT}">`, "호출 때 이 가운데 하나를 골라 넘겨요. 쉼표로 나눠요. 호출 글은 지침 → 망상홈쇼핑의 CALL 절에서 고쳐요."),
-        row4("스티커 들추기", seg4("peek", s8.peek ? "1" : "0", ONOFF), "상품 스티커 창에서 모서리를 들춰 아래 한 줄을 볼 수 있어요."),
-        row4("방청 신청", seg4("aud", s8.aud ? "1" : "0", ONOFF), "신청하면 다음 턴 본편에 한 줄만 넘겨요. 글은 지침의 AUDIENCE 절에서 고쳐요.")
-      ].join("")),
-      group3("진행자 동작", `<p class="ps-note">아무 일 없을 때는 「기본」 동작을 되풀이하다가, 정해진 횟수마다 「가끔」 동작을 하나 끼워요. 그 자리에서 확률로 「드물게」 동작이 대신 나와요. 「대사·사건」 동작은 큐시트의 표정에 맞춰서만 나와요. 같은 동작의 1·2판은 번갈아 써요.</p>` + [
-        row4("「가끔」 동작 간격", pairBox(vars, "fillLo", "fillHi", "가끔 동작 간격"), "기본 동작을 이만큼 되풀이한 뒤 하나 끼워요."),
-        row4("「가끔」 다시 나오기까지", num4(vars, "fillCool", "가끔 다시 나오기까지"), "같은 동작이 다시 나오기까지 기본 동작 되풀이 수예요."),
-        row4("「드물게」 확률", num4(vars, "rareP", "드물게 확률"), "「가끔」 자리마다 이 확률로 섬뜩한 동작이 나와요."),
-        row4("「드물게」 다시 나오기까지", num4(vars, "rareCool", "드물게 다시 나오기까지")),
-        row4("동작 분류 고치기", `<textarea class="gx-search ms-area" rows="4" data-change="hs-text" data-key="clips" placeholder="B:찢어지는 미소=안씀&#10;B:웃음=드물게">${esc15(s8.clipsText)}</textarea>`, `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}`)
-      ].join("")),
-      group3("화면 효과", [
-        row4("컷 전환", seg4("cut", s8.fx.cut ? "1" : "0", ONOFF), "끄면 진행자 정면(바스트) 한 장면만 써요."),
-        row4("전구 반짝임", seg4("bulb", s8.fx.bulb ? "1" : "0", ONOFF)),
-        row4("신호 찢김", seg4("tear", s8.fx.tear ? "1" : "0", ONOFF), "0.2~0.4초 동안 화면이 찢기고 다른 얼굴이 끼어들어요."),
-        row4("찢김 확률", num4(vars, "tearP", "찢김 확률"), "장면이 바뀔 때마다 저절로 찢길 확률이에요. 큐시트의 「신호 찢김」은 늘 나와요."),
-        row4("주사선", seg4("scan", s8.fx.scan ? "1" : "0", ONOFF)),
-        row4("PC 표시 배율", seg4("scalePc", s8.scalePc, scales), "자동 = 창이 넓으면 2배, 아니면 1배."),
-        row4("폰 표시 배율", seg4("scalePh", s8.scalePhone, scales), "자동 = 화면 폭에 맞춤.")
-      ].join(""))
-    ].join("");
-    return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${HS_NAME} 설정</b></div></header><div class="ph-form-body ps">${body5}</div></div>`;
-  }
-  async function homeshopSettingsAction(action, value, ctx2, env3) {
-    if (!["hs-cfg", "hs-num", "hs-shnum", "hs-text", "hs-retry"].includes(action)) return false;
-    const set2 = async (vars) => {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => Object.entries(vars).every(([k2, v2]) => String(chat.scriptstate?.[k2] ?? "") === v2) ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } });
-      await env3.refresh();
-      return true;
-    };
-    if (action === "hs-retry") {
-      const n3 = retryOf(ctx2) + (String(value).endsWith("+") ? 1 : -1);
-      return set2({ [HS_RETRY_KEY]: String(Math.max(0, Math.min(3, n3))) });
-    }
-    const m = /^([\w:]+)=([\s\S]*)$/.exec(value ?? "");
-    if (!m) return true;
-    const [, k, v] = m;
-    if (action === "hs-cfg") {
-      if (FLAG[k]) return set2({ [FLAG[k]]: v === "0" ? "0" : "" });
-      if (k === "auto") return set2({ [HS_KEY.auto]: v === "manual" ? "manual" : "" });
-      if (k === "scalePc" || k === "scalePh") return ["auto", "fit", "0.5", "1", "2"].includes(v) ? set2({ [k === "scalePc" ? HS_KEY.scalePc : HS_KEY.scalePhone]: v }) : true;
-      if (k.startsWith("sh:") && SH[k.slice(3)]) return set2({ [hsKey(SH[k.slice(3)])]: v });
-      return true;
-    }
-    if (action === "hs-num") {
-      const d = HS_NUM[k];
-      const n3 = Math.round(Number(v));
-      if (!d || !Number.isFinite(n3) || v.trim() === "") return env3.render(), true;
-      return set2({ [d.key]: String(Math.max(d.lo, Math.min(d.hi, n3))) });
-    }
-    if (action === "hs-shnum") {
-      const r = SH_RANGE[k];
-      const n3 = Math.floor(Number(v));
-      if (!r || !Number.isFinite(n3) || v.trim() === "") return env3.render(), true;
-      const val = String(Math.max(r[0], Math.min(r[1], n3)));
-      const s8 = hsSettings(ctx2.chat.scriptstate).shop;
-      const extra2 = {};
-      if (k === "min") extra2[hsKey("$sh_max")] = String(Math.max(Number(val), s8.size[1]));
-      if (k === "max") extra2[hsKey("$sh_min")] = String(Math.min(Number(val), s8.size[0]));
-      return set2({ [hsKey(SH[k])]: val, ...extra2 });
-    }
-    if (k === "tel") return set2({ [HS_TEL_KEY]: v.replace(/\s+/g, " ").trim().slice(0, 20) });
-    if (k === "clips") return set2({ [HS_KEY.clips]: v.trim().slice(0, 2e3) });
-    if (k === "forms") return set2({ [HS_KEY.forms]: v.replace(/\s+/g, " ").trim().slice(0, 200) });
-    if (k === "sh:price") return set2({ [hsKey("$sh_price")]: v.replace(/\s+/g, " ").trim().slice(0, 80) });
-    return true;
-  }
-
-  // src/ui/items.ts
-  var esc16 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var itemsUi = {
-    sub: "items",
-    view: "grid",
-    /** 기록 거르기: 전체 · 획득 · 사용 (사용 = 쓰기·버리기·없어짐·합침·팖) */
-    logFilter: "all",
-    q: "",
-    open: "",
-    mode: "view",
-    /** 버리기 띠에 끌어다 놓아 연 확인창: 취소하면 물건 팝업으로 가지 않고 닫는다 (2026-11-08 사용자) */
-    dragDrop: false,
-    notice: "",
-    info: ""
-  };
-  function resetItems() {
-    Object.assign(itemsUi, { sub: "items", view: "grid", q: "", open: "", mode: "view", dragDrop: false, notice: "", info: "" });
-  }
-  var itemsNav = () => ({ sub: itemsUi.sub, view: itemsUi.view, open: itemsUi.open });
-  function applyItemsNav(n3) {
-    Object.assign(itemsUi, { sub: n3.sub === "wallet" || n3.sub === "points" ? n3.sub : "items", view: n3.view === "log" ? "log" : "grid", open: n3.open ?? "", mode: "view", notice: "" });
-  }
-  var itemsOf = (ctx2) => readItems(ctx2.chat.scriptstate);
-  var liveOf = (ctx2) => liveItems(itemsOf(ctx2), aliveAnchors(ctx2.chat));
-  function itemPic(it) {
-    const u = itemIconUrl(it.name, it.icon, it.id ?? it.name);
-    return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
-  }
-  function traitsLine(it, left) {
-    return [it.equip ? EQUIP_LABEL[it.equip] : "", left !== void 0 ? `남은 ${left}` : it.use ? "사용" : "", it.weight !== void 0 ? it.uses !== void 0 ? `${weightText(lineWeight(it, left))} (1개 ${weightText(it.weight)})` : weightText(it.weight) : "", it.state !== "ok" ? STATE_LABEL[it.state] : ""].filter(Boolean).join(" · ");
-  }
-  var FROM_NAME = { store: "상점", story: "본문", manual: "직접" };
-  function whenOf(ctx2) {
-    const at = /* @__PURE__ */ new Map();
-    let cur = "";
-    (ctx2.chat.message ?? []).forEach((m, i) => {
-      const tags = findStatusTags(String(m.data ?? ""));
-      if (tags.length) {
-        const t = tags[tags.length - 1];
-        const d = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(t.date ?? "");
-        const date = d ? `${d[1]}.${d[2].padStart(2, "0")}.${d[3].padStart(2, "0")}` : (t.date ?? "").trim();
-        const next = [date, (t.time ?? "").trim()].filter(Boolean).join(" ");
-        if (next) cur = next;
-      }
-      at.set(messageKey(m, i), cur);
-    });
-    return { at, last: cur };
-  }
-  var realOf = (iso) => {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "";
-    const p2 = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(d);
-    const g2 = (t) => p2.find((x) => x.type === t)?.value ?? "";
-    return `${g2("year")}.${g2("month")}.${g2("day")} ${g2("hour")}:${g2("minute")}`;
-  };
-  var whenLabel = (w, anchor, iso) => (anchor ? w.at.get(anchor) : "") || w.last || realOf(iso);
-  var sourceLine = (it, w) => [FROM_NAME[it.from], whenLabel(w, it.anchor, it.at), Number.isSafeInteger(it.price) ? `₩ ${it.price.toLocaleString("en-US")}` : ""].filter(Boolean).join(" · ");
-  function useQueue(ctx2) {
-    return ctx2.chat.scriptstate?.[ITEM_USE_AT_VAR] ? [] : readItemUse(ctx2.chat.scriptstate);
-  }
-  var leftOf = (ctx2, it) => itemLeft(itemsOf(ctx2), it, aliveAnchors(ctx2.chat));
-  function itemsTab(ctx2) {
-    const SUBS2 = [["wallet", "가계부"], ["points", "포인트"], ["items", "소지품"]].filter(([v]) => v === "wallet" ? walletOn(ctx2) : v === "points" ? pointsOn(ctx2.chat) : invOn(ctx2.chat.scriptstate));
-    if (SUBS2.length && !SUBS2.some(([v]) => v === itemsUi.sub)) itemsUi.sub = SUBS2[0][0];
-    const tabs2 = `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist">${SUBS2.map(([v, l]) => `<button role="tab" class="ph-sub${itemsUi.sub === v ? " on" : ""}" data-action="items-sub" data-value="${v}" aria-selected="${itemsUi.sub === v}" aria-pressed="${itemsUi.sub === v}">${l}</button>`).join("")}</div>`;
-    const note = toast("items", itemsUi.info, (t) => {
-      if (itemsUi.info === t) itemsUi.info = "";
-    });
-    if (itemsUi.sub === "wallet" || itemsUi.sub === "points") {
-      const kind = itemsUi.sub === "points" ? "p" : "won";
-      walletUi.kind = kind;
-      const drawer2 = isPhone() && (kind === "p" || walletOn(ctx2)) ? drawerBox(walletTools(ctx2), "gx-rdrawer") : "";
-      return `<main class="gx-body gx-records gx-items">${tabs2}${walletPane(ctx2, kind)}${note}</main>${drawer2}`;
-    }
-    const notice2 = itemsUi.notice ? `<div class="gx-err" role="alert">${esc16(itemsUi.notice)}</div>` : "";
-    const drawer = isPhone() ? drawerHtml(`${addButton("ph-tool")}${mergeButton(ctx2, "ph-tool")}`, "", "gx-idrawer") : "";
-    const fix = !isPhone() && itemsUi.view === "grid" ? " it-fix" : "";
-    return `<main class="gx-body gx-records gx-items${fix}">${tabs2}${notice2}${itemsPane(ctx2)}${note}</main>${popup(ctx2)}${drawer}`;
-  }
-  var addButton = (cls) => `<button class="${cls} it-add" data-action="items-add" aria-label="직접 넣기">${ICONS.plus}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">직접 넣기</span></button>`;
-  var mergeMates = (ctx2, it) => liveOf(ctx2).filter((o) => canMerge(it, o));
-  function mergeButton(ctx2, cls) {
-    const any2 = liveOf(ctx2).some((it) => mergeMates(ctx2, it).length);
-    return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any2 ? "" : "disabled"}>${ICONS.refresh}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">합치기</span></button>`;
-  }
-  function statsRow(ctx2, live) {
-    const carried = gridItems(live).length;
-    const slots = itemSlots(ctx2.chat.scriptstate);
-    const over = Math.max(0, carried - slots);
-    return `<div class="it-stats"><span class="it-stat${over ? " over" : ""}" title="칸 ${carried} / ${slots}${over ? ` (${over}칸 넘침)` : ""}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small>${over ? `<em>+${over}</em>` : ""}</span>${weightPill(ctx2, live)}</div>`;
-  }
-  function itemsPane(ctx2) {
-    const seg10 = (v, label2) => `<button class="gx-seg${itemsUi.view === v ? " on" : ""}" data-action="items-view" data-value="${v}" aria-pressed="${itemsUi.view === v}">${label2}</button>`;
-    const tools = `<div class="gx-rec-tools gx-wt-tools it-tools">
-    <div class="gx-segs gx-segs-sm it-segs">${seg10("grid", "물건")}${seg10("log", "기록")}</div>
-    <span class="it-right">${isPhone() ? "" : `${addButton("it-act")}${mergeButton(ctx2, "it-act")}`}<input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc16(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기"></span>
-  </div>`;
-    const st = itemIconStatus();
-    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc16(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 기본 아이콘으로 보여요. (${esc16(st.failed)})</p>` : "";
-    if (itemsUi.view === "log") return `${tools}${picNote}<div class="it-body">${logList(ctx2)}</div>`;
-    return `${tools}${picNote}${equipBox(ctx2, "items")}<div class="it-scrollwrap"><div class="it-body it-scroll">${gridHtml(ctx2)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div></div>`;
-  }
-  function weightPill(ctx2, live) {
-    const w = totalWeight(live, (e) => leftOf(ctx2, e));
-    const cap = itemCarry(ctx2.chat.scriptstate);
-    const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
-    const num7 = (n3) => String(Number(n3.toFixed(1)));
-    return `<span class="it-stat it-wgt${w > cap ? " over" : ""}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ""} title="무게 ${num7(w)}kg / 소지 한도 ${num7(cap)}kg${w > cap ? ` (${num7(w - cap)}kg 넘음)` : ""}">${ICONS.weight}<b>${num7(w)}</b><small>/ ${num7(cap)}kg</small></span>`;
-  }
-  var avatarHtml = () => "";
-  function setAvatarHtml(fn2) {
-    avatarHtml = fn2;
-  }
-  function equipBox(ctx2, where2, sel = "") {
-    const { av, slots } = equipParts(ctx2, where2, sel);
-    if (where2 === "sell") return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ""}${slots}</div></section>`;
-    return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ""}<div class="it-eqcol">${statsRow(ctx2, liveOf(ctx2))}${slots}</div>${useBox(ctx2)}</div></section>`;
-  }
-  function equipParts(ctx2, where2, sel = "") {
-    const live = liveOf(ctx2);
-    const eq = equippedOf(live);
-    const slot2 = (k, i) => {
-      const it = eq[k][i];
-      if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
-      const act = where2 === "sell" ? "shop-sell-pick" : "items-open";
-      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act}" data-value="${esc16(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc16(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc16(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, leftOf(ctx2, it))}</span>${marks(it, leftOf(ctx2, it))}${tipOf(it, leftOf(ctx2, it), whenOf(ctx2))}</button>`;
-    };
-    const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot2(k, i))).join("")}</div>`;
-    return { av: avatarHtml(ctx2), slots };
-  }
-  function useBox(ctx2) {
-    const live = liveOf(ctx2);
-    const q = useQueue(ctx2).flatMap((u) => {
-      const it = live.find((x) => x.id === u.id);
-      return it ? [{ it, n: u.n }] : [];
-    });
-    const chips3 = q.map(({ it, n: n3 }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc16(it.name)}</b>${n3 > 1 ? `<em>×${n3}</em>` : ""}<button class="it-ux" data-action="items-unuse" data-value="${esc16(it.id)}" aria-label="${esc16(it.name)} 사용 취소">${ICONS.close}</button></span>`).join("");
-    return `<div class="it-usebox${q.length ? "" : " empty"}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips3 || `<p class="it-uhint">${isPhone() ? "물건을 눌러 「사용」을 고르면 여기에 모여요." : "쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요."}</p>`}</div></div>`;
-  }
-  var wtMark = (it, left) => {
-    const w = lineWeight(it, left);
-    return w !== void 0 ? `<span class="it-wt" title="무게">${weightText(w)}</span>` : "";
-  };
-  var stateCls = (it) => it.state === "broken" ? " broken" : it.state === "damaged" ? " damaged" : "";
-  function marks(it, left) {
-    return `${left !== void 0 ? `<span class="it-left" title="남은 횟수">${left}</span>` : ""}${it.state === "damaged" ? '<span class="it-crack" title="손상" aria-hidden="true"></span>' : it.state === "broken" ? '<span class="it-brk" title="고장">고장</span>' : ""}`;
-  }
-  function tipOf(it, left, w) {
-    const tr = traitsLine(it, left);
-    return `<span class="it-tip" aria-hidden="true"><b>${esc16(it.name)}</b><small>${esc16([tr, sourceLine(it, w)].filter(Boolean).join(" · "))}</small>${it.desc ? `<p>${esc16(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc16(it.effect)}</p>` : ""}</span>`;
-  }
-  function gridHtml(ctx2) {
-    const slots = itemSlots(ctx2.chat.scriptstate);
-    const q = itemsUi.q.trim();
-    const live = liveOf(ctx2);
-    const list4 = q ? searchItems(itemsOf(ctx2), aliveAnchors(ctx2.chat), q).items : gridItems(live);
-    if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
-    const w = whenOf(ctx2);
-    const queued2 = new Map(useQueue(ctx2).map((u) => [u.id, u.n]));
-    const cells = list4.map((it, i) => cell(ctx2, it, !q && i >= slots, w, queued2.get(it.id) ?? 0));
-    if (!q) for (let i = list4.length; i < slots; i++) cells.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
-    return `<div class="it-grid" data-drop="grid">${cells.join("")}</div>`;
-  }
-  function cell(ctx2, it, over, w, queued2) {
-    const left = leftOf(ctx2, it);
-    const all = queued2 > 0 && (left === void 0 || queued2 >= left);
-    const drag = !isPhone() ? ` draggable="true" data-drag="${esc16(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${canUse(it)
+    return popShell("☎ 전화 주문", `${head3}${op(

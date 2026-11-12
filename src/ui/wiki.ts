@@ -1,7 +1,8 @@
 // 「위키」 탭: 목록·검색·작성 화면·문서 보기. 생성은 "위키 작성 시작"·"새로고침"을 눌렀을 때만 한 번 부른다.
 // 생성은 창을 닫아도 계속되고, 끝나면 원래 채팅의 로어북에 저장한다.
+import { defGroups, type Wire } from './setrow';
+import { WIKI_SET } from '../core/setdef/wiki';
 import { turnKeyAt } from '../core/shop';
-import { onOffSwitch } from './controls';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { buildRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
@@ -15,7 +16,7 @@ import { generate as askModel, type LlmMessage } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
-import { advancedBox } from './advanced';
+import { advChipRow, advRow } from './advanced';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { ICONS } from './icons';
@@ -421,12 +422,6 @@ function face(ctx: ChatContext, e: Entry | undefined, cls = ''): string {
   return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
 }
 
-function seg(action: string, cur: string, items: [string, string][]): string {
-  const sw = onOffSwitch(items, cur, action, (v) => v);
-  if (sw) return sw;
-  return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
-}
-
 function busyLine(ctx: ChatContext): string {
   const job = jobs.get(chatKey(ctx));
   return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : '';
@@ -614,28 +609,15 @@ function paneHead(ctx: ChatContext, title: string, sub: string, right = '', e?: 
 /** 위키 설정 */
 function settingsView(ctx: ChatContext): string {
   const s = wikiSettings(ctx.chat.scriptstate);
-  const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
-  const line = (label: string, control: string, hint = '') =>
-    `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+  // 줄은 정의표(core/setdef/wiki.ts)에서 온다
+  const vals: Record<string, string> = {
+    auto: s.auto, auto_title: s.autoTitle, auto_query: s.autoQuery, length: s.length, mode: s.mode, model: s.model, refresh_previous: s.refreshPrevious ? '1' : '0',
+    context: wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', footnotes: s.footnotes, images: s.images, request: String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? ''),
+  };
+  const wire: Wire = { cur: (k) => vals[k] ?? '', adv: (item) => advRow('nw', item, ctx.chat.scriptstate), advChips: (items, label) => advChipRow('nw', items, ctx.chat.scriptstate, label) };
   return `<div class="ph-form nw-setpane">${paneHead(ctx, '위키 설정', '', defaultsButtons('wiki'))}${defaultsConfirm('wiki')}
     <div class="ph-form-body ps">
-    <section class="ps-group"><h3>자동 작성</h3><div class="ps-rows">
-      ${line('자동 호출', seg('wiki-auto', s.auto, [['0', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '채팅이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요')}
-      ${line('제목', seg('wiki-auto_title', s.autoTitle, [['model', '모델이 고름'], ['input', '직접 입력']]), '모델이 고름 = 명부 항목 중 이번 이야기에 맞는 것')}
-      ${s.autoTitle === 'input' ? line('직접 입력', `<input class="gx-search ps-text" data-change="wiki-auto_query" value="${esc(s.autoQuery)}" placeholder="문서 제목">`) : ''}
-    </div></section>
-    <section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
-      ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
-      ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
-      ${line('모델', seg('wiki-model', s.model, [['main', '메인 모델'], ['aux', '보조 모델']]))}
-      ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]))}
-      ${line('컨텍스트에 포함', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
-      ${line('주석', seg('wiki-footnotes', s.footnotes, [['pop', '뜨는 창'], ['inline', '펼치기']]), '펼치기는 주석을 본문 안에 괄호로 둬요. 폰에서 읽기 편해요')}
-      ${line('그림', seg('wiki-images', s.images, [['off', '끔'], ['infobox', '정보칸만'], ['body', '본문까지']]), '본문까지면 괴이·특수·거점·조직 그림을 본문에 넣고, 인물 문서는 정보칸 표정을 모델이 골라요. 인물 그림은 본문에 넣지 않아요')}
-    </div></section>
-    <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
-    ${advancedBox('nw', ctx.chat.scriptstate)}</div>
+    ${defGroups(WIKI_SET, wire)}</div>
   </div>`;
 }
 

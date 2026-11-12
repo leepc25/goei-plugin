@@ -43,7 +43,7 @@ export interface EntryDecision {
 }
 
 export function entryDecision(p: Presence): EntryDecision {
-  if (p === 'inside') return { allow: false, presence: p, reason: '본편에서 지금 괴이 안에 있어요. 밖으로 나온 뒤에 들어갈 수 있어요.' };
-  if (p === 'unknown') return { allow: true, presence: p, notice: '본편 상태를 확실히 판단하지 못해 그대로 들어가요.' };
+  if (p === 'inside') return { allow: false, presence: p, reason: 'RP에서 지금 괴이 안에 있어요. 밖으로 나온 뒤에 들어갈 수 있어요.' };
+  if (p === 'unknown') return { allow: true, presence: p, notice: 'RP 상태를 확실히 판단하지 못해 그대로 들어가요.' };
   return { allow: true, presence: p };
 }

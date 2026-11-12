@@ -1,5 +1,6 @@
 // 「고급 설정」 접는 칸 (v0.16.27, 사용자 설계): 각 기능 설정 맨 아래, 기본은 닫힘. 손대지 않아도 원본 기본값으로 돈다.
 // 바꾼 항목은 이름 앞 점과 되돌리기 버튼으로 보이고, 닫힌 칸 제목에 바꾼 개수가 뜬다.
+import { groupStep, numSet, setRow, setSeg, stepSize } from './setrow';
 import { ADV, advChanged, advItem, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
@@ -15,6 +16,8 @@ type State = Record<string, unknown> | undefined;
 function control(f: AdvFeature, item: AdvItem, cur: string): string {
   const id = `${f}:${item.key}`;
   if (item.type === 'text') return `<input class="gx-search ps-text adv-text" data-change="adv-set" data-key="${id}" value="${esc(cur)}" placeholder="비우면 기본" aria-label="${esc(item.label)}">`;
+  // 켬·끔 둘뿐이면 스위치 (같은 값은 어디서나 같은 조작)
+  if (item.type === 'pick' && item.opts?.length === 2 && item.opts.every(([v, l]) => (v === '1' && l === '켬') || (v === '0' && l === '끔'))) return setSeg('adv-set', id, cur === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
   if (item.type === 'pick') {
     return `<div class="gx-segs gx-segs-sm">${(item.opts ?? [])
       .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc(label)}</button>`)
@@ -29,30 +32,59 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
   const zero = n === 0 && item.zero;
   const down = Math.max(min, n - step);
   const up = Math.min(max, n + step);
-  return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n <= min ? 'disabled' : ''} aria-label="${esc(item.label)} 줄이기">−</button>
+  return `<div class="st-step adv-step${stepSize(max === Number.MAX_SAFE_INTEGER ? 9999999 : max, item.unit ?? '', item.zero ?? '')}"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n <= min ? 'disabled' : ''} aria-label="${esc(item.label)} 줄이기">−</button>
     <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item.max ?? ''}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? '' : n}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''} aria-label="${esc(item.label)}">${item.unit ? `<span>${esc(item.unit)}</span>` : ''}
     <button class="gx-step" data-action="adv-set" data-value="${id}=${up}" ${n >= max ? 'disabled' : ''} aria-label="${esc(item.label)} 늘리기">+</button></div>`;
 }
 
+
 function row(f: AdvFeature, item: AdvItem, state: State): string {
   const cur = advValue(state, f, item.key);
   const changed = cur !== String(item.def);
-  return `<div class="ps-row adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(item.label)}</b>${item.hint ? `<small>${esc(item.hint)}</small>` : ''}</div><div class="ps-ctl">${control(f, item, cur)}</div></div>`;
+  return setRow(esc(item.label), control(f, item, cur), item.hint ? esc(item.hint) : '', `adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}`);
 }
 
-function chips(f: AdvFeature, items: AdvItem[], state: State): string {
-  return `<div class="ps-row adv-chips"><div class="gx-chips">${items
+function chips(f: AdvFeature, items: AdvItem[], state: State, label = ''): string {
+  const html = `<div class="gx-chips">${items
     .map((i) => {
       const on = advValue(state, f, i.key) === '1';
       return `<button class="gx-chip${on ? ' on' : ''}" data-action="adv-set" data-value="${f}:${i.key}=${on ? '0' : '1'}" aria-pressed="${on}">${esc(i.label)}</button>`;
     })
-    .join('')}</div></div>`;
+    .join('')}</div>`;
+  return label ? setRow(esc(label), html) : `<div class="ps-row adv-chips">${html}</div>`;
+}
+
+/** 세부 값 한 줄 · 칩 한 줄 (정의표의 adv·advchips 줄이 부른다) */
+export function advRow(f: AdvFeature, key: string, state: State): string {
+  const item = advItem(f, key);
+  return item ? row(f, item, state) : '';
+}
+export function advChipRow(f: AdvFeature, keys: string[], state: State, label = ''): string {
+  const items = keys.map((k) => advItem(f, k)).filter((i): i is AdvItem => !!i);
+  return items.length ? chips(f, items, state, label) : '';
+}
+/** 같은 종류 수 여럿을 한 줄에 (keys = [항목, 짧은 이름]) */
+export function advSetRow(f: AdvFeature, label: string, keys: [string, string][], state: State, help = ''): string {
+  const cells = keys.map(([k, l]): [string, string] | null => { const item = advItem(f, k); return item ? [l, control(f, item, advValue(state, f, item.key))] : null; }).filter((c): c is [string, string] => !!c);
+  return cells.length ? setRow(esc(label), numSet(cells), help ? esc(help) : '') : '';
+}
+
+/** 조작만 (표 칸용: 줄 틀 없이) */
+export function advCtl(f: AdvFeature, key: string, state: State): string {
+  const item = advItem(f, key);
+  return item ? control(f, item, advValue(state, f, item.key)) : '';
+}
+export function advChipsCtl(f: AdvFeature, keys: string[], state: State): string {
+  return `<div class="gx-chips">${keys.map((k) => advItem(f, k)).filter((i): i is AdvItem => !!i).map((i) => {
+    const on = advValue(state, f, i.key) === '1';
+    return `<button class="gx-chip${on ? ' on' : ''}" data-action="adv-set" data-value="${f}:${i.key}=${on ? '0' : '1'}" aria-pressed="${on}">${esc(i.label)}</button>`;
+  }).join('')}</div>`;
 }
 
 /** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다 */
-export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[]): string {
+export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[], noTitle = false): string {
   return ADV[f]
-    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group"><h3>${esc(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}</div>${extra[gi] ?? ''}</section>`))
+    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group">${noTitle ? '' : `<h3>${esc(g.title)}</h3>`}<div class="ps-rows">${groupStep(`${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`)}</div>${extra[gi] ?? ''}</section>`))
     .join('');
 }
 
@@ -61,7 +93,7 @@ export function advancedBox(f: AdvFeature, state: State): string {
   const n = advChanged(state, f).length;
   const groups = ADV[f]
     .map((g, gi) => {
-      const body = `${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`;
+      const body = groupStep(`${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`);
       if (g.fold) {
         return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc(g.title)}</summary><div class="ps-rows">${body}</div></details>`;
       }

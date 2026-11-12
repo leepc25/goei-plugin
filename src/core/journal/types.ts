@@ -11,7 +11,7 @@ export const REPORTS_KEY = '$goei_reports';
 export type JournalKind = 'an' | 'in' | 'ms' | 'fd';
 export type JournalCause = CloseCause | 'field';
 
-export const JOURNAL_KIND_LABEL: Record<JournalKind, string> = { an: '괴이', in: '사건', ms: '특수', fd: '필드 출동' };
+export const JOURNAL_KIND_LABEL: Record<JournalKind, string> = { an: '괴이', in: '사건', ms: '특수', fd: '출동' };
 
 /** 투입 요원 하나와 종료 시점 상태 (명부에 없는 이름은 id '') */
 export interface JournalAgent {

@@ -1,4 +1,317 @@
- ? ' data-usable="1"' : ""}` : "";
+show.ops?.hello ?? "")}${pays}${pick4}`, `<button class="pri" data-action="hs-order" ${can ? "" : "disabled"}>주문 확정</button><button data-action="hs-pop" data-value="">끊기</button>`);
+  }
+  function peekPop(ctx2, s8) {
+    const { part } = nowPart(ctx2);
+    if (!part) return "";
+    const it = part.item;
+    const under = part.peek && s8.peek ? ui.lifted ? `<p class="hs-under">${esc15(part.peek)}</p>` : '<button class="hs-lift" data-action="hs-lift">스티커 모서리 들추기</button>' : "";
+    return popShell("상품 스티커", `<div class="hs-sticker"><span class="pic">${itemPic(it)}</span><b>${esc15(it.name)}</b><p>${esc15(it.desc)}</p>${it.effect ? `<p class="ef">${esc15(it.effect)}</p>` : ""}${under}</div>`);
+  }
+  function audPop() {
+    if (ui.audNo) return popShell("★ 방청 신청", `<p class="hs-ok">접수되었습니다.</p><p class="hs-no">접수번호 <b>${esc15(ui.audNo)}</b></p>`, '<button class="pri" data-action="hs-pop" data-value="">확인</button>');
+    return popShell("★ 방청 신청", `<label class="hs-f"><span>이름</span><input value="${esc15(userInfo().name || "")}" readonly></label>
+<button class="hs-chk${ui.agree ? " on" : ""}" data-action="hs-agree" aria-pressed="${ui.agree}"><i></i>객석 규칙에 동의합니다</button>`, `<button class="pri" data-action="hs-aud" ${ui.agree ? "" : "disabled"}>신청</button><button data-action="hs-pop" data-value="">취소</button>`);
+  }
+  function homeshopTab(ctx2, env3) {
+    liveEnv4 = env3;
+    sync(ctx2);
+    const mobile = isPhone();
+    const s8 = hsSettings(ctx2.chat.scriptstate);
+    const show = readShow(ctx2.chat.scriptstate);
+    const stt = homeshopStatus();
+    const art2 = homeshopArt();
+    const note = !s8.on ? "방송 없음" : stt.failed ? "신호 없음" : !art2 ? stt.progress || "방송 준비 중" : ui.loading ? "방송 연결 중" : ui.notice ? "신호 없음" : show.loaded ? "" : "신호 없음";
+    setPlayerFeed({ art: art2, show: s8.on && !ui.loading ? show : { ...show, loaded: false }, s: s8, note, scale: scaleOf2(s8, mobile), tel: telOf(ctx2) }, { advance, redraw: () => liveEnv4?.render() });
+    const pending2 = liveOrders2(ctx2.chat.scriptstate, aliveAnchors(ctx2.chat)).length;
+    const tabs2 = [["", "ON AIR"], ["sched", "편성표"], ["orders", `주문 조회${pending2 ? ` ${pending2}` : ""}`]];
+    const menu = `<nav class="hs-menu">${tabs2.map(([k, l]) => `<button class="${ui.page === k ? "on" : ""}" data-action="hs-page" data-value="${k}" aria-pressed="${ui.page === k}">${l}</button>`).join("")}${s8.aud ? '<button data-action="hs-pop" data-value="aud">방청 신청</button>' : ""}</nav>`;
+    const head3 = `<header class="hs-gnb"><span class="hs-logo">망상<i>홈쇼핑</i></span>${menu}<span class="hs-tel"><small>주문 전화</small>☎ ${esc15(telOf(ctx2))}</span></header>`;
+    const err = `${failBox()}${stt.failed ? `<div class="hs-err" role="alert"><span>방송 그림을 받지 못했어요. ${esc15(stt.failed)}</span></div>` : ""}`;
+    const page = ui.page === "sched" ? schedPage(show, s8) : ui.page === "orders" ? ordersPage(ctx2) : onAir(ctx2, show, s8, mobile);
+    const pop = ui.pop === "call" ? callPop(ctx2, s8) : ui.pop === "peek" ? peekPop(ctx2, s8) : ui.pop === "aud" && s8.aud ? audPop() : "";
+    return `<div class="hs${mobile ? " hs-m" : ""}">${head3}<div class="hs-wrap">${err}${page}</div>${pop}</div>`;
+  }
+  function homeshopMounted(root3) {
+    if (root3.querySelector('[data-hs-mount="stage"]')) mountPlayer(root3);
+    else stopPlayer();
+  }
+  function boxButton(ctx2, itemIdOf) {
+    return boxOrder(ctx2.chat.scriptstate, itemIdOf, aliveAnchors(ctx2.chat)) ? `<button class="gx-chip" data-action="hs-box-open" data-value="${esc15(itemIdOf)}">열기</button>` : "";
+  }
+  var SH = { model: "$sh_model", ctx: "$sh_ctx", price: "$sh_price", diverse: "$sh_diverse", thoughts: "$sh_thoughts", prev: "$sh_prev", min: "$sh_min", max: "$sh_max", turns: "$sh_turns", refs: "$sh_refs" };
+  var SH_RANGE = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
+  var FLAG = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
+  function homeshopSettingsPane(ctx2) {
+    const vars = ctx2.chat.scriptstate;
+    const s8 = hsSettings(vars);
+    const art2 = homeshopArt();
+    const clipHelp = art2 ? ["A", "B"].map((c) => `${c === "A" ? "와이드" : "바스트"}: ${[...new Map(art2.pack.cuts[c].clips.map((k) => [k.name, `${k.ko}(${CLIP_GROUP_LABEL[k.group]})`])).values()].join(", ")}`).join("<br>") : "방송 그림을 받으면 동작 목록이 보여요.";
+    const b = (x) => x ? "1" : "0";
+    const n3 = (k) => {
+      const raw = vars?.[HS_NUM[k].key];
+      return raw === void 0 || raw === "" ? HS_NUM[k].def : Number(raw);
+    };
+    const vals = {
+      on: b(s8.on),
+      net: b(s8.net),
+      auto: s8.auto,
+      retry: String(retryOf(ctx2)),
+      tel: String(vars?.[HS_TEL_KEY] ?? ""),
+      "sh:model": s8.shop.model,
+      "sh:ctx": b(s8.shop.context),
+      "sh:price": s8.shop.price,
+      "sh:diverse": b(s8.shop.diverse),
+      "sh:prev": b(s8.shop.avoidPrev),
+      "sh:thoughts": s8.shop.thoughts,
+      turns: String(s8.shop.turns),
+      refs: String(s8.shop.refs),
+      turn: b(s8.turn),
+      lock: b(s8.lock),
+      say: b(s8.say),
+      barter: b(s8.barter),
+      peek: b(s8.peek),
+      aud: b(s8.aud),
+      forms: String(vars?.[HS_KEY.forms] ?? ""),
+      clips: s8.clipsText,
+      cut: b(s8.fx.cut),
+      bulb: b(s8.fx.bulb),
+      tear: b(s8.fx.tear),
+      scan: b(s8.fx.scan),
+      scalePc: s8.scalePc,
+      scalePh: s8.scalePhone
+    };
+    const pairs2 = { cue: ["cueMin", "cueMax"], chat: ["chatMin", "chatMax"], call: ["callLo", "callHi"], fill: ["fillLo", "fillHi"] };
+    const wire = {
+      cur: (k) => vals[k] ?? String(n3(k)),
+      minmax: (k) => k === "size" ? s8.shop.size : [n3(pairs2[k][0]), n3(pairs2[k][1])],
+      help: { clips: () => `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}` }
+    };
+    const all = HOMESHOP_SET.groups.flatMap((g2) => g2.rows);
+    const pick4 = (title2, keys, note) => ({ title: title2, note, rows: keys.map((k) => all.find((r) => r.key === k)).filter(Boolean) });
+    const page = { ...HOMESHOP_SET, groups: [
+      pick4("", ["net", "retry", "say"]),
+      pick4("편성", ["cue", "chat"]),
+      pick4("방송 흐름", ["speed", "hold", "frame", "chatGap", "next", "left", "turn", "lock"]),
+      pick4("주문", ["barter", "peek"]),
+      pick4("컨텍스트 포함", ["call", "forms", "aud"]),
+      pick4("진행자 동작", ["fill", "fillCool", "rareP", "rareCool", "clips"], HOMESHOP_SET.groups.find((g2) => g2.title === "진행자 동작")?.note),
+      pick4("방송 화면", ["tel", "cut", "bulb", "tear", "tearP", "scan", "scalePc", "scalePh"])
+    ] };
+    const body5 = defGroups(page, wire);
+    return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${HS_NAME} 설정</b></div></header><div class="ph-form-body ps">${body5}</div></div>`;
+  }
+  async function homeshopSettingsAction(action, value, ctx2, env3) {
+    if (!["hs-cfg", "hs-num", "hs-shnum", "hs-text", "hs-retry"].includes(action)) return false;
+    const set2 = async (vars) => {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => Object.entries(vars).every(([k2, v2]) => String(chat.scriptstate?.[k2] ?? "") === v2) ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } });
+      await env3.refresh();
+      return true;
+    };
+    if (action === "hs-retry") {
+      const n3 = retryOf(ctx2) + (String(value).endsWith("+") ? 1 : -1);
+      return set2({ [HS_RETRY_KEY]: String(Math.max(0, Math.min(3, n3))) });
+    }
+    const m = /^([\w:]+)=([\s\S]*)$/.exec(value ?? "");
+    if (!m) return true;
+    const [, k, v] = m;
+    if (action === "hs-cfg") {
+      if (FLAG[k]) return set2({ [FLAG[k]]: v === "0" ? "0" : "" });
+      if (k === "auto") return set2({ [HS_KEY.auto]: v === "manual" ? "manual" : "" });
+      if (k === "scalePc" || k === "scalePh") return ["auto", "fit", "0.5", "1", "2"].includes(v) ? set2({ [k === "scalePc" ? HS_KEY.scalePc : HS_KEY.scalePhone]: v }) : true;
+      if (k.startsWith("sh:") && SH[k.slice(3)]) return set2({ [hsKey(SH[k.slice(3)])]: v });
+      return true;
+    }
+    if (action === "hs-num") {
+      const d = HS_NUM[k];
+      const n3 = Math.round(Number(v));
+      if (!d || !Number.isFinite(n3) || v.trim() === "") return env3.render(), true;
+      return set2({ [d.key]: String(Math.max(d.lo, Math.min(d.hi, n3))) });
+    }
+    if (action === "hs-shnum") {
+      const r = SH_RANGE[k];
+      const n3 = Math.floor(Number(v));
+      if (!r || !Number.isFinite(n3) || v.trim() === "") return env3.render(), true;
+      const val = String(Math.max(r[0], Math.min(r[1], n3)));
+      const s8 = hsSettings(ctx2.chat.scriptstate).shop;
+      const extra2 = {};
+      if (k === "min") extra2[hsKey("$sh_max")] = String(Math.max(Number(val), s8.size[1]));
+      if (k === "max") extra2[hsKey("$sh_min")] = String(Math.min(Number(val), s8.size[0]));
+      return set2({ [hsKey(SH[k])]: val, ...extra2 });
+    }
+    if (k === "tel") return set2({ [HS_TEL_KEY]: v.replace(/\s+/g, " ").trim().slice(0, 20) });
+    if (k === "clips") return set2({ [HS_KEY.clips]: v.trim().slice(0, 2e3) });
+    if (k === "forms") return set2({ [HS_KEY.forms]: v.replace(/\s+/g, " ").trim().slice(0, 200) });
+    if (k === "sh:price") return set2({ [hsKey("$sh_price")]: v.replace(/\s+/g, " ").trim().slice(0, 80) });
+    return true;
+  }
+
+  // src/ui/items.ts
+  var esc16 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var itemsUi = {
+    sub: "items",
+    view: "grid",
+    /** 기록 거르기: 전체 · 획득 · 사용 (사용 = 쓰기·버리기·없어짐·합침·팖) */
+    logFilter: "all",
+    q: "",
+    open: "",
+    mode: "view",
+    /** 버리기 띠에 끌어다 놓아 연 확인창: 취소하면 물건 팝업으로 가지 않고 닫는다 (2026-11-08 사용자) */
+    dragDrop: false,
+    notice: "",
+    info: ""
+  };
+  function resetItems() {
+    Object.assign(itemsUi, { sub: "items", view: "grid", q: "", open: "", mode: "view", dragDrop: false, notice: "", info: "" });
+  }
+  var itemsNav = () => ({ sub: itemsUi.sub, view: itemsUi.view, open: itemsUi.open });
+  function applyItemsNav(n3) {
+    Object.assign(itemsUi, { sub: n3.sub === "wallet" || n3.sub === "points" ? n3.sub : "items", view: n3.view === "log" ? "log" : "grid", open: n3.open ?? "", mode: "view", notice: "" });
+  }
+  var itemsOf = (ctx2) => readItems(ctx2.chat.scriptstate);
+  var liveOf = (ctx2) => liveItems(itemsOf(ctx2), aliveAnchors(ctx2.chat));
+  function itemPic(it) {
+    const u = itemIconUrl(it.name, it.icon, it.id ?? it.name);
+    return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
+  }
+  function traitsLine(it, left) {
+    return [it.equip ? EQUIP_LABEL[it.equip] : "", left !== void 0 ? `남은 ${left}` : it.use ? "사용" : "", it.weight !== void 0 ? it.uses !== void 0 ? `${weightText(lineWeight(it, left))} (1개 ${weightText(it.weight)})` : weightText(it.weight) : "", it.state !== "ok" ? STATE_LABEL[it.state] : ""].filter(Boolean).join(" · ");
+  }
+  var FROM_NAME = { store: "상점", story: "본문", manual: "직접" };
+  function whenOf(ctx2) {
+    const at = /* @__PURE__ */ new Map();
+    let cur = "";
+    (ctx2.chat.message ?? []).forEach((m, i) => {
+      const tags = findStatusTags(String(m.data ?? ""));
+      if (tags.length) {
+        const t = tags[tags.length - 1];
+        const d = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(t.date ?? "");
+        const date = d ? `${d[1]}.${d[2].padStart(2, "0")}.${d[3].padStart(2, "0")}` : (t.date ?? "").trim();
+        const next = [date, (t.time ?? "").trim()].filter(Boolean).join(" ");
+        if (next) cur = next;
+      }
+      at.set(messageKey(m, i), cur);
+    });
+    return { at, last: cur };
+  }
+  var realOf = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const p2 = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(d);
+    const g2 = (t) => p2.find((x) => x.type === t)?.value ?? "";
+    return `${g2("year")}.${g2("month")}.${g2("day")} ${g2("hour")}:${g2("minute")}`;
+  };
+  var whenLabel = (w, anchor, iso) => (anchor ? w.at.get(anchor) : "") || w.last || realOf(iso);
+  var sourceLine = (it, w) => [FROM_NAME[it.from], whenLabel(w, it.anchor, it.at), Number.isSafeInteger(it.price) ? `₩ ${it.price.toLocaleString("en-US")}` : ""].filter(Boolean).join(" · ");
+  function useQueue(ctx2) {
+    return ctx2.chat.scriptstate?.[ITEM_USE_AT_VAR] ? [] : readItemUse(ctx2.chat.scriptstate);
+  }
+  var leftOf = (ctx2, it) => itemLeft(itemsOf(ctx2), it, aliveAnchors(ctx2.chat));
+  function itemsTab(ctx2) {
+    const SUBS2 = [["wallet", "가계부"], ["points", "포인트"], ["items", "소지품"]].filter(([v]) => v === "wallet" ? walletOn(ctx2) : v === "points" ? pointsOn(ctx2.chat) : invOn(ctx2.chat.scriptstate));
+    if (SUBS2.length && !SUBS2.some(([v]) => v === itemsUi.sub)) itemsUi.sub = SUBS2[0][0];
+    const tabs2 = `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist">${SUBS2.map(([v, l]) => `<button role="tab" class="ph-sub${itemsUi.sub === v ? " on" : ""}" data-action="items-sub" data-value="${v}" aria-selected="${itemsUi.sub === v}" aria-pressed="${itemsUi.sub === v}">${l}</button>`).join("")}</div>`;
+    const note = toast("items", itemsUi.info, (t) => {
+      if (itemsUi.info === t) itemsUi.info = "";
+    });
+    if (itemsUi.sub === "wallet" || itemsUi.sub === "points") {
+      const kind = itemsUi.sub === "points" ? "p" : "won";
+      walletUi.kind = kind;
+      const drawer2 = isPhone() && (kind === "p" || walletOn(ctx2)) ? drawerBox(walletTools(ctx2), "gx-rdrawer") : "";
+      return `<main class="gx-body gx-records gx-items">${tabs2}${walletPane(ctx2, kind)}${note}</main>${drawer2}`;
+    }
+    const notice2 = itemsUi.notice ? `<div class="gx-err" role="alert">${esc16(itemsUi.notice)}</div>` : "";
+    const drawer = isPhone() ? drawerHtml(`${addButton("ph-tool")}${mergeButton(ctx2, "ph-tool")}`, "", "gx-idrawer") : "";
+    const fix = !isPhone() && itemsUi.view === "grid" ? " it-fix" : "";
+    return `<main class="gx-body gx-records gx-items${fix}">${tabs2}${notice2}${itemsPane(ctx2)}${note}</main>${popup(ctx2)}${drawer}`;
+  }
+  var addButton = (cls) => `<button class="${cls} it-add" data-action="items-add" aria-label="직접 넣기">${ICONS.plus}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">직접 넣기</span></button>`;
+  var mergeMates = (ctx2, it) => liveOf(ctx2).filter((o) => canMerge(it, o));
+  function mergeButton(ctx2, cls) {
+    const any2 = liveOf(ctx2).some((it) => mergeMates(ctx2, it).length);
+    return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any2 ? "" : "disabled"}>${ICONS.refresh}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">합치기</span></button>`;
+  }
+  function statsRow(ctx2, live) {
+    const carried = gridItems(live).length;
+    const slots = itemSlots(ctx2.chat.scriptstate);
+    const over = Math.max(0, carried - slots);
+    return `<div class="it-stats"><span class="it-stat${over ? " over" : ""}" title="칸 ${carried} / ${slots}${over ? ` (${over}칸 넘침)` : ""}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small>${over ? `<em>+${over}</em>` : ""}</span>${weightPill(ctx2, live)}</div>`;
+  }
+  function itemsPane(ctx2) {
+    const seg6 = (v, label2) => `<button class="gx-seg${itemsUi.view === v ? " on" : ""}" data-action="items-view" data-value="${v}" aria-pressed="${itemsUi.view === v}">${label2}</button>`;
+    const tools = `<div class="gx-rec-tools gx-wt-tools it-tools">
+    <div class="gx-segs gx-segs-sm it-segs">${seg6("grid", "물건")}${seg6("log", "기록")}</div>
+    <span class="it-right">${isPhone() ? "" : `${addButton("it-act")}${mergeButton(ctx2, "it-act")}`}<input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc16(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기"></span>
+  </div>`;
+    const st = itemIconStatus();
+    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc16(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 기본 아이콘으로 보여요. (${esc16(st.failed)})</p>` : "";
+    if (itemsUi.view === "log") return `${tools}${picNote}<div class="it-body">${logList(ctx2)}</div>`;
+    return `${tools}${picNote}${equipBox(ctx2, "items")}<div class="it-scrollwrap"><div class="it-body it-scroll">${gridHtml(ctx2)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div></div>`;
+  }
+  function weightPill(ctx2, live) {
+    const w = totalWeight(live, (e) => leftOf(ctx2, e));
+    const cap = itemCarry(ctx2.chat.scriptstate);
+    const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
+    const num7 = (n3) => String(Number(n3.toFixed(1)));
+    return `<span class="it-stat it-wgt${w > cap ? " over" : ""}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ""} title="무게 ${num7(w)}kg / 소지 한도 ${num7(cap)}kg${w > cap ? ` (${num7(w - cap)}kg 넘음)` : ""}">${ICONS.weight}<b>${num7(w)}</b><small>/ ${num7(cap)}kg</small></span>`;
+  }
+  var avatarHtml = () => "";
+  function setAvatarHtml(fn2) {
+    avatarHtml = fn2;
+  }
+  function equipBox(ctx2, where2, sel = "") {
+    const { av, slots } = equipParts(ctx2, where2, sel);
+    if (where2 === "sell") return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ""}${slots}</div></section>`;
+    return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ""}<div class="it-eqcol">${statsRow(ctx2, liveOf(ctx2))}${slots}</div>${useBox(ctx2)}</div></section>`;
+  }
+  function equipParts(ctx2, where2, sel = "") {
+    const live = liveOf(ctx2);
+    const eq = equippedOf(live);
+    const slot2 = (k, i) => {
+      const it = eq[k][i];
+      if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
+      const act2 = where2 === "sell" ? "shop-sell-pick" : "items-open";
+      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc16(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc16(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc16(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, leftOf(ctx2, it))}</span>${marks(it, leftOf(ctx2, it))}${tipOf(it, leftOf(ctx2, it), whenOf(ctx2))}</button>`;
+    };
+    const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot2(k, i))).join("")}</div>`;
+    return { av: avatarHtml(ctx2), slots };
+  }
+  function useBox(ctx2) {
+    const live = liveOf(ctx2);
+    const q = useQueue(ctx2).flatMap((u) => {
+      const it = live.find((x) => x.id === u.id);
+      return it ? [{ it, n: u.n }] : [];
+    });
+    const chips3 = q.map(({ it, n: n3 }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc16(it.name)}</b>${n3 > 1 ? `<em>×${n3}</em>` : ""}<button class="it-ux" data-action="items-unuse" data-value="${esc16(it.id)}" aria-label="${esc16(it.name)} 사용 취소">${ICONS.close}</button></span>`).join("");
+    return `<div class="it-usebox${q.length ? "" : " empty"}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips3 || `<p class="it-uhint">${isPhone() ? "물건을 눌러 「사용」을 고르면 여기에 모여요." : "쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요."}</p>`}</div></div>`;
+  }
+  var wtMark = (it, left) => {
+    const w = lineWeight(it, left);
+    return w !== void 0 ? `<span class="it-wt" title="무게">${weightText(w)}</span>` : "";
+  };
+  var stateCls = (it) => it.state === "broken" ? " broken" : it.state === "damaged" ? " damaged" : "";
+  function marks(it, left) {
+    return `${left !== void 0 ? `<span class="it-left" title="남은 횟수">${left}</span>` : ""}${it.state === "damaged" ? '<span class="it-crack" title="손상" aria-hidden="true"></span>' : it.state === "broken" ? '<span class="it-brk" title="고장">고장</span>' : ""}`;
+  }
+  function tipOf(it, left, w) {
+    const tr = traitsLine(it, left);
+    return `<span class="it-tip" aria-hidden="true"><b>${esc16(it.name)}</b><small>${esc16([tr, sourceLine(it, w)].filter(Boolean).join(" · "))}</small>${it.desc ? `<p>${esc16(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc16(it.effect)}</p>` : ""}</span>`;
+  }
+  function gridHtml(ctx2) {
+    const slots = itemSlots(ctx2.chat.scriptstate);
+    const q = itemsUi.q.trim();
+    const live = liveOf(ctx2);
+    const list4 = q ? searchItems(itemsOf(ctx2), aliveAnchors(ctx2.chat), q).items : gridItems(live);
+    if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
+    const w = whenOf(ctx2);
+    const queued2 = new Map(useQueue(ctx2).map((u) => [u.id, u.n]));
+    const cells2 = list4.map((it, i) => cell(ctx2, it, !q && i >= slots, w, queued2.get(it.id) ?? 0));
+    if (!q) for (let i = list4.length; i < slots; i++) cells2.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
+    return `<div class="it-grid" data-drop="grid">${cells2.join("")}</div>`;
+  }
+  function cell(ctx2, it, over, w, queued2) {
+    const left = leftOf(ctx2, it);
+    const all = queued2 > 0 && (left === void 0 || queued2 >= left);
+    const drag = !isPhone() ? ` draggable="true" data-drag="${esc16(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${canUse(it) ? ' data-usable="1"' : ""}` : "";
     return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}${all ? " queued" : ""}${stateCls(it)}" data-action="items-open" data-value="${esc16(it.id)}"${drag} aria-label="${esc16(it.name)}${over ? " (넘침)" : ""}${queued2 ? " (사용 예정)" : ""}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued2 ? `<span class="it-q8">사용 예정${queued2 > 1 ? ` ×${queued2}` : ""}</span>` : ""}<b>${esc16(it.name)}</b>${tipOf(it, left, w)}</button>`;
   }
   var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖" };
@@ -20,7 +333,7 @@
     if (!rows3.length) return `${chips3}<p class="gx-wt-empty">${q ? "맞는 기록이 없어요." : itemsUi.logFilter === "get" ? "아직 획득한 물건이 없어요." : itemsUi.logFilter === "out" ? "아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요." : "아직 기록이 없어요. 물건을 얻거나 쓰면 여기에 쌓여요."}</p>`;
     const w = whenOf(ctx2);
     const pic3 = (l) => itemPic(l);
-    const row11 = (l) => {
+    const row8 = (l) => {
       const when3 = whenLabel(w, l.anchor, l.at);
       const sub = [BY[l.by] ?? l.by, l.what === "use" && (l.n ?? 1) > 1 ? `×${l.n}` : "", l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · ");
       return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic3(l)}</span><span class="gx-wt-memo"><b>${esc16(l.name)} <em class="it-what ${l.what === "get" ? "get" : "out"}">${WHAT[l.what] ?? l.what}</em></b><small>${esc16(sub)}</small></span><span class="gx-wt-amt"><small>${esc16(when3.split(" ")[1] ?? when3)}</small></span></div></li>`;
@@ -34,8 +347,8 @@
     }
     return `${chips3}<div class="gx-wallettab it-log">${groups.map((g2) => {
       const gi = g2.rows.filter((l) => l.what === "get").length;
-      const go2 = g2.rows.length - gi;
-      return `<section class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go2 ? `사용 ${go2}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row11).join("")}</ul></section>`;
+      const go3 = g2.rows.length - gi;
+      return `<section class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go3 ? `사용 ${go3}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row8).join("")}</ul></section>`;
     }).join("")}</div>`;
   }
   function popup(ctx2) {
@@ -68,7 +381,7 @@
       ${it.uses !== void 0 ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx2, it).length ? "" : "disabled"} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ""}
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc16(it.id)}">버리기</button>
     </div>
-    ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 본편에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
+    ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 메인 요청에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
     return shell2(it.name, body5);
   }
   var shell2 = (label2, inner) => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc16(label2)}"><div class="gx-agpop-card it-card" data-action="items-keep"><button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
@@ -86,10 +399,10 @@
     <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc16(it?.id ?? "")}">${it ? "저장" : "넣기"}</button><button type="button" class="gx-chip" data-action="${it ? "items-back" : "items-close"}">취소</button></div>
   </div>`;
   }
-  function mergePick(ctx2, keep) {
-    const others = mergeMates(ctx2, keep);
+  function mergePick(ctx2, keep2) {
+    const others = mergeMates(ctx2, keep2);
     const w = whenOf(ctx2);
-    return `<div class="it-ph"><span class="it-ic">${itemPic(keep)}</span><div><b>${esc16(keep.name)}</b><small>합칠 상대를 고르세요. 이름·설명은 이 물건 그대로, 남은 횟수와 무게만 더해져요.</small></div></div>
+    return `<div class="it-ph"><span class="it-ic">${itemPic(keep2)}</span><div><b>${esc16(keep2.name)}</b><small>합칠 상대를 고르세요. 이름·설명은 이 물건 그대로, 남은 횟수와 무게만 더해져요.</small></div></div>
     <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc16(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc16(o.name)}</b><small>${esc16(o.desc || sourceLine(o, w))}</small></span></button></li>`).join("")}</ul>
     <div class="it-btns"><button class="gx-chip" data-action="items-back">취소</button></div>`;
   }
@@ -160,10 +473,10 @@
         return true;
       }
       case "items-merge-to": {
-        const keep = itemsUi.open;
-        if (!keep || !value) return true;
+        const keep2 = itemsUi.open;
+        if (!keep2 || !value) return true;
         const anchor = lastBotKey(ctx2.chat);
-        await write((it, alive) => mergeItems(it, alive, keep, value, anchor));
+        await write((it, alive) => mergeItems(it, alive, keep2, value, anchor));
         itemsUi.mode = "view";
         itemsUi.info = "합쳤어요.";
         await env3.refresh();
@@ -299,8 +612,8 @@
   }
   function itemsInput(root3, ctx2, v) {
     itemsUi.q = v;
-    const box4 = root3.querySelector(".it-body");
-    if (box4) box4.innerHTML = itemsUi.view === "log" ? logList(ctx2) : gridHtml(ctx2);
+    const box3 = root3.querySelector(".it-body");
+    if (box3) box3.innerHTML = itemsUi.view === "log" ? logList(ctx2) : gridHtml(ctx2);
   }
 
   // src/ui/shop.ts
@@ -344,7 +657,7 @@
     const pic3 = facePic(ctx2.char, a, true);
     return pic3 ? imageUrl(ctx2.char, pic3.includes("#") ? `${pic3}~${OWNER_TALL}` : pic3) : null;
   }
-  var shell3 = (inner, cls, action, keep, label2) => `<div class="gx-agpop ${cls}" data-action="${action}" role="dialog" aria-label="${esc17(label2)}"><div class="gx-agpop-card it-card ${cls}-card" data-action="${keep}">${inner}</div></div>`;
+  var shell3 = (inner, cls, action, keep2, label2) => `<div class="gx-agpop ${cls}" data-action="${action}" role="dialog" aria-label="${esc17(label2)}"><div class="gx-agpop-card it-card ${cls}-card" data-action="${keep2}">${inner}</div></div>`;
   var costText = (it) => it.pay ? `${it.pay}${it.price ? ` + ${amt(it.price)}` : ""}` : amt(it.price);
   function shopPopup(ctx2) {
     if (!shopUi.open) return "";
@@ -426,14 +739,14 @@
   }
   function pickHtml(ctx2, st) {
     const all = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat);
-    const mine = gridItems(all);
-    const head3 = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ""}</small></header>`;
-    const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join("")}</div>` : `<p class="gx-wt-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
+    const mine2 = gridItems(all);
+    const head3 = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine2.length} · 팔 물건을 고르세요` : ""}</small></header>`;
+    const inner = mine2.length ? `<div class="it-grid sh-grid">${mine2.map((it) => pickCell(it, st)).join("")}</div>` : `<p class="gx-wt-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
     if (isPhone()) return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx2, "sell", st.sell?.itemId ?? "")}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head3}${inner}</section></div>`;
     const { av, slots } = equipParts(ctx2, "sell", st.sell?.itemId ?? "");
-    const cells = mine.map((it) => pickCell(it, st)).join("");
-    const empty2 = mine.length ? "" : `<p class="gx-wt-empty sh-sell-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
-    return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head3}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells}${empty2}</div></section></div>`;
+    const cells2 = mine2.map((it) => pickCell(it, st)).join("");
+    const empty2 = mine2.length ? "" : `<p class="gx-wt-empty sh-sell-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
+    return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head3}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells2}${empty2}</div></section></div>`;
   }
   function pickCell(it, st) {
     const sel = st.sell?.itemId === it.id;
@@ -448,10 +761,10 @@
     const face3 = `<span class="sh-face${url ? "" : " none"}">${url ? `<img src="${esc17(url)}" alt="">` : SHADOW_FACE}</span>`;
     const name = `<div class="sh-dlg-name">${esc17(st.owner || "주인")}<small>${esc17(st.shop)}</small></div>`;
     const lines3 = st.talk.length ? st.talk.map((l) => l.who === "me" ? `<p class="me">${esc17(l.text)}</p>` : `<p>「${esc17(l.text)}」</p>`).join("") : `<p class="dim">${shopUi.loading === "shelf" ? "…" : st.loaded ? "" : "진열대를 받으면 주인이 말을 걸어요."}</p>`;
-    const box4 = `<div class="sh-dlg-box" data-sh-log>${lines3}${shopUi.loading === "talk" ? '<p class="dim">…</p>' : ""}</div>`;
+    const box3 = `<div class="sh-dlg-box" data-sh-log>${lines3}${shopUi.loading === "talk" ? '<p class="dim">…</p>' : ""}</div>`;
     const talk = talkbox(st);
-    if (drawer) return `<div class="sh-ov-head">${face3}${name}</div>${box4}${talk}`;
-    return `${face3}<div class="sh-dlg">${name}${box4}${talk}</div>`;
+    if (drawer) return `<div class="sh-ov-head">${face3}${name}</div>${box3}${talk}`;
+    return `${face3}<div class="sh-dlg">${name}${box3}${talk}</div>`;
   }
   function talkbox(st) {
     const off = st.closed || !!shopUi.loading || !st.loaded;
@@ -510,16 +823,16 @@
     return shell3(inner, "sh-det", "shop-detail-close", "shop-keep", `${o.name} 판매`);
   }
   var chatKey5 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  function shopSource(ctx2, st, sh = shopSettings(ctx2.chat.scriptstate)) {
+  function shopSource(ctx2, st, sh2 = shopSettings(ctx2.chat.scriptstate)) {
     const src = playerSource({ char: ctx2.char, chat: ctx2.chat, persona: personaText() });
     const vars = ctx2.chat.scriptstate ?? {};
-    const story = storyText(recentTurns(ctx2.chat, sh.turns, genSettings(vars).userMessages));
+    const story = storyText(recentTurns(ctx2.chat, sh2.turns, genSettings(vars).userMessages));
     const doc2 = findDoc(ctx2.chat, st.shop, ctx2.char.globalLore);
     const rows3 = limitRefs(
       collectRefs(src, { scope: "gnet", text: `${st.shop}
 ${st.owner}
 ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ source: `위키: ${st.shop}`, content: innerBody(doc2.body).slice(0, 3e3) }] : [] }),
-      sh.refs
+      sh2.refs
     );
     let status2 = "";
     const msgs4 = ctx2.chat.message ?? [];
@@ -577,10 +890,10 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
       await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
         const now2 = readShop(chat.scriptstate);
         if (!now2 || now2.shop !== next.shop) return null;
-        const saved2 = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...shopVars({ ...next, key: now2.key }) } };
-        const done3 = deal ? saleDone(saved2, next.shop, deal) : null;
+        const saved = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...shopVars({ ...next, key: now2.key }) } };
+        const done3 = deal ? saleDone(saved, next.shop, deal) : null;
         if (done3) sold = true;
-        return done3 ?? saved2;
+        return done3 ?? saved;
       });
       if (sold && next.sell) {
         shopUi.detail = "";
@@ -670,17 +983,17 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
         env3.render();
         return true;
       case "shop-sell-pick": {
-        const mine = st ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value) : null;
-        if (!st || !mine || st.closed || shopUi.loading) return true;
-        if (st.sell?.itemId === mine.id) {
+        const mine2 = st ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value) : null;
+        if (!st || !mine2 || st.closed || shopUi.loading) return true;
+        if (st.sell?.itemId === mine2.id) {
           shopUi.detail = "sell";
           env3.render();
           return true;
         }
-        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine, aliveAnchors(ctx2.chat));
-        const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, ...mine.truth ? { truth: mine.truth } : {}, use: mine.use, ...left !== void 0 ? { uses: left } : {}, ...mine.equip ? { equip: mine.equip } : {}, ...mine.icon ? { icon: mine.icon } : {}, ...Number.isSafeInteger(mine.price) ? { paid: mine.price } : {} });
+        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine2, aliveAnchors(ctx2.chat));
+        const next = startSell(st, { itemId: mine2.id, name: mine2.name, desc: mine2.desc, effect: mine2.effect, ...mine2.truth ? { truth: mine2.truth } : {}, use: mine2.use, ...left !== void 0 ? { uses: left } : {}, ...mine2.equip ? { equip: mine2.equip } : {}, ...mine2.icon ? { icon: mine2.icon } : {}, ...Number.isSafeInteger(mine2.price) ? { paid: mine2.price } : {} });
         await saveShop(ctx2, st, next);
-        shopUi.chip = mine.name;
+        shopUi.chip = mine2.name;
         shopUi.chipKind = "sell";
         shopUi.detail = "";
         if (isPhone()) shopUi.drawer = true;
@@ -762,21 +1075,21 @@ ${shopUi.failRaw.slice(0, 1500)}`;
         return true;
       case "shop-say": {
         const sell = shopUi.chipKind === "sell" && !!st?.sell;
-        const said2 = (value ?? shopUi.input).trim();
-        const text4 = sell ? `[판매: ${st.sell.name}]${said2 ? ` ${said2}` : ""}` : `${shopUi.chip ? `[${shopUi.chip}] ` : ""}${said2}`.trim();
-        if (!st || !text4 || !sell && !said2 || st.closed || shopUi.loading || !st.loaded) return true;
+        const said3 = (value ?? shopUi.input).trim();
+        const text5 = sell ? `[판매: ${st.sell.name}]${said3 ? ` ${said3}` : ""}` : `${shopUi.chip ? `[${shopUi.chip}] ` : ""}${said3}`.trim();
+        if (!st || !text5 || !sell && !said3 || st.closed || shopUi.loading || !st.loaded) return true;
         shopUi.input = "";
         shopUi.chip = "";
         shopUi.chipKind = "";
         shopUi.pick = false;
-        const next = sayToOwner(st, text4);
-        const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const next = sayToOwner(st, text5);
+        const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
           const now2 = readShop(chat.scriptstate);
           if (!now2 || now2.shop !== st.shop) return null;
           return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...shopVars({ ...next, key: now2.key }) } };
         });
-        if (!saved2) return true;
-        await ask2({ ...ctx2, chat: saved2 }, env3, "talk", next);
+        if (!saved) return true;
+        await ask2({ ...ctx2, chat: saved }, env3, "talk", next);
         return true;
       }
       case "shop-buy": {
@@ -915,10 +1228,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       const sale = deal ? next.sell : null;
       let sold = false;
       await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
-        const saved2 = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, { ...next, key }), ...note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: turnKey(chat) } : {} } };
-        const done3 = deal ? saleDone2(saved2, site, deal) : null;
+        const saved = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, { ...next, key }), ...note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: turnKey(chat) } : {} } };
+        const done3 = deal ? saleDone2(saved, site, deal) : null;
         if (done3) sold = true;
-        return done3 ?? saved2;
+        return done3 ?? saved;
       });
       if (sold && sale) {
         v.info = `「${sale.name}」을 ${won2(sale.price)}에 팔았다. 입금 완료, 너에게.`;
@@ -1093,10 +1406,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
         break;
       case "mall-sell-pick": {
         if (site !== "cos" || v.loading || !st.loaded) return true;
-        const mine = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value);
-        if (!mine) return true;
-        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine, aliveAnchors(ctx2.chat));
-        const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, ...mine.truth ? { truth: mine.truth } : {}, use: mine.use, ...left !== void 0 ? { uses: left } : {}, ...mine.equip ? { equip: mine.equip } : {}, ...mine.icon ? { icon: mine.icon } : {}, ...Number.isSafeInteger(mine.price) ? { paid: mine.price } : {} });
+        const mine2 = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value);
+        if (!mine2) return true;
+        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine2, aliveAnchors(ctx2.chat));
+        const next = startSell(st, { itemId: mine2.id, name: mine2.name, desc: mine2.desc, effect: mine2.effect, ...mine2.truth ? { truth: mine2.truth } : {}, use: mine2.use, ...left !== void 0 ? { uses: left } : {}, ...mine2.equip ? { equip: mine2.equip } : {}, ...mine2.icon ? { icon: mine2.icon } : {}, ...Number.isSafeInteger(mine2.price) ? { paid: mine2.price } : {} });
         v.selling = false;
         v.chip = "";
         await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, next) } }));
@@ -1220,31 +1533,31 @@ ${v.failRaw.slice(0, 1500)}`;
         return true;
       case "mall-desk-next": {
         if (site !== "bm" || v.dl) return true;
-        const saved2 = await saveDesk(ctx2, endDesk(readDesk(ctx2.chat.scriptstate)));
+        const saved = await saveDesk(ctx2, endDesk(readDesk(ctx2.chat.scriptstate)));
         v.input = "";
-        if (saved2) await deskRun({ ...ctx2, chat: saved2 }, env3, "make", endDesk(readDesk(saved2.scriptstate)));
+        if (saved) await deskRun({ ...ctx2, chat: saved }, env3, "make", endDesk(readDesk(saved.scriptstate)));
         return true;
       }
       case "mall-say": {
-        const said2 = (value ?? v.input).trim();
+        const said3 = (value ?? v.input).trim();
         if (site === "bm") {
           const d = readDesk(ctx2.chat.scriptstate);
-          if (!said2 || v.dl || !d.agent) return true;
-          const next2 = { ...d, talk: [...d.talk, { who: "me", text: said2.slice(0, 600) }] };
+          if (!said3 || v.dl || !d.agent) return true;
+          const next2 = { ...d, talk: [...d.talk, { who: "me", text: said3.slice(0, 600) }] };
           v.input = "";
-          const saved3 = await saveDesk(ctx2, next2);
-          if (saved3) await deskRun({ ...ctx2, chat: saved3 }, env3, "talk", next2);
+          const saved2 = await saveDesk(ctx2, next2);
+          if (saved2) await deskRun({ ...ctx2, chat: saved2 }, env3, "talk", next2);
           return true;
         }
-        if (site !== "cos" || !said2 || v.loading || !st.loaded) return true;
+        if (site !== "cos" || !said3 || v.loading || !st.loaded) return true;
         const chip3 = st.items.find((x) => x.id === v.chip && !x.sold);
-        const next = stampLastLine(sayToOwner(st, `${chip3 ? `[${chip3.name}] ` : ""}${said2}`), lastBot(ctx2.chat)?.key ?? "");
+        const next = stampLastLine(sayToOwner(st, `${chip3 ? `[${chip3.name}] ` : ""}${said3}`), lastBot(ctx2.chat)?.key ?? "");
         v.input = "";
         v.chip = "";
         v.picking = false;
-        const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, next) } }));
-        if (!saved2) return true;
-        await ask3({ ...ctx2, chat: saved2 }, env3, site, "talk", next);
+        const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, next) } }));
+        if (!saved) return true;
+        await ask3({ ...ctx2, chat: saved }, env3, site, "talk", next);
         return true;
       }
       default:
@@ -1334,12 +1647,12 @@ ${v.failRaw.slice(0, 1500)}`;
       await env3.refresh();
       return true;
     }
-    const saved2 = await saveDesk(ctx2, st);
-    if (saved2) await deskRun({ ...ctx2, chat: saved2 }, env3, "make", st);
+    const saved = await saveDesk(ctx2, st);
+    if (saved) await deskRun({ ...ctx2, chat: saved }, env3, "make", st);
     return true;
   }
-  function mallInput(site, text4) {
-    ui2[site].input = text4;
+  function mallInput(site, text5) {
+    ui2[site].input = text5;
   }
   var pic2 = (it) => itemPic({ name: it.name, icon: it.icon });
   var onShelf = (st) => shelfItems(st);
@@ -1377,8 +1690,8 @@ ${v.failRaw.slice(0, 1500)}`;
     }).join("");
     return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b>${cards2 ? `<div class="cs-gotgrid">${cards2}</div>` : ""}<table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th></tr>${rows3}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
   }
-  function opText(text4, st) {
-    let html = esc18(text4);
+  function opText(text5, st) {
+    let html = esc18(text5);
     for (const it of onShelf(st).slice().sort((a, b) => b.name.length - a.name.length)) {
       const n3 = esc18(it.name);
       if (!n3 || !html.includes(n3)) continue;
@@ -1421,8 +1734,8 @@ ${v.failRaw.slice(0, 1500)}`;
     const log = st.talk.length ? st.talk.map((l) => l.who === "me" ? `<div class="q-m q-me"><b>나</b><p>${esc18(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}${quoteCard(st, l.quote, v, orders)}</div>`).join("") : '<div class="q-m q-op"><b>운영자</b><p>안녕하신가! 무엇을 도울까, 만일 상품을 물어보면 붙여라 그것을 여기에.</p></div>';
     const wait = v.loading === "talk" ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : "";
     const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc18(x.id)}">${esc18(x.name)} <b>${won2(x.price)}</b></button>`).join("") || "<p>없다 붙일 상품.</p>"}</div>` : "";
-    const mine = v.selling ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat) : [];
-    const sellList = v.selling ? `<div class="q-pick">${mine.map((x) => `<button data-action="mall-sell-pick" data-value="${esc18(x.id)}">${esc18(x.name)}${Number.isSafeInteger(x.price) ? ` <small>산 값 ${won2(x.price)}</small>` : ""}</button>`).join("") || "<p>팔 만한 소지품이 없다.</p>"}</div>` : "";
+    const mine2 = v.selling ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat) : [];
+    const sellList = v.selling ? `<div class="q-pick">${mine2.map((x) => `<button data-action="mall-sell-pick" data-value="${esc18(x.id)}">${esc18(x.name)}${Number.isSafeInteger(x.price) ? ` <small>산 값 ${won2(x.price)}</small>` : ""}</button>`).join("") || "<p>팔 만한 소지품이 없다.</p>"}</div>` : "";
     const o = st.sell;
     const offered = !!o && typeof o.price === "number";
     const sellCard = o ? `<div class="q-card q-sell"><i class="q-th">${itemPic({ name: o.name, icon: o.icon })}</i><span>파는 물건</span><b>${esc18(o.name)}</b>${o.paid !== void 0 ? `<small>산 값 ${won2(o.paid)}</small>` : ""}<em>${offered ? `우리의 값 ${o.first !== void 0 ? `<s>${won2(o.first)}</s> ` : ""}${won2(o.price)}` : o.price === null ? "우리는 사지 않는다" : "값을 아직 말하지 않았다"}</em>${offered ? `<button class="cs-btn" data-action="mall-sell"${v.loading ? " disabled" : ""}>판매</button>` : ""}<button class="q-x" data-action="mall-sell-cancel" aria-label="그만">×</button></div>` : "";
@@ -1487,13 +1800,13 @@ ${v.failRaw.slice(0, 1500)}`;
     else if (!nick) body5 = '<div class="bp-box bp-need"><b>로그인이 필요합니다</b><p>포인트몰은 임직원 계정으로 로그인한 뒤 이용할 수 있습니다.</p><button class="bp-buy" data-action="br-login">로그인</button></div>';
     else {
       const cats = [["", "전체"], ...s8.feature ? [["rare", "이달의 한정"], ["sale", "특가"]] : []];
-      const shown3 = v.page === "rare" ? list4.filter((x) => x.tag === "rare") : v.page === "sale" ? list4.filter((x) => x.tag === "sale" && x.was) : list4;
+      const shown4 = v.page === "rare" ? list4.filter((x) => x.tag === "rare") : v.page === "sale" ? list4.filter((x) => x.tag === "sale" && x.was) : list4;
       const desk = deskSettings(ctx2.chat.scriptstate).on ? `<button class="bp-desk${v.ask ? " on" : ""}" data-action="mall-ask" data-value="" aria-pressed="${v.ask}">1:1 상담</button>` : "";
       const side = `<nav class="bp-side${mobile ? " m" : ""}">${cats.map(([k, l]) => `<button class="${v.page === k ? "on" : ""}" data-action="mall-page" data-value="${k}" aria-pressed="${v.page === k}">${l}</button>`).join("")}${desk}</nav>`;
       const note = mallNote(ctx2.chat.scriptstate, site);
       const banner = `<div class="bp-ban">포인트는 현금으로 바꿀 수 없으며, 이 몰에서만 쓸 수 있습니다.${note ? `<br>${esc18(note)}` : ""}</div>`;
       const info = v.info ? `<div class="bp-info" role="status">${esc18(v.info)}</div>` : "";
-      const grid = v.loading === "shelf" && !list4.length ? '<div class="bp-box">상품을 불러오는 중입니다…</div>' : !list4.length ? `<div class="bp-box"><p>${st.loaded ? "모든 상품이 품절되었습니다." : "등록된 상품이 없습니다."}</p><button class="bp-buy" data-action="mall-refresh" ${v.loading ? "disabled" : ""}>상품 불러오기</button></div>` : `<div class="bp-grid">${shown3.map((x) => bmCard(x, bal, v, !!v.loading)).join("") || '<p class="bp-none">이 분류에는 상품이 없습니다.</p>'}</div>`;
+      const grid = v.loading === "shelf" && !list4.length ? '<div class="bp-box">상품을 불러오는 중입니다…</div>' : !list4.length ? `<div class="bp-box"><p>${st.loaded ? "모든 상품이 품절되었습니다." : "등록된 상품이 없습니다."}</p><button class="bp-buy" data-action="mall-refresh" ${v.loading ? "disabled" : ""}>상품 불러오기</button></div>` : `<div class="bp-grid">${shown4.map((x) => bmCard(x, bal, v, !!v.loading)).join("") || '<p class="bp-none">이 분류에는 상품이 없습니다.</p>'}</div>`;
       body5 = `<div class="bp-wrap">${side}<div class="bp-main">${banner}${info}${failBox2(v, "bp-fail")}<h2>${v.page === "rare" ? "이달의 한정" : v.page === "sale" ? "특가" : "전체 상품"}${v.loading === "shelf" && list4.length ? " <small>새 상품을 불러오는 중…</small>" : ""}</h2>${grid}</div></div>`;
     }
     const deskWin = v.ask && s8.on && nick && deskSettings(ctx2.chat.scriptstate).on ? bmDesk(ctx2, v, mobile) : "";
@@ -1520,34 +1833,20 @@ ${v.failRaw.slice(0, 1500)}`;
     const mobile = isPhone();
     return site === "cos" ? cosHtml(ctx2, mobile) : bmHtml(ctx2, mobile);
   }
-  var row5 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group4 = (title2, rows3) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows3}</div></section>`;
+  var row3 = setRow;
+  var group = (title2, rows3) => setGroup(title2, rows3);
   function mseg(site, key, cur, items) {
-    const sw = onOffSwitch(items, cur, "ms-cfg", (v) => `${site}:${key}=${v}`);
-    if (sw) return sw;
+    const sw2 = onOffSwitch(items, cur, "ms-cfg", (v) => `${site}:${key}=${v}`);
+    if (sw2) return sw2;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, l]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ms-cfg" data-value="${site}:${key}=${v}" aria-pressed="${cur === v}">${l}</button>`).join("")}</div>`;
   }
-  var step = (site, key, shown3, down, up, label2) => `<div class="st-step"><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:-" ${down ? "" : "disabled"} aria-label="${esc18(label2)} 줄이기">−</button><b>${esc18(shown3)}</b><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:+" ${up ? "" : "disabled"} aria-label="${esc18(label2)} 늘리기">+</button></div>`;
-  var numBox = (site, key, cur, unit, label2) => `<input class="gx-search ph-pct" type="number" min="${MS_RANGE[key][0]}" max="${MS_RANGE[key][1]}" data-change="ms-num" data-key="${site}:${key}" value="${cur}" aria-label="${esc18(label2)}"><span>${unit}</span>`;
   var MS_KEY = { model: "$sh_model", ctx: "$sh_ctx", feature: "$sh_feature", price: "$sh_price", diverse: "$sh_diverse", thoughts: "$sh_thoughts", prev: "$sh_prev", min: "$sh_min", max: "$sh_max", turns: "$sh_turns", refs: "$sh_refs" };
   var MS_RANGE = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
   function mallSettingsPane(ctx2, site) {
     const s8 = mallSettings(ctx2.chat.scriptstate, site);
     const name = MALL_NAME[site];
     const blocked2 = s8.on ? "" : `<p class="gx-hint">소지품이나 가계부가 꺼져 있어 ${name}을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>`;
-    const rows3 = `${blocked2}${group4(name, [
-      row5("자동 호출", mseg(site, "auto", s8.auto, [["manual", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]]), s8.auto === "manual" ? "새로 고침을 눌렀을 때만 물건 목록을 새로 받아요." : s8.auto === "open" ? "사이트를 열 때, 지난번에 받은 뒤로 본편이 진행됐으면 한 번 새로 받아요." : "본편 응답마다 물건 목록을 새로 받아요(모델 호출 +1)."),
-      row5("모델", mseg(site, "model", s8.model, [["main", "메인 모델"], ["aux", "보조 모델"]]), `물건 목록${site === "cos" ? "과 운영자 답" : ""}을 지을 모델이에요.`),
-      row5("컨텍스트에 포함", mseg(site, "ctx", s8.context ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요."),
-      row5("상품 수", `<span class="ph-inline"><span>최소</span>${numBox(site, "min", s8.size[0], "개", "상품 수 최소")}<span>최대</span>${numBox(site, "max", s8.size[1], "개", "상품 수 최대")}</span>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
-      row5(site === "cos" ? "추천·할인 구획" : "한정·특가 구획", mseg(site, "feature", s8.feature ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), site === "cos" ? "켜면 「강하게 추천」 물건 하나와 ※할인!※ 물건을 받아 같은 목록 칸에 딱지로 표시해요." : "켜면 「이달의 한정」 하나와 특가 상품을 따로 받아 분류에 보여 줘요."),
-      row5("값 기준", `<input class="gx-search ps-text" data-change="ms-text" data-key="${site}:price" value="${esc18(s8.price)}" maxlength="80" placeholder="비우면 사이트에 어울리는 값">`),
-      row5("다양성 강화", mseg(site, "diverse", s8.diverse ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "켜면 싼 것·비싼 것·흔한 것·특이한 것을 섞어요."),
-      row5("지난 목록 피하기", mseg(site, "prev", s8.avoidPrev ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "새로 받을 때 이미 보였던 물건을 피해요."),
-      row5("생각 단계", mseg(site, "thoughts", s8.thoughts, [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]])),
-      row5("최근 본문 턴 수", step(site, "turns", `${s8.turns}턴`, s8.turns > 1, s8.turns < 8, "최근 본문 턴 수"), "컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8)."),
-      row5("참고 로어북 수", step(site, "refs", `${s8.refs}개`, s8.refs > 0, s8.refs < 12, "참고 로어북 수"), "봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).")
-    ].join(""))}${cosRollGroup(ctx2, site)}${site === "cos" ? cosReadyGroup(ctx2) + cosTruthGroup(ctx2) + cosFixedGroup(ctx2) : deskGroup(ctx2)}`;
+    const rows3 = `${blocked2}${cosRollGroup(ctx2, site)}${site === "cos" ? cosReadyGroup(ctx2) + cosTruthGroup(ctx2) + cosFixedGroup(ctx2) : deskGroup(ctx2)}`;
     return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows3}</div></div>`;
   }
   function cosRollGroup(ctx2, site) {
@@ -1566,57 +1865,57 @@ ${v.failRaw.slice(0, 1500)}`;
     const word = bm ? "분류" : "장르";
     const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 ${word}를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — ${bm ? "CATEGORY" : "GENRE"} · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, ${word}·등급을 바꾸지 못해요.${bm ? " 로어북의 가격 예시 물건을 그대로 되풀이하기 어렵게 하는 장치예요." : ""}</p>`;
     const tierHelp = bm ? `한 줄에 「이름|설명(영어)|하한|상한|가중치」(포인트). 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(30~9,999p, 싼 쪽에 가중치).` : "한 줄에 「이름|설명(영어)|하한|상한|가중치」. 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(₩999,999~49,999,999, 모두 1).";
-    return group4("진열 배정", how + [
-      row5("사용", mseg(site, "roll_on", r.on ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요)."),
-      row5(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres" placeholder="${esc18(genresText(D.genres))}">${esc18(gSet ? genresText(r.genres) : "")}</textarea>`, `쉼표로 나눠요. 비우면 기본 ${D.genres.length}종(회색 글).`),
-      row5(`${word} 뽑기`, mseg(site, "roll_gmode", r.gmode, [["uniq", "칸마다 다르게"], ["any", "겹쳐도 됨"], ["one", `한 ${word}로`]]), r.gmode === "uniq" ? "목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시." : r.gmode === "any" ? `칸마다 따로 무작위. 같은 ${word}가 여러 칸에 나올 수 있어요.` : `한 판에 ${word} 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).`),
-      row5("값 등급", `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="${site}:tiers" placeholder="${esc18(tiersText(D.tiers))}">${esc18(tSet ? tiersText(r.tiers) : "")}</textarea>`, tierHelp),
-      row5("등급 뽑기", mseg(site, "roll_tmode", r.tmode, [["weight", "가중치대로"], ["even", "골고루"], ["same", "한 등급으로"]]), r.tmode === "weight" ? "칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요." : r.tmode === "even" ? "등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요." : "한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요."),
-      row5("상황용 칸", mseg(site, "roll_useful", r.useful, [["auto", "자동"], ["0", "없음"], ["1", "1칸"], ["2", "2칸"]]), "「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위."),
-      r.on ? row5("뽑기 예", `<ul class="ms-sample">${sample}</ul>`, `지금 설정으로 ${n3}칸을 한 번 뽑아 본 거예요. 열 때마다 달라져요.`) : ""
+    return group("진열 배정", how + [
+      row3("사용", mseg(site, "roll_on", r.on ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요)."),
+      row3(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres" placeholder="${esc18(genresText(D.genres))}">${esc18(gSet ? genresText(r.genres) : "")}</textarea>`, `쉼표로 나눠요. 비우면 기본 ${D.genres.length}종(회색 글).`),
+      row3(`${word} 뽑기`, mseg(site, "roll_gmode", r.gmode, [["uniq", "칸마다 다르게"], ["any", "겹쳐도 됨"], ["one", `한 ${word}로`]]), r.gmode === "uniq" ? "목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시." : r.gmode === "any" ? `칸마다 따로 무작위. 같은 ${word}가 여러 칸에 나올 수 있어요.` : `한 판에 ${word} 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).`),
+      row3("값 등급", `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="${site}:tiers" placeholder="${esc18(tiersText(D.tiers))}">${esc18(tSet ? tiersText(r.tiers) : "")}</textarea>`, tierHelp),
+      row3("등급 뽑기", mseg(site, "roll_tmode", r.tmode, [["weight", "가중치대로"], ["even", "골고루"], ["same", "한 등급으로"]]), r.tmode === "weight" ? "칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요." : r.tmode === "even" ? "등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요." : "한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요."),
+      row3("상황용 칸", mseg(site, "roll_useful", r.useful, [["auto", "자동"], ["0", "없음"], ["1", "1칸"], ["2", "2칸"]]), "「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위."),
+      r.on ? row3("뽑기 예", `<ul class="ms-sample">${sample}</ul>`, `지금 설정으로 ${n3}칸을 한 번 뽑아 본 거예요. 열 때마다 달라져요.`) : ""
     ].join("") + reset);
   }
   function deskGroup(ctx2) {
     const d = deskSettings(ctx2.chat.scriptstate);
-    const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 본편이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
+    const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 턴이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
     const reset = d.axesText ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : "";
-    return group4("1:1 상담", how + [
-      row5("사용", mseg("bm", "desk_on", d.on ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요."),
-      row5("상담사 주사위 칸", `<textarea class="gx-search ms-area" rows="7" data-change="ms-desk" data-key="axes" placeholder="${esc18(DESK_AXES_DEFAULT)}">${esc18(d.axesText)}</textarea>`, "한 줄에 「칸 이름: 값, 값, …」. 칸마다 하나씩 뽑아요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 비우면 기본 칸(회색 글)."),
-      row5("지난 상담사 다시 만나기", mseg("bm", "desk_again", d.again ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요."),
-      row5("겹치지 않게 넘길 수", `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? "" : "disabled"} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? "" : "disabled"} aria-label="늘리기">+</button></div>`, "새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).")
+    return group("1:1 상담", how + [
+      row3("사용", mseg("bm", "desk_on", d.on ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요."),
+      row3("상담사 주사위 칸", `<textarea class="gx-search ms-area" rows="7" data-change="ms-desk" data-key="axes" placeholder="${esc18(DESK_AXES_DEFAULT)}">${esc18(d.axesText)}</textarea>`, "한 줄에 「칸 이름: 값, 값, …」. 칸마다 하나씩 뽑아요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 비우면 기본 칸(회색 글)."),
+      row3("지난 상담사 다시 만나기", mseg("bm", "desk_again", d.again ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요."),
+      row3("겹치지 않게 넘길 수", `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? "" : "disabled"} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? "" : "disabled"} aria-label="늘리기">+</button></div>`, "새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).")
     ].join("") + reset);
   }
   function cosReadyGroup(ctx2) {
     const m = cosReadyMode(ctx2.chat.scriptstate);
-    return group4("맞춤 주문", row5(
+    return group("맞춤 주문", row3(
       "완성 알림",
-      mseg("cos", "ready", m, [["both", "카드 + 본편"], ["card", "카드만"], ["off", "사용 안 함"]]),
-      m === "both" ? "완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 본편에 완성 사실을 한 번 넘겨요." : m === "card" ? "채팅에 카드만 떠요. 본편 모델은 완성된 줄 몰라요." : "알리지 않아요. 사이트의 「주문 조회」에서만 보여요."
+      mseg("cos", "ready", m, [["both", "카드 + 메인 요청"], ["card", "카드만"], ["off", "사용 안 함"]]),
+      m === "both" ? "완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 메인 요청에 완성 사실을 한 번 넘겨요." : m === "card" ? "카드만 떠요. 메인 모델은 완성된 줄 몰라요." : "알리지 않아요. 사이트의 「주문 조회」에서만 보여요."
     ));
   }
   function cosTruthGroup(ctx2) {
     const m = cosTruthMode(ctx2.chat.scriptstate);
-    return group4("진짜 효과", `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 본편 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row5(
+    return group("진짜 효과", `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 메인 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row3(
       "진실 미리 정하기",
       mseg("cos", "truth", m, [["all", "전부"], ["mix", "섞음"], ["none", "안 함"]]),
-      m === "all" ? "우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과." : m === "mix" ? "절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 본편 모델이 정해요." : "전부 「아무도 모름」. 처음 쓸 때 본편 모델이 그 자리에서 정해요."
+      m === "all" ? "우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과." : m === "mix" ? "절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 메인 모델이 정해요." : "전부 「아무도 모름」. 처음 쓸 때 메인 모델이 그 자리에서 정해요."
     ));
   }
   function cosFixedGroup(ctx2) {
     const vars = ctx2.chat.scriptstate;
     const list4 = cosFixed(vars);
     const num7 = (id2, key, v, ph, label2, max = 1e12) => `<input class="gx-search ms-num" type="number" min="0" max="${max}" data-change="ms-fx" data-key="${id2}:${key}" value="${v ?? ""}" placeholder="${ph}" aria-label="${esc18(label2)}">`;
-    const text4 = (id2, key, v, ph, label2, len) => `<input class="gx-search" data-change="ms-fx" data-key="${id2}:${key}" value="${esc18(v)}" maxlength="${len}" placeholder="${ph}" aria-label="${esc18(label2)}">`;
+    const text5 = (id2, key, v, ph, label2, len) => `<input class="gx-search" data-change="ms-fx" data-key="${id2}:${key}" value="${esc18(v)}" maxlength="${len}" placeholder="${ph}" aria-label="${esc18(label2)}">`;
     const items = list4.map((f) => `<div class="ms-fx${f.on ? "" : " off"}">
-      <div class="ms-fx-head">${text4(f.id, "name", f.name, "상품 이름", "이름", 40)}<span class="ph-inline"><span>확률</span>${num7(f.id, "pct", f.pct, "25", "확률", 100)}<span>%</span></span>${mseg("cos", `fx_on:${f.id}`, f.on ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}<button class="gx-mini danger" data-action="ms-fx-del" data-value="${esc18(f.id)}" aria-label="지우기">×</button></div>
+      <div class="ms-fx-head">${text5(f.id, "name", f.name, "상품 이름", "이름", 40)}<span class="ph-inline"><span>확률</span>${num7(f.id, "pct", f.pct, "25", "확률", 100)}<span>%</span></span>${mseg("cos", `fx_on:${f.id}`, f.on ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}<button class="gx-mini danger" data-action="ms-fx-del" data-value="${esc18(f.id)}" aria-label="지우기">×</button></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>값</span>${num7(f.id, "price", f.price, "999999", "값")}<span>원</span></span><span class="ph-inline"><span>할인 전</span>${num7(f.id, "was", f.was, "비우면 할인 없음", "할인 전 값")}<span>원</span></span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text4(f.id, "desc", f.desc, "겉보기 설명 (???·검열됨처럼 숨겨도 돼요)", "설명", 200)}</span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text4(f.id, "effect", f.effect, "화면에 보이는 광고 문구 (모호·검열·거짓·뚱딴지…)", "보이는 효과", 200)}</span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text4(f.id, "truth", f.truth, "숨긴 진짜 효과 — 본편 모델만 봐요. 비우면 「아무도 모름」", "진짜 효과", 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text5(f.id, "desc", f.desc, "겉보기 설명 (???·검열됨처럼 숨겨도 돼요)", "설명", 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text5(f.id, "effect", f.effect, "화면에 보이는 광고 문구 (모호·검열·거짓·뚱딴지…)", "보이는 효과", 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text5(f.id, "truth", f.truth, "숨긴 진짜 효과 — 메인 모델만 봐요. 비우면 「아무도 모름」", "진짜 효과", 200)}</span></div>
     </div>`).join("");
-    const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list4.length >= COS_FIXED_MAX ? "disabled" : ""}>추가</button></div>`;
-    return group4("시그니처 상품", `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요. 「효과」는 화면에 보이는 광고 문구이고 「진실」은 숨긴 진짜 효과예요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
+    const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list4.length >= COS_FIXED_MAX ? "disabled" : ""}>상품 추가</button></div>`;
+    return group("시그니처 상품", `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요. 「효과」는 화면에 보이는 광고 문구이고 「진실」은 숨긴 진짜 효과예요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
   }
   async function mallSettingsAction(action, value, ctx2, env3) {
     if (await deskSettingsAction(action, value, ctx2, env3)) return true;
@@ -1992,10 +2291,10 @@ ${v.failRaw.slice(0, 1500)}`;
       trailing
     };
   }
-  function paragraphs(text4) {
+  function paragraphs(text5) {
     const out = [];
     let cur = [];
-    for (const line2 of `${text4}
+    for (const line2 of `${text5}
 `.split("\n").slice(0, -1)) {
       if (/^\s*$/.test(line2)) {
         if (cur.length) out.push(cur.join("\n"));
@@ -2081,16 +2380,16 @@ ${v.failRaw.slice(0, 1500)}`;
     return [{ role: "user", content: w.join("\n") }];
   }
   function parsePatches(raw) {
-    const text4 = raw.replace(/```json/g, "").replace(/```/g, "").trim();
-    const s8 = text4.indexOf("[");
-    const e = text4.lastIndexOf("]");
+    const text5 = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+    const s8 = text5.indexOf("[");
+    const e = text5.lastIndexOf("]");
     if (s8 < 0 || e <= s8) return [];
     let v;
     try {
-      v = JSON.parse(text4.slice(s8, e + 1));
+      v = JSON.parse(text5.slice(s8, e + 1));
     } catch {
       try {
-        v = JSON.parse(text4.slice(s8, e + 1).replace(/,\s*([\]}])/g, "$1"));
+        v = JSON.parse(text5.slice(s8, e + 1).replace(/,\s*([\]}])/g, "$1"));
       } catch {
         return [];
       }
@@ -2101,7 +2400,7 @@ ${v.failRaw.slice(0, 1500)}`;
   function applyPatches(paras, patches, limit, d) {
     const sorted = [...d.characters].sort((a, b) => b.length - a.length);
     const inserts = /* @__PURE__ */ new Map();
-    const count3 = /* @__PURE__ */ new Map();
+    const count2 = /* @__PURE__ */ new Map();
     for (const p2 of patches) {
       const ln = p2.line;
       if (!Number.isInteger(ln) || ln < 1 || ln > paras.length || inserts.has(ln)) continue;
@@ -2110,10 +2409,10 @@ ${v.failRaw.slice(0, 1500)}`;
       if (!inner) continue;
       const name = sorted.find((c) => inner.startsWith(`${c}_`));
       if (!name || !d.keywordSet.has(inner.slice(name.length + 1))) continue;
-      const cur = count3.get(name) ?? 0;
+      const cur = count2.get(name) ?? 0;
       if (cur >= limit) continue;
       inserts.set(ln, `<img=${inner}>`);
-      count3.set(name, cur + 1);
+      count2.set(name, cur + 1);
     }
     const out = [];
     paras.forEach((para, i) => {
@@ -2235,7 +2534,7 @@ Next Paragraph Text
     if (!msg || msg.role !== "char" || typeof msg.data !== "string" || !msg.data) return;
     if (t.messageIndex !== (t.chat.message?.length ?? 0) - 1) return;
     running3 = true;
-    const note = (text4) => updateChat(t.charIndex, t.chatIndex, (c) => c.scriptstate?.[ASSET_NOTE] === text4 ? null : { ...c, scriptstate: { ...c.scriptstate ?? {}, [ASSET_NOTE]: text4 } }).catch(() => null);
+    const note = (text5) => updateChat(t.charIndex, t.chatIndex, (c) => c.scriptstate?.[ASSET_NOTE] === text5 ? null : { ...c, scriptstate: { ...c.scriptstate ?? {}, [ASSET_NOTE]: text5 } }).catch(() => null);
     try {
       const agent = playerAgent(t.lore, t.chat.scriptstate);
       const cfg = imgPromptConfig(getPrefs());
@@ -2252,7 +2551,7 @@ Next Paragraph Text
         await note("이번 응답에는 붙일 이미지가 없었어요.");
         return;
       }
-      const saved2 = await updateChat(t.charIndex, t.chatIndex, (latest) => {
+      const saved = await updateChat(t.charIndex, t.chatIndex, (latest) => {
         const list4 = latest.message ?? [];
         const i = t.messageIndex;
         if (i !== list4.length - 1 || list4[i]?.role !== "char" || stripReadyTags(stripShopTags(String(list4[i].data ?? ""))) !== stripReadyTags(stripShopTags(job.original))) return null;
@@ -2262,7 +2561,7 @@ Next Paragraph Text
         message[i] = { ...list4[i], data: [stripReadyTags(stripShopTags(next)), ready?.raw, tag?.raw].filter(Boolean).join("\n") };
         return { ...latest, message, scriptstate: { ...latest.scriptstate ?? {}, [ASSET_NOTE]: "" } };
       });
-      if (!saved2) console.log("[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.");
+      if (!saved) console.log("[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.");
     } catch (error) {
       const why = error instanceof AssetError ? error.message : `보조 모델 호출 실패: ${error instanceof Error ? error.message : String(error)}`;
       console.log(`[goei] 이미지 태그 보충 실패: ${why}`);
@@ -2330,7 +2629,7 @@ Next Paragraph Text
   var HIDE_AFTER_FAIL = 1e4;
   var WATCHDOG = PROGRESS_WATCHDOG;
   var PULSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l2.5-6 4 12 2.5-6h6"/></svg>';
-  var CSS3 = `
+  var CSS2 = `
 ${themeVars("[x-goei-prog]")}
 [x-goei-prog] { --p-dim: #97A9A5; --p-danger: #FF7A6B; --p-void: #1A2226; }
 [x-goei-prog][x-goei-theme="light"] { --p-dim: #5C6E6A; --p-danger: #C2412F; --p-void: #F4F6F5; }
@@ -2430,8 +2729,8 @@ ${themeVars("[x-goei-prog]")}
     }
     const run6 = runningStages(t);
     if (t.aborted && !run6.length) return "응답 없음";
-    if (!run6.length) return t.replyAt ? "응답 뒤 정리 중" : t.mainAt ? "본편 응답 대기" : now2 - t.at < WATCHDOG ? "요청 준비 중" : "응답 없음";
-    if (run6.some((s9) => s9.id === "main")) return "본편 응답 대기";
+    if (!run6.length) return t.replyAt ? "응답 뒤 정리 중" : t.mainAt ? "메인 응답 대기" : now2 - t.at < WATCHDOG ? "요청 준비 중" : "응답 없음";
+    if (run6.some((s9) => s9.id === "main")) return "메인 응답 대기";
     const net = run6.filter((s9) => s9.group === "net");
     if (net.length > 1) return `인터넷 자동 호출 · ${net.length}건`;
     const s8 = run6[0];
@@ -2451,47 +2750,54 @@ ${themeVars("[x-goei-prog]")}
         return s8.group === "net" ? `${s8.label === "통합" ? `통합 요청 (${s8.note ?? ""})` : s8.label} 확인 중` : `${s8.label} 처리 중`;
     }
   }
+  function sentGot(sent, got) {
+    const a = sent === void 0 ? "" : `보냄 ${num5(sent)}`;
+    const b = got === void 0 ? "받는 중" : `받음 ${num5(got)}`;
+    return a ? `${a} · ${b}` : b;
+  }
   function metaOf(t, now2) {
     if (t.endAt) {
       const s8 = turnSummary(t);
-      return `호출 <b data-mono>${num5(s8.calls)}</b>회 · <b data-mono>${num5(s8.req)} → ${num5(s8.resp)}</b> 토큰 · <b data-mono>${esc19(secs(s8.ms))}</b>`;
+      return `호출 <b data-mono>${num5(s8.calls)}</b>회 · 보냄 <b data-mono>${num5(s8.req)}</b> · 받음 <b data-mono>${num5(s8.resp)}</b> 토큰 · <b data-mono>${esc19(secs(s8.ms))}</b>`;
     }
     const run6 = running(t);
     const parts = [];
     if (run6.length) {
       const models = [...new Set(run6.map((c) => modelName(c.model)))].join("·");
       parts.push(run6.length > 1 ? `${esc19(models)} ${run6.length}건 동시` : `${esc19(models)} 모델`);
-      parts.push(`요청 <b data-mono>${num5(run6.reduce((n3, c) => n3 + c.reqTokens, 0))}</b> 토큰`);
+      parts.push(`보냄 <b data-mono>${num5(run6.reduce((n3, c) => n3 + c.reqTokens, 0))}</b> 토큰`);
       const chars2 = run6.reduce((n3, c) => n3 + (c.chars ?? 0), 0);
-      if (chars2) parts.push(`출력 <b data-mono>~${num5(chars2)}</b>자`);
-    } else if (t.mainAt && !t.replyAt) parts.push("Risu 가 본편 응답을 받는 중");
+      if (chars2) parts.push(`받는 중 <b data-mono>~${num5(chars2)}</b>자`);
+    } else if (t.mainAt && !t.replyAt) parts.push(`${esc19(modelName("main"))} 모델${t.mainTokens === void 0 ? "" : ` · 보냄 <b data-mono>${num5(t.mainTokens)}</b> 토큰`}`);
     parts.push(`경과 <b data-mono>${clock2(now2 - t.at)}</b>`);
     return parts.join(" · ");
   }
   function rowDetail(t, s8, st, now2) {
     if (s8.id === "main") {
-      if (st === "done") return { dt: `Risu 응답${t.replyTokens ? ` · ${num5(t.replyTokens)} 토큰` : ""}`, tm: secs((t.replyAt ?? now2) - (t.mainAt ?? t.at)) };
-      if (st === "run") return { dt: "Risu 응답", tm: `${Math.floor((now2 - (t.mainAt ?? t.at)) / 1e3)}초` };
+      const who = modelName("main");
+      if (st === "done") return { dt: `${who} · ${sentGot(t.mainTokens, t.replyTokens ?? 0)}`, tm: secs((t.replyAt ?? now2) - (t.mainAt ?? t.at)) };
+      if (st === "run") return { dt: `${who} · ${sentGot(t.mainTokens)}`, tm: `${Math.floor((now2 - (t.mainAt ?? t.at)) / 1e3)}초` };
       return { dt: "", tm: "" };
     }
     const calls = t.calls.filter((c2) => c2.stage === s8.id);
     if (!calls.length) return { dt: s8.note ?? "", tm: st === "skip" ? "없음" : "" };
     const c = calls[calls.length - 1];
     const more = calls.length > 1 ? ` · ${calls.length}회` : "";
-    if (c.ms === void 0) return { dt: `${s8.note ? `${s8.note} · ` : ""}${modelName(c.model)} · ${num5(c.reqTokens)} → ${c.chars ? `~${num5(c.chars)}자` : "…"}${more}`, tm: `${Math.floor((now2 - c.at) / 1e3)}초` };
+    const head3 = `${s8.note ? `${s8.note} · ` : ""}${modelName(c.model)} · `;
+    if (c.ms === void 0) return { dt: `${head3}보냄 ${num5(c.reqTokens)} · 받는 중${c.chars ? ` ~${num5(c.chars)}자` : ""}${more}`, tm: `${Math.floor((now2 - c.at) / 1e3)}초` };
     if (!c.ok) return { dt: (c.error ?? "실패").split("\n")[0].slice(0, 40) + more, tm: secs(c.ms) };
-    return { dt: `${s8.note ? `${s8.note} · ` : ""}${modelName(c.model)} · ${num5(c.reqTokens)} → ${num5(c.respTokens ?? 0)}${more}`, tm: secs(calls.reduce((n3, x) => n3 + (x.ms ?? 0), 0)) };
+    return { dt: `${head3}${sentGot(c.reqTokens, c.respTokens ?? 0)}${more}`, tm: secs(calls.reduce((n3, x) => n3 + (x.ms ?? 0), 0)) };
   }
   function cardHtml(t, now2 = Date.now()) {
     if (!t) return `<div data-grip>${PULSE}호출 진행<span data-p="n" data-mono>—</span></div><div data-p="t">아직 호출이 없어요</div><div data-p="m">채팅을 보내면 여기에 단계가 보여요.</div>`;
     const { done: done3, total } = stageCount(t);
-    const cells = t.plan.map((s8) => `<div data-p="c" data-s="${stageState(t, s8)}" title="${esc19(s8.note ? `${s8.label} (${s8.note})` : s8.label)}">${esc19(s8.label)}</div>`).join("");
+    const cells2 = t.plan.map((s8) => `<div data-p="c" data-s="${stageState(t, s8)}" title="${esc19(s8.note ? `${s8.label} (${s8.note})` : s8.label)}">${esc19(s8.label)}</div>`).join("");
     const rows3 = t.plan.map((s8) => {
       const st = stageState(t, s8);
       const { dt, tm } = rowDetail(t, s8, st, now2);
       return `<div data-p="r" data-s="${st}"><i data-p="ic" data-s="${st}"></i><span data-p="nm">${esc19(s8.label)}${dt ? `<span data-p="dt">${esc19(dt)}</span>` : ""}</span><span data-p="tm" data-mono>${esc19(tm)}</span></div>`;
     }).join("");
-    return `<div data-grip>${PULSE}${t.manual ? "수동 호출" : "호출 진행"}<span data-p="n" data-mono>${done3} / ${total}</span></div><div data-p="t">${esc19(titleOf(t, now2))}</div><div data-p="m">${metaOf(t, now2)}</div>` + (total > 1 ? `<div data-p="cells">${cells}</div>` : "") + `<div data-p="rows">${rows3}</div>`;
+    return `<div data-grip>${PULSE}${t.manual ? "수동 호출" : "호출 진행"}<span data-p="n" data-mono>${done3} / ${total}</span></div><div data-p="t">${esc19(titleOf(t, now2))}</div><div data-p="m">${metaOf(t, now2)}</div>` + (total > 1 ? `<div data-p="cells">${cells2}</div>` : "") + `<div data-p="rows">${rows3}</div>`;
   }
   function dotHtml(t) {
     const dots = GROUPS.map((g2) => `<i data-p="d" data-s="${t ? groupState(t, g2) : "skip"}" title="${GROUP_LABEL[g2]}"></i>`).join("");
@@ -2513,15 +2819,15 @@ ${themeVars("[x-goei-prog]")}
     await host3.setAttribute("x-goei-show", "false");
     await host3.setInnerHTML(`<div data-card></div><button type="button" data-dot aria-label="호출 진행 보기"></button>`);
     const style = await doc2.createElement("style");
-    await style.setTextContent(CSS3);
+    await style.setTextContent(CSS2);
     await host3.appendChild(style);
     await root3.body.appendChild(host3);
-    const card2 = await host3.querySelector("[data-card]");
+    const card3 = await host3.querySelector("[data-card]");
     const dot2 = await host3.querySelector("[data-dot]");
-    if (!card2 || !dot2) throw new Error("진행 창을 만들지 못했어요.");
+    if (!card3 || !dot2) throw new Error("진행 창을 만들지 못했어요.");
     let visible2 = false;
     let phone2 = false;
-    let open4 = false;
+    let open3 = false;
     let seen2 = null;
     let lastCard = "";
     let lastDot = "";
@@ -2545,14 +2851,14 @@ ${themeVars("[x-goei-prog]")}
         return;
       }
       const { vw, vh } = await viewport();
-      const w = open4 ? CARD_W : BTN;
+      const w = open3 ? CARD_W : BTN;
       pos = { right: Math.min(Math.max(0, pos.right), Math.max(0, vw - w)), top: Math.min(Math.max(0, pos.top), Math.max(0, vh - 40)) };
       await host3.setStyle("right", `${pos.right}px`);
       await host3.setStyle("top", `${pos.top}px`);
     };
     const setOpen = async (next) => {
-      if (open4 === next) return;
-      open4 = next;
+      if (open3 === next) return;
+      open3 = next;
       await host3.setAttribute("x-goei-open", next ? "true" : "false");
       if (next) await applyPos();
     };
@@ -2568,7 +2874,7 @@ ${themeVars("[x-goei-prog]")}
       const c = cardHtml(t, now2);
       if (c !== lastCard) {
         lastCard = c;
-        await card2.setInnerHTML(c);
+        await card3.setInnerHTML(c);
       }
       const d = dotHtml(t);
       if (d !== lastDot) {
@@ -2608,7 +2914,7 @@ ${themeVars("[x-goei-prog]")}
         clearHide();
         if (!phone2 && visible2) void setOpen(true);
       }
-      if (t?.endAt && open4 && hideTimer === void 0) {
+      if (t?.endAt && open3 && hideTimer === void 0) {
         hideTimer = setTimeout(() => {
           hideTimer = void 0;
           void setOpen(false);
@@ -2657,8 +2963,8 @@ ${themeVars("[x-goei-prog]")}
       if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
       const x = ev.clientX;
       const y = ev.clientY;
-      const grab = open4;
-      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card2.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
+      const grab = open3;
+      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card3.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
     };
     const onMove = (ev) => {
       if (!drag || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
@@ -2682,23 +2988,23 @@ ${themeVars("[x-goei-prog]")}
         }
       });
     };
-    const onClick2 = async (ev) => {
+    const onClick = async (ev) => {
       if (!visible2) return;
       await loop;
       if (moved) return;
-      if (!open4) {
+      if (!open3) {
         if (inside(await rectOf(dot2), ev.clientX, ev.clientY)) {
           clearHide();
           await setOpen(true);
         }
         return;
       }
-      if (inside(await rectOf(await card2.querySelector("[data-grip]")), ev.clientX, ev.clientY)) {
+      if (inside(await rectOf(await card3.querySelector("[data-grip]")), ev.clientX, ev.clientY)) {
         clearHide();
         await setOpen(false);
         return;
       }
-      if (inside(await rectOf(card2), ev.clientX, ev.clientY)) return;
+      if (inside(await rectOf(card3), ev.clientX, ev.clientY)) return;
       const t = progressTurn();
       if (!t || t.endAt || Date.now() - t.at >= WATCHDOG) {
         clearHide();
@@ -2722,7 +3028,7 @@ ${themeVars("[x-goei-prog]")}
         [docTarget, "pointermove", onMove],
         [docTarget, "pointerup", onUp],
         [docTarget, "pointercancel", onUp],
-        [docTarget, "click", onClick2]
+        [docTarget, "click", onClick]
       ]) {
         ids.push({ target, type, id: await target.addEventListener(type, fn2, { passive: true }) });
       }
@@ -2768,509 +3074,10 @@ ${themeVars("[x-goei-prog]")}
   }
   var progressOn = () => getPrefs().progress !== false;
 
-  // src/host/game/fetch.ts
-  var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
-  var GameFileError = class extends Error {
-  };
-  var fetchStats = { requests: 0, bytes: 0 };
-  var TIMEOUT_MS2 = 2e4;
-  var TRIES = 3;
-  function timeout2(p2, ms, what) {
-    let t;
-    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${what} ${ms / 1e3}초 응답 없음`)), ms))]).finally(() => clearTimeout(t));
-  }
-  var fetchLog = [];
-  var getBytes2 = (name) => getBytesFrom(GAME_BASE, name);
-  async function getBytesFrom(base, name) {
-    if (!base) throw new GameFileError("받을 곳이 정해지지 않았어요. 파일로 넣어 주세요.");
-    const why = [];
-    for (let attempt = 1; attempt <= TRIES; attempt++) {
-      const url = `${base}/${name}?t=${Date.now()}`;
-      const legacy = risuai.risuFetch;
-      if (legacy) {
-        try {
-          const r = await timeout2(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), TIMEOUT_MS2, "risuFetch");
-          const b = r?.ok ? toBytes3(r.data) : null;
-          if (b?.length) return count(b);
-          why.push(`risuFetch ${r?.ok ? "빈 응답" : `실패(${r?.status ?? "?"})`}`);
-        } catch (e) {
-          why.push(e instanceof Error ? e.message : String(e));
-        }
-      }
-      try {
-        const res = await timeout2(risuai.nativeFetch(url, { method: "GET" }), TIMEOUT_MS2, "nativeFetch");
-        if (res.ok) {
-          const b = new Uint8Array(await timeout2(res.arrayBuffer(), TIMEOUT_MS2, "nativeFetch 본문"));
-          if (b.length) return count(b);
-          why.push("nativeFetch 빈 응답");
-        } else why.push(`nativeFetch 실패(${res.status})`);
-      } catch (e) {
-        why.push(e instanceof Error ? e.message : String(e));
-      }
-      if (attempt < TRIES) await new Promise((r) => setTimeout(r, 1e3 * attempt));
-    }
-    const msg = `${name} 받기 실패: ${why.join(" · ")}`;
-    fetchLog.push(msg);
-    console.log(`[goei] ${msg}`);
-    throw new GameFileError(`${name}을(를) ${TRIES}번 시도했지만 받지 못했어요 (${why.slice(-2).join(" · ")}). 다시 받기를 눌러 주세요.`);
-  }
-  function count(b) {
-    fetchStats.requests++;
-    fetchStats.bytes += b.length;
-    return b;
-  }
-  var getText2 = async (name) => new TextDecoder().decode(await getBytes2(name)).replace(/^﻿/, "");
-  async function getParts(parts, onPart, base = GAME_BASE) {
-    const bufs = [];
-    for (const [i, p2] of parts.entries()) {
-      bufs.push(await getBytesFrom(base, p2));
-      onPart?.(i + 1, parts.length);
-    }
-    const out = new Uint8Array(bufs.reduce((n3, b) => n3 + b.length, 0));
-    let at = 0;
-    for (const b of bufs) out.set(b, at), at += b.length;
-    return out;
-  }
-  var index = null;
-  function gameIndex() {
-    index ??= (async () => {
-      let v;
-      try {
-        v = JSON.parse(await getText2("index.json"));
-      } catch {
-        throw new GameFileError("게임 파일 목록을 받지 못했어요.");
-      }
-      if (!v || typeof v.version !== "string" || !Array.isArray(v.code?.parts) || !Array.isArray(v.packs)) throw new GameFileError("게임 파일 목록이 올바르지 않아요.");
-      return v;
-    })();
-    index.catch(() => index = null);
-    return index;
-  }
-  function base643(b) {
-    let out = "";
-    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
-    return btoa(out);
-  }
-  var unbase64 = (s8) => Uint8Array.from(atob(s8), (c) => c.charCodeAt(0));
-
-  // src/host/game/packs.ts
-  var MIME3 = {
-    png: "image/png",
-    webp: "image/webp",
-    avif: "image/avif",
-    gif: "image/gif",
-    jpg: "image/jpeg",
-    ogg: "audio/ogg",
-    mp3: "audio/mpeg",
-    m4a: "audio/mp4",
-    wav: "audio/wav",
-    opus: "audio/ogg",
-    json: "application/json",
-    txt: "text/plain"
-  };
-  function parseGamePack(b) {
-    if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
-    const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
-    let head3;
-    try {
-      head3 = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
-    } catch {
-      return null;
-    }
-    if (typeof head3.id !== "string" || !Array.isArray(head3.files)) return null;
-    const at = 12 + len;
-    const files = /* @__PURE__ */ new Map();
-    for (const row11 of head3.files) {
-      if (!Array.isArray(row11)) return null;
-      const [name, start3, size] = row11;
-      if (typeof name !== "string" || typeof start3 !== "number" || typeof size !== "number" || at + start3 + size > b.length) return null;
-      files.set(name, b.subarray(at + start3, at + start3 + size));
-    }
-    return { id: head3.id, hash: typeof head3.hash === "string" ? head3.hash : "", atlas: head3.atlas ?? null, files };
-  }
-  function createPackStore(cfg) {
-    const memo = /* @__PURE__ */ new Map();
-    function stored2(id2) {
-      let p2 = memo.get(id2);
-      if (!p2) {
-        p2 = (async () => {
-          try {
-            const raw = await risuai.pluginStorage.getItem(cfg.key(id2));
-            const v = typeof raw === "string" ? JSON.parse(raw) : null;
-            return v && typeof v.hash === "string" && v.files && typeof v.files === "object" ? v : null;
-          } catch {
-            return null;
-          }
-        })();
-        memo.set(id2, p2);
-      }
-      return p2;
-    }
-    async function installGamePack2(bytes, expect, hash5) {
-      const pack4 = parseGamePack(bytes);
-      if (!pack4) throw new GameFileError("괴이 ː ANOMALY 게임 팩 파일이 아니에요.");
-      if (expect && pack4.id !== expect) throw new GameFileError(`다른 팩이에요 (${pack4.id}).`);
-      const files = {};
-      for (const [name, b] of pack4.files) files[name] = [MIME3[name.split(".").pop().toLowerCase()] ?? "application/octet-stream", base643(b)];
-      const value = { hash: hash5 || pack4.hash, atlas: pack4.atlas, bytes: bytes.length, files };
-      await risuai.pluginStorage.setItem(cfg.key(pack4.id), JSON.stringify(value));
-      release(pack4.id);
-      memo.set(pack4.id, Promise.resolve(value));
-      return pack4.id;
-    }
-    async function downloadGamePack2(entry3, onPart) {
-      const bytes = await getParts(entry3.parts, onPart, cfg.base);
-      if (bytes.length !== entry3.bytes) throw new GameFileError("팩을 끝까지 받지 못했어요.");
-      await installGamePack2(bytes, entry3.id, entry3.hash);
-    }
-    async function packStateOf2(entry3) {
-      const s8 = await stored2(entry3.id);
-      return !s8 ? "none" : s8.hash !== entry3.hash ? "old" : "ready";
-    }
-    async function missingPacks2() {
-      const idx = await cfg.index();
-      const out = [];
-      for (const p2 of idx.packs) if (p2.required && await packStateOf2(p2) !== "ready") out.push(p2);
-      return out;
-    }
-    const urls4 = /* @__PURE__ */ new Map();
-    function release(id2) {
-      for (const u of urls4.get(id2)?.values() ?? []) URL.revokeObjectURL(u);
-      urls4.delete(id2);
-    }
-    function releaseAll2() {
-      for (const id2 of [...urls4.keys()]) release(id2);
-      memo.clear();
-    }
-    const liveUrls2 = () => [...urls4.values()].reduce((n3, m) => n3 + m.size, 0);
-    async function fileUrl(id2, file) {
-      const have = urls4.get(id2)?.get(file);
-      if (have) return have;
-      const s8 = await ensure2(id2);
-      const row11 = s8?.files[file] ?? s8?.files[`${file}.png`];
-      if (!row11) return "";
-      const u = URL.createObjectURL(new Blob([unbase64(row11[1])], { type: row11[0] }));
-      let m = urls4.get(id2);
-      if (!m) urls4.set(id2, m = /* @__PURE__ */ new Map());
-      m.set(file, u);
-      return u;
-    }
-    const fetching = /* @__PURE__ */ new Map();
-    async function ensure2(id2) {
-      const have = await stored2(id2);
-      if (have) return have;
-      let p2 = fetching.get(id2);
-      if (!p2) {
-        p2 = (async () => {
-          try {
-            const entry3 = (await cfg.index()).packs.find((e) => e.id === id2);
-            if (!entry3) return null;
-            await downloadGamePack2(entry3);
-            return await stored2(id2);
-          } catch {
-            return null;
-          } finally {
-            fetching.delete(id2);
-          }
-        })();
-        fetching.set(id2, p2);
-      }
-      return p2;
-    }
-    const assets = {
-      ready: async (id2) => !!await ensure2(id2),
-      url: fileUrl,
-      atlas: async (id2) => (await ensure2(id2))?.atlas ?? null,
-      bytes: async (id2, file) => {
-        const row11 = (await ensure2(id2))?.files[file];
-        return row11 ? unbase64(row11[1]) : null;
-      },
-      list: async () => {
-        let entries2 = [];
-        try {
-          entries2 = (await cfg.index()).packs;
-        } catch {
-        }
-        return Promise.all(
-          entries2.map(async (e) => {
-            const st = await packStateOf2(e);
-            return { id: e.id, bytes: e.bytes, ready: st === "ready", old: st === "old" };
-          })
-        );
-      }
-    };
-    return { assets, installGamePack: installGamePack2, downloadGamePack: downloadGamePack2, packStateOf: packStateOf2, missingPacks: missingPacks2, releaseAll: releaseAll2, liveUrls: liveUrls2 };
-  }
-  var game = createPackStore({ key: (id2) => `goei:game:pack:${id2}`, index: gameIndex, base: GAME_BASE });
-  var { assets: gameAssets, installGamePack, downloadGamePack, packStateOf, missingPacks, releaseAll, liveUrls } = game;
-
-  // src/host/vs.ts
-  var VS_BASE = UPDATE_BASE ? `${UPDATE_BASE}/vs` : "";
-  var CODE_KEY = "goei:vs:code";
-  var VERSION = true ? "0.21.9" : "";
-  var COMMON = "vs-common";
-  var index2 = null;
-  function vsIndex() {
-    index2 ??= (async () => {
-      let v;
-      try {
-        v = JSON.parse(await getTextFrom("index.json"));
-      } catch {
-        throw new GameFileError("대전 자료 목록을 받지 못했어요.");
-      }
-      if (!v || !Array.isArray(v.code?.parts) || !Array.isArray(v.packs)) throw new GameFileError("대전 자료 목록이 올바르지 않아요.");
-      return v;
-    })();
-    index2.catch(() => index2 = null);
-    return index2;
-  }
-  var getTextFrom = async (name) => new TextDecoder().decode(await getParts([name], void 0, VS_BASE)).replace(/^﻿/, "");
-  var store = createPackStore({ key: (id2) => `goei:vs:pack:${id2}`, index: vsIndex, base: VS_BASE });
-  var codeVersion = (code2) => /^\/\/ goei-vs (\S+)/.exec(code2)?.[1] ?? null;
-  async function savedCode() {
-    try {
-      const v = await risuai.pluginStorage.getItem(CODE_KEY);
-      return typeof v === "string" && codeVersion(v) === VERSION ? v : null;
-    } catch {
-      return null;
-    }
-  }
-  async function npcIds() {
-    try {
-      const b = await store.assets.bytes(COMMON, "roster.json");
-      const r = b ? JSON.parse(new TextDecoder().decode(b)) : null;
-      return new Set((r?.chars ?? []).filter((c) => c.npc).map((c) => c.pack));
-    } catch {
-      return /* @__PURE__ */ new Set();
-    }
-  }
-  async function vsDataState() {
-    const idx = await vsIndex();
-    const common = idx.packs.find((p2) => p2.id === COMMON);
-    const code2 = await savedCode();
-    let st = common ? await store.packStateOf(common) : "none";
-    if (st === "ready" && !code2) st = "old";
-    const npc = st === "ready" ? await npcIds() : /* @__PURE__ */ new Set();
-    const out = { common: st, named: [0, 0], npc: [0, 0], commonBytes: (common?.bytes ?? 0) + (idx.code.length ?? 0), namedBytes: 0, npcBytes: 0 };
-    for (const p2 of idx.packs) {
-      if (p2.id === COMMON) continue;
-      const k = npc.has(p2.id) ? "npc" : "named";
-      out[k][1]++;
-      out[k === "npc" ? "npcBytes" : "namedBytes"] += p2.bytes;
-      if (await store.packStateOf(p2) === "ready") out[k][0]++;
-    }
-    return out;
-  }
-  async function downloadVsCommon(onProgress2) {
-    const idx = await vsIndex();
-    if (idx.version !== VERSION) throw new GameFileError("아직 이 판의 대전 자료가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.");
-    const common = idx.packs.find((p2) => p2.id === COMMON);
-    if (!common) throw new GameFileError("대전 공용 자료가 목록에 없어요.");
-    const total = idx.code.parts.length + common.parts.length;
-    const code2 = new TextDecoder().decode(await getParts(idx.code.parts, (d) => onProgress2?.(d, total), VS_BASE));
-    if (code2.length !== idx.code.length || codeVersion(code2) !== VERSION) throw new GameFileError("대전 코드를 끝까지 받지 못했어요.");
-    await risuai.pluginStorage.setItem(CODE_KEY, code2);
-    mod = null;
-    await store.downloadGamePack(common, (d) => onProgress2?.(idx.code.parts.length + d, total));
-  }
-  async function downloadVsChars(which, onProgress2) {
-    const idx = await vsIndex();
-    const npc = await npcIds();
-    const want = idx.packs.filter((p2) => p2.id !== COMMON && (which === "all" || !npc.has(p2.id)));
-    const todo = [];
-    for (const p2 of want) if (await store.packStateOf(p2) !== "ready") todo.push(p2);
-    for (const [i, p2] of todo.entries()) {
-      await store.downloadGamePack(p2);
-      onProgress2?.(i + 1, todo.length);
-    }
-  }
-  var mod = null;
-  async function loadVsCode() {
-    if (mod) return mod;
-    const code2 = await savedCode();
-    if (!code2) throw new GameFileError("대전 자료를 먼저 받아 주세요.");
-    const g2 = globalThis;
-    delete g2.__goeiVersus;
-    const nonce = [...document.querySelectorAll("script")].map((s9) => s9.nonce).find(Boolean);
-    const s8 = document.createElement("script");
-    if (nonce) s8.nonce = nonce;
-    s8.textContent = code2;
-    document.head.append(s8);
-    s8.remove();
-    const api = g2.__goeiVersus;
-    delete g2.__goeiVersus;
-    if (!api || typeof api.start !== "function") throw new GameFileError("대전 코드를 실행하지 못했어요.");
-    mod = api;
-    return api;
-  }
-  var CSS4 = `
-html.goei-vs-on, html.goei-vs-on body { background: transparent !important; }
-html.goei-vs-on body > :not(#goei-vs) { display: none !important; }
-#goei-vs { position: fixed; inset: 0; display: none; }
-html.goei-vs-on #goei-vs { display: block; }
-#goei-vs .goei-engine, #goei-vs .gs, #goei-vs .gs-stage { background: transparent !important; }
-#goei-vs .gs-touch, #goei-vs .tp { display: none !important; }
-`;
-  var box2 = null;
-  var handle = null;
-  var chatKey7 = "";
-  var open3 = false;
-  var fitTimer;
-  var frame = null;
-  var clickId = null;
-  var KEEP = ["top", "left", "width", "height", "pointerEvents", "background", "backgroundColor", "colorScheme"];
-  var saved = {};
-  var vsDevice = () => matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var vsOpen = () => open3;
-  async function rootDoc() {
-    return risuai.getRootDocument().catch(() => null);
-  }
-  async function ourFrame(doc2) {
-    const list4 = await doc2.querySelectorAll("body > iframe");
-    const n3 = await list4.length();
-    for (let i = 0; i < n3; i++) {
-      const f = await list4.at(i);
-      if (!f) continue;
-      const z = await f.getStyle("zIndex");
-      if ((z === "49" || z === "1000") && await f.getStyle("display") !== "none") return f;
-    }
-    return null;
-  }
-  async function chatRect(doc2) {
-    const screen = await doc2.querySelector(".default-chat-screen");
-    if (!screen) return null;
-    const r = await screen.getBoundingClientRect();
-    let bottom = r.bottom;
-    const input3 = await screen.querySelector("textarea");
-    if (input3) {
-      const ir = await input3.getBoundingClientRect();
-      if (ir.height > 0 && ir.top > r.top + 100) bottom = Math.min(bottom, ir.top - 8);
-    }
-    return { left: r.left, top: r.top, width: r.width, height: Math.max(200, bottom - r.top) };
-  }
-  async function fit(doc2) {
-    if (!frame) return false;
-    const r = await chatRect(doc2);
-    if (!r) return false;
-    await frame.setStyle("top", `${Math.round(r.top)}px`);
-    await frame.setStyle("left", `${Math.round(r.left)}px`);
-    await frame.setStyle("width", `${Math.round(r.width)}px`);
-    await frame.setStyle("height", `${Math.round(r.height)}px`);
-    return true;
-  }
-  async function setPass(pass) {
-    await frame?.setStyle("pointerEvents", pass ? "none" : "auto").catch(() => {
-    });
-  }
-  async function toggleVersus(key, goSettings) {
-    if (open3) return closeVersus();
-    if (await savedCode() === null || await store.assets.ready(COMMON).catch(() => false) === false) {
-      goSettings();
-      return;
-    }
-    const doc2 = await rootDoc();
-    if (!doc2) {
-      goSettings();
-      return;
-    }
-    let m;
-    try {
-      m = await loadVsCode();
-    } catch (e) {
-      console.log("[goei] 대전 코드", e);
-      goSettings();
-      return;
-    }
-    if (handle && chatKey7 !== key) {
-      handle.destroy();
-      handle = null;
-      box2?.remove();
-      box2 = null;
-    }
-    chatKey7 = key;
-    if (!document.getElementById("goei-vs-css")) {
-      const st = document.createElement("style");
-      st.id = "goei-vs-css";
-      st.textContent = CSS4;
-      document.head.append(st);
-    }
-    if (!box2) {
-      box2 = document.createElement("div");
-      box2.id = "goei-vs";
-      document.body.append(box2);
-    }
-    document.documentElement.classList.add("goei-vs-on");
-    await risuai.showContainer("fullscreen");
-    frame = await ourFrame(doc2);
-    if (frame) {
-      saved = {};
-      for (const k of KEEP) saved[k] = await frame.getStyle(k).catch(() => "");
-      await frame.setStyle("background", "transparent");
-      await frame.setStyle("backgroundColor", "transparent");
-      await frame.setStyle("colorScheme", "normal");
-      await frame.setStyle("zIndex", "49");
-      await fit(doc2);
-    }
-    open3 = true;
-    if (!handle) {
-      handle = m.start(box2, store.assets, { onClose: () => void closeVersus() });
-    } else handle.resume();
-    const syncPass = () => void setPass(!box2?.querySelector(".vs-sel"));
-    syncPass();
-    clearInterval(fitTimer);
-    fitTimer = setInterval(() => {
-      if (open3) {
-        void fit(doc2);
-        syncPass();
-      }
-    }, 700);
-    const take = () => {
-      void frame?.focus().catch(() => {
-      });
-      window.focus();
-    };
-    take();
-    if (!clickId) {
-      const target = doc2;
-      if (typeof target.addEventListener === "function") {
-        clickId = { target, id: await target.addEventListener("pointerup", () => {
-          if (open3) setTimeout(take, 0);
-        }, { passive: true }) };
-      }
-    }
-    window.addEventListener("keydown", onEsc, true);
-  }
-  function onEsc(e) {
-    if (e.key !== "Escape" || !open3 || box2?.querySelector(".vs-sel")) return;
-    e.preventDefault();
-    void closeVersus();
-  }
-  async function closeVersus() {
-    if (!open3) return;
-    open3 = false;
-    clearInterval(fitTimer);
-    window.removeEventListener("keydown", onEsc, true);
-    handle?.pause();
-    if (clickId) {
-      await clickId.target.removeEventListener("pointerup", clickId.id).catch(() => {
-      });
-      clickId = null;
-    }
-    document.documentElement.classList.remove("goei-vs-on");
-    if (frame) for (const [k, v] of Object.entries(saved)) await frame.setStyle(k, v).catch(() => {
-    });
-    frame = null;
-    await risuai.hideContainer();
-  }
-  async function yieldVersus() {
-    if (open3) await closeVersus();
-  }
-
   // src/host/container.ts
   var BELOW_ALERTS = "49";
   var doc;
   async function showWindow() {
-    await yieldVersus();
     if (doc === void 0) doc = await risuai.getRootDocument().catch(() => null);
     await risuai.showContainer("fullscreen");
     if (!doc) return;
@@ -3369,7 +3176,7 @@ html.goei-vs-on #goei-vs { display: block; }
     await Promise.all([worker(), worker(), worker(), worker()]);
     const paths = new Array(got.length);
     let j = 0;
-    let saved2 = 0;
+    let saved = 0;
     progress4(0, "save");
     const saver = async () => {
       while (j < got.length) {
@@ -3382,19 +3189,19 @@ html.goei-vs-on #goei-vs { display: block; }
         }
         if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
         paths[k] = path;
-        progress4(++saved2, "save");
+        progress4(++saved, "save");
       }
     };
     await Promise.all([saver(), saver(), saver(), saver()]);
     return mergePictures(assets, got.map(([p2], k) => [p2, paths[k]]));
   }
-  function mergePictures(assets, saved2) {
+  function mergePictures(assets, saved) {
     const rows3 = (Array.isArray(assets) ? assets : []).map((r) => isRow5(r) ? [...r] : r);
     const at = /* @__PURE__ */ new Map();
     for (const r of rows3) if (isRow5(r) && !at.has(r[0])) at.set(r[0], r);
-    for (const [p2, path] of saved2) {
-      const row11 = at.get(p2[0]);
-      if (row11) row11[1] = path, row11[2] = p2[2];
+    for (const [p2, path] of saved) {
+      const row8 = at.get(p2[0]);
+      if (row8) row8[1] = path, row8[2] = p2[2];
       else {
         const fresh3 = [p2[0], path, p2[2]];
         rows3.push(fresh3);
@@ -3437,4 +3244,4 @@ html.goei-vs-on #goei-vs { display: block; }
       lore,
       firstMessage: char.firstMessage,
       loreSettings: char.loreSettings,
-      alternateGreetings: char.a
+      alternate

@@ -1,24 +1,530 @@
-4 = root3.querySelector(".ph-drawer");
-    const grip = box4?.querySelector(".ph-grip");
-    if (!box4 || !grip) return;
-    const open4 = () => box4.classList.contains("open");
-    grip.addEventListener("click", () => set(box4, !open4()));
+ fill3(photos.get(asset));
+      else void loadPhoto(asset).then(fill3);
+    });
+  }
+  function zoomPhoto(src, alt) {
+    const box3 = document.createElement("div");
+    box3.className = "gx at-zoom";
+    box3.setAttribute("role", "dialog");
+    box3.setAttribute("aria-label", "사진 크게 보기");
+    box3.innerHTML = `<img src="${esc6(src)}" alt="${esc6(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
+    const close3 = () => {
+      box3.remove();
+      document.removeEventListener("keydown", key, true);
+    };
+    const key = (ev) => {
+      if (ev.key !== "Escape") return;
+      ev.stopPropagation();
+      close3();
+    };
+    box3.addEventListener("click", close3);
+    document.addEventListener("keydown", key, true);
+    document.body.appendChild(box3);
+  }
+  function card(kind, text5, asset) {
+    const label2 = ATTACH_LABELS[kind];
+    if (kind === "image") {
+      const src = asset ? photos.get(asset) : null;
+      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}" data-asset="${esc6(asset ?? "")}" alt="${esc6(text5 || label2)}" loading="lazy"></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
+    }
+    if (kind === "file") {
+      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc6(text5)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
+    }
+    if (kind === "link") {
+      const url = attachUrl(text5);
+      const go3 = url ? `<a class="at-go" href="${esc6(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
+      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc6(text5)}</b>${go3}</div></div>`;
+    }
+    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc6(text5)}</b><small>선물이 도착했습니다</small></div></div>`;
+    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc6(text5).replace(/\n/g, "<br>")}</span></div></div>`;
+  }
+  var sitePic = null;
+  function setSitePicSource(fn2) {
+    sitePic = fn2;
+  }
+  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
+  var camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+  function boardCard(kind, text5, asset, url) {
+    if (kind === "image" || url) {
+      const src = url ?? (asset ? photos.get(asset) : null);
+      const data3 = url ? "" : ` data-asset="${esc6(asset ?? "")}"`;
+      return `<figure class="ax ax-img at-card-image${!url && asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}"${data3} alt="${esc6(text5)}" loading="lazy"><span class="zm" aria-hidden="true">⤢</span></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${kind === "image" && text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
+    }
+    if (kind === "photo") return `<figure class="ax ax-ph"><div class="fr">${camera}<p>${esc6(text5).replace(/\n/g, "<br>")}</p></div></figure>`;
+    if (kind === "video") return `<figure class="ax ax-vd"><div class="fr"><span class="pl" aria-hidden="true">▶</span><p>${esc6(text5).replace(/\n/g, "<br>")}</p><div class="bar" aria-hidden="true"><span>▶</span><i></i><span>0:00</span></div></div></figure>`;
+    return card(kind, text5, asset);
+  }
+  function textWithPics(text5, board2) {
+    const out = [];
+    let last2 = 0;
+    const para = (t) => t.trim() ? out.push(`<p>${esc6(t.trim()).replace(/\n/g, "<br>")}</p>`) : 0;
+    for (const m of text5.matchAll(SITE_PIC)) {
+      para(text5.slice(last2, m.index));
+      const url = sitePic?.(m[1]) ?? null;
+      out.push(url ? board2 ? boardCard("image", "", void 0, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(url)}" alt="" loading="lazy"></button></figure>` : board2 ? boardCard("photo", m[1].replace(/_[a-z ]+$/i, "")) : card("photo", m[1]));
+      last2 = m.index + m[0].length;
+    }
+    para(text5.slice(last2));
+    return out;
+  }
+  function boardFiles(text5) {
+    return bodyParts(text5).filter((p2) => p2.kind === "file" || p2.kind === "link").map((p2) => ({ kind: p2.kind, text: p2.text, url: p2.kind === "link" ? attachUrl(p2.text) : null }));
+  }
+  function boardThumb(text5) {
+    let desc = false;
+    for (const p2 of bodyParts(text5)) {
+      if (p2.kind === "image" && p2.asset && photos.get(p2.asset)) return { url: photos.get(p2.asset) };
+      if (p2.kind === "text") {
+        for (const m of p2.text.matchAll(SITE_PIC)) {
+          const url = sitePic?.(m[1]) ?? null;
+          if (url) return { url };
+          desc = true;
+        }
+      }
+      if (p2.kind === "photo" || p2.kind === "image") desc = true;
+    }
+    return desc ? { url: null } : null;
+  }
+  function attachBody(text5, board2 = false, noFiles = false) {
+    const out = [];
+    const files = [];
+    for (const p2 of bodyParts(text5)) {
+      if (p2.kind === "text") out.push(...textWithPics(p2.text, board2));
+      else if (board2 && (p2.kind === "file" || p2.kind === "link")) {
+        if (noFiles) continue;
+        const url = p2.kind === "link" ? attachUrl(p2.text) : null;
+        files.push(`<div class="r"><span class="ic" aria-hidden="true">${p2.kind === "file" ? "📎" : "🔗"}</span>${url ? `<a href="${esc6(url)}" target="_blank" rel="noopener noreferrer">${esc6(p2.text)}</a>` : `<span>${esc6(p2.text)}</span>`}</div>`);
+      } else out.push(board2 ? boardCard(p2.kind, p2.text, p2.asset) : card(p2.kind, p2.text, p2.asset));
+    }
+    if (files.length) out.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join("")}</div>`);
+    return out.join("");
+  }
+
+  // src/host/assets.ts
+  var MIME2 = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
+  var cache8 = /* @__PURE__ */ new Map();
+  function toBytes3(data3) {
+    if (data3 instanceof Uint8Array) return data3;
+    if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
+    if (Array.isArray(data3)) return new Uint8Array(data3);
+    if (data3 && typeof data3 === "object") {
+      const values = Object.values(data3);
+      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
+    }
+    return null;
+  }
+  async function load(path, ext) {
+    try {
+      const data3 = await risuai.readImage(path);
+      if (typeof data3 === "string") return data3.startsWith("data:") || data3.startsWith("blob:") || data3.startsWith("http") ? data3 : null;
+      const bytes = toBytes3(data3);
+      if (!bytes?.length) return null;
+      return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
+    } catch (error) {
+      console.log(`[goei] 이미지를 읽지 못했어요 (${path}): ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  }
+  var isRow2 = (a) => Array.isArray(a) && typeof a[0] === "string" && typeof a[1] === "string";
+  var modRows = [];
+  var modVer = 0;
+  var modBusy = null;
+  function loadModuleAssets() {
+    modBusy ??= (async () => {
+      let rows3 = [];
+      try {
+        const idx = await risuai.getCurrentCharacterIndex();
+        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
+        rows3 = (char?.additionalAssets ?? []).filter(isRow2);
+      } catch {
+      }
+      try {
+        const db = await risuai.getDatabase(["modules", "enabledModules"]);
+        const on3 = new Set(db?.enabledModules ?? []);
+        const mods = [...db?.modules ?? []].sort((a, b) => Number(on3.has(b.id)) - Number(on3.has(a.id)));
+        rows3 = rows3.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow2) : []));
+      } catch {
+      }
+      const changed = JSON.stringify(rows3) !== JSON.stringify(modRows);
+      if (changed) modRows = rows3, modVer++;
+      return changed;
+    })().finally(() => {
+      modBusy = null;
+    });
+    return modBusy;
+  }
+  var moduleAssetStamp = () => modVer;
+  var modIndex = null;
+  var modIndexVer = -1;
+  function modRow(name) {
+    if (!modIndex || modIndexVer !== modVer) {
+      modIndex = { exact: /* @__PURE__ */ new Map(), lower: /* @__PURE__ */ new Map() };
+      for (const r of modRows) {
+        if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
+        if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
+      }
+      modIndexVer = modVer;
+    }
+    return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
+  }
+  function modulePicker() {
+    if (!modRows.length) return void 0;
+    return (name) => modRow(name)?.[0] ?? null;
+  }
+  function findRow(char, name) {
+    const lower = name.toLowerCase();
+    const card3 = (char.additionalAssets ?? []).filter(isRow2);
+    return card3.find((a) => a[0] === name) ?? card3.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
+  }
+  function assetNames(char) {
+    const card3 = (char.additionalAssets ?? []).filter(isRow2);
+    return [...new Set([...card3, ...modRows].map((r) => r[0]))].filter((n3) => !/^map\d+$/i.test(n3));
+  }
+  var DEFAULT_CROP = "50,16,44";
+  var AGENT_CROPS = {
+    "Aestheticism": "53,18,40",
+    "Aileen": "43,21,46",
+    "Baek Sa-heon": "50,18,44",
+    "Cha Yeo-jin": "54,18,44",
+    "Cho Seong-choon": "48,18,44",
+    "Do Pil-heon": "48,16,44",
+    "Go Young-eun": "46,16,44",
+    "Jang Heo-un": "52,18,44",
+    "Jay": "53,16,44",
+    "Jyaldi": "56,18,44",
+    "Kwak Je-gang": "56,19,44",
+    "Kyuras": "49,19,44",
+    "Lee Do-hyeong": "61,16,44",
+    "Ma Deok-hee": "49,19,44",
+    "Mun Hye-ran": "46,18,44",
+    "Secriem": "54,16,44",
+    "Seo Yun-ji": "46,18,44",
+    "Spangdal": "52,18,44"
+  };
+  var personCrop = (p2) => parseCrop(p2.crop) ?? parseCrop(!p2.photo && AGENT_CROPS[p2.english ?? ""] || DEFAULT_CROP);
+  function parseCrop(s8) {
+    const n3 = String(s8 ?? "").split(",").map(Number);
+    if (n3.length !== 3 || n3.some((x) => !Number.isFinite(x))) return null;
+    const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+    return [c(n3[0], 0, 100), c(n3[1], 0, 100), c(n3[2], 5, 100)];
+  }
+  function splitPic(pic3) {
+    const at = pic3.lastIndexOf("#");
+    const [cut3, t] = at > 0 ? pic3.slice(at + 1).split("~") : ["", ""];
+    const crop = at > 0 ? parseCrop(cut3) : null;
+    const tall = Number(t);
+    return crop ? { name: pic3.slice(0, at), crop, ...tall > 1 && tall <= 4 ? { tall } : {} } : { name: pic3, crop: null };
+  }
+  function mainPic(char, p2) {
+    const en2 = p2.english ?? "";
+    if (p2.photo) return p2.photo;
+    if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
+    if (en2 && hasAsset(char, en2)) return en2;
+    return p2.shared?.find((n3) => hasAsset(char, n3)) ?? "";
+  }
+  function facePic(char, p2, person = false) {
+    if (p2.face) return p2.face;
+    const en2 = p2.english ?? "";
+    if (person && !p2.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p2).join(",")}`;
+    if (en2 && hasAsset(char, en2)) return en2;
+    const main = mainPic(char, p2);
+    const crop = person ? personCrop(p2) : parseCrop(p2.crop);
+    return main && crop ? `${main}#${crop.join(",")}` : main;
+  }
+  var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
+  function assetUrl(char, name) {
+    const row8 = findRow(char, name);
+    if (!row8) return Promise.resolve(null);
+    const key = `${String(char.chaId ?? char.name ?? "")}|${row8[1]}`;
+    let hit4 = cache8.get(key);
+    if (!hit4) {
+      hit4 = load(row8[1], String(row8[2] ?? row8[1].split(".").pop() ?? ""));
+      cache8.set(key, hit4);
+      void hit4.then((url) => {
+        if (!url) cache8.delete(key);
+      });
+    }
+    return hit4;
+  }
+  setAssetCheck(hasAsset);
+
+  // src/ui/images.ts
+  var urls = /* @__PURE__ */ new Map();
+  var redraw = () => {
+  };
+  var queued = false;
+  function forgetImages() {
+    urls.clear();
+    schedule();
+  }
+  function setImageRedraw(fn2) {
+    redraw = fn2;
+  }
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    setTimeout(() => {
+      queued = false;
+      redraw();
+    }, 30);
+  }
+  var MAX_SIDE = 720;
+  var FACE_SIDE = 256;
+  async function shrink(url, crop = null, tall = 1) {
+    try {
+      const im = new Image();
+      im.src = url;
+      await im.decode();
+      const W3 = im.naturalWidth;
+      const H2 = im.naturalHeight;
+      let [sx, sy, sw2, sh2] = [0, 0, W3, H2];
+      if (crop) {
+        const side = Math.min(W3, H2, crop[2] / 100 * W3);
+        sx = Math.min(W3 - side, Math.max(0, crop[0] / 100 * W3 - side / 2));
+        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
+        sw2 = sh2 = side;
+        if (tall > 1) sh2 = Math.max(side, Math.min(H2 - sy, side * tall));
+      }
+      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw2, sh2));
+      if (!crop && !(scale < 1)) return url;
+      const canvas2 = document.createElement("canvas");
+      canvas2.width = Math.max(1, Math.round(sw2 * scale));
+      canvas2.height = Math.max(1, Math.round(sh2 * scale));
+      const g2 = canvas2.getContext("2d");
+      if (!g2) return url;
+      g2.imageSmoothingQuality = "high";
+      g2.drawImage(im, sx, sy, sw2, sh2, 0, 0, canvas2.width, canvas2.height);
+      const blob = await new Promise((res) => canvas2.toBlob(res, "image/webp", 0.88));
+      return blob ? URL.createObjectURL(blob) : url;
+    } catch {
+      return url;
+    }
+  }
+  function imageUrl(char, pic3) {
+    if (!pic3) return null;
+    const key = `${String(char.chaId ?? char.name ?? "")}|${pic3}`;
+    const hit4 = urls.get(key);
+    if (hit4 === void 0) {
+      urls.set(key, "loading");
+      const { name, crop, tall } = splitPic(pic3);
+      void assetUrl(char, name).then(async (raw) => {
+        const url = raw ? await shrink(raw, crop, tall) : null;
+        urls.set(key, url);
+        if (url) schedule();
+      });
+      return null;
+    }
+    return hit4 === "loading" ? null : hit4;
+  }
+  var escAttr = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function agentFace(char, english) {
+    if (!english) return "";
+    const a = readDirectory(char.globalLore ?? []).agents.find((x) => x.english === english);
+    return facePic(char, a ?? { english }, true);
+  }
+  function factionPic(char, f, slot2 = "main") {
+    const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
+    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
+    return slot2 === "face" ? facePic(char, src) : mainPic(char, src);
+  }
+  function picAvatar(char, pic3, name, cls = "") {
+    const url = imageUrl(char, pic3);
+    const first = escAttr(Array.from(name.trim())[0] ?? "?");
+    return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
+  }
+  var avatar = (char, english, name, cls = "") => picAvatar(char, agentFace(char, english), name, cls);
+  function prefetchFactions(char) {
+    for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
+  }
+  var stLabel = (st) => st === "작전투입" ? "작전" : st;
+  var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
+  var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
+  function agentInner(char, p2, st, situation = "", act2 = "") {
+    const role = [p2.department, p2.rank].filter(Boolean).join(" · ");
+    return `<span class="gx-acard-side">${avatar(char, p2.english, p2.name, "sq")}${act2}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p2.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+  }
+  function showIdCard(html, act2, cls = "") {
+    document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
+    const box3 = document.createElement("div");
+    box3.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
+    box3.setAttribute("role", "dialog");
+    box3.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
+    if (theme) box3.setAttribute("data-theme", theme);
+    box3.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (btn && act2 && box3.contains(btn)) {
+        box3.remove();
+        act2(btn.dataset.action, btn.dataset.value);
+        return;
+      }
+      if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
+      box3.remove();
+    });
+    document.body.appendChild(box3);
+  }
+
+  // src/core/josa.ts
+  function josa(word, withBatchim, without) {
+    const last2 = word.trim().slice(-1);
+    const code2 = last2.charCodeAt(0) - 44032;
+    if (!(code2 >= 0 && code2 <= 11171)) return `${word}${withBatchim}(${without})`;
+    return `${word}${code2 % 28 ? withBatchim : without}`;
+  }
+
+  // src/host/prefs.ts
+  var KEY = "goei:prefs";
+  async function loadPrefs() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(KEY);
+      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
+    } catch (error) {
+      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      return getPrefs();
+    }
+  }
+  async function saveVarDefaults(prefixes, state) {
+    const mine2 = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    await savePrefs((p2) => {
+      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(p2.vars ?? {})])].filter(mine2);
+      const vars = { ...p2.vars ?? {} };
+      for (const k of keys) {
+        const v = state?.[k];
+        if (v === void 0 || v === null || v === "" || v === "null") delete vars[k];
+        else vars[k] = String(v);
+      }
+      return { ...p2, vars };
+    });
+  }
+  function loadVarDefaults(prefixes, state) {
+    const mine2 = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    const saved = getPrefs().vars ?? {};
+    const out = {};
+    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine2)) out[k] = String(saved[k] ?? "");
+    return out;
+  }
+  async function savePrefs(change) {
+    const next = setPrefs(change(structuredClone(getPrefs())));
+    await risuai.pluginStorage.setItem(KEY, JSON.stringify(next));
+    return next;
+  }
+
+  // src/ui/defaults.ts
+  var PREFIXES = {
+    ph: ["$ph_"],
+    /** 게시판 사이트 넷 (괴담넷·괴담갤·세정게·연어 마켓, 2026-11-08 사이트마다 따로) */
+    gn: ["$lb_cfg_lb-gn.", "$gn_storage_", "$lb_cfg_lb-gal.", "$gal_storage_", "$lb_cfg_lb-wpf.", "$wpf_storage_", "$lb_cfg_lb-sm.", "$sm_storage_"],
+    wiki: ["$nw_"],
+    /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
+    pp: ["$pp_"],
+    /** 기록 (core/journal/settings.ts JR): 채팅에 보고서 표시·일지 컨텍스트·상한 둘 */
+    jr: ["$jr_"]
+  };
+  var MAIN_PREFIXES = ["$gen_", "$pp_", "$it_"];
+  var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, "$st_col_", "$st_wallet_", "$sh_", "$cos_sh_", "$bm_sh_", "$hs_", "$cos_roll_", "$bm_roll_", "$bm_desk_", "$cos_ready", "$cos_truth", "$cos_fixed", "$net_joint", ...Object.values(PREFIXES).flat()])];
+  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", pp: "인물 기록", jr: "기록" };
+  var defaultsAsk = { pane: "", what: "" };
+  var defaultsButtons = (pane2, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane2}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="${pane2}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}기본값 불러오기</button></span>`;
+  function defaultsConfirm(pane2) {
+    if (defaultsAsk.pane !== pane2 || !defaultsAsk.what) return "";
+    const save4 = defaultsAsk.what === "save";
+    const text5 = save4 ? `지금 ${NAME[pane2]} 설정을 새 채팅 기본값으로 저장할까요?` : `저장해 둔 ${NAME[pane2]} 기본값을 이 채팅에 불러올까요?`;
+    return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text5}</p><div class="gx-row-btns"><button class="gx-mini${save4 ? " ps-save" : " danger"}" data-action="${pane2}-def-yes">${save4 ? "저장" : "불러오기"}</button><button class="gx-mini" data-action="${pane2}-def-no">취소</button></div></div>`;
+  }
+  async function defaultsAction(pane2, action, value, ctx2, refresh3) {
+    const sub = action.slice(pane2.length + 1);
+    if (sub === "def-ask") {
+      defaultsAsk.pane = pane2;
+      defaultsAsk.what = value === "save" || value === "load" ? value : "";
+      return "";
+    }
+    if (sub === "def-no") {
+      defaultsAsk.pane = "";
+      defaultsAsk.what = "";
+      return "";
+    }
+    if (sub !== "def-yes") return null;
+    const what = defaultsAsk.pane === pane2 ? defaultsAsk.what : "";
+    defaultsAsk.pane = "";
+    defaultsAsk.what = "";
+    if (what === "save") {
+      await saveVarDefaults(PREFIXES[pane2], ctx2.chat.scriptstate);
+      return `지금 ${NAME[pane2]} 설정을 새 채팅 기본값으로 저장했어요.`;
+    }
+    if (what === "load") {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane2], chat.scriptstate) } }));
+      await refresh3();
+      return `새 채팅 기본값을 지금 ${NAME[pane2]}에 불러왔어요.`;
+    }
+    return "";
+  }
+
+  // src/ui/toast.ts
+  var esc7 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var timers = /* @__PURE__ */ new Map();
+  function toast(key, text5, clear) {
+    if (!text5) return "";
+    const cur = timers.get(key);
+    if (!cur || cur.text !== text5) {
+      if (cur) clearTimeout(cur.id);
+      const ms = Math.min(8e3, 2500 + [...text5].length * 50);
+      const id2 = setTimeout(() => {
+        timers.delete(key);
+        clear(text5);
+        const el = document.querySelector(`.gx-toast[data-toast="${key}"]`);
+        if (!el) return;
+        el.classList.add("out");
+        setTimeout(() => {
+          if (el.matches(`.gx-toast[data-toast="${key}"]`)) el.remove();
+        }, 300);
+      }, ms);
+      timers.set(key, { text: text5, id: id2 });
+    }
+    return `<div class="gx-toast gn-notice" data-toast="${key}" role="status">${esc7(text5)}</div>`;
+  }
+
+  // src/ui/drawer.ts
+  var opened = /* @__PURE__ */ new Map();
+  function shell(key, cls, inner) {
+    return `<div class="ph-drawer open${cls ? ` ${cls}` : ""}" data-drawer="${key}">${inner}</div>`;
+  }
+  function drawerHtml(tools, above = "", cls = "", key = cls || "tools") {
+    return shell(key, cls, `${above}<div class="ph-tools">${tools}</div>`);
+  }
+  function drawerBox(content, cls = "", after = "", key = cls || "box") {
+    return shell(key, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
+  }
+  function set(box3, on3) {
+    opened.set(box3.dataset.drawer ?? "tools", on3);
+    box3.classList.toggle("open", on3);
+    const grip = box3.querySelector(".ph-grip");
+    grip?.setAttribute("aria-expanded", String(on3));
+    grip?.setAttribute("aria-label", on3 ? "도구 접기" : "도구 펼치기");
+  }
+  function bindDrawer(root3) {
+    const box3 = root3.querySelector(".ph-drawer");
+    const grip = box3?.querySelector(".ph-grip");
+    if (!box3 || !grip) return;
+    const open3 = () => box3.classList.contains("open");
+    grip.addEventListener("click", () => set(box3, !open3()));
     let y0 = null;
-    box4.addEventListener("touchstart", (e) => {
+    box3.addEventListener("touchstart", (e) => {
       y0 = e.touches[0]?.clientY ?? null;
     }, { passive: true });
-    box4.addEventListener("touchend", (e) => {
+    box3.addEventListener("touchend", (e) => {
       if (y0 === null) return;
       const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
       y0 = null;
-      if (dy < -24 && !open4()) set(box4, true);
-      else if (dy > 24 && open4()) set(box4, false);
+      if (dy < -24 && !open3()) set(box3, true);
+      else if (dy > 24 && open3()) set(box3, false);
     }, { passive: true });
   }
 
   // src/core/progress.ts
   var GROUPS = ["router", "director", "main", "update", "net"];
-  var GROUP_LABEL = { router: "라우터", director: "디렉터", main: "본편", update: "갱신기", net: "인터넷", other: "기타" };
+  var GROUP_LABEL = { router: "라우터", director: "디렉터", main: "메인", update: "갱신기", net: "인터넷", other: "기타" };
   var PROGRESS_WATCHDOG = 10 * 60 * 1e3;
   var turn = null;
   var seq = 0;
@@ -37,7 +543,7 @@
     }
   };
   var progressTurn = () => turn;
-  var MAIN_STAGE = { id: "main", label: "본편", group: "main", match: [] };
+  var MAIN_STAGE = { id: "main", label: "메인", group: "main", match: [] };
   function progressBegin() {
     turn = { at: Date.now(), plan: [MAIN_STAGE], calls: [], manual: false };
     endWanted = false;
@@ -70,9 +576,10 @@
   }
   var ORDER2 = { router: 0, director: 1, main: 2, update: 3, net: 4, other: 5 };
   var sortPlan = (stages) => [...stages].sort((a, b) => ORDER2[a.group] - ORDER2[b.group]);
-  function progressMain() {
+  function progressMain(tokens2) {
     if (!turn || turn.manual) return;
     turn.mainAt = Date.now();
+    if (tokens2 !== void 0) turn.mainTokens = tokens2;
     notify();
   }
   function progressReply(tokens2) {
@@ -185,10 +692,11 @@
   }
   function turnSummary(t) {
     const done3 = t.calls.filter((c) => c.ms !== void 0);
+    const main = t.replyAt ? 1 : 0;
     return {
-      calls: done3.length,
-      req: done3.reduce((n3, c) => n3 + c.reqTokens, 0),
-      resp: done3.reduce((n3, c) => n3 + (c.respTokens ?? 0), 0),
+      calls: done3.length + main,
+      req: done3.reduce((n3, c) => n3 + c.reqTokens, 0) + (main ? t.mainTokens ?? 0 : 0),
+      resp: done3.reduce((n3, c) => n3 + (c.respTokens ?? 0), 0) + (main ? t.replyTokens ?? 0 : 0),
       ms: (t.endAt ?? Date.now()) - t.at,
       failed: t.plan.filter((s8) => stageState(t, s8) === "fail").length
     };
@@ -292,12 +800,12 @@ ${s8.slice(-tail2)}`;
       totalChars: rows3.reduce((n3, r) => n3 + r.content.length, 0),
       totalTokens: rows3.reduce((n3, r) => n3 + tokens(r.content), 0)
     };
-    progressMain();
+    progressMain(open.main.totalTokens);
     save();
   }
-  function traceReply(text4) {
+  function traceReply(text5) {
     if (!open) return;
-    open.reply = { at: (/* @__PURE__ */ new Date()).toISOString(), text: clip(text4), chars: text4.length, tokens: tokens(text4) };
+    open.reply = { at: (/* @__PURE__ */ new Date()).toISOString(), text: clip(text5), chars: text5.length, tokens: tokens(text5) };
     replied = true;
     progressReply(open.reply.tokens);
     save();
@@ -360,7 +868,7 @@ ${m.content}`).join("\n\n");
           ...rest,
           content: missing.length ? `${rest.content}
 Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
-          multimodals: data3.filter((d) => !!d).map((base644) => ({ type: "image", base64: base644 }))
+          multimodals: data3.filter((d) => !!d).map((base643) => ({ type: "image", base64: base643 }))
         };
       })
     );
@@ -379,9 +887,9 @@ Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.con
       });
     };
     try {
-      const text4 = await runModelRaw(messages, model2, staticModel, (n3) => progressCallChunk(pid, n3));
-      done3(true, text4);
-      return text4;
+      const text5 = await runModelRaw(messages, model2, staticModel, (n3) => progressCallChunk(pid, n3));
+      done3(true, text5);
+      return text5;
     } catch (error) {
       done3(false, error instanceof LlmError ? error.raw ?? "" : "", error instanceof Error ? error.message : String(error));
       throw error;
@@ -394,8 +902,8 @@ Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.con
     } catch (error) {
       throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
     }
-    let text4 = "";
-    if (typeof res === "string") text4 = res;
+    let text5 = "";
+    if (typeof res === "string") text5 = res;
     else if (res && typeof res === "object") {
       const r = res;
       if (r.type === "fail" && /Plugin calls are blocked/i.test(String(r.result ?? ""))) {
@@ -403,13 +911,13 @@ Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.con
       }
       if (r.type === "fail") throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.
 ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
-      if (r.type === "multiline" && Array.isArray(r.result)) text4 = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
-      else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text4 = await readStream(r.result, onChunk);
-      else if (typeof r.result === "string") text4 = r.result;
+      if (r.type === "multiline" && Array.isArray(r.result)) text5 = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
+      else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text5 = await readStream(r.result, onChunk);
+      else if (typeof r.result === "string") text5 = r.result;
     }
-    text4 = stripThoughts(text4).trim();
-    if (!text4) throw new LlmError("모델이 빈 응답을 보냈어요.");
-    return text4;
+    text5 = stripThoughts(text5).trim();
+    if (!text5) throw new LlmError("모델이 빈 응답을 보냈어요.");
+    return text5;
   }
   var running2 = 0;
   var waiting = [];
@@ -451,7 +959,7 @@ ${RETRY_ANALYZE}` }
   }
   async function generate(messages, model2, parse3, o) {
     const fix = o.fix ?? defaultFix(messages);
-    let ask4 = messages;
+    let ask5 = messages;
     let use = model2;
     let earlier = null;
     let transientLeft = TRANSIENT_RETRIES;
@@ -459,7 +967,7 @@ ${RETRY_ANALYZE}` }
       let raw = "";
       try {
         try {
-          raw = attempt === 0 && o.first ? await o.first(ask4) : await slot(o.concurrent, () => runModel(ask4, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
+          raw = attempt === 0 && o.first ? await o.first(ask5) : await slot(o.concurrent, () => runModel(ask5, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
         } catch (error) {
           if (!transient(error) || transientLeft <= 0) throw error;
           transientLeft--;
@@ -469,7 +977,7 @@ ${RETRY_ANALYZE}` }
           continue;
         }
         for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
-          const again = [...ask4, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
+          const again = [...ask5, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
           try {
             const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? "기타"} 다시 보기 ${i}`));
             if (next.trim()) raw = next;
@@ -483,7 +991,7 @@ ${RETRY_ANALYZE}` }
         if (earlier && !retryable(error)) throw earlier;
         if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
         earlier = withRawText(error, raw);
-        ask4 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+        ask5 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
         use = o.retryModel === "same" ? model2 : o.retryModel;
       }
     }
@@ -538,48 +1046,65 @@ ${RETRY_ANALYZE}` }
   }
 
   // src/ui/advanced.ts
-  var esc7 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function control(f, item2, cur) {
+  var esc8 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function control2(f, item2, cur) {
     const id2 = `${f}:${item2.key}`;
-    if (item2.type === "text") return `<input class="gx-search ps-text adv-text" data-change="adv-set" data-key="${id2}" value="${esc7(cur)}" placeholder="비우면 기본" aria-label="${esc7(item2.label)}">`;
+    if (item2.type === "text") return `<input class="gx-search ps-text adv-text" data-change="adv-set" data-key="${id2}" value="${esc8(cur)}" placeholder="비우면 기본" aria-label="${esc8(item2.label)}">`;
+    if (item2.type === "pick" && item2.opts?.length === 2 && item2.opts.every(([v, l]) => v === "1" && l === "켬" || v === "0" && l === "끔")) return setSeg("adv-set", id2, cur === "1" ? "1" : "0", [["1", "ON"], ["0", "OFF"]]);
     if (item2.type === "pick") {
-      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id2}=${v}" aria-pressed="${cur === v}">${esc7(label2)}</button>`).join("")}</div>`;
+      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id2}=${v}" aria-pressed="${cur === v}">${esc8(label2)}</button>`).join("")}</div>`;
     }
     const min = item2.min ?? 0;
     const max = item2.max ?? Number.MAX_SAFE_INTEGER;
-    const step2 = max >= 1e4 ? 500 : 1;
+    const step = max >= 1e4 ? 500 : 1;
     const n3 = Math.min(max, Math.max(min, Number(cur) || 0));
     const zero = n3 === 0 && item2.zero;
-    const down = Math.max(min, n3 - step2);
-    const up = Math.min(max, n3 + step2);
-    return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id2}=${down}" ${n3 <= min ? "disabled" : ""} aria-label="${esc7(item2.label)} 줄이기">−</button>
-    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item2.max ?? ""}" step="${step2}" data-change="adv-set" data-key="${id2}" value="${zero ? "" : n3}"${item2.zero ? ` placeholder="${esc7(item2.zero)}"` : ""} aria-label="${esc7(item2.label)}">${item2.unit ? `<span>${esc7(item2.unit)}</span>` : ""}
-    <button class="gx-step" data-action="adv-set" data-value="${id2}=${up}" ${n3 >= max ? "disabled" : ""} aria-label="${esc7(item2.label)} 늘리기">+</button></div>`;
+    const down = Math.max(min, n3 - step);
+    const up = Math.min(max, n3 + step);
+    return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id2}=${down}" ${n3 <= min ? "disabled" : ""} aria-label="${esc8(item2.label)} 줄이기">−</button>
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item2.max ?? ""}" step="${step}" data-change="adv-set" data-key="${id2}" value="${zero ? "" : n3}"${item2.zero ? ` placeholder="${esc8(item2.zero)}"` : ""}${zeroWidth(item2.zero, max)} aria-label="${esc8(item2.label)}">${item2.unit ? `<span>${esc8(item2.unit)}</span>` : ""}
+    <button class="gx-step" data-action="adv-set" data-value="${id2}=${up}" ${n3 >= max ? "disabled" : ""} aria-label="${esc8(item2.label)} 늘리기">+</button></div>`;
   }
+  var zeroWidth = (z, max = 0) => z && [...z].length > 5 ? ` style="width:${[...z].length + 1.2}em"` : ` style="width:${numWidth(max)}"`;
   function row(f, item2, state) {
     const cur = advValue(state, f, item2.key);
     const changed = cur !== String(item2.def);
-    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc7(item2.label)}</b>${item2.hint ? `<small>${esc7(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}</div></div>`;
+    return setRow(esc8(item2.label), control2(f, item2, cur), item2.hint ? esc8(item2.hint) : "", `adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}`);
   }
-  function chips(f, items, state) {
-    return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
-      const on2 = advValue(state, f, i.key) === "1";
-      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc7(i.label)}</button>`;
-    }).join("")}</div></div>`;
+  function chips(f, items, state, label2 = "") {
+    const html = `<div class="gx-chips">${items.map((i) => {
+      const on3 = advValue(state, f, i.key) === "1";
+      return `<button class="gx-chip${on3 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on3 ? "0" : "1"}" aria-pressed="${on3}">${esc8(i.label)}</button>`;
+    }).join("")}</div>`;
+    return label2 ? setRow(esc8(label2), html) : `<div class="ps-row adv-chips">${html}</div>`;
   }
-  function advSections(f, state, extra2 = {}, only) {
-    return ADV[f].map((g2, gi) => only && !only.includes(gi) ? "" : `<section class="ps-group"><h3>${esc7(g2.title)}</h3><div class="ps-rows">${g2.chips?.length ? chips(f, g2.chips, state) : ""}${g2.items.map((i) => row(f, i, state)).join("")}</div>${extra2[gi] ?? ""}</section>`).join("");
+  function advRow(f, key, state) {
+    const item2 = advItem(f, key);
+    return item2 ? row(f, item2, state) : "";
   }
-  function advancedBox(f, state) {
-    const n3 = advChanged(state, f).length;
-    const groups = ADV[f].map((g2, gi) => {
-      const body5 = `${g2.chips?.length ? chips(f, g2.chips, state) : ""}${g2.items.map((i) => row(f, i, state)).join("")}`;
-      if (g2.fold) {
-        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc7(g2.title)}</summary><div class="ps-rows">${body5}</div></details>`;
-      }
-      return `<section class="ps-group"><h3>${esc7(g2.title)}</h3><div class="ps-rows">${body5}</div></section>`;
-    }).join("");
-    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n3 ? `<span class="adv-count">${n3}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}</div></details>`;
+  function advChipRow(f, keys, state, label2 = "") {
+    const items = keys.map((k) => advItem(f, k)).filter((i) => !!i);
+    return items.length ? chips(f, items, state, label2) : "";
+  }
+  function advSetRow(f, label2, keys, state, help = "") {
+    const cells2 = keys.map(([k, l]) => {
+      const item2 = advItem(f, k);
+      return item2 ? [l, control2(f, item2, advValue(state, f, item2.key))] : null;
+    }).filter((c) => !!c);
+    return cells2.length ? setRow(esc8(label2), numSet(cells2), help ? esc8(help) : "") : "";
+  }
+  function advCtl(f, key, state) {
+    const item2 = advItem(f, key);
+    return item2 ? control2(f, item2, advValue(state, f, item2.key)) : "";
+  }
+  function advChipsCtl(f, keys, state) {
+    return `<div class="gx-chips">${keys.map((k) => advItem(f, k)).filter((i) => !!i).map((i) => {
+      const on3 = advValue(state, f, i.key) === "1";
+      return `<button class="gx-chip${on3 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on3 ? "0" : "1"}" aria-pressed="${on3}">${esc8(i.label)}</button>`;
+    }).join("")}</div>`;
+  }
+  function advSections(f, state, extra2 = {}, only, noTitle = false) {
+    return ADV[f].map((g2, gi) => only && !only.includes(gi) ? "" : `<section class="ps-group">${noTitle ? "" : `<h3>${esc8(g2.title)}</h3>`}<div class="ps-rows">${g2.chips?.length ? chips(f, g2.chips, state) : ""}${g2.items.map((i) => row(f, i, state)).join("")}</div>${extra2[gi] ?? ""}</section>`).join("");
   }
   var blank2 = (item2) => item2.v ? String(item2.def) : "";
   function parse2(value) {
@@ -621,8 +1146,8 @@ ${RETRY_ANALYZE}` }
       env3.render();
       return true;
     }
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
-    const mode2 = advValue(saved2?.scriptstate, "gen", "lore_mode");
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
+    const mode2 = advValue(saved?.scriptstate, "gen", "lore_mode");
     if (syncDecorators(ctx2.char.globalLore, mode2)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode2)).catch(() => false);
     await env3.refresh();
     return true;
@@ -710,7 +1235,7 @@ ${RETRY_ANALYZE}` }
   var jobs = /* @__PURE__ */ new Map();
   var chatKey = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
   var phoneBusy = (ctx2) => jobs.has(chatKey(ctx2));
-  var esc8 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc9 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var source = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
   function names2(ctx2) {
     try {
@@ -759,7 +1284,7 @@ ${RETRY_ANALYZE}` }
   function generate2(ctx2, env3, rid, label2) {
     return run(ctx2, env3, label2, async () => {
       const req = token();
-      const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
         const st2 = readPhone(chat);
         const r2 = st2.rooms[rid];
         if (!r2?.pending) return null;
@@ -767,15 +1292,15 @@ ${RETRY_ANALYZE}` }
         r2.pending.request = req;
         return writePhone(chat, st2);
       });
-      if (!saved2) throw new PhoneError("대기 중인 대화 요청이 없어요.");
-      const st = readPhone(saved2);
+      if (!saved) throw new PhoneError("대기 중인 대화 요청이 없어요.");
+      const st = readPhone(saved);
       const r = st.rooms[rid];
-      const d = dir(ctx2, saved2);
+      const d = dir(ctx2, saved);
       let raw = "";
       let result;
       try {
-        const prompt = fitPrompt(budgetFor(saved2.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved2), st, r, d, names2(ctx2)));
-        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved2.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved2.scriptstate), reiterate: craftSettings(saved2.scriptstate, "ph").reiterate, staticModel: featureModel(saved2.scriptstate, "ph"), state: saved2.scriptstate, label: "괴담톡 답장" }));
+        const prompt = fitPrompt(budgetFor(saved.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved), st, r, d, names2(ctx2)));
+        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), reiterate: craftSettings(saved.scriptstate, "ph").reiterate, staticModel: featureModel(saved.scriptstate, "ph"), state: saved.scriptstate, label: "괴담톡 답장" }));
       } catch (error) {
         await markFailed(ctx2, rid, req);
         const msg = error instanceof Error ? error.message : String(error);
@@ -809,25 +1334,25 @@ ${RETRY_ANALYZE}` }
       return writePhone(chat, st);
     }).catch(() => null);
   }
-  async function send(ctx2, env3, rid, text4) {
+  async function send(ctx2, env3, rid, text5) {
     if (phoneBusy(ctx2)) {
       phone.notice = `${jobs.get(chatKey(ctx2))} 끝난 뒤 다시 눌러 주세요.`;
       return env3.render();
     }
-    if (tokens(describe(text4)) > LIMITS2.input_tokens) {
+    if (tokens(describe(text5)) > LIMITS2.input_tokens) {
       phone.notice = `메시지와 첨부 내용은 합쳐서 ${LIMITS2.input_tokens}토큰 이내로 적어 주세요.`;
       return env3.render();
     }
     let giftBlocked = false;
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readPhone(chat);
       const r2 = st.rooms[rid];
       if (!r2 || r2.pending) return null;
-      if (r2.kind !== "dm" && /\[\[ATTACH:gift\]\]/i.test(text4)) return void (giftBlocked = true), null;
+      if (r2.kind !== "dm" && /\[\[ATTACH:gift\]\]/i.test(text5)) return void (giftBlocked = true), null;
       if (!st.order.includes(rid)) st.order.push(rid);
       const time2 = phoneTime(chat);
-      const pieces = splitRecords(text4);
-      let m = push(st, r2, "me", pieces[0] ?? text4, time2);
+      const pieces = splitRecords(text5);
+      let m = push(st, r2, "me", pieces[0] ?? text5, time2);
       for (const piece of pieces.slice(1)) m = push(st, r2, "me", piece, time2);
       r2.draft = "";
       r2.silent = false;
@@ -835,7 +1360,7 @@ ${RETRY_ANALYZE}` }
       r2.pending = { message: m.id, status: "error", action: { type: "send" } };
       return writePhone(chat, st);
     });
-    if (!saved2) {
+    if (!saved) {
       phone.notice = giftBlocked ? "단톡방에서는 선물을 보낼 수 없어요." : "이전 답장을 다시 시도하거나 건너뛴 뒤 보내 주세요.";
       return env3.refresh();
     }
@@ -843,8 +1368,8 @@ ${RETRY_ANALYZE}` }
     phone.attach = [];
     phone.attachMenu = false;
     phone.page = 1;
-    const r = readPhone(saved2).rooms[rid];
-    await generate2({ ...ctx2, chat: saved2 }, env3, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
+    const r = readPhone(saved).rooms[rid];
+    await generate2({ ...ctx2, chat: saved }, env3, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
   }
   async function roomRefresh(ctx2, env3, rid) {
     const st = readPhone(ctx2.chat);
@@ -858,14 +1383,14 @@ ${RETRY_ANALYZE}` }
       phone.notice = `${why} 내가 보낸 메시지의 답장에는 이 제한이 없어요.`;
       return env3.render();
     }
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const cur = readPhone(chat);
       const room = cur.rooms[rid];
       if (!room || room.pending) return null;
       room.pending = { status: "error", action: { type: "refresh" } };
       return writePhone(chat, cur);
     });
-    if (saved2) await generate2({ ...ctx2, chat: saved2 }, env3, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
+    if (saved) await generate2({ ...ctx2, chat: saved }, env3, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
   }
   async function createGroup(ctx2, env3) {
     const d = dir(ctx2);
@@ -891,7 +1416,7 @@ ${RETRY_ANALYZE}` }
     }
     let rid = "";
     let error = "";
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readPhone(chat);
       const time2 = phoneTime(chat);
       if (inviteRoom) {
@@ -931,12 +1456,12 @@ ${RETRY_ANALYZE}` }
       }
       return writePhone(chat, st);
     });
-    if (!saved2) {
+    if (!saved) {
       phone.notice = error || "저장하지 못했어요.";
       return env3.render();
     }
     Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
-    await generate2({ ...ctx2, chat: saved2 }, env3, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
+    await generate2({ ...ctx2, chat: saved }, env3, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
   }
   function refreshInbox(ctx2, env3, automatic = false, joint) {
     const e = env3 ?? (automatic ? envForAuto(ctx2) : envOr(env3));
@@ -1017,15 +1542,15 @@ ${RETRY_ANALYZE}` }
     if (!data3.trim()) return;
     const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
-    if (!saved2) return;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
+    if (!saved) return;
     try {
-      directory(ctx2.char.globalLore, saved2);
+      directory(ctx2.char.globalLore, saved);
     } catch {
       return;
     }
     const notice2 = phone.notice;
-    await refreshInbox({ ...ctx2, chat: saved2 }, env3, true, joint);
+    await refreshInbox({ ...ctx2, chat: saved }, env3, true, joint);
     if (!env3 && envForAuto(ctx2) === quietEnv) phone.notice = notice2;
   }
   async function autoView(ctx2, messageIndex, env3) {
@@ -1035,10 +1560,10 @@ ${RETRY_ANALYZE}` }
     if (!data3.trim()) return;
     const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[PH_VIEW_LAST] ?? "") === stamp) return;
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
-    if (!saved2) return;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
+    if (!saved) return;
     const notice2 = phone.notice;
-    await makeView({ ...ctx2, chat: saved2 }, env3 ?? envForAuto(ctx2), true);
+    await makeView({ ...ctx2, chat: saved }, env3 ?? envForAuto(ctx2), true);
     if (!env3 && envForAuto(ctx2) === quietEnv) phone.notice = notice2;
   }
   function openCheck(ctx2, env3) {
@@ -1078,9 +1603,9 @@ ${RETRY_ANALYZE}` }
     await openDm(ctx2, env3, c.id);
     return true;
   }
-  function dropEmpty(st, keep) {
+  function dropEmpty(st, keep2) {
     const prev = phone.room;
-    if (!prev || prev === keep) return;
+    if (!prev || prev === keep2) return;
     const r = st.rooms[prev];
     if (r && !r.messages.length && !r.pending && !r.draft.trim()) {
       delete st.rooms[prev];
@@ -1131,12 +1656,12 @@ ${RETRY_ANALYZE}` }
     Object.assign(phone, { view: "list", call: "", callText: "", notice: "" });
     await env3.close();
   }
-  var bubbleBody = (text4) => attachBody(text4);
+  var bubbleBody = (text5) => attachBody(text5);
   var phKinds = (r) => r.kind === "dm" ? ["image", "photo", "video", "file", "link", "gift"] : ["image", "photo", "video", "file", "link"];
-  var initial = (name) => esc8([...name][0] ?? "톡");
+  var initial = (name) => esc9([...name][0] ?? "톡");
   function face(ctx2, who, label2, cls = "") {
     const url = who && !who.custom ? imageUrl(ctx2.char, agentFace(ctx2.char, who.english)) : null;
-    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc8(url)}" alt="" loading="lazy">` : initial(label2)}</span>`;
+    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc9(url)}" alt="" loading="lazy">` : initial(label2)}</span>`;
   }
   var shortTime = (t) => /(\d\d:\d\d)/.exec(t)?.[1] ?? "";
   function matches(c, q, fnames) {
@@ -1145,9 +1670,9 @@ ${RETRY_ANALYZE}` }
   var tool = (action, icon, label2, extra2 = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra2}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   var badge = (n3) => n3 > 0 ? `<span class="ph-badge">${n3 > 99 ? "99+" : n3}</span>` : "";
   function chips2(action, cur, items) {
-    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc8(t.id)}" aria-selected="${t.id === cur}">${esc8(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
+    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc9(t.id)}" aria-selected="${t.id === cur}">${esc9(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
   }
-  var blank3 = (text4) => `<div class="ph-blank"><p>${text4}</p></div>`;
+  var blank3 = (text5) => `<div class="ph-blank"><p>${text5}</p></div>`;
   function agentStates(ctx2) {
     try {
       if (!worldOn(ctx2.chat)) return {};
@@ -1170,12 +1695,12 @@ ${RETRY_ANALYZE}` }
     return `<ul class="ph-list ph-contacts">${rows3.map((c) => {
       const room = st.rooms[`dm_${c.id}`];
       const confirm = phone.confirm === `contact:${c.id}`;
-      const on2 = phone.view === "room" && phone.room === `dm_${c.id}`;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
-            <span class="ph-who"><span class="ph-who-name"><b>${esc8(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc8(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
+      const on3 = phone.view === "room" && phone.room === `dm_${c.id}`;
+      return `<li class="ph-row"><button class="ph-main${on3 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
+            <span class="ph-who"><span class="ph-who-name"><b>${esc9(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc9(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
             ${badge(room?.unread ?? 0)}</button>
-            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc8(c.name)}" title="전화" aria-label="${esc8(c.name)}에게 전화">${ICONS.call}</button>
-            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc8(c.lore || c.name)}" title="위키" aria-label="${esc8(c.name)} 위키">${ICONS.book}</button>`}
+            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc9(c.name)}" title="전화" aria-label="${esc9(c.name)}에게 전화">${ICONS.call}</button>
+            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc9(c.lore || c.name)}" title="위키" aria-label="${esc9(c.name)} 위키">${ICONS.book}</button>`}
             ${c.saved && c.custom ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
     }).join("")}</ul>`;
   }
@@ -1203,14 +1728,14 @@ ${RETRY_ANALYZE}` }
       const last2 = [...r.messages].reverse().find((m) => m.kind === "message") ?? r.messages[r.messages.length - 1];
       const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : null;
       const preview = r.pending ? "답장을 기다리는 중…" : last2 ? last2.kind === "message" ? `${last2.sender === "me" ? "나: " : ""}${previewText(last2.text)}` : last2.text : "";
-      const on2 = phone.view === "room" && phone.room === r.id;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-room" data-value="${esc8(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
-        <span class="ph-who"><span class="ph-who-top"><b>${esc8(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc8(shortTime(last2.time))}</small>` : ""}</span>
-        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc8([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
+      const on3 = phone.view === "room" && phone.room === r.id;
+      return `<li class="ph-row"><button class="ph-main${on3 ? " on" : ""}" data-action="ph-room" data-value="${esc9(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
+        <span class="ph-who"><span class="ph-who-top"><b>${esc9(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc9(shortTime(last2.time))}</small>` : ""}</span>
+        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc9([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
     }).join("")}</ul>`;
   }
   function roomDel(id2, pending2, label2) {
-    return phone.confirm === `room:${id2}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc8(id2)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc8(id2)}" title="삭제" aria-label="${esc8(label2)} 삭제" ${pending2 ? "disabled" : ""}>${ICONS.trash}</button>`;
+    return phone.confirm === `room:${id2}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc9(id2)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc9(id2)}" title="삭제" aria-label="${esc9(label2)} 삭제" ${pending2 ? "disabled" : ""}>${ICONS.trash}</button>`;
   }
   var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
   function viewFace(ctx2, d, r, id2, cls = "") {
@@ -1224,11 +1749,11 @@ ${RETRY_ANALYZE}` }
     return `<ul class="ph-list ph-chats ph-views">${list4.map((r) => {
       const last2 = [...r.messages].reverse().find((m) => m.type === "text");
       const who = r.people.find((p2) => p2.id === last2?.sender)?.name ?? "";
-      const on2 = phone.view === "view" && phone.viewId === r.id;
-      const del = phone.confirm === `view:${r.id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-view-del" data-value="${esc8(r.id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-view-del" data-value="${esc8(r.id)}" title="삭제" aria-label="${esc8(r.name)} 삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-view-open" data-value="${esc8(r.id)}"><span class="ph-vface">${viewFace(ctx2, d, r, r.pov)}${r.people.length > 1 ? `<i>${r.people.length}</i>` : ""}</span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc8(r.name)}</b><small class="ph-time">${esc8(shortTime(r.time))}</small></span>
-        <span class="ph-who-bot"><small>${esc8([...`${who ? `${who}: ` : ""}${last2?.text ?? ""}`].slice(0, 60).join(""))}</small>${r.unread ? '<span class="ph-badge">N</span>' : ""}</span></span></button>${del}</li>`;
+      const on3 = phone.view === "view" && phone.viewId === r.id;
+      const del = phone.confirm === `view:${r.id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-view-del" data-value="${esc9(r.id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-view-del" data-value="${esc9(r.id)}" title="삭제" aria-label="${esc9(r.name)} 삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main${on3 ? " on" : ""}" data-action="ph-view-open" data-value="${esc9(r.id)}"><span class="ph-vface">${viewFace(ctx2, d, r, r.pov)}${r.people.length > 1 ? `<i>${r.people.length}</i>` : ""}</span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc9(r.name)}</b><small class="ph-time">${esc9(shortTime(r.time))}</small></span>
+        <span class="ph-who-bot"><small>${esc9([...`${who ? `${who}: ` : ""}${last2?.text ?? ""}`].slice(0, 60).join(""))}</small>${r.unread ? '<span class="ph-badge">N</span>' : ""}</span></span></button>${del}</li>`;
     }).join("")}</ul>`;
   }
   function viewPane(ctx2, d, busy6) {
@@ -1237,22 +1762,22 @@ ${RETRY_ANALYZE}` }
     const name = (id2) => r.people.find((p2) => p2.id === id2)?.name ?? id2;
     const bubbles2 = r.messages.map((m, i) => {
       if (m.type === "skip") return '<div class="ph-sys skip">생략됨</div>';
-      if (m.type === "time") return `<div class="ph-day"><span>${esc8(m.text)}</span></div>`;
-      if (m.type === "pause") return `<div class="ph-sys pause">${esc8(m.text)}</div>`;
+      if (m.type === "time") return `<div class="ph-day"><span>${esc9(m.text)}</span></div>`;
+      if (m.type === "pause") return `<div class="ph-sys pause">${esc9(m.text)}</div>`;
       const prev = r.messages[i - 1];
       const me = r.preset !== "side" ? false : m.sender === r.pov;
       const first = !prev || prev.type !== "text" || prev.sender !== m.sender;
-      const head3 = !me && first ? `<b class="ph-name">${esc8(name(m.sender))}</b>` : "";
+      const head3 = !me && first ? `<b class="ph-name">${esc9(name(m.sender))}</b>` : "";
       const pic3 = !me ? first ? viewFace(ctx2, d, r, m.sender, " ph-face") : '<span class="ph-face-gap"></span>' : "";
-      return `<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic3}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${esc8(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
+      return `<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic3}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${esc9(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
     }).join("");
     const confirm = phone.confirm === `view:${r.id}`;
     return `<div class="ph-room">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
-      ${viewFace(ctx2, d, r, r.pov, " sm")}<div class="ph-room-title"><b>${esc8(r.name)}</b><small>${esc8(VIEW_PRESETS[r.preset])} · ${esc8(name(r.pov))} 시점 · ${r.people.length}명 · ${esc8(shortTime(r.time))}</small></div>
+      ${viewFace(ctx2, d, r, r.pov, " sm")}<div class="ph-room-title"><b>${esc9(r.name)}</b><small>${esc9(VIEW_PRESETS[r.preset])} · ${esc9(name(r.pov))} 시점 · ${r.people.length}명 · ${esc9(shortTime(r.time))}</small></div>
       <span class="ph-act">
         ${tool("ph-view-new", ICONS.refresh, "이어 보기", busy6 ? "disabled" : "")}
-        ${confirm ? `<button class="gx-mini danger" data-action="ph-view-del" data-value="${esc8(r.id)}">정말 삭제</button>` : tool("ph-view-del", ICONS.trash, "방 삭제", `data-value="${esc8(r.id)}"`)}
+        ${confirm ? `<button class="gx-mini danger" data-action="ph-view-del" data-value="${esc9(r.id)}">정말 삭제</button>` : tool("ph-view-del", ICONS.trash, "방 삭제", `data-value="${esc9(r.id)}"`)}
       </span></header>
     <div class="ph-log">${bubbles2}</div>
     <div class="ph-view-foot"><span>보기 전용 방이에요. 끼어들 수 없어요.</span><button class="gx-mini" data-action="ph-view-new" ${busy6 ? "disabled" : ""}>이어 보기</button></div>
@@ -1302,38 +1827,38 @@ ${RETRY_ANALYZE}` }
   }
   var reactionChips = (v) => {
     const list4 = parseReactions(v);
-    return list4.length ? `<div class="ph-reacts">${list4.map((r) => `<span class="ph-react">${esc8(r.emoji)}<small>${r.count}</small></span>`).join("")}</div>` : "";
+    return list4.length ? `<div class="ph-reacts">${list4.map((r) => `<span class="ph-react">${esc9(r.emoji)}<small>${r.count}</small></span>`).join("")}</div>` : "";
   };
   function roomView(ctx2, st, d, busy6) {
     const r = phone.room ? st.rooms[phone.room] : void 0;
     if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
     const confirm = phone.confirm === `room:${r.id}`;
     const visible2 = r.messages.filter((m) => m.kind !== "pause" || !hiddenPause(m.text));
-    const shown3 = visible2.slice(-PAGE * phone.page);
-    const more = visible2.length > shown3.length;
+    const shown4 = visible2.slice(-PAGE * phone.page);
+    const more = visible2.length > shown4.length;
     const name = (cid) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
     const isMsg = (m) => !!m && m.kind === "message" && m.sender !== "system";
     let lastDay = "";
-    const bubbles2 = shown3.map((m, i) => {
+    const bubbles2 = shown4.map((m, i) => {
       const dm = dayOf(m.time);
       const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : "";
       const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : "";
       if (day) lastDay = day;
       if (m.kind === "skip") return `${sep}<div class="ph-sys skip">생략됨</div>`;
-      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc8(m.text)}</div>`;
-      const prev = shown3[i - 1];
-      const next = shown3[i + 1];
+      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc9(m.text)}</div>`;
+      const prev = shown4[i - 1];
+      const next = shown4[i + 1];
       const me = m.sender === "me";
       const first = !!sep || !isMsg(prev) || prev.sender !== m.sender;
       const last2 = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
       const pic3 = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
-      const head3 = !me && first ? `<b class="ph-name">${esc8(name(m.sender))}</b>` : "";
-      const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc8(shortTime(m.time)) : ""}</span>` : "";
+      const head3 = !me && first ? `<b class="ph-name">${esc9(name(m.sender))}</b>` : "";
+      const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc9(shortTime(m.time)) : ""}</span>` : "";
       return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic3}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
     }).join("");
-    const pending2 = r.pending ? r.pending.status === "working" || busy6 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc8(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc8(r.id)}">건너뛰기</button></div>` : "";
+    const pending2 = r.pending ? r.pending.status === "working" || busy6 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc9(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc9(r.id)}">건너뛰기</button></div>` : "";
     const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : void 0;
     const sub = r.kind === "dm" ? contactDetails(who) : `${r.members.length + 1}명${r.topic ? ` · ${r.topic}` : ""}`;
     const off = !r.members.length;
@@ -1341,21 +1866,21 @@ ${RETRY_ANALYZE}` }
     return `<div class="ph-room">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
       ${r.kind === "group" ? `<span class="ph-avatar group sm">${ICONS.group}</span>` : face(ctx2, who, roomLabel(r), " sm")}
-      <div class="ph-room-title"><b>${esc8(roomLabel(r))}</b>${sub ? `<small>${esc8(sub)}</small>` : ""}</div>
+      <div class="ph-room-title"><b>${esc9(roomLabel(r))}</b>${sub ? `<small>${esc9(sub)}</small>` : ""}</div>
       <span class="ph-act">
-        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc8(r.id)}" ${busy6 || off ? "disabled" : ""}`)}
-        ${r.kind === "dm" ? tool("ph-call", ICONS.call, "전화", `data-value="${esc8(roomLabel(r))}"`) : ""}
-        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc8(r.id)}" ${busy6 || r.pending ? "disabled" : ""}`)}
-        ${confirm ? `<button class="gx-mini danger" data-action="ph-room-del" data-value="${esc8(r.id)}">정말 삭제</button>` : tool("ph-room-del", ICONS.trash, "방 삭제", `data-value="${esc8(r.id)}" ${r.pending ? "disabled" : ""}`)}
+        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc9(r.id)}" ${busy6 || off ? "disabled" : ""}`)}
+        ${r.kind === "dm" ? tool("ph-call", ICONS.call, "전화", `data-value="${esc9(roomLabel(r))}"`) : ""}
+        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc9(r.id)}" ${busy6 || r.pending ? "disabled" : ""}`)}
+        ${confirm ? `<button class="gx-mini danger" data-action="ph-room-del" data-value="${esc9(r.id)}">정말 삭제</button>` : tool("ph-room-del", ICONS.trash, "방 삭제", `data-value="${esc9(r.id)}" ${r.pending ? "disabled" : ""}`)}
       </span></header>
-    ${r.kind === "group" ? `<p class="ph-members">참여자: 나, ${esc8(r.members.map(name).join(", "))}</p>` : ""}
+    ${r.kind === "group" ? `<p class="ph-members">참여자: 나, ${esc9(r.members.map(name).join(", "))}</p>` : ""}
     <div class="ph-log">${more ? `<button class="gx-mini ph-more" data-action="ph-more">이전 대화 더 보기</button>` : ""}${r.trimmedRecords && !more ? `<div class="ph-sys">오래된 기록 ${r.trimmedRecords}개는 보관 상한으로 정리됐어요.</div>` : ""}${bubbles2 || '<div class="ph-sys">아직 대화가 없어요. 첫 메시지를 보내 보세요.</div>'}${pending2}</div>
     <div class="ph-composer">
       ${off ? "" : attachEditor("ph", phone.attach, phKinds(r), !!r.pending, r.kind === "dm" ? "" : "선물은 1:1 대화에서만 보낼 수 있어요.", phone.attachMenu)}
       <div class="ph-compose">
         <button class="ph-tool ph-plus${phone.attachMenu ? " on" : ""}" data-action="ph-att-menu" aria-label="첨부" aria-expanded="${phone.attachMenu}" title="사진·파일·선물 첨부 (사진은 붙여넣기도 돼요)" ${locked ? "disabled" : ""}>${ICONS.plus}</button>
-        <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc8(phone.draft)}</textarea>
-        <button class="ph-send" data-action="ph-send" data-value="${esc8(r.id)}" aria-label="보내기" title="보내기" ${busy6 || locked ? "disabled" : ""}>${ICONS.send}</button>
+        <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc9(phone.draft)}</textarea>
+        <button class="ph-send" data-action="ph-send" data-value="${esc9(r.id)}" aria-label="보내기" title="보내기" ${busy6 || locked ? "disabled" : ""}>${ICONS.send}</button>
         <button class="ph-tool ph-back2" data-action="ph-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
       </div>
     </div>
@@ -1368,7 +1893,7 @@ ${RETRY_ANALYZE}` }
       st = readPhone(ctx2.chat);
       d = dir(ctx2);
     } catch (error) {
-      return `<p class="gx-none">${esc8(error instanceof Error ? error.message : String(error))}</p>`;
+      return `<p class="gx-none">${esc9(error instanceof Error ? error.message : String(error))}</p>`;
     }
     const room = phone.invite ? st.rooms[phone.invite] : void 0;
     const existing = new Set(room?.members ?? []);
@@ -1379,7 +1904,7 @@ ${RETRY_ANALYZE}` }
     const picked = new Set(phone.picked);
     if (!rows3.length) return '<p class="gx-none">고를 수 있는 연락처가 없어요.</p>';
     return rows3.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
-        <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx2, c, c.name)}<span class="ph-who"><b>${esc8(c.name)}</b><small>${esc8(contactDetails(c))}</small></span></button></li>`).join("");
+        <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx2, c, c.name)}<span class="ph-who"><b>${esc9(c.name)}</b><small>${esc9(contactDetails(c))}</small></span></button></li>`).join("");
   }
   function pickTabOf(d) {
     const cur = phone.pickTab;
@@ -1395,13 +1920,13 @@ ${RETRY_ANALYZE}` }
     const tabs2 = d.tabs.length > 1 ? chips2("ph-pick-tab", pickTabOf(d), d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id) && !existing.has(c.id)).length }))) : "";
     return `<div class="ph-form">
     ${paneHead(
-      room ? `「${esc8(roomLabel(room))}」에 초대` : "단톡방 만들기",
+      room ? `「${esc9(roomLabel(room))}」에 초대` : "단톡방 만들기",
       `${picked}명 선택 · 상대 최대 ${LIMITS2.members}명`,
-      `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc8(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
+      `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc9(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
     )}
     <div class="ph-form-body ph-gbody">
-      ${room ? "" : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc8(phone.gname)}" maxlength="${LIMITS2.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
-      ${room ? "" : `<textarea class="gx-search ph-topic${phone.topic.trim() ? " filled" : ""}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc8(phone.topic)}</textarea>`}
+      ${room ? "" : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc9(phone.gname)}" maxlength="${LIMITS2.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
+      ${room ? "" : `<textarea class="gx-search ph-topic${phone.topic.trim() ? " filled" : ""}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc9(phone.topic)}</textarea>`}
       ${tabs2}
       <ul class="ph-list ph-pick">${phonePickList(ctx2)}</ul>
     </div>
@@ -1413,7 +1938,7 @@ ${RETRY_ANALYZE}` }
     try {
       b = readBulletins(ctx2.chat);
     } catch (error) {
-      return `<p class="gx-none">${esc8(error.message)}</p>`;
+      return `<p class="gx-none">${esc9(error.message)}</p>`;
     }
     const received = [...b.items].reverse();
     if (!received.length) return blank3("아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.");
@@ -1430,25 +1955,25 @@ ${RETRY_ANALYZE}` }
     const head3 = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
       { id: "all", label: "전체", count: every.length },
       { id: "unread", label: "안읽음", alert: unreadN }
-    ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc8(f)}" aria-pressed="${phone.noticeFaction === f}">${esc8(label2(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
+    ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc9(f)}" aria-pressed="${phone.noticeFaction === f}">${esc9(label2(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
     if (!all.length) return head3 + blank3("안 읽은 공지가 없어요.");
     const nav = pages2 > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages2}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages2 ? "disabled" : ""}>다음 ›</button></div>` : "";
     return `${head3}${noticeList(items, label2)}${nav}`;
   }
   function noticeFactionLabel(names4) {
-    return (code2, saved2) => (code2 ? noticeLabel(code2, names4) : "") || saved2 || code2 || "소속 없음";
+    return (code2, saved) => (code2 ? noticeLabel(code2, names4) : "") || saved || code2 || "소속 없음";
   }
   function noticeList(items, label2) {
     return `<ul class="ph-list ph-notices">${items.map((r) => {
-      const on2 = phone.view === "notice" && phone.openNotice === r.id;
+      const on3 = phone.view === "notice" && phone.openNotice === r.id;
       const confirm = phone.confirm === `notice:${r.id}`;
-      const del = confirm ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc8(r.title)} 삭제">${ICONS.trash}</button>`;
-      const open4 = phone.openNotice === r.id;
-      return `<li class="ph-notice${on2 ? " on" : ""}${open4 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open4}">
-        <span class="ph-ncard-top"><span class="gx-badge">${esc8(r.category)}</span><span class="ph-nfac">${esc8(label2(r.channel, r.channelName))}</span><small>${esc8(r.issuer)}${r.time ? ` · ${esc8(r.time)}` : ""}</small></span>
-        <span class="ph-ncard-title"><b>${esc8(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
+      const del = confirm ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc9(r.title)} 삭제">${ICONS.trash}</button>`;
+      const open3 = phone.openNotice === r.id;
+      return `<li class="ph-notice${on3 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on3}" aria-expanded="${open3}">
+        <span class="ph-ncard-top"><span class="gx-badge">${esc9(r.category)}</span><span class="ph-nfac">${esc9(label2(r.channel, r.channelName))}</span><small>${esc9(r.issuer)}${r.time ? ` · ${esc9(r.time)}` : ""}</small></span>
+        <span class="ph-ncard-title"><b>${esc9(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
 </button>${del}
-        ${open4 ? `<div class="ph-notice-body">${esc8(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
+        ${open3 ? `<div class="ph-notice-body">${esc9(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
     }).join("")}</ul>`;
   }
   function noticeDetail(ctx2) {
@@ -1463,9 +1988,9 @@ ${RETRY_ANALYZE}` }
     const del = confirm ? `<button class="gx-mini danger" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : tool("ph-notice-del", ICONS.trash, "공지 삭제", `data-value="${r.id}"`);
     return `<div class="ph-form ph-ndoc">${paneHead("공지", "", `<span class="ph-act">${del}</span>`)}
     <article class="ph-ndoc-body">
-      <header class="ph-ndoc-head"><span class="gx-badge">${esc8(r.category)}</span><h3>${esc8(r.title)}</h3>
-        <div class="ph-ndoc-meta"><b>${esc8(r.issuer)}</b>${r.time ? `<span>${esc8(r.time)}</span>` : ""}</div></header>
-      <div class="ph-ndoc-text">${esc8(r.text).replace(/\n/g, "<br>")}</div>
+      <header class="ph-ndoc-head"><span class="gx-badge">${esc9(r.category)}</span><h3>${esc9(r.title)}</h3>
+        <div class="ph-ndoc-meta"><b>${esc9(r.issuer)}</b>${r.time ? `<span>${esc9(r.time)}</span>` : ""}</div></header>
+      <div class="ph-ndoc-text">${esc9(r.text).replace(/\n/g, "<br>")}</div>
     </article></div>`;
   }
   function searchView(ctx2, st, d) {
@@ -1485,86 +2010,48 @@ ${RETRY_ANALYZE}` }
   function callView() {
     return `<div class="ph-form">${paneHead("전화 걸기", "기록을 남기고 창을 닫아요. 채팅에서 전송을 누르면 통화 장면이 이어져요.")}
     <div class="ph-form-body">
-      <label class="ph-label">상대</label><input class="gx-search" data-input="ph-call-to" value="${esc8(phone.call)}" placeholder="상대 이름" maxlength="60">
-      <label class="ph-label">할 말·용건 (선택)<small>채팅 입력창에 덧붙여 보내도 돼요</small></label><textarea class="gx-search" data-input="ph-call-text" rows="3" placeholder="예: 방금 본 걸 보고하려고">${esc8(phone.callText)}</textarea>
+      <label class="ph-label">상대</label><input class="gx-search" data-input="ph-call-to" value="${esc9(phone.call)}" placeholder="상대 이름" maxlength="60">
+      <label class="ph-label">할 말·용건 (선택)<small>채팅 입력창에 덧붙여 보내도 돼요</small></label><textarea class="gx-search" data-input="ph-call-text" rows="3" placeholder="예: 방금 본 걸 보고하려고">${esc9(phone.callText)}</textarea>
     </div>
     <div class="ph-form-foot"><button class="gx-start" data-action="ph-call-place">${ICONS.call} 전화 걸기</button></div></div>`;
   }
   function addView() {
     return `<div class="ph-form">${paneHead("연락처 추가", "「기타」 탭에 들어가요. 명부에 있는 이름이면 그 인물로 추가돼요.")}
     <div class="ph-form-body">
-      <label class="ph-label">이름</label><input class="gx-search" data-input="ph-add-name" value="${esc8(phone.addName)}" maxlength="60" placeholder="이름">
-      <label class="ph-label">인물 메모 (선택)<small>어떤 사람인지, 어떻게 아는 사이인지</small></label><textarea class="gx-search" data-input="ph-add-note" rows="3">${esc8(phone.addNote)}</textarea>
+      <label class="ph-label">이름</label><input class="gx-search" data-input="ph-add-name" value="${esc9(phone.addName)}" maxlength="60" placeholder="이름">
+      <label class="ph-label">인물 메모 (선택)<small>어떤 사람인지, 어떻게 아는 사이인지</small></label><textarea class="gx-search" data-input="ph-add-note" rows="3">${esc9(phone.addNote)}</textarea>
     </div>
     <div class="ph-form-foot"><button class="gx-start" data-action="ph-add-save">추가</button></div></div>`;
   }
-  var AUTO_HINT = {
-    "0": "새로고침 버튼을 누를 때만 확인해요",
-    open: "채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요",
-    "1": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
-  };
-  function seg(key, cur, items) {
-    const sw = onOffSwitch(items, cur, "ph-cfg", (v) => `${key}=${v}`);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
-  }
-  var row2 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group = (title2, rows3) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows3}</div></section>`;
   function settingsView(ctx2) {
-    const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
-    const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "ON"], ["0", "OFF"]]);
-    const pct2 = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc8(v(k))}" aria-label="확률"><span>%</span></span>`;
-    const num7 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
-    const notices = noticeSettings(ctx2.chat.scriptstate);
-    const vs = viewSettings(ctx2.chat.scriptstate);
-    const rest = (k) => {
-      const n3 = advNum(ctx2.chat.scriptstate, "ph", k);
-      return n3 ? `받은 뒤 ${n3}턴 쉬어요` : "";
+    const state = ctx2.chat.scriptstate;
+    const notices = noticeSettings(state);
+    const vs = viewSettings(state);
+    const special = {
+      view_preset: () => vs.preset,
+      view_scope: () => vs.scope,
+      view_size: () => vs.size,
+      view_auto: () => vs.auto,
+      view_pov: () => vs.pov,
+      announcement_gap: () => String(notices.gap),
+      announcement_history: () => String(notices.history),
+      announcement_page_size: () => String(notices.page)
     };
-    const keep = (k, label2) => {
-      const st = phoneStorage(ctx2.chat.scriptstate, k);
-      return row2(label2, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}${st.auto ? num7(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX2, "개") : ""}</span>`, "최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요");
+    for (const k of ["dm", "group", "notice"]) {
+      special[`storage_auto_${k}`] = () => phoneStorage(state, k).auto ? "1" : "0";
+      special[`storage_limit_${k}`] = () => String(phoneStorage(state, k).limit);
+    }
+    const wire = {
+      cur: (k) => special[k]?.() ?? phoneValue(state, k),
+      minmax: () => phoneSettings(state).banterRows,
+      custom: { joint: () => ({ ctl: setSeg("ph-cfg", "joint", jointOn(state) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]) }) },
+      adv: (item2) => advRow("ph", item2, ctx2.chat.scriptstate),
+      advChips: (items, label2) => advChipRow("ph", items, ctx2.chat.scriptstate, label2),
+      advSet: (label2, items, help) => advSetRow("ph", label2, items, ctx2.chat.scriptstate, help)
     };
     return `<div class="ph-form">${paneHead("괴담톡 설정", "", `<span class="ph-act">${defaultsButtons("ph")}</span>`)}${defaultsConfirm("ph")}
     <div class="ph-form-body ps">
-      ${group("괴담톡", [
-      row2("자동 호출", seg("auto", ["1", "open"].includes(v("auto")) ? v("auto") : "0", [["0", "수동"], ["open", "창을 열 때"], ["1", "매 턴"]]), AUTO_HINT[v("auto")] ?? AUTO_HINT["0"]),
-      row2("한 번에 요청", seg("joint", jointOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요."),
-      row2("모델", seg("model", v("model") === "main" ? "main" : "aux", [["main", "메인 모델"], ["aux", "보조 모델"]]), "괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델"),
-      row2("컨텍스트에 포함", onoff("context"), "지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요")
-    ].join(""))}
-      ${group("답장", [
-      row2("요원 상태 참고", onoff("status"), "켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요"),
-      row2("말버릇 기록", onoff("habits"), "연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요"),
-      row2("이모지 반응", onoff("reactions"), "메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요")
-    ].join(""))}
-      ${group("새 메시지", [
-      row2("선톡 받기", `<span class="ph-inline">${onoff("incoming")}${pct2("incoming_chance")}</span>`, rest("cd_incoming")),
-      row2("단톡방 초대 받기", `<span class="ph-inline">${onoff("group_invites")}${pct2("group_invite_chance")}</span>`, rest("cd_invite")),
-      row2("단톡 수다", `<span class="ph-inline">${onoff("banter")}${pct2("banter_chance")}</span>`, "새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요"),
-      row2("단톡 수다 줄 수", `<span class="ph-inline"><span>최소</span>${num7("banter_min", phoneSettings(ctx2.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}<span>최대</span>${num7("banter_max", phoneSettings(ctx2.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
-      row2("소속 공지 받기", onoff("announcements"), "내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요"),
-      row2("공지 대기 턴", num7("announcement_gap", notices.gap, 1, 100, "턴"), "공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요"),
-      row2("공지 참고 수", num7("announcement_history", notices.history, 1, 50, "개"), "새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요")
-    ].join(""))}
-      ${group("보기 전용 방", [
-      row2("종류", seg("view_preset", vs.preset, [["side", "사이드스토리"], ["mono", "혼잣말"], ["multi", "다중인격 혼잣말"]]), "사이드스토리 = 본편에 안 나온 짧은 대화 · 혼잣말 = 시점 인물의 속마음 · 다중인격 혼잣말 = 마음속 여러 갈래가 단톡처럼 주고받아요"),
-      row2("시점 인물", `<input class="gx-search ps-text" data-change="ph-text" data-key="view_pov" value="${esc8(vs.pov)}" placeholder="비우면 주인공">`),
-      row2("시점 인물 대사", onoff("view_speak"), "켜면 시점 인물의 말도 모델이 써요. 끄면 시점 인물은 조용히 있어요"),
-      ...vs.preset === "side" ? [
-        row2("등장인물 범위", seg("view_scope", vs.scope, [["0", "주요 인물"], ["1", "장면 안"], ["2", "장면 안 주요 인물"], ["3", "자율"]])),
-        row2("방 크기", seg("view_size", vs.size, [["0", "자동"], ["1", "둘이서"], ["2", "여럿"]]))
-      ] : [],
-      row2("자동 호출", seg("view_auto", vs.auto, [["manual", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]]), "매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)")
-    ].join(""))}
-      ${group("연락처", [row2("모든 연락처 공개", onoff("all_contacts"), "내 소속과 관계없이 모든 탭을 보여요"), row2("괴이 연락처 공개", onoff("anomaly_contacts"), "켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만")].join(""))}
-      ${group("보관", [
-      keep("dm", "1:1 대화 정리"),
-      keep("group", "단톡방 정리"),
-      keep("notice", "공지 정리"),
-      row2("페이지당 공지", `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n3) => `<button class="gx-seg${notices.page === n3 ? " on" : ""}" data-action="ph-cfg" data-value="announcement_page_size=${n3}" aria-pressed="${notices.page === n3}">${n3}</button>`).join("")}</div>`)
-    ].join(""))}
-      ${advancedBox("ph", ctx2.chat.scriptstate)}
+      ${defGroups(PHONE_SET, wire)}
     </div></div>`;
   }
   function listHtml(ctx2, st, d) {
@@ -1586,7 +2073,7 @@ ${RETRY_ANALYZE}` }
     try {
       return listHtml(ctx2, readPhone(ctx2.chat), dir(ctx2));
     } catch (error) {
-      return `<p class="gx-none">${esc8(error instanceof Error ? error.message : String(error))}</p>`;
+      return `<p class="gx-none">${esc9(error instanceof Error ? error.message : String(error))}</p>`;
     }
   }
   function phoneTab(ctx2, env3) {
@@ -1598,7 +2085,7 @@ ${RETRY_ANALYZE}` }
       st = readPhone(ctx2.chat);
       d = dir(ctx2);
     } catch (error) {
-      return `<main class="gx-body"><div class="gx-empty">${esc8(error instanceof Error ? error.message : String(error))}</div></main>`;
+      return `<main class="gx-body"><div class="gx-empty">${esc9(error instanceof Error ? error.message : String(error))}</div></main>`;
     }
     const job = jobs.get(chatKey(ctx2));
     const busy6 = !!job;
@@ -1610,8 +2097,8 @@ ${RETRY_ANALYZE}` }
     }
     const unread = unreadCount(st);
     const subBtn = (id2, label2, extra2 = "") => `<button class="ph-sub${phone.sub === id2 ? " on" : ""}" data-action="ph-sub" data-value="${id2}" aria-pressed="${phone.sub === id2}">${label2}${extra2}</button>`;
-    const fail4 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc8(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc8(phone.failure.raw)}</textarea></details>` : "";
-    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc8(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const fail4 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc9(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc9(phone.failure.raw)}</textarea></details>` : "";
+    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc9(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("ph", phone.notice, (t) => {
       if (phone.notice === t) phone.notice = "";
     });
@@ -1627,7 +2114,7 @@ ${RETRY_ANALYZE}` }
     <section class="ph-side" aria-label="괴담톡 목록">
       <div class="ph-side-head">
         <div class="ph-subs">${subBtn("contacts", "연락처")}${subBtn("chats", "대화", badge(unread + viewUnread(readViews(ctx2.chat.scriptstate))))}${subBtn("notices", "공지", badge(b ? b.items.filter((r) => r.read === false).length : 0))}</div>
-        <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc8(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
+        <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc9(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
       </div>
       ${detail ? "" : status2}
       <div class="ph-content">${listHtml(ctx2, st, d)}</div>
@@ -1816,9 +2303,9 @@ ${RETRY_ANALYZE}` }
         else Object.assign(phone, { openNotice: id2, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row11 = b.items.find((x) => x.id === id2);
-          if (row11 && row11.read === false) {
-            row11.read = true;
+          const row8 = b.items.find((x) => x.id === id2);
+          if (row8 && row8.read === false) {
+            row8.read = true;
             await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
             return true;
           }
@@ -1832,7 +2319,7 @@ ${RETRY_ANALYZE}` }
       case "ph-notice-all": {
         const b = readBulletins(ctx2.chat);
         if (!b.items.some((x) => x.read === false)) break;
-        for (const row11 of b.items) row11.read = true;
+        for (const row8 of b.items) row8.read = true;
         await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
         return true;
       }
@@ -2021,6 +2508,60 @@ ${RETRY_ANALYZE}` }
     });
   }
 
+  // src/core/setdef/wiki.ts
+  var WIKI_SET = {
+    id: "wiki",
+    flat: true,
+    groups: [
+      {
+        title: "",
+        rows: [
+          { key: "auto", label: "자동 호출", common: "auto", ctl: { t: "seg", opts: [["0", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]] }, help: "턴이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요" },
+          { key: "auto_title", label: "자동 작성 제목", ctl: { t: "seg", opts: [["model", "모델이 고름"], ["input", "직접 입력"]] }, help: "「모델이 고름」이면 명부 항목 가운데 이번 이야기에 맞는 것을 써요." },
+          { key: "auto_query", label: "직접 입력", show: { key: "auto_title", eq: "input" }, ctl: { t: "text", ph: "문서 제목" } },
+          { key: "model", label: "모델", common: "model", ctl: { t: "seg", opts: [["main", "메인 모델"], ["aux", "보조 모델"]] }, help: "문서를 쓸 때 부를 모델이에요" }
+        ]
+      },
+      {
+        title: "참조",
+        rows: [
+          { key: "adv_turns", label: "챗로그 포함", ctl: { t: "adv", item: "turns" } },
+          { key: "adv_refs", label: "넘길 내용", ctl: { t: "advchips", items: ["desc", "authors", "persona", "active", "related", "secondary"] } },
+          { key: "adv_ref_count", label: "관련·2차 참조 최대", ctl: { t: "adv", item: "ref_count" } },
+          { key: "refresh_previous", label: "다시 쓸 때 이전 문서 참조", ctl: onOff(), help: "문서를 다시 쓸 때 이전 문서를 요청에 넣어요" },
+          { key: "adv_budget", label: "요청 토큰 상한", ctl: { t: "adv", item: "budget" } }
+        ]
+      },
+      {
+        title: "컨텍스트 포함",
+        rows: [
+          { key: "context", label: "사용", common: "ctx", ctl: onOff(), help: "장면에 나온 문서가 메인 요청에 붙어요" },
+          { key: "adv_ctx", label: "붙일 것", ctl: { t: "advchips", items: ["ctx_focus", "ctx_lore", "ctx_created"] } },
+          { key: "adv_ctx_count", label: "넣을 문서", ctl: { t: "adv", item: "ctx_count" } },
+          { key: "adv_ctx_tokens", label: "컨텍스트 토큰 상한", ctl: { t: "adv", item: "ctx_tokens" } }
+        ]
+      },
+      {
+        title: "문서",
+        rows: [
+          { key: "length", label: "분량", ctl: { t: "seg", opts: [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]] }, help: "문서 길이예요" },
+          { key: "mode", label: "작성 모드", ctl: { t: "seg", opts: [["expand", "확장"], ["faithful", "원본 충실"]] }, help: "확장 = 원본 사실은 지키고 비어 있는 곳을 어울리는 새 내용으로 채워요 · 원본 충실 = 새 사건·능력·관계를 더하지 않고 있는 내용만 풀어 써요" },
+          { key: "images", label: "그림", ctl: { t: "seg", opts: [["off", "끔"], ["infobox", "정보칸만"], ["body", "본문까지"]] }, help: "본문까지면 괴이·특수·거점·조직 그림을 본문에 넣고, 인물 문서는 정보칸 표정을 모델이 골라요. 인물 그림은 본문에 넣지 않아요" },
+          { key: "footnotes", label: "주석", ctl: { t: "seg", opts: [["pop", "뜨는 창"], ["inline", "펼치기"]] }, help: "펼치기는 주석을 본문 안에 괄호로 둬요. 폰에서 읽기 편해요" },
+          { key: "request", label: "공용 지침", ctl: { t: "area", ph: "모든 문서에 덧붙일 말투·형식·관점", rows: 3, cls: "nw-reqbox" } }
+        ]
+      },
+      {
+        title: "생성 방식",
+        rows: [
+          { key: "adv_thoughts", label: "생각 단계", ctl: { t: "adv", item: "thoughts" } },
+          { key: "adv_memo", label: "비망록", ctl: { t: "adv", item: "memo" } },
+          { key: "adv_reiterate", label: "다시 보기", ctl: { t: "adv", item: "reiterate" } }
+        ]
+      }
+    ]
+  };
+
   // src/ui/evpic.ts
   var cache9 = null;
   var viewerOf = (ctx2) => String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
@@ -2030,8 +2571,8 @@ ${RETRY_ANALYZE}` }
     const map = /* @__PURE__ */ new Map();
     const dir2 = readDirectory(ctx2.char.globalLore);
     for (const p2 of [...dir2.anomalies, ...dir2.sites]) {
-      const row11 = { pic: mainPic(ctx2.char, p2), title: p2.lore || p2.label };
-      for (const n3 of [p2.label, p2.lore, ...p2.aliases]) if (n3 && !map.has(n3)) map.set(n3, row11);
+      const row8 = { pic: mainPic(ctx2.char, p2), title: p2.lore || p2.label };
+      for (const n3 of [p2.label, p2.lore, ...p2.aliases]) if (n3 && !map.has(n3)) map.set(n3, row8);
     }
     let names4 = {};
     try {
@@ -2055,15 +2596,15 @@ ${RETRY_ANALYZE}` }
     return map;
   }
   var descs = /* @__PURE__ */ new Map();
-  var sharedFor = (kind, name, text4) => kind === "lm" ? ["Situation Incident"] : situationShared(kind, name, text4);
+  var sharedFor = (kind, name, text5) => kind === "lm" ? ["Situation Incident"] : situationShared(kind, name, text5);
   var basePic = (ctx2, name) => rows(ctx2).get(name)?.pic ?? "";
   function baseLink(ctx2, name) {
     const r = rows(ctx2).get(name);
     return { doc: r?.title ?? name, org: r?.org ?? "" };
   }
-  function evArt(ctx2, name, kind, text4 = "") {
+  function evArt(ctx2, name, kind, text5 = "") {
     const r = rows(ctx2).get(name);
-    const shared = !r?.pic && kind && sharedFor(kind, name, text4).find((n3) => hasAsset(ctx2.char, n3)) || "";
+    const shared = !r?.pic && kind && sharedFor(kind, name, text5).find((n3) => hasAsset(ctx2.char, n3)) || "";
     const pic3 = imageUrl(ctx2.char, r?.pic || shared);
     const title2 = r?.title ?? name;
     let desc = descs.get(title2);
@@ -2103,7 +2644,7 @@ ${RETRY_ANALYZE}` }
   }
   var jobs2 = /* @__PURE__ */ new Map();
   var chatKey2 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var esc9 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc10 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var regCache = null;
   function registry(ctx2) {
     if (!regCache || regCache.lore !== ctx2.char.globalLore) regCache = { lore: ctx2.char.globalLore, reg: buildRegistry(ctx2.char.globalLore) };
@@ -2232,16 +2773,16 @@ ${RETRY_ANALYZE}` }
   }, current: () => null };
   var liveEnv2 = null;
   var NW_AUTO_LAST = "$nw_auto_last";
-  async function autoWriteWiki(ctx2, messageIndex, open4 = false) {
+  async function autoWriteWiki(ctx2, messageIndex, open3 = false) {
     const s8 = wikiSettings(ctx2.chat.scriptstate);
-    if (!(open4 ? s8.auto === "open" : s8.auto === "turn") || jobs2.has(chatKey2(ctx2))) return;
+    if (!(open3 ? s8.auto === "open" : s8.auto === "turn") || jobs2.has(chatKey2(ctx2))) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
     const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[NW_AUTO_LAST] ?? "") === stamp) return;
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [NW_AUTO_LAST]: stamp } }));
-    if (!saved2) return;
-    const cur = { ...ctx2, chat: saved2 };
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [NW_AUTO_LAST]: stamp } }));
+    if (!saved) return;
+    const cur = { ...ctx2, chat: saved };
     const env3 = liveEnv2 ?? quietEnv2;
     const showing = env3.current();
     const target = showing && chatKey2(showing) === chatKey2(cur) ? env3 : quietEnv2;
@@ -2357,16 +2898,11 @@ ${RETRY_ANALYZE}` }
   }
   function face2(ctx2, e, cls = "") {
     const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
-    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc9(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
-  }
-  function seg2(action, cur, items) {
-    const sw = onOffSwitch(items, cur, action, (v) => v);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
+    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc10(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
   }
   function busyLine(ctx2) {
     const job = jobs2.get(chatKey2(ctx2));
-    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc9(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
+    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc10(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
   }
   var CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
   var PLAIN = { ㄲ: "ㄱ", ㄸ: "ㄷ", ㅃ: "ㅂ", ㅆ: "ㅅ", ㅉ: "ㅈ" };
@@ -2412,23 +2948,23 @@ ${RETRY_ANALYZE}` }
   }
   var catName = (ctx2, d) => TABS.find(([t]) => t === docCat(ctx2, d))?.[1] ?? "기타";
   function linkRow(ctx2, title2, o = {}) {
-    const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
-    return `<button type="button" class="it${on2 ? " on" : ""}${o.none ? " none" : ""}" data-action="wiki-pick" data-value="${esc9(title2)}"><span>${esc9(o.name ?? shownName(ctx2, title2))}</span>${o.dot ? '<i title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></i>' : ""}</button>`;
+    const on3 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
+    return `<button type="button" class="it${on3 ? " on" : ""}${o.none ? " none" : ""}" data-action="wiki-pick" data-value="${esc10(title2)}"><span>${esc10(o.name ?? shownName(ctx2, title2))}</span>${o.dot ? '<i title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></i>' : ""}</button>`;
   }
   function searchRows(ctx2, q) {
     const docs = sortedDocs(ctx2);
-    const saved2 = new Set(docs.map((d) => d.title));
+    const saved = new Set(docs.map((d) => d.title));
     const lower = q.toLowerCase();
-    const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
-    const hits = matches2(ctx2, q).filter((e, i, all) => !saved2.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
+    const mine2 = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
+    const hits = matches2(ctx2, q).filter((e, i, all) => !saved.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
     const exact = canon(ctx2)(q);
-    const known = saved2.has(exact) || hits.some((e) => e.title === exact);
-    const shown3 = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-    const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown3.has(t));
+    const known = saved.has(exact) || hits.some((e) => e.title === exact);
+    const shown4 = /* @__PURE__ */ new Set([...mine2.map((d) => d.title), ...hits.map((e) => e.title)]);
+    const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown4.has(t));
     const grp = (label2, rows3) => rows3.length ? `<h4>${label2}<b>${rows3.length}</b></h4>${rows3.join("")}` : "";
-    const fresh3 = known ? "" : `<button type="button" class="it new" data-action="wiki-write" data-value="${esc9(q)}"><span>「${esc9(q)}」 새 문서 만들기</span></button>`;
-    const body5 = grp("문서", mine.map((d) => linkRow(ctx2, d.title, { dot: !d.base }))) + grp("명부", hits.map((e) => linkRow(ctx2, e.title, { none: true, name: e.name }))) + grp("비슷한 문서", near.map((t) => linkRow(ctx2, t, { none: !saved2.has(t) })));
-    return body5 ? body5 + fresh3 : `<p class="wnone">「${esc9(q)}」 문서가 없어요.</p>${fresh3}`;
+    const fresh3 = known ? "" : `<button type="button" class="it new" data-action="wiki-write" data-value="${esc10(q)}"><span>「${esc10(q)}」 새 문서 만들기</span></button>`;
+    const body5 = grp("문서", mine2.map((d) => linkRow(ctx2, d.title, { dot: !d.base }))) + grp("명부", hits.map((e) => linkRow(ctx2, e.title, { none: true, name: e.name }))) + grp("비슷한 문서", near.map((t) => linkRow(ctx2, t, { none: !saved.has(t) })));
+    return body5 ? body5 + fresh3 : `<p class="wnone">「${esc10(q)}」 문서가 없어요.</p>${fresh3}`;
   }
   function wikiHomeResults(ctx2) {
     const q = wiki.homeQuery.trim();
@@ -2439,20 +2975,20 @@ ${RETRY_ANALYZE}` }
     if (q) return `<div class="wls">${searchRows(ctx2, q)}</div>`;
     const docs = sortedDocs(ctx2);
     if (!docs.length) return `<div class="wls"><p class="wnone">아직 작성한 문서가 없어요.</p></div>`;
-    const count3 = (t) => docs.filter((d) => inTab(ctx2, d, t)).length;
-    const tabs2 = TABS.filter(([t]) => t === "all" || count3(t));
+    const count2 = (t) => docs.filter((d) => inTab(ctx2, d, t)).length;
+    const tabs2 = TABS.filter(([t]) => t === "all" || count2(t));
     const tab2 = tabs2.some(([t]) => t === wiki.tab) ? wiki.tab : "all";
-    const shown3 = docs.filter((d) => inTab(ctx2, d, tab2));
-    const chips3 = `<div class="wtabs" role="tablist">${tabs2.map(([t, label2]) => `<button type="button" class="${t === tab2 ? "on" : ""}" data-action="wiki-tab" data-value="${t}" role="tab" aria-selected="${t === tab2}">${label2}<small>${count3(t)}</small></button>`).join("")}</div>`;
+    const shown4 = docs.filter((d) => inTab(ctx2, d, tab2));
+    const chips3 = `<div class="wtabs" role="tablist">${tabs2.map(([t, label2]) => `<button type="button" class="${t === tab2 ? "on" : ""}" data-action="wiki-tab" data-value="${t}" role="tab" aria-selected="${t === tab2}">${label2}<small>${count2(t)}</small></button>`).join("")}</div>`;
     const keyOfDoc = (d) => keyOf(shownName(ctx2, d.title));
-    const keys = KEYS2.filter((k) => shown3.some((d) => keyOfDoc(d) === k));
+    const keys = KEYS2.filter((k) => shown4.some((d) => keyOfDoc(d) === k));
     const groups = keys.map((k) => {
-      const rows3 = shown3.filter((d) => keyOfDoc(d) === k);
+      const rows3 = shown4.filter((d) => keyOfDoc(d) === k);
       const head3 = keys.length > 1 ? `<button type="button" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows3.length}</b></button>` : `${k}<b>${rows3.length}</b>`;
       return `<h4 data-ksec="${k}">${head3}</h4>${rows3.map((d) => linkRow(ctx2, d.title, { dot: tab2 !== "story" && !d.base })).join("")}`;
     }).join("");
-    const index3 = keys.length > 1 ? `<div class="nw-kgrid" hidden><div class="nw-kgrid-in" role="group" aria-label="가나다 색인">${KEYS2.map((k) => `<button type="button" data-k="${k}" ${keys.includes(k) ? "" : "disabled"}>${k}</button>`).join("")}</div></div>` : "";
-    return `${chips3}<div class="wls">${groups}</div>${index3}`;
+    const index = keys.length > 1 ? `<div class="nw-kgrid" hidden><div class="nw-kgrid-in" role="group" aria-label="가나다 색인">${KEYS2.map((k) => `<button type="button" data-k="${k}" ${keys.includes(k) ? "" : "disabled"}>${k}</button>`).join("")}</div></div>` : "";
+    return `${chips3}<div class="wls">${groups}</div>${index}`;
   }
   function docCat(ctx2, d) {
     const e = entryFor(ctx2, d.title);
@@ -2461,11 +2997,11 @@ ${RETRY_ANALYZE}` }
   }
   var inTab = (ctx2, d, t) => t === "all" ? true : t === "story" ? !d.base : docCat(ctx2, d) === t;
   function topBar(main) {
-    const open4 = wiki.listOpen;
-    const wlb = `<button type="button" class="wlb wk-menu${open4 ? " on" : ""}" data-action="wiki-list" aria-expanded="${open4}" aria-label="${open4 ? "목록 접기" : "목록 펼치기"}" title="목록">${LIST_ICO}</button>`;
+    const open3 = wiki.listOpen;
+    const wlb = `<button type="button" class="wlb wk-menu${open3 ? " on" : ""}" data-action="wiki-list" aria-expanded="${open3}" aria-label="${open3 ? "목록 접기" : "목록 펼치기"}" title="목록">${LIST_ICO}</button>`;
     const nav = main ? `<nav><button type="button" data-action="wiki-recent">${ni(CLOCK)}최근 변경</button></nav>` : `<nav><button type="button" data-action="wiki-recent">${ni(CLOCK)}최근 변경</button><button type="button" data-action="wiki-random">${ni(SHUFFLE)}임의 문서</button></nav>`;
     const rnd = main ? `<button type="button" class="rnd" data-action="wiki-random" title="임의 문서" aria-label="임의 문서"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#00a495" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SHUFFLE}</svg></button>` : "";
-    const sr = `<label class="sr"><input class="wk-in" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="${main ? "여기에서 검색" : "문서 제목 검색"}" value="${esc9(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button type="button" class="sg" data-action="wiki-search" data-take="wiki-q" aria-label="검색">${SRCH}</button></label>`;
+    const sr = `<label class="sr"><input class="wk-in" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="${main ? "여기에서 검색" : "문서 제목 검색"}" value="${esc10(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button type="button" class="sg" data-action="wiki-search" data-take="wiki-q" aria-label="검색">${SRCH}</button></label>`;
     return `<div class="top wk-top"><button type="button" class="lg wk-logo" data-action="wiki-home" aria-label="괴이위키 대문">${LOGO}괴이위키</button>${nav}${wlb}${rnd}${sr}</div>`;
   }
   function todayDoc(ctx2, docs) {
@@ -2476,22 +3012,22 @@ ${RETRY_ANALYZE}` }
   }
   function homeView(ctx2) {
     const docs = sortedDocs(ctx2);
-    const pick3 = (t) => `<button type="button" class="wl" data-action="wiki-pick" data-value="${esc9(t)}">${esc9(shownName(ctx2, t))}</button>`;
-    const links = (list4, tab2) => [...list4.slice(0, 9).map((d) => pick3(d.title)), `<button type="button" class="wl" data-action="wiki-browse" data-value="${tab2}">[전체]</button>`].join(" · ");
+    const pick4 = (t) => `<button type="button" class="wl" data-action="wiki-pick" data-value="${esc10(t)}">${esc10(shownName(ctx2, t))}</button>`;
+    const links = (list4, tab2) => [...list4.slice(0, 9).map((d) => pick4(d.title)), `<button type="button" class="wl" data-action="wiki-browse" data-value="${tab2}">[전체]</button>`].join(" · ");
     const places = docs.filter((d) => ["an", "ms"].includes(docCat(ctx2, d)));
     const people = docs.filter((d) => docCat(ctx2, d) === "ag");
     const today = todayDoc(ctx2, docs);
     const rows3 = [
-      today ? [IROW_ICO.doc, `오늘의 문서 · ${esc9(shownName(ctx2, today.doc.title))}`, `${esc9(today.text)} <button type="button" class="wl" data-action="wiki-pick" data-value="${esc9(today.doc.title)}">[더 보기]</button>`] : null,
+      today ? [IROW_ICO.doc, `오늘의 문서 · ${esc10(shownName(ctx2, today.doc.title))}`, `${esc10(today.text)} <button type="button" class="wl" data-action="wiki-pick" data-value="${esc10(today.doc.title)}">[더 보기]</button>`] : null,
       places.length ? [IROW_ICO.pin, `괴담·장소 <small>${places.length}</small>`, links(places, "an")] : null,
       people.length ? [IROW_ICO.person, `인물 <small>${people.length}</small>`, links(people, "ag")] : null,
       [IROW_ICO.pen, "새 문서 요청", '찾는 문서가 없으면 <button type="button" class="wl" data-action="wiki-new">문서 작성 요청</button>을 남겨 주세요.']
     ].filter((r) => !!r);
     const story = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0));
-    const recent = story.slice(0, 10).map((d) => `<div class="rc">${pick3(d.title)}${d.meta?.created ? `<small>${ago(d.meta.created)}</small>` : ""}</div>`).join("");
+    const recent = story.slice(0, 10).map((d) => `<div class="rc">${pick4(d.title)}${d.meta?.created ? `<small>${ago(d.meta.created)}</small>` : ""}</div>`).join("");
     return `<div class="wrap"><div class="doc mainp"><div class="h1r"><h1 class="wk-h1">괴이위키:대문</h1></div><div class="dm dm0">최근 수정 시각: 오늘</div><div class="cat">분류: <button type="button" class="wl" data-action="wiki-home">괴이위키</button></div><hr class="hl">
     <div class="intro"><h3>여러분이 기록해 나가는 <span>괴담의 나무</span></h3><p><button type="button" class="wl" data-action="wiki-home">괴이위키</button>에 오신 것을 환영합니다!</p><p class="sm2">괴이위키는 누구나 기여할 수 있는 위키입니다.<br>검증되지 않았거나 편향된 내용이 있을 수 있습니다.</p>
-      <div class="bsr"><input type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="여기에서 검색" value="${esc9(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"><button type="button" data-action="wiki-search" data-take="wiki-home-q">검색</button></div>
+      <div class="bsr"><input type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="여기에서 검색" value="${esc10(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"><button type="button" data-action="wiki-search" data-take="wiki-home-q">검색</button></div>
       <div class="hres">${wikiHomeResults(ctx2)}</div></div><hr class="hl">
     <table class="irow">${rows3.map(([ic2, tt, body5]) => `<tr><td class="ic">${ic2}</td><td><div class="tt">${tt}</div><div>${body5}</div></td></tr>`).join("")}</table>
   </div><div class="side wk-side"><div class="bx"><h5>${ni(CLOCK)}최근 변경</h5>${recent || '<p class="rc0">아직 바뀐 문서가 없어요.</p>'}${story.length > 10 ? `<button type="button" class="more" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ""}</div></div></div>`;
@@ -2499,51 +3035,47 @@ ${RETRY_ANALYZE}` }
   function paneHead2(ctx2, title2, sub, right = "", e) {
     const back = wiki.history.some((h) => h.view !== "home") ? `<button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : "";
     return `<header class="ph-room-head${back ? "" : " nw-noback"}">${back}
-    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc9(title2)}</b>${sub ? `<small>${esc9(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
+    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc10(title2)}</b>${sub ? `<small>${esc10(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
   }
   function settingsView2(ctx2) {
     const s8 = wikiSettings(ctx2.chat.scriptstate);
-    const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const line2 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+    const vals = {
+      auto: s8.auto,
+      auto_title: s8.autoTitle,
+      auto_query: s8.autoQuery,
+      length: s8.length,
+      mode: s8.mode,
+      model: s8.model,
+      refresh_previous: s8.refreshPrevious ? "1" : "0",
+      context: wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0",
+      footnotes: s8.footnotes,
+      images: s8.images,
+      request: String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "")
+    };
+    const wire = { cur: (k) => vals[k] ?? "", adv: (item2) => advRow("nw", item2, ctx2.chat.scriptstate), advChips: (items, label2) => advChipRow("nw", items, ctx2.chat.scriptstate, label2) };
     return `<div class="ph-form nw-setpane">${paneHead2(ctx2, "위키 설정", "", defaultsButtons("wiki"))}${defaultsConfirm("wiki")}
     <div class="ph-form-body ps">
-    <section class="ps-group"><h3>자동 작성</h3><div class="ps-rows">
-      ${line2("자동 호출", seg2("wiki-auto", s8.auto, [["0", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]]), "채팅이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요")}
-      ${line2("제목", seg2("wiki-auto_title", s8.autoTitle, [["model", "모델이 고름"], ["input", "직접 입력"]]), "모델이 고름 = 명부 항목 중 이번 이야기에 맞는 것")}
-      ${s8.autoTitle === "input" ? line2("직접 입력", `<input class="gx-search ps-text" data-change="wiki-auto_query" value="${esc9(s8.autoQuery)}" placeholder="문서 제목">`) : ""}
-    </div></section>
-    <section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
-      ${line2("분량", seg2("wiki-length", s8.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
-      ${line2("작성 모드", seg2("wiki-mode", s8.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
-      ${line2("모델", seg2("wiki-model", s8.model, [["main", "메인 모델"], ["aux", "보조 모델"]]))}
-      ${line2("다시 쓸 때 이전 문서 참고", seg2("wiki-refresh_previous", s8.refreshPrevious ? "1" : "0", [["1", "ON"], ["0", "OFF"]]))}
-      ${line2("컨텍스트에 포함", seg2("wiki-context", wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "채팅에 나온 문서가 채팅 요청에 참고로 붙어요")}
-      ${line2("주석", seg2("wiki-footnotes", s8.footnotes, [["pop", "뜨는 창"], ["inline", "펼치기"]]), "펼치기는 주석을 본문 안에 괄호로 둬요. 폰에서 읽기 편해요")}
-      ${line2("그림", seg2("wiki-images", s8.images, [["off", "끔"], ["infobox", "정보칸만"], ["body", "본문까지"]]), "본문까지면 괴이·특수·거점·조직 그림을 본문에 넣고, 인물 문서는 정보칸 표정을 모델이 골라요. 인물 그림은 본문에 넣지 않아요")}
-    </div></section>
-    <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc9(req)}</textarea></div></div></section>
-    ${advancedBox("nw", ctx2.chat.scriptstate)}</div>
+    ${defGroups(WIKI_SET, wire)}</div>
   </div>`;
   }
   function newView() {
     return `<div class="wrap one"><div class="doc"><h1 class="wk-h1">새 문서 만들기</h1><div class="dm">괴이위키</div>
-    <div class="nodoc"><label for="wk-new">문서 제목</label><input id="wk-new" class="in1" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc9(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"><p class="src">명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요.</p><div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-write" data-take="wiki-new">다음</button></div></div></div></div>`;
+    <div class="nodoc"><label for="wk-new">문서 제목</label><input id="wk-new" class="in1" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc10(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"><p class="src">명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요.</p><div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-write" data-take="wiki-new">다음</button></div></div></div></div>`;
   }
   function docReqBox(shared) {
-    return `<textarea class="ta" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc9(wiki.docReq)}</textarea>
-      ${shared ? `<p class="crq">공용 지침: ${esc9(shared)}</p>` : ""}`;
+    return `<textarea class="ta" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc10(wiki.docReq)}</textarea>
+      ${shared ? `<p class="crq">공용 지침: ${esc10(shared)}</p>` : ""}`;
   }
   function compose(ctx2) {
     const job = jobs2.get(chatKey2(ctx2));
-    const mine = job?.title === wiki.title;
+    const mine2 = job?.title === wiki.title;
     const lore = hasBook(source2(ctx2), wiki.title);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc9(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc9(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
-    return `<div class="wrap one"><div class="doc"><h1 class="wk-h1">${esc9(wiki.title)}</h1><div class="dm">새 문서</div>
+    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc10(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc10(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
+    return `<div class="wrap one"><div class="doc"><h1 class="wk-h1">${esc10(wiki.title)}</h1><div class="dm">새 문서</div>
     <div class="nodoc wk-compose"><p><b>해당 문서를 찾을 수 없습니다.</b></p><p class="src">${src}</p>
       ${docReqBox(req)}
-      <div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-start" data-value="${esc9(wiki.title)}" ${job ? "disabled" : ""}>${mine ? '<i class="spin"></i>작성하는 중…' : "문서 작성"}</button></div>${mine ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ""}</div></div></div>`;
+      <div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-start" data-value="${esc10(wiki.title)}" ${job ? "disabled" : ""}>${mine2 ? '<i class="spin"></i>작성하는 중…' : "문서 작성"}</button></div>${mine2 ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ""}</div></div></div>`;
   }
   function spoilerFold(ctx2, title2, e) {
     if (e?.cat !== "an") return false;
@@ -2557,7 +3089,7 @@ ${RETRY_ANALYZE}` }
       return compose(ctx2);
     }
     const c = canon(ctx2);
-    const saved2 = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => d.title));
+    const saved = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => d.title));
     const e = entryFor(ctx2, doc2.title);
     const s8 = wikiSettings(ctx2.chat.scriptstate);
     let pic3 = s8.images === "off" ? "" : e?.photo ?? "";
@@ -2565,7 +3097,7 @@ ${RETRY_ANALYZE}` }
     if (mood && /_default$/.test(pic3.replace(/#.*$/, "")) && hasAsset(ctx2.char, pic3.replace(/#.*$/, "").replace(/_default$/, `_${mood}`))) pic3 = pic3.replace(/_default(#|$)/, `_${mood}$1`);
     const photo = pic3 ? imageUrl(ctx2.char, pic3) : null;
     const r = renderArticle(doc2.body, {
-      saved: (t) => saved2.has(t),
+      saved: (t) => saved.has(t),
       canon: c,
       photo,
       fold: spoilerFold(ctx2, doc2.title, e),
@@ -2573,38 +3105,38 @@ ${RETRY_ANALYZE}` }
       image: s8.images === "body" ? (name) => hasAsset(ctx2.char, name) ? imageUrl(ctx2.char, name) : null : void 0
     });
     const job = jobs2.get(chatKey2(ctx2));
-    const rel = (label2, list4) => list4.length ? `<div class="rel"><b>${label2}</b>${list4.map((t) => `<button type="button" class="wl${saved2.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc9(t)}">${esc9(entryFor(ctx2, t)?.name ?? t)}</button>`).join(" · ")}</div>` : "";
+    const rel = (label2, list4) => list4.length ? `<div class="rel"><b>${label2}</b>${list4.map((t) => `<button type="button" class="wl${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc10(t)}">${esc10(entryFor(ctx2, t)?.name ?? t)}</button>`).join(" · ")}</div>` : "";
     const m = doc2.meta;
     const info = m ? `<details class="ref"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
-       ${m.sources.length ? `<p>${esc9(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc9(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc9(m.docRequest)}</p>` : ""}</details>` : "";
+       ${m.sources.length ? `<p>${esc10(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc10(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc10(m.docRequest)}</p>` : ""}</details>` : "";
     const confirm = wiki.confirmDelete === doc2.title;
     const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc2.title);
-    const del = doc2.base ? "" : `<button type="button" class="${confirm ? "danger" : ""}" data-action="wiki-delete" data-value="${esc9(doc2.title)}">${confirm ? hasBase ? "정말 되돌리기" : "정말 삭제" : hasBase ? "↺ 되돌리기" : "🗑 삭제"}</button>`;
-    const open4 = wiki.rewrite === doc2.title;
+    const del = doc2.base ? "" : `<button type="button" class="${confirm ? "danger" : ""}" data-action="wiki-delete" data-value="${esc10(doc2.title)}">${confirm ? hasBase ? "정말 되돌리기" : "정말 삭제" : hasBase ? "↺ 되돌리기" : "🗑 삭제"}</button>`;
+    const open3 = wiki.rewrite === doc2.title;
     const busy6 = job?.title === doc2.title;
-    const tools = `<div class="dbtn"><button type="button" class="${open4 ? "on" : ""}" data-action="wiki-rewrite" data-value="${esc9(doc2.title)}" aria-pressed="${open4}" ${job ? "disabled" : ""}>${busy6 ? "✎ 작성하는 중" : "✎ 다시 쓰기"}</button>${del}</div>`;
+    const tools = `<div class="dbtn"><button type="button" class="${open3 ? "on" : ""}" data-action="wiki-rewrite" data-value="${esc10(doc2.title)}" aria-pressed="${open3}" ${job ? "disabled" : ""}>${busy6 ? "✎ 작성하는 중" : "✎ 다시 쓰기"}</button>${del}</div>`;
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const rewrite = open4 ? `<div class="rwbox wk-rewrite"><b>다시 쓰기</b>${docReqBox(req)}
-        <div class="rr"><span>이전 문서 참고</span><span class="sg2">${[["1", "ON"], ["0", "OFF"]].map(([v, l]) => `<button type="button" class="${(wiki.rewritePrev ? "1" : "0") === v ? "on" : ""}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? "1" : "0") === v}">${l}</button>`).join("")}</span><span class="sp"></span><button type="button" class="bt go" data-action="wiki-rw-go" data-value="${esc9(doc2.title)}" ${job ? "disabled" : ""}>${busy6 ? '<i class="spin"></i>작성하는 중…' : "다시 쓰기"}</button><button type="button" class="bt" data-action="wiki-rw-cancel">취소</button></div>${busy6 ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ""}</div>` : "";
+    const rewrite = open3 ? `<div class="rwbox wk-rewrite"><b>다시 쓰기</b>${docReqBox(req)}
+        <div class="rr"><span>이전 문서 참고</span><span class="sg2">${[["1", "ON"], ["0", "OFF"]].map(([v, l]) => `<button type="button" class="${(wiki.rewritePrev ? "1" : "0") === v ? "on" : ""}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? "1" : "0") === v}">${l}</button>`).join("")}</span><span class="sp"></span><button type="button" class="bt go" data-action="wiki-rw-go" data-value="${esc10(doc2.title)}" ${job ? "disabled" : ""}>${busy6 ? '<i class="spin"></i>작성하는 중…' : "다시 쓰기"}</button><button type="button" class="bt" data-action="wiki-rw-cancel">취소</button></div>${busy6 ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ""}</div>` : "";
     const dm = [doc2.base ? "" : m?.created ? `최근 수정 시각: ${dayOf2(m.created)}` : "", `분류: ${catName(ctx2, doc2)}`, e && e.sub && e.cat !== "lm" ? e.sub : ""].filter(Boolean).join(" · ");
-    return `<div class="wrap one"><div class="doc wk-docp"><div class="h1r wk-head"><h1 class="wk-h1">${esc9(doc2.title)}</h1>${tools}</div><div class="dm">${esc9(dm)}</div>
+    return `<div class="wrap one"><div class="doc wk-docp"><div class="h1r wk-head"><h1 class="wk-h1">${esc10(doc2.title)}</h1>${tools}</div><div class="dm">${esc10(dm)}</div>
     ${rewrite}<article class="nw-doc"><div class="nw-body">${r.html}</div></article>
     ${rel("상세 문서", r.related)}${rel("관련 문서", r.recent)}${info}</div></div>`;
   }
   function findView(ctx2) {
     const q = wiki.query.trim();
     const docs = sortedDocs(ctx2);
-    const saved2 = new Set(docs.map((d) => d.title));
+    const saved = new Set(docs.map((d) => d.title));
     const lower = q.toLowerCase();
-    const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
-    const hits = matches2(ctx2, q).filter((e, i, all) => !saved2.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
-    const shown3 = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-    const near = similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown3.has(t));
-    const item2 = (title2, cat, text4, none3) => `<li><button type="button" class="wl t${none3 ? " none" : ""}" data-action="wiki-pick" data-value="${esc9(title2)}">${esc9(shownName(ctx2, title2))}</button><small>${esc9(cat)}</small>${text4 ? `<p>${esc9(text4)}</p>` : ""}</li>`;
+    const mine2 = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
+    const hits = matches2(ctx2, q).filter((e, i, all) => !saved.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
+    const shown4 = /* @__PURE__ */ new Set([...mine2.map((d) => d.title), ...hits.map((e) => e.title)]);
+    const near = similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown4.has(t));
+    const item2 = (title2, cat, text5, none3) => `<li><button type="button" class="wl t${none3 ? " none" : ""}" data-action="wiki-pick" data-value="${esc10(title2)}">${esc10(shownName(ctx2, title2))}</button><small>${esc10(cat)}</small>${text5 ? `<p>${esc10(text5)}</p>` : ""}</li>`;
     const ofDoc = (d) => item2(d.title, catName(ctx2, d), docSummary(d.body, 90), false);
     const ofEntry = (e) => item2(e.title, CAT_LABEL[entryFor(ctx2, e.title)?.cat ?? e.cat], [e.sub, "아직 없는 문서"].filter(Boolean).join(" · "), true);
     const list4 = [
-      ...mine.map(ofDoc),
+      ...mine2.map(ofDoc),
       ...hits.map(ofEntry),
       ...near.map((t) => {
         const d = docs.find((x) => x.title === t);
@@ -2613,9 +3145,9 @@ ${RETRY_ANALYZE}` }
         return e ? ofEntry(e) : "";
       })
     ].filter(Boolean);
-    const exact = saved2.has(canon(ctx2)(q));
-    const go1 = exact ? "" : `<div class="go1 wk-nohit">→ <button type="button" class="wl" data-action="wiki-write" data-value="${esc9(q)}"><b>${esc9(q)}</b></button> 문서가 없어요. <button type="button" class="wl new" data-action="wiki-write" data-value="${esc9(q)}">이 제목으로 새 문서 만들기</button></div>`;
-    return `<div class="wrap one"><div class="doc wk-find"><h1 class="wk-h1">"${esc9(q)}" 검색 결과</h1><div class="dm">문서 ${list4.length}개</div>
+    const exact = saved.has(canon(ctx2)(q));
+    const go1 = exact ? "" : `<div class="go1 wk-nohit">→ <button type="button" class="wl" data-action="wiki-write" data-value="${esc10(q)}"><b>${esc10(q)}</b></button> 문서가 없어요. <button type="button" class="wl new" data-action="wiki-write" data-value="${esc10(q)}">이 제목으로 새 문서 만들기</button></div>`;
+    return `<div class="wrap one"><div class="doc wk-find"><h1 class="wk-h1">"${esc10(q)}" 검색 결과</h1><div class="dm">문서 ${list4.length}개</div>
     ${go1}${list4.length ? `<ul class="sres">${list4.join("")}</ul>` : ""}</div></div>`;
   }
   function paneHtml2(ctx2) {
@@ -2628,21 +3160,21 @@ ${RETRY_ANALYZE}` }
   }
   function wikiTab(ctx2, env3) {
     if (env3) liveEnv2 = env3;
-    const fail4 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc9(wiki.failure.title)})</summary><p>${esc9(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc9(wiki.failure.raw)}</textarea></details>` : "";
+    const fail4 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc10(wiki.failure.title)})</summary><p>${esc10(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc10(wiki.failure.raw)}</textarea></details>` : "";
     const note = toast("nw", wiki.info, (t) => {
       if (wiki.info === t) wiki.info = "";
     });
     const job = jobs2.get(chatKey2(ctx2));
     const showBusy = job && !(wiki.title === job.title && (wiki.view === "compose" || wiki.view === "doc" && wiki.rewrite === job.title));
-    const status2 = `${showBusy ? busyLine(ctx2) : ""}${wiki.notice ? `<div class="gx-err" role="alert">${esc9(wiki.notice)}</div>` : ""}`;
-    const open4 = wiki.listOpen;
+    const status2 = `${showBusy ? busyLine(ctx2) : ""}${wiki.notice ? `<div class="gx-err" role="alert">${esc10(wiki.notice)}</div>` : ""}`;
+    const open3 = wiki.listOpen;
     const main = wiki.view === "home";
-    const drawer = `<aside class="wdr${open4 ? " open" : ""}" aria-label="위키 목록"${open4 ? "" : " inert"}>
-      <label class="wsr">${SRCH}<input type="search" name="wiki-filter" data-input="wiki-filter" placeholder="이름·제목 검색" value="${esc9(wiki.filter)}" aria-label="이름·제목 검색" autocomplete="off"></label>
+    const drawer = `<aside class="wdr${open3 ? " open" : ""}" aria-label="위키 목록"${open3 ? "" : " inert"}>
+      <label class="wsr">${SRCH}<input type="search" name="wiki-filter" data-input="wiki-filter" placeholder="이름·제목 검색" value="${esc10(wiki.filter)}" aria-label="이름·제목 검색" autocomplete="off"></label>
       <div class="wlist">${wikiList(ctx2)}</div>${fail4}</aside>`;
     const grab = `<button type="button" class="wgrab" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">‹<span>목록</span></button>`;
-    const scrim = open4 ? '<button type="button" class="wscrim" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>' : "";
-    return `<main class="gx-body wk hasdr${main ? " nm" : ""}${open4 ? " dr-open" : ""}">
+    const scrim = open3 ? '<button type="button" class="wscrim" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>' : "";
+    return `<main class="gx-body wk hasdr${main ? " nm" : ""}${open3 ? " dr-open" : ""}">
     ${topBar(main)}
     <div class="wsc">${status2 ? `<div class="wst nw-status">${status2}</div>` : ""}${paneHtml2(ctx2)}</div>
     ${grab}${drawer}${scrim}
@@ -2668,13 +3200,13 @@ ${RETRY_ANALYZE}` }
       cur = sup;
       pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${(li.querySelector(".nw-fn-t") ?? li).innerHTML}`;
       pop.hidden = false;
-      const box4 = doc2.getBoundingClientRect();
+      const box3 = doc2.getBoundingClientRect();
       const r = sup.getBoundingClientRect();
-      const w = Math.min(360, box4.width - 24);
+      const w = Math.min(360, box3.width - 24);
       pop.style.width = `${w}px`;
-      const left = Math.max(12, Math.min(r.left - box4.left - w / 2 + r.width / 2, box4.width - w - 12));
-      let top = r.bottom - box4.top + doc2.scrollTop + 6;
-      if (r.bottom + pop.offsetHeight + 12 > box4.bottom && r.top - pop.offsetHeight - 12 > box4.top) top = r.top - box4.top + doc2.scrollTop - pop.offsetHeight - 6;
+      const left = Math.max(12, Math.min(r.left - box3.left - w / 2 + r.width / 2, box3.width - w - 12));
+      let top = r.bottom - box3.top + doc2.scrollTop + 6;
+      if (r.bottom + pop.offsetHeight + 12 > box3.bottom && r.top - pop.offsetHeight - 12 > box3.top) top = r.top - box3.top + doc2.scrollTop - pop.offsetHeight - 6;
       pop.style.left = `${left}px`;
       pop.style.top = `${top}px`;
     };
@@ -2711,7 +3243,7 @@ ${RETRY_ANALYZE}` }
     doc2.addEventListener("scroll", () => !hover && hide(), { passive: true });
     doc2.closest(".wsc")?.addEventListener("scroll", () => !hover && hide(), { passive: true });
   }
-  function bindWikiSide(root3, act) {
+  function bindWikiSide(root3, act2) {
     const bar = root3.querySelector(".nw-rail");
     const panel = root3.querySelector(".wk .wdr");
     if (!panel) return;
@@ -2724,8 +3256,8 @@ ${RETRY_ANALYZE}` }
       if (Math.abs(dx) < 30) return;
       dragged = true;
       const d = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "right" ? -dx : dx;
-      if (d > 0 && !wiki.listOpen) act("open");
-      else if (d < 0 && wiki.listOpen) act("close");
+      if (d > 0 && !wiki.listOpen) act2("open");
+      else if (d < 0 && wiki.listOpen) act2("close");
     };
     bar?.addEventListener("pointerdown", (e) => {
       x0 = e.clientX;
@@ -2748,9 +3280,9 @@ ${RETRY_ANALYZE}` }
       }
       const k = t.closest(".nw-kgrid [data-k]")?.dataset.k;
       if (k) {
-        const box4 = panel.querySelector(".wls");
-        const sec2 = box4?.querySelector(`[data-ksec="${k}"]`);
-        if (box4 && sec2) box4.scrollTop = sec2.offsetTop;
+        const box3 = panel.querySelector(".wls");
+        const sec2 = box3?.querySelector(`[data-ksec="${k}"]`);
+        if (box3 && sec2) box3.scrollTop = sec2.offsetTop;
         grid.hidden = true;
         return;
       }
@@ -2765,7 +3297,7 @@ ${RETRY_ANALYZE}` }
       t0 = null;
       const fromLeft = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "left";
       const out = fromLeft ? dx < -36 : dx > 36;
-      if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act("close");
+      if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act2("close");
     }, { passive: true });
     const edge = root3.querySelector(".wk .wgrab");
     let e0 = null;
@@ -2775,7 +3307,7 @@ ${RETRY_ANALYZE}` }
       const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
       e0 = null;
       const leftSide = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "left";
-      if ((leftSide ? dx > 24 : dx < -24) && !wiki.listOpen) act("open");
+      if ((leftSide ? dx > 24 : dx < -24) && !wiki.listOpen) act2("open");
     }, { passive: true });
   }
   var wide = () => !isPhone();
@@ -2899,8 +3431,8 @@ ${RETRY_ANALYZE}` }
         return true;
       case "wiki-jump": {
         const el = document.getElementById(v);
-        const fold2 = el?.closest("details");
-        if (fold2) fold2.open = true;
+        const fold = el?.closest("details");
+        if (fold) fold.open = true;
         el?.scrollIntoView({ behavior: "smooth", block: "start" });
         return true;
       }
@@ -2960,6 +3492,74 @@ ${RETRY_ANALYZE}` }
     return { title: titleMsgs, article: p2.messages };
   }
 
+  // src/core/setdef/gnet.ts
+  var GNET_SET = {
+    id: "gn",
+    groups: [
+      {
+        title: "@page",
+        rows: [
+          {
+            key: "lazy",
+            label: "자동 호출",
+            common: "auto",
+            ctl: { t: "seg", opts: [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]], fb: "1" },
+            help: { "1": "새로고침 버튼을 누를 때만 불러요", open: "채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요", "0": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요" }
+          },
+          {
+            key: "joint",
+            label: "한 번에 요청",
+            common: "joint",
+            ctl: { t: "custom" },
+            help: "괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요."
+          },
+          {
+            key: "mode",
+            label: "모델",
+            common: "model",
+            ctl: { t: "seg", opts: [["1", "메인 모델"], ["2", "보조 모델"]], fb: "2" },
+            help: "게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 메인 응답과 같은 모델"
+          },
+          { key: "context", label: "컨텍스트 포함", common: "ctx", ctl: onOff("0", "0"), help: "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요" },
+          {
+            key: "sampling",
+            label: "다양성 강화",
+            common: "sampling",
+            ctl: { t: "seg", opts: [["0", "OFF"], ["1", "ON"]], fb: "0" },
+            help: "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요"
+          }
+        ]
+      },
+      {
+        title: "게시판",
+        rows: [
+          { key: "post", label: "게시글 수", ctl: { t: "minmax", lo: COUNT_RANGE.post[0], hi: COUNT_RANGE.post[1], unit: "개" }, help: `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요` },
+          { key: "cmt", label: "새 글 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.cmt[0], hi: COUNT_RANGE.cmt[1], unit: "개" }, help: `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요` },
+          { key: "act", label: "활동 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.act[0], hi: COUNT_RANGE.act[1], unit: "개" }, help: `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요` },
+          {
+            key: "privacy",
+            label: "사생활",
+            ctl: { t: "seg", opts: [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]] },
+            help: "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"
+          },
+          { key: "subject", label: "주제", ctl: { t: "text", ph: "비우면 세계관에 맞는 다양한 주제" } },
+          { key: "mood", label: "분위기·말투", ctl: { t: "text", ph: "비우면 익명 커뮤니티 말투" } },
+          { key: "protagonist", label: "보호 대상", ctl: { t: "text", ph: "비우면 주인공" }, help: "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공" },
+          { key: "keyfigures", label: "주요 인물 닉네임", ctl: { t: "seg", opts: [["1", "보존"], ["0", "안 함"]], fb: "1" }, help: "주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요" },
+          { key: "keepown", label: "새로고침 시 내 글", ctl: { t: "seg", opts: [["1", "유지"], ["0", "교체"]] }, help: "새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요" },
+          { key: "keepreplied", label: "내 댓글 있는 글", ctl: { t: "seg", opts: [["1", "유지"], ["0", "교체"]] }, help: "내가 댓글을 단 남의 글도 새로고침 때 남길지예요" }
+        ]
+      },
+      {
+        title: "쪽지",
+        rows: [
+          { key: "incoming", label: "선쪽지 받기", ctl: { t: "seg", opts: [["1", "받기"], ["0", "안 받기"]], fb: "1" }, help: "게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요" },
+          { key: "storage", label: "쪽지 자동 정리", ctl: { t: "custom" } }
+        ]
+      }
+    ]
+  };
+
   // src/core/update.ts
   var UPDATE_SCHEMA = 1;
   var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
@@ -3011,31 +3611,31 @@ ${RETRY_ANALYZE}` }
       return `${k}\0${n3}`;
     });
   }
-  function mergeByName(current5, incoming, name, keep = () => false) {
+  function mergeByName(current5, incoming, name, keep2 = () => false) {
     const ck = keyed(current5, name);
     const ik = keyed(incoming, name);
     const cur = new Map(ck.map((k, i) => [k, current5[i]]));
-    const count3 = { replaced: 0, added: 0, kept: 0, protected: 0 };
+    const count2 = { replaced: 0, added: 0, kept: 0, protected: 0 };
     const list4 = incoming.map((x, i) => {
       const old = cur.get(ik[i]);
       if (old === void 0) {
-        count3.added++;
+        count2.added++;
         return x;
       }
-      if (keep(old)) {
-        count3.protected++;
+      if (keep2(old)) {
+        count2.protected++;
         return old;
       }
-      if (JSON.stringify(old) !== JSON.stringify(x)) count3.replaced++;
+      if (JSON.stringify(old) !== JSON.stringify(x)) count2.replaced++;
       return x;
     });
     const used = new Set(ik);
     ck.forEach((k, i) => {
       if (used.has(k)) return;
-      count3.kept++;
+      count2.kept++;
       list4.push(current5[i]);
     });
-    return { list: list4, count: count3 };
+    return { list: list4, count: count2 };
   }
   var RETIRED_SCRIPTS = ["📊상태창", "🖼️에셋줄바꿈", "🖼️에셋출력", "🖼️에셋리퀘제거"];
   var loreName = (e) => `${e.comment ?? ""}${e.folder ?? ""}`;
@@ -3047,9 +3647,9 @@ ${RETRY_ANALYZE}` }
     return current5.filter((e) => !retired(e) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
   }
   function keyPrint(key) {
-    const norm3 = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
+    const norm4 = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
     let h = 2166136261;
-    for (const b of new TextEncoder().encode(norm3)) h = Math.imul(h ^ b, 16777619) >>> 0;
+    for (const b of new TextEncoder().encode(norm4)) h = Math.imul(h ^ b, 16777619) >>> 0;
     return h.toString(16).padStart(8, "0");
   }
   function shippedKeys(lore) {
@@ -3102,7 +3702,7 @@ ${RETRY_ANALYZE}` }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.9" : "0";
+  var PLUGIN_VERSION = true ? "0.21.11" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -3164,8 +3764,8 @@ ${RETRY_ANALYZE}` }
     const byKey = key ? lore.find((e) => isFolder2(e) && e.key === key) : void 0;
     return byKey ?? lore.find((e) => isFolder2(e) && str7(e.comment).trim() === SETTINGS_FOLDER_NAME);
   }
-  function isLanding(text4) {
-    return typeof text4 === "string" && (text4.includes('data-goei="landing"') || text4.includes("ANOMALY SIMULATION") && text4.includes("버튼을 눌러 시작하세요"));
+  function isLanding(text5) {
+    return typeof text5 === "string" && (text5.includes('data-goei="landing"') || text5.includes("ANOMALY SIMULATION") && text5.includes("버튼을 눌러 시작하세요"));
   }
   function installLoreSettings(cur) {
     return cur && typeof cur === "object" ? null : { tokenBudget: DEFAULT_BUDGET, scanDepth: DEFAULT_DEPTH, recursiveScanning: false };
@@ -3202,567 +3802,4 @@ ${RETRY_ANALYZE}` }
       settingsFolder: !!findFolder(lore),
       firstMessage: isLanding(i.firstMessage),
       loreSettings: !installLoreSettings(i.loreSettings),
-      greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
-      pictures: { missing: missingPics, bytes: missingPics.reduce((n3, p2) => n3 + (Number(p2[3]) || 0), 0), total: want.length },
-      icon: i.iconOurs,
-      wikiPack: i.wikiPack,
-      tokenizer: i.tokenizer
-    };
-  }
-  var uuid = () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
-  function plantGreetings(existing) {
-    const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
-    const index3 = {};
-    const at = /* @__PURE__ */ new Map();
-    out.forEach((g2, n3) => {
-      if (!at.has(g2)) at.set(g2, n3);
-    });
-    const inst = installData();
-    for (const [key, n3] of Object.entries(inst.greetings.index)) {
-      const text4 = inst.greetings.texts[n3] ?? "";
-      let hit4 = at.get(text4);
-      if (hit4 === void 0) {
-        hit4 = out.length;
-        out.push(text4);
-        at.set(text4, hit4);
-      }
-      index3[key] = hit4;
-    }
-    return { greetings: out, index: index3 };
-  }
-  function buildManifest(o) {
-    const prev = o.prev ?? {};
-    const { wiki: _wiki, ...keys } = prev.keys ?? {};
-    return {
-      ...prev,
-      schema: 1,
-      plugin: "goei-plugin",
-      version: prev.version ?? PLUGIN_VERSION,
-      greetings: o.greetings,
-      pictures: pictures(prev).length ? pictures(prev) : installData().pictures,
-      keys: { ...keys, settings: o.settingsKey }
-    };
-  }
-  var entry2 = (comment, content, folder, extra2 = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra2 });
-  var folderEntry = (comment, key) => ({ key, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
-  var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
-  function fillDirectory(cur, def) {
-    const out = { ...cur };
-    let gaps = 0;
-    for (const [k, dv] of Object.entries(def)) {
-      if (k === "_help") continue;
-      const cv = out[k];
-      if (empty(cv)) {
-        if (!empty(dv)) out[k] = dv, gaps++;
-        continue;
-      }
-      if (k === "괴담톡 탭") {
-        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
-        continue;
-      }
-      if (!isObj2(cv) || !isObj2(dv)) continue;
-      const sec2 = { ...cv };
-      for (const [name, de] of Object.entries(dv)) {
-        const ce = sec2[name];
-        if (ce === void 0) {
-          sec2[name] = de;
-          gaps++;
-        } else if (isObj2(ce) && isObj2(de)) {
-          const row11 = { ...ce };
-          for (const [f, fv] of Object.entries(de)) if (empty(row11[f]) && !empty(fv)) row11[f] = fv, gaps++;
-          sec2[name] = row11;
-        }
-      }
-      out[k] = sec2;
-    }
-    return { data: out, gaps };
-  }
-  function directoryGapCount(lore) {
-    const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
-    if (!parts.length) return 0;
-    const cur = readDirectoryData(lore);
-    if (!cur) return -1;
-    return data2 ? fillDirectory(cur, installData().directory).gaps : 0;
-  }
-  function installLore(lore, greetings) {
-    const out = [...lore ?? []];
-    let settings = findFolder(out);
-    if (!settings) {
-      settings = folderEntry(SETTINGS_FOLDER_NAME, `${FOLDER_PREFIX}${uuid()}`);
-      out.push(settings);
-    }
-    const settingsKey = str7(settings.key);
-    const dir2 = directoryEntries(out).filter((e) => typeof e.content === "string" && e.content.trim());
-    const cur = dir2.length ? readDirectoryData(out) : null;
-    if (!dir2.length || !cur) {
-      for (const e of dir2) e.comment = `${String(e.comment)} (읽을 수 없어 보관)`;
-      const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
-      const fresh4 = entry2(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
-      if (stale >= 0) out[stale] = fresh4;
-      else out.push(fresh4);
-    } else {
-      for (const e of dir2) if (!e.folder) e.folder = settingsKey;
-      const filled = fillDirectory(cur, installData().directory);
-      if (filled.gaps) {
-        const first = out.indexOf(dir2[0]);
-        out[first] = { ...dir2[0], comment: DIRECTORY_COMMENT, content: JSON.stringify(filled.data) };
-        for (let i = out.length - 1; i >= 0; i--) if (i !== first && dir2.includes(out[i])) out.splice(i, 1);
-      }
-    }
-    const prev = readManifest(out);
-    const manifest = buildManifest({ greetings, settingsKey, prev });
-    const old = manifestEntry(out);
-    const fresh3 = entry2(MANIFEST_COMMENT, JSON.stringify(manifest), settingsKey);
-    if (old) {
-      const at = out.indexOf(old);
-      out[at] = { ...old, content: fresh3.content, folder: old.folder || settingsKey };
-    } else out.push(fresh3);
-    return out;
-  }
-  function installSummary(s8) {
-    const out = [];
-    if (!s8.settingsFolder) out.push("⚙️설정 폴더 없음");
-    if (!s8.directory) out.push(s8.directoryGaps < 0 ? "명부(Directory)를 읽을 수 없음" : "명부(Directory) 없음");
-    else if (s8.directoryGaps > 0) out.push(`명부에 빠진 칸 ${s8.directoryGaps}개`);
-    if (!s8.manifest) out.push("Plugin manifest 없음");
-    if (!s8.firstMessage) out.push("첫 메시지(시작 안내) 없음");
-    if (!s8.loreSettings) out.push("로어북 설정 없음");
-    if (!s8.greetings.ok) out.push(`인사말 ${s8.greetings.missing.length}/${s8.greetings.total}개 없음`);
-    if (s8.pictures.missing.length) out.push(`카드 사진 ${s8.pictures.missing.length}/${s8.pictures.total}장 없음`);
-    if (!s8.wikiPack) out.push("위키 기본 문서 없음");
-    if (!s8.tokenizer) out.push("토크나이저 없음");
-    return out;
-  }
-
-  // src/core/texthash.ts
-  function textHash(text4) {
-    let h = 2166136261;
-    for (let i = 0; i < text4.length; i++) h = Math.imul(h ^ text4.charCodeAt(i), 16777619) >>> 0;
-    return h.toString(16).padStart(8, "0");
-  }
-  async function sha256Text(text4) {
-    try {
-      const subtle = globalThis.crypto?.subtle;
-      if (!subtle) return null;
-      const d = await subtle.digest("SHA-256", new TextEncoder().encode(text4));
-      return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
-    } catch {
-      return null;
-    }
-  }
-
-  // src/core/datapack.ts
-  function expectOf(raw) {
-    try {
-      const o = typeof raw === "string" ? JSON.parse(raw) : null;
-      if (o && typeof o.hash === "string" && typeof o.sha256 === "string" && typeof o.length === "number") return { hash: o.hash, sha256: o.sha256, length: o.length };
-    } catch {
-    }
-    return { hash: "", sha256: "", length: 0 };
-  }
-  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"b9688ee8","sha256":"a73e000d58b807f1d9f87d934856d79711928c1b493025118a54242f7b38de9c","length":1234781}' : void 0) };
-  var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"9541920f","sha256":"b4eae9d7a8120cf8642833cfa7df0f54bd7bc9cc660164ee8ed7b1e8c5e216bd","length":168812}' : void 0) };
-  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"0a3b1d71","sha256":"d86d034a4771dfb31658171e7573c8318e310886bfe6bdff15ae9939d256a569","length":8467376}' : void 0) };
-  function packMatches(text4, expect) {
-    return !!expect.hash && text4.length === expect.length && textHash(text4) === expect.hash;
-  }
-  var obj5 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  function applyWorldPack(text4) {
-    let j;
-    try {
-      j = JSON.parse(text4);
-    } catch {
-      throw new Error("세계 자료 팩이 JSON 이 아니에요.");
-    }
-    if (!obj5(j) || j.schema !== 1 || j.kind !== "world") throw new Error("세계 자료 팩 형식이 달라요 (schema·kind).");
-    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) if (!obj5(j[k])) throw new Error(`세계 자료 팩 형식이 달라요 (${k}).`);
-    const rel = j.relations;
-    if (!obj5(rel) || !obj5(rel.pairs) || typeof rel.common !== "string") throw new Error("세계 자료 팩 형식이 달라요 (relations).");
-    setWorldData({
-      agent: j.agent,
-      org: j.org,
-      anomaly: j.anomaly,
-      site: j.site,
-      appendix: j.appendix,
-      relations: { pairs: rel.pairs, common: rel.common },
-      // 첫 장면 기본값 (옛 팩에는 없다)
-      ...obj5(j.scenes) && obj5(j.scenes.세력) && obj5(j.scenes.인물) ? { scenes: j.scenes } : {}
-    });
-  }
-  function applyInstallPack(text4) {
-    let j;
-    try {
-      j = JSON.parse(text4);
-    } catch {
-      throw new Error("설치 자료 팩이 JSON 이 아니에요.");
-    }
-    if (!obj5(j) || j.schema !== 1 || j.kind !== "install") throw new Error("설치 자료 팩 형식이 달라요 (schema·kind).");
-    const g2 = j.greetings;
-    if (!obj5(g2) || !obj5(g2.index) || !Array.isArray(g2.texts) || typeof g2.first !== "string") throw new Error("설치 자료 팩 형식이 달라요 (greetings).");
-    if (!Array.isArray(j.pictures)) throw new Error("설치 자료 팩 형식이 달라요 (pictures).");
-    if (!obj5(j.directory)) throw new Error("설치 자료 팩 형식이 달라요 (directory).");
-    if (!obj5(j.icon)) throw new Error("설치 자료 팩 형식이 달라요 (icon).");
-    setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String), first: g2.first }, pictures: j.pictures, directory: j.directory, icon: j.icon });
-  }
-  function makeIconFind(table, rep, base, same4, cats) {
-    return makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same: same4, cats });
-  }
-  function applyItemsPack(text4) {
-    let j;
-    try {
-      j = JSON.parse(text4);
-    } catch {
-      throw new Error("소지품 그림 팩이 JSON 이 아니에요.");
-    }
-    if (!obj5(j) || j.schema !== 1 || j.kind !== "items" || !Array.isArray(j.table) || !obj5(j.icons)) throw new Error("소지품 그림 팩 형식이 달라요.");
-    const icons2 = j.icons;
-    const strs = (v) => Array.isArray(v) ? v.map((x) => String(x)) : [];
-    const table = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons2[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...Array.isArray(r.u) ? { u: strs(r.u) } : {}, ...r.base ? { base: true } : {} }));
-    const rep = {};
-    if (obj5(j.rep)) {
-      for (const [k, f] of Object.entries(j.rep)) if (typeof f === "string" && typeof icons2[f] === "string") rep[normIcon(k)] = f;
-    }
-    const base = {};
-    for (const r of table) if (r.base) base[r.kind] = r.f;
-    const same4 = {};
-    if (obj5(j.same)) {
-      for (const [k, v] of Object.entries(j.same)) if (typeof v === "string") same4[k] = v;
-    }
-    const hit4 = makeIconFind(table, rep, base, same4, Array.isArray(j.cats) ? strs(j.cats) : void 0);
-    return { table, rep, icons: icons2, base, hit: hit4, find: (name, icon) => hit4(name, icon)?.file ?? null };
-  }
-  function matchItemIcon(pack4, itemName, icon, seed2) {
-    const h = pack4.hit(itemName, icon);
-    if (h?.pool && seed2 !== void 0 && iconPoolOn()) return pickIconFromPool(h.pool.filter((f) => typeof pack4.icons[f] === "string"), seed2) ?? h.file;
-    return h?.file ?? pack4.base.misc ?? null;
-  }
-  var packWords = /* @__PURE__ */ new WeakMap();
-  function wordsOf(pack4) {
-    let m = packWords.get(pack4);
-    if (!m) {
-      m = /* @__PURE__ */ new Map();
-      const fts = /* @__PURE__ */ new Map();
-      for (const r of pack4.table) {
-        if (!fts.has(r.f)) fts.set(r.f, /* @__PURE__ */ new Set());
-        for (const t of r.ft) fts.get(r.f).add(normIcon(t));
-      }
-      for (const r of pack4.table) {
-        let x = m.get(r.f);
-        if (!x) m.set(r.f, x = { heads: /* @__PURE__ */ new Set(), mods: /* @__PURE__ */ new Set() });
-        const ft = fts.get(r.f);
-        for (const t of [...r.k, ...r.h]) {
-          const ws = normIcon(t.replace(/\([^)]*\)/g, " ")).split(" ").filter(Boolean);
-          ws.forEach((w, i) => (i === ws.length - 1 && !ft.has(w) ? x.heads : x.mods).add(w));
-        }
-      }
-      packWords.set(pack4, m);
-    }
-    return m;
-  }
-  function matchTitleIcon(pack4, title2) {
-    const words = normIcon(title2).split(" ").filter(Boolean);
-    if (!words.length) return null;
-    const table = wordsOf(pack4);
-    const pre = (a, b) => a.length >= 2 && b.startsWith(a) || b.length >= 2 && a.startsWith(b);
-    const backed = (file, last2) => {
-      const x = table.get(file);
-      if (!x) return false;
-      for (const w of x.heads) if (w === last2 || pre(w, last2)) return true;
-      for (const w of x.mods) if (w !== last2 && pre(w, last2)) return true;
-      return false;
-    };
-    const at = (n3) => {
-      const h = pack4.hit(words.slice(0, n3).join(" "), void 0, true);
-      return h && h.score >= 1 && backed(h.file, words[n3 - 1]) ? h.file : null;
-    };
-    const whole = pack4.hit(words.join(" "), void 0, true);
-    const first = at(words.length);
-    if (first) return first;
-    for (let n3 = 1; n3 < words.length; n3++) {
-      const f = at(n3);
-      if (f) return f;
-    }
-    return whole?.file ?? null;
-  }
-
-  // src/core/fetchparts.ts
-  var PART_CONCURRENCY = 4;
-  async function fetchParts(names4, get, onDone, limit = PART_CONCURRENCY) {
-    const out = new Array(names4.length);
-    let next = 0;
-    let done3 = 0;
-    let failed4 = false;
-    const worker = async () => {
-      while (next < names4.length && !failed4) {
-        const i = next++;
-        try {
-          out[i] = await get(names4[i]);
-        } catch (error) {
-          failed4 = true;
-          throw error;
-        }
-        onDone?.(++done3);
-      }
-    };
-    await Promise.all(Array.from({ length: Math.min(limit, names4.length) }, worker));
-    return out.join("");
-  }
-
-  // src/host/datapack.ts
-  var WORLD_KEY2 = "goei:data-world";
-  var INSTALL_KEY = "goei:data-install";
-  var DataPackError = class extends Error {
-  };
-  var TIMEOUT_MS = 4e4;
-  function timeout(p2, name) {
-    let t;
-    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${name}을 ${TIMEOUT_MS / 1e3}초 안에 받지 못했어요.`)), TIMEOUT_MS))]).finally(() => clearTimeout(t));
-  }
-  async function getText(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
-        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-      } catch {
-      }
-    }
-    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
-    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
-    return String(await timeout(res.text(), name) ?? "");
-  }
-  async function getBytes(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
-        const b = r?.ok ? toBytes3(r.data) : null;
-        if (b?.length) return b;
-      } catch {
-      }
-    }
-    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
-    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
-    return new Uint8Array(await timeout(res.arrayBuffer(), name));
-  }
-  async function fetchPack(pack4, progress4) {
-    if (!UPDATE_BASE) throw new DataPackError("받을 곳이 정해지지 않은 빌드예요.");
-    if (!pack4.expect.hash) throw new DataPackError(`이 빌드에는 ${pack4.label} 지문이 없어요.`);
-    progress4?.(`${pack4.label} 목록 받는 중…`);
-    let index3 = null;
-    try {
-      index3 = JSON.parse((await getText(`${pack4.name}.json`)).replace(/^﻿/, ""));
-    } catch (error) {
-      throw new DataPackError(`${pack4.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
-    }
-    if (!index3 || !Array.isArray(index3.parts) || typeof index3.length !== "number") throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
-    if (index3.hash !== pack4.expect.hash) throw new DataPackError(`아직 이 판의 ${pack4.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
-    const re = new RegExp(`^${pack4.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
-    for (const name of index3.parts) {
-      if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
-    }
-    const parts = index3.parts;
-    const t0 = Date.now();
-    const text4 = await fetchParts(parts, getText, (n3) => progress4?.(`${pack4.label} 받는 중 ${n3}/${parts.length}`));
-    console.log(`[goei] ${pack4.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
-    if (text4.length !== pack4.expect.length) throw new DataPackError(`${pack4.label}를 끝까지 받지 못했어요. (${text4.length}/${pack4.expect.length}자)`);
-    const got = await sha256Text(text4);
-    if (got !== null) {
-      if (got !== pack4.expect.sha256) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(sha256). 다시 받아 주세요.`);
-    } else if (textHash(text4) !== pack4.expect.hash) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(hash). 다시 받아 주세요.`);
-    return text4;
-  }
-  async function loadWorldData(force = false) {
-    let saved2 = null;
-    try {
-      saved2 = await risuai.pluginStorage.getItem(WORLD_KEY2);
-    } catch {
-    }
-    if (typeof saved2 === "string" && packMatches(saved2, WORLD_PACK.expect)) {
-      try {
-        applyWorldPack(saved2);
-        return "store";
-      } catch (error) {
-        console.log(`[goei] 저장된 세계 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-      }
-    } else if (typeof saved2 === "string") console.log("[goei] 저장된 세계 자료가 이 판과 달라 다시 받아요");
-    const g2 = globalThis;
-    if (!force && g2.__goeiWorldFail && Date.now() - g2.__goeiWorldFail.at < 6e4) throw new Error(g2.__goeiWorldFail.reason);
-    let text4;
-    try {
-      text4 = await fetchPack(WORLD_PACK);
-    } catch (error) {
-      const reason3 = `${WORLD_PACK.label}(${WORLD_PACK.name})를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      g2.__goeiWorldFail = { at: Date.now(), reason: reason3 };
-      throw new Error(reason3);
-    }
-    await keepWorldData(text4);
-    return "fetch";
-  }
-  async function keepWorldData(text4) {
-    const g2 = globalThis;
-    applyWorldPack(text4);
-    delete g2.__goeiWorldFail;
-    delete g2.__goeiWorldDismissed;
-    try {
-      await risuai.pluginStorage.setItem(WORLD_KEY2, text4);
-    } catch (error) {
-      console.log(`[goei] 세계 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-  async function installWorldFile(raw) {
-    const text4 = raw.replace(/^\ufeff/, "");
-    if (!packMatches(text4, WORLD_PACK.expect)) {
-      let head3 = null;
-      try {
-        head3 = text4.length < 4e3 ? JSON.parse(text4) : null;
-      } catch {
-      }
-      if (head3 && typeof head3 === "object" && Array.isArray(head3.parts)) throw new DataPackError("그건 조각 목록(goei-data-world.json)이에요. 릴리스 zip 의 goei-data-world.txt 를 넣어 주세요.");
-      throw new DataPackError(`이 플러그인 판과 맞는 세계 자료(goei-data-world.txt)가 아니에요. (${text4.length.toLocaleString()}자, 기대 ${WORLD_PACK.expect.length.toLocaleString()}자)`);
-    }
-    await keepWorldData(text4);
-  }
-  var installPending = null;
-  async function ensureInstallData(progress4) {
-    if (installDataReady()) return;
-    installPending ??= (async () => {
-      let saved2 = null;
-      try {
-        saved2 = await risuai.pluginStorage.getItem(INSTALL_KEY);
-      } catch {
-      }
-      if (typeof saved2 === "string" && packMatches(saved2, INSTALL_PACK.expect)) {
-        try {
-          applyInstallPack(saved2);
-          return;
-        } catch (error) {
-          console.log(`[goei] 저장된 설치 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-        }
-      } else if (typeof saved2 === "string") console.log("[goei] 저장된 설치 자료가 이 판과 달라 다시 받아요");
-      const text4 = await fetchPack(INSTALL_PACK, progress4);
-      applyInstallPack(text4);
-      try {
-        await risuai.pluginStorage.setItem(INSTALL_KEY, text4);
-      } catch (error) {
-        console.log(`[goei] 설치 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-      }
-    })().finally(() => installPending = null);
-    await installPending;
-  }
-
-  // src/host/itemicons.ts
-  var ITEMS_KEY = "goei:data-items";
-  var pack3 = null;
-  var loading3 = null;
-  var failed = "";
-  var progress = "";
-  var redraw2 = () => {
-  };
-  var urls2 = /* @__PURE__ */ new Map();
-  function setItemIconRedraw(fn2) {
-    redraw2 = fn2;
-  }
-  var itemIconStatus = () => ({ ready: !!pack3, loading: !!loading3, progress, failed });
-  function ensureItemIcons() {
-    if (pack3 || loading3) return loading3 ?? Promise.resolve();
-    loading3 = (async () => {
-      failed = "";
-      try {
-        let saved2 = null;
-        try {
-          saved2 = await risuai.pluginStorage.getItem(ITEMS_KEY);
-        } catch {
-        }
-        if (typeof saved2 === "string" && packMatches(saved2, ITEMS_PACK.expect)) {
-          try {
-            pack3 = applyItemsPack(saved2);
-            return;
-          } catch (error) {
-            console.log(`[goei] 저장된 소지품 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-          }
-        }
-        const text4 = await fetchPack(ITEMS_PACK, (t) => {
-          progress = t;
-          redraw2();
-        });
-        pack3 = applyItemsPack(text4);
-        try {
-          await risuai.pluginStorage.setItem(ITEMS_KEY, text4);
-        } catch (error) {
-          console.log(`[goei] 소지품 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
-        }
-      } catch (error) {
-        failed = error instanceof DataPackError || error instanceof Error ? error.message : String(error);
-        console.log(`[goei] 소지품 그림 팩: ${failed}`);
-      } finally {
-        progress = "";
-        loading3 = null;
-        redraw2();
-      }
-    })();
-    return loading3;
-  }
-  function itemIconUrl(name, icon, seed2) {
-    if (!pack3) {
-      if (!failed) void ensureItemIcons();
-      return null;
-    }
-    return urlOf(matchItemIcon(pack3, name, icon, seed2));
-  }
-  function titleIconUrl(title2) {
-    if (!pack3) {
-      if (!failed) void ensureItemIcons();
-      return null;
-    }
-    return urlOf(matchTitleIcon(pack3, title2) ?? pack3.base.misc ?? null);
-  }
-  function urlOf(file) {
-    if (!pack3 || !file) return null;
-    let u = urls2.get(file);
-    if (!u) {
-      u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
-      urls2.set(file, u);
-    }
-    return u;
-  }
-
-  // src/ui/needfill.ts
-  var bound = false;
-  var needAttr = (name, value, busy6 = false) => ` data-need="${name}"${busy6 ? ' data-busy="1"' : ""}${busy6 || !value.trim() ? " disabled" : ""}`;
-  function bindNeedFill(doc2 = document) {
-    if (bound) return;
-    bound = true;
-    doc2.addEventListener(
-      "input",
-      (ev) => {
-        const el = ev.target;
-        const name = el?.getAttribute?.("name");
-        if (!name) return;
-        doc2.querySelectorAll(`button[data-need="${CSS.escape(name)}"]:not([data-busy])`).forEach((b) => {
-          b.disabled = !el.value.trim();
-        });
-      },
-      true
-    );
-  }
-
-  // src/ui/browser.ts
-  var esc10 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var SITES = [
-    { id: "gn", name: "괴담넷", title: "괴담넷 - 자유게시판", host: "goedam.net", path: "/board/free" },
-    { id: "gal", name: "괴담 갤러리", title: "괴담 갤러리 - 괴담갤", host: "gall.goedam.co.kr", path: "/board/lists/?id=horror" },
-    { id: "wpf", name: "세정게", title: "::: 世界政治 게시판 :::", host: "www.wpf.or.kr", path: "/zboard/zboard.php?id=politics" },
-    { id: "sm", name: "연어 마켓", title: "연어 마켓 | 이면의 중고거래", host: "salmon-market.kr", path: "" },
-    { id: "cos", name: "우주 쇼핑몰", title: "★우주 쇼핑몰★에 오는 것을 환영하는 것이다", host: "cosmic-mall.alien", path: "/~shop/index.html" },
-    { id: "wk", name: "괴이위키", title: "괴이위키", host: "goei.wiki", path: "/w/괴이위키:대문" },
-    { id: "bm", name: "백일몽 포인트몰", title: "백일몽 포인트몰", host: "point.baekilmong.intra", path: "/mall/main" },
-    { id: "hs", name: "망상홈쇼핑", title: "망상홈쇼핑 LIVE", host: "live.mangsang.tv", path: "/onair" }
-  ];
-  var siteOf = (id2) => SITES.find((s8) => s8.id === id2);
-  var isSite = (id2) => SITES.some((s8) => s8.id === id2);
-  var LOGO2 = {
-    gn: ["0 0 24 24", '<path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill=
+      greetings: { ok: !missing.length, missing, t

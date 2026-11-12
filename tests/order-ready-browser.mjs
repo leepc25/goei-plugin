@@ -37,6 +37,9 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   await page.waitForTimeout(600);
   await page.screenshot({ path: `${OUT}/${vp}-open.png` });
   // 상태창이 없는 글에도 카드가 붙는다
+  // 같은 사이트의 「접속하기」 표식과 같이 오면 카드는 「받으러 가기」 하나만
+  const both = await page.evaluate(() => window.__calls.handlers.display('답\n[shop: 우주 쇼핑몰|@web:cos]\n[shop-ready: cos|장갑]'));
+  assert.ok(both.includes('받으러 가기') && !both.includes('접속하기') && !both.includes('[shop'), both);
   const bare = await page.evaluate(() => window.__calls.handlers.display('상태창 없는 답\n[shop-ready: cos|장갑]'));
   assert.ok(bare.includes('받으러 가기') && bare.includes('장갑') && !bare.includes('shop-ready'));
   // 주문 조회에서 받으면 표식이 지워진다

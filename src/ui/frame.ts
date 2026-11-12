@@ -34,7 +34,8 @@ export function frameState(pref: FrameKind | undefined, nav: boolean): FrameStat
   const w = window.innerWidth;
   const h = window.innerHeight;
   if (w < (nav ? PANEL_W.nav : PANEL_W.pre) + EXTRA_W[want] + PAD[want] * 2) return { kind: 'none', hidden: true };
-  if (want === 'tactical' && h - PAD.tactical * 2 - EXTRA_H.tactical < TACTICAL_MIN_H) return { kind: 'none', hidden: true };
+  // 틀은 화면 높이의 90%까지만 쓴다 (style.css .gx-frame, 2026-11-11 사용자)
+  if (want === 'tactical' && (h - PAD.tactical * 2) * 0.9 - EXTRA_H.tactical < TACTICAL_MIN_H) return { kind: 'none', hidden: true };
   return { kind: want, hidden: false };
 }
 

@@ -108,7 +108,7 @@ let prefsSaved;
   s = await state(page);
   assert.equal(s.frame, 'none');
   assert.equal(s.hidden, '1', '좁은 창: 숨김 표시');
-  assert.equal(s.panelW, 1000 - 28, '좁은 창: 창은 바깥 여백 14px 만 빼고 가득');
+  assert.ok(Math.abs(s.panelW - (1000 - 28) * 0.9) < 1, `좁은 창: 창은 바깥 여백을 뺀 폭의 90% (11-11), 실제 ${s.panelW}`);
   await page.setViewportSize({ width: 1600, height: 1000 });
   await sleep(200);
   assert.equal((await state(page)).kind, 'tactical', '넓히면 다시');
@@ -134,7 +134,7 @@ let prefsSaved;
   assert.ok(pre.pre, '시작 전 창 폭(1024) 기준 틀');
   // 11-08 사용자: 시작 패널은 3:4 (폭 1024 넘지 않음, 낮은 화면은 높이에 맞춰 좁아짐)
   // 폭 = min(1024, (화면 높이 − 틀 두께) 기준 3:4 폭)  (style.css .gx-frame.pre:has(> .gx-panel.pick))
-  const want = Math.min(1024, (Math.min((pre.vh - 28) * 0.92, 1366 + 2 * pre.bz) - 2 * pre.bz) * 0.75); // 11-10: 시작 패널 높이 92%
+  const want = Math.min(1024, (Math.min((pre.vh - 28) * 0.9, 1366 + 2 * pre.bz) - 2 * pre.bz) * 0.75); // 11-11: 시작 패널 높이 90%
   assert.ok(pre.panelW <= 1024 && Math.abs(pre.panelW - want) < 4, `시작 전 창 폭 ${pre.panelW} (기대 약 ${Math.round(want)})`);
   assert.deepEqual(errors, []);
   await page.close();

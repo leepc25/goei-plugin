@@ -36,7 +36,7 @@ test('지침 편집: 절 본문 읽기 (기본 지침은 지침 탭에서만 고
 test('단계별 모델·전용 ID: same 은 갱신 모델을 따르고, ID 는 비면 없음', () => {
   const a = St.peopleSettings({ $pp_model: 'main', $pp_model_router: 'aux', $pp_model_id_director: ' gpt-x ' });
   assert.deepEqual(a.stageModel, { update: 'main', director: 'main', router: 'aux', tidy: 'main' });
-  assert.deepEqual(a.stageModelId, { update: '', director: 'gpt-x', router: '', tidy: '' });
+  assert.deepEqual(a.stageModelId, { update: '', director: '', router: '', tidy: '' }); // 전용 모델 ID 는 없앤 기능
   const b = St.peopleSettings({});
   assert.deepEqual(b.stageModel, { update: 'aux', director: 'aux', router: 'aux', tidy: 'aux' });
 });
