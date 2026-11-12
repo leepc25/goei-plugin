@@ -2,6 +2,7 @@
 // 모양은 11-10 도트 시안(site_mock_dot: 도트 글꼴·2px 테두리·판 색)을 그대로. 방송 칸은 재생기(ui/hsplayer.ts)가 그린다.
 // 편성 호출은 상점 요청문(core/shop.ts shelfPrompt)에 방송 절(지침 「망상홈쇼핑」 BROADCAST)을 붙여 한 번에: 상품·상품마다 큐시트·채팅.
 // 설정은 우주몰·포인트몰과 같은 틀(설정 → 인터넷 → 망상홈쇼핑). 재생 규칙·효과·속도 모두 설정에서 고친다.
+import { shopGive, type ShopFn } from '../core/shopfn';
 import { defGroups, type Wire } from './setrow';
 import { HOMESHOP_SET, HS_DEF_TEXT, HS_FLAG, HS_PAIRS, HS_RETRY_KEY, HS_TEL_KEY } from '../core/setdef/homeshop';
 export { HS_RETRY_KEY, HS_TEL_KEY };
@@ -86,9 +87,9 @@ const retryOf = (ctx: ChatContext) => { const n = Number(ctx.chat.scriptstate?.[
 // ── 모델 ──
 
 /** 방송 요청에 넘기는 자료 묶음 (참고 자료·본편은 상점과 같은 길로 모은다) */
-function showSource(ctx: ChatContext, show: HsShow, s: HsSettings) {
+function showSource(ctx: ChatContext, show: HsShow, s: HsSettings, fn: ShopFn = 'shelf') {
   const st: ShopState = { ...emptyShop({ raw: '', shop: HS_NAME, owner: HS_HOST }, ''), loaded: true, identity: { sells: HS_NAME, never: '', prices: '무이자 N회' }, prev: show.prev.concat(show.parts.map((p) => p.item.name)).slice(-24) };
-  return shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: hsVars(ctx.chat.scriptstate) as typeof ctx.chat.scriptstate } }, st, s.shop);
+  return shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: hsVars(ctx.chat.scriptstate) as typeof ctx.chat.scriptstate } }, st, s.shop, shopGive(ctx.chat.scriptstate, 'hs', fn));
 }
 /** 지침에 채우는 낱말 (컷·표정·화면 사건) */
 function cueWords(): Record<string, string> {
@@ -384,7 +385,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
     const recent = part.cues.slice(Math.max(0, (st?.cue ?? 0) - 3), (st?.cue ?? 0) + 1).map((c) => `진행자: ${c.text}`).join('\n');
     // 방금까지 흐른 채팅 (내 줄은 playerSay 로 이미 맨 끝에 있다): 같은 닉네임·말투를 잇게
     const flowed = playerRecentChat(24).slice(0, -1).map((c) => `${c.nick}: ${c.text}`).join('\n');
-    const user = `${broadcastMaterial(showSource(ctx, show, s), s.shop)}\n\n[지금 방송]\n${show.title ? `${show.title} · ` : ''}${show.at + 1}부 「${part.item.name}」 (${part.item.pay ?? ''})\n${part.item.desc}\n\n[방금 진행자]\n${recent || '-'}${flowed ? `\n\n[방금까지 흐른 채팅]\n${flowed}` : ''}\n\n[지금 시청자가 쓴 채팅]\n${nick}: ${text.slice(0, 200)}`;
+    const user = `${broadcastMaterial(showSource(ctx, show, s, 'say'), s.shop)}\n\n[지금 방송]\n${show.title ? `${show.title} · ` : ''}${show.at + 1}부 「${part.item.name}」 (${part.item.pay ?? ''})\n${part.item.desc}\n\n[방금 진행자]\n${recent || '-'}${flowed ? `\n\n[방금까지 흐른 채팅]\n${flowed}` : ''}\n\n[지금 시청자가 쓴 채팅]\n${nick}: ${text.slice(0, 200)}`;
     const gs = genSettings(ctx.chat.scriptstate);
     const moods = moodMap(art?.pack ?? null);
     const { value } = await generate([{ role: 'system', content: system }, { role: 'user', content: user }] as LlmMessage[], s.shop.model, (raw) => {

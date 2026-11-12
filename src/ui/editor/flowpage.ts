@@ -349,7 +349,7 @@ export function flowPage(ctx: ChatContext, headFn: (crumb: string, title: string
   const mainEst = mainTok !== undefined ? mainTok + (t?.reply?.tokens ?? 0) : undefined;
   const sumLine = (label: string, m: number | undefined, a: number | null) => `<span>${label}: 메인 <b>${m !== undefined ? fmt(m) : '–'}</b> + 보조 <b>${a !== null ? fmt(a) : '–'}</b> = <b>${m !== undefined && a !== null ? fmt(m + a) : '–'}</b></span>`;
   const turnSum = t ? `<small class="fl-sum">${sumLine('이번 턴 예상', mainEst, tok.ready ? auxTok : null)}${sumLine('지난 턴', mainTok, rsent)}</small>` : '';
-  const bar = `<div class="fl-line fl-bar"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>${turnSum}</p><div><span>보조 예상</span><b>${estTok}</b></div><div><span>보조 지난 턴</span><b>${t ? fmt(rsent) : '–'}</b></div><i></i></div>`;
+  const bar = `<div class="fl-line fl-bar"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>${turnSum}</p><div><span>호출</span><b>${sure}${maybe ? `~${sure + maybe}` : ''}회</b></div><div><span>보조 예상</span><b>${estTok}</b></div><div><span>보조 지난 턴</span><b>${t ? fmt(rsent) : '–'}</b></div><i></i></div>`;
   const body = sections.map((s) => `<h2 class="fam-h">${esc(s.title)}${s.note ? ` <small>${esc(s.note)}</small>` : ''}</h2>${s.tables.map(table).join('')}`).join('');
   return `<div class="gw-page gw-set">${headFn('', '호출 흐름', '한 턴에 플러그인이 모델을 부르는 순서예요. 호출 수와 모델을 바꾸는 값만 모았고, 여기서 바꾼 값은 각 메뉴의 설정과 같은 값이에요.')}
     <div class="gx-settings gw-setbody fl-page">${bar}${body}</div></div>`;

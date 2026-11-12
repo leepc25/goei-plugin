@@ -2,7 +2,7 @@
 //  - 가게 표: 줄 = 가게, 칸 = 넘길 내용 여섯 칩(core/reffn.ts REF_CHIP_KEYS) + 맥락 반영. 가게마다 제 값 ($sh_* · $cos_sh_* · $bm_sh_*).
 //  - 기능 표: 줄 = 진열·문의·1:1 상담, 같은 일곱 칸. 세 가게가 한 값을 같이 쓴다 ($sh_fn_*). 가게 표와 기능 표 둘 다 켜진 것만 넘긴다.
 //  - 양 표: 줄 = 기능, 칸 = 챗로그(턴)·참조 로어북(개). 따로 정하지 않은 기능은 $sh_turns·$sh_refs 를 그대로 쓴다.
-// 망상홈쇼핑은 여기 것을 읽지 않는다 (예전 고정 값 그대로, ui/shop.ts shopSource 에 give 를 안 넘김).
+// 망상홈쇼핑도 같은 표를 쓴다 (2026-11-13): 가게 표에 제 줄($hs_sh_give_* · $hs_sh_ctx), 기능 표에서 편성은 「진열」 줄, 보낸 채팅의 반응은 「채팅 반응」 줄.
 import type { RefToggles } from './advanced';
 import { mallKey, mallSettings, type MallSite } from './malls';
 import { REF_CHIP_KEYS, type RefChip } from './reffn';
@@ -11,16 +11,18 @@ import { SHOP_CTX_VAR, shopSettings } from './shop';
 
 type Vars = Record<string, unknown> | undefined;
 
-export type GiveShop = 'shop' | MallSite;
-export const GIVE_SHOPS: GiveShop[] = ['shop', 'cos', 'bm'];
+export type GiveShop = 'shop' | MallSite | 'hs';
+export const GIVE_SHOPS: GiveShop[] = ['shop', 'cos', 'bm', 'hs'];
 export const isGiveShop = (v: string): v is GiveShop => (GIVE_SHOPS as string[]).includes(v);
 
 /** 기능 (요청 종류). label 은 화면 줄 이름 */
-export type ShopFn = 'shelf' | 'talk' | 'desk';
+export type ShopFn = 'shelf' | 'talk' | 'desk' | 'say';
 export const SHOP_FNS: { key: ShopFn; label: string }[] = [
   { key: 'shelf', label: '진열' },
   { key: 'talk', label: '문의' },
   { key: 'desk', label: '1:1 상담' },
+  /** 망상홈쇼핑에서 내가 보낸 채팅에 진행자·시청자가 답하는 요청 (ui/homeshop.ts say) */
+  { key: 'say', label: '채팅 반응' },
 ];
 export const isShopFn = (v: string): v is ShopFn => SHOP_FNS.some((f) => f.key === v);
 
@@ -37,11 +39,14 @@ const FN_DEF: Record<RefChip, boolean> = { desc: true, authors: true, persona: t
 /** 가게 표 한 칸의 변수 */
 export function shopGiveVar(shop: GiveShop, key: GiveKey): string {
   const sh = key === 'ctx' ? SHOP_CTX_VAR : `$sh_give_${key}`;
-  return shop === 'shop' ? sh : mallKey(sh, shop);
+  return shop === 'shop' ? sh : shop === 'hs' ? `$hs_${sh.slice(1)}` : mallKey(sh, shop);
 }
 /** 가게 표 한 칸이 켜져 있나. 쇼핑몰의 맥락 반영은 따로 정한 적이 없으면 기본 상점 값 (core/malls.ts mallVars) */
 export function shopGiveOn(vars: Vars, shop: GiveShop, key: GiveKey): boolean {
-  if (key === 'ctx') return shop === 'shop' ? shopSettings(vars).context : mallSettings(vars, shop).context;
+  if (key === 'ctx') {
+    if (shop === 'hs') { const h = vars?.[shopGiveVar('hs', 'ctx')]; return h === '1' || h === '0' ? h === '1' : shopSettings(vars).context; }
+    return shop === 'shop' ? shopSettings(vars).context : mallSettings(vars, shop).context;
+  }
   const v = vars?.[shopGiveVar(shop, key)];
   return v === '1' || v === '0' ? v === '1' : SHOP_DEF[key];
 }

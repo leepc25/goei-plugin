@@ -258,7 +258,7 @@ export function shopTable(vars: State, busy = false): string {
     ['대화', '「문의」와 「1:1 상담」으로 붙이는 대화의 줄 수예요. 넘으면 최근 줄만 붙여요.'],
     [HS_NAME, '망상홈쇼핑에서 붙이는 것의 토큰 상한이에요. 넘으면 오래된 시청자 채팅부터 빼요.'],
   ])));
-  /* ── 1-2. 가게 표: 줄 = 가게 셋(망상홈쇼핑은 제 설정을 따로 쓴다), 칸 = 넘길 내용 여섯 + 맥락 반영 (core/shopfn.ts) ── */
+  /* ── 1-2. 가게 표: 줄 = 가게 넷, 칸 = 넘길 내용 여섯 + 맥락 반영 (core/shopfn.ts) ── */
   const GIVE_OPTS = ['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영'];
   const giveRows = SHOP_ROWS.filter((r) => (GIVE_SHOPS as string[]).includes(r.id));
   const giveShop: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: GIVE_OPTS, kind: 'check' }],
@@ -270,7 +270,7 @@ export function shopTable(vars: State, busy = false): string {
       ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
       ['맥락 반영', '켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'],
     ]) };
-  /* ── 2. 기능마다 따로 정하는 값: 줄 = 진열·문의·1:1 상담. 세 가게가 한 값을 같이 쓴다 ($sh_fn_*) ── */
+  /* ── 2. 기능마다 따로 정하는 값: 줄 = 진열·문의·1:1 상담·채팅 반응(망상홈쇼핑). 가게들이 한 값을 같이 쓴다 ($sh_fn_*) ── */
   const FL = SHOP_FNS.map((f) => nm('', f.label));
   const giveFn: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: GIVE_OPTS, kind: 'check' }],
     marks: SHOP_FNS.map((f) => SHOP_GIVE_KEYS.map((k) => (shopFnNone(f.key, k) ? null : shopFnOn(v, f.key, k)))),

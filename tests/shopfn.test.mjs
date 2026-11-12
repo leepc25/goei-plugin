@@ -226,21 +226,27 @@ test('요청 종류마다 제 줄을 읽는다 (진열 · 문의 · 1:1 상담)'
   assert.ok(!JSON.stringify(pv).includes('ROLE: useful'));
 });
 
-test('망상홈쇼핑: 가게 표·기능 표·양 표를 읽지 않는다 (요청문이 그대로)', () => {
+test('망상홈쇼핑: 기본값이면 요청문이 그대로고, 자기 줄(가게 표)만 읽는다', () => {
   const base = { $sh_refs: '2', $sh_turns: '2' };
   const tables = {
     $sh_give_desc: '0', $sh_give_authors: '1', $sh_give_persona: '1', $sh_give_active: '0', $sh_give_related: '0', $sh_give_secondary: '1',
-    $cos_sh_give_desc: '0', $bm_sh_give_related: '0', $cos_sh_ctx: '0', $bm_sh_ctx: '0', $hs_sh_give_desc: '0', $hs_sh_give_authors: '1', $hs_sh_ctx: '0',
+    $cos_sh_give_desc: '0', $bm_sh_give_related: '0', $cos_sh_ctx: '0', $bm_sh_ctx: '0',
     ...Object.fromEntries(['shelf', 'talk', 'desk'].flatMap((f) => [...M.SHOP_GIVE_KEYS.map((k) => [`$sh_fn_${f}_${k}`, '0']), [`$sh_fn_${f}_turns`, '8'], [`$sh_fn_${f}_refs`, '0']])),
   };
   const a = M.previewHomeshop(ctxOf(base));
-  const b = M.previewHomeshop(ctxOf({ ...base, ...tables }));
+  // 가게 표의 다른 가게 줄은 닿지 않는다. 기능 표(진열 줄)는 가게가 같이 쓰므로 망상홈쇼핑 편성에도 닿는다
+  const shopRows = Object.fromEntries(Object.entries(tables).filter(([k]) => !k.startsWith('$sh_fn_')));
+  const b = M.previewHomeshop(ctxOf({ ...base, ...shopRows }));
   assert.ok(a && a.length);
-  assert.deepEqual(b, a);
+  assert.ok(!JSON.stringify(M.previewHomeshop(ctxOf({ ...base, $sh_fn_shelf_desc: '0' }))).includes('[공통: 봇 설명]'), '기능 표 진열 줄에서 끄면 안 간다');
+  assert.deepEqual(b, a, '다른 가게 줄은 망상홈쇼핑에 닿지 않는다');
+  const off = JSON.stringify(M.previewHomeshop(ctxOf({ ...base, $hs_sh_give_desc: '0' })));
+  assert.ok(!off.includes('[공통: 봇 설명]'), '망상홈쇼핑 줄에서 봇 설명을 끄면 안 간다');
   const text = JSON.stringify(a);
-  // 예전 그대로: 수(2)를 넘어도 관련 로어북이 다 가고, 봇 설명·상시 로어북은 가고 작가 노트는 안 간다
+  // 기본값: 봇 설명·상시 로어북은 가고 작가 노트는 안 간다
   assert.ok(text.includes('[공통: 봇 설명]') && text.includes('[활성 로어북: 📜Faction]') && !text.includes('작가 노트 글'));
-  assert.equal((text.match(/\[관련 로어북: /g) ?? []).length, 7);
+  // 「참조 로어북」 수(양 표 진열 줄)는 망상홈쇼핑 편성에도 다른 가게와 똑같이 듣는다
+  assert.equal((text.match(/\[관련 로어북: /g) ?? []).length, 2);
   assert.deepEqual(M.hsVars({ ...base, ...tables }).$sh_ctx, undefined);
   assert.equal(M.hsSettings({ ...base, ...tables }).shop.context, true);
   assert.equal(M.hsSettings({ $sh_ctx: '0' }).shop.context, false, '기본 상점 자리의 맥락 반영을 그대로 읽는다');

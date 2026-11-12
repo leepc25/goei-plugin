@@ -13,7 +13,7 @@ export const PP_DEFAULTS: Record<string, string> = {
   when: 'turn',
   model: 'aux',
   /** detailed = 자세히(원문), compact = 간결 */
-  prompt: 'detailed',
+  prompt: 'compact',
   /** split = 절 단위 혼합, append = 시트 전체 + 기록, record = 기록만, off = 본편에 안 넣음 */
   inject: 'split',
   /** off / note(뒤, 갱신기에 얹은 메모만, 호출 없음) / facts(앞, 사실형 — 본편 전 보조 1회, 원본 directorRole facts) / scene(앞, 연출형).
