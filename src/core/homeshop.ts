@@ -109,15 +109,16 @@ export const HS_KEY = {
   fillLo: '$hs_fill_lo', fillHi: '$hs_fill_hi', fillCool: '$hs_fill_cool', rareP: '$hs_rare_p', rareCool: '$hs_rare_cool',
   clips: '$hs_clips', scalePc: '$hs_scale_pc', scalePhone: '$hs_scale_ph',
   next: '$hs_next', turn: '$hs_turn', lock: '$hs_lock', left: '$hs_left',
+  drop: '$hs_drop', dropRate: '$hs_drop_rate', dropFast: '$hs_drop_fast', dropStep: '$hs_drop_step', soonAt: '$hs_soon_at', endLo: '$hs_end_lo', endHi: '$hs_end_hi',
   callLo: '$hs_call_lo', callHi: '$hs_call_hi', forms: '$hs_forms', aud: '$hs_aud_on', peek: '$hs_peek', say: '$hs_say', barter: '$hs_barter',
 } as const;
 /** 숫자 칸 범위·기본값 (설정 화면과 읽기가 같이 쓴다) */
 export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: number; unit: string }> = {
-  chatMin: { key: HS_KEY.chatMin, lo: 0, hi: 120, def: 40, unit: '줄' },
-  chatMax: { key: HS_KEY.chatMax, lo: 0, hi: 120, def: 60, unit: '줄' },
+  chatMin: { key: HS_KEY.chatMin, lo: 0, hi: 120, def: 30, unit: '줄' },
+  chatMax: { key: HS_KEY.chatMax, lo: 0, hi: 120, def: 40, unit: '줄' },
   chatGap: { key: HS_KEY.chatGap, lo: 5, hi: 100, def: 22, unit: '×0.1초' },
-  cueMin: { key: HS_KEY.cueMin, lo: 2, hi: 20, def: 6, unit: '줄' },
-  cueMax: { key: HS_KEY.cueMax, lo: 2, hi: 20, def: 10, unit: '줄' },
+  cueMin: { key: HS_KEY.cueMin, lo: 2, hi: 20, def: 12, unit: '줄' },
+  cueMax: { key: HS_KEY.cueMax, lo: 2, hi: 20, def: 16, unit: '줄' },
   speed: { key: HS_KEY.speed, lo: 3, hi: 40, def: 11, unit: '자/초' },
   hold: { key: HS_KEY.hold, lo: 0, hi: 50, def: 12, unit: '×0.1초' },
   frame: { key: HS_KEY.frame, lo: 50, hi: 250, def: 110, unit: 'ms' },
@@ -129,6 +130,12 @@ export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: 
   rareCool: { key: HS_KEY.rareCool, lo: 0, hi: 120, def: 20, unit: '번' },
   next: { key: HS_KEY.next, lo: 0, hi: 60, def: 6, unit: '초' },
   left: { key: HS_KEY.left, lo: 1, hi: 999, def: 30, unit: '개' },
+  dropRate: { key: HS_KEY.dropRate, lo: 10, hi: 400, def: 100, unit: '%' },
+  dropFast: { key: HS_KEY.dropFast, lo: 10, hi: 50, def: 20, unit: '×0.1배' },
+  dropStep: { key: HS_KEY.dropStep, lo: 1, hi: 20, def: 3, unit: '개' },
+  soonAt: { key: HS_KEY.soonAt, lo: 0, hi: 99, def: 5, unit: '개' },
+  endLo: { key: HS_KEY.endLo, lo: 1, hi: 99, def: 2, unit: '개' },
+  endHi: { key: HS_KEY.endHi, lo: 1, hi: 99, def: 8, unit: '개' },
   callLo: { key: HS_KEY.callLo, lo: 1, hi: 60, def: 6, unit: '턴' },
   callHi: { key: HS_KEY.callHi, lo: 1, hi: 60, def: 12, unit: '턴' },
 };
@@ -147,6 +154,16 @@ export interface HsRules {
   rareP: number;
   /** 「드물게」 동작이 다시 나오기까지 대기 반복 수 */
   rareCool: number;
+}
+/** 남은 수량이 저절로 줄기: 빠르기(1 = 큐시트 끝에 맞춤) · 가격 공개·주문 폭주 뒤 배수 · 매진 임박 기준 수(0 = 안 붙임) · 끝날 때 남기는 수 [최소, 최대] */
+export interface HsDrop {
+  on: boolean;
+  rate: number;
+  fast: number;
+  /** 한 번에 줄어드는 수 최대 */
+  step: number;
+  soon: number;
+  end: [number, number];
 }
 export interface HsSettings {
   on: boolean;
@@ -175,6 +192,7 @@ export interface HsSettings {
   lock: boolean;
   /** 남은 수량 시작 값 */
   left: number;
+  drop: HsDrop;
   /** 할부 호출: 다음 호출까지 턴 [최소, 최대] · 출연 형태 목록 */
   call: [number, number];
   forms: string[];
@@ -211,6 +229,7 @@ export function hsSettings(vars: Vars): HsSettings {
     turn: vars?.[HS_KEY.turn] !== '0',
     lock: vars?.[HS_KEY.lock] !== '0',
     left: n(vars, 'left'),
+    drop: { on: vars?.[HS_KEY.drop] !== '0', rate: n(vars, 'dropRate') / 100, fast: n(vars, 'dropFast') / 10, step: n(vars, 'dropStep'), soon: n(vars, 'soonAt'), end: pair(n(vars, 'endLo'), n(vars, 'endHi')) },
     call: pair(n(vars, 'callLo'), n(vars, 'callHi')),
     forms: (() => { const f = String(vars?.[HS_KEY.forms] ?? '').split(/[,\n]/).map((x) => x.trim().slice(0, 30)).filter(Boolean); return f.length ? f : HS_FORMS_DEFAULT.split(',').map((x) => x.trim()); })(),
     aud: vars?.[HS_KEY.aud] !== '0',
@@ -258,6 +277,8 @@ export interface HsPart {
   cues: HsCue[];
   /** 스티커를 들췄을 때 보이는 한 줄 (진실 보장 없음) */
   peek?: string;
+  /** 이 부가 방송되는 동안 흐르는 시청자 채팅 (11-12 사용자: 상품마다) */
+  chat?: HsChatLine[];
 }
 /** 전화 주문 상담원의 말 (편성과 같이 받는다) */
 export interface HsOps { hello: string; done: string; barter: string }
@@ -268,6 +289,7 @@ export interface HsShow {
   key: string;
   title: string;
   parts: HsPart[];
+  /** 부 머리(#n) 없이 온 채팅 (부마다 채팅이 없을 때만 쓴다) */
   chat: HsChatLine[];
   /** 지금 방송 중인 부 (0부터). parts.length 이면 방송 끝 */
   at: number;
@@ -301,9 +323,13 @@ export function parseCue(line: string, moods: Map<string, string>): HsCue | null
   const text = clean(cells[2], 160);
   if (!text) return null;
   const cut = CUT_IN.find(([re]) => re.test(cells[0]))?.[1] ?? 'B';
-  const mood = moods.get(cells[1].replace(/\s+/g, '').toLowerCase()) ?? 'talk';
+  // 그림 묶음이 아직 안 왔으면(표정 표가 비었으면) 낱말 그대로 두고 재생 때 찾는다 (moodName)
+  const word = cells[1].replace(/\s+/g, '').toLowerCase();
+  const mood = moods.get(word) ?? (moods.size ? 'talk' : word || 'talk');
   return { cut, mood, text, ...eventOf(cells[3] ?? '') };
 }
+/** 저장된 표정(동작 이름 또는 그림이 늦어 남은 낱말) → 동작 이름 */
+export const moodName = (mood: string, moods: Map<string, string>): string => moods.get(mood.replace(/\s+/g, '').toLowerCase()) ?? (moods.size ? 'talk' : mood);
 /** 표정 낱말 → 동작 이름 (팩의 우리말 이름·영문 이름 둘 다 받는다) */
 export function moodMap(pack: Pick<HsPack, 'cuts'> | null): Map<string, string> {
   const m = new Map<string, string>();
@@ -320,8 +346,8 @@ function block(raw: string, tag: string): string {
   const m = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}\\s*>`, 'i').exec(raw);
   return m ? m[1].trim() : '';
 }
-export interface ShowReply { title: string; items: Omit<ShopItem, 'id'>[]; cues: HsCue[][]; chat: HsChatLine[]; peeks: string[]; ops: HsOps }
-/** 편성 응답: <title> · <shelf>(상점 줄) · <cue>(「#n」 아래 그 상품의 큐 줄) · <chat>(닉|말) */
+export interface ShowReply { title: string; items: Omit<ShopItem, 'id'>[]; cues: HsCue[][]; chat: HsChatLine[]; chats: HsChatLine[][]; peeks: string[]; ops: HsOps }
+/** 편성 응답: <title> · <shelf>(상점 줄) · <cue>(「#n」 아래 그 상품의 큐 줄) · <chat>(「#n」 아래 그 상품 동안의 닉|말) */
 export function parseShow(raw: string, moods: Map<string, string>): ShowReply {
   const shelf = parseShelf(raw, HS_IDENTITY);
   const cueText = block(raw, 'cue');
@@ -344,24 +370,39 @@ export function parseShow(raw: string, moods: Map<string, string>): ShowReply {
   }
   const items = shelf.items.slice(0, cues.length || shelf.items.length);
   if (items.some((_, i) => !cues[i]?.length)) throw new HsError(`<cue> 블록에 상품마다 큐 줄이 있어야 해요 (#1 … #${shelf.items.length}, 줄 꼴: 컷|표정|대사|화면 사건).`);
-  const chat: HsChatLine[] = [];
-  for (const line of block(raw, 'chat').split('\n')) {
-    const i = line.indexOf('|');
-    const nick = clean(i >= 0 ? line.slice(0, i) : '', 16);
-    const text = clean(i >= 0 ? line.slice(i + 1) : line, 80);
-    if (text) chat.push({ nick: nick || '익명', text });
-  }
+  const { shared: chat, parts: chats } = parseChat(block(raw, 'chat'));
   const peeks = block(raw, 'peek').split('\n').map((x) => clean(x.replace(/^\s*#?\d+\s*[.)|:]?\s*/, ''), 80)).filter(Boolean);
   const opLine = (re: RegExp) => clean(block(raw, 'operator').split('\n').map((x) => re.exec(x)?.[1] ?? '').find(Boolean) ?? '', 120);
   const ops: HsOps = { hello: opLine(/^\s*(?:인사|hello)\s*[|:]\s*(.+)$/i), done: opLine(/^\s*(?:확정|done)\s*[|:]\s*(.+)$/i), barter: opLine(/^\s*(?:맞교환|barter)\s*[|:]\s*(.+)$/i) };
-  return { title: clean(block(raw, 'title'), 40), items, cues: cues.slice(0, items.length), chat, peeks, ops };
+  return { title: clean(block(raw, 'title'), 40), items, cues: cues.slice(0, items.length), chat, chats: chats.slice(0, items.length), peeks, ops };
+}
+
+/** 채팅 줄 「닉|말」. 「#n」 머리 아래 줄은 그 부의 것, 머리 앞 줄은 공용 */
+export function parseChat(text: string): { shared: HsChatLine[]; parts: HsChatLine[][] } {
+  const shared: HsChatLine[] = [];
+  const parts: HsChatLine[][] = [];
+  let cur: HsChatLine[] = shared;
+  for (const line of text.split('\n')) {
+    const head = /^\s*#\s*(\d+)\s*$/.exec(line);
+    if (head) {
+      const n = Math.max(1, Math.min(20, Number(head[1])));
+      while (parts.length < n) parts.push([]);
+      cur = parts[n - 1];
+      continue;
+    }
+    const i = line.indexOf('|');
+    const nick = clean(i >= 0 ? line.slice(0, i) : '', 16);
+    const said = clean(i >= 0 ? line.slice(i + 1) : line, 80);
+    if (said) cur.push({ nick: nick || '익명', text: said });
+  }
+  return { shared, parts };
 }
 
 let seq = 0;
 const itemId = (key: string, i: number) => `ms${(Date.now() % 1e9).toString(36)}${(seq++).toString(36)}_${i}_${key.slice(-4)}`;
 /** 받은 편성을 상태로 (지금 부는 처음부터) */
 export function applyShow(st: HsShow, r: ShowReply, key: string): HsShow {
-  const parts = r.items.map((it, i) => ({ item: { ...it, id: itemId(key, i) }, cues: r.cues[i], ...(r.peeks?.[i] ? { peek: r.peeks[i] } : {}) }));
+  const parts = r.items.map((it, i) => ({ item: { ...it, id: itemId(key, i) }, cues: r.cues[i], ...(r.peeks?.[i] ? { peek: r.peeks[i] } : {}), ...(r.chats?.[i]?.length ? { chat: r.chats[i] } : {}) }));
   return { loaded: true, key, title: r.title, parts, chat: r.chat, at: 0, prev: [...st.prev, ...st.parts.map((p) => p.item.name)].slice(-24), ...(r.ops ? { ops: r.ops } : {}), tk: key };
 }
 
@@ -371,10 +412,11 @@ export function readShow(vars: Vars): HsShow {
   try {
     const j = JSON.parse(raw) as Partial<HsShow>;
     if (!j || !Array.isArray(j.parts)) return emptyShow();
-    const parts = j.parts.filter((p): p is HsPart => !!p && typeof p === 'object' && !!p.item && typeof p.item.name === 'string' && Array.isArray(p.cues));
+    const lines = (x: unknown): HsChatLine[] => (Array.isArray(x) ? x.filter((c): c is HsChatLine => !!c && typeof c.text === 'string').map((c) => ({ nick: String(c.nick ?? ''), text: c.text })) : []);
+    const parts = j.parts.filter((p): p is HsPart => !!p && typeof p === 'object' && !!p.item && typeof p.item.name === 'string' && Array.isArray(p.cues)).map((p) => { const { chat, ...rest } = p; const c = lines(chat); return c.length ? { ...rest, chat: c } : rest; });
     return {
       loaded: j.loaded === true && parts.length > 0, key: String(j.key ?? ''), title: String(j.title ?? ''), parts,
-      chat: Array.isArray(j.chat) ? j.chat.filter((c): c is HsChatLine => !!c && typeof c.text === 'string').map((c) => ({ nick: String(c.nick ?? ''), text: c.text })) : [],
+      chat: lines(j.chat),
       at: Math.max(0, Math.min(parts.length, Math.floor(Number(j.at) || 0))),
       prev: Array.isArray(j.prev) ? j.prev.map(String).slice(-24) : [],
       ...(j.ops && typeof j.ops === 'object' ? { ops: { hello: String(j.ops.hello ?? ''), done: String(j.ops.done ?? ''), barter: String(j.ops.barter ?? '') } } : {}),
@@ -447,6 +489,38 @@ export function moodClip(clips: HsClip[], mood: string, st: IdleState): HsClip |
 }
 /** 큐 한 줄의 길이 (ms): 글자 수 ÷ 자막 속도 + 쉼 */
 export const cueMs = (c: Pick<HsCue, 'text'>, s: Pick<HsSettings, 'speed' | 'hold'>): number => Math.round((Array.from(c.text).length / s.speed + s.hold) * 1000);
+
+// ── 남은 수량 저절로 줄기 (값은 전부 설정 HsDrop) ──
+
+/** 한 번에 줄이는 수는 1~설정 「한 번에 줄어드는 수」. 너무 잦아지면(DROP_GAP_MS 안쪽, 화면 갱신 한계) 한 번에 더 많이 줄인다 */
+const DROP_GAP_MS = 1000;
+/** 이번 부에서 끝날 때 남길 수 (시작 값보다 작게, 1 이상) */
+export const dropEnd = (left: number, d: HsDrop, rnd: () => number = Math.random): number =>
+  Math.max(1, Math.min(left - 1, d.end[0] + Math.floor(rnd() * (d.end[1] - d.end[0] + 1))));
+/** 남은 방송 길이(ms. 빨라지는 구간은 배수만큼 길게 친다)와 큐시트가 앞으로 뺄 수. at = 지금 큐 자리, restMs = 지금 큐의 남은 시간 */
+export function dropRest(cues: HsCue[], at: number, restMs: number, fast: boolean, s: Pick<HsSettings, 'speed' | 'hold' | 'drop'>): { ms: number; planned: number } {
+  let ms = Math.max(0, restMs) * (fast ? s.drop.fast : 1);
+  let planned = 0;
+  for (let i = at + 1; i < cues.length; i++) {
+    const c = cues[i];
+    // 매진 뒤로는 줄 것이 없다
+    if (c.ev === 'sold') break;
+    if (c.ev === 'price' || c.ev === 'rush') fast = true;
+    if (c.ev === 'left') planned += c.n ?? 1;
+    ms += cueMs(c, s) * (fast ? s.drop.fast : 1);
+  }
+  return { ms, planned };
+}
+/** 다음에 줄일 수와 그때까지(ms, 빨라진 동안은 배수만큼 빨리 흐른다). 더 줄일 것이 없으면 null. 끝 수(end, 1 이상) 아래로는 안 내려간다 */
+export function nextDrop(left: number, end: number, rest: { ms: number; planned: number }, d: HsDrop, rnd: () => number = Math.random): { n: number; wait: number } | null {
+  const room = left - rest.planned - Math.max(1, end);
+  if (!d.on || room <= 0 || rest.ms <= 0) return null;
+  const unit = rest.ms / room / d.rate;
+  const base = Math.max(1, Math.ceil(DROP_GAP_MS / unit));
+  const n = Math.min(room, Math.floor(base * (1 + rnd() * Math.max(1, d.step))));
+  // 마지막 몫이 방송 끝을 넘겨 버려지지 않게, 남은 시간의 절반 안에 줄인다
+  return { n, wait: Math.min(n * unit * (0.6 + rnd() * 0.8), rest.ms / 2) };
+}
 
 
 // ── 주문·할부 장부·택배 상자·방청 (설계 8-4 ~ 8-10) ──

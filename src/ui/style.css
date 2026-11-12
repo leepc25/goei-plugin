@@ -4243,6 +4243,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 
 /* ── 인터넷 쇼핑몰 (2026-11-08 사용자, 시안 pc_08_cos·pc_09_bm·pc_13_cos_ask) ── */
 .br-page > .ms { flex: 1; min-height: 0; overflow-y: auto; position: static; display: block; }
+/* 망상홈쇼핑: 사이트 안에서 스크롤 (11-11 사용자: 스크롤이 안 됐다) */
+.br-page > .hs { flex: 1; min-height: 0; overflow-y: auto; position: static; }
+/* 창(전화 주문·스티커·방청)은 스크롤과 상관없이 보이는 화면 기준 (.br-page, 쇼핑몰 창과 같게) */
+.br-page > .hs .hs-pop { position: relative; top: auto; bottom: auto; }
 /* 창(문의·입금)은 스크롤과 상관없이 보이는 화면 기준 (.br-page) */
 .ms button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 .ms .ms-pic svg, .ms [class$="-pic"] svg { width: 56%; height: 56%; }
