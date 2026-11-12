@@ -1,3 +1,5 @@
+// 보낸 뒤 (2026-11-12 사용자: 「채팅 보냈는데 왜 안 없어져」): 요청에 실려 나간 순간 숨긴다 (markUseSent). 전에는 응답이 다 붙은 뒤에야(settleItemUse) 사라져서,
+//  응답을 쓰는 동안·요청이 실패한 동안 방금 보낸 유저 메시지 아래에 그대로 남았다. 응답 알림 없이 기다림이 끝나면(실패) 아직 안 쓰인 것이니 다시 보인다.
 // 「사용」 상자 (2026-11-07 소지품): 소지품 메뉴에서 「사용」을 누른 물건을 채팅의 마지막 메시지 아래에 칩으로 보여 준다.
 // 다음 전송 때 [Inventory] 글의 This turn 에 같이 넘어가고(core/items.ts withInventory), 응답이 붙으면 settleItemUse 가 상자를 정리한다.
 // 자리 (2026-11-11 사용자): 브라우저 창에 고정하면 Risu 왼쪽 목록 위에 떴다 → 시작 안내(openinghint.ts)처럼 채팅 메시지 안에 붙인다.
@@ -5,11 +7,12 @@
 //    Risu 는 글이 그대로면 메시지를 다시 그리지 않으니(Chats.svelte 글 해시), 이름은 글이 아니라 CSS(::before content)로 넣는다.
 //  · 마지막 메시지 = .chat-message-container:first-child (Risu 는 새 메시지를 맨 앞에 넣고 flex-col-reverse 로 뒤집어 보인다).
 import { aliveAnchors } from '../core/wallet';
-import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, liveItems, readItemUse, readItems } from '../core/items';
+import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, lastUserKey, liveItems, pendingItemUse, readItemUse, readItems } from '../core/items';
 import type { Chat } from '../core/types';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { body } from './overlay';
 import { updateChat } from './risu';
+import { onWaiting } from './waiting';
 
 /** 한 번에 보이는 칩 수. 넘으면 마지막 칸이 「외 n개」 */
 const SLOTS = 12;
@@ -45,6 +48,32 @@ let styleEl: El | null = null;
 let where = { charIndex: -1, chatIndex: -1 };
 let shown: { id: string; label: string }[] = [];
 let busy = false;
+/** 이번 요청에 실려 나간 것: 어느 채팅의 어느 유저 메시지 턴에 어떤 물건이 나갔나. 그 턴이 끝날 때까지 그 물건 칩은 숨긴다 */
+let sent: { charIndex: number; chatIndex: number; userKey: string; ids: Set<string> } | null = null;
+
+/** 숨길 물건 id: 같은 채팅·같은 유저 턴이고 아직 응답이 정리하지 않았을 때만 (다른 턴이면 지난 일이니 잊는다) */
+export function sentUseIds(chat: Chat | null, charIndex: number, chatIndex: number): Set<string> | null {
+  if (!sent || !chat || sent.charIndex !== charIndex || sent.chatIndex !== chatIndex) return null;
+  if (chat.scriptstate?.[ITEM_USE_AT_VAR] || lastUserKey(chat) !== sent.userKey) { sent = null; return null; }
+  return sent.ids;
+}
+
+/** 본편 요청에 「사용」이 실려 나갔다 (body.ts onBeforeRequest, [Inventory] 를 넣은 바로 뒤). 칩을 바로 숨긴다 */
+export async function markUseSent(charIndex: number, chatIndex: number, chat: Chat): Promise<void> {
+  const userKey = lastUserKey(chat);
+  const ids = pendingItemUse(chat.scriptstate, userKey).map((u) => u.id);
+  if (!ids.length || chat.scriptstate?.[ITEM_USE_AT_VAR]) return;
+  sent = { charIndex, chatIndex, userKey, ids: new Set(ids) };
+  await refreshUseBox(charIndex, chatIndex, chat);
+}
+
+// 응답 알림 없이 기다림이 끝났다 = 요청이 실패했거나 멈췄다: 아직 안 쓰인 것이니 칩을 다시 보인다 (다음 전송에 다시 실린다)
+onWaiting((w, late) => {
+  if (w || !late || !sent) return;
+  const { charIndex, chatIndex } = sent;
+  sent = null;
+  void refreshUseBox(charIndex, chatIndex).catch(() => {});
+});
 
 /** 상자에 보일 것: 아직 보내지 않은 것만 (보낸 턴은 다시 굴리기용으로 변수에 남지만 칩은 숨긴다). 이름 ×n */
 export function useBoxNames(chat: Chat | null): { id: string; label: string }[] {
@@ -122,7 +151,8 @@ async function redrawLast(doc: Root['doc'], charIndex: number, chatIndex: number
 export async function refreshUseBox(charIndex: number, chatIndex: number, known?: Chat | null): Promise<void> {
   if (charIndex < 0 || chatIndex < 0) return hideUseBox();
   const chat = known ?? ((await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null);
-  const names = useBoxNames(chat);
+  const hold = sentUseIds(chat, charIndex, chatIndex);
+  const names = useBoxNames(chat).filter((n) => !hold?.has(n.id));
   where = { charIndex, chatIndex };
   if (!names.length) return hideUseBox();
   const e = await ensure();

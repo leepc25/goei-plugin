@@ -114,14 +114,7 @@ for (const vp of ['pc', 'phone']) {
   if (!chip.lastOn || chip.oldOn || !chip.label.includes('다음 메시지에 사용') || !chip.names.length || chip.fixed) errorsAll.push(`[${vp}] use chip not under last message: ${JSON.stringify(chip)}`);
   console.log(vp, 'chip', JSON.stringify(chip));
   await shot('usebox');
-  const req = await page.evaluate(async () => {
-    window.__chat.message.push({ role: 'user', data: '소금을 뿌린다', chatId: 'u2' });
-    const out = await window.__calls.replacers[0]([{ role: 'user', content: 'hi' }, { role: 'assistant', content: '본문' }, { role: 'user', content: '소금을 뿌린다' }], 'model');
-    return out.map((m) => `${m.role}: ${String(m.content).slice(0, 60)}`);
-  });
-  const inv = req.find((l) => l.includes('[Inventory]'));
-  if (!inv) errorsAll.push(`[${vp}] no [Inventory] in request: ${JSON.stringify(req)}`);
-  // × 로 빼기: 칩의 × 좌표를 눌러 상자가 사라지는지
+  // × 로 빼기: 칩의 × 좌표를 눌러 상자가 사라지는지. 보내기 전에 본다 (2026-11-12: 요청에 실려 나가면 칩이 바로 숨는다, tests/usebar-browser.mjs)
   let xClicks = 0;
   for (let i = 0; i < 6; i++) {
     let x = null;
@@ -134,6 +127,13 @@ for (const vp of ['pc', 'phone']) {
   if (boxShown !== 'none') errorsAll.push(`[${vp}] use box still shown after ×: ${boxShown}`);
   const useLeft = await page.evaluate(() => window.__chat.scriptstate.$st_item_use);
   console.log(vp, 'use after ×', useLeft, 'clicks', xClicks);
+  const req = await page.evaluate(async () => {
+    window.__chat.message.push({ role: 'user', data: '소금을 뿌린다', chatId: 'u2' });
+    const out = await window.__calls.replacers[0]([{ role: 'user', content: 'hi' }, { role: 'assistant', content: '본문' }, { role: 'user', content: '소금을 뿌린다' }], 'model');
+    return out.map((m) => `${m.role}: ${String(m.content).slice(0, 60)}`);
+  });
+  const inv = req.find((l) => l.includes('[Inventory]'));
+  if (!inv) errorsAll.push(`[${vp}] no [Inventory] in request: ${JSON.stringify(req)}`);
   await page.evaluate(() => document.querySelector('#chatmock')?.remove());
   await openWin(page); await sleep(300);
   await openEditor(page, 'set:items'); await sleep(300);

@@ -70,7 +70,7 @@ import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
 import { cosReadyMode } from './core/malls';
-import { hideUseBox, refreshUseBox, USE_SLOT } from './host/usebox';
+import { hideUseBox, markUseSent, refreshUseBox, USE_SLOT } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
@@ -174,6 +174,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
         // 소지품 [Inventory]: 지금 가진 것·한계·이번 턴 사건(사용·새로 산 것·넘침)을 마지막 유저 메시지 앞에 (core/items.ts, 설정 「소지품 → 본편에 넘기기」)
         messages = step('소지품', () => withInventory(messages, c.chat), messages);
+        // 「다음 메시지에 사용」 칩: 요청에 실려 나갔으니 바로 숨긴다 (host/usebox.ts markUseSent, 2026-11-12 사용자: 보냈는데 안 없어짐)
+        await stepAsync('사용 상자', () => markUseSent(c.charIndex, c.chatIndex, c.chat), undefined);
         // 망상홈쇼핑: 할부 호출 턴·방청 신청 턴에만 한 번 (core/homeshop.ts, 평소엔 아무것도 안 넣는다)
         messages = step('망상홈쇼핑', () => withHomeshop(messages, c.chat), messages);
         // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
