@@ -81,7 +81,7 @@ const numBox = (page: SetPage, key: string, cur: string | number, lo: number, hi
 /** 수 상자 「− 값 +」는 앱 전체에 두 크기뿐 (2026-11-12 사용자: 큰 것·작은 것. 자릿수로 폭이 바뀌지 않는다, src/ui/editor/style.css --step-sm·--step-lg).
  * 작은 것 = 가장 빽빽한 격자(인터넷 「양」, 한 줄 8개)에 들어가는 폭. 그 줄이 가질 수 있는 값(가장 큰 수·0일 때의 말)에 단위를 붙인 글이
  * 작은 것의 가운데 칸(STEP_SM_ROOM px)에 다 들어가면 작은 것, 하나라도 안 들어가면 큰 것. 크기는 여기 한 곳에서만 정한다. */
-const STEP_SM_ROOM = 38;
+const STEP_SM_ROOM = 34;
 const textPx = (t: string): number => [...t].reduce((n, ch) => n + (/[0-9]/.test(ch) ? 7.6 : ch === ' ' ? 3.6 : /[.,%]/.test(ch) ? 9 : ch.charCodeAt(0) > 0x2e7f ? 12.4 : 8), 0);
 export const stepSize = (hi: number, unit = '', zero = ''): '' | ' lg' => {
   const u = unit ? textPx(unit) + 3 : 0;

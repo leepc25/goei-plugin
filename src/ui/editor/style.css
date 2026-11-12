@@ -663,8 +663,9 @@
 /* 173줄의 입력 공통 규칙(안쪽 여백 12px)이 더 세서 수가 잘린다 → 수 칸만 여백을 줄인다 */
 .gw .adv-step > input.adv-val { padding: 0 2px !important; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gw .ps-ctl > .fam-set { flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
-  .gw .ps-ctl > .fam-set > .fam-set1 { justify-content: space-between; }
+  /* 폰: 짝을 한 열로 쌓는다. 이름은 왼쪽, 상자는 오른쪽 끝 한 줄 */
+  .gw .ps-ctl > .fam-set, .gw .ps-ctl > .fam-set:has(.st-step.lg) { grid-template-columns: minmax(0, 1fr); width: 100%; gap: 8px; }
+  .gw .ps-ctl > .fam-set > .fam-set1 { grid-template-columns: minmax(0, 1fr) max-content; }
   .gw .hb-i { grid-template-columns: 6.5em minmax(0, 1fr); }
   .gw .mx-grid.ck-ph { display: block; }
   .gw .mx-grid.ck-ph .mx-cell { flex-wrap: wrap; align-items: center; }
