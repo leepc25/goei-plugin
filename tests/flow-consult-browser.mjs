@@ -55,8 +55,8 @@ async function clickAll(page, where) {
   return n;
 }
 
-/* ── 1. 시작 뒤: 모든 조작은 이 채팅에 ── */
-{
+/* ── 1. 시작 뒤: 모든 조작은 이 채팅에 ── (CONSULT_ONLY=1 이면 상담 절만 돈다) */
+if (!process.env.CONSULT_ONLY) {
   const { page, errors } = await boot(browser, fx, started(), PC);
   await openWin(page);
   await openEditor(page, 'manage:flow');
@@ -131,7 +131,7 @@ async function clickAll(page, where) {
 }
 
 /* ── 2. 시작 전: 메뉴 페이지와 같은 곳에 ── */
-{
+if (!process.env.CONSULT_ONLY) {
   const { page, errors } = await boot(browser, fx, fresh(), PC);
   await openWin(page);
   await openEditor(page, 'manage:flow');
@@ -178,19 +178,27 @@ async function send(page, text, replies) {
   const dir0 = (await chatOf(page)).scriptstate.$pp_director;
 
   // (가) 묻기 → 바꾸자고 함: 이 턴에는 아무것도 안 바뀐다
-  await send(page, '토큰을 줄이고 싶어', [`${SAY('Director를 메모형(뒤)로 바꾸면 메인 요청 전 호출이 없어져요. 바꿀까요?')}\n<set>\npp.director=메모형(뒤)\n</set>`]);
+  // 관제 화면에서는 펼친 메뉴가 없다 → 모델이 <open> 으로 메뉴를 달라고 하면 그 메뉴를 더해 한 번만 다시 묻는다
+  const c0 = await page.evaluate(() => (window.__calls.llm ?? []).length);
+  await send(page, '토큰을 줄이고 싶어', ['<open>인물, 생성 공통, 없는메뉴</open>', `${SAY('Director를 메모형(뒤)로 바꾸면 메인 요청 전 호출이 없어져요. 바꿀까요?')}\n<set>\npp-set.director=메모형(뒤)\n</set>`]);
+  const two = await page.evaluate((c0) => window.__calls.llm.slice(c0).map((c) => JSON.stringify(c.messages)), c0);
+  eq(two.length, 2, '<open> 이 오면 한 번 다시 묻는다');
+  ok(!two[0].includes('[pp-set.director]') && two[0].includes('(펼친 메뉴 없음)'), '첫 요청: 메뉴 이름·줄 이름만 (펼친 메뉴 없음)');
+  ok(two[0].includes('- 인물:') && two[0].includes('- 생성 공통:'), '첫 요청에 메뉴 목록이 있다');
+  eq((await logOf(page)).filter((l) => l.startsWith('ai-op')).length, 1, '<open> 답은 화면에 내지 않는다');
   eq((await chatOf(page)).scriptstate.$pp_director, dir0, '바꾸자고 한 턴에는 적용하지 않는다');
   eq(await page.evaluate(() => document.querySelectorAll('.gw-ai .ai-card').length), 0, '판이 아직 없다');
   const req = await page.evaluate(() => window.__calls.llm.at(-1));
   eq(req.mode, 'submodel', '보조 모델로 부른다');
   const reqText = JSON.stringify(req.messages);
   ok(!reqText.includes('ZZ메인본문표식'), '상담 요청에 채팅 글이 없다');
-  ok(reqText.includes('[pp.director]') && reqText.includes('[gen.retries]') && reqText.includes('[board.gn.auto]'), '상담 요청에 관제 화면의 설정 목록이 들어간다');
+  ok(reqText.includes('[pp-set.director]') && reqText.includes('[adv-set.gen:retries]'), '다시 물은 요청에 달라고 한 메뉴의 설정 목록이 들어간다');
+  ok(!reqText.includes('## 위키') && !reqText.includes('## 상점'), '달라고 하지 않은 메뉴는 펼치지 않는다');
   ok(reqText.includes('턴마다 보조 호출'), '상담 요청에 지금 호출 수가 들어간다');
   // (나) 동의 → 적용 → 판
   await send(page, '응 바꿔줘', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   eq((await chatOf(page)).scriptstate.$pp_director, 'note', '동의한 뒤에 적용된다');
-  ok(JSON.stringify(await page.evaluate(() => window.__calls.llm.at(-1).messages)).includes('pp.director=메모형(뒤)'), '동의 턴 요청에 「바꾸자고 한 것」이 들어간다');
+  ok(JSON.stringify(await page.evaluate(() => window.__calls.llm.at(-1).messages)).includes('pp-set.director=메모형(뒤)'), '동의 턴 요청에 「바꾸자고 한 것」이 들어간다');
   const card = await page.evaluate(() => { const c = document.querySelector('.gw-ai .ai-card'); return c ? { head: c.querySelector('b').textContent, row: c.querySelector('.ai-ch').textContent.replace(/\s+/g, ' ').trim(), btns: [...c.querySelectorAll('button')].map((b) => b.textContent) } : null; });
   eq(card?.head, '바꾼 설정 1개', '판 머리');
   eq(card?.row, '인물 · Director사실형(앞) → 메모형(뒤)', '판: 무엇을 무엇에서 무엇으로');
@@ -207,7 +215,7 @@ async function send(page, text, replies) {
   ok(await page.evaluate(() => !!document.querySelector('.gw-ai')), 'PC: 다른 메뉴로 가도 상담 창은 그대로');
   // (마) 동의 없이 바로 바꾸려는 답: 적어 둔 것이 없으니 아무것도 안 바뀐다
   const on0 = (await chatOf(page)).scriptstate.$pp_on;
-  await send(page, '인물 기록 꺼', [`${SAY('껐어요.')}\n<set>\npp.on=끔\n</set>\n<apply>yes</apply>`]);
+  await send(page, '인물 기록 꺼', [`${SAY('껐어요.')}\n<set>\npp-set.on=끔\n</set>\n<apply>yes</apply>`]);
   eq((await chatOf(page)).scriptstate.$pp_on, on0, '바꾸자고 한 적 없는 것은 <apply> 가 와도 적용하지 않는다');
   ok((await logOf(page)).some((l) => l.startsWith('ai-sys') && l.includes('아무것도 바꾸지 않았어요')), '적용하지 않았다고 알린다');
   // 사용자가 다른 말을 하면 적어 둔 것은 버린다
@@ -215,7 +223,7 @@ async function send(page, text, replies) {
   await send(page, '응', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   eq((await chatOf(page)).scriptstate.$pp_on, on0, '거절한 뒤의 <apply> 는 적용하지 않는다');
   // (바) 목록에 없는 설정 · 고를 수 없는 값 · 범위 밖 수는 빠지고, 맞는 것만 남는다
-  await send(page, '이것저것 바꿔줘', [`${SAY('네 가지를 바꿀까요?')}\n<set>\nnope.key=1\n$pp_log=지움\npp.director=없는값\ngen.retries=9\npp.when=수동\n</set>`]);
+  await send(page, '이것저것 바꿔줘', [`${SAY('네 가지를 바꿀까요?')}\n<set>\nnope.key=1\n$pp_log=지움\npp-set.director=없는값\nadv-set.gen:retries=9\npp-set.when=수동\n</set>`]);
   const sys = (await logOf(page)).filter((l) => l.startsWith('ai-sys')).at(-1) ?? '';
   ok(sys.includes('nope.key') && sys.includes('Director') && sys.includes('형식 오류 재시도'), `못 바꾸는 것을 알린다: ${sys}`);
   const before = (await chatOf(page)).scriptstate;
@@ -283,7 +291,7 @@ async function send(page, text, replies) {
   await sleep(600);
   await clickSel(page, '.gw [data-action="ai-toggle"]');
   await page.waitForSelector('.gw-ai');
-  await send(page, '이미지 태그 모델을 보조로', [`${SAY('이미지 태그 모델을 보조 모델로 바꿀까요?')}\n<set>\nimg.model=보조 모델\npp.when=수동\n</set>`]);
+  await send(page, '이미지 태그 모델을 보조로', [`${SAY('이미지 태그 모델을 보조 모델로 바꿀까요?')}\n<set>\nset-asset-model=보조 모델\npp-set.when=수동\n</set>`]);
   await send(page, '응', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   const s = await snap(page);
   eq(JSON.parse(s.prefs).basic.assetModel, 'aux', '시작 전: 메인 설정 값은 새 채팅 기본값에');
@@ -323,7 +331,7 @@ async function send(page, text, replies) {
   eq(sheet.w, sheet.vw, '폰: 판이 화면 폭');
   eq(sheet.b, sheet.vh, '폰: 판이 화면 아래에 붙는다');
   ok(sheet.t > 100, '폰: 위에 설정 화면이 조금 보인다');
-  await send(page, '갱신기를 수동으로', [`${SAY('갱신기 자동 호출을 수동으로 바꿀까요?')}\n<set>\npp.when=수동\n</set>`]);
+  await send(page, '갱신기를 수동으로', [`${SAY('갱신기 자동 호출을 수동으로 바꿀까요?')}\n<set>\npp-set.when=수동\n</set>`]);
   await send(page, '응', [`${SAY('바꿨어요.')}\n<apply>yes</apply>`]);
   eq((await chatOf(page)).scriptstate.$pp_when, 'manual', '폰: 상담으로 바꾼다');
   ok(await page.evaluate(() => { const i = document.querySelector('.gw-ai .gw-ai-in').getBoundingClientRect(); return i.bottom <= innerHeight + 1 && i.right <= innerWidth + 1; }), '폰: 글칸이 화면 안');

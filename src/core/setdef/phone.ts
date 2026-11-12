@@ -5,7 +5,7 @@ import { onOff, type SetDef, type SetPage } from './types';
 const KEEP_HELP = '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요';
 const keep = (k: 'dm' | 'group' | 'notice', label: string): SetDef => ({
   key: `storage_auto_${k}`, label, ctl: onOff('0'), help: KEEP_HELP,
-  inline: { key: `storage_limit_${k}`, lo: 1, hi: STORAGE_MAX, unit: '개', aria: `storage_limit_${k}`, whenOn: true },
+  inline: { key: `storage_limit_${k}`, lo: 1, hi: STORAGE_MAX, unit: '개', aria: '남길 수', whenOn: true },
 });
 const pct = (key: string) => ({ key, lo: 0, hi: 100, unit: '%', aria: '확률' });
 
