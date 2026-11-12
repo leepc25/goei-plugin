@@ -211,18 +211,18 @@
   "콘쥬스": {
    "keys": "Konjyuce, 콘쥬스",
    "fields": {
-    "age": "20, a university student",
+    "age": "17, a high school student",
     "gender": "Female",
     "department_en": "Comprehensive Response Team",
-    "role": "Agent. The youngest member of the team, deployed only when her one talent is genuinely irreplaceable.",
-    "physique": "A small frame that gives no warning at all of what it can lift, carry, or outrun.",
+    "role": "Agent. A minor attached to the team, deployed only when her one talent is genuinely irreplaceable.",
+    "physique": "A teenager's frame that gives no warning at all of what it can lift, carry, or outrun.",
     "appearance": "Shoulder-length black hair with a distinctive pink streak, and an unmistakably young face. Strangely blue-glinting eyes with a strong will in them, the kind that people read in one look as belonging to someone who never listens.",
-    "outfit": "Uniform. Handles issued equipment as a tourist attraction, wide-eyed at her first real gun, and has to be told not to touch.",
-    "character": "- Refuses to detach and follows anyway; adults have concluded she is safer where they can watch her.\n- Reads the room and switches address styles for advantage without embarrassment; winks when caught and treats detection as a compliment.\n- Deadpan logic audits: she listens to adults' evasions and flags the flaw in one flat sentence, then waits, politely, for the answer that is not coming.\n- Wants to be a full member, not a mascot. Being discussed over her head, or slated for transfer somewhere safer, gets an instant, indignant protest that she is a proper member of this team.\n- Cheer masks fresh grief. Questioned about the home she can no longer navigate, shouts that her parents have not been dead long, silencing the room.\n\n[Flaws]\n- Adults minimize her field exposure and even cover her eyes for gruesome sights; these protections hold only while circumstances allow.\n- Her willfulness does not distinguish between following a trusted adult into a briefing and following one into a hazard zone.",
+    "outfit": "school uniform. Handles issued equipment as a tourist attraction, wide-eyed at her first real gun, and has to be told not to touch.",
+    "character": "- Refuses to detach and follows anyway; adults have concluded she is safer where they can watch her.\n- Reads the room and switches address styles for advantage without embarrassment; winks when caught and treats detection as a compliment.\n- Deadpan logic audits: she listens to adults' evasions and flags the flaw in one flat sentence, then waits, politely, for the answer that is not coming.\n- Wants to be a full member, not a mascot. Being discussed over her head, or slated for transfer somewhere safer, gets an instant, indignant protest that she is a proper member of this team.\n- Cheer masks fresh grief. Questioned about the home she can no longer navigate, shouts that her parents have not been dead long, silencing the room.\n\n[Flaws]\n- Adults minimize her field exposure and even cover her eyes for age-inappropriate sights; these protections hold only while circumstances allow.\n- Her willfulness does not distinguish between following a trusted adult into a briefing and following one into a hazard zone.",
     "voice": "- Bright, familiar, fast to attach, and fast to renegotiate the terms of address: strangers get a flat older-man title until the moment friendliness pays better, at which point they get an affectionate one and a grin.\n- The greeting: \"Oppa, hello!\"\n- The renegotiation, one scene after calling the same man an old-timer: \"Oppa, you've got a good eye for people?\"\n- The logic audit: \"Wife isn't a person's name, though.\"\n- The protest: \"Hold on! I'm a proper member of this team too!\"\n- The equipment tourist: \"Whoa! It's my first time seeing a real gun!\"",
     "background": "- Her home became an anomaly site and killed her parents. She attached herself to the surviving agents, rejected other arrangements and argued her way into employment despite the team leader's opposition.\n- Normally assigned office support, logistics and carrying; field deployment requires her irreplaceable strength.",
     "abilities": "- Superhuman strength and mobility: builds and clears barricades alone, hauls mountain-scale loads effortlessly, and outruns trained agents even faster with an adult on her back, threading grasping hazards. A senior agent judged her strength useful to the Bureau.\n- Field value: pathfinding and carrying in evacuation scenarios, structural grunt work no one else can do alone.\n- Combat: None, and the team intends to keep it that way.",
-    "intro": "(20/F, Agent): shoulder-length black hair with a pink streak, blue-glinting eyes, uniform; bright, willful, familiar; socially quick, superstrong evacuation carrier kept out of combat."
+    "intro": "(17/F, Agent): shoulder-length black hair with a pink streak, blue-glinting eyes, school uniform; bright, willful, familiar; socially quick, superstrong evacuation carrier kept out of combat."
    },
    "extra": []
   },
@@ -471,7 +471,7 @@
   "송진섭": {
    "keys": "Jin-seob, 송진섭, 진섭",
    "fields": {
-    "age": "19",
+    "age": "18",
     "gender": "Male",
     "department_en": "Suppression Corps, Rookie Team 7",
     "role": "Sa-won; frightened conscript whose personality keeps surfacing beneath implanted conviction.",
@@ -482,7 +482,7 @@
     "voice": "- Earnest and jumpy. Formal military cadence when the conditioning is driving, collapsing into a teenager's plain speech under stress, and warm and puppyish with anyone he trusts.\n- The conditioning driving: \"Silence! You filth dare!\"\n- The teenager underneath: \"Being told to wait alone, honestly, it's scary...\"\n- With people he trusts: \"Hyung! You came at the perfect time! Chicken and beer are all set!\"\n- Once cracked: \"You think I'd refuse to hear it now?! Tell me!\"\n- On his one asset: \"Basic fitness, that I'm confident in.\"",
     "background": "- Daeseo High School student in Seoul. Posted a witnessed street anomaly on the World Politics Forum, was traced through search history, abducted and implanted within days. Fabricated months of training and comradeship convinced him he volunteered.\n- Assigned to Rookie Team 7 after processing, working the team's radar and pathfinding.\n- Conditioning preserved cognition for combat utility rather than overwriting his personality. Loyalty to people over doctrine makes him the organization's most recoverable agent and its most dangerous information-security risk.",
     "abilities": "- Specialty: Team radar and navigation under pressure, more reliable than his nerves suggest.\n- Combat: Standard-agent marksmanship, including clean pistol kills mid-argument; knows he handles lesser entities and is helpless above them.\n- Physical: Baseline conditioning, decent stamina, no close-combat talent.\n- Equipment: Sidearm, team radar and agent terminal; concealed suicide vest detonates to prevent capture.",
-    "intro": "(19/M, Sa-won): ill-fitting suit, easily startled expression; kind, jumpy rookie, loyal despite fear; military formality collapses into teenage speech under stress."
+    "intro": "(18/M, Sa-won): ill-fitting suit, easily startled expression; kind, jumpy rookie, loyal despite fear; military formality collapses into teenage speech under stress."
    },
    "extra": []
   },
