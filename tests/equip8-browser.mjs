@@ -260,6 +260,38 @@ if (PART.includes('sell')) {
       return { out, lap, lapCell, lapAv, hscroll: body ? body.scrollWidth > body.clientWidth + 1 : null, zone: zone ? Math.round(zone.width) : null };
     });
     if (fit.out || fit.lap || fit.lapCell || fit.lapAv || fit.hscroll || m.over) bad(`[sell/${name}] 넘침·겹침 ${JSON.stringify(fit)} over=${m.over}`);
+    // 장착 띠와 소지품 구획이 서로 다른 테두리 상자, 사이가 떨어져 있고, 장착 칸과 물건 카드 크기가 다름 (2026-11-12 사용자: 「장착칸이랑 아이템칸이랑 구분도 없냐」)
+    const sep = await page.evaluate(() => {
+      const R = (e) => { const r = e.getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), b: Math.round(r.bottom) }; };
+      const band = document.querySelector('.sh-pick .it-eqbox.sell'), zone = document.querySelector('.sh-pick .sh-mine');
+      if (!band || !zone) return null;
+      const bw = (e) => parseFloat(getComputedStyle(e).borderTopWidth) || 0;
+      const slot = document.querySelector('.sh-pick .it-eqslots .it-slot'), card = zone.querySelector('.it-c');
+      const head = zone.querySelector('.sh-zh');
+      return {
+        band: R(band), zone: R(zone), gap: Math.round(zone.getBoundingClientRect().top - band.getBoundingClientRect().bottom),
+        bandBorder: bw(band), zoneBorder: bw(zone), nested: band.contains(zone) || zone.contains(band),
+        slotsInBand: [...document.querySelectorAll('.sh-pick .it-slot')].every((e) => band.contains(e)), avInBand: !!band.querySelector('.it-av'),
+        cardsInZone: [...document.querySelectorAll('.sh-pick .it-c:not(.it-slot)')].every((e) => zone.contains(e)), cards: zone.querySelectorAll('.it-c').length,
+        slot: slot ? R(slot) : null, card: card ? R(card) : null, head: head ? head.textContent.trim() : '', headInZone: !!head && head.getBoundingClientRect().top >= zone.getBoundingClientRect().top,
+        sameLeft: Math.round(band.getBoundingClientRect().left) === Math.round(zone.getBoundingClientRect().left), sameWidth: Math.round(band.getBoundingClientRect().width) === Math.round(zone.getBoundingClientRect().width),
+      };
+    });
+    const GAP = 8; // 띠와 구획 사이 최소 간격 (.sh-eq margin-bottom 10)
+    if (!sep) bad(`[sell/${name}] 장착 띠 상자나 소지품 구획이 없음`);
+    else {
+      if (sep.nested) bad(`[sell/${name}] 장착 띠와 소지품 구획이 한 상자 안에 있음`);
+      if (sep.bandBorder < 1 || sep.zoneBorder < 1) bad(`[sell/${name}] 테두리 없음 (띠 ${sep.bandBorder}, 구획 ${sep.zoneBorder})`);
+      if (sep.gap < GAP) bad(`[sell/${name}] 띠와 구획 사이 ${sep.gap}px (바람 ≥ ${GAP})`);
+      if (!sep.slotsInBand || !sep.avInBand) bad(`[sell/${name}] 장착 칸·아바타가 띠 상자 밖에 있음`);
+      if (!sep.cardsInZone || !sep.cards) bad(`[sell/${name}] 물건 카드가 소지품 구획 밖에 있음 (${sep.cards})`);
+      if (!sep.sameLeft || !sep.sameWidth) bad(`[sell/${name}] 띠와 구획의 왼쪽 끝·폭이 다름 (띠 ${sep.band.x}/${sep.band.w}, 구획 ${sep.zone.x}/${sep.zone.w})`);
+      if (!/^소지품/.test(sep.head) || !sep.headInZone) bad(`[sell/${name}] 소지품 구획 제목 줄이 구획 안에 없음 (${sep.head})`);
+      if (sep.slot && sep.card && (Math.abs(sep.slot.w - sep.card.w) < 8 || sep.slot.h === sep.card.h)) bad(`[sell/${name}] 장착 칸 ${sep.slot.w}×${sep.slot.h} 과 물건 카드 ${sep.card.w}×${sep.card.h} 크기가 같음`);
+      const wantSlot = name === 'phone' ? 59 : 97;
+      if (sep.slot && sep.slot.w !== wantSlot) bad(`[sell/${name}] 장착 칸 ${sep.slot.w} (바람 ${wantSlot} — 소지품 창 장착 칸과 같은 크기)`);
+    }
+    report[`sellsep/${name}`] = sep && { 띠: `${sep.band.w}×${sep.band.h}`, 구획: `${sep.zone.w}×${sep.zone.h}`, 간격: sep.gap, 장착칸: sep.slot && `${sep.slot.w}×${sep.slot.h}`, 물건카드: sep.card && `${sep.card.w}×${sep.card.h}`, 제목: sep.head };
     await page.screenshot({ path: `${out}/sell_${name}.png` });
     // 장착한 물건을 눌러 팔 물건으로 고를 수 있음 (새 칸 = 장비 여섯째)
     await page.evaluate(() => document.querySelector('.sh-pick .it-slot[data-value="i_gas"]')?.click()); await sleep(400);

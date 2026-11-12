@@ -194,7 +194,7 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
   return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av" data-drop="auto">${av}</div>` : ''}<div class="it-eqcol" data-drop="auto">${statsRow(ctx, liveOf(ctx))}${slots}</div>${isPhone() ? '' : useBox(ctx)}</div></section>`;
 }
 
-/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 6). 상점 팔기(PC)는 이 둘을 소지품 격자와 한 상자에 엮는다 (ui/shop.ts pickHtml) */
+/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 6) */
 export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''): { av: string; slots: string } {
   const live = liveOf(ctx);
   const eq = equippedOf(live);

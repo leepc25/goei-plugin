@@ -30,7 +30,7 @@ import {
 } from '../core/shop';
 import { ICONS } from './icons';
 import { imageUrl } from './images';
-import { equipBox, equipParts, itemPic } from './items';
+import { equipBox, itemPic } from './items';
 
 /** 상품 그림: 소지품과 같은 PixelLab 그림 팩에서 그림 낱말·이름으로 (ui/items.ts itemPic, 표시 전용) */
 const pic = (name: string, icon?: string): string => itemPic({ name, icon });
@@ -189,13 +189,9 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
   // 진열대와 같은 구획 상자 안에 (사용자 11-07: 배경에 늘어놓지 말고 상자 안에)
   const head = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small></header>`;
   const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : `<p class="gx-wt-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
-  if (isPhone()) return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
-  // PC (2026-11-08 사용자: 장착 띠를 따로 두면 소지품이 가려 안 보임): 상자 하나에 왼쪽 아바타(자르지 않음, 세로로 섬),
-  // 오른쪽 첫 줄 장착 8칸(무기 2 · 장비 6), 그 아래부터 소지품 격자. 소지품이 많으면 아바타 아래까지 전체 너비로 이어진다
-  const { av, slots } = equipParts(ctx, 'sell', st.sell?.itemId ?? '');
-  const cells = mine.map((it) => pickCell(it, st)).join('');
-  const empty = mine.length ? '' : `<p class="gx-wt-empty sh-sell-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
-  return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells}${empty}</div></section></div>`;
+  // 장착 띠와 소지품 구획은 서로 다른 상자 (2026-11-12 사용자: 장착 칸과 물건 칸이 한 격자처럼 붙어 구분이 안 됨).
+  // 소지품 창과 같은 규격: 위에 테두리 친 장착 띠 [아바타 | 장착 8칸], 그 아래 제목 줄을 가진 소지품 구획. 칸 크기·열 수는 style.css 가 PC·폰을 가른다
+  return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
 }
 
 function pickCell(it: Item, st: ShopState): string {
