@@ -132,7 +132,17 @@ const pairs = (r: Row) => shown(r).map((c) => `<span class="fl-pair${wide(c) ? '
 /** 예상·지난 턴 칸: 숫자가 있을 때만 숫자. 없으면 비운다 (모든 줄 같은 규칙) */
 const stat = (v: string | undefined) => `<div class="fl-st">${v || ''}</div>`;
 /** 호출 글: 모든 줄에서 같은 자리(고정 칸). 설명 글과 달리 본문 색 */
-const said = (r: Row) => `<div class="fl-said${r.on ? ' on' : ''}">${r.calls ? esc(r.calls) : ''}</div>`;
+/** 호출 글 나누기: 「1회 (자료 부족 땐 2회)」 → 횟수(크게) + 조건(아래 작은 글). 호출이 안 가는 글(호출 없음·수동)은 흐리게 */
+export function saidParts(calls: string): { main: string; note: string; none: boolean } {
+  const m = /^(.*?)\s*\((.*)\)\s*$/.exec(calls);
+  const main = (m ? m[1] : calls).trim();
+  return { main, note: m ? m[2].trim() : '', none: /^(호출 없음|수동)/.test(main) };
+}
+const said = (r: Row) => {
+  if (!r.calls) return '<div class="fl-said"></div>';
+  const p = saidParts(r.calls);
+  return `<div class="fl-said${r.on && !p.none ? ' on' : ''}${p.none ? ' none' : ''}"><b>${esc(p.main)}</b>${p.note ? `<small>${esc(p.note)}</small>` : ''}</div>`;
+};
 /** 격자 칸: 그 묶음의 조작에서 열 이름과 같은 선택지의 둥근 칸. 그 설정이 없는 칸은 비운다 */
 function cells(r: Row, cols: Col[]): string {
   return cols.map((g, gi) => g.opts.map((o, i) => {
