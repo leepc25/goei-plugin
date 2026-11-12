@@ -33,7 +33,7 @@ RisuAI용 괴담 시뮬레이션 「괴이 ː ANOMALY」의 전용 플러그인�
 ## 개발
 
 - `npm run build`: `dist/goei-plugin.js`(시작기, `src/main.ts`), `dist/goei-body.js`(본체, `src/body.ts`)와 받기용 조각 `dist/goei-body.json`·`goei-body.N.txt`, 자료 팩 `dist/goei-data-world.*`·`goei-data-install.*`(`scripts/data-pack.mjs`), 토크나이저 조각 `dist/tok-o200k.*`. 원본 카드가 있으면 실제 카드 시험용 `dist-test/real-module.json`도 풉니다.
-- 시험: `npm run typecheck` → `npm test`(단위) → `npm run test:browser -- --group plugin`(브라우저, 약 30분. `--only 이름`으로 골라 돌릴 수 있음). 시험 목록·틀은 `tests/browser-suite.json`.
+- 시험: `npm run typecheck` → `npm test`(단위). 화면 시험(`tests/*-browser.mjs`)은 고친 화면 것만 골라 돌린다. 전부 돌리는 목록(`tests/browser-suite.json`)은 2026-11-13 사용자 지시로 폐기.
 - 릴리스 준비: `npm run release:prep -- --bump patch`(판 올림 → 빌드 → 카드·release 부속 파일 → `release/` 복사 → 형 검사·단위 시험 → 남은 절차 출력). 순서 설명은 [docs/인계서.md](docs/인계서.md) 3장. main에 올리고 릴리스하는 것은 사용자가 「릴리스해」라고 할 때만.
 - `release/`에는 시작기·본체 조각·자료 팩·토크나이저 조각과 카드 부속(`card-update.*`·`version.json`·`wiki-base.*`·`icon.png`·`pic/`)을 둡니다. 시작기는 자기 판과 같은 본체만 받고, 본체는 자기에게 박힌 지문과 같은 자료 팩만 씁니다. `release/version.json`이 바뀐 커밋이 main에 올라가면 GitHub Actions(`.github/workflows/release.yml`)가 카드·플러그인을 빌드해 Releases에 붙입니다.
 - 시작기는 Risu 플러그인 칸의 nonce를 붙인 `<script>`로 본체를 실행합니다(그 칸은 eval·blob이 막혀 있음). 시험: `tests/browser.mjs`의 「시작기」.
