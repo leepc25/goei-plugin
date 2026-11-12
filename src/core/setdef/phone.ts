@@ -46,7 +46,7 @@ export const PHONE_SET: SetPage = {
     {
       title: '답장',
       rows: [
-        { key: 'habits', label: '말버릇 기록', ctl: onOff('0'), help: '연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요' },
+        { key: 'habits', label: '말버릇 기록', ctl: onOff('0'), help: '연락처마다 문자 습관(맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요' },
         { key: 'reactions', label: '이모지 반응', ctl: onOff('0'), help: '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요' },
       ],
     },

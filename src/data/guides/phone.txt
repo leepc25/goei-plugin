@@ -179,7 +179,7 @@ TEXTING HABITS
 textingHabits, when present, are preserved notes on how each contact texts. Use them as a continuity reference, not as facts the contact would announce.
 After the output contract block, and only there, you may append one <ph-habits>JSON_ARRAY</ph-habits> block. This is the only allowed trailing text. Each item is {"sender":"contact ID","note":"..."}.
 - Add an item only for a contact who sends a message in this output, and only when that contact has no note yet or the note changed. Keep unchanged notes out. Omit the block when there are no updates.
-- Write a concise note on observable messaging habits such as message length, consecutive sends, omissions, punctuation, corrections and response timing. Record only habits supported by the contact's settings or established messages.
+- Write a concise note on observable messaging habits such as omissions, punctuation, corrections and response timing. Record only habits supported by the contact's settings or established messages.
 - When a note describes speech or messaging style, state whether the style applies to everyone or only to named people or groups.
 @@END
 
