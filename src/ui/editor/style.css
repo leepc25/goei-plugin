@@ -789,6 +789,12 @@
 .gw-ai-top .ai-model { margin-left: 2px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: none; font: inherit; font-size: 12px; color: var(--dim); cursor: pointer; }
 .gw-ai-top .ai-model:hover:not(:disabled) { color: var(--text); border-color: var(--dim); }
 .gw-ai-top .gx-x { margin-left: auto; }
+/* 대화 지우기: 모델 칩과 같은 작은 단추, 닫기 바로 앞 (2026-11-12) */
+.gw-ai-top .ai-clear { margin-left: auto; white-space: nowrap; }
+.gw-ai-top .ai-clear + .gx-x { margin-left: 0; }
+.gw-ai-top .ai-model:disabled { opacity: .45; cursor: default; }
+.gw-ai > .gw-confirm { z-index: 2; }
+.gw-ai > .gw-confirm .gw-confirm-box { margin: 0 16px; }
 .gw-ai-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
 .gw-ai .ai-sys { align-self: center; max-width: 92%; padding: 4px 10px; border-radius: 10px; background: var(--panel2); color: var(--dim); font-size: 12.5px; text-align: center; overflow-wrap: anywhere; }
 .gw-ai .ai-err { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 10px; color: var(--danger); }
@@ -803,6 +809,9 @@
 .gw-ai .ai-ch > i s { color: var(--dim); }
 .gw-ai .ai-ch > i em { font-style: normal; font-weight: 700; color: var(--signal); }
 .gw-ai .ai-btns { display: flex; flex-wrap: wrap; gap: var(--gap); margin-top: 8px; }
+/* 답 아래 「설정으로 가기 →」: 답 풍선에 붙여서 · 판의 긴 글(글 칸)은 줄을 바꿔 다 보인다 */
+.gw-ai .ai-gobtn { align-self: flex-start; margin-top: -4px; }
+.gw-ai .ai-ch > span, .gw-ai .ai-ch > i { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
 .gw-ai-in { display: flex; gap: var(--gap); flex: none; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--panel); }
 .gw-ai-in input { flex: 1; min-width: 0; }
 .gw .gw-top-right .ai-open.on { background: var(--accent-bg); border-color: var(--accent-line); }

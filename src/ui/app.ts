@@ -21,7 +21,8 @@ import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
 import { bindNeedFill } from './needfill';
 import { chatLookPopup, flashPick, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
-import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
+import { editorOnSettings, editorOpen, isFeatPage, openEditor, render as editorRender, type EditorNode } from './editor/index';
+import { consultAllowed } from './editor/catalog';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { frameHtml, frameState } from './frame';
@@ -898,6 +899,25 @@ async function handle(action: string, value?: string): Promise<void> {
     if (!settingsUi.page) settingsUi.page = 'people';
     try {
       await handle(inner, (value ?? '').slice(cut + 1));
+    } finally {
+      settingsUi.scope = view.kind === 'started' ? keep.scope : settingsUi.scope;
+      settingsUi.page = keep.page;
+    }
+    return;
+  }
+  if (action === 'ai-do') {
+    // AI 상담 전용 통로 「메뉴|동작|값」: 그 메뉴 화면의 조작이 보내는 동작만 받는다 (ui/editor/catalog.ts consultAllowed —
+    // 화면에 지금 있는, 잠기지 않은 조작과 값까지 같아야 한다. 지우기·초기화·추가·저장·불러오기·업데이트는 이름으로도 한 번 더 막는다).
+    // 그 메뉴 화면을 열어 둔 것처럼 두고(기능 페이지는 그 페이지, 시작 뒤엔 이 채팅) 원래 처리기를 그대로 부른다 (값을 따로 저장하지 않는다)
+    const [page = '', inner = '', ...rest] = (value ?? '').split('|');
+    const v = rest.join('|');
+    if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
+    if (!consultAllowed(page, inner, v)) return;
+    const keep = { scope: settingsUi.scope, page: settingsUi.page };
+    if (view.kind === 'started') settingsUi.scope = 'chat';
+    settingsUi.page = isFeatPage(page) ? page : '';
+    try {
+      await handle(inner, v);
     } finally {
       settingsUi.scope = view.kind === 'started' ? keep.scope : settingsUi.scope;
       settingsUi.page = keep.page;

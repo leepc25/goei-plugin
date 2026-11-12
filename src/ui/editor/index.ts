@@ -34,6 +34,7 @@ import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
 import { isPhone } from '../media';
 import { consultAction, consultAfterRender, consultAside, consultButton, consultClose, consultUi } from './consult';
+import { setCatalogHost } from './catalog';
 import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
@@ -42,7 +43,7 @@ export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'start' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
 const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update', 'net'];
 /** 패널 기능 설정 화면을 그대로 쓰는 페이지 (게시판 사이트·괴담톡·위키·기록) */
-const isFeatPage = (p: string): p is NonNullable<typeof settingsUi.page> & string => ['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'people', 'journal', 'factions'].includes(p);
+export const isFeatPage = (p: string): p is NonNullable<typeof settingsUi.page> & string => ['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'people', 'journal', 'factions'].includes(p);
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
@@ -579,6 +580,26 @@ function buildFindIndex(ctx: ChatContext): FindHit[] {
   settingsUi.page = keepPage;
   return out;
 }
+/* AI 상담의 설정 목록 (catalog.ts): 설정 탭 왼쪽 목록의 메뉴를 차례로, 그 메뉴 화면을 그대로 그려 준다. 소개는 페이지 머리의 글(FEATURE_INFO) */
+setCatalogHost({
+  pages: () => treeOf('set').flatMap((g) => g.items).filter((i) => i[0].startsWith('set:')).map((i) => { const p = i[0].slice(4) as SetPage; return [p, SET_LABEL[p], FEATURE_INFO[p]?.desc ?? '']; }),
+  render: (page) => {
+    const ctx = host?.ctx();
+    if (!ctx) return '';
+    const keep = settingsUi.page;
+    try {
+      settingsUi.page = isFeatPage(page) ? page : '';
+      return settingsPage(ctx, page as SetPage);
+    } finally {
+      settingsUi.page = keep;
+    }
+  },
+  others: () => [
+    `${TABS.find(([t]) => t === 'set')![1]} 탭: ${treeOf('set').flatMap((g) => g.items).filter((i) => !i[0].startsWith('set:') && !i[0].startsWith('label:')).map((i) => i[1]).join(', ')}`,
+    ...(['world', 'guide', 'manage'] as Tab[]).map((t) => `${TABS.find(([x]) => x === t)![1]} 탭: ${treeOf(t).map((g) => (t === 'guide' && g.title === '추가 규칙' ? g.title : g.items.map((i) => i[1]).join(', '))).join(', ')}`),
+  ].join('\n'),
+  current: () => (edUi.open && edUi.node.startsWith('set:') ? edUi.node.slice(4) : ''),
+});
 function findResults(ctx: ChatContext | null): string {
   const q = findNorm(edUi.sq);
   if (!ctx) return '<p class="gw-find-none">채팅 정보를 읽지 못했어요.</p>';
