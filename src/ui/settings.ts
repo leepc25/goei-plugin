@@ -24,6 +24,7 @@ import { readIconMisses } from '../core/iconmatch';
 import { aliasCanAdd, aliasChanged, aliasEdit, aliasRowBad, aliasShown, ALIAS_WORD_MAX } from '../core/aliasrows';
 import { keepOpen } from './panels';
 import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
+import { SHOP_AMOUNTS, isGiveKey, isGiveShop, isShopAmount, isShopFn, shopFnNone, shopFnVar, shopGiveVar } from '../core/shopfn';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -622,7 +623,8 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
 }
 
 /** 설정 → 상점의 격자와 그 아래 줄 (fam-* 의 상점 쪽). col = 기본 상점·쇼핑몰 둘·망상홈쇼핑.
- *  네 곳이 같이 쓰는 값(맥락 반영·챗로그 포함·참조 로어북·생각 단계·다양성 강화·지난 목록 피하기)과 거래 끊음은 기본 상점 자리($sh_*) 하나 */
+ *  네 곳이 같이 쓰는 값(생각 단계·다양성 강화·지난 목록 피하기)과 거래 끊음은 기본 상점 자리($sh_*) 하나.
+ *  넘길 내용·맥락 반영은 가게 표(가게마다)와 기능 표($sh_fn_*, 세 가게가 한 값), 챗로그·참조 로어북 수는 양 표 (core/shopfn.ts) */
 export type ShopCol = 'shop' | MallSite | 'hs';
 export async function shopFamSet(ctx: ChatContext, env: SettingsEnv, scope: 'chat' | 'defaults', col: ShopCol, key: string, raw: string): Promise<boolean> {
   const vars = scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate;
@@ -652,8 +654,19 @@ export async function shopFamSet(ctx: ChatContext, env: SettingsEnv, scope: 'cha
       if (key === 'min') { lo = n; if (lo > hi) hi = lo; } else { hi = n; if (hi < lo) lo = hi; }
       patch = { [name(SHOP_MIN_VAR)]: String(lo), [name(SHOP_MAX_VAR)]: String(hi) };
     }
+  } else if (key === 'ctx' || key.startsWith('give_')) {
+    // 가게 표 (넘길 내용 + 맥락 반영): 기본 상점·쇼핑몰 둘, 가게마다 제 값
+    const k = key === 'ctx' ? 'ctx' : key.slice(5);
+    if (isGiveShop(col) && isGiveKey(k) && flag) patch = { [shopGiveVar(col, k)]: raw };
+  } else if (key.startsWith('fn_')) {
+    // 기능 표·양 표: 세 가게가 한 값 (col 은 늘 shop)
+    const m = /^fn_([a-z]+)_([a-z]+)$/.exec(key);
+    if (col === 'shop' && m && isShopFn(m[1])) {
+      if (isGiveKey(m[2]) && flag && !shopFnNone(m[1], m[2])) patch = { [shopFnVar(m[1], m[2])]: raw };
+      else if (isShopAmount(m[2])) { const n = int(SHOP_AMOUNTS[m[2]].min, SHOP_AMOUNTS[m[2]].max); if (n !== null) patch = { [shopFnVar(m[1], m[2])]: String(n) }; }
+    }
   } else if (col === 'shop') {
-    const FLAGS: Record<string, string> = { ctx: SHOP_CTX_VAR, diverse: SHOP_DIVERSE_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR };
+    const FLAGS: Record<string, string> = { diverse: SHOP_DIVERSE_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR };
     if (FLAGS[key] && flag) patch = { [FLAGS[key]]: raw };
     else if (key === 'thoughts' && ['off', 'inner', 'note'].includes(raw)) patch = { [SHOP_THOUGHTS_VAR]: raw };
     else if (key === 'turns') { const n = int(1, 8); if (n !== null) patch = { [SHOP_TURNS_VAR]: String(n) }; }

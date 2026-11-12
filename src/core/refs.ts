@@ -140,10 +140,23 @@ export function collectRefs(src: RefSource, o: CollectOptions): RefRow[] {
   return rows;
 }
 
-/** 개수 제한 (원본 reference_count): 추가 참조(관련·2차)만 센다. 필수가 아닌 2차 참조, 그다음 관련 로어북부터 뺀다 */
-export function limitRefs(rows: RefRow[], max: number): RefRow[] {
+/** 개수 제한 (원본 reference_count): 추가 참조(관련·2차)만 센다. 필수가 아닌 2차 참조, 그다음 관련 로어북부터 뺀다.
+ *  o.hard (상점 요청만, 2026-11-12 사용자: 「참조 로어북」 수가 실제로 듣게): 필수인 관련 로어북도 수에 맞춰 뺀다.
+ *  빼는 차례 = 2차 참조 → o.first 가 아닌 관련 로어북 → o.first 인 관련 로어북, 저마다 뒤에서부터. o 를 안 주면 예전 그대로 */
+export interface LimitOptions {
+  hard?: boolean;
+  /** 끝까지 남길 줄 (가게 이름·주인 이름에 걸린 로어북) */
+  first?: (r: RefRow) => boolean;
+}
+export function limitRefs(rows: RefRow[], max: number, o?: LimitOptions): RefRow[] {
   const out = rows.slice();
   const extra = () => out.filter((r) => r.kind === 'direct' || r.kind === 'secondary').length;
+  if (o?.hard) {
+    const first = o.first ?? (() => false);
+    const steps: ((r: RefRow) => boolean)[] = [(r) => r.kind === 'secondary', (r) => r.kind === 'direct' && !first(r), (r) => r.kind === 'direct'];
+    for (const hit of steps) for (let i = out.length - 1; i >= 0 && extra() > max; i--) if (hit(out[i])) out.splice(i, 1);
+    return out;
+  }
   for (const kind of ['secondary', 'direct'] as RefKind[]) {
     for (let i = out.length - 1; i >= 0 && extra() > max; i--) if (out[i].kind === kind && !out[i].required) out.splice(i, 1);
   }

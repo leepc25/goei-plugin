@@ -11,7 +11,9 @@ import { facePic } from '../host/assets';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { genSettings } from '../core/advanced';
-import { collectRefs, limitRefs, recentTurns, refText, storyText, type RefSource } from '../core/refs';
+import { collectRefs, limitRefs, recentTurns, refText, storyText, type RefRow, type RefSource } from '../core/refs';
+import { buildRegistry } from '../core/world/registry';
+import { matchedBooks, shopGive, type ShopGive } from '../core/shopfn';
 import { readDirectory } from '../core/world';
 import { findStatusTags } from '../core/world/status';
 import { rebuildStatusLine } from '../core/statusctx';
@@ -300,17 +302,26 @@ export interface ShopEnv {
 
 const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
 
-/** 상점·쇼핑몰 요청 자료. sh: 쓸 설정 (쇼핑몰은 사이트 설정) */
-export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ctx.chat.scriptstate)): ShopSource {
+/** 상점·쇼핑몰 요청 자료. sh: 쓸 설정 (쇼핑몰은 사이트 설정).
+ *  give: 가게 표·기능 표·양 표로 정한 「넘길 것」 (core/shopfn.ts shopGive, 기본 상점·쇼핑몰 둘). 안 주면 예전 고정 값 그대로 (망상홈쇼핑) */
+export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ctx.chat.scriptstate), give?: ShopGive): ShopSource {
   const src = playerSource({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() } as RefSource);
   const vars = ctx.chat.scriptstate ?? {};
-  const story = storyText(recentTurns(ctx.chat, sh.turns, genSettings(vars).userMessages));
-  // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
+  // 최근 챗로그는 맥락 반영이 꺼져 있어도 관련 로어북을 고를 때는 읽는다
+  const story = storyText(recentTurns(ctx.chat, give ? give.turns : sh.turns, genSettings(vars).userMessages));
   const doc = findDoc(ctx.chat, st.shop, ctx.char.globalLore);
-  const rows = limitRefs(
-    collectRefs(src, { scope: 'gnet', text: `${st.shop}\n${st.owner}\n${story}`, authors: false, persona: false, related: true, extra: doc ? [{ source: `위키: ${st.shop}`, content: innerBody(doc.body).slice(0, 3000) }] : [] }),
-    sh.refs,
-  );
+  const extra = doc ? [{ source: `위키: ${st.shop}`, content: innerBody(doc.body).slice(0, 3000) }] : [];
+  const text = `${st.shop}\n${st.owner}\n${story}`;
+  let rows: RefRow[];
+  if (give) {
+    // 「참조 로어북」 수: 관련 로어북·2차 참조를 실제로 이 수까지만. 가게 이름·주인 이름에 걸린 것을 끝까지 남긴다
+    const registry = buildRegistry(src.char.globalLore);
+    const named = matchedBooks(registry, `${st.shop}\n${st.owner}`);
+    rows = limitRefs(collectRefs(src, { scope: 'gnet', text, ...give.toggles, registry, extra }), give.refs, { hard: true, first: (r) => r.sources.some((x) => named.has(x.trim().toLowerCase())) });
+  } else {
+    // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
+    rows = limitRefs(collectRefs(src, { scope: 'gnet', text, authors: false, persona: false, related: true, extra }), sh.refs);
+  }
   let status = '';
   const msgs = ctx.chat.message ?? [];
   for (let i = msgs.length - 1; i >= 0 && !status; i--) {
@@ -322,6 +333,8 @@ export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ct
   if (status) status = rebuildStatusLine(status, usedCols(colConfig(vars)).filter((c) => c !== 'wallet' && c !== 'points'));
   const situation = ['$an_report', '$in_report'].map((k) => String(vars[k] ?? '').trim()).filter(Boolean).join('\n').slice(0, 1500);
   const identity = peopleSettings(vars).on ? identityText(peopleStore(ctx.chat).identity) : '';
+  // 가게 표와 기능 표 가운데 하나라도 맥락 반영이 꺼져 있으면 신분·상태창·괴이·챗로그를 넘기지 않는다
+  if (give && !give.context) return { st, refs: refText(rows), story: '', status: '', situation: '', identity: '', language: genSettings(vars).language };
   return { st, refs: refText(rows), story, status, situation, identity, language: genSettings(vars).language };
 }
 
@@ -355,7 +368,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
   if (kind === 'talk') await env.refresh();
   else env.render();
   try {
-    const src = shopSource(ctx, st0);
+    const src = shopSource(ctx, st0, s, shopGive(ctx.chat.scriptstate, 'shop', kind));
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: kind === 'shelf' ? '상점 진열' : '상점 대화' };
     let deal = '';
@@ -624,5 +637,6 @@ export function shopInput(v: string): void {
 export function previewShopShelf(ctx: ChatContext): LlmMessage[] | null {
   const st = currentShop(ctx.chat);
   if (!st) return null;
-  return shelfPrompt(shopSource(ctx, st), shopSettings(ctx.chat.scriptstate));
+  const s = shopSettings(ctx.chat.scriptstate);
+  return shelfPrompt(shopSource(ctx, st, s, shopGive(ctx.chat.scriptstate, 'shop', 'shelf')), s);
 }

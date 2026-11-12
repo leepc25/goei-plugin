@@ -294,6 +294,59 @@ for (const vp of vps) {
       assert.equal((await tryWon('1,000,000,000,001'))[1], 1000000000000, '1조 넘으면 저장 안 함');
       assert.deepEqual(await tryWon('0'), ['0', 0], '0원');
     }
+    // 상점 페이지의 가게 표·기능 표·양 표 (2026-11-12): 칸을 누르면 그 칸의 변수에만 저장되고 다시 그린 칸에 그 값이 보인다
+    await goNode(page, 'set:shop');
+    await settle(page);
+    {
+      const twin = isPhoneVp(vp) ? '.ck-ph' : '.ck-pc';
+      const ss = async () => (await chatOf(page)).scriptstate;
+      const cell = (key) => `.gw ${twin} [data-action="fam-set"][data-value^="${key}="]`;
+      const pressed = (key) => page.$eval(cell(key), (e) => e.getAttribute('aria-pressed'));
+      const tap = async (key) => { await page.evaluate((s) => document.querySelector(s).click(), cell(key)); await settle(page); };
+      const heads = await page.evaluate((t) => [...document.querySelectorAll(`.gw ${t}`)].filter((g) => g.querySelector('h3')?.textContent === '넘길 내용').map((g) => [...g.querySelectorAll('.ck-h2 > span')].slice(1).map((s) => s.textContent)), twin);
+      assert.deepEqual(heads, Array(2).fill(['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영']), `[${vp}] 「넘길 내용」 격자 둘의 칸 이름`);
+      // 가게 표: 기본값 (봇 설명·상시·관련·맥락 켬, 작가 노트·페르소나·2차 끔) → 우주 쇼핑몰의 작가 노트만 켠다
+      for (const shop of ['shop', 'cos', 'bm']) {
+        assert.deepEqual(await Promise.all(['give_desc', 'give_authors', 'give_persona', 'give_active', 'give_related', 'give_secondary', 'ctx'].map((k) => pressed(`s:${shop}:${k}`))), ['true', 'false', 'false', 'true', 'true', 'false', 'true'], `[${vp}] 가게 표 기본값 ${shop}`);
+      }
+      assert.equal(await page.$(cell('s:hs:give_desc')), null, '망상홈쇼핑 줄은 없다');
+      await tap('s:cos:give_authors');
+      assert.equal((await ss()).$cos_sh_give_authors, '1');
+      assert.equal(await pressed('s:cos:give_authors'), 'true', '다시 그린 칸이 켜져 있다');
+      assert.deepEqual([await pressed('s:shop:give_authors'), await pressed('s:bm:give_authors'), (await ss()).$sh_give_authors, (await ss()).$bm_sh_give_authors], ['false', 'false', undefined, undefined], '다른 가게는 그대로');
+      // 맥락 반영은 가게마다 따로
+      await tap('s:bm:ctx');
+      assert.equal((await ss()).$bm_sh_ctx, '0');
+      assert.deepEqual([await pressed('s:bm:ctx'), await pressed('s:cos:ctx'), await pressed('s:shop:ctx')], ['false', 'true', 'true']);
+      // 기능 표: 세 가게가 같이 쓰는 한 값. 1:1 상담의 맥락 반영은 없는 칸(「–」)
+      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'true', 'true']);
+      assert.equal(await page.$(cell('s:shop:fn_desk_ctx')), null, '1:1 상담 · 맥락 반영 칸은 조작이 없다');
+      await tap('s:shop:fn_talk_persona');
+      assert.equal((await ss()).$sh_fn_talk_persona, '0');
+      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'false', 'true'], '그 기능의 줄만 꺼진다');
+      // 양 표: − + 와 직접 치기, 범위 밖은 끝값으로
+      const num = (key) => `.gw ${isPhoneVp(vp) ? '.mx-grid.ck-ph' : '.ck-pc'} input.adv-val[data-change="fam-num"][data-key="s:shop:${key}"]`;
+      assert.deepEqual([await page.$eval(num('fn_shelf_turns'), (e) => e.value), await page.$eval(num('fn_desk_refs'), (e) => e.value)], ['3', '6'], '정하지 않은 기능은 챗로그 3턴·참조 로어북 6개');
+      await page.evaluate((s) => document.querySelector(s).closest('.st-step').querySelectorAll('button.gx-step')[1].click(), num('fn_talk_turns'));
+      await settle(page);
+      assert.equal((await ss()).$sh_fn_talk_turns, '4');
+      assert.deepEqual([await page.$eval(num('fn_talk_turns'), (e) => e.value), await page.$eval(num('fn_shelf_turns'), (e) => e.value)], ['4', '3']);
+      await setInput(page, num('fn_desk_refs'), '99');
+      await settle(page);
+      assert.equal((await ss()).$sh_fn_desk_refs, '12', '상한 12');
+      await setInput(page, num('fn_desk_refs'), '0');
+      await settle(page);
+      assert.deepEqual([(await ss()).$sh_fn_desk_refs, await page.$eval(num('fn_desk_refs'), (e) => e.value), (await ss()).$sh_refs], ['0', '0', undefined], '0개 · 같이 쓰던 값($sh_refs)은 건드리지 않는다');
+      // 옮겨 간 줄은 「같이 쓰는 값」에 없다
+      const rows = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row > .ps-label > b')].map((b) => b.textContent.trim()));
+      for (const gone of ['맥락 반영', '챗로그 포함', '참조 로어북']) assert.ok(!rows.includes(gone), `「${gone}」 줄은 격자로 옮겨 갔다`);
+      for (const kept of ['생각 단계', '다양성 강화', '지난 목록 피하기']) assert.ok(rows.includes(kept), `「${kept}」 줄은 그대로`);
+      // 다시 열어도 같은 값
+      await closeEditor(page);
+      await openEditor(page, 'set:shop');
+      await settle(page);
+      assert.deepEqual([await pressed('s:cos:give_authors'), await pressed('s:bm:ctx'), await pressed('s:shop:fn_talk_persona'), await page.$eval(num('fn_talk_turns'), (e) => e.value)], ['true', 'false', 'false', '4'], `[${vp}] 다시 열어도 같은 값`);
+    }
     // 고급(생성 공통) 숫자 칸: 음수·소수·빈 칸·너무 큰 수·글자
     await goNode(page, 'set:adv');
     const retries = '.gw input.adv-val[data-key="gen:retries"]';
