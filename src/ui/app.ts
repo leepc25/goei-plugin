@@ -424,15 +424,21 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('dragover', (ev) => {
     if (photoTarget(ev.target) && ev.dataTransfer?.types.includes('Files')) ev.preventDefault();
   });
-  // 소지품 끌어다 놓기 (ui/items.ts): 격자·장착 칸의 물건([data-drag]) → 장착 칸 · 격자 · 사용 상자 · 버리기 띠([data-drop]). 끄는 동안 .it-dragging 이 버리기 띠를 띄운다
+  // 소지품 끌어다 놓기 (ui/items.ts): 격자·장착 칸의 물건([data-drag]) → 장착 칸 · 아바타·장착 칸 쪽(auto) · 격자 · 사용 상자 · 버리기 띠([data-drop]). 끄는 동안 .it-dragging 이 버리기 띠를 띄운다
   let dragItem: { id: string; equip: string; usable: boolean } | null = null;
-  const dropAt = (t: EventTarget | null) => (t instanceof Element ? t.closest<HTMLElement>('[data-drop]') : null);
   const dropOk = (z: HTMLElement | null) => {
     if (!z || !dragItem) return false;
     const to = z.dataset.drop ?? '';
+    if (to === 'auto') return !!dragItem.equip || dragItem.usable;
     if (to.startsWith('equip:')) return to.split(':')[1] === dragItem.equip;
     if (to === 'use') return dragItem.usable;
     return to === 'grid' || to === 'drop';
+  };
+  // 갈래가 안 맞는 장착 칸 위라면 그 바깥의 「아바타·장착 칸 쪽」 자리로 넘긴다 (쓰는 물건을 장착 칸 위에 놓아도 사용 예정, 2026-11-12 사용자)
+  const dropAt = (t: EventTarget | null) => {
+    const z = t instanceof Element ? t.closest<HTMLElement>('[data-drop]') : null;
+    if (!z || dropOk(z)) return z;
+    return z.parentElement?.closest<HTMLElement>('[data-drop="auto"]') ?? z;
   };
   const clearDrag = () => {
     dragItem = null;
