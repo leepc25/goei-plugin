@@ -338,7 +338,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ? `<div class="st-confirm"><p>끄면 지금 상황판의 괴이·사건·특수·요원 상태를 비워요. 다시 켜도 이전 상태는 돌아오지 않아요.</p>
         <div class="gx-row-btns"><button class="gx-mini danger" data-action="set-anomaly" data-value="off-yes" ${busy ? 'disabled' : ''}>끄기</button>
         <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>`
-    : seg('set-anomaly', on ? 'on' : 'off', [['on', 'ON'], ['off', 'OFF']], busy);
+    // 이 채팅에서 끄면 상황판 상태를 비우고(되돌릴 수 없음) 한 번 묻는다 → AI 상담은 이 조작을 누르지 않는다 (ui/editor/catalog.ts)
+    : scope === 'chat' ? `<span data-consult="no" style="display:contents">${seg('set-anomaly', on ? 'on' : 'off', [['on', 'ON'], ['off', 'OFF']], busy)}</span>` : seg('set-anomaly', on ? 'on' : 'off', [['on', 'ON'], ['off', 'OFF']], busy);
   const note = String(ctx.chat.scriptstate?.[ASSET_NOTE] ?? '');
   // 상태창 칸 구성·시작 잔고 (채팅 변수 또는 새 채팅 기본값)
   const colCfg = colConfig(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars);

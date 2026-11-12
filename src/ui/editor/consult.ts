@@ -135,7 +135,8 @@ export function menusInText(menus: CatMenu[], text: string): string[] {
   return [...new Set([...byName, ...byRow])];
 }
 
-/** 펼칠 메뉴를 차례대로 고른다. 「생성 공통 → 요청 토큰 상한」이 있으면 그 안에 드는 메뉴까지만 (못 든 메뉴는 이름 목록에만 남는다) */
+/** 펼칠 메뉴를 차례대로 고른다. 「생성 공통 → 요청 토큰 상한」이 있으면 그 안에 드는 메뉴까지만 (못 든 메뉴는 이름 목록에만 남는다).
+ * 첫 메뉴(지금 보는 메뉴)는 상한과 상관없이 펼친다: 상한이 아주 작아도 상담이 아무 줄도 못 보는 일이 없게 */
 function openMenus(menus: CatMenu[], want: string[], base: number, budget: number): CatMenu[] {
   const out: CatMenu[] = [];
   let used = base;
@@ -143,7 +144,7 @@ function openMenus(menus: CatMenu[], want: string[], base: number, budget: numbe
     const m = menus.find((x) => x.page === page);
     if (!m || !m.rows.length) continue;
     const cost = budget > 0 ? tokens(m.rows.map(itemLine).join('\n')) : 0;
-    if (budget > 0 && used + cost > budget) continue;
+    if (budget > 0 && out.length > 0 && used + cost > budget) continue;
     used += cost;
     out.push(m);
   }
@@ -228,11 +229,12 @@ async function stepTo(d: ConsultDeps, page: string, id: string, value: string): 
   }
   return false;
 }
+const cardOf = (e: CatRow, now: CatRow): CardRow => ({ id: e.id, page: e.page, title: `${e.menu} · ${e.name}`, from: e.cur, to: now.cur, fromLabel: consultLabel(e, e.cur), toLabel: consultLabel(now, now.cur), go: e.go, ...(e.scope ? { scope: e.scope } : {}) });
 /** 값 하나를 그 설정의 원래 동작으로 바꾸고, 화면을 다시 읽어 정말 바뀌었는지 본다 */
 async function setOne(d: ConsultDeps, page: string, id: string, value: string): Promise<CardRow | null> {
   const e = rowAt(page, id);
   if (!e || !consultCan(e) || e.cur === value) return null;
-  const card = (now: CatRow): CardRow => ({ id, page, title: `${e.menu} · ${e.name}`, from: e.cur, to: now.cur, fromLabel: consultLabel(e, e.cur), toLabel: consultLabel(now, now.cur), go: e.go, ...(e.scope ? { scope: e.scope } : {}) });
+  const card = (now: CatRow): CardRow => cardOf(e, now);
   if (e.ctl?.t === 'rel') {
     if (await stepTo(d, page, id, value)) { const now = rowAt(page, id); return now ? card(now) : null; }
     await stepTo(d, page, id, e.cur); // 그 값에 못 닿았으면 처음 값으로
@@ -288,10 +290,18 @@ async function ask(d: ConsultDeps, ctx: ChatContext): Promise<void> {
       else {
         const rows: CardRow[] = [];
         const failed: string[] = [];
+        // 처음 값을 적어 두고 차례로 바꾼 뒤, 끝난 화면을 다시 읽어 줄마다 판정한다.
+        // (한 줄을 바꾸면 다른 줄이 같이 바뀌는 설정이 있다 — 「모든 칸」 등. 이미 그 값이 된 줄은 다시 누르지 않고, 끝에 그 값이면 바뀐 것으로 적는다)
+        const first = new Map(pending.map((p) => [p.id, rowAt(pageOf(p.id), p.id)]));
         for (const p of pending) {
-          const row = await setOne(d, pageOf(p.id), p.id, p.value);
-          if (row) rows.push(row);
-          else failed.push(all.find((e) => e.id === p.id)?.name ?? p.id);
+          if (rowAt(pageOf(p.id), p.id)?.cur === p.value) continue;
+          await setOne(d, pageOf(p.id), p.id, p.value);
+        }
+        for (const p of pending) {
+          const e = first.get(p.id);
+          const now = rowAt(pageOf(p.id), p.id);
+          if (e && now && now.cur !== e.cur && (e.kind === 'text' || now.cur === p.value)) rows.push(cardOf(e, now));
+          else failed.push(e?.name ?? all.find((x) => x.id === p.id)?.name ?? p.id);
         }
         if (rows.length) me.lines.push({ who: 'card', rows });
         if (failed.length) me.lines.push({ who: 'sys', text: `바꾸지 못했어요: ${failed.join(', ')}` });
@@ -365,11 +375,13 @@ export async function consultAction(action: string, value: string | undefined, d
     consultUi.busy = true;
     d.render();
     const failed: string[] = [];
-    for (const r of [...card.rows].reverse()) {
-      const cur = rowAt(r.page, r.id);
-      if (cur && cur.cur === r.from) continue; // 이미 그 값
-      if (!(await setOne(d, r.page, r.id, r.from))) failed.push(r.title);
+    // 거꾸로 차례로 되돌리고, 끝난 화면을 다시 읽어 줄마다 판정한다. 다른 줄에 묶여 잠겨 있던 줄은 그 줄이 풀린 뒤 한 번 더 해 본다
+    const back = (r: CardRow) => rowAt(r.page, r.id)?.cur === r.from;
+    for (let pass = 0; pass < 2; pass++) {
+      for (const r of [...card.rows].reverse()) if (!back(r)) await setOne(d, r.page, r.id, r.from);
+      if (card.rows.every(back)) break;
     }
+    for (const r of card.rows) if (!back(r)) failed.push(r.title);
     if (failed.length) me.lines.push({ who: 'sys', text: `되돌리지 못했어요: ${failed.join(', ')}` });
     else card.undone = true;
     me.at = Date.now();

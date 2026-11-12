@@ -26,6 +26,8 @@ export interface ConsultItem {
   hi?: number;
   unit?: string;
   zero?: string;
+  /** step: 한 번 누를 때 움직이는 양 (화면이 적어 둔 때만) */
+  stride?: number;
   /** 글 칸: 글자 수 상한 · 여러 줄 칸인지 */
   max?: number;
   multi?: boolean;
@@ -59,7 +61,7 @@ export const consultCan = (i: ConsultItem): boolean => i.kind !== 'info' && !i.l
 
 function choices(i: ConsultItem): string {
   if (i.kind === 'num') return `${i.lo ?? 0}~${i.hi ?? 0}${i.unit ?? ''} (정수)`;
-  if (i.kind === 'step') return `정수${i.unit ? ` (${i.unit})` : ''}, 화면의 − + 단추가 닿는 값`;
+  if (i.kind === 'step') return `정수${i.unit ? ` (${i.unit})` : ''}, ${i.stride && i.stride > 1 ? `지금 값에서 ${i.stride}씩` : '화면의 − + 단추가 닿는 값'}`;
   if (i.kind === 'text') return `글${i.max ? ` (최대 ${i.max}자)` : ''}${i.multi ? ', 여러 줄은 \\n 으로 이음' : ', 한 줄'}`;
   return (i.opts ?? []).map(([, l]) => onOff(l)).join(' / ');
 }
@@ -128,7 +130,7 @@ export function consultValue(item: ConsultItem, raw: string): string | null {
     const t = raw.trim().replace(/(\d),(?=\d{3})/g, '$1');
     const n = item.zero && norm(t) === norm(item.zero) ? 0 : /^-?\d+/.test(t) && /^-?\d+\s*\D{0,3}$/.test(t) ? Number.parseInt(t, 10) : NaN;
     if (!Number.isInteger(n)) return null;
-    if (item.kind === 'step') return (item.lo === undefined || n >= item.lo) && (item.hi === undefined || n <= item.hi) ? String(n) : null;
+    if (item.kind === 'step') return (item.lo === undefined || n >= item.lo) && (item.hi === undefined || n <= item.hi) && (!item.stride || (n - Number(item.cur)) % item.stride === 0) ? String(n) : null;
     return n >= (item.lo ?? 0) && n <= (item.hi ?? 0) ? String(n) : null;
   }
   const want = norm(raw);

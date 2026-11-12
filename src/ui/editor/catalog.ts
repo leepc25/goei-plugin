@@ -99,7 +99,8 @@ export function pageRows(html: string, page: string, menu: string): CatRow[] {
     const scope = badge && badge !== '이 채팅' ? badge : undefined;
     const grp = txt(section?.querySelector('h3'));
     const spot = (colGroup = ''): [string, string] => [`set:${page}`, isPs ? `r:${label}${grp ? `@${grp}` : ''}` : colGroup ? `r:${colGroup}` : ''];
-    const els = [...row.querySelectorAll<HTMLElement>(CTL)].filter((e) => e.closest(ROW) === row);
+    // data-consult="no": 그 조작을 그린 곳이 「상담이 누르면 안 된다」고 적어 둔 것 (누르면 되돌릴 수 없는 것을 비우는 조작). 설명만 남는다
+    const els = [...row.querySelectorAll<HTMLElement>(CTL)].filter((e) => e.closest(ROW) === row && !e.closest('[data-consult="no"]'));
     const gcols = isGrid ? colsOf(section) : [];
     const cellAt = (e: Element): [string, string] => {
       const cell = e.closest('.ck-cell');
@@ -158,7 +159,7 @@ export function pageRows(html: string, page: string, menu: string): CatRow[] {
         const n = m ? Number(m[0].replace(/,/g, '')) : 0;
         const key = (minus.dataset.value ?? '').slice(0, -1).replace(/:$/, '');
         push({ id: key ? `${action}.${key}` : action, name: subOf(e, label), kind: 'step', cur: String(n), unit: m ? shown.slice((m.index ?? 0) + m[0].length).trim() || undefined : undefined, zero: m ? undefined : shown || undefined,
-          ...(minus.hasAttribute('disabled') ? { lo: n } : {}), ...(plus.hasAttribute('disabled') ? { hi: n } : {}), locked: false, ctl: { t: 'rel', action, minus: minus.dataset.value ?? '', plus: plus.dataset.value ?? '' } });
+          ...(Number((box as HTMLElement).dataset.step) > 1 ? { stride: Number((box as HTMLElement).dataset.step) } : {}), ...(minus.hasAttribute('disabled') ? { lo: n } : {}), ...(plus.hasAttribute('disabled') ? { hi: n } : {}), locked: false, ctl: { t: 'rel', action, minus: minus.dataset.value ?? '', plus: plus.dataset.value ?? '' } });
         continue;
       }
       if (!e.hasAttribute('aria-pressed')) continue; // 조작이 아닌 단추 (지우기·추가·가기·지금 실행)
@@ -249,6 +250,8 @@ export function consultAllowed(page: string, action: string, value: string): boo
     if (c.key && !value.startsWith(`${c.key}=`)) return false;
     const v = c.key ? value.slice(c.key.length + 1) : value;
     // 수 칸·글 칸: 범위·글자 수·꺾쇠를 여기서도 본다 (여러 줄 글은 진짜 줄바꿈으로 온다)
+    // 빈 값: 수 칸을 비우는 것(= 정해 두지 않음)은 화면에서도 되는 일이다 — 비어 있던 칸을 되돌릴 때 온다
+    if (v === '' && r.kind !== 'text') return r.kind === 'num';
     return consultValue(r.kind === 'text' ? { ...r, multi: true } : r, v.replace(/\n/g, '\\n')) !== null;
   });
 }
