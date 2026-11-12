@@ -775,6 +775,8 @@
 .gw .fl-grid .ck-cell { display: flex; align-items: center; justify-content: center; align-self: stretch; }
 .gw .fl .ck-first { box-shadow: inset 1px 0 0 var(--gline); }
 .gw .fl-ph { display: none; }
+/* 떠 있는 「맨 위로」 단추(42px)가 「설정 →」 단추를 덮지 않게: 이 쪽에서는 단추를 오른쪽으로 10px 붙이고, 줄 오른쪽에 그 자리를 비운다 (2026-11-12 전수점검 A3). 폰은 폭이 모자라 그대로 */
+@media (min-width: 761px) { .gw .fl-page { padding-right: 22px; } .gw-body:has(.fl-page) ~ .gw-totop { margin-right: 12px; } }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .fl-pc { display: none; }
   .gw .fl-ph { display: flex; }
@@ -796,14 +798,15 @@
   .gw .flc.on .flc-calls { color: var(--text); }
   .gw .flc-num { margin-top: -4px; font-size: 12.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
   .gw .flc-num b { font-weight: 600; color: var(--text); }
-  .gw .flc-side { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
-  .gw .flc-side > .flc-c { flex: 1 1 auto; flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
-  .gw .flc-side > .flc-c > :last-child { margin-left: 0; }
-  .gw .flc-side > .flc-c.nol { flex: 0 0 auto; }
-  .gw .flc-c { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 34px; }
-  .gw .flc-c > :last-child { margin-left: auto; max-width: 100%; }
-  .gw .flc-c > .gx-segs { display: flex; }
-  .gw .flc-c > .gx-segs > .gx-seg { flex: 1 1 auto; white-space: nowrap; }
+  /* 조작 줄 (전수점검 B1): 조작 하나에 한 줄, 카드 안쪽 왼쪽 끝에서 시작. 격자 줄(.row)만 두 조작을 한 줄에 */
+  .gw .flc-sw { display: inline-flex; align-items: center; flex: none; }
+  .gw .flc-top > .fl-go { flex: none; }
+  .gw .flc-top > span.fl-go { width: 59px; height: 1px; }
+  .gw .flc-side { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .gw .flc-side.row { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+  .gw .flc-c { display: flex; align-items: center; gap: 8px; min-height: 34px; min-width: 0; max-width: 100%; }
+  .gw .flc-c > .gx-segs { display: flex; min-width: 0; }
+  .gw .flc-c > .gx-segs > .gx-seg { flex: 0 1 auto; white-space: nowrap; }
   .gw .flc-c .fl-help { margin: 0; }
 }
 

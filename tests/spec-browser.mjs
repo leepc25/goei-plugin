@@ -21,6 +21,8 @@ const H = 34;
 const X_ALLOW = {
   // 호출 흐름의 이름표: 조작 칸이 두 칸이라 왼쪽 칸·오른쪽 칸 두 자리
   'manage:flow|label': 2,
+  // 폰 격자 줄: [자동 호출][모델] 두 조작이 한 줄 → 두 자리
+  'manage:flow|phGridCtl': 2,
 };
 const browser = await launch();
 const fails = [];
@@ -120,6 +122,17 @@ const probe = () => {
     add(c.classList.contains('sub') ? 'subName' : 'name', tx(nm), row);
     add(c.classList.contains('sub') ? 'subCard' : 'card', L(c), row);
     const help = c.querySelector('.fl-help'); if (help) add(c.classList.contains('sub') ? 'subHelp' : 'help', tx(help), row);
+    // 폰 조작 자리 (2026-11-12 전수점검 B1): 켜고 끄는 스위치는 첫 줄 오른쪽 한 자리, 「설정 →」 한 자리, 조작 줄은 카드 안쪽 왼쪽 끝 한 자리 (격자 줄만 두 자리), 조작이 카드 밖으로 안 나감
+    const top = c.querySelector('.flc-top'); const cr = c.getBoundingClientRect(); const inL = top.getBoundingClientRect().left; const inR = top.getBoundingClientRect().right;
+    const sw = c.querySelector('.flc-top .gx-switch, .flc-top .flc-sw'); if (sw) add('phSwitch', R(cr.right - sw.getBoundingClientRect().right), row);
+    add('phGo', R(cr.right - c.querySelector('.flc-top .fl-go').getBoundingClientRect().right), row);
+    for (const cell of c.querySelectorAll('.flc-c')) {
+      const inRow = !!cell.closest('.flc-side.row');
+      add(inRow ? 'phGridCtl' : 'phCtl', R(cell.getBoundingClientRect().left - inL), row);
+      const k = cell.lastElementChild.getBoundingClientRect();
+      if (k.right > inR + 0.5) out.clip.push(`폰 조작이 카드 밖으로: ${row} ${R(k.right)} > ${R(inR)}`);
+    }
+    if (c.querySelector(':scope > .flc-c, .flc-top ~ .gx-switch')) out.clip.push(`폰 카드에 조작 줄 밖의 조작: ${row}`);
   }
   for (const s of page.querySelectorAll('.ps-ctl > .fam-set')) {
     if (!vis(s)) continue;

@@ -154,18 +154,24 @@ function pcHead(cols: Col[]): string {
   return `<div class="fl-line fl-h1"><span></span>${cols.map((g) => `<b class="ck-first" style="grid-column: span ${g.opts.length}">${esc(g.group)}</b>`).join('')}${tail}</div>
     <div class="fl-line fl-h2"><span></span>${opts.map((c) => `<span class="${c.first ? 'ck-first' : ''}">${esc(c.o)}</span>`).join('')}${tail}</div>`;
 }
-/** 폰 판: 이름 · 호출 글 · [스위치 하나면 그 자리] · 설정 → / (예상 · 지난 턴) / 조작 줄 / 설명. 격자 줄은 조작을 한 줄에 나란히 (모델만 이름표) */
+/** 폰 판 (2026-11-12 전수점검 B1: 카드마다 조작 자리가 달랐다 → 한 가지 틀).
+ * 첫 줄 = 이름 · 호출 글 | [그 줄을 켜고 끄는 스위치(이름표 없는 스위치)는 늘 여기] | 설정 →(없어도 자리는 둔다)
+ * 그 아래 = 조작 줄. 조작 하나에 한 줄, 모든 카드에서 카드 안쪽 왼쪽 끝에서 시작한다 (이름표가 있으면 이름표 다음에 조작).
+ * 격자 줄(게시판·쇼핑몰 표)만 [자동 호출][모델]을 한 줄에 나란히 — 표의 모든 카드에서 같은 자리. 폭이 모자라면 둘째가 다음 줄 왼쪽 끝으로 넘어간다. */
 function card(r: Row, cols: Col[] | null): string {
-  const list: [string, string][] = cols
-    ? cols.flatMap((g, gi): [string, string][] => { const c = r.grid?.[gi]; return c ? [[g.group === '모델' ? g.group : '', ctlHtml(c, `${r.name} ${g.group}`)]] : []; })
-    : shown(r).map((c): [string, string] => [c.label, ctlHtml(c, c.label ? `${r.name} ${c.label}` : r.name)]);
-  const swOnly = list.length === 1 && /gx-switch/.test(list[0][1]);
-  const tag = swOnly && list[0][0] ? `<span class="flc-tag">${esc(list[0][0])}</span>` : '';
-  const ctl = ([l, c]: [string, string]) => `<div class="flc-c${l ? '' : ' nol'}">${l ? `<span class="flc-l">${esc(l)}</span>` : ''}${c}</div>`;
-  const body = (swOnly ? '' : list.length > 1 || cols ? `<div class="flc-side">${list.map(ctl).join('')}</div>` : list.map(ctl).join('')) + (!cols && r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '');
+  const list: [string, Ctl][] = cols
+    ? cols.flatMap((g, gi): [string, Ctl][] => { const c = r.grid?.[gi]; return c ? [[g.group === '모델' ? g.group : '', c]] : []; })
+    : shown(r).map((c): [string, Ctl] => [c.label, c]);
+  const isSw = (c: Ctl) => c.kind !== 'step' && isOnOff(c.opts ?? []);
+  const html = ([l, c]: [string, Ctl]) => ctlHtml(c, cols ? `${r.name} ${l || cols[0].group}` : l ? `${r.name} ${l}` : r.name);
+  const own = list.findIndex(([l, c]) => !l && isSw(c));
+  const sw = own >= 0 ? `<span class="flc-sw">${html(list[own])}</span>` : '';
+  const rest = list.filter((_, i) => i !== own);
+  const ctl = (x: [string, Ctl]) => `<div class="flc-c">${x[0] ? `<span class="flc-l">${esc(x[0])}</span>` : ''}${html(x)}</div>`;
+  const body = (rest.length ? `<div class="flc-side${cols ? ' row' : ''}">${rest.map(ctl).join('')}</div>` : '') + (!cols && r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '');
   const nums = r.est || r.real ? `<div class="flc-num">예상 <b>${r.est || '–'}</b> · 지난 턴 <b>${r.real || '–'}</b></div>` : '';
   const calls = r.calls ? `<small class="flc-calls">${esc(r.calls)}</small>` : '';
-  return `<div class="flc${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><div class="flc-top"><span class="flc-nm"><b class="fl-name">${esc(r.name)}</b>${tag}${calls}</span>${swOnly ? list[0][1] : ''}${go(r.go)}</div>${nums}${body}</div>`;
+  return `<div class="flc${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><div class="flc-top"><span class="flc-nm"><b class="fl-name">${esc(r.name)}</b>${calls}</span>${sw}${go(r.go) || '<span class="fl-go"></span>'}</div>${nums}${body}</div>`;
 }
 /** 격자 표의 줄 나누기: 격자 줄(끊김 없이) / 그 아래 보통 줄(앞 줄 + 딸린 줄, 이름 앞에 격자 줄 이름) / 격자 줄의 설명 */
 function split(t: FlowTable): { grid: Row[]; below: Row[]; notes: [string, string][] } {

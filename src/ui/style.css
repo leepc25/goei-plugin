@@ -946,6 +946,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
 .ph-pick { flex: none; }
 .ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+/* 이름표와 그 상자는 한 덩어리: 줄이 바뀌면 같이 넘어간다 (2026-11-12 전수점검 F1: 「최대」 이름표만 앞줄 끝에 남았다) */
+.ph-inline.ph-pair { flex-wrap: nowrap; }
 .ph-pct { width: 72px; min-height: 34px; }
 
 /* 설정 줄 (괴담톡 설정·설정 탭 공통): 묶음마다 카드, 줄마다 왼쪽 이름·설명 / 오른쪽 조작 */
@@ -4847,11 +4849,13 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 칸 입력 표 (값 등급·상담사 주사위 칸·그림 대체 말, 2026-11-12 사용자: 글 상자에 줄을 치게 하지 말고 칸으로) — 조작은 전부 공통 규격 그대로(.gx-search·.ms-num·.st-step·.gx-mini), 배치만 여기서 */
 .gw .ps-row.ms-wide > .ps-ctl { display: block; }
 .ms-tb { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-.ms-tb-h, .ms-tb-r { display: grid; grid-template-columns: 92px minmax(0, 1fr) 144px 144px 104px 34px; column-gap: 8px; align-items: center; }
+.ms-tb-h, .ms-tb-r { display: grid; grid-template-columns: 92px minmax(0, 1fr) 144px 144px 104px 34px; column-gap: 8px; align-items: start; }
 .ms-tb-h > span { font-size: 12.5px; color: var(--dim); }
 .ms-tb-c { display: block; min-width: 0; margin: 0; }
 .ms-tb-c > span:first-child { display: none; }
-.ms-tb-c > input.gx-search { width: 100%; box-sizing: border-box; }
+.ms-tb-c > input.gx-search, .gw .ms-tb-c > textarea.ms-list { width: 100%; box-sizing: border-box; }
+.gw .ms-tb-c > textarea.ms-list { display: block; padding-top: 6px; padding-bottom: 6px; overflow: hidden; }
+.ms-axs .ms-ax, .ms-pairs .ms-tb-r { align-items: center; }
 .ms-tb .ph-inline { flex-wrap: nowrap; }
 .ms-tb .ph-inline .ms-num { width: 120px; }
 .gw .ms-tb-r.bad input.gx-search.ms-num, .gw .ms-tb-r.bad .n > input.gx-search, .gw .ms-ax.bad .n > input.gx-search { border-color: var(--danger); }
@@ -4869,24 +4873,33 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gw .ps-adv.ps-changed > .ps-adv-sum b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
 .gw .ms-pairs .ms-tb-r.bad input.gx-search { border-color: var(--danger); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .ms-tb { gap: 8px; }
-  .ms-tb-h, .ms-axs .ms-tb-h { display: none; }
-  .ms-tb-r, .ms-ax { grid-template-columns: minmax(0, 1fr) 34px; row-gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
-  .ms-tb-r > .ms-tb-c, .ms-ax > .ms-tb-c { display: grid; grid-template-columns: 68px minmax(0, 1fr); align-items: center; column-gap: 6px; grid-column: 1 / -1; }
-  .ms-tb-r > .ms-tb-c.n, .ms-ax > .ms-tb-c.n { grid-column: 1; }
-  .ms-tb-c > span:first-child { display: block; font-size: 12.5px; color: var(--dim); }
-  .ms-tb-r > .ms-tb-x, .ms-ax > .ms-tb-x { grid-column: 2; grid-row: 1; }
-  .ms-tb .ph-inline .ms-num { width: 150px; }
-  .ms-pairs .ms-tb-r { grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) 34px; padding: 0; border: 0; border-radius: 0; }
-  .ms-pairs .ms-tb-r > .ms-tb-c { display: block; grid-column: auto; }
-  .ms-pairs .ms-tb-r > .ms-tb-x { grid-column: 4; }
-  .ms-pairs .ms-tb-c > span:first-child { display: none; }
-  .ms-tb-c.w > .st-step { justify-self: start; }
-  .ms-ax > .ms-tb-c.n, .ms-ax > .ms-tb-c.v { display: block; }
-  .ms-ax > .ms-tb-c > span:first-child { display: none; }
-  .ms-ax { padding: 8px 10px; }
+  /* 폰 (2026-11-12 전수점검 D2·D3·D5): 카드로 쌓지 않는다. 값 등급 = 제목 두 줄 + 등급마다 두 줄 (이름·하한·상한·× / 설명·가중치), 주사위 칸 = 칸마다 한 줄, 제목 줄은 폰에서도 보인다 */
+  .ms-tb { gap: 0; }
+  .ms-tb > .ms-tb-h, .ms-tb > .ms-tb-r { grid-template-columns: minmax(0, 1fr) 104px 104px 34px; grid-template-areas: "n lo hi x" "d d w w"; column-gap: 6px; row-gap: 6px; }
+  .ms-tb > .ms-tb-r { padding: 9px 0; border-top: 1px solid var(--line); }
+  .ms-tb > .ms-tb-h { row-gap: 2px; padding-bottom: 6px; }
+  .ms-tb > .ms-tb-h > :nth-child(1), .ms-tb > .ms-tb-r > .n { grid-area: n; }
+  .ms-tb > .ms-tb-h > :nth-child(2), .ms-tb > .ms-tb-r > .d { grid-area: d; }
+  .ms-tb > .ms-tb-h > :nth-child(3), .ms-tb > .ms-tb-r > .lo { grid-area: lo; }
+  .ms-tb > .ms-tb-h > :nth-child(4), .ms-tb > .ms-tb-r > .hi { grid-area: hi; }
+  .ms-tb > .ms-tb-h > :nth-child(5), .ms-tb > .ms-tb-r > .w { grid-area: w; }
+  .ms-tb > .ms-tb-h > :nth-child(6) { display: none; }
+  .ms-tb > .ms-tb-r > .ms-tb-x { grid-area: x; }
+  .ms-tb > .ms-tb-r > .ms-tb-err { grid-area: auto; grid-column: 1 / -1; }
+  .ms-tb .ph-inline { display: flex; width: 100%; gap: 3px; min-width: 0; }
+  .ms-tb .ph-inline .ms-num { width: auto; flex: 1 1 0; min-width: 0; padding-left: 7px; padding-right: 4px; }
+  .ms-tb > .ms-tb-foot { padding-top: 8px; }
+  /* 주사위 칸: 칸 이름 | 값 | × 한 줄 */
+  .ms-axs > .ms-tb-h, .ms-axs > .ms-ax { grid-template-columns: 88px minmax(0, 1fr) 34px; grid-template-areas: none; column-gap: 6px; }
+  .ms-axs > .ms-tb-h > :nth-child(n) { grid-area: auto; display: block; }
+  .ms-axs > .ms-ax { padding: 3px 0; }
+  .ms-axs > .ms-ax > .ms-tb-err { grid-column: 1 / -1; }
+  /* 그림 대체 말: 한 줄에 한 쌍, 제목 줄 하나 */
   .ms-pairs .ms-pg { grid-template-columns: minmax(0, 1fr); }
   .ms-pairs .ms-pg > .ms-tb-h:nth-child(2) { display: none; }
+  .ms-pairs .ms-tb-h, .ms-pairs .ms-tb-r { grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) 34px; grid-template-areas: none; column-gap: 8px; padding: 0; border: 0; }
+  .ms-pairs .ms-tb-h > :nth-child(n), .ms-pairs .ms-tb-r > * { grid-area: auto; display: block; }
+  .ms-pairs .ms-tb-r > .ms-tb-err { grid-column: 1 / -1; }
 }
 .ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
 .ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
