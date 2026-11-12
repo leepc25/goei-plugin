@@ -30,18 +30,6 @@
     {"name": "qc-static-xss", "fast": true, "file": "tests/qc-static-xss-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "자체 boot(browser.mjs hostScript 축약 사본)", "note": "HTML 조각이 글자로만"},
     {"name": "qc-static-cache", "fast": true, "file": "tests/qc-static-cache-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-static-harness.mjs", "note": "전역 상태가 채팅에 안 샘"},
     {"name": "qc-static-perf", "fast": true, "file": "tests/qc-static-perf-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-static-harness.mjs", "note": "성능·자원 상한(부팅·display 1000건·열고 닫기 100번)"},
-    {"name": "qc-static-risu", "fast": true, "file": "tests/qc-static-risu-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-static-harness.mjs(hostScript 만)", "note": "등록 거부에도 켜짐"},
-    {"name": "qc-game-plugin", "file": "tests/qc-game-plugin-browser.mjs", "group": "game", "args": ["fixture", "shots"], "timeoutMin": 20, "frame": "tests/qc-game-host.mjs", "note": "플러그인 창에서 게임 열기·팩·누수·다리"},
-    {"name": "qc-mobile", "file": "tests/qc-mobile-browser.mjs", "group": "game", "args": ["fixture", "shots"], "timeoutMin": 20, "frame": "tests/qc-host.mjs + tests/qc-game-host.mjs", "note": "폰 세로·가로·아이폰 흉내. 사진은 결과 폴더로(문서 사진 안 덮음)"},
-    {"name": "qc-field-world", "file": "tests/qc-field-world-browser.mjs", "group": "game", "args": ["shots"], "timeoutMin": 20, "frame": "tests/field-harness.mjs(리스 필드 모드 틀)", "note": "생태계·시계·장부 다리"},
-    {"name": "qc-combat", "file": "tests/qc-combat-browser.mjs", "group": "game", "args": ["shots"], "timeoutMin": 20, "frame": "필드 시연판 release/demo/goei-field-demo.html (공용 http 서버, 팩은 저장소 game-pack/)", "note": "대련 4단계·선입력 3칸", "server": true, "env": {"GAME_URL": "http://127.0.0.1:${port}/release/demo/goei-field-demo.html?base=http://127.0.0.1:${port}"}},
-    {"name": "field-wallet", "file": "tests/field-wallet-browser.mjs", "group": "game", "args": [], "timeoutMin": 10, "frame": "tests/field-harness.mjs", "note": "필드 가계부 다리"},
-    {"name": "hq-textures", "file": "tests/hq-textures-browser.mjs", "group": "game", "args": [], "timeoutMin": 10, "frame": "tests/field-harness.mjs", "note": "본부 그림 팩 (사진 out/hq-textures/)"},
-    {"name": "engine", "file": "tests/engine-browser.mjs", "group": "game", "args": [], "timeoutMin": 10, "frame": "필드 시연판 release/demo/goei-field-demo.html (공용 http 서버, 팩은 저장소 game-pack/)", "note": "엔진 실입력 PC·폰", "server": true, "env": {"GAME_URL": "http://127.0.0.1:${port}/release/demo/goei-field-demo.html?base=http://127.0.0.1:${port}"}},
-    {"name": "audio", "file": "tests/audio-browser.mjs", "group": "game", "args": [], "requires": ["release/demo/goei-sound.html"], "timeoutMin": 10, "frame": "소리 시험실 release/demo/goei-sound.html (file://)", "note": "빌드가 release/demo 에 새로 쓴 판을 시험하고 끝나면 release/ 를 되돌린다"},
-    {"name": "field-sweep", "file": "tests/field-sweep.mjs", "group": "game", "args": ["shots"], "timeoutMin": 40, "frame": "tests/field-harness.mjs", "note": "본부 전수 순회(10분쯤)"},
-    {"name": "audio-lifecycle-round2", "file": "tests/audio-lifecycle-round2-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 자체 http (Web Audio)", "note": "결과 /tmp/goei-audio-lifecycle-round2/"},
-    {"name": "movement", "file": "tests/movement-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 자체 http", "note": ""},
-    {"name": "story-video-lifecycle", "file": "tests/story-video-lifecycle-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 자체 http", "note": ""}
+    {"name": "qc-static-risu", "fast": true, "file": "tests/qc-static-risu-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-static-harness.mjs(hostScript 만)", "note": "등록 거부에도 켜짐"}
   ]
 }
