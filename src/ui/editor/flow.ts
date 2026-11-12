@@ -1,5 +1,5 @@
-// 점검 탭 「전체 호출 흐름」 (11-07 사용자: 인물 설정 위의 호출 흐름 도식처럼, 지금 설정 기준으로 한 턴에 어떤 보조 호출이 몇 번 가는지 한 페이지에서).
-// 자료는 각 기능의 설정(인물 기록·이미지·괴담톡·괴담넷·관전·위키·보고서). 모양은 인물 설정 도식(.pp-flow/.pp-fn)을 그대로 쓴다.
+// 호출 흐름의 셈: 지금 설정으로 한 턴에 어떤 보조 호출이 몇 번 가는지(flowNodes)와 요청 토큰 미리 계산(ensureFlow).
+// 화면은 flowpage.ts(관제 화면), 기능 페이지 맨 위 한 줄은 callSummary.
 // 실제로 간 호출의 원문은 「호출 흐름」(trace.ts)에서 본다.
 import type { ChatContext } from '../../host/risu';
 import { basicSettings, getPrefs } from '../../core/settings';
@@ -10,7 +10,6 @@ import { viewSettings, VIEW_PRESETS } from '../../core/phoneView';
 import { gnetSettings } from '../../core/gnet';
 import { wikiSettings } from '../../core/wiki';
 import { promptTokens } from '../../core/budget';
-import { tokenizerName } from '../../core/tokenizer';
 import type { LlmMessage } from '../../host/llm';
 import { previewPeopleCalls } from '../../host/people';
 import { previewAsset } from '../../host/asset';
@@ -206,41 +205,8 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   return { pre, main, post, manual };
 }
 
-const tokLabel = (n: Node): string => {
-  if (n.kind === 'plain') return '';
-  if (n.tok === undefined) return flowTok.pending ? '세는 중…' : '';
-  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : n.name.endsWith(' 진열') ? '쇼핑몰 꺼짐' : '지금은 보낼 것 없음';
-  return `요청 ${tokenizerName() ? '' : '약 '}${n.tok.toLocaleString('ko-KR')}토큰`;
-};
-function nodeHtml(n: Node): string {
-  const tl = tokLabel(n);
-  return `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${esc(n.name)}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${esc(n.sub)}</small></div><span class="pp-fn-calls">${esc(n.calls)}${tl ? `<small class="pp-fn-tok">${esc(tl)}</small>` : ''}</span><div class="pp-fn-ctl"></div>${n.page ? `<button class="gx-mini pp-fn-go" data-action="ed-flow-go" data-value="${esc(n.page)}|${esc(n.to ?? '')}">설정 →</button>` : '<span></span>'}</div>`;
-}
-
-export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, desc: string) => string): string {
-  const { pre, main, post, manual } = flowNodes(ctx);
-  const all = [...pre, main, ...post];
-  const sure = all.reduce((n, x) => n + x.sure, 0);
-  const maybe = all.reduce((n, x) => n + x.maybe, 0);
-  const auxTok = [...pre, ...post].filter((x) => x.on && typeof x.tok === 'number').reduce((n, x) => n + (x.tok as number), 0);
-  const tokNote = flowTok.pending
-    ? ' 요청 토큰을 세는 중이에요…'
-    : flowTok.error
-      ? ` 토큰 셈 실패: ${esc(flowTok.error)}`
-      : flowTok.map
-        ? ` 켜진 보조 호출의 요청 합계 ${tokenizerName() ? '' : '약 '}<b>${auxTok.toLocaleString('ko-KR')}토큰</b> (지금 설정·채팅으로 조립, 응답 토큰은 제외).`
-        : '';
-  const arrow = '<i class="pp-fn-arrow" aria-hidden="true">↓</i>';
-  const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
-  return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>.${jointOn(ctx.chat.scriptstate) ? '' : ' 인터넷 「한 번에 요청」이 꺼져 있어 괴담톡·게시판(괴담넷·괴담갤·세정게·연어 마켓)은 따로 불러요.'} 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
-    ${group('메인 요청 전', '유저 메시지 → 요청 조립', pre)}
-    ${group('메인 응답', '', [main])}
-    ${group('메인 응답 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·게시판·관전·위키·쇼핑몰은 인물 갱신이 끝난 뒤)', post)}
-    ${group('턴과 무관', '누르거나 열 때만', manual)}
-    </div></div>`;
-}
+/** 토큰 셈 상태 (관제 화면 맨 위 띠: 세는 중·실패·끝남) */
+export const flowTokState = (): { ready: boolean; pending: boolean; error: string } => ({ ready: !!flowTok.map, pending: flowTok.pending, error: flowTok.error });
 
 /** 받침에 따라 「와/과」 (릴리스 점검 11-09: 「괴담톡와」) */
 function wa(word: string): string {
