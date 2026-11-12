@@ -128,7 +128,7 @@ export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: 
   fillCool: { key: HS_KEY.fillCool, lo: 0, hi: 60, def: 8, unit: '번' },
   rareP: { key: HS_KEY.rareP, lo: 0, hi: 100, def: 10, unit: '%' },
   rareCool: { key: HS_KEY.rareCool, lo: 0, hi: 120, def: 20, unit: '번' },
-  next: { key: HS_KEY.next, lo: 0, hi: 60, def: 6, unit: '초' },
+  next: { key: HS_KEY.next, lo: 0, hi: 60, def: 0, unit: '초' },
   left: { key: HS_KEY.left, lo: 1, hi: 999, def: 30, unit: '개' },
   dropRate: { key: HS_KEY.dropRate, lo: 10, hi: 400, def: 100, unit: '%' },
   dropFast: { key: HS_KEY.dropFast, lo: 10, hi: 50, def: 20, unit: '×0.1배' },
