@@ -1,5 +1,5 @@
 // 기본값이 든 글 칸 (2026-11-12 사용자: 회색 안내 글을 기본값으로 쓰지 않는다 — 한 글자만 쳐도 다 사라졌다).
-// 우주 쇼핑몰·포인트몰 진열 배정(목록·값 등급), 포인트몰 상담사 주사위 칸, 망상홈쇼핑 주문 전화번호·출연 형태.
+// 우주 쇼핑몰·포인트몰 진열 배정 목록, 망상홈쇼핑 주문 전화번호·출연 형태. (값 등급·상담사 주사위 칸·그림 대체 말은 칸 입력: tests/fields-browser.mjs)
 // ① 저장값이 없으면 칸에 기본값이 진짜 글로 들어 있다 ② 한 군데만 고쳐도 나머지가 남는다 ③ 기본값과 같으면 저장하지 않는다
 // ④ 다르게 고친 줄만 「바꾼 줄」 점 ⑤ 다 지우면·「기본값으로」를 누르면 기본값으로 돌아간다.  사용: node tests/graybox-browser.mjs <fixture.json> [사진 폴더] [--shots-only]
 import { mkdirSync } from 'node:fs';
@@ -28,7 +28,7 @@ for (const [vp, size] of [['pc', { width: 1920, height: 1080, touch: false }], [
   await openWin(page); await sleep(300);
   if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
   await openEditor(page, 'set:cos'); await sleep(300);
-  const G = sel('ms-roll', 'cos:genres'); const T = sel('ms-roll', 'cos:tiers');
+  const G = sel('ms-roll', 'cos:genres');
   await shot('cos-1-first', G);
   if (shotsOnly) {
     // 사용자가 겪은 일 그대로: 칸을 누르고 글자 하나를 친다
@@ -38,46 +38,34 @@ for (const [vp, size] of [['pc', { width: 1920, height: 1080, touch: false }], [
     continue;
   }
   // ① 기본값이 진짜 글로
-  const g0 = await val(G); const t0 = await val(T);
+  const g0 = await val(G);
   assert.ok(g0.split(',').length === 20, `[${vp}] 장르 칸에 기본 20종이 들어 있다: ${g0.slice(0, 60)}`);
-  assert.equal(t0.split('\n').length, 5, `[${vp}] 값 등급 칸에 기본 5단계`);
-  assert.equal(await ph(G), '', '회색 안내 글 없음'); assert.equal(await ph(T), '');
-  assert.equal(await changed(G), false); assert.equal(await changed(T), false);
+  assert.equal(await ph(G), '', '회색 안내 글 없음');
+  assert.equal(await changed(G), false);
   assert.equal(await page.locator('.gw [data-action="ms-roll-reset"]').count(), 0, '고친 게 없으면 「기본값으로」 없음');
   // ③ 손대지 않고 나가면(같은 글) 저장 안 함
-  await put(G, g0); await put(T, `${t0}\n`);
-  assert.ok(!(await ss()).$cos_roll_genres, '기본값과 같으면 저장 안 함'); assert.ok(!(await ss()).$cos_roll_tiers);
+  await put(G, g0);
+  assert.ok(!(await ss()).$cos_roll_genres, '기본값과 같으면 저장 안 함');
   // ② 하나만 덧붙이면 나머지가 남는다 + ④ 점
   await page.focus(G); await page.keyboard.press('Control+End'); await page.keyboard.type(', 시험 장르'); await page.evaluate((s) => document.querySelector(s).blur(), G); await sleep(400);
   const g1 = (await ss()).$cos_roll_genres;
   assert.equal(g1, `${g0}, 시험 장르`, '친 글 + 기본 20종이 그대로');
-  assert.equal(await val(G), g1); assert.equal(await changed(G), true, '바꾼 줄 점'); assert.equal(await changed(T), false);
+  assert.equal(await val(G), g1); assert.equal(await changed(G), true, '바꾼 줄 점');
   assert.equal(await page.locator('.gw [data-action="ms-roll-reset"]').count(), 1);
   await shot('cos-2-typed', G);
   // 다음 진열 요청에 고친 목록이 쓰인다 (읽는 쪽)
   // ⑤ 다 지우면 기본값
   await put(G, '   ');
   assert.ok(!(await ss()).$cos_roll_genres); assert.equal(await val(G), g0, '다 지우면 기본값이 다시 들어온다'); assert.equal(await changed(G), false);
-  // 값 등급: 한 줄만 고침 → 나머지 줄 남음, 「기본값으로」 → 되돌아감
-  const lines = t0.split('\n'); const edited = [lines[0].replace(/\|[^|]*$/, '|7'), ...lines.slice(1)].join('\n');
-  await put(T, edited);
-  assert.equal((await ss()).$cos_roll_tiers, edited); assert.equal((await val(T)).split('\n').length, 5); assert.equal(await changed(T), true);
-  await page.evaluate(() => document.querySelector('.gw [data-action="ms-roll-reset"]').click()); await sleep(400);
-  assert.ok(!(await ss()).$cos_roll_tiers); assert.equal(await val(T), t0, '「기본값으로」'); assert.equal(await changed(T), false);
-  // 쓸 수 있는 줄이 없는 글 → 기본 따름
-  await put(T, '아무 글'); assert.ok(!(await ss()).$cos_roll_tiers); assert.equal(await val(T), t0);
+  // 값 등급·상담사 주사위 칸·그림 대체 말은 칸 입력으로 바뀌었다 → tests/fields-browser.mjs
   // 포인트몰: 분류·값 등급·상담사 주사위 칸
   await goNode(page, 'set:bm'); await sleep(300);
-  const BG = sel('ms-roll', 'bm:genres'); const A = sel('ms-desk', 'axes');
-  const b0 = await val(BG); const a0 = await val(A);
-  assert.ok(b0.includes(','), '분류 칸에 기본 목록'); assert.equal(a0.split('\n').length, 7, '주사위 기본 7칸'); assert.equal(await ph(A), '');
-  await put(A, a0); assert.ok(!(await ss()).$bm_desk_axes, '같으면 저장 안 함');
-  assert.equal(await page.locator('.gw [data-action="ms-desk-reset"]').count(), 0);
-  const a1 = a0.replace('사원, 사원, 사원', '사원, 인턴');
-  await put(A, a1); assert.equal((await ss()).$bm_desk_axes, a1); assert.equal((await val(A)).split('\n').length, 7); assert.equal(await changed(A), true);
-  await shot('bm-desk-edited', A);
-  await page.evaluate(() => document.querySelector('.gw [data-action="ms-desk-reset"]').click()); await sleep(400);
-  assert.ok(!(await ss()).$bm_desk_axes); assert.equal(await val(A), a0);
+  const BG = sel('ms-roll', 'bm:genres');
+  const b0 = await val(BG);
+  assert.ok(b0.includes(','), '분류 칸에 기본 목록'); assert.equal(await ph(BG), '');
+  await put(BG, `${b0}, 시험 분류`); assert.equal((await ss()).$bm_roll_genres, `${b0}, 시험 분류`); assert.equal(await changed(BG), true);
+  await shot('bm-genres-edited', BG);
+  await put(BG, ''); assert.ok(!(await ss()).$bm_roll_genres); assert.equal(await val(BG), b0);
   // 망상홈쇼핑: 주문 전화번호·출연 형태
   await goNode(page, 'set:hs'); await sleep(300);
   const TEL = sel('hs-text', 'tel'); const F = sel('hs-text', 'forms');
