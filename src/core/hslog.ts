@@ -117,7 +117,7 @@ export function appendLog(vars: Vars, show: Pick<HsShow, 'key' | 'title' | 'part
 export const HS_MAIN_KEY = { on: '$hs_main', kinds: '$hs_main_kinds', tokens: '$hs_main_tokens' } as const;
 /** 설정 표: 변수 이름 · 기본값 · 범위 · 화면 이름 (제안) */
 export const HS_MAIN_SET = {
-  on: { key: HS_MAIN_KEY.on, def: '1', values: ['1', '0'], label: '시청 기록을 본편에 넘기기', hint: '방송에서 본 것·친 채팅·주문을 메인 요청의 참고 기록으로 넣어요' },
+  on: { key: HS_MAIN_KEY.on, def: '1', values: ['1', '0'], label: '시청 기록을 메인 요청에 넘기기', hint: '방송에서 본 것·친 채팅·주문을 메인 요청의 참고 기록으로 넣어요' },
   kinds: {
     key: HS_MAIN_KEY.kinds, def: HS_LOG_KINDS.join(','), values: HS_LOG_KINDS, label: '넘길 기록',
     labels: { show: '방송 내용(편성 제목·상품·진행자 대사)', chat: '시청자 채팅', say: '내 채팅과 반응', buy: '전화 주문·맞교환' } as Record<HsLogKind, string>,

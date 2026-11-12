@@ -1,4 +1,4 @@
-<!-- Director 덧붙임: 기능별 적용 절(APPLY.*)·검색(SEARCH·PASS2)·출력 꼴(OUTPUT)·고침 요청(REPAIR)·본편에 넣는 메모의 머리말(MAIN_NOTE). {이름} 자리는 플러그인이 채웁니다. -->
+<!-- Director 덧붙임: 기능별 적용 절(APPLY.*)·검색(SEARCH·PASS2)·출력 꼴(OUTPUT)·고침 요청(REPAIR)·메인 요청에 넣는 메모의 머리말(MAIN_NOTE). {이름} 자리는 플러그인이 채웁니다. -->
 @@SECTION SEARCH
 ## Missing material (one extra pass)
 Only when a judgment this turn depends on material not supplied (the exact wording of an earlier line, a past event's details, a lore or wiki fact about a named thing), return instead {"need":[{"kind":"chat|lore|wiki","query":"<Korean term exactly as it would appear>","reason":"<≤60 chars>"}]} with at most {max} items and nothing else. `chat` searches earlier messages of this chat, `lore` the character's lorebook, `wiki` the chat's wiki documents by title or body. The program runs the searches and calls you once more with `found` (hits with a `ref` and an excerpt); that second call must return notes and may not ask again. Do not request a search for a stable relationship or a scene with no open question; a search costs a turn's time.

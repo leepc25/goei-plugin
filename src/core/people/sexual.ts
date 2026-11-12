@@ -53,7 +53,7 @@ export const SEXUAL_DIRECTOR_POLICY = 'sexual_context_only fields are inactive d
 
 const EXPLICIT_STYLE = 'Vocabulary rule, mandatory: write like adults talking dirty in private. Name body parts and acts with the crude Korean words actually used (`자지`, `보지`, `젖`, `엉덩이`, `박다`, `빨다`, `싸다` and similar), and name positions and play plainly. Euphemism, medical or academic terms, poetic wording, and softened phrasing are errors; if a sentence could appear in a romance novel, rewrite it cruder.';
 const PLAIN_STYLE = 'Use the 0.10.7 style: blunt everyday sex words and slang, crude terms included, with no euphemism, clinical vocabulary, literary wording, or psychological analysis. Keep it direct but do not force the stronger explicit vocabulary examples.';
-/** 위 글들은 지침 절에서 읽는다 (설정 → 지침): SEXUAL.POLICY 는 「본편에 붙는 글」, 나머지는 「인물 기록 갱신기(덧붙임)」. 절이 없으면 위 글 */
+/** 위 글들은 지침 절에서 읽는다 (설정 → 지침): SEXUAL.POLICY 는 「메인 요청에 붙는 글」, 나머지는 「인물 기록 갱신기(덧붙임)」. 절이 없으면 위 글 */
 export const sexualDirectorPolicy = (): string => guideOr('Main', 'SEXUAL.POLICY', SEXUAL_DIRECTOR_POLICY);
 const contextRule = (): string => guideOr('UpdaterExtra', 'SEXUAL.CONTEXT_RULE', SEXUAL_CONTEXT_RULE);
 const explicitStyle = (): string => guideOr('UpdaterExtra', 'SEXUAL.EXPLICIT_STYLE', EXPLICIT_STYLE);

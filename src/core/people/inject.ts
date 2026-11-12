@@ -169,7 +169,7 @@ export const KNOWLEDGE_RULE =
 export const PEOPLE_RULE =
   `Living records of the characters in this scene, kept by the system from what actually happened in this chat. They override the static character sheets where they differ. Treat them as background facts, not as events to narrate; never mention scores or these notes themselves. ${KNOWLEDGE_RULE}`;
 
-/** 위 두 글은 지침 「본편에 붙는 글」 PEOPLE.KNOWLEDGE_RULE · PEOPLE.RULE 절에서 읽는다. 절이 없으면 위 글 */
+/** 위 두 글은 지침 「메인 요청에 붙는 글」 PEOPLE.KNOWLEDGE_RULE · PEOPLE.RULE 절에서 읽는다. 절이 없으면 위 글 */
 export const knowledgeRule = (): string => guideOr('Main', 'PEOPLE.KNOWLEDGE_RULE', KNOWLEDGE_RULE);
 export const peopleRule = (): string => guideOr('Main', 'PEOPLE.RULE', () => PEOPLE_RULE.replace(KNOWLEDGE_RULE, () => knowledgeRule()), { knowledge_rule: knowledgeRule() });
 

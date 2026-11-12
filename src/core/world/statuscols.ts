@@ -187,7 +187,7 @@ const EXAMPLE_B: Record<ColId, string> = { date: '2025.01.01', time: '10:15 PM',
 /** 🏷️Tag 지침의 상태창 절: 칸 구성에서 형식 줄·규칙·예시를 만든다 */
 export function statusSection(cols: ColId[]): string {
   const fmt = `[▣|${cols.map((id) => colDef(id).token).join('|')}]`;
-  // 칸 규칙·고정 줄은 지침 「본편에 붙는 글」 STATUS.RULE.* 절. 절이 없으면 여기 남긴 글
+  // 칸 규칙·고정 줄은 지침 「메인 요청에 붙는 글」 STATUS.RULE.* 절. 절이 없으면 여기 남긴 글
   const rules = cols.map((id) => (RULE[id] ? guideOr('Main', `STATUS.RULE.${id.toUpperCase()}`, RULE[id]) : '')).filter(Boolean).map((r) => `- ${r}`);
   // 포인트 칸이 있으면 백일몽 소속이라 예시 신분도 백일몽으로
   const ex = (v: Record<ColId, string>) => `[▣|${cols.map((id) => (id === 'identity' && cols.includes('points') ? '백일몽/사원' : v[id])).join('|')}]`;

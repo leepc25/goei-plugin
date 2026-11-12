@@ -50,7 +50,7 @@ export function stripStatusLines<M extends PromptMessage>(messages: M[]): M[] {
 
 export function statusBlock(line: string, cols?: ColId[]): string {
   const fields = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(' | ')}\n` : '';
-  // 안내 글은 지침 「본편에 붙는 글」 STATUS.NOTE 절. 절이 없으면 위 글
+  // 안내 글은 지침 「메인 요청에 붙는 글」 STATUS.NOTE 절. 절이 없으면 위 글
   return `${STATUS_HEAD}\n${line}\n${fields}${guideOr('Main', 'STATUS.NOTE', NOTE)}`;
 }
 
@@ -101,7 +101,7 @@ export function withStatusBlock<M extends PromptMessage>(messages: M[], identity
     ].filter(Boolean);
     if (!starts.length) return messages;
     const fields = shape?.cols?.length ? `Fields: ${shape.cols.map((c) => colDef(c).label).join(' | ')}\n` : '';
-    // 글은 지침 「본편에 붙는 글」 STATUS.FIRST 절. 절이 없으면 여기 남긴 글
+    // 글은 지침 「메인 요청에 붙는 글」 STATUS.FIRST 절. 절이 없으면 여기 남긴 글
     const first = guideOr('Main', 'STATUS.FIRST', () => `No status line yet: this is the first turn.\nStarting values: ${starts.join(', ')}\n${fields}Treat them as the previous values (copy them unless the story changes them) and output exactly one new [▣] line at the very end of your response.`, { starts: starts.join(', '), fields });
     const block = { role: 'system', content: `${STATUS_HEAD}\n${first}` } as M;
     const at = messages.map((m) => m?.role).lastIndexOf('user');

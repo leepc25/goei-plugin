@@ -146,7 +146,7 @@ export function calls(M) {
   put('consolidate.en', () => M.consolidate.CONSOLIDATE_PROMPT('en'));
   put('consolidate.user', () => need(M.consolidate.consolidateUserText)('{"name":"쟈알디"}'));
 
-  // ── 본편에 붙는 글 ──
+  // ── 메인 요청에 붙는 글 ──
   const ALL = ['date', 'time', 'weather', 'temp', 'place', 'target', 'companions', 'deployed', 'identity', 'wallet', 'points'];
   put('status.block', () => M.statusctx.statusBlock('[▣|2025.01.01|02:47 AM]', ['date', 'time']));
   put('status.first', () => M.statusctx.withStatusBlock([{ role: 'user', content: '시작' }], '', { cols: ['date', 'time', 'wallet'], wallet: 1140000 }));

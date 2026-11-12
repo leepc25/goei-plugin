@@ -29,11 +29,11 @@ const HELP: Record<GuideName, string> = {
   Shop: '상점 지침: 진열대 짜기·주인 대화·판매 값·메인 응답의 상점 표식. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{price}·{prev} 자리는 플러그인이 채워요. 상점 판단: SHOP_RULE 은 「지금 상점이 있나」 공용 기준이라 메인 모델 표식 지침(MAIN_TAG)과 갱신기가 같은 글을 읽어요(한 곳만 고치면 양쪽에 들어가요). OWN_SHOPS 는 설정 → 상점 「고유 상점」 표의 켜진 줄({list})이 있을 때 SHOP_RULE 의 {own} 자리에 붙어요. SHOP_JUDGE 는 상점 판단을 갱신기가 맡을 때 갱신기만 더 받는 판단 요령이에요.',
   Updater: '인물 기록 갱신기(자세히판): 응답마다 보조 모델이 인물·사건·장소·세력·소지품 기록을 고칠 때 주는 지침. <<SECTION:이름>>…<<END:이름>> 표식은 설정에서 끈 기능의 절을 빼는 자리라 지우지 마세요.',
   UpdaterCompact: '인물 기록 갱신기(간결판): 설정 「갱신기 지침」을 간결로 골랐을 때 쓰는 지침. 표식은 자세히판과 같아요.',
-  Director: 'Director 기본 지침: 메인 요청 전에 보조 모델이 이번 턴 인물 자료를 정리할 때 주는 글. FACTS 절은 사실형·연출형 모두, SCENE 절은 연출형에만 붙어요. 기능별 절(APPLY.*)·검색(SEARCH·PASS2)·출력 형식(OUTPUT)·고침 요청(REPAIR)은 설정에 따라 플러그인이 골라 덧붙이고, MAIN_NOTE 는 본편에 넣는 메모의 머리말이에요. {{LANG}}·{{LINES}} 자리는 그대로 두세요.',
+  Director: 'Director 기본 지침: 메인 요청 전에 보조 모델이 이번 턴 인물 자료를 정리할 때 주는 글. FACTS 절은 사실형·연출형 모두, SCENE 절은 연출형에만 붙어요. 기능별 절(APPLY.*)·검색(SEARCH·PASS2)·출력 형식(OUTPUT)·고침 요청(REPAIR)은 설정에 따라 플러그인이 골라 덧붙이고, MAIN_NOTE 는 메인 요청에 넣는 메모의 머리말이에요. {{LANG}}·{{LINES}} 자리는 그대로 두세요.',
   Common: '여러 기능의 요청에 공통으로 붙는 글이에요: 인터넷·괴담톡 자동 확인을 한 번에 묶는 틀(JOINT.*), 형식이 틀렸을 때 다시 묻는 글(RETRY.*), 다시 보기(REITERATE), 생각 단계 머리말(THOUGHTS.*), 첨부 안내(ATTACH.*), 생성 언어 문장(LANGUAGE.*). {count}·{keys}·{reason} 같은 자리는 플러그인이 채워요.',
-  Main: '본편(메인 모델) 요청에 플러그인이 붙이는 글이에요: 직전 상태창 안내(STATUS.NOTE·STATUS.FIRST), 상태창 칸 규칙(STATUS.RULE.*, 상황판 태그 지침의 상태창 절에 들어가요), 소지품 안내(INVENTORY.*), 잠긴 부록 안내(LORE.LOCKED), 인물 기록 머리말(PEOPLE.*·SEXUAL.POLICY), 세력·명부 머리말(FACTION.*·ROSTER.INTRO). {이름} 자리는 플러그인이 채워요.',
+  Main: '메인 요청에 플러그인이 붙이는 글이에요: 직전 상태창 안내(STATUS.NOTE·STATUS.FIRST), 상태창 칸 규칙(STATUS.RULE.*, 상황판 태그 지침의 상태창 절에 들어가요), 소지품 안내(INVENTORY.*), 잠긴 부록 안내(LORE.LOCKED), 인물 기록 머리말(PEOPLE.*·SEXUAL.POLICY), 세력·명부 머리말(FACTION.*·ROSTER.INTRO). {이름} 자리는 플러그인이 채워요.',
   UpdaterExtra: '인물 기록 갱신기에 설정에 따라 덧붙는 글이에요: 기록 언어 영어(LANG_EN), 추적 인물(TRACKING_RULE), 태그 신호(SIGNAL_STATE), 상점 판단 칸(SHOP_KEY), 말투 다변화(SPEECH.*), 성적 프로필(SEXUAL.*). CONSOLIDATE 는 기록 정리 요청의 지침이에요. {이름} 자리는 플러그인이 채워요.',
-  Asset: '보조 모델이 완성된 본문에 캐릭터 이미지 태그를 넣을 때 주는 지침이에요 (설정 → 캐릭터 이미지에서 「보조 모델」 방식일 때). {limit}·{names}·{keywords}·{narrative} 같은 자리는 플러그인이 채워요. 메인 모델이 직접 넣는 방식의 지침은 「이미지」 항목에 있어요.',
+  Asset: '보조 모델이 완성된 본문에 캐릭터 이미지 태그를 넣을 때 주는 지침이에요 (설정 → 캐릭터 이미지에서 「보조 모델」 방식일 때). {limit}·{names}·{keywords}·{narrative} 같은 자리는 플러그인이 채워요. 메인 모델이 직접 넣는 방식의 지침은 「이미지(메인 모델)」 항목에 있어요.',
   Router: 'Router 기본 지침: 메인 요청 전에 보조 모델이 장면에 필요한 인물을 고를 때 주는 글. ROLE(역할·입력)·RULES(고르는 규칙·출력) 절. {{MAX}} 자리(최대 인원)는 그대로 두세요.',
 };
 

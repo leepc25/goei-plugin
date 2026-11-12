@@ -39,7 +39,7 @@ const code = (o: OrgRow) => (o.faction ? ` [${o.faction}]` : '');
 
 /** Faction 지침: 세력 요약(소개 첫 문단) → 관계(중립 아닌 쌍만) → 공통 규칙 */
 export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, rel: Relations): string {
-  // 머리말·관계표 설명은 지침 「본편에 붙는 글」 FACTION.* · ROSTER.INTRO 절. 절이 없으면 위 글
+  // 머리말·관계표 설명은 지침 「메인 요청에 붙는 글」 FACTION.* · ROSTER.INTRO 절. 절이 없으면 위 글
   const parts: string[] = ['## Faction', guideOr('Main', 'FACTION.INTRO', FACTION_INTRO)];
   const named = (name: string): string => {
     const o = dir.orgs.find((x) => x.name === name);

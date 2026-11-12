@@ -21,7 +21,7 @@ import { DIRECTOR_FACTS, DIRECTOR_SCENE, ROUTER_SYSTEM } from './people/basetext
 
 export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router' | 'Consult' | 'Common' | 'Main' | 'UpdaterExtra' | 'Asset';
 export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router', 'Consult', 'Common', 'Main', 'UpdaterExtra', 'Asset'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담', Common: '요청 공통(묶음·다시 묻기·생각 단계·첨부)', Main: '본편에 붙는 글(상태창·소지품·인물 기록)', UpdaterExtra: '인물 기록 갱신기(덧붙임·정리)', Asset: '이미지 태그 넣기(보조 모델)' };
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담', Common: '요청 공통', Main: '메인 요청에 붙는 글', UpdaterExtra: '갱신기(덧붙임·정리)', Asset: '이미지(보조 모델)' };
 
 /* ── 게시판 사이트별 기본 지침 (2026-11-08 사용자: 사이트마다 따로). 기본 글은 한 벌(gnet.txt)에 사이트 갈래가 들어 있고,
    여기서 그 사이트 갈래만 남겨 사이트마다 따로 된 지침을 만든다. 그 뒤 사용자는 사이트마다 따로 고친다 ── */
@@ -168,7 +168,7 @@ const HS_AUDIENCE = `The user has just applied for a studio audience seat at 망
 function hsGuide(): string {
   const sec = (name: string, body: string) => `@@SECTION ${name}\n${body}\n@@END`;
   return [
-    '<!-- Hs: 망상홈쇼핑 방송 지침. 플러그인이 요청마다 필요한 절만 골라 씁니다. 절 구분 줄은 그대로 두세요. HOST·VIEWERS 는 편성과 내 채팅 뒤 반응이 같이 읽는 진행자·시청자 절, MAIN_CONTEXT 는 본편에 넘기는 시청 기록의 머리말입니다. -->',
+    '<!-- Hs: 망상홈쇼핑 방송 지침. 플러그인이 요청마다 필요한 절만 골라 씁니다. 절 구분 줄은 그대로 두세요. HOST·VIEWERS 는 편성과 내 채팅 뒤 반응이 같이 읽는 진행자·시청자 절, MAIN_CONTEXT 는 메인 요청에 넘기는 시청 기록의 머리말입니다. -->',
     sec('COMMON', HS_COMMON),
     ...HS_FROM_SHOP.map((n) => sec(n, shopSection(n))),
     sec('STOCK', HS_STOCK),

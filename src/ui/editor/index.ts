@@ -404,7 +404,7 @@ const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS
 type TreeItem = [EditorNode | `label:${string}`, string, string, string?, boolean?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
 const subItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true];
-const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Image' ? '이미지' : GUIDE_LABEL[g], ICONS.book];
+const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Image' ? '이미지(메인 모델)' : GUIDE_LABEL[g], ICONS.book];
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
@@ -428,10 +428,13 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid], ['start', '시작 화면', ICONS.idcard]] }]; // 시작 화면은 세계 자료가 아니라 새 채팅 화면 꾸미기라 맨 아래 (2026-11-13 사용자)
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, ICONS.pen, badge] as TreeItem) },
-      { title: '기본 지침', items: (['RP', 'Directive', 'Tag', 'Main', 'Common'] as GuideName[]).map(guideItem) },
-      // 기능 탭과 같은 순서 (2026-11-13 사용자 「그래」): 이미지 → 인터넷 넷 → 괴담톡 → 위키 → 상점 → 쇼핑몰 → 망상홈쇼핑. AI 상담은 설정 창의 것이라 따로 맨 아래
-      { title: '기능별 지침', items: (['Image', 'Asset', 'GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki', 'Shop', 'Cos', 'Bm', 'BmDesk', 'Hs'] as (GuideName | 'Image')[]).map(guideItem) },
-      { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'UpdaterExtra', 'Director', 'Router'] as GuideName[]).map(guideItem) },
+      { title: '기본', items: (['RP', 'Directive', 'Tag', 'Main', 'Common'] as GuideName[]).map(guideItem) },
+      // 기능 탭과 같은 묶음 (2026-11-13 사용자: 한 줄로 늘어놓지 말고 묶어라): 이미지 / 인터넷 / 괴담톡·위키 / 상점
+      { title: '이미지', items: (['Image', 'Asset'] as (GuideName | 'Image')[]).map(guideItem) },
+      { title: '인터넷', items: (['GNet', 'Gal', 'Wpf', 'Salmon'] as GuideName[]).map(guideItem) },
+      { title: '괴담톡·위키', items: (['Phone', 'Wiki'] as GuideName[]).map(guideItem) },
+      { title: '상점', items: (['Shop', 'Cos', 'Bm', 'BmDesk', 'Hs'] as GuideName[]).map(guideItem) },
+      { title: '인물 기록', items: (['Updater', 'UpdaterCompact', 'UpdaterExtra', 'Director', 'Router'] as GuideName[]).map(guideItem) },
       { title: '설정 창', items: (['Consult'] as GuideName[]).map(guideItem) },
     ];
     // 11-09 사용자: 설치·업데이트는 하나로, 아이콘은 서로 다르게, 다음 호출 로어북은 따로(펼친 채), 이름은 무엇을 보는지 바로 알게
@@ -717,7 +720,7 @@ function guideNodePage(ctx: ChatContext, n: GuideNode): string {
   const g = n.slice(6) as GuideName | 'Image';
   // 길 표시는 메뉴의 묶음 이름 그대로 (전에는 인물 기록 지침도 「기능별 지침」으로 나왔다)
   const crumb = `지침 / ${treeOf('guide').find((gr) => gr.items.some((i) => i[0] === n))?.title ?? '기능별 지침'}`;
-  if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody gw-imgp">${imgPromptPane(ctx)}</div></div>`;
+  if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지(메인 모델)</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody gw-imgp">${imgPromptPane(ctx)}</div></div>`;
   return guidePage(g, crumb);
 }
 

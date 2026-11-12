@@ -115,7 +115,7 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
       return names.length ? `- ${name} (${names.join(', ')})` : '';
     })
     .filter(Boolean);
-  // 글은 지침 「이미지 태그 넣기」 PROMPT · NO_TAG · NO_TAG_USER · ALIASES_HEAD 절 (설정 → 지침에서 고침). PROMPT 절이 없으면 아래에 남긴 글
+  // 글은 지침 「이미지(보조 모델)」 PROMPT · NO_TAG · NO_TAG_USER · ALIASES_HEAD 절 (설정 → 지침에서 고침). PROMPT 절이 없으면 아래에 남긴 글
   const noTag = d.allowUser ? guideOr('Asset', 'NO_TAG', '- DO NOT tag the narrator or undefined NPCs.') : guideOr('Asset', 'NO_TAG_USER', '- DO NOT tag {{user}}, the narrator, or undefined NPCs.');
   const aliasHead = guideOr('Asset', 'ALIASES_HEAD', '## Aliases (for presence verification — still use the full English name in tag)');
   const narrative = paras.map((p, i) => `[${i + 1}] ${p}`).join('\n\n');

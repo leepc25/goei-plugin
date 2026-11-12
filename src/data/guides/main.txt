@@ -1,4 +1,4 @@
-<!-- Main: 본편(메인 모델) 요청에 플러그인이 붙이는 글 (직전 상태창·상태창 칸 규칙·소지품·잠긴 부록·인물 기록·세력표 머리말). {이름} 자리는 플러그인이 채웁니다. 절 구분 줄은 그대로 두세요. -->
+<!-- Main: 메인 요청에 플러그인이 붙이는 글 (직전 상태창·상태창 칸 규칙·소지품·잠긴 부록·인물 기록·세력표 머리말). {이름} 자리는 플러그인이 채웁니다. 절 구분 줄은 그대로 두세요. -->
 @@SECTION STATUS.NOTE
 This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.
 @@END
