@@ -7,6 +7,7 @@ import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { syncDecorators, type LoreMode } from '../core/lore';
+import { fnSet, type FnFeature } from '../core/reffn';
 import { keepOpen } from './panels';
 
 const esc = (s: unknown) =>
@@ -175,8 +176,12 @@ export async function handleAdvanced(action: string, value: string | undefined, 
   const v = value ?? '';
   let vars: Record<string, string> | null = null;
   if (action === 'adv-set') {
-    const hit = parse(v);
-    if (hit) vars = { [advVar(hit[0], hit[1])]: hit[2] };
+    // 기능별 넘길 내용·양 (core/reffn.ts): 「gn:fn_기능_칸=값」「ph:fn_기능_칸=값」
+    const fn = /^(gn|ph):(fn_[a-z_]+)=(.*)$/.exec(v);
+    const own = fn ? fnSet(fn[1] as FnFeature, fn[2], fn[3]) : null;
+    const hit = fn ? null : parse(v);
+    if (own) vars = { [own[0]]: own[1] };
+    else if (hit) vars = { [advVar(hit[0], hit[1])]: hit[2] };
   } else if (action === 'adv-books') {
     booksUi.open = !booksUi.open;
     booksUi.q = '';

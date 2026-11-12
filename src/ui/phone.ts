@@ -1,7 +1,8 @@
 // 「괴담톡」 탭: 연락처·대화방·공지·전화. 원본 괴담톡(폰)과 같은 저장 형식과 규칙.
 // 생성은 보내기·방 새로고침·단톡 만들기·초대·새 메시지 확인을 눌렀을 때, 그리고 (설정이 켜져 있으면) 채팅 응답이 끝날 때마다 한 번.
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
-import { defGroups, setSeg, type Wire } from './setrow';
+import { defGroups, helpBox, setSeg, type Wire } from './setrow';
+import { fnGrids } from './fngrid';
 import { PHONE_SET } from '../core/setdef/phone';
 import { turnKeyAt } from '../core/shop';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
@@ -30,7 +31,8 @@ import { generate as askModel, type LlmMessage } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { JOINT_VAR, jointOn } from '../core/netjoint';
-import { budgetFor, genSettings } from '../core/advanced';
+import { genSettings } from '../core/advanced';
+import { fnBudget } from '../core/reffn';
 import { advChipRow, advRow, advSetRow } from './advanced';
 import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
@@ -194,7 +196,7 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
     let raw = '';
     let result: ReturnType<typeof parseReply>;
     try {
-      const prompt = fitPrompt(budgetFor(saved.scriptstate, 'ph'), () => replyPrompt(source(ctx, saved), st, r, d, names(ctx)));
+      const prompt = fitPrompt(fnBudget(saved.scriptstate, 'ph', 'reply'), () => replyPrompt(source(ctx, saved), st, r, d, names(ctx)));
       ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), reiterate: craftSettings(saved.scriptstate, 'ph').reiterate, staticModel: featureModel(saved.scriptstate, 'ph'), state: saved.scriptstate, label: '괴담톡 답장' }));
     } catch (error) {
       await markFailed(ctx, rid, req);
@@ -376,7 +378,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     const rolls: number[] = [];
     let k = 0;
     const roll = () => (k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]));
-    const plan = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => {
+    const plan = fitPrompt(fnBudget(ctx.chat.scriptstate, 'ph', 'check'), () => {
       k = 0;
       const p = refreshPrompt(source(ctx), st, d, names(ctx), roll);
       return { ...p, messages: p.prompt?.messages ?? [] };
@@ -771,7 +773,7 @@ function makeView(ctx: ChatContext, env: PhoneEnv, automatic = false) {
   const set = viewSettings(ctx.chat.scriptstate);
   return run(ctx, env, `${VIEW_PRESETS[set.preset]}을 만드는 중이에요.`, async () => {
     const startLength = ctx.chat.message?.length ?? 0;
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate)));
+    const prompt = fitPrompt(fnBudget(ctx.chat.scriptstate, 'ph', 'view'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate)));
     const { value } = await askModel(prompt.messages, phoneSettings(ctx.chat.scriptstate).model, (raw) => parseView(raw, set.preset), {
       ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'ph'), state: ctx.chat.scriptstate, label: '관전',
     });
@@ -1070,6 +1072,11 @@ function settingsView(ctx: ChatContext): string {
     adv: (item) => advRow('ph', item, ctx.chat.scriptstate),
     advChips: (items, label) => advChipRow('ph', items, ctx.chat.scriptstate, label),
     advSet: (label, items, help) => advSetRow('ph', label, items, ctx.chat.scriptstate, help),
+    grid: { fn: () => `<div class="fn-wide">${fnGrids('ph', state, { refs: '', amount: helpBox('요청 토큰 상한을 넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요.', [
+      ['챗로그', '0이면 안 봐요.'],
+      ['지난 기록', '방마다 참조할 말풍선의 수예요.'],
+      ['요청 토큰 상한', '0이면 생성 공통 값을 따라요.'],
+    ]) })}</div>` },
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
@@ -1533,7 +1540,7 @@ export function previewPhoneRefresh(ctx: ChatContext): LlmMessage[] | null {
   const rolls: number[] = [];
   let k = 0;
   const roll = () => (k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]));
-  const plan = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => {
+  const plan = fitPrompt(fnBudget(ctx.chat.scriptstate, 'ph', 'check'), () => {
     k = 0;
     const p = refreshPrompt(source(ctx), st, d, names(ctx), roll);
     return { ...p, messages: p.prompt?.messages ?? [] };
@@ -1543,7 +1550,7 @@ export function previewPhoneRefresh(ctx: ChatContext): LlmMessage[] | null {
 
 /** 호출 흐름 미리 계산: 관전(보기 전용 방) 요청 */
 export function previewPhoneView(ctx: ChatContext): LlmMessage[] {
-  return fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate))).messages;
+  return fitPrompt(fnBudget(ctx.chat.scriptstate, 'ph', 'view'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate))).messages;
 }
 
 /** 괴담톡은 [사진:이름] 을 그림으로 바꾸지 않는다 (2026-11-12 사용자: 인물 사진 보내기 뺌). 남아 있는 옛 글은 사진 설명 틀로 보인다. 게시판이 넣어 둔 그림 찾기가 남지 않게 그릴 때마다 비운다 */

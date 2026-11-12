@@ -71,12 +71,13 @@ export const writeViews = (list: ViewRoom[]): Record<string, string> => ({ [PH_V
 export const viewUnread = (list: ViewRoom[]) => list.filter((r) => r.unread).length;
 
 /** 이어 쓸 때 참고할 같은 종류의 마지막 방 (모델에 보낼 모양) */
-export function previousView(list: ViewRoom[], preset: ViewPreset): unknown {
+/** limit = 넘길 말풍선 수 (양 표 「보기 전용 방」 줄의 지난 기록) */
+export function previousView(list: ViewRoom[], preset: ViewPreset, limit = VIEW_LIMITS.messages): unknown {
   const r = [...list].reverse().find((x) => x.preset === preset);
   if (!r) return undefined;
   return {
     name: r.name, pov: r.pov, participants: r.people,
-    messages: r.messages.filter((m) => m.type !== 'time').slice(-VIEW_LIMITS.messages).map((m) => ({ sender: m.type === 'text' ? m.sender : '-', type: m.type, content: m.type === 'text' ? m.text : m.type === 'pause' ? m.text : '-' })),
+    messages: r.messages.filter((m) => m.type !== 'time').slice(-limit).map((m) => ({ sender: m.type === 'text' ? m.sender : '-', type: m.type, content: m.type === 'text' ? m.text : m.type === 'pause' ? m.text : '-' })),
   };
 }
 

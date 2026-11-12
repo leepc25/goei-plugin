@@ -25,13 +25,14 @@ import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate, type LlmMessage, type RetryOptions } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
-import { budgetFor, genSettings } from '../core/advanced';
+import { genSettings } from '../core/advanced';
+import { fnBudget } from '../core/reffn';
 import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
-import { BOARD_NAME, BOARD_SITE_VAR, boardView, boardWrite, isBoardSite, type BoardSite } from '../core/boards';
+import { BOARD_NAME, BOARD_REF_CFG, BOARD_SITE_VAR, boardView, boardWrite, isBoardSite, type BoardSite } from '../core/boards';
 import { JOINT_VAR, jointOn } from '../core/netjoint';
 import { siteLogo } from './browser';
 import { isPhone } from './media';
@@ -210,7 +211,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
     const nick = userNick(ctx.chat.scriptstate);
     const s = gnetSettings(ctx.chat.scriptstate);
     const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx)));
+    const prompt = fitPrompt(fnBudget(ctx.chat.scriptstate, 'gn', 'refresh'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx)));
     const site = siteOf(ctx);
     const first = joint && ((m: LlmMessage[]) => joint.ask(site, m));
     const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx.chat), first });
@@ -249,7 +250,7 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string, tag = '') {
     const s = gnetSettings(ctx.chat.scriptstate);
     const draftPost: GPost = { id: 0, date: '', nick, title: '', body: input, views: 0, votes: 0, mine: true, comments: [] };
     const plan = incomingPlan(ctx.chat, st, s, nick, Math.random, { post: draftPost });
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => postPrompt(source(ctx), st, tag ? `[${tag}] ${input}` : input, plan, names(ctx)));
+    const prompt = fitPrompt(fnBudget(ctx.chat.scriptstate, 'gn', 'post'), () => postPrompt(source(ctx), st, tag ? `[${tag}] ${input}` : input, plan, names(ctx)));
     const { value, draft: parsed } = (await generate(prompt.messages, s.model, (r) => {
       const v = withRaw(r, () => parseJsonPayload(r)) as Record<string, unknown>;
       return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
@@ -302,7 +303,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
     const s = gnetSettings(chat.scriptstate);
     const nick = userNick(chat.scriptstate);
     const plan = incomingPlan(chat, st, { ...s, incoming: false }, nick, Math.random);
-    const prompt = fitPrompt(budgetFor(chat.scriptstate, 'gn'), () => commentPrompt(source(ctx, chat), st, postId, 0, '', plan, nick, names(ctx), POST_REFRESH_ACTION));
+    const prompt = fitPrompt(fnBudget(chat.scriptstate, 'gn', 'refresh'), () => commentPrompt(source(ctx, chat), st, postId, 0, '', plan, nick, names(ctx), POST_REFRESH_ACTION, 'refresh'));
     const snapshot = postKey(target);
     const { value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r) as Record<string, unknown>), retry(chat));
     let note = '';
@@ -354,7 +355,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
     let value: Record<string, unknown>;
     let prompt: ReturnType<typeof commentPrompt>;
     try {
-      prompt = fitPrompt(budgetFor(saved.scriptstate, 'gn'), () => commentPrompt(source(ctx, saved), st, postId, index, body, plan, nick, names(ctx)));
+      prompt = fitPrompt(fnBudget(saved.scriptstate, 'gn', 'comment'), () => commentPrompt(source(ctx, saved), st, postId, index, body, plan, nick, names(ctx)));
       value = (await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r) as Record<string, unknown>), retry(saved))).value;
     } catch (error) {
       throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
@@ -413,7 +414,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
     const s = gnetSettings(saved.scriptstate);
     let reply: string;
     try {
-      const prompt = fitPrompt(budgetFor(saved.scriptstate, 'gn'), () => dmPrompt(source(ctx, saved), st, nick, body, me, names(ctx)));
+      const prompt = fitPrompt(fnBudget(saved.scriptstate, 'gn', 'dm'), () => dmPrompt(source(ctx, saved), st, nick, body, me, names(ctx)));
       // 원본과 같이 고쳐 달라고 다시 묻는다 (횟수·모델은 고급 설정 → 생성 공통)
       reply = (await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
     } catch (error) {
@@ -1320,6 +1321,9 @@ export async function handleGnet(action: string, value: string | undefined, base
         return true;
       }
       if (k in GN_DEFAULTS) await setVar(ctx, env, CFG(k), val);
+      // 게시판마다의 「넘길 내용」 칩 (설정 → 인터넷의 게시판 표)
+      else if (BOARD_REF_CFG.includes(k) && (val === '1' || val === '0')) await setVar(ctx, env, CFG(k), val);
+      else env.render();
       return true;
     }
     case 'gn-count': {
@@ -1376,7 +1380,7 @@ export function previewGnetRefresh(base: ChatContext, site: BoardSite = 'gn'): L
   const nick = userNick(ctx.chat.scriptstate);
   const s = gnetSettings(ctx.chat.scriptstate);
   const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
-  return fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx))).messages;
+  return fitPrompt(fnBudget(ctx.chat.scriptstate, 'gn', 'refresh'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx))).messages;
 }
 
 /** [사진:이름] 을 이 봇의 그림으로 (그리기 전에) */

@@ -1021,10 +1021,11 @@ export interface ActivitySnapshot {
   commentsAllowed: boolean;
 }
 
-export function activityContext(st: GState, targetId: number | null): { posts: ActivityPost[]; snapshots: Map<number, ActivitySnapshot> } {
+/** posts = 다른 글 활동으로 넘길 게시판 글 수 (글 쓰기는 기능 표의 「지난 기록」, 그 밖은 새로고침의 글 수) */
+export function activityContext(st: GState, targetId: number | null, posts_ = HISTORY.refresh): { posts: ActivityPost[]; snapshots: Map<number, ActivitySnapshot> } {
   const posts: ActivityPost[] = [];
   const snapshots = new Map<number, ActivitySnapshot>();
-  for (const p of st.posts.slice(0, HISTORY.refresh)) {
+  for (const p of st.posts.slice(0, posts_)) {
     const selected = new Set<number>();
     for (let n = Math.max(1, p.comments.length - HISTORY.comment + 1); n <= p.comments.length; n++) {
       let k = n;

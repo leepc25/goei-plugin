@@ -8,7 +8,8 @@ import {
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
   type PState, phoneTime, hiddenPause, cooldownReady, readHabits,
 } from './phone';
-import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { applyAdvanced, genSettings, type RefToggles } from './advanced';
+import { fnHistory, fnNum, fnRefs } from './reffn';
 import { previousView, viewSettings, type ViewRoom } from './phoneView';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
@@ -123,9 +124,10 @@ interface RoomPacket {
 const SITE_PIC_GUIDE = 'Real photos: when the subject is one of the pictures listed below, an NPC may send [사진:Name] instead of a photo description, or [사진:Name_expression] for a person in the People list; the app shows the actual picture. Write the listed name exactly, on its own line inside the content/body string. Anything not listed stays a described [[ATTACH:photo]]. Send one only when that character would plausibly have or take such a photo.';
 const dropSitePicGuide = (text: string): string => (text.includes('__SITE_PICS__') ? text.split('\n').filter((l) => l.trim() !== '__SITE_PICS__' && l.trim() !== SITE_PIC_GUIDE).join('\n') : text);
 
-export function roomPacket(r: PRoom, reactions = false): RoomPacket {
+/** limit = 넘길 말풍선 수 (양 표의 그 기능 줄 「지난 기록」) */
+export function roomPacket(r: PRoom, reactions = false, limit = HISTORY.room): RoomPacket {
   const messages = r.messages
-    .slice(-HISTORY.room)
+    .slice(-limit)
     .filter((m) => m.kind !== 'pause' || !hiddenPause(m.text))
     .map((m) => ({
       sender: m.sender === 'system' ? '-' : m.sender,
@@ -199,9 +201,10 @@ function ownerCharacter(src: RefSource): { character?: string; rank?: string } {
   return a ? { character: a.name, ...(a.rank ? { rank: a.rank } : {}) } : {};
 }
 
-function narrator(src: RefSource, names: Record<string, string>, related: boolean, text: string): Narrator {
+/** fn = 기능(요청 종류): 넘길 내용·챗로그 턴 수를 기능 표·양 표의 그 줄에서 읽는다 (core/reffn.ts) */
+function narrator(src: RefSource, names: Record<string, string>, fn: string, t: RefToggles, text: string): Narrator {
   applyAdvanced(src.chat.scriptstate);
-  const n = trimTurns(HISTORY.turns);
+  const n = trimTurns(fnNum(src.chat.scriptstate, 'ph', fn, 'turns'));
   const turns = n ? recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages) : [];
   const recentStory: Narrator['recentStory'] = [];
   turns.forEach((t, i) => {
@@ -210,10 +213,9 @@ function narrator(src: RefSource, names: Record<string, string>, related: boolea
   });
   const last = turns[turns.length - 1];
   const faction = String(src.chat.scriptstate?.['$st_faction'] ?? '') || 'none';
-  const t = refToggles(src.chat.scriptstate, 'ph');
   const rows = collectRefs(src, {
     scope: 'phone', text: `${text}\n${recentStory.map((m) => m.text).join('\n')}`, description: t.description, authors: t.authors, persona: t.persona,
-    active: t.active, related: related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
+    active: t.active, related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
   });
   const universe: Narrator['universe'] = { characterDescription: '', authorsNote: '', activeLoreBooks: [] };
   for (const r of rows) {
@@ -229,7 +231,7 @@ function narrator(src: RefSource, names: Record<string, string>, related: boolea
 }
 
 /** 다른 방에서 이 참여자들이 보내거나 받은 말 (원본 P.bindCrossRoomMemory) */
-function crossRoom(body: Body, st: PState): void {
+function crossRoom(body: Body, st: PState, limit: number): void {
   const wanted = new Set(body.participants.map((p) => p.sender));
   if (!wanted.size) return;
   const covered = new Set((body.rooms ?? (body.room ? [body.room] : [])).map((r) => r.id));
@@ -251,7 +253,7 @@ function crossRoom(body: Body, st: PState): void {
     const knownBy: string[] = [];
     for (const c of e.allowed) {
       const n = counts.get(c) ?? 0;
-      if (n < HISTORY.room) {
+      if (n < limit) {
         counts.set(c, n + 1);
         knownBy.push(c);
       }
@@ -324,10 +326,12 @@ function gnetBoard(src: RefSource, query: string): unknown {
 /** 한 방에 대한 답장 요청 (보내기·단톡 만들기·초대·방 새로고침) */
 export function replyPrompt(src: RefSource, st: PState, r: PRoom, dir: Directory, names: Record<string, string>): PhonePrompt {
   const set = phoneSettings(src.chat.scriptstate);
-  const packet = roomPacket(r, set.reactions);
-  const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
-  const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, set.related, JSON.stringify(packet)) };
-  crossRoom(body, st);
+  const t = fnRefs(src.chat.scriptstate, 'ph', 'reply');
+  const history = fnHistory(src.chat.scriptstate, 'ph', 'reply');
+  const packet = roomPacket(r, set.reactions, history);
+  const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related, set.status, names));
+  const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, 'reply', t, JSON.stringify(packet)) };
+  crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(packet));
   return finish(src, body, 'REPLY', names);
 }
@@ -346,6 +350,8 @@ export interface RefreshPlan {
 export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names: Record<string, string>, rng: () => number): RefreshPlan {
   const chat = src.chat;
   const set = phoneSettings(chat.scriptstate);
+  const t = fnRefs(chat.scriptstate, 'ph', 'check');
+  const history = fnHistory(chat.scriptstate, 'ph', 'check');
   const inviteOn = set.invites && cooldownReady(chat, 'invitation') && chancePassed(set.inviteChance, rng);
   const incomingOn = set.incoming && cooldownReady(chat, 'incoming') && chancePassed(set.incomingChance, rng);
   const announce = announcementPacket(chat, set, names, src.char.globalLore);
@@ -378,14 +384,14 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   const rooms: RoomPacket[] = [];
   const memo = new Map<string, Participant>();
   for (const r of candidates) {
-    const packet = roomPacket(r, set.reactions);
+    const packet = roomPacket(r, set.reactions, history);
     packet.action = { type: 'refresh' };
     packet.receiveMessages = refreshAllowed(chat, r, set, incomingOn)[0];
     rooms.push(packet);
     selected.set(r.id, r);
     receive.set(r.id, packet.receiveMessages);
     for (const cid of r.members) {
-      if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
+      if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related, set.status, names));
     }
   }
   // 단톡 수다: NPC가 둘 이상인 내 단톡방 하나를 골라 대화 한 조각을 꼭 만들게 한다
@@ -398,10 +404,10 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   void _channel;
   const invite = invitationPacket(st, participants.map((p) => p.sender), inviteOn);
   const body: Body = {
-    rooms, participants, narratorOnly: narrator(src, names, set.related, JSON.stringify(rooms)), announcementCheck: publicAnnounce,
+    rooms, participants, narratorOnly: narrator(src, names, 'check', t, JSON.stringify(rooms)), announcementCheck: publicAnnounce,
     activityCheck: { incoming: incomingOn, groupInvites: inviteOn }, invitationCheck: invite,
   };
-  crossRoom(body, st);
+  crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(rooms));
   return { prompt: finish(src, body, 'REFRESH', names), selected, receive, announce, invite, reason: '' };
 }
@@ -437,13 +443,13 @@ export function viewPrompt(src: RefSource, names: Record<string, string>, views:
   keys.push('VIEW.OUTPUT');
   const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
   if (!system.includes('OUTPUT CONTRACT')) throw new PhoneError('Phone 로어북에 보기 전용 방 항목이 없어요.');
-  const previousRoom = previousView(views, set.preset);
+  const previousRoom = previousView(views, set.preset, fnHistory(src.chat.scriptstate, 'ph', 'view'));
   const owner = ownerCharacter(src).character;
   const body = {
     viewpoint: { name: set.pov || owner || '주인공', isPhoneOwner: !set.pov || set.pov === owner },
     kind: set.preset,
     ...(previousRoom ? { previousRoom } : {}),
-    narratorOnly: narrator(src, names, phoneSettings(src.chat.scriptstate).related, `${set.pov}\n${JSON.stringify(previousRoom ?? '')}`),
+    narratorOnly: narrator(src, names, 'view', fnRefs(src.chat.scriptstate, 'ph', 'view'), `${set.pov}\n${JSON.stringify(previousRoom ?? '')}`),
   };
   const read = (k: string) => opt(k);
   const messages: CraftMessage[] = [

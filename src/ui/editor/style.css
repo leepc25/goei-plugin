@@ -613,7 +613,9 @@
   .gw .ck-pc { display: none; }
   .gw .hl-i { grid-template-columns: 1fr; padding: 4px 0; }
   .gw .ck-ph { display: block; }
-  .gw .ck-line { grid-template-columns: 74px repeat(var(--ck-n), minmax(0, 1fr)); padding: 0 6px; }
+  .gw .ck-line { grid-template-columns: var(--gname-ph, 74px) repeat(var(--ck-n), minmax(0, 1fr)); padding: 0 6px; }
+  /* 줄 이름이 긴 페이지(괴담톡 기능 표 「새 메시지 확인」)는 폰 격자의 이름 칸을 페이지째 넓힌다 (줄 이름이 꺾이거나 선에 닿지 않게) */
+  .gw .fn-wide { --gname-ph: 92px; }
   .gw .ck-name .mx-name svg, .gw .ck-name .mx-name img { width: 15px; height: 15px; }
   .gw .ck-name { font-size: 12.5px; letter-spacing: -.3px; }
   .gw .ck-h1 b { padding-left: 4px; font-size: 12px; text-align: center; white-space: normal; }
