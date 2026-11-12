@@ -50,9 +50,10 @@ export interface TraceTurn {
 }
 
 export const TRACE_KEEP = 5;
-export const TRACE_TEXT = 6000;
-/** 본편 요청 메시지 하나의 보관 한도 (로어북·긴 system 글도 거의 다 들어간다) */
-export const TRACE_MAIN_TEXT = 40000;
+/** 요청·응답 글 하나의 보관 한도. 사실상 생략 없이 전부 남긴다 (2026-11-13 사용자: 「대부분 생략이 되어있는데 꼭 생략해야 하나」). 전에는 6000자·본편 40000자 */
+export const TRACE_TEXT = 400000;
+/** 본편 요청 메시지 하나의 보관 한도 */
+export const TRACE_MAIN_TEXT = 400000;
 const KEY = 'goei-trace';
 
 let turns: TraceTurn[] | null = null;

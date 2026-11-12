@@ -5,6 +5,7 @@ import { SETTINGS_SET } from '../core/setdef/settings';
 import { findDef } from '../core/setdef/types';
 import { mallSettingsPane } from './malls';
 import { homeshopSettingsPane } from './homeshop';
+import { HS_LOG_KINDS, HS_MAIN_KEY, HS_MAIN_SET, hsMainSettings, type HsLogKind } from '../core/hslog';
 import { SHOP_MAIN_KINDS, SHOP_MAIN_LINES, SHOP_MAIN_LINES_VAR, isShopPlace, shopMainKey, type ShopMainKind } from '../core/shopctx';
 import { GUIDE_NAMES, setGuideOverride } from '../core/guides';
 import { onOffSwitch, switchHtml } from './controls';
@@ -685,7 +686,17 @@ export async function shopFamSet(ctx: ChatContext, env: SettingsEnv, scope: 'cha
   } else if (key === 'main' || key.startsWith('main_')) {
     // 메인 요청에 붙이는 것 (core/shopctx.ts): 가게마다 「컨텍스트 포함」과 붙일 것, 세 곳이 같이 쓰는 「최대 양」
     const kind = key.slice(5) as ShopMainKind;
-    if (key === 'main_lines') { /* 칸을 비우면 「제한 없음」(0) */ const n = col !== 'shop' ? null : raw.trim() === '' ? SHOP_MAIN_LINES.def : int(SHOP_MAIN_LINES.min, SHOP_MAIN_LINES.max); if (n !== null) patch = { [SHOP_MAIN_LINES_VAR]: String(n) }; }
+    if (col === 'hs') {
+      // 망상홈쇼핑 줄 (core/hslog.ts): 전체 켬/끔, 붙일 것 넷(이름 목록 하나에 적는다), 토큰 상한
+      const hk = key.slice(8) as HsLogKind;
+      if (key === 'main' && flag) patch = { [HS_MAIN_KEY.on]: raw };
+      else if (key === 'main_tokens') { const t = HS_MAIN_SET.tokens; const n = raw.trim() === '' ? 0 : int(t.lo, t.hi); if (n !== null) patch = { [HS_MAIN_KEY.tokens]: String(n) }; }
+      else if (key.startsWith('main_hs_') && flag && HS_LOG_KINDS.includes(hk)) {
+        const cur = hsMainSettings(scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate).kinds;
+        const next = HS_LOG_KINDS.filter((k) => (k === hk ? raw === '1' : cur.includes(k)));
+        patch = { [HS_MAIN_KEY.kinds]: next.length ? next.join(',') : 'none' };
+      }
+    } else if (key === 'main_lines') { /* 칸을 비우면 「제한 없음」(0) */ const n = col !== 'shop' ? null : raw.trim() === '' ? SHOP_MAIN_LINES.def : int(SHOP_MAIN_LINES.min, SHOP_MAIN_LINES.max); if (n !== null) patch = { [SHOP_MAIN_LINES_VAR]: String(n) }; }
     else if (isShopPlace(col) && flag && (key === 'main' || SHOP_MAIN_KINDS[col].includes(kind))) patch = { [shopMainKey(col, key === 'main' ? undefined : kind)]: raw };
   } else if (key === 'price') {
     patch = { [name(SHOP_PRICE_VAR)]: raw.replace(/\s+/g, ' ').trim().slice(0, 80) };

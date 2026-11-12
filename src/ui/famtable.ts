@@ -8,6 +8,7 @@ import { jointOn } from '../core/netjoint';
 import { MALL_NAME, mallSettings } from '../core/malls';
 import { HS_NAME, hsSettings } from '../core/homeshop';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO, shopBlocked, shopSettings, type ShopSettings } from '../core/shop';
+import { HS_MAIN_SET, hsMainSettings, type HsLogKind } from '../core/hslog';
 import { SHOP_MAIN_ALL, SHOP_MAIN_KINDS, SHOP_MAIN_LABEL, SHOP_MAIN_LINES, SHOP_PLACES, shopMain, shopMainLines, type ShopPlace } from '../core/shopctx';
 import { advChipsCtl, advCtl } from './advanced';
 import { advValue } from '../core/advanced';
@@ -226,20 +227,37 @@ export function shopTable(vars: State, busy = false): string {
     helpBox('물건값을 매길 때 모델이 따를 기준이에요. 비우면 그곳에 어울리는 값으로 매겨요.'), '값 기준');
 
   /* ── 1-2. 메인 요청에 붙이는 것 (상점 → 메인 요청, core/shopctx.ts): 줄 = 가게, 칸 = 그 가게에서 생기는 것. 없는 것은 빈 칸 (2026-11-12 사용자: 「메뉴마다 다른데」).
-   *  맨 앞 「컨텍스트 포함」은 게시판 격자의 같은 칸과 같은 조작(그 가게 것 전부 켬/끔). 꺼지면 그 줄의 나머지 칸은 잠긴다. 망상홈쇼핑 줄은 그쪽 설정이 따로 다룬다 ── */
+   *  맨 앞 「컨텍스트 포함」은 게시판 격자의 같은 칸과 같은 조작(그 가게 것 전부 켬/끔). 꺼지면 그 줄의 나머지 칸은 잠긴다. 망상홈쇼핑 줄은 칸이 달라 따로 붙인다 ── */
   const places = SHOP_ROWS.filter((r): r is { id: ShopPlace; name: string; icon: string } => (SHOP_PLACES as string[]).includes(r.id));
+  // 망상홈쇼핑 줄 (2026-11-13): 방송에서 생기는 것은 다른 가게와 달라 칸 셋(방송 내용·시청자 채팅·내 채팅)을 더한다. 주문은 「구매」 칸. 값은 core/hslog.ts ($hs_main·$hs_main_kinds·$hs_main_tokens)
+  const hsRow = SHOP_ROWS.find((r) => r.id === 'hs')!;
+  const hm = hsMainSettings(v);
+  const HS_EXTRA: [HsLogKind, string][] = [['show', '방송 내용'], ['chat', '시청자 채팅'], ['say', '내 채팅']];
+  const hsCell = (k: HsLogKind) => hm.kinds.includes(k);
+  const hsAct = (k: HsLogKind) => (hm.on ? `s:hs:main_hs_${k}=${hsCell(k) ? '0' : '1'}` : null);
   const attach: CkBand = { title: '메인 요청에 붙이는 것', groups: [
     { name: '메인 요청', opts: ['컨텍스트 포함'], kind: 'check' },
-    { name: '붙일 것', opts: SHOP_MAIN_ALL.map((k) => SHOP_MAIN_LABEL[k]), kind: 'check' },
-  ], marks: places.map(({ id }) => { const m = shopMain(v, id); return [m.on, ...SHOP_MAIN_ALL.map((k) => (SHOP_MAIN_KINDS[id].includes(k) ? m.kinds[k] : null))]; }),
-    acts: places.map(({ id }) => { const m = shopMain(v, id); return [`s:${id}:main=${m.on ? '0' : '1'}`, ...SHOP_MAIN_ALL.map((k) => (m.on && SHOP_MAIN_KINDS[id].includes(k) ? `s:${id}:main_${k}=${m.kinds[k] ? '0' : '1'}` : null))]; }),
+    { name: '붙일 것', opts: [...SHOP_MAIN_ALL.map((k) => SHOP_MAIN_LABEL[k]), ...HS_EXTRA.map(([, l]) => l)], kind: 'check' },
+  ], marks: [
+    ...places.map(({ id }) => { const m = shopMain(v, id); return [m.on, ...SHOP_MAIN_ALL.map((k) => (SHOP_MAIN_KINDS[id].includes(k) ? m.kinds[k] : null)), ...HS_EXTRA.map(() => null)]; }),
+    [hm.on, ...SHOP_MAIN_ALL.map((k) => (k === 'buy' ? hsCell('buy') : null)), ...HS_EXTRA.map(([k]) => hsCell(k))],
+  ],
+    acts: [
+      ...places.map(({ id }) => { const m = shopMain(v, id); return [`s:${id}:main=${m.on ? '0' : '1'}`, ...SHOP_MAIN_ALL.map((k) => (m.on && SHOP_MAIN_KINDS[id].includes(k) ? `s:${id}:main_${k}=${m.kinds[k] ? '0' : '1'}` : null)), ...HS_EXTRA.map(() => null)]; }),
+      [`s:hs:main=${hm.on ? '0' : '1'}`, ...SHOP_MAIN_ALL.map((k) => (k === 'buy' ? hsAct('buy') : null)), ...HS_EXTRA.map(([k]) => hsAct(k))],
+    ],
     foot: helpBox('켜면 그 상점에서 한 일을 다음 메인 요청에 한 번 붙여요. 본문을 상점 모델에 넘기는 「맥락 반영」과는 방향이 반대예요.', [
       ['문의', '주인이나 운영자와 나눈 말이에요. 기본 상점은 거래가 끊긴 일도, 우주 쇼핑몰은 문의 창에서 물건을 판 일도 여기에 들어요.'],
       ['맞춤 주문', '주문한 일, 완성된 일, 받은 물건이에요. 완성된 일은 우주 쇼핑몰 설정의 「완성 알림」이 「카드 + 메인 요청」일 때만 붙어요.'],
+      ['방송 내용', '망상홈쇼핑에서 본 편성 제목, 상품, 진행자 대사예요.'],
+      ['내 채팅', '방송 채팅에 내가 친 말과 거기에 돌아온 반응이에요.'],
     ]) };
-  const lines = shopMainLines(v);
-  const lineBox = `<div class="st-step adv-step${stepSize(SHOP_MAIN_LINES.max, '줄', '제한 없음')}"><button class="gx-step" data-action="fam-num" data-value="s:shop:main_lines=${Math.max(SHOP_MAIN_LINES.min, lines - 1)}" ${lines <= SHOP_MAIN_LINES.min || busy ? 'disabled' : ''} aria-label="최대 양 대화 줄이기">−</button><input class="adv-val" type="number" inputmode="numeric" min="${SHOP_MAIN_LINES.min}" max="${SHOP_MAIN_LINES.max}" step="1" data-change="fam-num" data-key="s:shop:main_lines" value="${lines === 0 ? '' : lines}" placeholder="제한 없음" aria-label="최대 양 대화"${busy ? ' disabled' : ''}><span>줄</span><button class="gx-step" data-action="fam-num" data-value="s:shop:main_lines=${Math.min(SHOP_MAIN_LINES.max, lines + 1)}" ${lines >= SHOP_MAIN_LINES.max || busy ? 'disabled' : ''} aria-label="최대 양 대화 늘리기">+</button></div>`;
-  const attachMax = setGroup('', setRow('최대 양', numSet([['대화', lineBox]]), helpBox('「문의」와 「1:1 상담」으로 붙이는 대화의 줄 수예요. 넘으면 최근 줄만 붙여요.')));
+  const numBox = (key: string, n: number, lo: number, hi: number, unit: string, label: string) => `<div class="st-step adv-step${stepSize(hi, unit, '제한 없음')}"><button class="gx-step" data-action="fam-num" data-value="${key}=${Math.max(lo, n - 1)}" ${n <= lo || busy ? 'disabled' : ''} aria-label="최대 양 ${label} 줄이기">−</button><input class="adv-val" type="number" inputmode="numeric" min="${lo}" max="${hi}" step="1" data-change="fam-num" data-key="${key}" value="${n === 0 ? '' : n}" placeholder="제한 없음" aria-label="최대 양 ${label}"${busy ? ' disabled' : ''}><span>${unit}</span><button class="gx-step" data-action="fam-num" data-value="${key}=${Math.min(hi, n + 1)}" ${n >= hi || busy ? 'disabled' : ''} aria-label="최대 양 ${label} 늘리기">+</button></div>`;
+  const HT = HS_MAIN_SET.tokens;
+  const attachMax = setGroup('', setRow('최대 양', numSet([['대화', numBox('s:shop:main_lines', shopMainLines(v), SHOP_MAIN_LINES.min, SHOP_MAIN_LINES.max, '줄', '대화')], [HS_NAME, numBox('s:hs:main_tokens', hm.tokens, HT.lo, HT.hi, HT.unit, HS_NAME)]]), helpBox('', [
+    ['대화', '「문의」와 「1:1 상담」으로 붙이는 대화의 줄 수예요. 넘으면 최근 줄만 붙여요.'],
+    [HS_NAME, '망상홈쇼핑에서 붙이는 것의 토큰 상한이에요. 넘으면 오래된 시청자 채팅부터 빼요.'],
+  ])));
   /* ── 1-2. 가게 표: 줄 = 가게 셋(망상홈쇼핑은 제 설정을 따로 쓴다), 칸 = 넘길 내용 여섯 + 맥락 반영 (core/shopfn.ts) ── */
   const GIVE_OPTS = ['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영'];
   const giveRows = SHOP_ROWS.filter((r) => (GIVE_SHOPS as string[]).includes(r.id));
@@ -283,5 +301,5 @@ export function shopTable(vars: State, busy = false): string {
   const note = blocked ? `<p class="gx-hint">${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 기본 상점과 쇼핑몰 둘을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>` : '';
   /* ── 3. 기본 상점에만 있는 값: 거래 끊음 + (ui/settings.ts 가 잇는) 열리는 조건 ── */
   const own = s0.on ? `<h2 class="fam-h">기본 상점에만 있는 값</h2>${setGroup('', R('거래 끊음', sw('kick', s0.kick), '켜면 주인이 모욕이나 끝없는 흥정에 거래를 끊을 수 있어요.'))}` : '';
-  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}${ckWide([giveShop], giveRows.map(({ name, icon }) => nm(icon, name)), busy)}${ckWide([attach], places.map(({ name, icon }) => nm(icon, name)), busy)}${attachMax}</div>${fnPart}<h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${write}${own}`;
+  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}${ckWide([giveShop], giveRows.map(({ name, icon }) => nm(icon, name)), busy)}${ckWide([attach], [...places, hsRow].map(({ name, icon }) => nm(icon, name)), busy)}${attachMax}</div>${fnPart}<h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${write}${own}`;
 }
