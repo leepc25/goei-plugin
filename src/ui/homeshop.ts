@@ -8,7 +8,7 @@ import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
-import { emptyShop, lastBot, shelfPrompt, turnKey, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
+import { broadcastMaterial, emptyShop, lastBot, programPrompt, turnKey, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
 import { aliveAnchors } from '../core/wallet';
 import { addItem, addItemLog, itemId, liveItemsOf, readItems, itemsVars, removeItem, sellItem, type Item } from '../core/items';
 import { userTurns } from '../core/request';
@@ -17,10 +17,12 @@ import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
 import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_FORMS_DEFAULT, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
-import { mountPlayer, playerCut, playerSay, playerState, setPlayerFeed, stopPlayer } from './hsplayer';
+import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
 import { itemPic } from './items';
 import { isPhone } from './media';
+import { playerFlush } from './hsplayer';
+import { appendLog, sameProgram, type HsLogEntry } from '../core/hslog';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -84,22 +86,23 @@ const retryOf = (ctx: ChatContext) => { const n = Number(ctx.chat.scriptstate?.[
 
 // ── 모델 ──
 
-/** 편성 요청문: 상점 진열 요청(다시 짜기 꼴)에 방송 절을 붙인다 */
-function showPrompt(ctx: ChatContext, show: HsShow, s: HsSettings): LlmMessage[] {
+/** 방송 요청에 넘기는 자료 묶음 (참고 자료·본편은 상점과 같은 길로 모은다) */
+function showSource(ctx: ChatContext, show: HsShow, s: HsSettings) {
   const st: ShopState = { ...emptyShop({ raw: '', shop: HS_NAME, owner: HS_HOST }, ''), loaded: true, identity: { sells: HS_NAME, never: '', prices: '무이자 N회' }, prev: show.prev.concat(show.parts.map((p) => p.item.name)).slice(-24) };
-  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: hsVars(ctx.chat.scriptstate) as typeof ctx.chat.scriptstate } }, st, s.shop);
-  const msgs = shelfPrompt(src, s.shop, 'Hs');
+  return shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: hsVars(ctx.chat.scriptstate) as typeof ctx.chat.scriptstate } }, st, s.shop);
+}
+/** 지침에 채우는 낱말 (컷·표정·화면 사건) */
+function cueWords(): Record<string, string> {
   const art = homeshopArt();
-  const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.ko))];
+  const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.name))];
   const a = names('A');
   const b = names('B').filter((x) => !a.includes(x));
-  const range = (r: [number, number]) => (r[0] === r[1] ? `${r[0]}` : `${r[0]} to ${r[1]}`);
-  const extra = fillGuide(guideSections('Hs').BROADCAST, {
-    cue: range(s.cue), chat: range(s.chat), cuts: Object.values(CUE_CUT_WORD).join(', '),
-    moods: a.join(', ') || '말하기', moods_b: b.join(', ') || '-', events: Object.values(CUE_EVENT_WORD).join(', '),
-  });
-  const i = msgs.findIndex((m) => m.role === 'system');
-  return msgs.map((m, k) => (k === i ? { ...m, content: `${m.content}\n\n${extra}` } : m)) as LlmMessage[];
+  return { cuts: Object.values(CUE_CUT_WORD).join(', '), moods: a.join(', ') || 'talk', moods_b: b.join(', ') || '-', moods_all: [...a, ...b].join(', ') || 'talk', events: Object.values(CUE_EVENT_WORD).join(', ') };
+}
+/** 편성 요청문: 방송 전용 지침(첫 절·물건 줄·방송 꼴·시청자 절·생각 단계). 상점 진열 지침은 빌리지 않는다 (11-12 사용자) */
+const range = (r: [number, number]) => (r[0] === r[1] ? `${r[0]}` : `${r[0]} to ${r[1]}`);
+function showPrompt(ctx: ChatContext, show: HsShow, s: HsSettings): LlmMessage[] {
+  return programPrompt(showSource(ctx, show, s), s.shop, { ...cueWords(), cue: range(s.cue), chat: range(s.chat) }) as LlmMessage[];
 }
 
 /** 호출 흐름 미리 계산용 (모델은 안 부름). 꺼져 있으면 null */
@@ -178,6 +181,12 @@ export async function homeshopAction(action: string, value: string | undefined, 
   liveEnv = env;
   sync(ctx);
   switch (action) {
+    case 'hs-next': {
+      // 다음 상품은 내가 넘긴다 (11-12 사용자: 꼭 자동일 필요 없다)
+      const now = readShow(ctx.chat.scriptstate);
+      if (now.loaded && now.at < now.parts.length) advance(now.at + 1);
+      return true;
+    }
     case 'hs-refresh':
       if (!hsSettings(ctx.chat.scriptstate).on || ui.loading) return true;
       ui.retried = 0;
@@ -241,11 +250,27 @@ function advance(at: number): void {
   const env = liveEnv;
   const ctx = env?.current();
   if (!env || !ctx) return;
+  // 부가 넘어가기 전에 지금까지 본 것을 적는다 (시청 기록)
+  playerFlush();
   void updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     const show = readShow(chat.scriptstate);
     if (!show.loaded || show.at >= at) return null;
     return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...showVars({ ...show, at: Math.min(at, show.parts.length) }) } };
   }).then(() => env.refresh());
+}
+
+/**
+ * 시청 기록 저장 (core/hslog.ts): 재생기가 모아 준 「화면에 나온 줄」 묶음을 그 채팅의 `$hs_log` 에 덧붙인다. 본편 요청이 참고 기록으로 읽는다 (body.ts moduleContext).
+ * 줄마다가 아니라 묶음으로만 부른다 (재생기 playerFlush). 그 채팅의 편성이 그사이 바뀌었으면 버린다
+ */
+function saveLog(charIndex: number, chatIndex: number, entries: HsLogEntry[], show: HsShow): void {
+  if (!entries.length) return;
+  void updateChat(charIndex, chatIndex, (chat) => {
+    const cur = readShow(chat.scriptstate);
+    if (!sameProgram(cur, show)) return null;
+    const vars = appendLog(chat.scriptstate, cur, entries);
+    return Object.keys(vars).length ? { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } } : null;
+  }).catch((error) => console.log(`[goei] ${HS_NAME} 시청 기록 저장 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 // ── 주문·상자·방청·채팅 (설계 8-4 ~ 8-10) ──
@@ -270,6 +295,9 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
   if (ui.pay === 'barter' && (!s.barter || !barterId)) return;
   let ok = false;
   let usedBarter = false;
+  // 시청 기록: 주문 전에 본 것을 먼저 적고, 주문 줄은 아래 저장에 같이 적는다
+  playerFlush();
+  const buyer = userInfo().name || '나';
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     const show = readShow(chat.scriptstate);
     const part = show.loaded ? show.parts[show.at] : null;
@@ -291,12 +319,15 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
     o.boxId = itemId(anchor, name);
     ok = true;
     usedBarter = !!gave;
-    return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars([...readOrders(chat.scriptstate).filter((x) => x.id !== o.id), o]) } };
+    // 시청 기록의 주문 줄 (본편 참고 기록, core/hslog.ts). 주문 id 를 달아 두어 주문이 없던 일이 되면 본편에도 안 간다
+    const bought = appendLog(chat.scriptstate, show, [{ k: 'buy', p: show.at, who: buyer, text: `전화 주문: 「${part.item.name}」 · ${gave ? `「${gave.name}」 맞교환` : o.n ? `무이자 할부 ${o.n}회` : part.item.pay || '방송 특가'}`, ref: o.id }]);
+    return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars([...readOrders(chat.scriptstate).filter((x) => x.id !== o.id), o]), ...bought } };
   });
   if (ok) {
     const ops = readShow(ctx.chat.scriptstate).ops;
     ui.done = (usedBarter ? ops?.barter : ops?.done) || '주문이 접수되었습니다.';
     playerSay('안내', '주문 1건 접수', 'sys');
+    playerTake(1);
   }
   await env.refresh();
 }
@@ -342,22 +373,25 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
   const nick = userInfo().name || '나';
   ui.input = '';
   ui.saying = true;
+  playerHold(true);
   playerSay(nick, text.slice(0, 80), 'me');
   env.render();
   try {
     const art = homeshopArt();
-    const names = (cut: 'A' | 'B') => [...new Set((art?.pack.cuts[cut].clips ?? []).filter((c) => c.group !== 'off' && c.group !== 'base').map((c) => c.ko))];
     const g = guideSections('Hs');
-    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: '1 to 3', say_chat: '2 to 5', cuts: Object.values(CUE_CUT_WORD).join(', '), moods: [...new Set([...names('A'), ...names('B')])].join(', ') || '말하기', events: Object.values(CUE_EVENT_WORD).join(', ') })].filter(Boolean).join('\n\n');
+    const w = cueWords();
+    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: range(s.sayCue), say_chat: range(s.sayChat), cuts: w.cuts, moods: w.moods_all, events: w.events }), fillGuide(g.HOST ?? '', {}), fillGuide(g.VIEWERS ?? '', {})].filter(Boolean).join('\n\n');
     const st = playerState();
     const recent = part.cues.slice(Math.max(0, (st?.cue ?? 0) - 3), (st?.cue ?? 0) + 1).map((c) => `진행자: ${c.text}`).join('\n');
-    const user = `[지금 방송]\n${show.title ? `${show.title} · ` : ''}${show.at + 1}부 「${part.item.name}」 (${part.item.pay ?? ''})\n${part.item.desc}\n\n[방금 진행자]\n${recent || '-'}\n\n[시청자 채팅]\n${nick}: ${text.slice(0, 200)}`;
+    // 방금까지 흐른 채팅 (내 줄은 playerSay 로 이미 맨 끝에 있다): 같은 닉네임·말투를 잇게
+    const flowed = playerRecentChat(24).slice(0, -1).map((c) => `${c.nick}: ${c.text}`).join('\n');
+    const user = `${broadcastMaterial(showSource(ctx, show, s), s.shop)}\n\n[지금 방송]\n${show.title ? `${show.title} · ` : ''}${show.at + 1}부 「${part.item.name}」 (${part.item.pay ?? ''})\n${part.item.desc}\n\n[방금 진행자]\n${recent || '-'}${flowed ? `\n\n[방금까지 흐른 채팅]\n${flowed}` : ''}\n\n[지금 시청자가 쓴 채팅]\n${nick}: ${text.slice(0, 200)}`;
     const gs = genSettings(ctx.chat.scriptstate);
     const moods = moodMap(art?.pack ?? null);
     const { value } = await generate([{ role: 'system', content: system }, { role: 'user', content: user }] as LlmMessage[], s.shop.model, (raw) => {
       const cueText = /<cue[^>]*>([\s\S]*?)<\/cue\s*>/i.exec(raw)?.[1] ?? '';
-      const cues = cueText.split('\n').map((l) => parseCue(l, moods)).filter((c): c is HsCue => !!c).slice(0, 3);
-      const chat = (/<chat[^>]*>([\s\S]*?)<\/chat\s*>/i.exec(raw)?.[1] ?? '').split('\n').map((l) => { const k = l.indexOf('|'); return k > 0 ? { nick: l.slice(0, k).trim().slice(0, 16), text: l.slice(k + 1).trim().slice(0, 80) } : null; }).filter((c): c is { nick: string; text: string } => !!c && !!c.text).slice(0, 6);
+      const cues = cueText.split('\n').map((l) => parseCue(l, moods)).filter((c): c is HsCue => !!c).slice(0, s.sayCue[1]);
+      const chat = (/<chat[^>]*>([\s\S]*?)<\/chat\s*>/i.exec(raw)?.[1] ?? '').split('\n').map((l) => { const k = l.indexOf('|'); return k > 0 ? { nick: l.slice(0, k).trim().slice(0, 16), text: l.slice(k + 1).trim().slice(0, 80) } : null; }).filter((c): c is { nick: string; text: string } => !!c && !!c.text).slice(0, s.sayChat[1]);
       if (!cues.length && !chat.length) throw new Error('응답에 <cue>·<chat> 블록이 없어요.');
       return { cues, chat };
     }, { retries: gs.retries, retryModel: gs.retryModel, concurrent: gs.concurrent, state: ctx.chat.scriptstate, label: `${HS_NAME} 채팅` });
@@ -366,6 +400,9 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
     ui.info = `채팅이 전달되지 않았어요. ${error instanceof Error ? error.message.split('\n')[0] : ''}`;
   } finally {
     ui.saying = false;
+    playerHold(false);
+    // 시청 기록: 내 줄과 그때까지 본 것을 바로 적는다 (반응 줄은 화면에 다 나온 뒤 재생기가 넘긴다)
+    playerFlush();
   }
   env.render();
 }
@@ -377,8 +414,9 @@ function scaleOf(s: HsSettings, phone: boolean): number {
   // 0 = 칸 폭에 맞춤 (재생기가 꽂힌 칸의 폭으로 잰다)
   if (v === 'fit') return 0;
   if (v !== 'auto') return Number(v);
-  const w = typeof window === 'undefined' ? 0 : window.innerWidth;
-  return phone ? 0 : w >= 1700 ? 2 : 1;
+  // 자동 = 보이는 자리에 맞춤 (PC·폰 모두, ui/hsplayer.ts fitScale)
+  void phone;
+  return 0;
 }
 
 const failBox = () => (ui.notice ? `<div class="hs-err" role="alert"><span>${esc(ui.notice).replace(/\n/g, '<br>')}</span>${ui.failRaw ? '<button data-action="hs-raw">받은 글 보기</button>' : ''}<button data-action="hs-refresh">다시 연결</button></div>` : '');
@@ -400,7 +438,7 @@ function lineup(show: HsShow, s: HsSettings, col = false): string {
 function onAir(ctx: ChatContext, show: HsShow, s: HsSettings, mobile: boolean): string {
   const { part, ordered } = nowPart(ctx);
   const ended = show.loaded && show.at >= show.parts.length;
-  const bar = `<div class="hs-bar"><span class="hs-on${show.loaded && !ended ? '' : ' off'}">${show.loaded && !ended ? 'LIVE' : 'OFF'}</span><b>${esc(show.title || HS_NAME)}</b>${part ? `<span class="hs-pt">${show.at + 1}부 <i>/ ${show.parts.length}부</i></span>` : ''}</div>`;
+  const bar = `<div class="hs-bar"><span class="hs-on${show.loaded && !ended ? '' : ' off'}">${show.loaded && !ended ? 'LIVE' : 'OFF'}</span><b>${esc(show.title || HS_NAME)}</b>${part ? `<span class="hs-pt">${show.at + 1}부 <i>/ ${show.parts.length}부</i></span><button class="hs-nx" data-action="hs-next">${show.at + 1 < show.parts.length ? '다음 상품 ▶' : '방송 마치기 ■'}</button>` : ''}</div>`;
   const tv = `<div class="hs-tv">${bar}<div class="hs-mount" data-hs-mount="stage"></div></div>`;
   const prod = part
     ? `<div class="hs-prod"><button class="hs-icon" data-action="hs-pop" data-value="peek" aria-label="상품 스티커 보기">${itemPic(part.item)}<span class="hs-stk" aria-hidden="true"></span></button>
@@ -489,7 +527,7 @@ export function homeshopTab(ctx: ChatContext, env: HsEnv): string {
   const stt = homeshopStatus();
   const art = homeshopArt();
   const note = !s.on ? '방송 없음' : stt.failed ? '신호 없음' : !art ? stt.progress || '방송 준비 중' : ui.loading ? '방송 연결 중' : ui.notice ? '신호 없음' : show.loaded ? '' : '신호 없음';
-  setPlayerFeed({ art, show: s.on && !ui.loading ? show : { ...show, loaded: false }, s, note, scale: scaleOf(s, mobile), tel: telOf(ctx) }, { advance, redraw: () => liveEnv?.render() });
+  setPlayerFeed({ art, show: s.on && !ui.loading ? show : { ...show, loaded: false }, s, note, scale: scaleOf(s, mobile), tel: telOf(ctx) }, { advance, redraw: () => liveEnv?.render(), log: (entries, shown) => saveLog(ctx.charIndex, ctx.chatIndex, entries, shown) });
   const pending = liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat)).length;
   const tabs: [View['page'], string][] = [['', 'ON AIR'], ['sched', '편성표'], ['orders', `주문 조회${pending ? ` ${pending}` : ''}`]];
   const menu = `<nav class="hs-menu">${tabs.map(([k, l]) => `<button class="${ui.page === k ? 'on' : ''}" data-action="hs-page" data-value="${k}" aria-pressed="${ui.page === k}">${l}</button>`).join('')}${s.aud ? '<button data-action="hs-pop" data-value="aud">방청 신청</button>' : ''}</nav>`;
@@ -517,7 +555,7 @@ export function boxButton(ctx: ChatContext, itemIdOf: string): string {
 const SH: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
 const SH_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
 /** 켬/끔 칸: 설정 키 → 변수 이름 */
-const FLAG: Record<string, string> = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
+const FLAG: Record<string, string> = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, drop: HS_KEY.drop, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
 
 export function homeshopSettingsPane(ctx: ChatContext): string {
   const vars = ctx.chat.scriptstate;
@@ -532,10 +570,10 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
   const vals: Record<string, string> = {
     on: b(s.on), net: b(s.net), auto: s.auto, retry: String(retryOf(ctx)), tel: String(vars?.[HS_TEL_KEY] ?? ''),
     'sh:model': s.shop.model, 'sh:ctx': b(s.shop.context), 'sh:price': s.shop.price, 'sh:diverse': b(s.shop.diverse), 'sh:prev': b(s.shop.avoidPrev), 'sh:thoughts': s.shop.thoughts,
-    turns: String(s.shop.turns), refs: String(s.shop.refs), turn: b(s.turn), lock: b(s.lock), say: b(s.say), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
+    turns: String(s.shop.turns), refs: String(s.shop.refs), turn: b(s.turn), lock: b(s.lock), drop: b(s.drop.on), say: b(s.say), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
     forms: String(vars?.[HS_KEY.forms] ?? ''), clips: s.clipsText, cut: b(s.fx.cut), bulb: b(s.fx.bulb), tear: b(s.fx.tear), scan: b(s.fx.scan), scalePc: s.scalePc, scalePh: s.scalePhone,
   };
-  const pairs: Record<string, [string, string]> = { cue: ['cueMin', 'cueMax'], chat: ['chatMin', 'chatMax'], call: ['callLo', 'callHi'], fill: ['fillLo', 'fillHi'] };
+  const pairs: Record<string, [string, string]> = { cue: ['cueMin', 'cueMax'], chat: ['chatMin', 'chatMax'], call: ['callLo', 'callHi'], fill: ['fillLo', 'fillHi'], end: ['endLo', 'endHi'] };
   const wire: Wire = {
     cur: (k) => vals[k] ?? String(n(k)),
     minmax: (k) => (k === 'size' ? s.shop.size : [n(pairs[k][0]), n(pairs[k][1])]),
@@ -547,7 +585,7 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
   const page: typeof HOMESHOP_SET = { ...HOMESHOP_SET, groups: [
     pick('', ['net', 'retry', 'say']),
     pick('편성', ['cue', 'chat']),
-    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'turn', 'lock']),
+    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'drop', 'dropRate', 'dropFast', 'dropStep', 'soonAt', 'end', 'turn', 'lock']),
     pick('주문', ['barter', 'peek']),
     pick('컨텍스트 포함', ['call', 'forms', 'aud']),
     pick('진행자 동작', ['fill', 'fillCool', 'rareP', 'rareCool', 'clips'], HOMESHOP_SET.groups.find((g) => g.title === '진행자 동작')?.note),

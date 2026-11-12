@@ -1,8 +1,8 @@
 // 소지품 판정 칸 (장착 갈래·상태·소모 횟수·쓰임 글). 다른 데에 기대지 않는 순수 함수만 — 명부(world/directory)·시작 소지품이 소지품 전체를 끌어오지 않게 (core/items.ts 가 다시 내보냄)
 
-/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 무기·무기 아닌 것 둘만). 칸: 무기 2 · 장비 4 */
+/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 무기·무기 아닌 것 둘만). 칸: 무기 2 · 장비 6 (2026-11-12 사용자: 장비 칸 둘 더) */
 export type ItemEquip = 'weapon' | 'gear';
-export const EQUIP_SLOTS: Record<ItemEquip, number> = { weapon: 2, gear: 4 };
+export const EQUIP_SLOTS: Record<ItemEquip, number> = { weapon: 2, gear: 6 };
 export const EQUIP_LABEL: Record<ItemEquip, string> = { weapon: '무기', gear: '장비' };
 export const itemEquip = (v: unknown): ItemEquip | undefined => (v === 'weapon' || v === 'gear' ? v : undefined);
 

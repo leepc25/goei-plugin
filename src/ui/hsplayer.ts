@@ -4,10 +4,11 @@
 // - 글자·숫자·띠는 그림이 아니라 HTML 로 얹는다 (도트 글꼴, 11-10 도트 시안 site_mock_dot).
 // - 화면을 다시 그려도(app render) 캔버스·채팅 줄은 같은 DOM 을 다시 꽂아 끊기지 않는다. 화면에서 빠지면(탭 닫기·창 닫기) 멈추고, 다시 꽂히면 그 자리부터.
 // - 동작 고르기·길이 계산은 core/homeshop.ts (설정 값). 여기는 시간 흐름과 그리기만.
-import { clipsOf, cueMs, CUE_EVENT_WORD, idleState, installments, moodClip, nextIdle, parseClipGroups, type CueCut, type CutId, type HsClip, type HsCue, type HsSettings, type HsShow, type IdleState } from '../core/homeshop';
+import { clipsOf, cueMs, dropEnd, dropRest, nextDrop, moodMap, moodName, CUE_EVENT_LABEL, idleState, installments, moodClip, nextIdle, parseClipGroups, pickVersion, type CueCut, type CutId, type HsClip, type HsCue, type HsSettings, type HsShow, type IdleState } from '../core/homeshop';
 import type { HsArt } from '../host/homeshop';
 import { HS_FONT } from '../host/homeshop';
 import { itemPic } from './items';
+import { HS_LOG_HOST, type HsLogEntry, type HsLogKind } from '../core/hslog';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -27,6 +28,8 @@ export interface PlayerHooks {
   advance(at: number): void;
   /** 상품 그림이 뒤늦게 준비됐을 때 화면을 한 번 다시 그린다 */
   redraw(): void;
+  /** 화면에 나온 줄 묶음 (본편 참고 기록용, core/hslog.ts). 저장은 부른 쪽이. show = 그 줄이 나온 편성 */
+  log?(entries: HsLogEntry[], show: HsShow): void;
 }
 
 interface Run {
@@ -42,6 +45,10 @@ interface Run {
   /** 지금 동작이 대사에 딸린 것인가 (끝까지 돌고 대사 시간이 지나면 다음 큐) */
   talking: boolean;
   left: number;
+  /** 저절로 줄기: 끝날 때 남길 수 · 다음에 줄일 수(0 = 아직 안 정함) · 그때까지 남은 시간(ms) */
+  dropEnd: number;
+  dropN: number;
+  dropWait: number;
   flags: { price: boolean; rush: boolean; soon: boolean; sold: boolean; call: boolean; look: boolean };
   tearUntil: number;
   gapUntil: number;
@@ -61,8 +68,11 @@ const TEAR_MS: [number, number] = [200, 400];
 let feed: PlayerFeed | null = null;
 let hooks: PlayerHooks = { advance() {}, redraw() {} };
 let iconMiss = false;
+let resizing = false;
 const extra: HsCue[] = [];
 const extraChat: { nick: string; text: string }[] = [];
+/** 화면에 흐른 채팅 (내 채팅 뒤 호출에 넘긴다) */
+const shown: { nick: string; text: string }[] = [];
 /** 지금 자막에 찍는 끼어든 대사 (없으면 큐시트의 것) */
 let said: HsCue | null = null;
 let stage: HTMLElement | null = null;
@@ -72,6 +82,8 @@ let chatLog: HTMLElement | null = null;
 let run: Run | null = null;
 let showKey = '';
 let timer: ReturnType<typeof setInterval> | null = null;
+/** 바로 앞 tick 시각 (0 = 막 다시 돌기 시작) */
+let tickAt = 0;
 const idle: Record<CutId, IdleState> = { A: idleState(), B: idleState() };
 const icons = new Map<string, HTMLImageElement | null>();
 let scratch: HTMLCanvasElement | null = null;
@@ -80,19 +92,23 @@ const now = () => performance.now();
 const cutArt = (c: CueCut): CutId => (c === 'A' || c === 'C' ? 'A' : 'B');
 
 function freshRun(part: number): Run {
-  return { part, cue: -1, cueAt: 0, cueLen: 0, cut: 'A', clip: null, frame: 0, frameAt: 0, talking: false, left: feed?.s.left ?? 30, flags: { price: false, rush: false, soon: false, sold: false, call: false, look: false }, tearUntil: 0, gapUntil: 0, chatAt: 0, chatIdx: run?.chatIdx ?? 0, bulbStep: 0, bulbAt: 0 };
+  const left = feed?.s.left ?? 30;
+  return { part, cue: -1, cueAt: 0, cueLen: 0, cut: 'A', clip: null, frame: 0, frameAt: 0, talking: false, left, dropEnd: feed ? dropEnd(left, feed.s.drop) : 1, dropN: 0, dropWait: 0, flags: { price: false, rush: false, soon: false, sold: false, call: false, look: false }, tearUntil: 0, gapUntil: 0, chatAt: 0, chatIdx: 0, bulbStep: 0, bulbAt: 0 };
 }
 
 /** 화면 상태를 갈아 끼운다. 편성이 바뀌었으면 처음부터, 같으면 보던 자리 그대로 */
 export function setPlayerFeed(f: PlayerFeed, h: PlayerHooks): void {
+  const key = f.show.loaded ? `${f.show.key}:${f.show.parts.map((p) => p.item.id).join(',')}` : '';
+  // 편성이 바뀌기 전에, 모아 둔 시청 기록을 옛 편성·옛 채팅 쪽으로 넘긴다
+  if (key !== showKey) playerFlush();
   feed = f;
   hooks = h;
-  const key = f.show.loaded ? `${f.show.key}:${f.show.parts.map((p) => p.item.id).join(',')}` : '';
   if (key !== showKey) {
     showKey = key;
     run = null;
     extra.length = 0;
     extraChat.length = 0;
+    shown.length = 0;
     said = null;
     if (chatLog) chatLog.innerHTML = '';
   }
@@ -111,12 +127,49 @@ export function mountPlayer(root: HTMLElement): void {
     chatLog.scrollTop = chatLog.scrollHeight;
   }
   layout();
-  if (!timer) timer = setInterval(tick, 33);
+  if (!timer) {
+    // 멈췄다 다시 돌 때: 멈춘 동안은 수량 줄기 시간에 치지 않는다
+    tickAt = 0;
+    timer = setInterval(tick, 33);
+  }
+  if (!resizing) {
+    resizing = true;
+    window.addEventListener('resize', () => layout());
+  }
   tick();
 }
 export function stopPlayer(): void {
   if (timer) clearInterval(timer);
   timer = null;
+  playerFlush();
+}
+
+// ── 시청 기록 모으기 (본편 참고 기록용, core/hslog.ts). 화면에 나온 줄을 모아 두었다가 묶어서 넘긴다 (줄마다 저장하지 않는다) ──
+
+/** 모아 둔 줄을 이만큼 지나면 넘긴다 (ms) */
+const LOG_FLUSH_MS = 5000;
+const seen: HsLogEntry[] = [];
+/** 모아 둔 줄이 나온 편성 · 첫 줄을 모은 때 */
+let seenShow: HsShow | null = null;
+let seenAt = 0;
+/** 내 채팅의 반응이 다 나왔다: 다음 tick 에 바로 넘긴다 */
+let seenDue = false;
+function note(kind: HsLogKind, nick: string, text: string, me: boolean): void {
+  if (!feed?.show.loaded) return;
+  // 다른 편성의 줄이 섞이지 않게
+  if (seenShow && seenShow !== feed.show && (seenShow.key !== feed.show.key || seenShow.parts[0]?.item.id !== feed.show.parts[0]?.item.id)) playerFlush();
+  if (!seen.length) seenAt = now();
+  seenShow = feed.show;
+  seen.push({ k: kind, p: run?.part ?? feed.show.at, who: nick, text, ...(me ? { me: 1 as const } : {}) });
+  if (kind === 'say' && !me && !extra.length && !extraChat.length) seenDue = true;
+}
+/** 모아 둔 시청 기록을 넘긴다 (부가 넘어갈 때·주문·내 채팅 반응 뒤·멈출 때, 그리고 tick 이 5초마다) */
+export function playerFlush(): void {
+  seenDue = false;
+  if (!seen.length || !seenShow) return;
+  const show = seenShow;
+  seenShow = null;
+  hooks.log?.(seen.splice(0), show);
 }
 
 function build(): void {
@@ -133,13 +186,28 @@ function build(): void {
   chatLog.className = 'hs-chlog';
 }
 
+/** 「자동·폭 맞춤」 배율: 방송 칸이 화면을 다 차지하지 않게, 사이트 칸 폭(PC 는 채팅 칸을 뺀 폭)과 보이는 높이 안에서.
+ *  1배·2배처럼 정수가 들어가면 정수로 (도트가 고르게), 1배도 안 들어가면 그 폭에 맞춰 줄인다 (11-11 사용자: 큰 화면에서 2배로 커져 나머지가 안 보였다) */
+function fitScale(w: number, h: number): number {
+  const wrap = stage?.closest<HTMLElement>('.hs-wrap');
+  const page = stage?.closest<HTMLElement>('.hs');
+  if (!wrap || !page) return 1;
+  const phone = page.classList.contains('hs-m');
+  const cs = getComputedStyle(wrap);
+  const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  // PC: 채팅 칸 최소 폭 260 + 사이 14 · 방송 칸 테두리 2. 높이: 보이는 높이의 60% (아래 상품 칸·주문 단추가 첫 화면에 같이 보이게)
+  const roomW = (phone ? inner : inner - 274) - 2;
+  const roomH = (page.clientHeight || window.innerHeight) * (phone ? 0.5 : 0.6) - 36;
+  const fit = Math.max(0.25, Math.min(roomW / w, roomH / h));
+  return fit >= 2 ? 2 : fit >= 1 ? 1 : fit;
+}
+
 function layout(): void {
   if (!stage || !canvas || !feed) return;
   const w = feed.art?.pack.w ?? 512;
   const h = feed.art?.pack.h ?? 384;
   // 0 = 꽂힌 칸의 폭에 맞춤 (1배를 넘기지 않는다)
-  const room = stage.parentElement?.clientWidth || w;
-  const k = feed.scale > 0 ? feed.scale : Math.min(1, room / w);
+  const k = feed.scale > 0 ? feed.scale : fitScale(w, h);
   if (canvas.width !== w) canvas.width = w;
   if (canvas.height !== h) canvas.height = h;
   stage.style.width = `${w * k}px`;
@@ -176,9 +244,14 @@ function tick(): void {
   if (!stage.isConnected || !stage.offsetParent) return stopPlayer();
   const f = feed;
   const t = now();
+  // 시청 기록: 모아 둔 줄을 5초마다 (또는 내 채팅 반응이 다 나온 뒤 바로) 넘긴다
+  if (seen.length && (seenDue || t - seenAt >= LOG_FLUSH_MS)) playerFlush();
   if (!f.art || !f.show.loaded) return void drawNote(f, t);
   if (!run) run = freshRun(f.show.at);
   const r = run;
+  // 돌고 있던 시간만 (수량 줄기용)
+  const dt = tickAt ? t - tickAt : 0;
+  tickAt = t;
   if (r.part >= f.show.parts.length) return void drawOff(f);
   const part = f.show.parts[r.part];
   const over = parseClipGroups(f.s.clipsText);
@@ -192,15 +265,28 @@ function tick(): void {
     r.cut = f.s.fx.cut ? c.cut : 'B';
     if (c.ev === 'call' && f.s.fx.cut) r.cut = 'D';
     applyEvent(r, c, f, t);
-    r.clip = moodClip(clips(r.cut), c.ev === 'look' ? 'stare' : c.mood, idle[cutArt(r.cut)]);
+    r.clip = moodClip(clips(r.cut), c.ev === 'look' ? 'stare' : moodName(c.mood, moodMap(f.art!.pack)), idle[cutArt(r.cut)]);
     r.frame = 0;
     r.frameAt = t;
     r.talking = true;
     if (f.s.fx.tear && c.ev !== 'tear' && Math.random() < f.s.fx.tearP) r.tearUntil = t + TEAR_MS[0] + Math.random() * (TEAR_MS[1] - TEAR_MS[0]);
-    pushChat('진행자', c.text, 'host');
+    pushChat(HS_LOG_HOST, c.text, 'host', own ? 'say' : undefined);
   };
   const startIdle = () => {
     r.clip = nextIdle(clips(r.cut), idle[cutArt(r.cut)], f.s.rules);
+    r.frame = 0;
+    r.frameAt = t;
+    r.talking = false;
+  };
+  // 내 채팅을 읽는 중: 진행자 컷에서 읽는 동작(고개 꺾기·응시)과 대기를 번갈아 (11-12 사용자: 흥미를 갖고 보는 느낌)
+  const startRead = () => {
+    if (f.s.fx.cut) r.cut = 'B';
+    r.flags.call = false;
+    const cs = clips(r.cut);
+    const base = cs.find((c) => c.group === 'base') ?? null;
+    const name = f.s.read.length && readN % 2 === 0 ? moodName(f.s.read[(readN / 2) % f.s.read.length], moodMap(f.art!.pack)) : '';
+    r.clip = (name && cs.some((c) => c.name === name) ? pickVersion(cs, name, idle[cutArt(r.cut)]) : null) ?? base ?? r.clip;
+    readN++;
     r.frame = 0;
     r.frameAt = t;
     r.talking = false;
@@ -211,15 +297,28 @@ function tick(): void {
     r.frameAt += f.s.frame;
     r.frame++;
     if (r.frame >= r.clip.frames) {
-      // 동작이 한 바퀴 돌았다: 대사 중이면 대사 시간이 남았을 때 한 번 더, 다 됐으면 다음 큐
-      if (r.talking && t - r.cueAt < r.cueLen) r.frame = 0;
+      // 동작은 한 번만 (11-11 사용자: 기본은 대기 자세, 각 동작은 한 번씩 나오고 대기로 돌아온다. 무한 반복 금지)
+      // 대사 시간이 남았으면 대기 동작으로 돌아가 기다린다. 대기 동작이 한 바퀴 끝나는 자리(처음·끝 장이 같은 자세)에서 다음 큐로
+      if (r.talking && t - r.cueAt < r.cueLen) {
+        r.clip = clips(r.cut).find((c) => c.group === 'base') ?? r.clip;
+        r.frame = 0;
+      }
       // 내 채팅에 대한 진행자 반응이 와 있으면 지금 대사가 끝난 자리에 끼운다 (큐시트 자리는 그대로)
       else if (extra.length) {
-        extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, /^\?+$/.test(c.nick) ? 'q' : ''));
+        extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, /^\?+$/.test(c.nick) ? 'q' : '', 'say'));
         startCue(r.cue, extra.shift());
       }
-      else if (r.talking && r.cue + 1 < part.cues.length) startCue(r.cue + 1);
-      else if (r.talking && r.cue < part.cues.length) {
+      // 반응을 기다리는 동안은 대본을 멈추고 채팅을 읽는다. 반응이 오면 위에서 말하고, 그 뒤 대본을 잇는다
+      else if (holding && r.cue < part.cues.length) {
+        reading = true;
+        startRead();
+      }
+      else if ((r.talking || reading) && r.cue + 1 < part.cues.length) {
+        reading = false;
+        startCue(r.cue + 1);
+      }
+      else if ((r.talking || reading) && r.cue < part.cues.length) {
+        reading = false;
         // 큐시트 끝: 쉬다가 다음 부로
         r.cue = part.cues.length;
         r.gapUntil = f.s.next > 0 ? t + f.s.next * 1000 : Infinity;
@@ -227,12 +326,13 @@ function tick(): void {
         r.flags.look = false;
         if (f.s.fx.cut) r.cut = 'B';
         startIdle();
-      } else if (t >= r.gapUntil) {
+      } else if (t >= r.gapUntil && !holding) {
         const next = r.part + 1;
         run = freshRun(next);
         hooks.advance(next);
         return;
-      } else startIdle();
+      } else if (holding) startRead();
+      else startIdle();
     }
   }
   if (!r.clip) r.clip = clips(r.cut)[0] ?? null;
@@ -248,12 +348,40 @@ function tick(): void {
     r.bulbStep++;
   }
   // 채팅 (응시 중에는 멈춘다)
-  if (f.show.chat.length && !r.flags.look && t - r.chatAt >= f.s.chatGap * 1000 * (0.6 + Math.random() * 0.8)) {
+  // 이 부의 채팅만 흐르고, 다 흐르면 되풀이하지 않는다 (11-12 사용자)
+  const lines = f.show.parts[r.part]?.chat?.length ? f.show.parts[r.part].chat! : f.show.chat;
+  if (r.chatIdx < lines.length && !r.flags.look && t - r.chatAt >= f.s.chatGap * 1000 * (0.6 + Math.random() * 0.8)) {
     r.chatAt = t;
-    const line = f.show.chat[r.chatIdx % f.show.chat.length];
+    const line = lines[r.chatIdx];
     r.chatIdx++;
     pushChat(line.nick, line.text, /^\?+$/.test(line.nick) ? 'q' : '');
   }
+  // 남은 수량 저절로 줄기 (큐시트가 도는 동안만. 끝 수 아래로는 안 내려가고, 매진은 큐시트의 「매진」만)
+  const d = f.s.drop;
+  if (d.on && !r.flags.sold && r.cue >= 0 && r.cue < part.cues.length) {
+    const fast = r.flags.price || r.flags.rush;
+    if (!r.dropN) {
+      const plan = nextDrop(r.left, r.dropEnd, dropRest(part.cues, r.cue, r.cueLen - (t - r.cueAt), fast, f.s), d);
+      if (plan) {
+        r.dropN = plan.n;
+        r.dropWait = plan.wait;
+      }
+    } else {
+      r.dropWait -= dt * (fast ? d.fast : 1);
+      if (r.dropWait <= 0) {
+        r.left = Math.min(r.left, Math.max(1, r.dropEnd, r.left - r.dropN));
+        r.dropN = 0;
+      }
+    }
+  }
+  // 매진 임박 딱지: 기준 수 이하가 되면 저절로
+  if (d.on && d.soon > 0 && !r.flags.sold && r.left <= d.soon) r.flags.soon = true;
+  // 지금 동작 이름 (시험·디버그용 표시, 화면에는 안 보인다)
+  const tag = `${r.cut}:${r.clip?.name ?? ''}:${r.cue}`;
+  if (stage.dataset.clip !== tag) stage.dataset.clip = tag;
+  // 큐시트가 끝나 기다리는 중 (「다음 상품」 단추가 알려 준다)
+  const waiting = r.cue >= part.cues.length && !extra.length ? '1' : '';
+  if ((stage.dataset.wait ?? '') !== waiting) stage.dataset.wait = waiting;
   draw(f, r, t);
   drawCg(f, r, t);
 }
@@ -272,7 +400,12 @@ function applyEvent(r: Run, c: HsCue, f: PlayerFeed, t: number): void {
   if (c.ev === 'tear' && f.s.fx.tear) r.tearUntil = t + TEAR_MS[0] + Math.random() * (TEAR_MS[1] - TEAR_MS[0]);
 }
 
-function pushChat(nick: string, text: string, cls: string): void {
+function pushChat(nick: string, text: string, cls: string, kind?: HsLogKind): void {
+  // 시청 기록 (본편 참고 기록용): 진행자 대사 = show · 내 줄 = say · 안내 줄(sys)은 안 적는다(주문은 ui/homeshop.ts 가 따로) · 나머지 = 시청자 채팅
+  const k = kind ?? (cls === 'host' ? 'show' : cls === 'me' ? 'say' : cls === 'sys' ? null : 'chat');
+  if (k) note(k, nick, text, cls === 'me');
+  shown.push({ nick, text });
+  if (shown.length > KEEP_CHAT) shown.splice(0, shown.length - KEEP_CHAT);
   if (!chatLog) return;
   const p = document.createElement('p');
   if (cls) p.className = cls;
@@ -282,13 +415,18 @@ function pushChat(nick: string, text: string, cls: string): void {
   while (chatLog.childElementCount > KEEP_CHAT) chatLog.firstElementChild!.remove();
   if (bottom) chatLog.scrollTop = chatLog.scrollHeight;
 }
+/** 전화 주문이 들어갔을 때 남은 수량을 n 줄인다 (0으로는 안 간다. 저절로 줄기를 껐으면 안 줄인다) */
+export function playerTake(n: number): void {
+  if (!run || !feed?.s.drop.on || run.flags.sold) return;
+  run.left = Math.max(1, run.left - n);
+}
 /** 내가 쓴 채팅 줄 (화면이 부른다) */
 export const playerSay = (nick: string, text: string, cls = 'me'): void => pushChat(nick, text, cls);
 /** 내 채팅에 대한 반응: 진행자 큐 몇 줄(지금 대사 뒤에 끼움)과 다른 시청자 줄 */
 export function playerCut(cues: HsCue[], chat: { nick: string; text: string }[]): void {
   extra.push(...cues);
   extraChat.push(...chat);
-  if (!cues.length) extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, ''));
+  if (!cues.length) extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, '', 'say'));
 }
 
 // ── 그리기 ──
@@ -317,9 +455,13 @@ function scene(g: CanvasRenderingContext2D, f: PlayerFeed, r: Run, id: CutId, cl
   }
   const sheet = clip ? img(clip.file) : undefined;
   const host = img(a.host);
-  const rows = a.over !== undefined ? Math.max(0, Math.min(pack.box, a.over - a.y)) : pack.box;
+  // 가림 (11-12 사용자: 손이 전시판을 파고든다 → 곧은 줄 대신 판의 진열대 윤곽 그대로): 가림 판이 있으면 진행자를 다 그린 뒤 가림 판(판의 점 그대로)을 덮는다.
+  // 몸통은 상판 뒤 모서리부터 가려지고, 상판 위로 뻗은 손·팔은 앞면에만 가려진다. 가림 판이 없으면 옛 방식(over 줄 위쪽만 그림)
+  const mask = img(a.mask);
+  const rows = !mask && a.over !== undefined ? Math.max(0, Math.min(pack.box, a.over - a.y)) : pack.box;
   if (sheet && clip) g.drawImage(sheet, Math.min(frame, clip.frames - 1) * pack.box, 0, pack.box, rows, a.x, a.y, pack.box, rows);
   else if (host) g.drawImage(host, 0, 0, pack.box, rows, a.x, a.y, pack.box, rows);
+  if (mask) g.drawImage(mask, 0, 0);
   // 상품: 컷 A 진열대 회전판 위 (그림 그대로 1배)
   if (id === 'A') {
     const part = f.show.parts[r.part];
@@ -414,7 +556,7 @@ function drawCg(f: PlayerFeed, r: Run, t: number): void {
   const art = cutArt(r.cut);
   const board = r.flags.price && r.cut !== 'C' && r.cut !== 'D'
     ? `<div class="hs-board hs-b${art}">${n ? `<span><span class="sm">무이자 </span><span class="big">${n}회</span></span>` : `<span class="big">${esc(pay)}</span>`}<span class="sm">오늘 방송에서만</span></div>` : '';
-  const tag = r.flags.sold ? '매진' : r.flags.rush ? CUE_EVENT_WORD.rush : '';
+  const tag = r.flags.sold ? '매진' : r.flags.rush ? CUE_EVENT_LABEL.rush : '';
   const key = [r.part, r.cut, r.flags.price, r.flags.soon, r.flags.sold, r.flags.rush, r.flags.call, r.left, f.tel, stage?.classList.contains('sm')].join('|');
   if (cg.dataset.h !== key) {
     cg.dataset.h = key;
@@ -439,4 +581,12 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ''}
 }
 
 /** 시험·디버그: 지금 재생 자리 */
+/** 내 채팅의 반응을 기다리는 동안에는 저절로 다음 부로 넘어가지 않는다 */
+let holding = false;
+/** 읽느라 대본을 멈춘 상태 · 읽는 동작 차례 */
+let reading = false;
+let readN = 0;
+export const playerHold = (on: boolean): void => { holding = on; if (on) readN = 0; };
+/** 방금까지 흐른 채팅 n줄 */
+export const playerRecentChat = (n: number): { nick: string; text: string }[] => shown.slice(-n);
 export const playerState = () => (run ? { part: run.part, cue: run.cue, cut: run.cut, clip: run.clip?.name ?? '', left: run.left, flags: { ...run.flags } } : null);

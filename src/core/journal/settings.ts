@@ -8,10 +8,13 @@ export const JR_DEFAULTS: Record<string, string> = {
   chat_card: 'mine',
   journal_cap: '500',
   report_cap: '100',
+  /** 쌓이는 목록(일지·연대기·가계부 거래·소지품 기록)에 한 번에 보일 줄 수. 넘는 줄은 「더 보기」 (2026-11-12 사용자, ui/more.ts) */
+  list_page: '30',
 };
 
 export const JR_JOURNAL_CAP = { min: 100, max: 2000, step: 100 } as const;
 export const JR_REPORT_CAP = { min: 20, max: 300, step: 10 } as const;
+export const JR_LIST_PAGE = { min: 10, max: 100, step: 10 } as const;
 
 export type ChatCardMode = 'off' | 'mine' | 'all';
 
@@ -19,6 +22,7 @@ export interface JournalSettings {
   chatCard: ChatCardMode;
   journalCap: number;
   reportCap: number;
+  listPage: number;
 }
 
 export function jrValue(state: Record<string, unknown> | undefined, key: string): string {
@@ -37,5 +41,6 @@ export function journalSettings(state: Record<string, unknown> | undefined): Jou
     chatCard: card === 'off' || card === 'all' ? card : 'mine',
     journalCap: num('journal_cap', JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max),
     reportCap: num('report_cap', JR_REPORT_CAP.min, JR_REPORT_CAP.max),
+    listPage: num('list_page', JR_LIST_PAGE.min, JR_LIST_PAGE.max),
   };
 }

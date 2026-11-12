@@ -180,7 +180,7 @@ function textWithPics(text: string, board: boolean): string[] {
   for (const m of text.matchAll(SITE_PIC)) {
     para(text.slice(last, m.index));
     const url = sitePic?.(m[1]) ?? null;
-    out.push(url ? (board ? boardCard('image', '', undefined, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc(url)}" alt="" loading="lazy"></button></figure>`) : board ? boardCard('photo', m[1].replace(/_[a-z ]+$/i, '')) : card('photo', m[1]));
+    out.push(url ? (board ? boardCard('image', '', undefined, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc(url)}" alt="" loading="lazy"></button></figure>`) : board ? boardCard('photo', m[1].replace(/_[a-z ]+$/i, '')) : card('photo', m[1].replace(/_[a-z ]+$/i, '')));
     last = m.index! + m[0].length;
   }
   para(text.slice(last));

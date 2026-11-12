@@ -19,6 +19,7 @@ import { playableAgents, playerAgent } from '../core/player';
 import { defaultLook, LOOK_KEY, lookId } from '../core/looks';
 import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
 import { bindNeedFill } from './needfill';
+import { moreAction, moreBegin, moreEnd, resetMore } from './more';
 import { chatLookPopup, flashPick, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, isFeatPage, openEditor, render as editorRender, type EditorNode } from './editor/index';
@@ -153,6 +154,14 @@ function gnActionSite(action: string): BoardSite {
 const tabBoard = (): BoardSite => { const s = curTab().site; return isBoardSite(s) ? s : 'gn'; };
 /** 폰 공용 서랍(위키·괴담넷·설정) 펼침 (2026-11-07 사용자: 메뉴별 도구 줄은 늘 보이고, 서랍은 전 메뉴 공통) */
 let cdrOpen = false;
+/** 서랍 열림·닫힘을 화면에 맞춘다. 요소를 갈지 않고 class 만 바꿔서 미끄러짐이 돈다 */
+function syncDrawer(): void {
+  const el = root?.querySelector<HTMLElement>('.gx-cdr');
+  if (!el) return;
+  void el.offsetHeight; // 앞 모습을 한 번 계산시켜야 바꿀 때 미끄러진다
+  el.classList.toggle('open', cdrOpen);
+  el.querySelector('.gx-cgrip')?.setAttribute('aria-expanded', String(cdrOpen));
+}
 let lastForm: HTMLFormElement | null = null;
 let tab: Tab = 'board';
 /** 카드에서 고유 상점 사이트로 접속: 인터넷 창만 (닫으면 풀린다) */
@@ -415,15 +424,21 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('dragover', (ev) => {
     if (photoTarget(ev.target) && ev.dataTransfer?.types.includes('Files')) ev.preventDefault();
   });
-  // 소지품 끌어다 놓기 (ui/items.ts): 격자·장착 칸의 물건([data-drag]) → 장착 칸 · 격자 · 사용 상자 · 버리기 띠([data-drop]). 끄는 동안 .it-dragging 이 버리기 띠를 띄운다
+  // 소지품 끌어다 놓기 (ui/items.ts): 격자·장착 칸의 물건([data-drag]) → 장착 칸 · 아바타·장착 칸 쪽(auto) · 격자 · 사용 상자 · 버리기 띠([data-drop]). 끄는 동안 .it-dragging 이 버리기 띠를 띄운다
   let dragItem: { id: string; equip: string; usable: boolean } | null = null;
-  const dropAt = (t: EventTarget | null) => (t instanceof Element ? t.closest<HTMLElement>('[data-drop]') : null);
   const dropOk = (z: HTMLElement | null) => {
     if (!z || !dragItem) return false;
     const to = z.dataset.drop ?? '';
+    if (to === 'auto') return !!dragItem.equip || dragItem.usable;
     if (to.startsWith('equip:')) return to.split(':')[1] === dragItem.equip;
     if (to === 'use') return dragItem.usable;
     return to === 'grid' || to === 'drop';
+  };
+  // 갈래가 안 맞는 장착 칸 위라면 그 바깥의 「아바타·장착 칸 쪽」 자리로 넘긴다 (쓰는 물건을 장착 칸 위에 놓아도 사용 예정, 2026-11-12 사용자)
+  const dropAt = (t: EventTarget | null) => {
+    const z = t instanceof Element ? t.closest<HTMLElement>('[data-drop]') : null;
+    if (!z || dropOk(z)) return z;
+    return z.parentElement?.closest<HTMLElement>('[data-drop="auto"]') ?? z;
   };
   const clearDrag = () => {
     dragItem = null;
@@ -861,6 +876,7 @@ async function refresh(): Promise<void> {
 
 async function close(): Promise<void> {
   setShown(false);
+  resetMore();
   netSolo = false;
   stopCctvFx();
   await risuai.hideContainer();
@@ -967,10 +983,14 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close() }))) return;
+  if (action === 'list-more') {
+    // 쌓이는 목록의 「더 보기」 (ui/more.ts): 누른 횟수만 올리고 다시 그린다. 읽던 자리는 render 가 지킨다
+    moreAction(value ?? '');
+    return render();
+  }
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
-    root?.querySelector('.gx-cdr')?.classList.toggle('open', cdrOpen);
-    root?.querySelector('.gx-cgrip')?.setAttribute('aria-expanded', String(cdrOpen));
+    syncDrawer();
     return;
   }
   // 기록 메뉴(일지·보고서·인물·세력)와 설정 「기록」 묶음. 상황판 종료 줄·알림의 보고서 지름길(rec-open)·「기록에서 전부 보기」(rec-journal)는 기록 탭으로 넘어간다
@@ -1549,7 +1569,10 @@ function render(): void {
   const solo = view.kind === 'started' && shopUi.open && shopUi.solo;
   // 고르기 화면(시작 패널)은 태블릿 세로 비율 3:4 (2026-11-08 사용자: 세로가 짧다)
   const pick = view.kind === 'picker' ? ' pick' : '';
+  // 「더 보기」로 펼친 목록: 이번 그리기에 나오지 않으면(다른 메뉴·하위 탭) 처음 줄 수로 돌아간다 (ui/more.ts)
+  moreBegin();
   const panel = `<div class="gx-panel${solo ? ' solo' : nav ? ' has-nav' : ` pre${pick}`}">${body()}</div>`;
+  moreEnd();
   root.innerHTML = fr.kind === 'none' || solo ? panel : frameHtml(fr.kind, !nav, panel);
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
   if (dirUi.scrollTo) {
@@ -1901,9 +1924,14 @@ function commonDrawer(ctx: ChatContext | null): string {
   const site = (id: SiteId) =>
     `<button class="ph-tool${here === id ? ' on' : ''}" data-action="br-site" data-value="${id}">${siteLogo(id, 'gx-cdr-logo')}<span class="ph-tool-l">${esc(SITES.find((x) => x.id === id)!.name)}</span></button>`;
   const set = `<button class="ph-tool${tab === 'settings' ? ' on' : ''}" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span class="ph-tool-l">설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>`;
-  return `<div class="gx-cdr${cdrOpen ? ' open' : ''}">
-    <div class="gx-cpanel ph-tools gx-cpanel2">${browserSites(ctx).map(site).join('')}${set}</div>
-    <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
+  // 다시 그리는 사이에 열림이 바뀌었으면(메뉴·사이트를 골라 닫힘 등) 지금 화면에 있는 모습으로 그린 뒤 다음 장에 바꿔서, 서랍이 뚝 사라지지 않고 바 뒤로 미끄러져 내려가게 한다
+  const drawn = !!root?.querySelector('.gx-cdr.open');
+  if (drawn !== cdrOpen) requestAnimationFrame(syncDrawer);
+  return `<div class="gx-cdr${drawn ? ' open' : ''}">
+    <div class="gx-cslide">
+      <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
+      <div class="gx-cpanel ph-tools gx-cpanel2">${browserSites(ctx).map(site).join('')}${set}</div>
+    </div>
   </div>`;
 }
 

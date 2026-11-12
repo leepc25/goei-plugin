@@ -350,10 +350,10 @@ test('상한 설정대로 조립 때 잘린다', () => {
 
 test('기록 설정: 기본값·경계값·글자', () => {
   const d = journalSettings(undefined);
-  assert.deepEqual(d, { chatCard: 'mine', journalCap: 500, reportCap: 100 });
+  assert.deepEqual(d, { chatCard: 'mine', journalCap: 500, reportCap: 100, listPage: 30 });
   assert.equal(JR_DEFAULTS.chat_card, 'mine');
   const s = journalSettings({ [JR('chat_card')]: 'off', [JR('journal_cap')]: '-5', [JR('report_cap')]: 'abc' });
-  assert.deepEqual(s, { chatCard: 'off', journalCap: 100, reportCap: 100 });
+  assert.deepEqual(s, { chatCard: 'off', journalCap: 100, reportCap: 100, listPage: 30 });
   assert.equal(journalSettings({ [JR('chat_card')]: 'all' }).chatCard, 'all');
   assert.equal(journalSettings({ [JR('chat_card')]: 'weird' }).chatCard, 'mine');
   for (const k of ['$jr_chat_card', '$jr_journal_cap', '$jr_report_cap']) assert.ok(settings.PREF_VAR.test(k), `${k} 는 「기본값으로 저장」 범위`);

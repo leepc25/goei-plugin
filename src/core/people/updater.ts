@@ -16,7 +16,7 @@ import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFaction
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
 import { mentionsPoints, parsePoints } from '../points';
-import { cleanIcon, itemEquip, itemState, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
+import { cleanIcon, itemEquip, itemState, stripGrades, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -82,6 +82,8 @@ export interface UpdateInput {
   points: boolean;
   /** 소지품 절 켜짐(설정 「보조 모델이 읽기」)이면 지금 목록의 이름들, 꺼져 있으면 null. update·gone 은 이 이름만 받는다 */
   items: string[] | null;
+  /** 지금 장착 칸에 놓인 물건 이름 (unequip 검사) */
+  itemsWorn?: string[];
   /** 이 묶음에서 「사용」한 물건 (자료 used_now). 인용 없이도 그 응답을 기준으로 받는다 */
   used: UsedNow[];
   /** 상점 판단 (설정 「상점 판단」이 갱신기일 때, core/shop.ts shopJudgeBy): 판단할 응답의 m 꼬리표. 없으면 null */
@@ -89,7 +91,7 @@ export interface UpdateInput {
 }
 
 /** 소지품 절 자료: 지금 가진 것 (core/items.ts). 판정(사용·남은 횟수·장착)과 상태를 같이 준다 */
-export interface ItemNow { name: string; desc: string; use: boolean; left?: number; weight?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState }
+export interface ItemNow { name: string; desc: string; use: boolean; left?: number; weight?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState; /** 상태에 따라 그림이 여러 장인 물건: 고를 수 있는 그림 이름들 */ pictures?: string[] }
 
 const CUE_MEANING: Record<Cue, string> = {
   작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
@@ -172,6 +174,8 @@ export interface BuildOpts {
   items?: ItemNow[] | null;
   /** 이 묶음 응답에서 「사용」 자리로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 소모성 횟수는 프로그램이 이미 뺐다 */
   used?: UsedNow[];
+  /** 치워 둔 물건 (두고 옴·버림·잃음, core/items.ts itemsAwayOf). 자료 items_away: 되찾으면 이 이름 그대로 new 를 쓰게 */
+  away?: { name: string; place?: string }[];
   /** 상점 판단 (갱신기가 판단할 때): 판단할 응답 위치(가장 최근 응답)와 주인공 이름들 */
   shop?: { at: number; self: string[] } | null;
 }
@@ -324,14 +328,15 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
     items_now: o.items
-      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
+      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
       : undefined,
+    items_away: o.items && o.away?.length ? o.away.map((e) => ({ name: e.name, place: e.place || undefined })) : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
     // 상점 판단 (11-09): 가장 최근 응답 끝에 주인공이 물건을 살 수 있는 곳이 있나. 기준 글은 지침 「상점」 SHOP_RULE (본편 표식 지침과 같은 글)
     shop_check: shopM ? { m: shopM, protagonist: o.shop!.self.filter(Boolean) } : undefined,
     want: { shop: !!shopM || undefined, new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', point_transactions: typeof o.points === 'number' || undefined, items: !!o.items },
   };
-  return { shop: shopM ? { m: shopM } : null, system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
+  return { shop: shopM ? { m: shopM } : null, system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, itemsWorn: o.items ? o.items.filter((e) => e.equipped).map((e) => e.name) : [], used: o.items ? o.used ?? [] : [] };
 }
 
 // ── 지침 조립 ──
@@ -404,7 +409,7 @@ export interface UpdateResult {
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   point_transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소지품: 본문에 분명히 적힌 얻음(new)·상태 바뀜(update)·없어짐(gone)만. update·gone 은 목록의 이름 그대로 */
-  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; weight?: number | string | null; m: string; quote: string }[];
+  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; weight?: number | string | null; place?: string | null; m: string; quote: string }[];
   /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
   observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
   /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
@@ -456,11 +461,12 @@ export interface ApplyReport {
 export interface ItemChange {
   anchor: string;
   name: string;
-  action: 'new' | 'update' | 'gone' | 'destroyed';
+  /** unequip = 벗음·내려놓음(아직 지님), left = 두고 옴·맡김(place), gone = 버림·잃음·줌, destroyed = 파괴 */
+  action: 'new' | 'update' | 'unequip' | 'left' | 'gone' | 'destroyed';
   desc: string;
   effect: string;
   quote: string;
-  /** 판정 (new 에서 정하고, update 에서는 준 칸만 바꾼다). uses: new 는 처음 횟수, update 는 지금 남은 횟수 */
+  /** 판정 (new 에서만 — 갈래는 들어올 때 정한다. update 에서는 받지 않는다). uses: new 는 처음 횟수, update 는 지금 남은 횟수 */
   use?: boolean;
   uses?: number;
   /** null = 장착 갈래 없음 */
@@ -469,6 +475,8 @@ export interface ItemChange {
   icon?: string;
   /** 무게 kg (new 에서 정하고, update 에서는 바뀌었을 때만) */
   weight?: number;
+  /** left: 두고 온 자리 (≤30) */
+  place?: string;
 }
 
 export interface ApplyCtx {
@@ -1298,46 +1306,60 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('items', t, '이름 없음');
         continue;
       }
-      if (action !== 'new' && action !== 'update' && action !== 'gone' && action !== 'destroyed') {
-        drop('items', t, '모르는 action');
+      if (action !== 'new' && action !== 'update' && action !== 'unequip' && action !== 'left' && action !== 'gone' && action !== 'destroyed') {
+        drop('items', t, '모르는 action', name);
         continue;
       }
-      // 「사용」한 물건(used_now)은 인용이 없어도 그 응답을 기준으로 받는다 (프로그램이 이미 아는 사실)
-      const usedAt = (input.used ?? []).find((u) => sameItemName(u.name, name));
+      // 「사용」한 물건(used_now)은 인용이 없어도 그 응답을 기준으로 받는다 (프로그램이 이미 아는 사실). 벗음·두고 옴은 늘 인용이 있어야 한다
+      const usedAt = action === 'unequip' || action === 'left' ? undefined : (input.used ?? []).find((u) => sameItemName(u.name, name));
       const ev0 = evidence(str(t.m), str(t.quote));
       const ev = typeof ev0 === 'string' && usedAt ? { anchor: usedAt.anchor, index: -1 } : ev0;
       if (typeof ev === 'string') {
-        drop('items', t, ev);
+        drop('items', t, ev, name);
         continue;
       }
       const listed = has(name);
       if (action !== 'new' && !listed) {
-        drop('items', t, '목록에 없는 이름');
+        drop('items', t, '목록에 없는 이름', name);
+        continue;
+      }
+      if (action === 'unequip' && !(input.itemsWorn ?? []).some((x) => sameItemName(x, name))) {
+        drop('items', t, '장착하지 않은 물건', name);
         continue;
       }
       if (seen.has(norm(listed ?? name))) {
-        drop('items', t, '같은 물건 중복');
+        drop('items', t, '같은 물건 중복', name);
         continue;
       }
       if (report.items.length >= 4) {
-        drop('items', t, '한 번에 4개까지');
+        drop('items', t, '한 번에 4개까지', name);
         continue;
       }
       seen.add(norm(listed ?? name));
+      const act = action === 'new' && listed ? 'update' : (action as ItemChange['action']);
       const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase());
       const uses = t.uses === undefined || t.uses === null ? undefined : str(t.uses).trim() === '0' ? 0 : itemUses(t.uses);
       const cond = t.condition ? str(t.condition).trim().toLowerCase() : '';
       const icon = cleanIcon(t.icon);
       const weight = t.weight === undefined || t.weight === null ? undefined : itemWeight(t.weight);
+      // 등급은 본문이 정한다 (2026-11-12 사용자): 갱신기가 이름·설명에 넣은 등급 말(「B등급」「어둠 등급」)은 인용에 그 등급이 적혀 있을 때만 둔다. 없으면 그 말만 뺀다
+      const quote = str(t.quote);
+      const nameCut = act === 'new' ? stripGrades(name, quote) : { text: name, cut: [] };
+      const descCut = stripGrades(plain(t.desc, 80), quote);
+      if (nameCut.cut.length || descCut.cut.length) drop('items', t, `본문에 없는 등급 말을 뺌: ${[...nameCut.cut, ...descCut.cut].join(', ')}`, name);
+      const outName = act === 'new' ? nameCut.text || name : listed ?? name;
+      const place = plain(t.place, 30);
       report.items.push({
-        anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : (action as ItemChange['action']),
-        desc: plain(t.desc, 80), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
-        ...(typeof t.usable === 'boolean' ? { use: t.usable } : /^(true|false)$/i.test(str(t.usable).trim()) ? { use: /^true$/i.test(str(t.usable).trim()) } : {}),
+        anchor: ev.anchor, name: outName, action: act,
+        desc: descCut.text, effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
+        // 사용·장착 갈래는 새로 얻을 때만 받는다 (update 의 「equip: none」에 갈래가 지워지던 것)
+        ...(act !== 'new' ? {} : typeof t.usable === 'boolean' ? { use: t.usable } : /^(true|false)$/i.test(str(t.usable).trim()) ? { use: /^true$/i.test(str(t.usable).trim()) } : {}),
         ...(uses !== undefined ? { uses } : {}),
-        ...(eq !== undefined ? { equip: eq ?? null } : {}),
+        ...(act === 'new' && eq !== undefined ? { equip: eq ?? null } : {}),
         ...(cond === 'ok' || cond === 'damaged' || cond === 'broken' ? { state: itemState(cond) } : {}),
         ...(icon ? { icon } : {}),
         ...(weight !== undefined ? { weight } : {}),
+        ...(act === 'left' && place ? { place } : {}),
       });
       report.applied.items++;
     }

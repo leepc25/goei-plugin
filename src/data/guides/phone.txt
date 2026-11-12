@@ -72,8 +72,6 @@ When replying to newly shared material, address a concrete relevant detail and t
 
 @@SECTION ATTACHMENT_OUTPUT
 NPCs may send a warranted virtual attachment inside an ordinary text/content field: [[ATTACH:photo]]what the picture shows[[/ATTACH]], or the same tag with video, file, link, gift. Use descriptive contents for photo/video/file, an address or link description for link, and the gift name for gift. Put accompanying spoken text in a separate message/DM paragraph. Do not fabricate native image IDs, uploaded assets, filenames, file sizes, purchases, payments or completed external actions. A gift is RP only and permitted exclusively in a one-to-one private conversation, never a group or public post/comment. Attachments are optional; do not add them routinely. Preserve the existing JSON/DM/post schema and output envelope; these tags are string contents, not new fields or message types. Never output internal %%ATTACHMENT records or A-number lookup labels.
-Real photos: when the subject is one of the pictures listed below, an NPC may send [사진:Name] instead of a photo description, or [사진:Name_expression] for a person in the People list; the app shows the actual picture. Write the listed name exactly, on its own line inside the content/body string. Anything not listed stays a described [[ATTACH:photo]]. Send one only when that character would plausibly have or take such a photo.
-__SITE_PICS__
 @@END
 
 @@SECTION PATCH

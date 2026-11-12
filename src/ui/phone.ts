@@ -5,7 +5,6 @@ import { defGroups, setSeg, type Wire } from './setrow';
 import { PHONE_SET } from '../core/setdef/phone';
 import { turnKeyAt } from '../core/shop';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
-import { resolveSitePic } from '../core/sitepics';
 import { setSitePicSource, attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
 import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
@@ -1547,10 +1546,7 @@ export function previewPhoneView(ctx: ChatContext): LlmMessage[] {
   return fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate))).messages;
 }
 
-/** [사진:이름] 을 이 봇의 그림으로 (그리기 전에) */
-function sitePicFor(ctx: ChatContext): void {
-  setSitePicSource((raw) => {
-    const name = resolveSitePic(ctx.char as never, raw);
-    return name ? imageUrl(ctx.char, name) : null;
-  });
+/** 괴담톡은 [사진:이름] 을 그림으로 바꾸지 않는다 (2026-11-12 사용자: 인물 사진 보내기 뺌). 남아 있는 옛 글은 사진 설명 틀로 보인다. 게시판이 넣어 둔 그림 찾기가 남지 않게 그릴 때마다 비운다 */
+function sitePicFor(_ctx: ChatContext): void {
+  setSitePicSource(null);
 }

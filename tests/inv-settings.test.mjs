@@ -93,7 +93,7 @@ test('가계부 옵션: 잔고 따르기 기본 켬, 거래 기준 기본 금액
 });
 
 test('새 옵션 값은 새 채팅 기본값으로 저장된다', () => {
-  for (const k of ['$it_on', '$it_start', '$it_spent', '$it_state', '$it_detail', '$it_logturns', '$st_wallet_sync', '$st_wallet_loose', '$st_wallet_recent', '$sh_where', '$sh_on']) assert.ok(settings.PREF_VAR.test(k), k);
+  for (const k of ['$it_on', '$it_start', '$it_spent', '$it_state', '$it_detail', '$it_logturns', '$st_wallet_sync', '$st_wallet_loose', '$st_wallet_recent', '$sh_where', '$sh_on', '$it_rules', '$it_left_words', '$it_off_words', '$sh_main_lines']) assert.ok(settings.PREF_VAR.test(k), k);
   assert.ok(!settings.PREF_VAR.test('$it_resumed'), '다시 켠 표시는 채팅 상태');
 });
 

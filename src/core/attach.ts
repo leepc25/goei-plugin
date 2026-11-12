@@ -119,6 +119,11 @@ export function describe(body: string, brief = false): string {
     .join('');
 }
 
+/** 괴담톡에 남은 옛 [사진:이름] · [사진:이름_표정] 을 모델에게는 글 사진 설명으로 넘긴다 (괴담톡은 에셋 사진 보내기를 뺐다. 모델이 옛 표식을 보고 따라 쓰지 않게) */
+export function sitePicAsPhoto(text: string): string {
+  return String(text ?? '').replace(/\[사진:([^\]\n]{1,80})\]/g, (_m, raw: string) => `[[ATTACH:photo]]${raw.replace(/_[a-z ]+$/i, '').trim()}[[/ATTACH]]`);
+}
+
 /** 목록 미리보기 한 줄 */
 export function previewText(body: string): string {
   return bodyParts(body)

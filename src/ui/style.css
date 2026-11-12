@@ -869,6 +869,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-members { flex: none; margin: 0; padding: 6px 16px; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--panel2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ph-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px 10px; overscroll-behavior: contain; }
 .ph-more { align-self: center; margin-bottom: 6px; }
+/* 쌓이는 목록(일지·연대기·가계부 거래·소지품 기록) 맨 아래 「더 보기」: 괴담톡의 「이전 대화 더 보기」와 같은 단추, 목록 가운데 (ui/more.ts) */
+.gx-more { display: flex; justify-content: center; padding: 12px 0 4px; }
+.gx-more .ph-more { margin: 0; }
+.gx-more .ph-more small { margin-left: 6px; color: var(--dim); font-size: 12px; font-weight: 400; }
 .ph-day { align-self: center; margin: 10px 0 6px; }
 .ph-day span { display: inline-block; padding: 3px 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel2) 80%, transparent); color: var(--sub); font-size: 12px; }
 .ph-msg { display: flex; gap: 8px; max-width: min(78%, 560px); }
@@ -942,6 +946,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
 .ph-pick { flex: none; }
 .ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+/* 이름표와 그 상자는 한 덩어리: 줄이 바뀌면 같이 넘어간다 (2026-11-12 전수점검 F1: 「최대」 이름표만 앞줄 끝에 남았다) */
+.ph-inline.ph-pair { flex-wrap: nowrap; }
 .ph-pct { width: 72px; min-height: 34px; }
 
 /* 설정 줄 (괴담톡 설정·설정 탭 공통): 묶음마다 카드, 줄마다 왼쪽 이름·설명 / 오른쪽 조작 */
@@ -3239,7 +3245,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-pickrow b { display: block; font-size: 13.5px; }
 .it-pickrow small { display: block; color: var(--dim); font-size: 11.5px; }
 .it-pickrow:hover { border-color: var(--signal); }
-/* 장착 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 1배 | 장착 칸 3열 | 사용칸]. 상자 모양은 상점 구획(.sh-zone)과 같게. 버리기는 끄는 동안만 붉은 띠 */
+/* 장착 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 1배 | 장착 칸 4열 | 사용칸] (2026-11-12 사용자: 장비 칸 둘 더 = 무기 2 · 장비 6, 폰은 사용칸 없이 2열 4줄). 상자 모양은 상점 구획(.sh-zone)과 같게. 버리기는 끄는 동안만 붉은 띠 */
 .gx-items .it-box, .it-box { position: relative; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--sunk); }
 .it-eqin { --slot: 97px; display: flex; gap: 14px; align-items: stretch; }
 .it-av { flex: none; display: grid; place-items: end center; width: 128px; height: 256px; border-radius: 12px; background: radial-gradient(ellipse 46% 40% at 50% 56%, color-mix(in srgb, var(--signal) 10%, transparent), transparent); overflow: hidden; } /* 아바타는 자르지 않음 (사용자). 빛은 칸 안에서 다 사라지게 (2026-11-08 사용자: 밑이 일직선으로 잘림) */
@@ -3247,8 +3253,8 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 button.it-avbtn { cursor: pointer; }
 button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transparent); }
 .it-avnone { align-self: center; font-size: 12px; line-height: 1.5; text-align: center; }
-/* 칸 차례 = 무기 2 → 장비 4: 3열이면 무기·무기·장비 / 장비·장비·장비 */
-.it-eqslots { flex: none; display: grid; grid-template-columns: repeat(3, var(--slot, 97px)); grid-auto-rows: var(--slot, 97px); gap: 8px; align-content: center; }
+/* 칸 차례 = 무기 2 → 장비 6: 4열이면 무기·무기·장비·장비 / 장비·장비·장비·장비 */
+.it-eqslots { flex: none; display: grid; grid-template-columns: repeat(4, var(--slot, 97px)); grid-auto-rows: var(--slot, 97px); gap: 8px; align-content: center; }
 .it-slot { position: relative; display: grid; place-items: center; width: 100%; height: 100%; padding: 6px; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; cursor: pointer; }
 .it-slot .it-ic { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-slot .it-ic svg { width: 56%; height: 56%; }
@@ -3264,11 +3270,11 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-slot.sel { border-color: var(--signal); }
 .it-slot:not(.empty):hover { background: color-mix(in srgb, var(--signal) 6%, var(--panel)); }
 
-.it-eqslots .it-slot:nth-child(3n) .it-tip { left: auto; right: calc(100% + 8px); }
+.it-eqslots .it-slot:nth-child(4n) .it-tip { left: auto; right: calc(100% + 8px); }
 /* 사용칸: 장착 칸 오른쪽 남는 자리. 놓는 만큼 칩이 늘어난다 */
 .it-usebox { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px dashed var(--line2); border-radius: 12px; }
 .it-ulab { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .02em; }
-.sh-body .it-eqbox.sell .it-eqin { --slot: var(--shc); } /* 상점 팔기: 소지품 화면과 같은 [아바타 | 장착 3열], 칸은 진열대·소지품 칸과 같은 크기 */
+.sh-body .it-eqbox.sell .it-eqin { --slot: min(97px, calc((100cqw - 2 * var(--zp) - 2px - 128px - 14px - 3 * 8px) / 4)); } /* 상점 팔기: 소지품 화면과 같은 [아바타 | 장착 칸 4열 2줄], 칸 크기도 소지품 화면 장착 칸(97)과 같게 — 아래 소지품 구획의 물건 카드와 크기가 달라야 구분된다 (2026-11-12 사용자) */
 .sh-body .it-eqbox.sell { padding: var(--zp); }
 /* 칸 위 표시: 남은 횟수(오른쪽 위 숫자) · 손상(노란 금) · 고장(흐림 + 붉은 띠) · 사용 예정(흐림 + 띠) */
 .it-left { position: absolute; top: 9px; right: 9px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: color-mix(in srgb, var(--void) 78%, transparent); color: var(--text); font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; pointer-events: none; }
@@ -3278,15 +3284,15 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-c.queued .it-ic { opacity: .4; }
 .it-q8 { position: absolute; left: 6px; right: 6px; top: calc(6px + (100% - 12px) * 0); margin-top: 0; padding: 2px 0; border-radius: 6px 6px 0 0; background: color-mix(in srgb, var(--signal) 22%, var(--void)); color: var(--signal); font-size: 10.5px; font-weight: 700; text-align: center; pointer-events: none; }
 .it-c b, .it-c .it-ic { transition: opacity .15s; }
-.it-uchips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; align-items: center; }
+.it-uchips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; min-height: 40px; align-items: center; }
 .it-uhint { margin: 0; font-size: 12.5px; color: var(--dim); }
-.it-uchip { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 4px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); }
-.it-uchip .it-ic { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 7px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
+.it-uchip { display: inline-flex; align-items: center; gap: 8px; height: 40px; max-width: 100%; box-sizing: border-box; padding: 0 6px 0 4px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); }
+.it-uchip .it-ic { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 7px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-uchip .it-ic img { width: 28px; height: 28px; object-fit: contain; image-rendering: pixelated; }
 .it-uchip .it-ic svg { width: 18px; height: 18px; }
-.it-uchip b { font-size: 13px; font-weight: 600; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.it-uchip em { font-style: normal; font-size: 12px; font-weight: 700; color: var(--signal); font-variant-numeric: tabular-nums; }
-.it-ux { display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
+.it-uchip b { font-size: 13px; font-weight: 600; flex: 0 1 auto; min-width: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.it-uchip em { flex: none; white-space: nowrap; font-style: normal; font-size: 12px; font-weight: 700; color: var(--signal); font-variant-numeric: tabular-nums; }
+.it-ux { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
 .it-ux svg { width: 14px; height: 14px; }
 .it-ux:hover { color: var(--text); background: var(--panel2); }
 /* 끌기: 놓을 수 있는 자리는 신호색 테두리. 버리기 띠는 끄는 동안만 아래에 */
@@ -3294,7 +3300,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 11-09 사용자(2차): 안쪽 그림자는 칸 그림 밑에 깔려 격자 왼쪽·위쪽이 잘려 보였다 → 맨 위 겹(::after)에 2px 테두리, 안쪽에만 (고른 테두리와 같은 규칙) */
 .it-over-ok { outline: none; }
 [data-drop].it-over-ok:not(.it-trash) { position: relative; }
-.it-usebox.it-over-ok, .it-grid.it-over-ok { border-radius: 12px; }
+.it-usebox.it-over-ok, .it-grid.it-over-ok, .it-av.it-over-ok, .it-eqcol.it-over-ok { border-radius: 12px; }
 [data-drop].it-over-ok:not(.it-trash)::after { content: ''; position: absolute; inset: 0; z-index: 6; border: 2px solid var(--signal); border-radius: inherit; pointer-events: none; }
 .it-trash { display: none; }
 .it-scrollwrap { position: relative; min-width: 0; }
@@ -3305,18 +3311,18 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-card p.bad { color: var(--danger); font-size: 12.5px; }
 .it-form label.it-chk > span:last-child { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
 .it-form label.it-chk input { width: 16px; height: 16px; padding: 0; }
-.sh-eq { margin-bottom: 10px; }
+.sh-eq { margin: 0; } /* 띠와 소지품 구획 사이는 상점 구획끼리의 간격(.sh-shelf gap) 하나로 */
 .sh-eq .it-box { background: var(--sunk); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  /* 폰 (2026-11-08 사용자): 끌기 없이 누르기만. 장착 칸은 일반 소지품 칸 크기, 2열 × 3줄로 아바타 옆에. 좁은 폰은 칸을 줄임 (아바타는 그대로) */
-  .it-eqin { --slot: min(82px, calc((100vw - 32px - 24px - 128px - 10px - 8px) / 2)); gap: 10px; flex-wrap: wrap; }
+  /* 폰 (2026-11-08 사용자): 끌기 없이 누르기만. 장착 칸은 아바타 옆에 2열.
+     2026-11-12 사용자: 8칸 = 2열 × 4줄, 4줄이 아바타 키(256)에 맞게 칸을 줄인다 — 59 = (260 − 8×3) / 4. 좁은 폰은 더 줄임 (아바타는 그대로). 사용칸은 폰에서 안 그린다 (ui/items.ts equipBox) */
+  .it-eqin { --slot: min(59px, calc((100vw - 32px - 24px - 128px - 10px - 8px) / 2)); gap: 10px; flex-wrap: wrap; justify-content: center; }
   .it-eqslots { grid-template-columns: repeat(2, var(--slot)); }
-  .it-eqslots .it-slot:nth-child(3n) .it-tip { left: 0; right: auto; }
+  .it-eqslots .it-slot:nth-child(4n) .it-tip { left: 0; right: auto; }
   .it-slot { padding: 4px; border-radius: 10px; }
-  .it-usebox { flex-basis: 100%; }
-  .it-usebox.empty { display: none; }
-  /* 상점 팔기 (폰): 아바타 옆 2열이 상점 본문 폭(cqw) 안에 들어가게 */
-  .sh-body .it-eqbox.sell .it-eqin { --slot: min(82px, calc((100cqw - 2 * var(--zp) - 2px - 128px - 10px - 8px) / 2)); flex-wrap: nowrap; }
+  .it-slot .it-wt { display: none; } /* 폰 장착 칸: 칸이 작아 무게 글자가 그림을 가린다 → 숨김, 무게는 물건을 누르면 뜨는 창에 (2026-11-12 사용자) */
+  /* 상점 팔기 (폰): 아바타 옆 2열 4줄이 상점 본문 폭(cqw) 안에 들어가게 */
+  .sh-body .it-eqbox.sell .it-eqin { --slot: min(59px, calc((100cqw - 2 * var(--zp) - 2px - 128px - 10px - 8px) / 2)); flex-wrap: nowrap; }
 }
 /* 상점 팝업 (2026-11-07 사용자 설계, docs/인계/상점_1107/mock.mjs): 조작 34px·모서리 10, 칸·상자 12, 안쪽 8. 금액은 어디서나 같은 글꼴(mono 700 14), 색은 민트·흐림·빨강만 */
 .sh-wrap { --h: 34px; --r: 10px; --rc: 12px; --ri: 8px; --red: color-mix(in srgb, var(--danger) 80%, #fff); --red-bg: color-mix(in srgb, var(--danger) 12%, transparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
@@ -3452,13 +3458,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 팔 것 고르기 머리 줄 */
 .sh-shelf.sh-pick { min-height: inherit; } /* 판매로 바꿔도 창 높이 그대로: 소지품 상자가 그 높이를 채움 */
 .sh-pick > .sh-mine { flex: 1 1 auto; }
-/* 상점 팔기 PC (2026-11-08 사용자): [아바타(세로, 2줄 높이) | 첫 줄 장착 6칸 / 아래로 소지품]. 아바타 아래 칸들은 첫 열(128)에서도 같은 칸 크기 */
-.sh-sellgrid { display: grid; grid-template-columns: 128px repeat(auto-fill, var(--shc)); grid-auto-rows: auto; gap: 8px; align-items: start; }
-.sh-sellgrid > .it-av { grid-column: 1; grid-row: 1 / span 2; width: 128px; height: 256px; align-self: start; }
-.sh-body .sh-sellgrid > .sh-eqrow { grid-column: 2 / -1; grid-row: 1; padding: 0; border: 0; border-radius: 0; background: none; }
-.sh-sellgrid > .sh-eqrow .it-eqslots { --slot: var(--shc); grid-template-columns: repeat(6, var(--slot)); }
-.sh-sellgrid > .it-c { width: var(--shc); justify-self: center; }
-.sh-sellgrid > .sh-sell-empty { grid-column: 2 / -1; margin: 0; }
+/* 상점 팔기 (2026-11-12 사용자: 장착 칸과 물건 칸 구분): PC·폰 모두 [장착 띠 상자(.sh-eq > .it-eqbox.sell)] 아래 [소지품 구획(.sh-mine)] 두 상자. 한 격자에 엮던 .sh-sellgrid 는 없앴다 */
 .sh-pick-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font-size: 13.5px; color: var(--sub); }
 .sh-pick-head .gx-chip { min-height: 28px; font-size: 12.5px; }
 /* 진열대 설명창: 칸 안에서 열어 창 밖으로 안 나가게 — 왼쪽 3칸은 오른쪽으로, 오른쪽 3칸은 왼쪽으로 펼친다 (가로 스크롤 방지, 2026-11-07 사용자) */
@@ -3525,16 +3525,21 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .sh-drawer .sh-dlg-box { flex: 1; min-height: 0; max-height: none; overflow-y: auto; padding: 12px 14px; }
   .sh-drawer .sh-dlg-box p { font-size: 14.5px; line-height: 1.7; }
 }
-/* 폰 공용 서랍 (2026-11-07 사용자): 하단 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색·테두리만 선 색). 열면 위키·괴담넷·설정 한 줄이 도구 줄을 덮는다 */
+/* 폰 공용 서랍 (2026-11-07 사용자): 하단 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색·테두리만 선 색). 열면 사이트·설정 줄이 도구 줄을 덮는다.
+   2026-11-12 사용자: 서랍은 하단 바 「뒤에서」 올라온다. 그릇(.gx-cdr)이 바 윗선에서 잘라서 바를 덮는 일이 없고, 흐려졌다 나타나지 않고 미끄러지기만 한다.
+   손잡이는 서랍 윗선에 붙어 같이 오르내린다. 마지막 줄과 바 사이는 --cdr-pad 만큼 띄운다. 값은 여기 한 곳 */
 .gx-cdr { display: none; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gx-nav { position: relative; }
-  .gx-cdr { display: block; position: absolute; left: 0; right: 0; bottom: 100%; z-index: 4; pointer-events: none; }
-  .gx-cgrip { position: absolute; z-index: 2; left: 50%; bottom: 0; transform: translateX(-50%); width: 48px; height: 8px; padding: 0; border: 1px solid var(--line); border-bottom: 0; border-radius: 5px 5px 0 0; background: var(--sunk); display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; touch-action: none; }
+  .gx-cdr { --cdr-grip: 8px; --cdr-pad: 10px; --cdr-move: .26s; display: block; position: absolute; left: 0; right: 0; bottom: calc(100% + 1px); height: 0; z-index: 4; pointer-events: none; clip-path: inset(-100vh 0 0 0); }
+  .gx-cslide { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateY(calc(100% - var(--cdr-grip))); transition: transform var(--cdr-move) cubic-bezier(.22, .8, .3, 1); will-change: transform; }
+  .gx-cdr.open .gx-cslide { transform: none; }
+  .gx-cgrip { flex: none; position: relative; z-index: 2; width: 48px; height: var(--cdr-grip); padding: 0; border: 1px solid var(--line); border-bottom: 0; border-radius: 5px 5px 0 0; background: var(--sunk); display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; touch-action: none; }
   .gx-cgrip i { width: 18px; height: 2px; border-radius: 2px; background: var(--dim); }
   .gx-cdr.open .gx-cgrip i { background: var(--signal); }
-  .gx-cpanel { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; padding: 6px 8px 4px; box-sizing: border-box; display: flex; gap: 4px; background: var(--panel); border-top: 1px solid var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .6); transform: translateY(100%); opacity: 0; transition: transform .18s ease, opacity .18s ease; pointer-events: none; }
-  .gx-cdr.open .gx-cpanel { transform: none; opacity: 1; pointer-events: auto; }
+  .gx-cpanel { align-self: stretch; flex: none; height: 56px; padding: 6px 8px var(--cdr-pad); box-sizing: border-box; display: flex; gap: 4px; background: var(--panel); border-top: 1px solid var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, 0); visibility: hidden; transition: visibility 0s linear var(--cdr-move), box-shadow var(--cdr-move) ease-out; pointer-events: none; }
+  .gx-cdr.open .gx-cpanel { visibility: visible; box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .6); transition-delay: 0s; pointer-events: auto; }
+  @media (prefers-reduced-motion: reduce) { .gx-cslide, .gx-cpanel { transition: none; } }
   .gx-cpanel .ph-tool { flex: 1; height: 44px; gap: 4px; }
   .gx-cpanel .ph-tool svg { width: 20px; height: 20px; }
   .gx-cpanel .ph-tool-l { font-size: 11px; }
@@ -3643,15 +3648,23 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gx-items.it-fix > * { flex: none; }
 .gx-items.it-fix > .it-scrollwrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
 .gx-items.it-fix .it-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 4px 4px 8px; margin: -4px; }
-/* 장착 띠 여백: 아바타 위·좌우를 넉넉히, 사용칸은 줄이고 칸 사이를 띄운다 */
-.gx-items .it-eqbox:not(.sell) { padding: 12px 16px 16px; }
-.gx-items .it-eqin { gap: 28px; }
-.gx-items .it-av { width: auto; min-width: 168px; flex: 1 1 0; max-width: 300px; height: 256px; align-self: flex-end; }
-.gx-items .it-usebox { flex: 0 1 300px; }
+/* 장착 띠 여백: 아바타 위·좌우를 넉넉히, 칸 사이를 띄운다.
+   2026-11-12 사용자: 아바타 자리 256, 장착 4열(칸 97 → 412), 사용칸은 남는 폭.
+   창이 좁으면(띠 안쪽 폭 = 100cqw): 아바타 자리가 128까지 줄고 → 사용칸이 160까지 줄고 → 그다음 장착 칸이 줄어든다 (넷이 늘 한 줄, 가로 넘침 없음).
+   더 좁으면(안쪽 604 아래, 칸이 59보다 작아질 때) 사용칸을 아랫줄로 내린다 */
+.gx-items .it-eqbox:not(.sell) { padding: 12px 16px 16px; container-type: inline-size; }
+.gx-items .it-eqin { gap: 28px; --slot: min(97px, calc((100cqw - 128px - 2 * 28px - 160px - 3 * 8px) / 4)); }
+.gx-items .it-av { width: auto; min-width: 128px; flex: 0 1 256px; height: 256px; align-self: flex-end; }
+.gx-items .it-usebox { flex: 1 1 0; min-width: 160px; }
+@container (max-width: 603px) {
+  .gx-items .it-eqin { flex-wrap: wrap; --slot: min(97px, calc((100cqw - 128px - 28px - 3 * 8px) / 4)); }
+  .gx-items .it-av { flex: none; width: 128px; }
+  .gx-items .it-usebox { flex: 1 1 100%; min-height: 96px; }
+  .gx-items .it-eqslots .it-wt { display: none; } /* 칸이 59보다 작아 무게 글자가 그림을 가린다 (폰과 같음) */
+}
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gx-items .it-eqin { gap: 10px; }
+  .gx-items .it-eqin { gap: 10px; flex-wrap: wrap; --slot: min(59px, calc((100vw - 32px - 24px - 128px - 10px - 8px) / 2)); }
   .gx-items .it-av { flex: none; width: 128px; min-width: 0; height: 272px; }
-  .gx-items .it-usebox { flex: 1 1 100%; }
   .it-stats { flex-wrap: nowrap; width: calc(2 * var(--slot) + 8px); padding: 0; }
   .it-stat { gap: 4px; }
   .it-stat svg { width: 12px; height: 12px; }
@@ -4233,6 +4246,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 
 /* ── 인터넷 쇼핑몰 (2026-11-08 사용자, 시안 pc_08_cos·pc_09_bm·pc_13_cos_ask) ── */
 .br-page > .ms { flex: 1; min-height: 0; overflow-y: auto; position: static; display: block; }
+/* 망상홈쇼핑: 사이트 안에서 스크롤 (11-11 사용자: 스크롤이 안 됐다) */
+.br-page > .hs { flex: 1; min-height: 0; overflow-y: auto; position: static; }
+/* 창(전화 주문·스티커·방청)은 스크롤과 상관없이 보이는 화면 기준 (.br-page, 쇼핑몰 창과 같게) */
+.br-page > .hs .hs-pop { position: relative; top: auto; bottom: auto; }
 /* 창(문의·입금)은 스크롤과 상관없이 보이는 화면 기준 (.br-page) */
 .ms button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 .ms .ms-pic svg, .ms [class$="-pic"] svg { width: 56%; height: 56%; }
@@ -4841,11 +4858,13 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 칸 입력 표 (값 등급·상담사 주사위 칸·그림 대체 말, 2026-11-12 사용자: 글 상자에 줄을 치게 하지 말고 칸으로) — 조작은 전부 공통 규격 그대로(.gx-search·.ms-num·.st-step·.gx-mini), 배치만 여기서 */
 .gw .ps-row.ms-wide > .ps-ctl { display: block; }
 .ms-tb { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-.ms-tb-h, .ms-tb-r { display: grid; grid-template-columns: 92px minmax(0, 1fr) 144px 144px 104px 34px; column-gap: 8px; align-items: center; }
+.ms-tb-h, .ms-tb-r { display: grid; grid-template-columns: 92px minmax(0, 1fr) 144px 144px 104px 34px; column-gap: 8px; align-items: start; }
 .ms-tb-h > span { font-size: 12.5px; color: var(--dim); }
 .ms-tb-c { display: block; min-width: 0; margin: 0; }
 .ms-tb-c > span:first-child { display: none; }
-.ms-tb-c > input.gx-search { width: 100%; box-sizing: border-box; }
+.ms-tb-c > input.gx-search, .gw .ms-tb-c > textarea.ms-list { width: 100%; box-sizing: border-box; }
+.gw .ms-tb-c > textarea.ms-list { display: block; padding-top: 6px; padding-bottom: 6px; overflow: hidden; }
+.ms-axs .ms-ax, .ms-pairs .ms-tb-r { align-items: center; }
 .ms-tb .ph-inline { flex-wrap: nowrap; }
 .ms-tb .ph-inline .ms-num { width: 120px; }
 .gw .ms-tb-r.bad input.gx-search.ms-num, .gw .ms-tb-r.bad .n > input.gx-search, .gw .ms-ax.bad .n > input.gx-search { border-color: var(--danger); }
@@ -4863,24 +4882,33 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gw .ps-adv.ps-changed > .ps-adv-sum b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
 .gw .ms-pairs .ms-tb-r.bad input.gx-search { border-color: var(--danger); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .ms-tb { gap: 8px; }
-  .ms-tb-h, .ms-axs .ms-tb-h { display: none; }
-  .ms-tb-r, .ms-ax { grid-template-columns: minmax(0, 1fr) 34px; row-gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
-  .ms-tb-r > .ms-tb-c, .ms-ax > .ms-tb-c { display: grid; grid-template-columns: 68px minmax(0, 1fr); align-items: center; column-gap: 6px; grid-column: 1 / -1; }
-  .ms-tb-r > .ms-tb-c.n, .ms-ax > .ms-tb-c.n { grid-column: 1; }
-  .ms-tb-c > span:first-child { display: block; font-size: 12.5px; color: var(--dim); }
-  .ms-tb-r > .ms-tb-x, .ms-ax > .ms-tb-x { grid-column: 2; grid-row: 1; }
-  .ms-tb .ph-inline .ms-num { width: 150px; }
-  .ms-pairs .ms-tb-r { grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) 34px; padding: 0; border: 0; border-radius: 0; }
-  .ms-pairs .ms-tb-r > .ms-tb-c { display: block; grid-column: auto; }
-  .ms-pairs .ms-tb-r > .ms-tb-x { grid-column: 4; }
-  .ms-pairs .ms-tb-c > span:first-child { display: none; }
-  .ms-tb-c.w > .st-step { justify-self: start; }
-  .ms-ax > .ms-tb-c.n, .ms-ax > .ms-tb-c.v { display: block; }
-  .ms-ax > .ms-tb-c > span:first-child { display: none; }
-  .ms-ax { padding: 8px 10px; }
+  /* 폰 (2026-11-12 전수점검 D2·D3·D5): 카드로 쌓지 않는다. 값 등급 = 제목 두 줄 + 등급마다 두 줄 (이름·하한·상한·× / 설명·가중치), 주사위 칸 = 칸마다 한 줄, 제목 줄은 폰에서도 보인다 */
+  .ms-tb { gap: 0; }
+  .ms-tb > .ms-tb-h, .ms-tb > .ms-tb-r { grid-template-columns: minmax(0, 1fr) 104px 104px 34px; grid-template-areas: "n lo hi x" "d d w w"; column-gap: 6px; row-gap: 6px; }
+  .ms-tb > .ms-tb-r { padding: 9px 0; border-top: 1px solid var(--line); }
+  .ms-tb > .ms-tb-h { row-gap: 2px; padding-bottom: 6px; }
+  .ms-tb > .ms-tb-h > :nth-child(1), .ms-tb > .ms-tb-r > .n { grid-area: n; }
+  .ms-tb > .ms-tb-h > :nth-child(2), .ms-tb > .ms-tb-r > .d { grid-area: d; }
+  .ms-tb > .ms-tb-h > :nth-child(3), .ms-tb > .ms-tb-r > .lo { grid-area: lo; }
+  .ms-tb > .ms-tb-h > :nth-child(4), .ms-tb > .ms-tb-r > .hi { grid-area: hi; }
+  .ms-tb > .ms-tb-h > :nth-child(5), .ms-tb > .ms-tb-r > .w { grid-area: w; }
+  .ms-tb > .ms-tb-h > :nth-child(6) { display: none; }
+  .ms-tb > .ms-tb-r > .ms-tb-x { grid-area: x; }
+  .ms-tb > .ms-tb-r > .ms-tb-err { grid-area: auto; grid-column: 1 / -1; }
+  .ms-tb .ph-inline { display: flex; width: 100%; gap: 3px; min-width: 0; }
+  .ms-tb .ph-inline .ms-num { width: auto; flex: 1 1 0; min-width: 0; padding-left: 7px; padding-right: 4px; }
+  .ms-tb > .ms-tb-foot { padding-top: 8px; }
+  /* 주사위 칸: 칸 이름 | 값 | × 한 줄 */
+  .ms-axs > .ms-tb-h, .ms-axs > .ms-ax { grid-template-columns: 88px minmax(0, 1fr) 34px; grid-template-areas: none; column-gap: 6px; }
+  .ms-axs > .ms-tb-h > :nth-child(n) { grid-area: auto; display: block; }
+  .ms-axs > .ms-ax { padding: 3px 0; }
+  .ms-axs > .ms-ax > .ms-tb-err { grid-column: 1 / -1; }
+  /* 그림 대체 말: 한 줄에 한 쌍, 제목 줄 하나 */
   .ms-pairs .ms-pg { grid-template-columns: minmax(0, 1fr); }
   .ms-pairs .ms-pg > .ms-tb-h:nth-child(2) { display: none; }
+  .ms-pairs .ms-tb-h, .ms-pairs .ms-tb-r { grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr) 34px; grid-template-areas: none; column-gap: 8px; padding: 0; border: 0; }
+  .ms-pairs .ms-tb-h > :nth-child(n), .ms-pairs .ms-tb-r > * { grid-area: auto; display: block; }
+  .ms-pairs .ms-tb-r > .ms-tb-err { grid-column: 1 / -1; }
 }
 .ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
 .ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
@@ -4937,6 +4965,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 @keyframes hs-blink { 50% { opacity: .2; } }
 .hs .hs-pt { color: var(--y); font-weight: 800; white-space: nowrap; }
 .hs .hs-pt i { font-style: normal; font-weight: 500; color: var(--sub); }
+.hs .hs-nx { height: 26px; padding: 0 10px; border: 1px solid var(--line2); border-radius: 4px; background: var(--card); color: #eee; font-weight: 800; font-size: 12.5px; white-space: nowrap; }
+.hs .hs-nx:hover { background: var(--card2); }
+.hs:has(.hs-scr[data-wait="1"]) .hs-nx { border-color: var(--y); color: #1a0c0f; background: var(--y); animation: hs-nx 1.4s ease-in-out infinite; }
+@keyframes hs-nx { 50% { opacity: .55; } }
 .hs .hs-tv .hs-mount { display: grid; place-items: center; width: 100%; background: #000; }
 .hs .hs-scr { position: relative; overflow: hidden; background: #000; -webkit-font-smoothing: none; }
 .hs .hs-cv { display: block; width: 100%; height: 100%; }

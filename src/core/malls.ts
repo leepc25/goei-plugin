@@ -8,6 +8,7 @@ import { lastBot, SHOP_SHARED_VARS } from './shop';
 import { liveOrders, readyNotes } from './orders';
 import { readDesk } from './bmdesk';
 import { aliveAnchors } from './wallet';
+import { capLines, shopMain, shopMainLines } from './shopctx';
 
 export type MallSite = 'cos' | 'bm';
 export const MALL_SITES: MallSite[] = ['cos', 'bm'];
@@ -250,17 +251,31 @@ export function mallEvents(chat: Chat): string[] {
   if (!key) return [];
   const vars = chat.scriptstate;
   const out: string[] = [];
+  // 설정 「메인 요청에 붙이는 것」(core/shopctx.ts): 문의 · 맞춤 주문 · 1:1 상담을 가게마다 따로 거른다. 대화는 「최대 양」 줄까지 (0 = 전부)
+  const cosMain = shopMain(vars, 'cos');
+  const lines = shopMainLines(vars);
   const cos = readMall(vars, 'cos').talk.filter((l) => l.k === key);
-  if (cos.some((l) => l.who === 'me')) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${cos.map((l) => `${l.who === 'me' ? 'protagonist' : 'operator'}: "${l.text}"`).join(' / ')}`);
-  for (const o of liveOrders(vars, aliveAnchors(chat))) {
-    if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString('en-US')} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
-  }
-  // 맞춤 주문이 바로 앞 응답에서 완성됐으면 한 번만 (그 뒤 턴에는 다시 넘기지 않는다)
-  if (cosReadyMode(vars) === 'both') {
-    const at = lastBot(chat)!.index;
-    for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
+  if (cosMain.has('ask') && cos.some((l) => l.who === 'me')) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${capLines(cos, lines).map((l) => `${l.who === 'me' ? 'protagonist' : 'operator'}: "${l.text}"`).join(' / ')}`);
+  if (cosMain.has('order')) {
+    for (const o of liveOrders(vars, aliveAnchors(chat))) {
+      if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString('en-US')} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
+    }
+    // 맞춤 주문이 바로 앞 응답에서 완성됐으면 한 번만 (그 뒤 턴에는 다시 넘기지 않는다). 「완성 알림」이 「카드 + 메인 요청」일 때만
+    if (cosReadyMode(vars) === 'both') {
+      const at = lastBot(chat)!.index;
+      for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
+    }
   }
   const desk = readDesk(vars);
-  if (desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${desk.talk.filter((l) => l.who !== 'sys').map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
+  if (shopMain(vars, 'bm').has('desk') && desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${capLines(desk.talk.filter((l) => l.who !== 'sys'), lines).map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
   return out;
+}
+
+/** 판 것(core/items.ts soldNow 의 「…에 팖」 자리 이름)을 메인 요청에 붙이나: 우주 쇼핑몰에 판 것은 문의 창에서 운영자와 흥정해 파는 것이라 「문의」를 따르고,
+ *  포인트몰에 판 것은 그 줄의 「컨텍스트 포함」만 따른다(팔기 칸이 없다). 그 밖의 이름은 기본 상점의 「팔기」. 「…에 팖」이 아닌 기록(망상홈쇼핑 맞교환 등)은 거르지 않는다 */
+export function soldPasses(vars: Vars, place: string, plain: boolean): boolean {
+  if (!plain) return true;
+  if (place === MALL_NAME.cos) return shopMain(vars, 'cos').has('ask');
+  if (place === MALL_NAME.bm) return shopMain(vars, 'bm').on;
+  return shopMain(vars, 'shop').has('sell');
 }

@@ -2460,7 +2460,8 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
   else {
     // 폰 하단 메뉴에는 설정이 없고 공용 서랍(도구 줄)의 설정 단추로 연다 (2026-11-07 폰 하단 구조)
     await page.click('.gx-cgrip');
-    await page.click('.gx-cdr.open .gx-cpanel [data-action="ed-open"]');
+    // 이 가짜 틀에는 창 iframe 이 없어서 플로팅 버튼(z45)이 창 위에 뜬다(실제 Risu 에서는 창이 49로 위). 서랍 여백(2026-11-12)으로 「설정」 단추 가운데가 그 밑에 들어가므로 단추 왼쪽을 누른다
+    await page.click('.gx-cdr.open .gx-cpanel [data-action="ed-open"]', { position: { x: 12, y: 22 } });
     await page.waitForFunction(() => { const g = document.querySelector('.gw'); return g && !g.hidden && g.querySelector('.gw-win'); });
     await edGo(page, 'set:board');
   }
