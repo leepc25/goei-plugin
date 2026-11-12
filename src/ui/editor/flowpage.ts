@@ -145,9 +145,8 @@ function cells(r: Row, cols: Col[]): string {
 
 function pcRow(r: Row, cols: Col[] | null): string {
   const ctl = cols ? `${cells(r, cols)}<span></span>` : `<div class="fl-ctl">${pairs(r)}</div>`;
-  const gap = cols ? '<span></span>' : '';
   const help = !cols && r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '';
-  return `<div class="fl-line fl-row${cols ? '' : ' fl-plain'}${help ? ' has-help' : ''}${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><b class="fl-name">${esc(r.name)}</b>${ctl}${said(r)}${gap}${stat(r.est)}${stat(r.real)}${go(r.go) || '<span class="fl-go"></span>'}${help}</div>`;
+  return `<div class="fl-line fl-row${cols ? '' : ' fl-plain'}${help ? ' has-help' : ''}${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><b class="fl-name">${esc(r.name)}</b>${ctl}${said(r)}${stat(r.est)}${stat(r.real)}${go(r.go) || '<span class="fl-go"></span>'}${help}</div>`;
 }
 function pcHead(cols: Col[]): string {
   const opts = cols.flatMap((g) => g.opts.map((o, i) => ({ o, first: i === 0 })));

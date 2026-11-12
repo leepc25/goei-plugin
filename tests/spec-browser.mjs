@@ -100,12 +100,22 @@ const probe = () => {
     if (l.querySelector('.ck-cell')) add('gridCell', L(l.querySelector('.ck-cell')), row);
     for (const lab of l.querySelectorAll('.fl-l')) add('label', L(lab), row);
     const said = l.querySelector('.fl-said'); if (said && said.textContent.trim()) add('said', tx(said), row);
+    // 호출 글은 한 줄: 두 줄로 꺾이거나 칸을 넘치면 안 된다 (2026-11-12 사용자)
+    if (said && said.textContent.trim()) {
+      const rg = document.createRange(); rg.selectNodeContents(said);
+      const tops = new Set([...rg.getClientRects()].map((c) => Math.round(c.top)));
+      const go = l.querySelector('.fl-go'); const st0 = [...l.querySelectorAll('.fl-st')].find(vis);
+      const limit = (st0 ?? go)?.getBoundingClientRect().left ?? Infinity;
+      if (tops.size > 1) out.clip.push(`호출 글 두 줄: ${row} 「${said.textContent.trim()}」`);
+      else if (rg.getBoundingClientRect().right > limit + 0.5) out.clip.push(`호출 글이 옆 칸을 넘음: ${row} 「${said.textContent.trim()}」 ${R(rg.getBoundingClientRect().right)} > ${R(limit)}`);
+    }
     const help = l.querySelector('.fl-help'); if (help) add('help', tx(help), row);
     const st = l.querySelectorAll('.fl-st'); add('st1', L(st[0]), row); add('st2', L(st[1]), row);
     add('goR', Rr(l.querySelector('button.fl-go')), row);
   }
   for (const c of page.querySelectorAll('.fl-ph .flc')) {
     if (!vis(c)) continue;
+    { const cs = c.querySelector('.flc-calls'); if (cs && cs.textContent.trim()) { const rg = document.createRange(); rg.selectNodeContents(cs); if (new Set([...rg.getClientRects()].map((q) => Math.round(q.top))).size > 1) out.clip.push(`호출 글 두 줄(폰): ${c.querySelector('.fl-name')?.textContent ?? ''} 「${cs.textContent.trim()}」`); } }
     const nm = c.querySelector('.fl-name'); const row = nm?.textContent ?? '';
     add(c.classList.contains('sub') ? 'subName' : 'name', tx(nm), row);
     add(c.classList.contains('sub') ? 'subCard' : 'card', L(c), row);
