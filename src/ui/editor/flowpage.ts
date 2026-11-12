@@ -135,8 +135,14 @@ const stat = (v: string | undefined) => `<div class="fl-st">${v || ''}</div>`;
 /** 호출 글 나누기: 「1회 (자료 부족 땐 2회)」 → 횟수(크게) + 조건(아래 작은 글). 호출이 안 가는 글(호출 없음·수동)은 흐리게 */
 export function saidParts(calls: string): { main: string; note: string; none: boolean } {
   const m = /^(.*?)\s*\((.*)\)\s*$/.exec(calls);
-  const main = (m ? m[1] : calls).trim();
-  return { main, note: m ? m[2].trim() : '', none: /^(호출 없음|수동)/.test(main) };
+  let main = (m ? m[1] : calls).trim();
+  let note = m ? m[2].trim() : '';
+  // 「넘긴 인물마다 1회」→ 횟수 「1회」 + 조건 「넘긴 인물마다」. 칸을 좁게 쓰려고 횟수만 크게 둔다 (2026-11-13 사용자: 호출 칸이 너무 길다)
+  const n = /^(.+?)\s+(\d+회)$/.exec(main);
+  if (n && n[1] !== '메인') { main = n[2]; note = [n[1], note].filter(Boolean).join(', '); }
+  // 「인물 갱신에 얹음 (추가 호출 없음)」→ 「호출 없음」 + 「인물 갱신에 얹음」
+  if (/호출 없음/.test(note) && !/호출 없음/.test(main)) { note = main; main = '호출 없음'; }
+  return { main, note, none: /^(호출 없음|수동)/.test(main) };
 }
 const said = (r: Row) => {
   if (!r.calls) return '<div class="fl-said"></div>';
