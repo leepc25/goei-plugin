@@ -16,7 +16,7 @@ import { messageKey } from './people/store';
 import { parseWon } from './wallet';
 import { craftMessages, type CraftMessage, type ThoughtsMode } from './craft';
 import { genSettings } from './advanced';
-import { fillGuide, guideDefault, guideSections, type GuideName } from './guides';
+import { fillGuide, guideDefault, guideOr, guideSections, type GuideName } from './guides';
 import { peopleSettings } from './people/settings';
 import { capLines, shopMain, shopMainLines } from './shopctx';
 
@@ -883,7 +883,7 @@ const G = (name: GuideName = 'Shop') => guideSections(name);
 
 const SHELF_RULES = (g: Record<string, string>, s: ShopSettings, st: ShopState, guide: GuideName = 'Shop', truthMode: TruthMode = 'mix') => {
   const r = s.size;
-  const v = { size: r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`, line: lineOf(guide), price: s.price, prev: st.prev.join(', '), truth_rule: TRUTH_RULE[truthMode] };
+  const v = { size: r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`, line: lineOf(guide), price: s.price, prev: st.prev.join(', '), truth_rule: guideOr(guide, `TRUTH_${truthMode.toUpperCase()}`, TRUTH_RULE[truthMode]) };
   return [
     fillGuide(g.SHELF, v),
     guide === 'Cos' ? fillGuide(g.SHELF_SECRET, v) : '',
@@ -936,13 +936,16 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings, guide: GuideName =
   return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}${talk}\n\n[현재 작업]\n${first ? '가게 정체·주인 첫 대사·진열대' : '진열대 새로 짜기'}` }], s, fillGuide(g.THOUGHTS_SHELF, {}));
 }
 
+/** 우주몰 진열 줄 끝 칸(숨긴 진짜 효과) 안내. 지침의 SECRET_NOTE 절이 없을 때 쓰는 글 */
+const SECRET_NOTE = '(last column = what each item REALLY does; ? means not even the catalogue knows. The buyer cannot see it. The 운영자 knows it and never states it: answer on the listed basics, deflect or withhold the rest, invent nothing beyond the listing.)';
 /** 주인에게 말하기 (흥정·문의·요청·잡담). 대화는 이번 방문 것 전부 */
 export function talkPrompt(src: ShopSource, s: ShopSettings, guide: GuideName = 'Shop'): CraftMessage[] {
   const st = src.st;
   // 우주몰: 숨긴 진짜 효과를 운영자만 안다 — 답에서 밝히지 않고 비켜 간다 (11-09 사용자)
   const secret = guide === 'Cos' && shelfItems(st).some((x) => x.truth);
   const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? '-'}|${x.weight ?? '-'}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}${secret ? `|${x.truth ?? '-'}` : ''}`).join('\n') || '(empty)';
-  const secretNote = secret ? '\n(last column = what each item REALLY does; ? means not even the catalogue knows. The buyer cannot see it. The 운영자 knows it and never states it: answer on the listed basics, deflect or withhold the rest, invent nothing beyond the listing.)' : '';
+  // 글은 지침의 SECRET_NOTE 절. 절이 없으면 여기 남긴 글
+  const secretNote = secret ? `\n${guideOr(guide, 'SECRET_NOTE', SECRET_NOTE)}` : '';
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
   const g = G(guide);
@@ -968,12 +971,14 @@ export function talkPrompt(src: ShopSource, s: ShopSettings, guide: GuideName = 
 
 /** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄). 지침 「상점」의 MAIN_TAG 절 */
 /** 상점이 열리는 자리 (설정): any(기본, 온라인몰·홈쇼핑·자판기·이면 쇼핑몰처럼 판매자가 없는 곳도) · shop(판매자가 있는 가게 장면만) */
-const WHERE: Record<ShopWhere, string> = {
+const WHERE_OLD: Record<ShopWhere, string> = {
   any: 'Any way of buying counts: store, stall, unstaffed shop, online mall, home shopping, catalog, vending machine, otherworldly mall.',
   shop: 'Only a physical store or stall with a seller present, or a shop with its own screen listed below; not other online, broadcast, catalog or machine sales.',
 };
+/** 지침 「상점」의 WHERE_ANY · WHERE_SHOP 절 (없으면 위 글) */
+const whereLine = (w: ShopWhere): string => guideOr('Shop', `WHERE_${w.toUpperCase()}`, WHERE_OLD[w]);
 /** 상점 판단 기준 (지침 「상점」의 SHOP_RULE 절). 메인 모델 표식 지침과 갱신기가 같은 글을 읽는다 (11-09 사용자: 상점 지침은 양쪽을 동시에) */
-export const shopRule = (vars?: Vars): string => fillGuide(G().SHOP_RULE ?? guideSectionDefault('SHOP_RULE'), { where: WHERE[shopSettings(vars).where], own: ownShopsLine(vars) });
+export const shopRule = (vars?: Vars): string => fillGuide(G().SHOP_RULE ?? guideSectionDefault('SHOP_RULE'), { where: whereLine(shopSettings(vars).where), own: ownShopsLine(vars) });
 /** 갱신기만 더 받는 판단 요령 (지침 「상점」 SHOP_JUDGE 절) */
 export const shopJudgeGuide = (): string => fillGuide(G().SHOP_JUDGE ?? guideSectionDefault('SHOP_JUDGE'), {});
 /** 고유 상점 줄 (설정 표의 켜진 줄): 이름·다른 이름·어떻게 열리는지 */
@@ -994,7 +999,7 @@ export function shopGuide(vars?: Vars): string {
   // 옛 글로 고쳐 둔 MAIN_TAG 엔 {rule} 자리가 없을 수 있다: 그러면 기준 글을 뒤에 붙인다 (릴리스 점검 11-09)
   const tag = G().MAIN_TAG ?? guideSectionDefault('MAIN_TAG');
   const rule = shopRule(vars);
-  const out = fillGuide(tag, { where: WHERE[shopSettings(vars).where], rule });
+  const out = fillGuide(tag, { where: whereLine(shopSettings(vars).where), rule });
   return tag.includes('{rule}') ? out : `${out}\n${rule}`.trim();
 }
 

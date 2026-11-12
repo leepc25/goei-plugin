@@ -5,6 +5,7 @@
 // 넘치면 오래된 채팅을 지금처럼 지운다. 키는 로어북에 그대로 있어 사용자가 고칠 수 있다.
 // 규칙 표: docs/호출키_검토_1019.md
 import { evaluate, type CbsEnv } from './cbs';
+import { guideOr } from './guides';
 import { tokens } from './gnet';
 import { messageText } from './refs';
 import type { Chat, LoreEntry } from './types';
@@ -517,8 +518,9 @@ export function lockedAppendices(entries: ManagedEntry[], picks: LorePick[], unl
 
 /** 해금 안내 한 줄 (본 항목과 같은 자리에) */
 export function unlockHint(e: ManagedEntry): string {
-  return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix!.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix!.when.unlock}\n`
-    + `Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line at the very end.`;
+  // 글은 지침 「본편에 붙는 글」 LORE.LOCKED 절. 절이 없으면 여기 남긴 글
+  return guideOr('Main', 'LORE.LOCKED', () => `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix!.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix!.when.unlock}\n`
+    + `Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line at the very end.`, { name: e.name, parent: e.appendix!.parent, when: e.appendix!.when.unlock });
 }
 
 /** Risu 방식: 키를 소문자로, 띄어쓰기를 모두 지우고 메시지마다 포함 검사 (v2026.8.250 lorebook.svelte.ts) */

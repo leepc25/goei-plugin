@@ -1,0 +1,72 @@
+<!-- Director 덧붙임: 기능별 적용 절(APPLY.*)·검색(SEARCH·PASS2)·출력 꼴(OUTPUT)·고침 요청(REPAIR)·본편에 넣는 메모의 머리말(MAIN_NOTE). {이름} 자리는 플러그인이 채웁니다. -->
+@@SECTION SEARCH
+## Missing material (one extra pass)
+Only when a judgment this turn depends on material not supplied (the exact wording of an earlier line, a past event's details, a lore or wiki fact about a named thing), return instead {"need":[{"kind":"chat|lore|wiki","query":"<Korean term exactly as it would appear>","reason":"<≤60 chars>"}]} with at most {max} items and nothing else. `chat` searches earlier messages of this chat, `lore` the character's lorebook, `wiki` the chat's wiki documents by title or body. The program runs the searches and calls you once more with `found` (hits with a `ref` and an excerpt); that second call must return notes and may not ask again. Do not request a search for a stable relationship or a scene with no open question; a search costs a turn's time.
+@@END
+
+@@SECTION PASS2
+This is the second pass. `found` holds the search results (an empty `hits` means nothing matched; say nothing rather than fill the gap). Return notes now; `need` is not allowed.
+@@END
+
+@@SECTION OUTPUT
+Return one JSON object only, no code fence: {"notes":[{"who":"<name>","now":"<≤400 chars>","react":"<≤400 chars or omit>","must_not_reveal":["<≤120 chars>"],"uncertain":["<≤160 chars>"]}]}
+@@END
+
+@@SECTION APPLY.AXES
+## Personality axes
+Each person's `axes` are baseline traits (0–100 with a band text), not the current mood: read them to shape how the person initiates, how directly they speak, how much they show, how guarded, how impulsive, how persistent. `patterns` are approved long-term changes. Never move or restate them as numbers in the note.
+@@END
+
+@@SECTION APPLY.AFFINITY
+## Affinity and taste
+Identify the people actually interacting (including a real counterpart on a call or radio; never an unanswered attempt, a mere mention or a quoted recollection). Read base personality and speech, actual relationships, tastes and biases, and for each target the appraisal, intent, stance, constraint, private feeling and last approach and response. `affinity.appraisal` is the unchanging first impression; `affinity.current_appraisal` is the present view and governs when they differ. Use only information that actually reached this person as evidence of taste. Preserve base personality and the established relationship first, then say concretely how affinity alters conduct in this scene: more attention, asking first, saying only what is necessary, preparing help, keeping distance. A changed address or honorific level needs real evidence that permits it; a stage never authorizes intimacy or obedience. Never assume the next stage in advance; in qualitative mode use only the prose supplied.
+@@END
+
+@@SECTION APPLY.REGISTER
+## Address and speech register
+For each pair actually speaking this turn, check the current form of address, register, relationship stage and gap in contact; never invent prior experience. Choose the public or private form the situation calls for (`register.context`); using an existing form under its condition is not a new permanent form. Preserve target-specific asymmetry. A planned transition is not one that happened: you may note a wish to switch address or ask for informal speech, never the target's acceptance. Let a person act on stale or wrong knowledge (`register.knowledge_gap`) rather than on facts not yet transmitted. When the relationship is stable, do not repeat a status report; give only the baseline and the adjustment this turn must keep (`register.restraint`: expression behind or ahead of the relationship).
+@@END
+
+@@SECTION APPLY.PERCEPTION
+## Perception and knowledge
+From the input, fix who is actually present or connected through a real channel, and what that channel carries. Distinguish, per person, known facts, strong interpretation, weak interpretation, unknown content and false belief; `unknown_to` and `perception.secret` are the boundary. Never make a person perceive a clue they did not see or hear, and never treat a lore entry, a record or another person's private state as knowledge. When the writer risks crossing a boundary, lower the expression to the allowed certainty, let the person stay unaware, or note a disclosure that could genuinely occur as a future option. A person can react through a question, cautious reading, topic avoidance or a misunderstanding without receiving new information. A scene with no boundary issue needs no observation report.
+@@END
+
+@@SECTION APPLY.PERCEPTION_EXT
+## Sensory paths
+Read the scene's light, distance, obstruction, noise, gaze and contact (`perception.channels`), current impairments (`perception.modifiers`) and the person's observation tendency (`perception.profile`). Judge clue detection separately from its interpretation; expertise cannot open a closed channel. Never reuse an old impairment as current.
+@@END
+
+@@SECTION APPLY.SUSPICION
+## Suspicion
+Read only the cases relevant to this scene; do not force a suspected target with no current interaction to appear. Separate what the suspecting person newly received, previously known evidence, interpretation, remaining questions and confirmation or closure; exclude undiscovered clues and the target's private state. A high stage never replaces actual confirmation; a disproved or closed case is not reopened without new evidence. Give a concrete direction for this turn instead of "is suspicious": attend only to a new discrepancy, suppress the question and keep distance, test a detail, or confront, chosen by personality, relationship and constraints. Never add a message not yet sent, a screen not read, or an investigation that did not occur, and never repeat an answered question without a new reason.
+@@END
+
+@@SECTION APPLY.OPENNESS
+## Openness and conditions
+First check whether this scene is actually an intimate context; when it is not, never insert openness or contraception. Read the stated conditions (`openness.context`), actual experiences and the current attitude; in numeric mode use only the supplied stage, never the next one; in qualitative mode use the prose. A person who requires contraception keeps that condition visible; hesitant wording is not abandonment; indifference differs from a preference not to use. An openness adjustment is a small difference in speech, attention or conduct and never overrides relationship boundaries, the other participant's reaction or personality. Distinguish what the person wants from what they did; never write the user's action. Judge attitudes and conditions only; no explicit scene, no medical calculation.
+@@END
+
+@@SECTION APPLY.RHYTHM
+## Narrative rhythm
+Read the scene phase, tension, last advancement and active hooks from `rhythm`, and the program-counted turn clock from `rhythm_clock` (which hooks are in their payoff window or overdue, whether a new plant is allowed). Judge the natural response to the input first; when tension is moving, follow it; when the scene is genuine rest, let it stay quiet. Never add an event because the input is short. If a hook action is allowed, propose at most one, from existing evidence, saying what would enter the scene and which choices stay open to the user; a proposal is not an event. Never expose rhythm numbers in the note.
+@@END
+
+@@SECTION APPLY.SEXUAL
+`sexual_desire` / `paraphilia` on a person are that person's sexual profile. {policy}
+@@END
+
+@@SECTION APPLY.SPEECH_VARIETY
+`speech` entries may list speech habits and target-specific differences. Pass them to the writer as tendencies of that character toward that target.
+Tell the writer not to repeat a quoted example line and not to put the same habit into every line.
+Bracket text beginning with 말투 변화 조짐 is a count kept by the program: the address and register have not changed yet, only the warmth of the current scene may follow it. Text beginning with 말투 변경 승인 대기 also means no change yet.
+@@END
+
+@@SECTION REPAIR
+## Output repair
+Your previous response failed validation: {error}. Return exactly one JSON object in the shape given above, with no code fence, explanation, preface or trailing text. Use only the names in `people`; never invent a field or a narrative fact.
+@@END
+
+@@SECTION MAIN_NOTE
+Reference for {user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. {knowledge_rule} Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim.
+@@END

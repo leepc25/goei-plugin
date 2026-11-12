@@ -8,7 +8,8 @@ import { fixedSections } from './seed';
 import { norm } from './store';
 import { OPENNESS_MAX, SEXUAL_CHARS, SLOT_META, TASTE_STAGES, opennessStage, slotsFor, type Change, type Entry, type PeopleStore, type Person, type SlotId } from './types';
 import { axesLinesEn } from './axes';
-import { SEXUAL_DIRECTOR_POLICY, SEXUAL_POLICY } from './sexual';
+import { SEXUAL_POLICY, sexualDirectorPolicy } from './sexual';
+import { guideOr } from '../guides';
 
 const EXPRESS_TAIL: Record<0 | 1 | 2 | 3, string> = {
   0: 'Expression: almost never shown; appears only through actions and priorities, not words.',
@@ -88,7 +89,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   if (per.length) out.push('Personality:\n' + lines(per));
   if (o.axes) out.push('Personality axes (baseline traits, not current feeling):\n' + axesLinesEn(p.axes).join('\n') + (p.patterns?.length ? '\nLong-term changes:\n' + p.patterns.map((t) => `- ${plain(t, 300)}`).join('\n') : ''));
   // 성적 욕망·이상성욕 (원본 people_profile 의 sexual_desire/paraphilia + policy sexual_context_only)
-  if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY} — ${SEXUAL_DIRECTOR_POLICY})\n` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : '', o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ''].filter(Boolean).join('\n'));
+  if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY} — ${sexualDirectorPolicy()})\n` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : '', o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ''].filter(Boolean).join('\n'));
   if (o.sheet && mode === 'split') for (const s of fixedSections(o.sheet)) out.push(`${s.name}:\n${s.body}`);
   const st = slot('state');
   if (st.length) out.push('Current state:\n' + lines(st));
@@ -168,12 +169,16 @@ export const KNOWLEDGE_RULE =
 export const PEOPLE_RULE =
   `Living records of the characters in this scene, kept by the system from what actually happened in this chat. They override the static character sheets where they differ. Treat them as background facts, not as events to narrate; never mention scores or these notes themselves. ${KNOWLEDGE_RULE}`;
 
+/** 위 두 글은 지침 「본편에 붙는 글」 PEOPLE.KNOWLEDGE_RULE · PEOPLE.RULE 절에서 읽는다. 절이 없으면 위 글 */
+export const knowledgeRule = (): string => guideOr('Main', 'PEOPLE.KNOWLEDGE_RULE', KNOWLEDGE_RULE);
+export const peopleRule = (): string => guideOr('Main', 'PEOPLE.RULE', () => PEOPLE_RULE.replace(KNOWLEDGE_RULE, () => knowledgeRule()), { knowledge_rule: knowledgeRule() });
+
 /** 여러 인물의 블록을 한 덩어리로 */
 export function peopleBlock(blocks: string[], maxChars = 16000): string {
   if (!blocks.length) return '';
   let body = blocks.join('\n\n');
   if (body.length > maxChars) body = body.slice(0, maxChars - 1) + '…';
-  return `${PEOPLE_HEAD}\n${PEOPLE_RULE}\n\n${body}`;
+  return `${PEOPLE_HEAD}\n${peopleRule()}\n\n${body}`;
 }
 
 /** 서사 리듬 블록 (문서 종류 rhythm + '@rhythm' 메모). 기록이 없으면 빈 문자열 */

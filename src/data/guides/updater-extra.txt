@@ -1,0 +1,103 @@
+<!-- UpdaterExtra: 인물 기록 갱신기에 설정에 따라 덧붙는 글 (기록 언어·추적 인물·상점 판단 칸·말투 다변화·성적 프로필)과 기록 정리(CONSOLIDATE) 지침. {이름} 자리는 플러그인이 채웁니다. 절 구분 줄은 그대로 두세요. -->
+@@SECTION LANG_EN
+## Record language
+Write every free-text field you produce in English even where this document says Korean: entry `text`, cue `reason`, new person `identity` and `speech`, doc `text`, suspicion text, and `next_note`.
+Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소], slot names, and every `quote`.
+@@END
+
+@@SECTION TRACKING_RULE
+Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.
+@@END
+
+@@SECTION SIGNAL_STATE
+Record how and why in `state`; add one `history` line.
+@@END
+
+@@SECTION SHOP_KEY
+Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.
+@@END
+
+@@SECTION SPEECH.VARIETY
+## Speech variety (user setting)
+The user switched on speech variety. These lines add to the `speech` slot rules above and win where they differ.
+In each `speech` entry, after the form of address and the register, also write, in Korean and only from dialogue this character actually spoke in the supplied span:
+- what is different in how the character speaks to this target compared with other targets;
+- speech habits that were actually observed: sentence endings, sentence length and pace, recurring openers or interjections.
+You may quote one short line as an example. Keep the whole entry under {chars} characters.
+If the character has not spoken to this target yet, write only the address and register. Never invent a habit, an ending or an example.
+Complete old entries: when a stored `speech` entry for a target holds only address and register (no difference toward this target, no speech habits), and the supplied span contains dialogue this character speaks to that target, upsert that entry in this response to add those details. This is required and overrides the rule above that tells you to leave an unchanged `speech` entry alone.
+Completing an entry is not a register change: keep the stored form of address and honorific level exactly as they are, and return no `address` item for it.
+An entry that already lists speech habits is complete. Leave it alone unless the span shows a clearly new habit that is not listed yet.
+@@END
+
+@@SECTION SPEECH.SIGN
+Speech change signs are also on.
+A sign is evidence in this span that the way the character speaks to one target is starting to shift: closer (more relaxed, familiar, warmer) or more distant (stiffer, colder, more formal). Growing or broken closeness, a change of status or role, and a clear rise or fall of affinity all count when the span shows them.
+When this span gives a sign for a target, upsert that `speech` entry with its stored wording kept, and end the text with exactly this form: `SIGN closer: <reason in Korean, under 60 characters>` or `SIGN distant: <reason in Korean, under 60 characters>`. At most one sign per target in one response. A span without a sign needs no upsert.
+Do not put a SIGN in the same upsert that completes an old entry with speech habits: when a SIGN is present the program keeps the stored wording and drops the rest. Complete the entry first and report the sign in a later span.
+Do not change the form of address or the honorific level because of a sign, and return no `address` item for it. The program counts the signs and rejects an `address` change while it is counting.
+Bracket text that begins with 말투 변화 or 말투 변경 belongs to the program. Never write, edit or remove it yourself.
+Only when the stored entry contains text beginning with [말투 변경 가능 may you rewrite the address and register of that entry (and return the matching `address` item) to fit the listed reasons and the current span. If the span does not support a change after all, leave the entry alone.
+@@END
+
+@@SECTION SPEECH.FREE
+Speech change by your own judgment is also on.
+When the span shows that closeness, status or role, or affinity toward a target has really changed, you may update the form of address and the register of that `speech` entry in the same response (and return the matching `address` item), without waiting for a second scene. Write the reason for the change in the entry in Korean.
+A passing mood, a joke or one angry line is still not a change.
+@@END
+
+@@SECTION SEXUAL.CONTEXT_RULE
+Sexual desire and paraphilia fields are `sexual_context_only`. They are inactive during ordinary conversation, work, dating, flirting, handholding, hugs, and light kisses. Apply them only after a clear adult sexual proposition enters an imminent sexual situation, sexual touching begins, sexually intended exposure occurs, foreplay begins, or sexual activity is ongoing. Current consent, boundaries, and explicit conditions remain authoritative.
+@@END
+
+@@SECTION SEXUAL.EXPLICIT_STYLE
+Vocabulary rule, mandatory: write like adults talking dirty in private. Name body parts and acts with the crude Korean words actually used (`자지`, `보지`, `젖`, `엉덩이`, `박다`, `빨다`, `싸다` and similar), and name positions and play plainly. Euphemism, medical or academic terms, poetic wording, and softened phrasing are errors; if a sentence could appear in a romance novel, rewrite it cruder.
+@@END
+
+@@SECTION SEXUAL.PLAIN_STYLE
+Use the 0.10.7 style: blunt everyday sex words and slang, crude terms included, with no euphemism, clinical vocabulary, literary wording, or psychological analysis. Keep it direct but do not force the stronger explicit vocabulary examples.
+@@END
+
+@@SECTION SEXUAL.PROMPT_RULES
+Sexual desire is a concrete list of what this adult character likes in bed: favorite positions and poses, favorite kinds of play, preferred pace and roughness, whether they lead or follow, spots and touches that work, and what kills the mood. Write 3 to 5 short direct Korean sentences, each naming something specific. {style} Paraphilia is chosen from this closed list of adult-consensual types: fetishism focused on a body part, object, or material; sadism; masochism; exhibitionism; voyeurism; cross-dressing fixation; frotteuristic roleplay; fixation on a specific fluid or smell; fixation on body modification or scars; humiliation or submission dependency; and comparable named types. Judge in order: explicit statements, sexual history or reactions, the supplied openness lewdness value and stage, then personality traits such as control, submission, shame, exposure, possessiveness, or fixation. Use exact prefix "<추정>" for a plausible inference supported by weak or indirect evidence instead of returning "미확인". Return exact text "미확인" only for a minor or ambiguous age, an inference requiring non-consent, or when the data truly offers no basis at all. Never fabricate a concrete history; every inferred inclination must use that inference prefix and name its basis.
+@@END
+
+@@SECTION SEXUAL.INIT_DESIRE
+`sexual_desire`: 3 to 5 short direct Korean sentences listing concretely what the adult character likes in bed.
+@@END
+
+@@SECTION SEXUAL.INIT_PARAPHILIA
+`paraphilia`: chosen from named adult-consensual types.
+@@END
+
+@@SECTION SEXUAL.WRITER
+## 7b. Sexual desire and paraphilia (Risupot sexual profile; user setting)
+Each person's data carries `sexual`: which of {fields} this person uses, the current text of each (or null), `init_needed` (fields still empty) and `explicit_style` (true = 0.10.9 explicit vocabulary, false = 0.10.7 blunt style). A field this person does not use is omitted completely: never write it.
+- **First text once (`sexual_init`)**: only for a person whose `sexual.init_needed` lists the field. {init_desire}{init_paraphilia}Consider explicit facts, sexual history or reactions, the supplied openness lewdness value and stage (`openness_now` when present), then personality. A weak but plausible inference is prefixed with exact text "<추정>" and names its basis. Use exact text "미확인" only for a minor or ambiguous age, an inference requiring non-consent, or no usable basis at all. Cite `m` and `quote` from the span that gives the basis; when the only basis is the record, cite the span line where the person appears.
+- **Wording style is selected per person** (`sexual.explicit_style`). {plain_false} When true, {explicit_true} In both modes avoid clinical, academic, poetic, or psychological-analysis wording.
+- **Existing text is never overwritten directly.** An `observations` item may use `axis` {axis}, `direction` `replace`, and `pattern` (Korean ≤700) as the proposed complete replacement only when the confirmed span depicts an actual adult sexual scene. Handholding, a hug, a light kiss, ordinary dating, flirting, a sexual joke, fantasy roleplay, a proposition that did not enter a sexual situation, and temporary arousal are insufficient. Propose only a repeated desire, a directly acknowledged lasting change during actual sexual activity, sustained changed sexual choices or reactions, or a sexual milestone confirmed again in later sexual scenes. The program requires six independent observations across four scenes and confidence at least 75 before user review.
+- {context_rule}
+{prompt_rules}
+@@END
+
+@@SECTION CONSOLIDATE
+You tidy the per-chat record of one roleplay character. The record is a set of slots, each a list of short entries. Over time entries pile up, overlap, or go stale. Rewrite each slot into fewer, denser entries without losing any fact that is still true.
+
+Rules:
+- Merge entries that describe the same thing; drop nothing that is still true. Keep concrete details (names, numbers, places, dates). When two entries conflict, keep the later one (entries are listed oldest first) and you may note the change.
+- `chars` is the record's current size and `target` the size to reach (sum of entry texts). Reduce toward target; a result near it is enough; never pad. Each entry is one statement ≤300 chars{lang_note}. Names, quotes, address terms, Korean labels and prefixes stay as written.
+- `state` and `scene` are the present: merge aggressively, keep only what is still true. `history` is a chronological digest: merge adjacent events into one line each. `relationship`, `speech` and the feature slots (`affinity.*`, `register.*`) keep one entry per `target`. `affinity.appraisal` (first impression) is never rewritten: return it unchanged or leave the slot out.
+- Give every result entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.
+- Slots you do not return stay as they are.
+
+Output exactly one JSON object, nothing else:
+{"slots":{"<slot>":[{"text":"<statement>","target":"<name|@user|null>","from":["<id>"]}]}}
+Slot hints: {slot_hints}
+@@END
+
+@@SECTION CONSOLIDATE.USER
+Record to tidy:
+{data}
+
+Return the JSON object.
+@@END

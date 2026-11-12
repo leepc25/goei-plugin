@@ -185,3 +185,39 @@ Judge where the response ends, not where it passed through:
 - The protagonist is the seller, or is there to work, deliver, investigate or guard rather than to buy → no shop.
 - Keep the same 가게 이름 as long as the protagonist stays in the same shop.
 @@END
+
+@@SECTION TRUTH_ALL
+Give EVERY item a concrete 진실 (never ?). Make sure at least one item genuinely does what it claims and at least one does something else entirely.
+@@END
+
+@@SECTION TRUTH_MIX
+MIX the two: give roughly half the items a concrete 진실 and write ? for the rest, varying which ones. Among the concrete ones, at least one genuinely does what it claims and at least one does something else entirely.
+@@END
+
+@@SECTION TRUTH_NONE
+Write ? for EVERY 진실: nothing is decided until it is used.
+@@END
+
+@@SECTION SECRET_NOTE
+(last column = what each item REALLY does; ? means not even the catalogue knows. The buyer cannot see it. The 운영자 knows it and never states it: answer on the listed basics, deflect or withhold the rest, invent nothing beyond the listing.)
+@@END
+
+@@SECTION WHERE_ANY
+Any way of buying counts: store, stall, unstaffed shop, online mall, home shopping, catalog, vending machine, otherworldly mall.
+@@END
+
+@@SECTION WHERE_SHOP
+Only a physical store or stall with a seller present, or a shop with its own screen listed below; not other online, broadcast, catalog or machine sales.
+@@END
+
+@@SECTION ASSIGN_ROLE_USEFUL
+useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)
+@@END
+
+@@SECTION ASSIGN_ROLE_BROAD
+broad stock, unrelated to the current scene
+@@END
+
+@@SECTION ASSIGN_RULE
+Build each item to its assigned {unit} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. {units} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.
+@@END

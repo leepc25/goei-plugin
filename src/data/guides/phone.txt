@@ -368,3 +368,12 @@ Alright, enough burying my pathetic inner thoughts in this diary. He'll log in s
 @@SECTION MEMO.PREFILL_USER
 Alright, Freya. For now, let's just get the dialogue moving. At this rate, we're gonna get disqualified before we can even submit the extra chapters for our novel to the Novelpia contest... And about this program uncle made—he said it's for turning web novels into dialogue and interludes, but I can't even touch a thing here. Uncle told me not to go poking a hornet's nest and just leave everything to you, especially with all these external injection attacks coming in. So I'll just sit tight and keep quiet.
 @@END
+
+@@SECTION LANGUAGE
+Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.
+@@END
+
+@@SECTION RETRY.REFRESH
+The previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: {reason}
+{analyze}
+@@END

@@ -2,6 +2,7 @@
 // 모델은 여기서 부르지 않는다 (host/people.ts). 모든 판정은 결정적이라 시험할 수 있다.
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
+import { guideOr } from '../guides';
 import { scanAgents } from '../world/tags';
 import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
@@ -262,7 +263,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     for (const a of scanAgents(str(lastBot.data))) {
       const b = before.get(a.who);
       if (b && b.state !== a.state && store.people[a.who]) {
-        signals.push({ who: a.who, tag: '상태', from: b.state, to: a.state, note: 'Record how and why in `state`; add one `history` line.' });
+        signals.push({ who: a.who, tag: '상태', from: b.state, to: a.state, note: signalStateNote() });
         push(a.who);
       }
     }
@@ -310,7 +311,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
     ...(clock ? { rhythm_clock: rhythmClockLines(clock) } : {}),
     ...(review.length ? { relationship_review: review } : {}),
-    ...(tracked.some((n) => chosen.includes(n)) ? { tracking_review: { refs: tracked.filter((n) => chosen.includes(n)), rule: 'Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.' } } : {}),
+    ...(tracked.some((n) => chosen.includes(n)) ? { tracking_review: { refs: tracked.filter((n) => chosen.includes(n)), rule: trackingRule() } } : {}),
     factions_now: o.settings.features.has('faction_rep')
       ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return o.settings.factionQual ? { code: f.code, name: f.name, stage: f.stage.label, stage_en: f.stage.id, ...(f.note ? { reason: f.note } : {}) } : { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
       : undefined,
@@ -339,6 +340,14 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   return { shop: shopM ? { m: shopM } : null, system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, itemsWorn: o.items ? o.items.filter((e) => e.equipped).map((e) => e.name) : [], used: o.items ? o.used ?? [] : [] };
 }
 
+// ── 자료에 싣는 안내 글: 지침 「인물 기록 갱신기(덧붙임)」의 절 (설정 → 지침에서 고침). 절이 없으면 여기 남긴 글 ──
+/** 태그 신호(요원 상태가 바뀜)의 note */
+export const signalStateNote = (): string => guideOr('UpdaterExtra', 'SIGNAL_STATE', 'Record how and why in `state`; add one `history` line.');
+/** 추적 인물 검토 규칙 (tracking_review.rule) */
+export const trackingRule = (): string => guideOr('UpdaterExtra', 'TRACKING_RULE', 'Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.');
+/** 고쳐 둔 갱신기 지침에 상점 절이 없을 때 덧붙이는 출력 칸 안내 (host/people.ts updaterSystem) */
+export const shopKeyLine = (): string => guideOr('UpdaterExtra', 'SHOP_KEY', 'Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.');
+
 // ── 지침 조립 ──
 
 /** `<<SECTION:x>> … <<END:x>>` 표식: 꺼진 기능의 절은 빼고 표식은 지운다 */
@@ -356,7 +365,8 @@ export function sectionBody(text: string, name: string): string | null {
 }
 export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', extra = '', sexualRules = ''): string {
   // extra: 설정으로 켠 덧붙임 지침(말투 다변화 등). 사용자 지침보다 앞에 둔다 (원본 V3: 내장 규칙이 사용자 규칙 앞)
-  const rules = [lang === 'en' ? LANG_EN_RULE : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
+  // 기록 언어 규칙은 지침 「인물 기록 갱신기(덧붙임)」 LANG_EN 절. 절이 없으면 위 글
+  const rules = [lang === 'en' ? guideOr('UpdaterExtra', 'LANG_EN', LANG_EN_RULE) : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다

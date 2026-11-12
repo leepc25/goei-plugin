@@ -2,6 +2,7 @@
 // 기능마다 접힌 칸 하나에 모은다. 손대지 않아도 원본 기본값으로 돌아간다. 값은 이 채팅의 변수에 두고,
 // 각 설정 화면의 「덮어쓰기」로 새 채팅 기본값에 같이 담긴다.
 import { CONTEXT as GN_CONTEXT, HISTORY as GN_HISTORY, LIMITS as GN_LIMITS } from './gnet';
+import { guideOr } from './guides';
 import { COOLDOWN as PH_COOLDOWN, HISTORY as PH_HISTORY, LIMITS as PH_LIMITS } from './phone';
 
 export type AdvFeature = 'gn' | 'ph' | 'nw' | 'gen';
@@ -245,11 +246,16 @@ const LANG: Record<string, string> = {
   en: 'Write all output in English.',
   ja: 'Write all output in Japanese.',
 };
+/** 생성 언어 문장: 지침 「요청 공통」의 LANGUAGE.KO·EN·JA 절 (없으면 위 글) */
+const langLine = (k: string): string | null => {
+  const base = LANG[k] ?? null;
+  return typeof base === 'string' ? guideOr('Common', `LANGUAGE.${k.toUpperCase()}`, base) : base;
+};
 
 export function genSettings(state: State): GenSettings {
   const m = advValue(state, 'gen', 'retry_model');
   return {
-    language: LANG[advValue(state, 'gen', 'lang')] ?? null, retries: advNum(state, 'gen', 'retries'), retryModel: m === 'main' || m === 'aux' ? m : 'same',
+    language: langLine(advValue(state, 'gen', 'lang')), retries: advNum(state, 'gen', 'retries'), retryModel: m === 'main' || m === 'aux' ? m : 'same',
     userMessages: advValue(state, 'gen', 'user_msgs') !== '0', concurrent: advNum(state, 'gen', 'concurrent'),
   };
 }

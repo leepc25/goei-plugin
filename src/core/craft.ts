@@ -4,6 +4,7 @@
 // - 비망록 (원본 「탈옥 (비망록)」): 지침의 MEMO.* 절. 맨 앞에 인물 글과 작업 문장, 맨 끝에 미리 채운 응답과 사용자 한마디.
 // 다시 보기·동시 요청 수·재시도 문구는 모델 호출 쪽(host/llm.ts)에서 한다.
 import { advNum, advValue, type AdvFeature } from './advanced';
+import { guideOr } from './guides';
 
 export type ThoughtsMode = 'off' | 'inner' | 'note';
 type State = Record<string, unknown> | undefined;
@@ -50,6 +51,8 @@ const NOTE_TAIL = 'Always include subject and object. For list items like genera
   + 'Write the process in an extremely condensed telegraphic style plaintext, almost to the level of noun lists, without any preambles or markdown decorations.\n\n'
   + 'Put the above step-by-step process into a `<lb-process>` block BEFORE the required output:\n<lb-process>\n(process)\n</lb-process>\n\nThen output the required data exactly as instructed. The application removes the <lb-process> block.';
 const INNER_HEAD = 'The following template is your internal guide. Reason through it thoroughly, every step of it. Do not write the reasoning out; output only the required data.';
+/** 위 글들은 지침 「요청 공통」의 RETRY.ANALYZE · THOUGHTS.* 절에서 읽는다 (설정 → 지침에서 고침). 절이 없으면 위 글 */
+export const retryAnalyze = (): string => guideOr('Common', 'RETRY.ANALYZE', RETRY_ANALYZE);
 
 /** system 칸 하나를 고친다 (첫 system, 없으면 맨 앞에 새로) */
 function editSystem(messages: CraftMessage[], edit: (s: string) => string): CraftMessage[] {
@@ -63,7 +66,7 @@ export function craftMessages<M extends CraftMessage>(messages: M[], s: CraftSet
   let out: CraftMessage[] = messages;
   const steps = texts.thoughts?.trim();
   if (steps && s.thoughts !== 'off') {
-    const block = s.thoughts === 'note' ? `# Thoughts\n${NOTE_HEAD}\n\n${steps}\n\n${NOTE_TAIL}` : `# Thoughts Guideline\n${INNER_HEAD}\n\n${steps}`;
+    const block = s.thoughts === 'note' ? `# Thoughts\n${guideOr('Common', 'THOUGHTS.NOTE_HEAD', NOTE_HEAD)}\n\n${steps}\n\n${guideOr('Common', 'THOUGHTS.NOTE_TAIL', NOTE_TAIL)}` : `# Thoughts Guideline\n${guideOr('Common', 'THOUGHTS.INNER_HEAD', INNER_HEAD)}\n\n${steps}`;
     out = editSystem(out, (sys) => `${sys}\n\n${block}`);
   }
   const memo = texts.memo;

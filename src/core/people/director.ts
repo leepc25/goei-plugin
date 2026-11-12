@@ -6,13 +6,14 @@ import { messageText } from '../refs';
 import { listDocs } from '../wiki';
 import { addressOf, affinityView } from './affinity';
 import { axesLinesEn } from './axes';
-import { KNOWLEDGE_RULE, personBlock, unknownTo } from './inject';
+import { knowledgeRule, personBlock, unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
 import { rhythmClock, rhythmClockLines } from './rhythm';
 import { speechVarietyBlock } from './speech';
-import { SEXUAL_DIRECTOR_POLICY, SEXUAL_POLICY, sexualAnyOn, sexualTexts } from './sexual';
+import { SEXUAL_POLICY, sexualAnyOn, sexualDirectorPolicy, sexualTexts } from './sexual';
 import type { PeopleSettings } from './settings';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE } from './basetext';
+import { guideOr } from '../guides';
 import { SLOT_META, slotsFor, type PeopleStore, type SlotId } from './types';
 
 /** 2026-11-07 (전수검사 2 의 E): 메모 상한 120 → 400자, 모르는 것 ≤8, 불확실한 점(uncertain) 추가 (원본 note ≤12,000 + uncertainties) */
@@ -111,11 +112,11 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const rhythm = s.directorFeatures && s.features.has('rhythm')
     ? Object.values(store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })))
     : [];
-  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', ...FEATURE_GUIDE[f], ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [`\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${SEXUAL_DIRECTOR_POLICY}`] : [])]) : [];
+  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', guideOr('Director', `APPLY.${f.toUpperCase()}`, () => FEATURE_GUIDE[f].join('\n')), ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [guideOr('Director', 'APPLY.SEXUAL', () => `\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${sexualDirectorPolicy()}`, { policy: sexualDirectorPolicy() })] : [])]) : [];
   // 기본 지침은 지침 탭 「Director」에서 고친다 (리수폿 J-1). 기능별 절·검색·출력 계약은 그대로
   const facts = base.facts?.trim() || DIRECTOR_FACTS.join('\n');
   const scene = base.scene?.trim() || DIRECTOR_SCENE.join('\n');
-  const system = [facts, ...(s.director === 'scene' ? [scene] : []), ...guides, '', ...(s.directorSearch ? SYSTEM_SEARCH : []), OUTPUT, s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']
+  const system = [facts, ...(s.director === 'scene' ? [scene] : []), ...guides, '', ...(s.directorSearch ? [guideOr('Director', 'SEARCH', () => SYSTEM_SEARCH.join('\n'), { max: SEARCH_MAX })] : []), guideOr('Director', 'OUTPUT', OUTPUT), s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']
     .join('\n')
     .replace('{{LANG}}', s.directorLang === 'ko' ? 'Korean' : 'English')
     .replace('{{LINES}}', s.directorLen === 'normal' ? '3' : '1');
@@ -126,13 +127,14 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
 
 /** 출력 검증 실패 뒤 고침 요청 (원본 repairDirectorPrompt): 같은 지침 + 오류·이전 답을 붙여 1회 더 */
 export function repairDirector(built: DirectorInput, invalid: string, error: string): DirectorInput {
-  const fix = `## Output repair\nYour previous response failed validation: ${plain(error, 200)}. Return exactly one JSON object in the shape given above, with no code fence, explanation, preface or trailing text. Use only the names in \`people\`; never invent a field or a narrative fact.`;
+  // 글은 지침 「Director」 REPAIR 절. 절이 없으면 여기 남긴 글
+  const fix = guideOr('Director', 'REPAIR', () => `## Output repair\nYour previous response failed validation: ${plain(error, 200)}. Return exactly one JSON object in the shape given above, with no code fence, explanation, preface or trailing text. Use only the names in \`people\`; never invent a field or a narrative fact.`, { error: plain(error, 200) });
   return { ...built, system: `${built.system}\n\n${fix}`, data: { ...built.data, invalid_previous_response: invalid.slice(0, 6000) } };
 }
 
 /** 2차 호출 자료: 같은 지침 + 「2차」 안내 + found */
 export function buildDirectorPass2(built: DirectorInput, found: SearchResult[]): DirectorInput {
-  return { ...built, system: `${built.system}\n\n${SYSTEM_PASS2}`, data: { ...built.data, found }, search: false };
+  return { ...built, system: `${built.system}\n\n${guideOr('Director', 'PASS2', SYSTEM_PASS2)}`, data: { ...built.data, found }, search: false };
 }
 
 function jsonOf(raw: string): Record<string, unknown> {
@@ -228,7 +230,9 @@ export const DIRECTOR_HEAD = '[Director note]';
 export function directorBlock(notes: DirectorNote[], user: string): string {
   if (!notes.length) return '';
   const lines = notes.map((n) => [`- ${n.who}: ${n.now}`, n.react ? `  Likely reaction this turn: ${n.react}` : '', ...n.mustNot.map((m) => `  Must not reveal: ${m}`), ...(n.uncertain ?? []).map((u) => `  Uncertain: ${u}`)].filter(Boolean).join('\n'));
-  return `${DIRECTOR_HEAD}\nReference for ${user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. ${KNOWLEDGE_RULE} Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim.\n${lines.join('\n')}`;
+  // 머리말은 지침 「Director」 MAIN_NOTE 절. 절이 없으면 여기 남긴 글
+  const head = guideOr('Director', 'MAIN_NOTE', () => `Reference for ${user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. ${knowledgeRule()} Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim.`, { user, knowledge_rule: knowledgeRule() });
+  return `${DIRECTOR_HEAD}\n${head}\n${lines.join('\n')}`;
 }
 
 /** 화면 「지침 편집」용 기본 지침 원문 (연출형 기준) */

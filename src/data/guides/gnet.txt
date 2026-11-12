@@ -401,3 +401,53 @@ Each entry is {"keyFigure":"character name or identity from the universe setting
 Preserved key-figure state from previous boards (reference; use only when appropriate, never as identity disclosure to other users):
 __GN_KEYFIGURES__
 @@END
+
+@@SECTION LANGUAGE
+Use the language of the actual conversation; default to Korean.
+@@END
+
+@@SECTION IMPORTANT_NOTE
+Important Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.
+@@END
+
+@@SECTION POST.TAG_RULE
+Post category: every post (new or retained) also has "tag": one short category label in Korean, the way this board sorts its posts (a 말머리). Reuse labels already used on the board when they fit; supplied tags on retained posts are records, never change them.
+@@END
+
+@@SECTION COMMENT.TIME_RULE
+Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. It must be after its post and after the comment it replies to, and not later than the current narrative time{now}. Space comments realistically: quick replies minutes apart, slower threads hours apart. Supplied "time" values on existing comments are records; never change them.
+@@END
+
+@@SECTION KEYFIGURES.FORMAT
+Also include a top-level "keyFigures" array (use [] when there are no updates).
+@@END
+
+@@SECTION SAMPLING
+Diversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.
+@@END
+
+@@SECTION POST.TAG_FORMAT
+Also give post.tag: one short category label in Korean for this post, the way this board sorts its posts.
+@@END
+
+@@SECTION ACTION.COMMENT
+The protagonist publicly commented: {body}
+@@END
+
+@@SECTION ACTION.POST_REFRESH
+Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.
+@@END
+
+@@SECTION PUBLIC.ACCESS
+Published GNet material available for reference when this conversation mentions, shares or consults a post. Discuss its supplied details naturally. Availability alone does not establish that everyone already read it, the real identity behind a handle, or truth of its claims. No private notes or unsent drafts are included.
+@@END
+
+@@SECTION RETRY.FORMAT
+<system>
+Validation error!
+Your previous output did not adhere to the required format, or contained invalid data.
+Error message: {error}
+Please fix your last output into correct structure as previously instructed, while keeping the data intact.
+{analyze}
+</system>
+@@END
