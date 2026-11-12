@@ -10,7 +10,8 @@ import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
 import type { ItemChange, ItemNow } from './people/updater';
 import { currentShop, shopEvents, shopOn, shopGuide } from './shop';
-import { mallEvents } from './malls';
+import { mallEvents, soldPasses } from './malls';
+import { boughtPasses } from './shopctx';
 import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, itemWeight, type ItemEquip, type ItemState } from './itemtraits';
 export * from './itemtraits';
 import type { StartItem } from './startitems';
@@ -81,6 +82,8 @@ export interface Item {
   quote?: string;
   /** 상점에 판 응답 키: 그 응답이 살아 있는 동안 목록에서 안 보인다 (다시 굴리면 판 돈과 함께 돌아온다) */
   soldAt?: string;
+  /** 상점: 산 곳 (core/shopctx.ts ItemStore). 설정 「메인 요청에 붙이는 것 · 구매」가 그 가게 것만 거를 때 본다 */
+  store?: string;
   at: string;
 }
 
@@ -245,6 +248,8 @@ export interface ItemInput {
   price?: number;
   walletId?: string;
   paidWith?: string;
+  /** 상점: 산 곳 (core/shopctx.ts ItemStore) */
+  store?: string;
   quote?: string;
   id?: string;
   at?: string;
@@ -311,6 +316,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(Number.isSafeInteger(e.price) ? { price: e.price } : {}),
     ...(e.walletId ? { walletId: e.walletId } : {}),
     ...(e.paidWith ? { paidWith: clean(e.paidWith, 60) } : {}),
+    ...(e.store ? { store: clean(e.store, 16) } : {}),
     ...(truth ? { truth } : {}),
     ...(text ? { text } : {}),
     ...(quote ? { quote } : {}),
@@ -511,11 +517,14 @@ export function mergedNow(it: Items, lastAnchor: string): string[] {
 
 /** 이번 턴에 인터넷 쇼핑몰 등에 판 것 (2026-11-10 사용자: 우주 쇼핑몰에 입던 옷을 팔았는데 본편은 그 옷을 계속 입고 나왔다 — 판 일이 본편에 안 넘어가고 있었다).
  *  마지막 응답 뒤의 판매 기록(what=sell). 지금 열린 상점(skipPlace)에 판 것은 shopEvents 가 따로 넘기므로 뺀다 */
-export function soldNow(it: Items, lastAnchor: string, skipPlace = ''): string[] {
+export function soldNow(it: Items, lastAnchor: string, skipPlace = '', passes?: (place: string, plain: boolean) => boolean): string[] {
   if (!lastAnchor) return [];
   return it.log.filter((l) => l.what === 'sell' && l.anchor === lastAnchor).flatMap((l) => {
-    const place = String(l.note ?? '').replace(/에 팖$/, '').trim();
+    const note = String(l.note ?? '');
+    const place = note.replace(/에 팖$/, '').trim();
     if (skipPlace && place === skipPlace) return [];
+    // 설정 「메인 요청에 붙이는 것」이 꺼 둔 가게에 판 것은 뺀다 (core/malls.ts soldPasses)
+    if (passes && !passes(place, /에 팖$/.test(note))) return [];
     return [`just sold ${l.name}${place ? ` to ${place}` : ''} and handed it over — the protagonist no longer has, carries or wears it`];
   });
 }
@@ -651,7 +660,7 @@ export function inventoryText(chat: Chat): string {
   const vars = chat.scriptstate;
   if (!itemPushOn(vars)) {
     // 소지품이 꺼져 있다 (상점도 같이 꺼진다): 물건 목록은 없고, 이번 턴에 판 일·쇼핑몰 사건만 [Shop] 글로 넘긴다
-    const soldOff = [...soldNow(readItems(vars), lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
+    const soldOff = [...soldNow(readItems(vars), lastBotKey(chat), currentShop(chat)?.shop, (place, plain) => soldPasses(vars, place, plain)), ...mallEvents(chat)];
     return soldOff.length ? [SHOP_HEAD, `This turn: ${soldOff.join('; ')}`].join('\n') : '';
   }
   const it = readItems(vars);
@@ -672,14 +681,14 @@ export function inventoryText(chat: Chat): string {
     return n > 0 ? [{ name: e.name, n, ...(l !== undefined ? { after: l - n } : {}) }] : [];
   });
   const resumed = invJustResumed(chat);
-  const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
+  const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop, (place, plain) => soldPasses(vars, place, plain)), ...mallEvents(chat)];
   const text = itemsBlock(live, {
     slots: itemSlots(vars),
     limit: itemLimit(vars),
     carry: itemCarry(vars),
     left,
     use,
-    bought: newlyBought(live, lastBotKey(chat)).map(boughtLine),
+    bought: newlyBought(live, lastBotKey(chat)).filter((e) => boughtPasses(vars, e.store)).map(boughtLine),
     events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),

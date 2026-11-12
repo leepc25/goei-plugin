@@ -587,7 +587,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
         // 포인트로 산 것은 원 값 없이 「N 포인트」 대가로 적는다 (본편에 「paid with N points」)
         const paid = p ? { paidWith: `${target.price.toLocaleString('en-US')} Baekilmong points${target.pay ? ` + ${target.pay}` : ''}` } : { price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) };
-        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, truth: target.truth, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', anchor: now.key, ...paid });
+        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, truth: target.truth, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', store: 'shop', anchor: now.key, ...paid });
         bought = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
       });

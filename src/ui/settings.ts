@@ -5,6 +5,7 @@ import { SETTINGS_SET } from '../core/setdef/settings';
 import { findDef } from '../core/setdef/types';
 import { mallSettingsPane } from './malls';
 import { homeshopSettingsPane } from './homeshop';
+import { SHOP_MAIN_KINDS, SHOP_MAIN_LINES, SHOP_MAIN_LINES_VAR, isShopPlace, shopMainKey, type ShopMainKind } from '../core/shopctx';
 import { GUIDE_NAMES, setGuideOverride } from '../core/guides';
 import { onOffSwitch, switchHtml } from './controls';
 import { repaintTheme } from './theme';
@@ -642,6 +643,11 @@ export async function shopFamSet(ctx: ChatContext, env: SettingsEnv, scope: 'cha
     if (raw === 'main' || raw === 'aux') patch = { [name(SHOP_MODEL_VAR)]: raw };
   } else if (key === 'feature') {
     if (col !== 'hs' && flag) patch = { [name(SHOP_FEATURE_VAR)]: raw };
+  } else if (key === 'main' || key.startsWith('main_')) {
+    // 메인 요청에 붙이는 것 (core/shopctx.ts): 가게마다 「컨텍스트 포함」과 붙일 것, 세 곳이 같이 쓰는 「최대 양」
+    const kind = key.slice(5) as ShopMainKind;
+    if (key === 'main_lines') { /* 칸을 비우면 「제한 없음」(0) */ const n = col !== 'shop' ? null : raw.trim() === '' ? SHOP_MAIN_LINES.def : int(SHOP_MAIN_LINES.min, SHOP_MAIN_LINES.max); if (n !== null) patch = { [SHOP_MAIN_LINES_VAR]: String(n) }; }
+    else if (isShopPlace(col) && flag && (key === 'main' || SHOP_MAIN_KINDS[col].includes(kind))) patch = { [shopMainKey(col, key === 'main' ? undefined : kind)]: raw };
   } else if (key === 'price') {
     patch = { [name(SHOP_PRICE_VAR)]: raw.replace(/\s+/g, ' ').trim().slice(0, 80) };
   } else if (key === 'min' || key === 'max') {

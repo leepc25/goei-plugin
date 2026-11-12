@@ -6,11 +6,12 @@ import { jointOn } from '../core/netjoint';
 import { MALL_NAME, mallSettings } from '../core/malls';
 import { HS_NAME, hsSettings } from '../core/homeshop';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO, shopBlocked, shopSettings, type ShopSettings } from '../core/shop';
+import { SHOP_MAIN_ALL, SHOP_MAIN_KINDS, SHOP_MAIN_LABEL, SHOP_MAIN_LINES, SHOP_PLACES, shopMain, shopMainLines, type ShopPlace } from '../core/shopctx';
 import { advChipsCtl, advCtl } from './advanced';
 import { advValue } from '../core/advanced';
 import { siteLogo } from './browser';
 import { ICONS } from './icons';
-import { ckWide, helpBox, mxGrid, numCtl, numSet, setGroup, setRow, setSeg, type CkBand } from './setrow';
+import { ckWide, helpBox, mxGrid, numCtl, numSet, setGroup, setRow, setSeg, stepSize, type CkBand } from './setrow';
 import type { ShopCol } from './settings';
 
 type State = Record<string, unknown> | undefined;
@@ -208,6 +209,22 @@ export function shopTable(vars: State, busy = false): string {
   const price = mxGrid([{ name: '모델에 알려 줄 말' }], SHOP_ROWS.map(({ id, name, icon }) => ({ label: nm(icon, name), cells: [text('fam-text', `s:${id}:price`, set[id].price, '', 80, `${name} 값 기준`, busy)] })),
     helpBox('물건값을 매길 때 모델이 따를 기준이에요. 비우면 그곳에 어울리는 값으로 매겨요.'), '값 기준');
 
+  /* ── 1-2. 메인 요청에 붙이는 것 (상점 → 메인 요청, core/shopctx.ts): 줄 = 가게, 칸 = 그 가게에서 생기는 것. 없는 것은 빈 칸 (2026-11-12 사용자: 「메뉴마다 다른데」).
+   *  맨 앞 「컨텍스트 포함」은 게시판 격자의 같은 칸과 같은 조작(그 가게 것 전부 켬/끔). 꺼지면 그 줄의 나머지 칸은 잠긴다. 망상홈쇼핑 줄은 그쪽 설정이 따로 다룬다 ── */
+  const places = SHOP_ROWS.filter((r): r is { id: ShopPlace; name: string; icon: string } => (SHOP_PLACES as string[]).includes(r.id));
+  const attach: CkBand = { title: '메인 요청에 붙이는 것', groups: [
+    { name: '메인 요청', opts: ['컨텍스트 포함'], kind: 'check' },
+    { name: '붙일 것', opts: SHOP_MAIN_ALL.map((k) => SHOP_MAIN_LABEL[k]), kind: 'check' },
+  ], marks: places.map(({ id }) => { const m = shopMain(v, id); return [m.on, ...SHOP_MAIN_ALL.map((k) => (SHOP_MAIN_KINDS[id].includes(k) ? m.kinds[k] : null))]; }),
+    acts: places.map(({ id }) => { const m = shopMain(v, id); return [`s:${id}:main=${m.on ? '0' : '1'}`, ...SHOP_MAIN_ALL.map((k) => (m.on && SHOP_MAIN_KINDS[id].includes(k) ? `s:${id}:main_${k}=${m.kinds[k] ? '0' : '1'}` : null))]; }),
+    foot: helpBox('켜면 그 상점에서 한 일을 다음 메인 요청에 한 번 붙여요. 본문을 상점 모델에 넘기는 「맥락 반영」과는 방향이 반대예요.', [
+      ['문의', '주인이나 운영자와 나눈 말이에요. 기본 상점은 거래가 끊긴 일도, 우주 쇼핑몰은 문의 창에서 물건을 판 일도 여기에 들어요.'],
+      ['맞춤 주문', '주문한 일, 완성된 일, 받은 물건이에요. 완성된 일은 우주 쇼핑몰 설정의 「완성 알림」이 「카드 + 메인 요청」일 때만 붙어요.'],
+    ]) };
+  const lines = shopMainLines(v);
+  const lineBox = `<div class="st-step adv-step${stepSize(SHOP_MAIN_LINES.max, '줄', '제한 없음')}"><button class="gx-step" data-action="fam-num" data-value="s:shop:main_lines=${Math.max(SHOP_MAIN_LINES.min, lines - 1)}" ${lines <= SHOP_MAIN_LINES.min || busy ? 'disabled' : ''} aria-label="최대 양 대화 줄이기">−</button><input class="adv-val" type="number" inputmode="numeric" min="${SHOP_MAIN_LINES.min}" max="${SHOP_MAIN_LINES.max}" step="1" data-change="fam-num" data-key="s:shop:main_lines" value="${lines === 0 ? '' : lines}" placeholder="제한 없음" aria-label="최대 양 대화"${busy ? ' disabled' : ''}><span>줄</span><button class="gx-step" data-action="fam-num" data-value="s:shop:main_lines=${Math.min(SHOP_MAIN_LINES.max, lines + 1)}" ${lines >= SHOP_MAIN_LINES.max || busy ? 'disabled' : ''} aria-label="최대 양 대화 늘리기">+</button></div>`;
+  const attachMax = setGroup('', setRow('최대 양', numSet([['대화', lineBox]]), helpBox('「문의」와 「1:1 상담」으로 붙이는 대화의 줄 수예요. 넘으면 최근 줄만 붙여요.')));
+
   /* ── 2. 네 곳이 같이 쓰는 값: 기본 상점 자리의 값 하나 (core/shop.ts SHOP_SHARED_VARS) ── */
   const s0 = set.shop;
   const R = (label: string, ctl: string, lead = '', items: [string, string][] = []) => setRow(label, ctl, lead || items.length ? helpBox(lead, items) : '');
@@ -228,5 +245,5 @@ export function shopTable(vars: State, busy = false): string {
   const note = blocked ? `<p class="gx-hint">${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 기본 상점과 쇼핑몰 둘을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>` : '';
   /* ── 3. 기본 상점에만 있는 값: 거래 끊음 + (ui/settings.ts 가 잇는) 열리는 조건 ── */
   const own = s0.on ? `<h2 class="fam-h">기본 상점에만 있는 값</h2>${setGroup('', R('거래 끊음', sw('kick', s0.kick), '켜면 주인이 모욕이나 끝없는 흥정에 거래를 끊을 수 있어요.'))}` : '';
-  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}</div><h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${give}${write}${own}`;
+  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}${ckWide([attach], places.map(({ name, icon }) => nm(icon, name)), busy)}${attachMax}</div><h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${give}${write}${own}`;
 }
