@@ -20,7 +20,7 @@ import { advItem, advValue, genSettings } from '../../core/advanced';
 import { invOn } from '../../core/items';
 import { colConfig } from '../../core/world/statuscols';
 import { isOnOff, switchHtml } from '../controls';
-import { stepSizeText } from '../setrow';
+import { sameStep, stepSizeText } from '../setrow';
 import { flowNodes, flowTokState } from './flow';
 import { traceUi } from './trace';
 
@@ -118,11 +118,11 @@ const shown = (r: Row) => r.ctls.filter((c) => !c.hide);
  * PC 한 줄 = 이름 | 조작 | 호출 글(고정 칸) | 예상 | 지난 턴 | 설정 →.  설명은 늘 그 아래 줄, 조작이 시작하는 자리에서.
  * 조작 칸은 두 칸으로 나눈다: 조작마다 왼쪽 칸부터 채우고, 폭이 넓은 조작(넓이 어림 wide)은 한 줄을 다 쓴다. 이름표는 늘 그 칸의 맨 앞.
  * 격자 표는 격자 줄만 끊김 없이 잇는다. 딸린 줄(after)·격자 줄의 설명·앞 줄(leads)은 격자 아래에 보통 줄로 놓고, 딸린 줄 이름 앞에 그 격자 줄 이름을 붙인다. */
-const WIDE_PX = 215;
-const optPx = (l: string) => [...l].reduce((n, ch) => n + (ch === ' ' ? 3.6 : /[0-9,.()]/.test(ch) ? 8 : 12.4), 26);
-/** 조작 하나의 넓이 어림 (이름표 + 조작). 반 칸(약 217px)에 안 들어가면 한 줄을 다 쓴다 */
+const WIDE_PX = 198;
+const optPx = (l: string) => [...l].reduce((n, ch) => n + (ch === ' ' ? 3.6 : /[0-9,.()]/.test(ch) ? 8 : 12.4), 19);
+/** 조작 하나의 넓이 어림 (이름표 + 조작). 반 칸(200px)에 안 들어가면 한 줄을 다 쓴다 */
 function wide(c: Ctl): boolean {
-  const label = c.label ? optPx(c.label) - 26 + 8 : 0;
+  const label = c.label ? optPx(c.label) - 19 + 8 : 0;
   if (c.kind === 'step') return label + 206 > WIDE_PX;
   const opts = c.opts ?? [];
   if (isOnOff(opts)) return label + 64 > WIDE_PX;
@@ -145,12 +145,13 @@ function cells(r: Row, cols: Col[]): string {
 
 function pcRow(r: Row, cols: Col[] | null): string {
   const ctl = cols ? `${cells(r, cols)}<span></span>` : `<div class="fl-ctl">${pairs(r)}</div>`;
+  const gap = cols ? '<span></span>' : '';
   const help = !cols && r.help ? `<small class="fl-help">${esc(r.help)}</small>` : '';
-  return `<div class="fl-line fl-row${cols ? '' : ' fl-plain'}${help ? ' has-help' : ''}${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><b class="fl-name">${esc(r.name)}</b>${ctl}${said(r)}${stat(r.est)}${stat(r.real)}${go(r.go) || '<span class="fl-go"></span>'}${help}</div>`;
+  return `<div class="fl-line fl-row${cols ? '' : ' fl-plain'}${help ? ' has-help' : ''}${r.on ? ' on' : ''}${r.sub ? ' sub' : ''}"><b class="fl-name">${esc(r.name)}</b>${ctl}${said(r)}${gap}${stat(r.est)}${stat(r.real)}${go(r.go) || '<span class="fl-go"></span>'}${help}</div>`;
 }
 function pcHead(cols: Col[]): string {
   const opts = cols.flatMap((g) => g.opts.map((o, i) => ({ o, first: i === 0 })));
-  const tail = '<span></span><span></span><span></span><span></span><span></span>';
+  const tail = '<span></span><span></span><span></span><span></span><span></span><span></span>';
   return `<div class="fl-line fl-h1"><span></span>${cols.map((g) => `<b class="ck-first" style="grid-column: span ${g.opts.length}">${esc(g.group)}</b>`).join('')}${tail}</div>
     <div class="fl-line fl-h2"><span></span>${opts.map((c) => `<span class="${c.first ? 'ck-first' : ''}">${esc(c.o)}</span>`).join('')}${tail}</div>`;
 }
@@ -176,10 +177,12 @@ function split(t: FlowTable): { grid: Row[]; below: Row[]; notes: [string, strin
 function table(t: FlowTable): string {
   const cols = t.cols ?? null;
   const { grid, below, notes } = split(t);
+  /** 예상·지난 턴 숫자가 하나도 없는 상자는 그 두 칸의 세로선을 긋지 않는다 (빈 열 금지) */
+  const hasNum = [...grid, ...below].some((r) => r.est || r.real);
   const note = notes.map(([n, h]) => `<p class="fl-gnote"><b>${esc(n)}</b>${esc(h)}</p>`).join('');
-  return `<section class="ps-group fl${cols ? ` fl-grid fl-g${cols.reduce((n, g) => n + g.opts.length, 0)}` : ''}">${t.title ? `<h3>${esc(t.title)}</h3>` : ''}
-    <div class="ps-rows fl-pc">${cols ? `<div class="fl-gbox">${pcHead(cols)}${grid.map((r) => pcRow(r, cols)).join('')}${note}</div>` : ''}${below.map((r) => pcRow(r, null)).join('')}</div>
-    <div class="ps-rows fl-ph">${cols ? grid.map((r) => card(r, cols)).join('') + note : ''}${below.map((r) => card(r, null)).join('')}</div></section>`;
+  return sameStep(`<section class="ps-group fl${cols ? ` fl-grid fl-g${cols.reduce((n, g) => n + g.opts.length, 0)}` : ''}">${t.title ? `<h3>${esc(t.title)}</h3>` : ''}
+    <div class="ps-rows fl-pc${hasNum ? '' : ' no-num'}">${cols ? `<div class="fl-gbox">${pcHead(cols)}${grid.map((r) => pcRow(r, cols)).join('')}${note}</div>` : ''}${below.map((r) => pcRow(r, null)).join('')}</div>
+    <div class="ps-rows fl-ph">${cols ? grid.map((r) => card(r, cols)).join('') + note : ''}${below.map((r) => card(r, null)).join('')}</div></section>`);
 }
 
 /* ── 어느 값을 보나 ──

@@ -63,6 +63,18 @@ const probe = () => {
     const ws = [...new Set([...g.querySelectorAll('.st-step')].filter(vis).map((s) => R(s.getBoundingClientRect().width)))];
     if (ws.length > 1) out.mixed.push(`${(g.closest('.ps-group')?.querySelector('h3')?.textContent ?? rowOf(g)).trim()}: ${ws.join(' / ')}`);
   }
+  // 한 묶음(상자)의 줄들: 수 상자 크기 하나 (격자·접힌 칸 빼고)
+  for (const g of page.querySelectorAll('.ps-rows')) {
+    if (!vis(g) || g.querySelector('.ck-line')) continue;
+    const ws = [...new Set([...g.querySelectorAll('.st-step')].filter((s) => vis(s) && s.closest('.ps-rows') === g).map((s) => R(s.getBoundingClientRect().width)))];
+    if (ws.length > 1) out.mixed.push(`묶음 「${(g.closest('.ps-group, details')?.querySelector('h3, summary')?.textContent ?? '').trim() || '(제목 없음)'}」: ${ws.join(' / ')}`);
+  }
+  // 격자: 가로 넘침 없음, 한 줄의 수 상자 사이 틈 4px 이상
+  for (const g of page.querySelectorAll('.ck-pc')) {
+    if (!vis(g)) continue;
+    if (g.scrollWidth > g.clientWidth + 1) out.clip.push(`격자 「${g.closest('.ps-group')?.querySelector('h3')?.textContent ?? ''}」 가로 넘침 ${g.scrollWidth} > ${g.clientWidth}`);
+    for (const row of g.querySelectorAll('.ck-row')) { const bs = [...row.querySelectorAll('.st-step')].filter(vis).map((s) => s.getBoundingClientRect()); for (let i = 1; i < bs.length; i++) if (bs[i].left - bs[i - 1].right < 3.5) { out.clip.push(`격자 「${g.closest('.ps-group')?.querySelector('h3')?.textContent ?? ''}」 수 상자가 붙음 (${R(bs[i].left - bs[i - 1].right)}px)`); break; } }
+  }
   for (const e of page.querySelectorAll('.gx-seg, .gx-chip, .gx-mini')) {
     if (!vis(e)) continue;
     if (e.scrollWidth > e.clientWidth + 1) out.clip.push(`${rowOf(e)} <${e.className.split(' ')[0]}> 「${e.textContent.trim().slice(0, 20)}」 ${e.scrollWidth} > ${e.clientWidth}`);

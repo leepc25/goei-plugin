@@ -1,6 +1,6 @@
 // 「고급 설정」 접는 칸 (v0.16.27, 사용자 설계): 각 기능 설정 맨 아래, 기본은 닫힘. 손대지 않아도 원본 기본값으로 돈다.
 // 바꾼 항목은 이름 앞 점과 되돌리기 버튼으로 보이고, 닫힌 칸 제목에 바꾼 개수가 뜬다.
-import { numSet, setRow, setSeg, stepSize } from './setrow';
+import { groupStep, numSet, setRow, setSeg, stepSize } from './setrow';
 import { ADV, advChanged, advItem, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
@@ -84,7 +84,7 @@ export function advChipsCtl(f: AdvFeature, keys: string[], state: State): string
 /** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다 */
 export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[], noTitle = false): string {
   return ADV[f]
-    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group">${noTitle ? '' : `<h3>${esc(g.title)}</h3>`}<div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}</div>${extra[gi] ?? ''}</section>`))
+    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group">${noTitle ? '' : `<h3>${esc(g.title)}</h3>`}<div class="ps-rows">${groupStep(`${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`)}</div>${extra[gi] ?? ''}</section>`))
     .join('');
 }
 
@@ -93,7 +93,7 @@ export function advancedBox(f: AdvFeature, state: State): string {
   const n = advChanged(state, f).length;
   const groups = ADV[f]
     .map((g, gi) => {
-      const body = `${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`;
+      const body = groupStep(`${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`);
       if (g.fold) {
         return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc(g.title)}</summary><div class="ps-rows">${body}</div></details>`;
       }

@@ -5,7 +5,7 @@
    ─ 묶음 = 작은 제목 + 카드 하나(상자 한 겹). 카드 안 줄은 가는 선으로만 나뉨. 상자 속 상자 없음.
    ─ 색: 카드 panel, 입력칸(들어간 면) void, 단추(올린 면) panel2, 고른 것 accent-bg + accent-line. 그 밖의 색 없음.
    폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%, 최대 1340px), 높이 90%, 760px 이하 전체 화면 */
-.gw { --h: 34px; --r: 8px; --gap: 8px; --pad: 14px; --label: 200px; --ctl: 320px; --hair: var(--panel2); --gline: color-mix(in srgb, var(--line) 62%, var(--dim)); --step-sm: 110px; --step-lg: 206px; --fam-l: 104px;
+.gw { --h: 34px; --r: 8px; --gap: 8px; --pad: 14px; --label: 200px; --ctl: 320px; --hair: var(--panel2); --gline: color-mix(in srgb, var(--line) 62%, var(--dim)); --step-sm: 104px; --step-lg: 206px; --fam-l: 104px;
   position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 14px/1.5 var(--font); }
 .gw[hidden] { display: none; }
 .gw-win { position: relative; width: min(var(--gw-width, 90%), 1340px); height: min(90%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
@@ -661,7 +661,7 @@
 .gw .fam-l { font-size: 13px; color: var(--text); white-space: nowrap; }
 /* 격자 칸의 수 상자: 규격 그대로(높이·단추 폭). 가운데 수 칸 폭은 자릿수에 맞춘 값(setrow.ts numWidth) */
 /* 173줄의 입력 공통 규칙(안쪽 여백 12px)이 더 세서 수가 잘린다 → 수 칸만 여백을 줄인다 */
-.gw .adv-step > input.adv-val { padding: 0 2px !important; }
+.gw .adv-step > input.adv-val { padding: 0 !important; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   /* 폰: 짝을 한 열로 쌓는다. 이름은 왼쪽, 상자는 오른쪽 끝 한 줄 */
   .gw .ps-ctl > .fam-set, .gw .ps-ctl > .fam-set:has(.st-step.lg) { grid-template-columns: minmax(0, 1fr); width: 100%; gap: 8px; }
@@ -713,10 +713,10 @@
 }
 
 /* ── 시안9: 관제 화면 (호출 흐름). 줄 = 이름 96px · 조작 · 호출 글 · 예상 · 지난 턴 · 설정 →. 머리(예상·지난 턴)는 맨 위 한 번, 스크롤해도 붙어 있다. 폰 = 기능마다 판 ── */
-.gw .fl-page { --fl-st: 84px; --fl-go: 78px; --fl-name: 136px; --fl-ck: 78px; --fl-said: 176px; }
+.gw .fl-page { --fl-st: 84px; --fl-go: 78px; --fl-name: 136px; --fl-ck: 78px; --fl-said: 176px; --fl-ctlw: 412px; }
 /* 한 줄 = 이름 | 조작 | 호출 글(고정 칸) | 예상 | 지난 턴 | 설정 →. 설명은 그 아래 줄(조작 자리부터). 격자 줄은 조작 자리에 둥근 칸 5개 */
-.gw .fl-line { display: grid; grid-template-columns: var(--fl-name) minmax(0, 1fr) var(--fl-said) var(--fl-st) var(--fl-st) var(--fl-go); align-items: center; padding: 0 10px; }
-.gw .fl-g5 .fl-gbox .fl-line { grid-template-columns: var(--fl-name) repeat(5, var(--fl-ck)) minmax(0, 1fr) var(--fl-said) var(--fl-st) var(--fl-st) var(--fl-go); }
+.gw .fl-line { display: grid; grid-template-columns: var(--fl-name) var(--fl-ctlw) var(--fl-said) minmax(0, 1fr) var(--fl-st) var(--fl-st) var(--fl-go); align-items: center; padding: 0 10px; }
+.gw .fl-g5 .fl-gbox .fl-line { grid-template-columns: var(--fl-name) repeat(5, var(--fl-ck)) calc(var(--fl-ctlw) - 5 * var(--fl-ck)) var(--fl-said) minmax(0, 1fr) var(--fl-st) var(--fl-st) var(--fl-go); }
 .gw .fl-bar { position: sticky; top: 0; z-index: 3; margin: 0 0 18px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); grid-template-columns: minmax(0, 1fr) var(--fl-st) var(--fl-st) var(--fl-go); }
 .gw .fl-bar > p { margin: 0; font-size: 13.5px; color: var(--text); }
 .gw .fl-bar > p b { font-weight: 700; }
@@ -743,22 +743,23 @@
 .gw .fl-row.sub .fl-name::before { content: ''; position: absolute; left: 4px; top: -3px; width: 8px; height: 11px; border-left: 1.5px solid var(--gline); border-bottom: 1.5px solid var(--gline); }
 .gw .fl-plain > .fl-name { grid-area: 1 / 1; }
 .gw .fl-plain > .fl-ctl { grid-area: 1 / 2; }
-.gw .fl-plain > .fl-said { grid-area: 1 / -5; }
+.gw .fl-plain > .fl-said { grid-area: 1 / 3; }
 .gw .fl-plain > .fl-st { grid-area: 1 / -4 / span 2 / -3; }
 .gw .fl-plain > .fl-st + .fl-st { grid-area: 1 / -3 / span 2 / -2; }
 .gw .fl-plain > .fl-go { grid-area: 1 / -2; }
 /* 조작 칸: 두 칸 격자. 조작은 왼쪽 칸부터, 넓은 조작(.wide)은 한 줄 전부. 이름표는 늘 그 칸 맨 앞 */
-.gw .fl-ctl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 8px 12px; padding: 9px 12px 9px 0; min-width: 0; }
+.gw .fl-ctl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 8px 12px; padding: 9px 0; min-width: 0; }
 .gw .fl-pair { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 .gw .fl-pair.wide { grid-column: 1 / -1; }
 .gw .fl-l, .gw .flc-l, .gw .flc-tag { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
 /* 설명: 늘 조작 아래 줄, 조작이 시작하는 자리에서. 흐린 글 */
 .gw .fl-row > .fl-help { grid-area: 2 / 2 / auto / -4; margin: -3px 0 9px; padding-right: 12px; font-size: 12.5px; line-height: 1.45; color: var(--dim); }
 /* 호출 글: 모든 줄 같은 자리(고정 칸). 설명과 달리 본문 색·굵게 */
-.gw .fl-said { align-self: center; padding: 6px 10px 6px 12px; font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--dim); word-break: keep-all; }
+.gw .fl-said { align-self: center; padding: 6px 10px 6px 16px; font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--dim); word-break: keep-all; }
 .gw .fl-said.on { color: var(--text); }
 .gw .fl-pc .fl-name { white-space: nowrap; }
 .gw .fl-st { display: flex; align-items: center; justify-content: flex-end; align-self: stretch; padding: 6px 10px; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; box-shadow: inset 1px 0 0 var(--gline); }
+.gw .fl-pc.no-num .fl-st { box-shadow: none; }
 .gw .fl-fail { font-style: normal; font-weight: 700; color: var(--danger); }
 .gw .fl-go { justify-self: end; }
 /* 격자 줄의 설명: 격자 바로 아래, 이름을 앞에 붙여 한 줄씩 */
