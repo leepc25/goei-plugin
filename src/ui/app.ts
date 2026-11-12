@@ -55,7 +55,7 @@ import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reo
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
-import { handleAdvanced } from './advanced';
+import { booksInput, defaultsState, handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
 import { startCctvFx, stopCctvFx } from './cctvfx';
 import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard } from './evcard';
@@ -653,6 +653,11 @@ function panelInput(el: HTMLInputElement): void {
     if (box) box.innerHTML = directoryPhotoList(view.ctx);
     return;
   }
+  // 「상시 로어북」 목록 검색 (설정 → 로어북 호출): 그 줄이 보이는 범위의 값으로 목록만 다시 그린다
+  if (el?.dataset?.input === 'adv-books-q' && (view.kind === 'started' || view.kind === 'picker')) {
+    booksInput('adv-books-q', el.value, root, { char: view.ctx.char, chat: view.ctx.chat }, view.kind === 'started' && settingsUi.scope !== 'defaults' ? view.ctx.chat.scriptstate : defaultsState());
+    return;
+  }
   if (el?.dataset?.input === 'dir-ext-q' && (view.kind === 'started' || view.kind === 'picker')) {
     dirUi.addQ = el.value;
     const box = root?.querySelector('.dir-ext-list');
@@ -927,7 +932,8 @@ async function handle(action: string, value?: string): Promise<void> {
   if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
     // 범위: 시작 뒤엔 설정 창 범위(이 채팅/새 채팅 기본값). 시작 전엔 「고급」(gen)은 새 채팅 기본값, 기능 페이지(괴담넷·괴담톡·위키·필드)의
     // 고급 칸은 그 페이지의 다른 값처럼 이 채팅 (2026-10-28 QC: 시작 전 기능 페이지에서 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
-    const feat = (value ?? '').split(/[:=]/)[0];
+    // 「상시 로어북」(adv-books·adv-book)은 값이 로어북 이름이라 갈래가 없다: 생성 공통(gen)과 같은 범위
+    const feat = action === 'adv-set' ? (value ?? '').split(/[:=]/)[0] : 'gen';
     // 기능 페이지(gn·ph·wk·hq·pp)는 범위 전환이 없고 늘 이 채팅 값을 보여 준다: 시작 뒤 범위가 「새 채팅 기본값」이어도 이 채팅에
     // (2026-10-28 QC: 고급 페이지에서 기본값으로 바꿔 두고 괴담넷 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
     const scope = feat !== 'gen' ? 'chat' : view.kind === 'started' ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';

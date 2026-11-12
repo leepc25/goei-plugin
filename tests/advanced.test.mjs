@@ -132,3 +132,79 @@ test('budget: fitTotal splits the main-story total by each feature cap and gives
   assert.deepEqual(sizes(budget.fitTotal([part(4000, 500), part(4000, 4000)], 3000)), [500, 2500]);
   assert.ok(sizes(budget.fitTotal([part(4000, 4000), part(3000, 3000), part(8000, 8000)], 5000)).reduce((a, b) => a + b) <= 5000);
 });
+
+// ── 「상시 로어북」 고르기 (설정 → 로어북 호출, $gen_active_books) ──
+import { ACTIVE_BOOKS, ACTIVE_BOOKS_VAR, activeBooks, activeBooksValue, toggleActiveBook, bookNames, collectRefs as collectRefsAB } from '../dist-test/core.mjs';
+
+const abLore = [
+  { comment: '세계', mode: 'folder', key: 'f1' },
+  { comment: '📜Faction', content: '세력 글' },
+  { comment: '🙂Roster', content: '명부 글' },
+  { comment: '🏷️Tag', content: '표식 글' },
+  { comment: '소라 랜드', content: '놀이공원' },
+  { comment: '소라 랜드', content: '놀이공원 부록' },
+  { comment: 'GNet', content: '@@SECTION X\nsecret\n@@END' },
+  { comment: 'World catalog', content: '{}' },
+  { comment: '', content: '이름 없음' },
+];
+const abSrc = (state = {}, local = []) => ({ char: { name: '괴이봇', globalLore: abLore }, chat: { message: [], scriptstate: state, localLore: local } });
+const abActive = (state, opt = {}) => collectRefsAB(abSrc(state), { scope: 'gnet', text: '', ...opt }).filter((r) => r.kind === 'active').map((r) => r.sources[0]);
+
+test('상시 로어북: 기본값은 📜Faction·🙂Roster, 손대지 않으면 지금과 같다', () => {
+  assert.deepEqual(ACTIVE_BOOKS, ['📜Faction', '🙂Roster']);
+  assert.equal(ACTIVE_BOOKS_VAR, '$gen_active_books');
+  assert.deepEqual(activeBooks(undefined), ['📜Faction', '🙂Roster']);
+  assert.deepEqual(activeBooks({}), ['📜Faction', '🙂Roster']);
+  assert.deepEqual(activeBooks({ [ACTIVE_BOOKS_VAR]: '' }), ['📜Faction', '🙂Roster']);
+  assert.deepEqual(activeBooks({ [ACTIVE_BOOKS_VAR]: 'null' }), ['📜Faction', '🙂Roster'], '배열이 아님');
+  assert.deepEqual(activeBooks({ [ACTIVE_BOOKS_VAR]: '{깨진 글' }), ['📜Faction', '🙂Roster'], '읽을 수 없음');
+  assert.deepEqual(abActive({}), ['📜Faction', '🙂Roster']);
+  assert.deepEqual(abActive(undefined), ['📜Faction', '🙂Roster']);
+  // 기본값을 돌려준 배열을 고쳐도 기본값은 그대로
+  activeBooks({}).push('x');
+  assert.deepEqual(ACTIVE_BOOKS, ['📜Faction', '🙂Roster']);
+});
+
+test('상시 로어북: 고른 목록을 적고 읽는다 (기본값과 같으면 비운다, 하나도 안 고른 것은 따로 적힌다)', () => {
+  assert.equal(activeBooksValue(['📜Faction', '🙂Roster']), '');
+  assert.equal(activeBooksValue(['🙂Roster', '📜Faction']), '', '순서만 다름');
+  assert.equal(activeBooksValue([]), '[]');
+  assert.deepEqual(activeBooks({ [ACTIVE_BOOKS_VAR]: '[]' }), []);
+  const v = activeBooksValue(['📜Faction', ' 소라 랜드 ', '소라 랜드', '', 3]);
+  assert.equal(v, JSON.stringify(['📜Faction', '소라 랜드']));
+  assert.deepEqual(activeBooks({ [ACTIVE_BOOKS_VAR]: v }), ['📜Faction', '소라 랜드']);
+  // 체크: 넣기 → 빼기 → 기본값으로 돌아오면 빈 글
+  const add = toggleActiveBook({}, '소라 랜드');
+  assert.deepEqual(JSON.parse(add), ['📜Faction', '🙂Roster', '소라 랜드']);
+  assert.equal(toggleActiveBook({ [ACTIVE_BOOKS_VAR]: add }, '소라 랜드'), '');
+  assert.deepEqual(JSON.parse(toggleActiveBook({}, '🙂Roster')), ['📜Faction']);
+  assert.equal(toggleActiveBook({ [ACTIVE_BOOKS_VAR]: '["📜Faction"]' }, '📜Faction'), '[]');
+  // 새 채팅 기본값으로 저장되는 변수 (생성 공통·로어북 호출과 같은 $gen_)
+  assert.ok(settings.PREF_VAR.test(ACTIVE_BOOKS_VAR));
+  assert.ok(settings.isSettingVar ? settings.isSettingVar(ACTIVE_BOOKS_VAR) : true);
+  const p = settings.setPrefs({ vars: { [ACTIVE_BOOKS_VAR]: v } });
+  assert.equal(p.vars[ACTIVE_BOOKS_VAR], v);
+  assert.deepEqual(activeBooks(p.vars), ['📜Faction', '소라 랜드']);
+  settings.setPrefs({});
+});
+
+test('상시 로어북: 고른 로어북만 「상시 로어북」으로 넘긴다, 카드에 없는 이름은 건너뛴다', () => {
+  const set = (list) => ({ [ACTIVE_BOOKS_VAR]: JSON.stringify(list) });
+  assert.deepEqual(abActive(set(['🏷️Tag'])), ['🏷️Tag']);
+  assert.deepEqual(abActive(set(['🙂Roster', '소라 랜드'])), ['🙂Roster', '소라 랜드', '소라 랜드'], '같은 이름 로어북 둘 다');
+  assert.deepEqual(abActive(set([])), []);
+  assert.deepEqual(abActive(set(['없는 로어북', '📜Faction'])), ['📜Faction']);
+  assert.deepEqual(abActive(set(['없는 로어북'])), []);
+  assert.deepEqual(abActive(set(['GNet', 'World catalog'])), [], '내부 로어북은 골라 적어도 안 넘긴다');
+  // 기능의 「상시 로어북」 칩을 끄면 고른 것도 안 넘긴다
+  assert.deepEqual(abActive(set(['🏷️Tag']), { active: false }), []);
+  // 위키 범위에서는 필수 자료
+  const rows = collectRefsAB(abSrc(set(['🏷️Tag'])), { scope: 'wiki', text: '' });
+  assert.deepEqual(rows.map((r) => [r.kind, r.sources[0], r.required]), [['active', '🏷️Tag', true]]);
+});
+
+test('상시 로어북: 고를 수 있는 이름 목록 (폴더·내부 로어북·이름 없는 것 빼고, 같은 이름은 한 번)', () => {
+  assert.deepEqual(bookNames(abSrc()), ['📜Faction', '🙂Roster', '🏷️Tag', '소라 랜드']);
+  assert.deepEqual(bookNames(abSrc({}, [{ comment: '내 메모', content: 'x' }, { comment: '🏷️tag', content: 'y' }])), ['📜Faction', '🙂Roster', '🏷️Tag', '소라 랜드', '내 메모']);
+  assert.deepEqual(bookNames({ char: {}, chat: {} }), []);
+});

@@ -13,7 +13,7 @@ import {
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
-import { advSections } from './advanced';
+import { activeBooksRow, advSections } from './advanced';
 import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
@@ -480,7 +480,10 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       ].join('');
     })(),
     // 로어북 호출: 고급에서 따로 뺀 페이지 (2026-11-05 사용자)
-    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1], true)}`,
+    lore: (() => {
+      const st = scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars;
+      return advSections('gen', st, {}, [1], true, { 1: activeBooksRow({ char: ctx.char, chat: ctx.chat }, st) });
+    })(),
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0], true)}`,
     update: `${updateGroup(ctx)}`,
   };

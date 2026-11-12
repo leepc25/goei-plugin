@@ -1013,6 +1013,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-ext-open:hover { border-color: var(--accent-line); background: var(--accent-bg); }
 .dir-ext { margin-top: 10px; padding: 12px; border: 1px solid var(--accent-line); border-radius: 14px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
 
+/* 설정 줄 안의 고르기 목록 (로어북 호출 「상시 로어북」): 조작 아래 한 줄을 다 쓴다 */
+.ps-row > .ps-ctl:has(> .dir-ext) { flex: 1 1 100%; flex-wrap: wrap; }
+.ps-ctl > .dir-ext { flex: 1 1 100%; min-width: 0; margin-top: 0; }
 .dir-ext-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
 .dir-ext-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n a" "s a"; align-items: center; gap: 0 10px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--text); text-align: left; font: inherit; }
 .dir-ext-item:hover { background: var(--accent-bg); }

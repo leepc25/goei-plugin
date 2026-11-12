@@ -16,6 +16,7 @@ import { GHOST_ICON, ICONS } from '../icons';
 import { labelSwitches } from '../controls';
 import { bindDrawer, drawerHtml } from '../drawer';
 import { bindMbar } from '../mbar';
+import { booksInput, defaultsState } from '../advanced';
 import { rememberPanel } from '../panels';
 import editorCss from './style.css';
 import { recordCount, recordList, recordPage, recordAction, recordInput, recUi, rowsOf } from './record';
@@ -246,6 +247,11 @@ function ensureRoot(): HTMLElement {
       setCrop(key, [x, y, Number(el.value)]);
       const frame = root?.querySelector<HTMLElement>('[data-crop] .dir-crop-frame');
       if (frame) frame.style.width = `${el.value}%`;
+      return;
+    }
+    // 「상시 로어북」 목록 검색 (로어북 호출 페이지): 시작 전에는 새 채팅 기본값
+    if (name === 'adv-books-q' && ctx) {
+      booksInput(name, el.value, root, { char: ctx.char, chat: ctx.chat }, (host?.canChat?.() ?? true) ? ctx.chat.scriptstate : defaultsState());
       return;
     }
     if (name === 'dir-ext-q' && ctx) {
@@ -769,7 +775,7 @@ export function render(): void {
   autoSaveWorld();
   // 머리는 유령 아이콘 + 「설정」만 (2026-10-29 사용자: 봇 이름·현재 채팅·「바꾸면 바로 저장」 글귀는 지저분함)
   // 다시 그려도 보던 자리를 지킨다 (2026-10-29 사용자: 값 하나 바꿀 때마다 맨 위로 튕겼다). 같은 화면(노드)일 때만 — 다른 화면으로 가면 맨 위부터
-  const KEEP = ['.gw-body', '.gw-tree', '.gw-list', '.nw-groups'];
+  const KEEP = ['.gw-body', '.gw-tree', '.gw-list', '.nw-groups', '.ps-ctl > .dir-ext > .dir-ext-list'];
   const sameNode = lastDrawn === edUi.node;
   // 왼쪽 메뉴는 다른 항목을 골라도 보던 자리 그대로 (2026-11-10 사용자: 메뉴를 고르면 왼쪽 목록이 맨 위로 튕겼다). 탭이 바뀌면 목록이 달라지니 맨 위부터
   const sameTab = !!lastDrawn && tabOf(lastDrawn as EditorNode) === tab;

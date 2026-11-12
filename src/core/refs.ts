@@ -1,5 +1,5 @@
 // 참고 자료 모으기 (원본 REFERENCE_CORE). 위키·괴담넷·괴담톡이 같이 쓴다.
-// 봇 설명, 작가 노트, 제목과 같은 이름의 로어북, 글에 이름이 나온 로어북, 상시 참고(📜Faction·🙂Roster),
+// 봇 설명, 작가 노트, 제목과 같은 이름의 로어북, 글에 이름이 나온 로어북, 상시 로어북(고른 것, 기본 📜Faction·🙂Roster),
 // 그 로어북들 속 이름으로 한 번 더 찾은 2차 참조를 모아 "[종류: 출처]\n내용" 블록으로 만든다.
 import { guidePrompt, isGuideName } from './guides';
 import { evaluate, type CbsEnv } from './cbs';
@@ -30,7 +30,47 @@ const INTERNAL = new Set([
   'World catalog', 'Agent roster', 'Directive', 'Faction display', 'Start trigger', 'LB Backend', 'GNet', 'Wiki', 'Phone',
   'Phone tabs', 'Visit', 'Settings', '⚙️설정', '괴이봇 플러그인 매니페스트', '괴이봇 명부', 'Plugin manifest', 'Directory', 'WIKI_DIAGNOSTIC',
 ]);
+/** 「상시 로어북」 기본값 (사용자가 고르지 않았을 때) */
 export const ACTIVE_BOOKS = ['📜Faction', '🙂Roster'];
+/** 고른 「상시 로어북」 이름 목록 (JSON 배열). 비어 있으면 기본값. 설정 → 로어북 호출 (ui/advanced.ts), 새 채팅 기본값에도 담긴다 ($gen_) */
+export const ACTIVE_BOOKS_VAR = '$gen_active_books';
+const bookKey = (name: string) => name.trim().toLowerCase();
+/** 이름 목록 다듬기: 빈 이름·같은 이름(대소문자 무시)은 한 번만 */
+function cleanNames(list: unknown[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const x of list) {
+    const name = typeof x === 'string' ? x.trim() : '';
+    if (!name || seen.has(bookKey(name))) continue;
+    seen.add(bookKey(name));
+    out.push(name);
+  }
+  return out;
+}
+/** 지금 고른 「상시 로어북」. 저장된 값이 없거나 읽을 수 없으면 기본값 */
+export function activeBooks(state: Record<string, unknown> | undefined): string[] {
+  const raw = state?.[ACTIVE_BOOKS_VAR];
+  if (typeof raw !== 'string' || !raw.trim()) return [...ACTIVE_BOOKS];
+  try {
+    const list: unknown = JSON.parse(raw);
+    return Array.isArray(list) ? cleanNames(list) : [...ACTIVE_BOOKS];
+  } catch {
+    return [...ACTIVE_BOOKS];
+  }
+}
+/** 저장할 값: 기본값과 같으면 빈 글(= 기본값) */
+export function activeBooksValue(names: string[]): string {
+  const list = cleanNames(names);
+  const same = list.length === ACTIVE_BOOKS.length && ACTIVE_BOOKS.every((n) => list.some((x) => bookKey(x) === bookKey(n)));
+  return same ? '' : JSON.stringify(list);
+}
+/** 이름 하나를 넣거나 뺀 뒤 저장할 값 */
+export function toggleActiveBook(state: Record<string, unknown> | undefined, name: string): string {
+  const cur = activeBooks(state);
+  const key = bookKey(name);
+  if (!key) return activeBooksValue(cur);
+  return activeBooksValue(cur.some((n) => bookKey(n) === key) ? cur.filter((n) => bookKey(n) !== key) : [...cur, name.trim()]);
+}
 export const PERSONA_SOURCE = '사용자 페르소나';
 
 export function allowedBook(e: LoreEntry): boolean {
@@ -60,6 +100,11 @@ export function cbsEnv(src: RefSource): CbsEnv {
 function allBooks(src: RefSource): LoreEntry[] {
   const local = Array.isArray(src.chat.localLore) ? (src.chat.localLore as LoreEntry[]) : [];
   return [...(src.char.globalLore ?? []), ...local];
+}
+
+/** 이 카드에서 고를 수 있는 로어북 이름 (폴더·내부 로어북 빼고, 같은 이름은 한 번만) */
+export function bookNames(src: RefSource): string[] {
+  return cleanNames(allBooks(src).filter((e) => e.mode !== 'folder' && allowedBook(e)).map((e) => String(e.comment ?? '')));
 }
 
 /** 이름이 정확히 같은 로어북 내용 (CBS 해석, 표식 제거) */
@@ -131,7 +176,7 @@ export function collectRefs(src: RefSource, o: CollectOptions): RefRow[] {
   };
   for (const n of o.primaryNames ?? []) pull('primary', n);
   for (const x of o.extra ?? []) add('active', x.source, x.content);
-  if (o.active !== false) for (const n of ACTIVE_BOOKS) pull('active', n);
+  if (o.active !== false) for (const n of activeBooks(src.chat.scriptstate)) pull('active', n);
   if (o.related !== false) for (const e of referenceEntries(registry, o.text)) if (e.lore) pull('direct', e.lore);
   if (o.secondary) {
     const hop = rows.filter((r) => r.kind === 'primary' || r.kind === 'direct').map((r) => r.content).join('\n');

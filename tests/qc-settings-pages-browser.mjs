@@ -14,7 +14,7 @@ const PAGES = ['screen', 'image', 'board', 'status', 'net', 'phone', 'wiki', 'jo
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
 const FEATURE = new Set(['net', 'phone', 'wiki', 'people', 'journal', 'factions']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
-const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|man-|ip-|dir-|mk-|nav-|tab|close)/;
+const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|man-|ip-|dir-|mk-|nav-|tab|close|adv-book$)/; // adv-book: 「상시 로어북」 목록의 체크(카드의 로어북 수만큼, 150개쯤)는 아래 「상시 로어북」 절에서 따로 본다
 const CHANGE_SKIP = /^(ed-|dir-|ip-|pp-diag-all|pp-backfill-turns|pp-reread-turns)/;
 
 /** 저장 상태 스냅샷 */
@@ -369,6 +369,99 @@ for (const vp of vps) {
     await closeEditor(page, true);
     await closeWin(page);
     assert.deepEqual(errors, [], `${vp}: 시작 뒤 오류`);
+    await page.close();
+  }
+  // ── 로어북 호출 「상시 로어북」: 줄·목록·검색·체크 저장 (시작 전 = 새 채팅 기본값, 시작 뒤 = 이 채팅) ──
+  for (const mode of ['pre', 'chat']) {
+    const VAR = '$gen_active_books';
+    const chat0 = mode === 'pre' ? { message: [], scriptstate: {} } : { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } };
+    const { page, errors } = await boot(browser, fx, chat0, vp);
+    await openWin(page);
+    await openEditor(page, 'set:lore');
+    await page.waitForSelector('.gw .gw-setbody');
+    const saved = async () => (mode === 'pre' ? (await prefsOf(page)).vars?.[VAR] : (await chatOf(page)).scriptstate?.[VAR]) ?? '';
+    const row = () => page.evaluate(() => {
+      const btn = document.querySelector('.gw .gw-setbody [data-action="adv-books"]');
+      const r = btn?.closest('.ps-row');
+      if (!r) return null;
+      const name = r.querySelector(':scope > .ps-label > b');
+      const rg = document.createRange(); rg.selectNodeContents(name);
+      const b = btn.getBoundingClientRect();
+      return {
+        name: name.textContent.trim(), lines: new Set([...rg.getClientRects()].map((c) => Math.round(c.top))).size, group: r.closest('.ps-group')?.querySelectorAll('.ps-row').length,
+        count: btn.previousElementSibling?.textContent ?? '', btn: btn.textContent.trim(), h: Math.round(b.height), clip: btn.scrollWidth > btn.clientWidth + 1, help: r.querySelector(':scope > .ps-label > small')?.textContent ?? '',
+        open: !!r.querySelector('.dir-ext'), items: [...r.querySelectorAll('.dir-ext-item')].map((e) => [e.querySelector('b').textContent, e.getAttribute('aria-pressed') === 'true', e.querySelector('.ck-m').classList.contains('on'), e.querySelector('small')?.textContent ?? '']),
+        over: [...r.querySelectorAll('.dir-ext, .dir-ext-item, .gx-search')].filter((e) => e.getBoundingClientRect().right > r.getBoundingClientRect().right + 0.5 || e.getBoundingClientRect().left < r.getBoundingClientRect().left - 0.5).length,
+        qh: Math.round(r.querySelector('.gx-search')?.getBoundingClientRect().height ?? 0), empty: r.querySelector('.dir-ext-list > p')?.textContent ?? '',
+      };
+    });
+    const click = async (sel) => { await page.evaluate((s) => document.querySelector(s).click(), sel); await settle(page); };
+    const item = (n) => `.gw .gw-setbody .dir-ext-item[data-value="${n}"]`;
+    let r = await row();
+    const at = `${vp} 상시 로어북(${mode})`;
+    assert.ok(r, `${at}: 줄이 있다`);
+    assert.equal(r.name, '상시 로어북'); assert.equal(r.lines, 1, `${at}: 줄 이름 한 줄`);
+    assert.equal(r.count, '2개 선택'); assert.equal(r.btn, '로어북 선택'); assert.equal(r.h, 34); assert.ok(!r.clip, `${at}: 단추 글 안 잘림`);
+    assert.equal(r.help, '조건 없이 늘 넘기는 로어북이에요.'); assert.ok(!r.open, `${at}: 처음엔 닫힘`);
+    await click('.gw .gw-setbody [data-action="adv-books"]');
+    r = await row();
+    assert.ok(r.open && r.items.length > 2, `${at}: 목록이 열린다 (${r.items.length}개)`);
+    assert.equal(r.qh, 34); assert.equal(r.over, 0, `${at}: 목록이 줄 밖으로 안 넘침`);
+    assert.equal(new Set(r.items.map((i) => i[0].trim().toLowerCase())).size, r.items.length, `${at}: 같은 이름은 한 번`);
+    assert.deepEqual(r.items.slice(0, 2).map((i) => i[0]).sort(), ['🙂Roster', '📜Faction'].sort(), `${at}: 고른 것이 맨 위`);
+    assert.deepEqual(r.items.filter((i) => i[1]).map((i) => i[0]).sort(), ['🙂Roster', '📜Faction'].sort(), `${at}: 기본은 둘만 체크`);
+    assert.ok(r.items.every((i) => i[1] === i[2] && !i[3]), `${at}: 체크 모양 = 값, 카드에 없는 것 없음`);
+    assert.equal(await saved(), '', `${at}: 열기만 해서는 저장 안 함`);
+    // 검색: 목록만 걸러진다 (입력 칸은 그대로)
+    const pick = r.items.find((i) => !i[1])[0];
+    await page.evaluate((v) => { const q = document.querySelector('.gw .gw-setbody [data-input="adv-books-q"]'); q.focus(); q.value = v; q.dispatchEvent(new Event('input', { bubbles: true })); }, pick);
+    await sleep(150);
+    r = await row();
+    assert.ok(r.items.length >= 1 && r.items.every((i) => i[0].toLowerCase().includes(pick.toLowerCase())), `${at}: 검색 「${pick}」`);
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset?.input), 'adv-books-q', `${at}: 검색 칸에 그대로`);
+    // 체크: 바로 저장, 개수 글이 바뀐다
+    await click(item(pick));
+    assert.deepEqual(JSON.parse(await saved()), ['📜Faction', '🙂Roster', pick], `${at}: 체크하면 바로 저장`);
+    if (mode === 'pre') assert.equal((await chatOf(page)).scriptstate?.[VAR] ?? '', '', `${at}: 시작 전엔 채팅에 안 섞임`);
+    else assert.equal((await prefsOf(page)).vars?.[VAR] ?? '', '', `${at}: 시작 뒤엔 기본값에 안 섞임`);
+    r = await row();
+    assert.equal(r.count, '3개 선택'); assert.ok(r.open, `${at}: 체크해도 목록은 열려 있다`);
+    assert.ok(r.items.find((i) => i[0] === pick)[1], `${at}: 체크 표시`);
+    await page.evaluate(() => { const q = document.querySelector('.gw .gw-setbody [data-input="adv-books-q"]'); q.value = '없는이름zz'; q.dispatchEvent(new Event('input', { bubbles: true })); });
+    await sleep(150);
+    assert.equal((await row()).empty, '검색 결과가 없어요.');
+    await page.evaluate(() => { const q = document.querySelector('.gw .gw-setbody [data-input="adv-books-q"]'); q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true })); });
+    await sleep(150);
+    // 풀기 → 기본값과 같아지면 변수를 비운다
+    await click(item(pick));
+    assert.equal(await saved(), '', `${at}: 기본값과 같아지면 비움`);
+    assert.equal((await row()).count, '2개 선택');
+    await click(item('🙂Roster'));
+    assert.deepEqual(JSON.parse(await saved()), ['📜Faction'], `${at}: 기본 로어북도 뺄 수 있다`);
+    await click(item('📜Faction'));
+    assert.equal(await saved(), '[]'); assert.equal((await row()).count, '0개 선택');
+    await click(item('📜Faction')); await click(item('🙂Roster'));
+    assert.equal(await saved(), '', `${at}: 다시 둘을 고르면 기본값`);
+    // 닫기
+    await click('.gw .gw-setbody [data-action="adv-books"]');
+    assert.ok(!(await row()).open, `${at}: 다시 누르면 닫힘`);
+    if (mode === 'chat') {
+      // 카드에 없는 이름: 목록 맨 위에 「카드에 없음」으로 남고, 풀 수 있다
+      await setChat(page, { ...chat0, scriptstate: { ...chat0.scriptstate, [VAR]: JSON.stringify(['📜Faction', '지워진 로어북 zz']) } });
+      await closeEditor(page, true); await closeWin(page); await openWin(page); await openEditor(page, 'set:lore');
+      assert.equal((await row()).count, '2개 선택');
+      await click('.gw .gw-setbody [data-action="adv-books"]');
+      r = await row();
+      assert.deepEqual(r.items[0], ['지워진 로어북 zz', true, true, '카드에 없음'], `${at}: 카드에 없는 이름`);
+      await click(item('지워진 로어북 zz'));
+      assert.deepEqual(JSON.parse(await saved()), ['📜Faction']);
+      assert.ok(!(await row()).items.some((i) => i[0] === '지워진 로어북 zz'), `${at}: 풀면 목록에서 사라짐`);
+      // AI 상담 목록: 설명만 있는 줄 (바꾸기 못 함), 목록의 체크는 상담 조작이 아니다
+      const a = await auditDom(page, '.gw');
+      assert.deepEqual(a.missing, [], `${at}: 글자·aria-label 없는 단추`);
+      if (vp !== 'pc') assert.deepEqual(a.overflow, [], `${at}: 가로 넘침`);
+    }
+    assert.deepEqual(errors, [], `${at}: 오류`);
     await page.close();
   }
   console.log(`PASS 설정 페이지 [${vp}]: 조작 ${total}회`);
