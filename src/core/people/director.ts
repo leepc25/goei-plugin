@@ -123,7 +123,8 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
     .replace('{{LANG}}', s.directorLang === 'ko' ? 'Korean' : 'English')
     .replace('{{LINES}}', s.directorLen === 'normal' ? '3' : '1');
   const data = { people: persons, ...(rhythm.length ? { rhythm, rhythm_clock: rhythmClockLines(rhythmClock(store, chat, live)) } : {}), ...(memory.length ? { memory } : {}), recent, input: input.slice(0, 4000) };
-  const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, p.state, p.threads, p.unknown_to, p.slots]), input }));
+  // 최근 글도 열쇠에 넣는다: 같은 입력을 두 번 보내도 장면이 나아갔으면 다시 묻는다. 리롤은 최근 글이 같아 그대로 재사용 (전수검사 11-13)
+  const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, p.state, p.threads, p.unknown_to, p.slots]), input, recent: recent.map((r) => r.text.slice(0, 400)) }));
   return { system, data, key, people, search: s.directorSearch };
 }
 
@@ -153,7 +154,9 @@ const KINDS: SearchKind[] = ['chat', 'lore', 'wiki'];
 /** 응답 → 메모 또는 검색 요청. allowSearch=false 면 need 는 오류 */
 export function parseDirectorAny(raw: string, people: string[], scene: boolean, allowSearch: boolean): { notes: DirectorNote[] } | { need: DirectorSearch[] } {
   const v = jsonOf(raw);
-  if (Array.isArray(v.need)) {
+  // 빈 need 는 없는 것으로 친다. need 와 notes 가 같이 오면 2차·검색 요청이 비었을 때 notes 를 쓴다 (전수검사 11-13)
+  const hasNotes = Array.isArray(v.notes);
+  if (Array.isArray(v.need) && v.need.length && !(hasNotes && !allowSearch)) {
     if (!allowSearch) throw new Error('2차에서는 검색을 요청할 수 없어요');
     const need: DirectorSearch[] = [];
     for (const x of v.need as Record<string, unknown>[]) {
@@ -163,8 +166,8 @@ export function parseDirectorAny(raw: string, people: string[], scene: boolean, 
       need.push({ kind, query, reason: plain(x?.reason, 60) });
       if (need.length >= SEARCH_MAX) break;
     }
-    if (!need.length) throw new Error('검색 요청이 비어 있어요');
-    return { need };
+    if (need.length) return { need };
+    if (!hasNotes) throw new Error('검색 요청이 비어 있어요');
   }
   if (!Array.isArray(v.notes)) throw new Error('notes 목록이 없어요');
   const out: DirectorNote[] = [];

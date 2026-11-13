@@ -277,7 +277,9 @@ export function mallEvents(chat: Chat): string[] {
     }
   }
   const desk = readDesk(vars);
-  if (shopMain(vars, 'bm').has('desk') && desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${capLines(desk.talk.filter((l) => l.who !== 'sys'), lines).map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
+  // 상담 줄마다 적힌 응답 키로 거른다 (키 없는 옛 줄은 상담 키): 창을 열어 둔 채 다음 턴에 이어 한 말도 넘어가고, 지난 턴 줄은 다시 안 간다 (전수검사 11-13)
+  const dl = desk.talk.filter((l) => l.who !== 'sys' && ((l as { k?: string }).k ?? desk.anchor) === key);
+  if (shopMain(vars, 'bm').has('desk') && dl.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${capLines(dl, lines).map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
   return out;
 }
 

@@ -29,13 +29,28 @@ export async function saveVarDefaults(prefixes: string[], state: Record<string, 
   });
 }
 
-/** 「불러오기」: 새 채팅 기본값을 지금 채팅 변수로. 기본값에 없는 항목은 비워서 원래 기본값으로 돌린다 */
+/** 「불러오기」 옛판: 기본값에 없는 항목을 ''로 채운다. ''를 0으로 읽는 칸이 있어 varDefaultsToLoad 로 옮길 것 (전수검사 11-13) */
 export function loadVarDefaults(prefixes: string[], state: Record<string, unknown> | undefined): Record<string, string> {
   const mine = (k: string) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
   const saved = getPrefs().vars ?? {};
   const out: Record<string, string> = {};
   for (const k of [...new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? '');
   return out;
+}
+
+/** 「불러오기」 새판: 기본값에 있는 값은 set, 없는 항목은 drop(채팅 변수에서 지워 코드 기본값으로).
+ *  ''로 덮으면 소지 칸·한도·선쪽지 확률 등이 0·최솟값으로 읽혀서 지운다 (전수검사 11-13) */
+export function varDefaultsToLoad(prefixes: string[], state: Record<string, unknown> | undefined): { set: Record<string, string>; drop: string[] } {
+  const mine = (k: string) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+  const saved = getPrefs().vars ?? {};
+  const set: Record<string, string> = {};
+  const drop: string[] = [];
+  for (const k of [...new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) {
+    const v = saved[k];
+    if (typeof v === 'string' && v !== '') set[k] = v;
+    else drop.push(k);
+  }
+  return { set, drop };
 }
 
 /** 고친 값을 합쳐 저장한다 */

@@ -17,6 +17,7 @@ import { deskSettings } from '../../core/bmdesk';
 import { boardView, BOARD_NAME, BOARD_SITES } from '../../core/boards';
 import { jointOn, JOINT_LABEL } from '../../core/netjoint';
 import { advItem, advValue, genSettings } from '../../core/advanced';
+import { baseLabel } from '../../core/progress';
 import { invOn } from '../../core/items';
 import { colConfig } from '../../core/world/statuscols';
 import { isOnOff, switchHtml } from '../controls';
@@ -81,7 +82,8 @@ function lastTurn() {
 function real(match: (label: string) => boolean): string {
   const t = lastTurn();
   if (!t) return '';
-  const cs = t.calls.filter((c) => match(c.label));
+  // 「다시 묻기 1」「(통합 뒤 따로)」 꼬리는 떼고 센다. 안 떼면 줄 합이 맨 위 합계와 안 맞던 것 (전수검사 11-13)
+  const cs = t.calls.filter((c) => match(baseLabel(c.label)));
   if (!cs.length) return '';
   const sent = cs.reduce((s, c) => s + (c.requestTokens ?? 0), 0);
   return cs.some((c) => !c.ok) ? `<em class="fl-fail" title="실패">${fmt(sent)}</em>` : fmt(sent);
@@ -292,7 +294,7 @@ export function flowSections(real0: ChatContext, started: boolean): { sections: 
   const jointFirst = (name: string) => (l: string) => l.endsWith(' 통합') && l.split(' ')[0].split('+')[0] === name;
   const wikiOn = nw.auto === 'turn';
   const grid: Row[] = [
-    { name: '괴담톡', on: ph.auto, call: true, ctls: [], grid: [auto3('ph.auto', ph.auto ? '1' : ph.autoOpen ? 'open' : '0', ['0', 'open', '1'], (v) => `ph-cfg|auto=${v}`), model2('ph.model', ph.model === 'main' ? 'main' : 'aux', ['main', 'aux'], (v) => `ph-cfg|model=${v}`)], calls: calls('괴담톡 확인'), est: est('괴담톡 확인'), real: real((l) => l === '괴담톡 확인' || l === '괴담톡 답장' || jointFirst(JOINT_LABEL.phone)(l)), go: ['set:phone', 'r:자동 호출'],
+    { name: '괴담톡', on: ph.auto, call: true, ctls: [], grid: [auto3('ph.auto', ph.auto ? '1' : ph.autoOpen ? 'open' : '0', ['0', 'open', '1'], (v) => `ph-cfg|auto=${v}`), model2('ph.model', ph.model === 'main' ? 'main' : 'aux', ['main', 'aux'], (v) => `ph-cfg|model=${v}`)], calls: calls('괴담톡 확인'), est: est('괴담톡 확인'), real: real((l) => l === '괴담톡 확인' || l === '괴담톡 답장' || l === JOINT_LABEL.phone || jointFirst(JOINT_LABEL.phone)(l)), go: ['set:phone', 'r:자동 호출'],
       after: [{ name: '선톡·초대', on: ph.auto && (ph.incoming || ph.invites), ctls: [sw('ph.incoming', '선톡 받기', ph.incoming, (v) => `ph-cfg|incoming=${v}`), sw('ph.group_invites', '단톡방 초대 받기', ph.invites, (v) => `ph-cfg|group_invites=${v}`)], help: '인물이 먼저 보내는 메시지와 단톡방 초대를 받을지예요. 둘 다 끄면, 확인할 방이 없는 턴에는 괴담톡 호출을 건너뛰어요.', go: ['set:phone', 'r:선톡 받기'] }] },
     ...boards.map(({ site, g }): Row => ({ name: BOARD_NAME[site], on: g.enabled && g.auto, call: true, ctls: [], grid: [auto3(`board.${site}.auto`, g.auto ? '0' : g.autoOpen ? 'open' : '1', ['1', 'open', '0'], (v) => `fam-set|b:${site}:lazy=${v}`), model2(`board.${site}.model`, g.model === 'main' ? '1' : '2', ['1', '2'], (v) => `fam-set|b:${site}:mode=${v}`)], calls: calls(`${BOARD_NAME[site]} 새로고침`), est: est(`${BOARD_NAME[site]} 새로고침`), real: real((l) => l === BOARD_NAME[site] || jointFirst(BOARD_NAME[site])(l)), go: ['set:net', 'r:자동 호출'] })),
     /** 관전은 모델 설정이 따로 없다 (괴담톡 모델을 씀, flow.ts 관전 줄) */

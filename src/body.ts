@@ -46,7 +46,7 @@ import { createFab, type Fab } from './host/overlay';
 import { createProgWin, progressOn, type ProgWin } from './host/progwin';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintTheme, setCurrentTheme, themeName } from './ui/theme';
-import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
+import { hasImgTag, IMG_RECENT, imgHidden, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { appShown, openApp, openInstall, openRecords, openShop, openWiki } from './ui/app';
@@ -145,17 +145,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   try {
     setWaiting(true);
     setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
-    // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
-    messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages).messages).messages, messages);
-    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
-    if (messages.some((m) => marked(m?.content))) {
-      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripSceneMark(stripStartCard(stripUnsentMark(m.content))) } : m)), messages);
-    }
-    // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
-    if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) {
-      messages = step('옛 이미지 태그', () => stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def), messages);
-    }
     // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
+    // 지시문 풀기가 채팅의 마지막 메시지를 봐야 해서 그 앞에서 읽는다 (전수검사 11-13)
     let ctx: ChatContext | null = null;
     if (liteNow) {
       // 호출 흐름 기록: 새 턴 (host/trace.ts). 이 뒤의 라우터·디렉터 호출은 이 턴의 「본편 전」
@@ -163,6 +154,27 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
       // 진행 창 (core/progress.ts): 이 턴에 돌 단계를 설정으로 미리 깐다
       if (ctx) step('진행 계획', () => progressPlan(turnPlan(ctx!.char, ctx!.chat)), undefined);
+    }
+    // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
+    // 카드·전화가 채팅의 마지막 메시지면 요청에서 그 뒤의 user 글은 프리셋 글이라 합치지 않는다. 채팅을 못 읽으면 전처럼 (전수검사 11-13)
+    if (messages.some((m) => m?.role === 'user' && (hasSceneCard(m.content) || hasCall(m.content)))) {
+      const chat0 = ctx?.chat ?? (await stepAsync('지시문 채팅 읽기', async () => (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null, null));
+      const last = chat0?.message?.at(-1);
+      const lastData = last?.role === 'user' && typeof last.data === 'string' ? last.data : '';
+      const o = chat0 ? { cardIsLast: hasSceneCard(lastData), callIsLast: hasCall(lastData) } : {};
+      messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages, o).messages, o).messages, messages);
+    }
+    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
+    if (messages.some((m) => marked(m?.content))) {
+      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripSceneMark(stripStartCard(stripUnsentMark(m.content))) } : m)), messages);
+    }
+    // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
+    if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) {
+      // 이 채팅의 에셋 출력이 꺼져 있으면 최근 것까지 전부 뺀다. 남기면 모델이 따라 써 태그가 끝없이 이어졌다 (전수검사 11-13)
+      const assetOff = step('에셋 출력 읽기', () => (ctx ? !basicSettings(ctx.char.globalLore, ctx.chat.scriptstate).assetOn : imgHidden()), false);
+      messages = step('옛 이미지 태그', () => (assetOff ? stripAllImgTags(messages) : stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def)), messages);
+    }
+    if (liteNow) {
       // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
       await stepAsync('유저 이름', () => readUser(), undefined);
       messages = step('기록 태그 정리', () => stripHistoryTags(messages), messages);
@@ -210,6 +222,17 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (liteNow) step('호출 기록', () => traceMain(out, failed), undefined);
   lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
   return out;
+}
+
+/** 요청의 이미지 태그를 전부 지운다 (시스템 글 제외). 에셋 출력을 끈 채팅용 (전수검사 11-13) */
+function stripAllImgTags<M extends PromptMessage>(messages: M[]): M[] {
+  let changed = false;
+  const out = messages.map((m) => {
+    if (!m || m.role === 'system' || typeof m.content !== 'string' || !m.content.includes('<img=')) return m;
+    changed = true;
+    return { ...m, content: m.content.replace(/<img=.*?>/g, '') };
+  });
+  return changed ? out : messages;
 }
 
 /** 플러그인 표식만 지운다 (core/sanitize.ts). 시작기도 본체 beforeRequest 가 던졌을 때 이것을 부른다. 던지지 않는다 */

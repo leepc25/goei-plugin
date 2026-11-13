@@ -174,10 +174,16 @@ export function syncWalletToStatus(w: Wallet, chat: Chat): Wallet | null {
   if (target === null) return null;
   const id = syncId(anchor);
   const base = removeWalletEntry(w, id);
+  const alive = aliveAnchors(chat);
+  // 응답 뒤에 한 직접 수정(수동 줄)은 상태창이 쓰인 다음 일이라 셈에서 뺀다 (전수검사 11-13: 갱신기가 끝날 때 되돌려졌다)
+  const t = typeof msgs[i].time === 'number' ? (msgs[i].time as number) : NaN;
+  const later = (e: WalletEntry) => e.src === 'manual' && Number.isFinite(t) && Date.parse(e.at) > t;
+  // 모델이 잔고 칸을 바꾸지 않았으면(직전 [Previous status] 로 넘긴 값 그대로) 맞추지 않는다 — 갱신기가 읽은 지출이 맞춤 줄로 되돌려지지 않게 (전수검사 11-13, 설정 도움말 「바꿨을 때」)
+  const prior = { ...base, log: base.log.filter((e) => e.anchor !== anchor && !later(e)) };
+  if (target === walletBalance(prior, alive)) return JSON.stringify(base) === JSON.stringify(w) ? null : base;
   // 그 응답 뒤 상점에서 사고판 거래(같은 응답에 묶인 store 줄)는 상태창이 쓰인 다음 일이라 맞춤 셈에서 뺀다 —
   // 갱신기가 늦게 끝나 다시 맞출 때 방금 산 값이 「상태창 잔고」 줄로 되돌려지지 않게
-  const alive = aliveAnchors(chat);
-  const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor)) };
+  const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor) && !later(e)) };
   const diff = target - walletBalance(before, alive);
   const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: WALLET_SYNC_MEMO, src: 'story' });
   return JSON.stringify(next) === JSON.stringify(w) ? null : next;

@@ -107,11 +107,11 @@ export function applyConsolidate(store: PeopleStore, who: string, input: Consoli
       list.push({ id: entryId(who, slot, '#0', seq, n.text), text: n.text, src: 'story', anchor: '#0', seq, ...(n.target ? { target: n.target } : {}), ...(n.from.length === 1 ? { replaces: n.from[0] } : { from: n.from }) });
       for (const id of n.from) used.add(id);
     }
-    // 어디에도 안 쓰인 원본은 버린 것: 취소 표시한 빈 대체 항목으로 숨긴다 (정리 항목은 '#0' 기준이라 되살아나지 않는다)
+    // 어디에도 안 쓰인 원본은 버린 것: 원본에 folded 를 단다. 예전의 취소(void) 대체 항목은 살아 있지 않아 원본을 숨기지 못했다 (전수검사 11-13)
     for (const e of input.data.slots[slot]) {
       if (used.has(e.id)) continue;
-      seq++;
-      list.push({ id: entryId(who, slot, '#0', seq, `-${e.id}`), text: `(정리에서 제외) ${e.text}`.slice(0, 300), src: 'story', anchor: '#0', seq, replaces: e.id, void: true, ...(e.target ? { target: e.target } : {}) });
+      const orig = list.find((x) => x.id === e.id);
+      if (orig) orig.folded = true;
     }
     report.slots++;
     report.before += input.data.slots[slot].length;

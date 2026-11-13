@@ -34,8 +34,8 @@ export interface PeopleEnv {
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-/** 도식 「설정 →」이 가는 줄 (블록 id → 그 단계를 켜고 끄는 줄 이름) */
-const PP_GOTO_ROW: Record<string, string> = { 'pp-blk-router': 'Router', 'pp-blk-director': 'Director', 'pp-blk-update': '자동 호출', 'pp-blk-tidy': '정리 방식' };
+/** 도식 「설정 →」이 가는 줄 (블록 id → [그 줄이 있는 블록, 그 단계를 켜고 끄는 줄 이름]). 갱신의 「자동 호출」은 공통 블록에 있다 (전수검사 11-13) */
+const PP_GOTO_ROW: Record<string, [string, string]> = { 'pp-blk-router': ['pp-blk-router', 'Router'], 'pp-blk-director': ['pp-blk-director', 'Director'], 'pp-blk-update': ['pp-blk-common', '자동 호출'], 'pp-blk-tidy': ['pp-blk-tidy', '정리 방식'] };
 
 /** 화면 상태 (입력 중인 글은 다시 그려도 지킨다) */
 export const peopleUi = {
@@ -858,10 +858,10 @@ export function personView(ctx: ChatContext, name: string): string {
     const aliveN = liveEntries(all, live).length;
     return `<section class="pp-slot"><h4 title="${esc(SLOT_HELP[s])}">${esc(SLOT_LABEL[s])}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(all, live, `pp-old:${name}:${s}`, (e, st) => entryRow(ctx, name, s, e, live, st))}</section>`;
   };
-  // 기본 칸 → 기능별 전용 칸 묶음 (꺼진 기능의 칸은 통째로 숨김)
+  // 기본 칸 → 기능별 전용 칸 묶음 (꺼진 기능의 칸은 통째로 숨김). 기본은 펼침, 접은 묶음은 다시 그려도 접힌 채로 (전수검사 11-13)
   const groups = SLOT_GROUPS.map((g) => {
     const body = g.slots.map(slotSection).join('');
-    return body ? `<details class="ps-adv-sub pp-group" data-keep="pp-group:${g.key}"${keepOpen(`pp-group:${g.key}`)} open><summary title="${esc(g.help)}">${esc(g.title)}<b>${g.slots.reduce((n, s) => n + (enabledSlots.has(s) ? liveEntries(p.slots[s] ?? [], live).length : 0), 0)}</b></summary><div class="pp-group-body">${body}</div></details>` : '';
+    return body ? `<details class="ps-adv-sub pp-group" data-keep="pp-group:${g.key}"${keepOpen(`pp-group:${g.key}`, true)}><summary title="${esc(g.help)}">${esc(g.title)}<b>${g.slots.reduce((n, s) => n + (enabledSlots.has(s) ? liveEntries(p.slots[s] ?? [], live).length : 0), 0)}</b></summary><div class="pp-group-body">${body}</div></details>` : '';
   }).join('');
   const hiddenN = FEATURE_SLOTS.filter((s) => !enabledSlots.has(s) && (p.slots[s]?.length ?? 0) > 0).length;
   const slots = CORE_SLOTS.map(slotSection).join('') + groups + (hiddenN ? `<p class="ps-note">꺼진 기능의 칸 ${hiddenN}개는 숨겨져 있어요 (기능을 켜면 돌아와요).</p>` : '');
@@ -980,8 +980,8 @@ export async function handlePeople(action: string, value: string | undefined, ct
       // 호출 흐름 도식 → 그 단계를 켜고 끄는 줄로 가서 그 줄만 잠깐 밝힌다 (통합 검색과 같은 효과, 2026-11-08 사용자: 블록 전체 X)
       // 설정 창은 조작 뒤 늘 다시 그리므로 다시 그린 뒤에
       setTimeout(() => {
-        const label = PP_GOTO_ROW[v];
-        const row = [...(document.getElementById(v)?.querySelectorAll<HTMLElement>('.ps-row') ?? [])].find((r) => r.querySelector('.ps-label > b')?.firstChild?.textContent?.trim() === label);
+        const [blockId, label] = PP_GOTO_ROW[v] ?? [v, ''];
+        const row = [...(document.getElementById(blockId)?.querySelectorAll<HTMLElement>('.ps-row') ?? [])].find((r) => r.querySelector('.ps-label > b')?.firstChild?.textContent?.trim() === label);
         if (!row) return;
         row.scrollIntoView({ block: 'center' });
         row.classList.remove('gw-find-flash');

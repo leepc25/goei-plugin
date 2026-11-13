@@ -891,8 +891,23 @@ function autoSaveWorld(): void {
   });
 }
 
+// 도는 저장. 저장 중에 또 부르면 버리지 않고 끝난 뒤 한 번 더 돈다 (전수검사 11-13)
+let saving: Promise<void> | null = null;
 async function save(ctx: ChatContext): Promise<void> {
-  if (edUi.busy) return;
+  if (saving) {
+    await saving;
+    // 앞 저장이 카드를 새로 읽었으니 지금 ctx 로
+    return anyDirty() ? save(host?.ctx() ?? ctx) : undefined;
+  }
+  saving = saveNow(ctx);
+  try {
+    await saving;
+  } finally {
+    saving = null;
+  }
+}
+
+async function saveNow(ctx: ChatContext): Promise<void> {
   edUi.busy = true;
   edUi.notice = '';
   try {

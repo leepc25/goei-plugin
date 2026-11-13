@@ -1,5 +1,6 @@
 // 지침 편집 (docs/설계안_세계편집.md 3장): 글칸 하나 + 자리표 안내 + 토큰. 고친 글은 이 기기 설정(prefs.guides)에 두고 core/guides.ts 가 요청에 쓴다.
 import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, isGuideName, joinGuide, setGuideOverride, splitGuide, type GuideName } from '../../core/guides';
+type GuidePart = ReturnType<typeof splitGuide>[number];
 import { tokenizerName } from '../../core/tokenizer';
 import { tokens } from '../../core/gnet';
 import { savePrefs } from '../../host/prefs';
@@ -8,6 +9,14 @@ import { copyBtn } from '../copy';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 export const guideUi = { draft: {} as Partial<Record<GuideName, string>>, info: '' };
+/** 화면에 그린 절 나눔. 입력 중에는 다시 나누지 않는다: 본문에 친 ##·### 줄이 새 절이 되면 칸 순번이 어긋나 다른 절을 덮었다 (전수검사 11-13) */
+const drawn: Partial<Record<GuideName, GuidePart[]>> = {};
+/** 입력할 절: 그린 나눔이 지금 글과 같으면 그대로, 아니면(다른 데서 바뀜) 새로 나눈다 */
+function partsNow(name: GuideName): GuidePart[] {
+  const text = guideUi.draft[name] ?? guideText(name);
+  const kept = drawn[name];
+  return kept && joinGuide(kept) === text ? kept : splitGuide(text);
+}
 /** 저장 상한 (core/settings.ts setPrefs 와 같은 값) */
 export const GUIDE_MAX = 120000;
 
@@ -42,6 +51,7 @@ export function guidePage(name: GuideName, crumb = ''): string {
   // 절 단위 글칸 (2026-10-27 사용자): 구분 줄(@@SECTION·===·##)은 플러그인이 들고, 사용자는 절 본문만 고친다
   // 글칸 첫 줄바꿈 하나는 HTML 이 떼어 버리므로(<textarea>\n…) 하나를 더 넣어 본문이 줄바꿈으로 시작해도 그대로 보이게 (2026-10-28 QC: 제목 뒤 빈 줄이 사라졌다)
   const parts = splitGuide(text);
+  drawn[name] = parts.map((p) => ({ ...p }));
   // 제목 줄 (2026-11-05 사용자: 구분 표시(##·===COMMON===)는 보이지 않게, 제목은 고칠 수 있게)
   //  - ##·### 머리글: 모델에게 가는 글의 제목이라 그대로 고칠 수 있다 (### 는 한 단 들여 보임)
   //  - @@SECTION·=== 이름: 플러그인이 요청마다 절을 고르는 이름표라 글자를 바꾸면 못 찾는다 → 이름만 보여 주고 잠근다
@@ -66,12 +76,20 @@ export function guidePage(name: GuideName, crumb = ''): string {
   </div>`;
 }
 
-/** 입력 중 머리의 토큰 수만 맞춘다 (창 전체를 다시 그리면 커서가 날아간다) */
+/** 입력 중 머리의 토큰 수만 맞춘다 (창 전체를 다시 그리면 커서가 날아간다).
+ *  입력이 멈추고 0.3초 뒤에 센다: 글자마다 지침 전체(갱신기 11만 자)를 세면 입력이 버벅였다 (전수검사 11-13) */
+let barTimer: ReturnType<typeof setTimeout> | undefined;
 export function guideBarSync(root: ParentNode, name: string): void {
   if (!isGuideName(name)) return;
-  const text = guideUi.draft[name] ?? guideText(name);
-  const tok = root.querySelector('.gw-head .gw-tokens');
-  if (tok) tok.textContent = `${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰`;
+  if (barTimer !== undefined) clearTimeout(barTimer);
+  barTimer = setTimeout(() => {
+    barTimer = undefined;
+    // 그새 다른 지침으로 옮겼으면 그 머리에 쓰지 않는다
+    if (!root.querySelector(`[data-key^="${name}|"]`)) return;
+    const text = guideUi.draft[name] ?? guideText(name);
+    const tok = root.querySelector('.gw-head .gw-tokens');
+    if (tok) tok.textContent = `${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰`;
+  }, 300);
 }
 
 export function guideInput(input: string, key: string, value: string): boolean {
@@ -79,11 +97,12 @@ export function guideInput(input: string, key: string, value: string): boolean {
     const at = key.lastIndexOf('|');
     const name = key.slice(0, at) as GuideName;
     const i = Number(key.slice(at + 1));
-    const parts = splitGuide(guideUi.draft[name] ?? guideText(name));
+    const parts = partsNow(name);
     const md = parts[i] && /^(#{2,3}) /.exec(parts[i].head);
     if (!md) return true;
     const title = value.replace(/[\r\n]/g, ' ').trim();
     parts[i] = { ...parts[i], title, head: `${md[1]} ${title}\n` };
+    drawn[name] = parts;
     guideUi.draft[name] = joinGuide(parts);
     guideUi.info = '';
     return true;
@@ -92,9 +111,10 @@ export function guideInput(input: string, key: string, value: string): boolean {
     const at = key.lastIndexOf('|');
     const name = key.slice(0, at) as GuideName;
     const i = Number(key.slice(at + 1));
-    const parts = splitGuide(guideUi.draft[name] ?? guideText(name));
+    const parts = partsNow(name);
     if (!parts[i]) return true;
     parts[i] = { ...parts[i], body: value.replace(/\r/g, '') };
+    drawn[name] = parts;
     guideUi.draft[name] = joinGuide(parts);
     guideUi.info = '';
     return true;
@@ -124,7 +144,8 @@ export async function guideAction(action: string, value: string | undefined): Pr
       else guides[name] = text;
       return { ...p, guides };
     });
-    delete guideUi.draft[name];
+    // 저장하는 동안 더 친 글은 남긴다 (예약된 다음 저장이 넣는다) (전수검사 11-13)
+    if (guideUi.draft[name] === text) delete guideUi.draft[name];
     // 바로 저장이라 저장 알림은 띄우지 않는다 (2026-11-08 사용자)
     return true;
   }

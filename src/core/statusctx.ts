@@ -112,6 +112,9 @@ export function withStatusBlock<M extends PromptMessage>(messages: M[], identity
   const at = out.map((m) => m?.role).lastIndexOf('user');
   const recent = (shape?.recent ?? []).filter(Boolean);
   const recentP = (shape?.recentPoints ?? []).filter(Boolean);
-  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${recent.length ? `\nRecent cash transactions (oldest first): ${recent.join('; ')}` : ''}${recentP.length ? `\nRecent Baekilmong point transactions (oldest first): ${recentP.join('; ')}` : ''}` } as M;
+  // 거래 내역 줄은 지침 「Main」 STATUS.RECENT_CASH·STATUS.RECENT_POINT 절. 절이 없으면 여기 남긴 글 (전수검사 11-13)
+  const cash = recent.length ? `\n${guideOr('Main', 'STATUS.RECENT_CASH', () => `Recent cash transactions (oldest first): ${recent.join('; ')}`, { list: recent.join('; ') })}` : '';
+  const points = recentP.length ? `\n${guideOr('Main', 'STATUS.RECENT_POINT', () => `Recent Baekilmong point transactions (oldest first): ${recentP.join('; ')}`, { list: recentP.join('; ') })}` : '';
+  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${cash}${points}` } as M;
   return at < 0 ? [...out, block] : [...out.slice(0, at), block, ...out.slice(at)];
 }

@@ -39,10 +39,15 @@ export const EMOTIONS = new Set([...'default angry annoyed bored confused contem
  *  목록이 없으면 표정이 세트 안일 때만 태그를 믿는다. 페르소나 태그는 유저 사진 */
 const tagName = (who: string, expr: string, pick?: (name: string) => string | null, self?: string) => {
   const name = who.trim();
-  const want = `${name}_${expr.trim()}`;
-  if (self && name === self.trim()) return pick?.(want) ?? SELF;
-  if (pick) return pick(want);
-  return EMOTIONS.has(expr.trim().toLowerCase()) ? want : null;
+  const e = expr.trim();
+  const want = `${name}_${e}`;
+  // 띄어쓰기 표정(forced smiling)을 밑줄로 쓴 꼴(forced_smiling)도 받는다 (전수검사 11-13)
+  const spaced = e.includes('_') ? `${name}_${e.replace(/_/g, ' ')}` : '';
+  const find = pick && (() => pick(want) ?? (spaced ? pick(spaced) : null));
+  if (self && name === self.trim()) return find?.() ?? SELF;
+  if (find) return find();
+  if (EMOTIONS.has(e.toLowerCase())) return want;
+  return spaced && EMOTIONS.has(e.replace(/_/g, ' ').toLowerCase()) ? spaced : null;
 };
 
 /** 태그 가운데 에셋에 있는 이름이 하나라도 있는지 (괴이봇 판정 전에도 그려도 되는지. 다른 봇의 같은 꼴 태그는 건드리지 않게).

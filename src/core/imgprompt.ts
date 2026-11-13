@@ -100,8 +100,8 @@ export function imgCharacters(lore: LoreEntry[] | undefined, cfg: ImgPromptConfi
   return names;
 }
 
-/** 지침 조립 */
-export function buildImgPrompt(cfg: ImgPromptConfig, characters: string[], assetPlayer: boolean): string {
+/** 지침 조립. userName을 주면 {{user}}를 그 이름으로 푼다 (플러그인이 붙이는 글은 Risu가 CBS를 풀지 않음. 전수검사 11-13) */
+export function buildImgPrompt(cfg: ImgPromptConfig, characters: string[], assetPlayer: boolean, userName?: string): string {
   const userSkip = assetPlayer ? '' : '{{user}}, ';
   const userRule = assetPlayer ? '' : '- Do not create tags for {{user}}.';
   // 바꿀 글은 함수로 넘긴다: 이름·표정에 $& 같은 글자가 있어도 replace 특수 문자로 풀리지 않게 (QC 2026-10-28)
@@ -111,6 +111,7 @@ export function buildImgPrompt(cfg: ImgPromptConfig, characters: string[], asset
     .replace(/\{user_skip\}/g, () => userSkip)
     .replace(/\{user_rule\}\n?/g, () => (userRule ? `${userRule}\n` : ''))
     .replace(/\n{3,}/g, '\n\n')
+    .replace(/\{\{user\}\}/g, () => userName?.trim() || '{{user}}')
     .trim();
 }
 

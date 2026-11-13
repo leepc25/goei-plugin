@@ -412,7 +412,8 @@ export function parseShow(raw: string, moods: Map<string, string>): ShowReply {
   const items = shelf.items.slice(0, cues.length || shelf.items.length);
   if (items.some((_, i) => !cues[i]?.length)) throw new HsError(`<cue> 블록에 상품마다 큐 줄이 있어야 해요 (#1 … #${shelf.items.length}, 줄 꼴: cut|mood|line|event).`);
   const { shared: chat, parts: chats } = parseChat(block(raw, 'chat'));
-  const peeks = block(raw, 'peek').split('\n').map((x) => clean(x.replace(/^\s*#?\d+\s*[.)|:]?\s*/, ''), 80)).filter(Boolean);
+  // 번호 머리('#3', '3.', '3)')만 뗀다. 구분 기호 없는 앞 숫자('3번 접으면')·소수('3.5배')는 글이라 둔다 (전수검사 11-13)
+  const peeks = block(raw, 'peek').split('\n').map((x) => clean(x.replace(/^\s*(?:[#＃]\s*\d+\s*[.)|:]?|\d+\s*[.)|:](?!\d))\s*/, ''), 80)).filter(Boolean);
   const opLine = (re: RegExp) => clean(block(raw, 'operator').split('\n').map((x) => re.exec(x)?.[1] ?? '').find(Boolean) ?? '', 120);
   const ops: HsOps = { hello: opLine(/^\s*(?:인사|hello)\s*[|:]\s*(.+)$/i), done: opLine(/^\s*(?:확정|done)\s*[|:]\s*(.+)$/i), barter: opLine(/^\s*(?:맞교환|barter)\s*[|:]\s*(.+)$/i) };
   return { title: clean(block(raw, 'title'), 40), items, cues: cues.slice(0, items.length), chat, chats: chats.slice(0, items.length), peeks, ops };

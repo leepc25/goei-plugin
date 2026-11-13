@@ -4,7 +4,7 @@ import { sitePicAsPhoto } from './attach';
 import { publicAccess, publicBoard } from './gnetPrompt';
 import { readGnet } from './gnet';
 import {
-  agentStatus, announcementPacket, chancePassed, conversationState, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
+  agentStatus, announcementPacket, chancePassed, conversationState, eventCap, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
   type PState, phoneTime, hiddenPause, cooldownReady, readHabits,
 } from './phone';
@@ -36,11 +36,11 @@ function sections(src: RefSource): Record<string, string> {
   return p;
 }
 
-function section(p: Record<string, string>, name: string): string {
+function section(p: Record<string, string>, name: string, limits: Partial<Record<keyof typeof LIMITS, number>> = {}): string {
   const raw = p[name];
   if (raw === undefined) throw new PhoneError(`Phone 로어북의 ${name} 항목이 없어요.`);
   return raw
-    .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(LIMITS[k as keyof typeof LIMITS]) : m))
+    .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(limits[k as keyof typeof LIMITS] ?? LIMITS[k as keyof typeof LIMITS]) : m))
     .replace(/<!--[\s\S]*?-->/g, '')
     .trim();
 }
@@ -102,7 +102,9 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
   if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   const br = phoneSettings(src.chat.scriptstate).banterRows;
-  return [...keys.map((k) => dropSitePicGuide(section(p, k)).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
+  // 수다가 든 확인 요청은 방마다 말풍선 상한을 수다 줄 수까지: 지침 숫자와 저장 상한을 맞춘다 (전수검사 11-13)
+  const limits = { events: eventCap(src.chat.scriptstate, mode === 'REFRESH' && !!body.rooms?.some((x) => x.banter)) };
+  return [...keys.map((k) => dropSitePicGuide(section(p, k, limits)).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
 }
 
 // ── 자료 ──
@@ -320,7 +322,7 @@ export function replyPrompt(src: RefSource, st: PState, r: PRoom, dir: Directory
   const t = fnRefs(src.chat.scriptstate, 'ph', 'reply');
   const history = fnHistory(src.chat.scriptstate, 'ph', 'reply');
   const packet = roomPacket(r, set.reactions, history);
-  const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related, set.status, names));
+  const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related && !trimRelated(), set.status, names));
   const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, 'reply', t, JSON.stringify(packet)) };
   crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(packet));
@@ -335,6 +337,8 @@ export interface RefreshPlan {
   invite: InvitationCheck;
   /** 확률·대기로 이번에 아무것도 묻지 않은 이유 */
   reason: string;
+  /** 방마다 한 번에 넣을 말풍선 상한 (수다가 들면 수다 줄 수까지, 전수검사 11-13) */
+  cap: number;
 }
 
 /** 전체 새 메시지 확인 (원본 refreshPrompt): 대화 중인 방 + 공개된 연락처 전부 + 공지 + 단톡 초대 */
@@ -370,7 +374,7 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   const emptyInvite = invitationPacket(st, [], false);
   if (!candidates.length && !announce.allowed) {
     const why = !set.incoming && !set.invites ? '선톡·단톡 초대 받기가 모두 꺼져 있어요.' : '이번 확인은 대기 턴이나 요청 확률에 따라 건너뛰었어요.';
-    return { prompt: null, selected, receive, announce, invite: emptyInvite, reason: why };
+    return { prompt: null, selected, receive, announce, invite: emptyInvite, reason: why, cap: LIMITS.events };
   }
   const rooms: RoomPacket[] = [];
   const memo = new Map<string, Participant>();
@@ -383,7 +387,7 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
     selected.set(r.id, r);
     receive.set(r.id, packet.receiveMessages);
     for (const cid of r.members) {
-      if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related, set.status, names));
+      if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related && !trimRelated(), set.status, names));
     }
   }
   // 단톡 수다: NPC가 둘 이상인 내 단톡방 하나를 골라 대화 한 조각을 꼭 만들게 한다
@@ -401,7 +405,7 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   };
   crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(rooms));
-  return { prompt: finish(src, st, body, 'REFRESH', names), selected, receive, announce, invite, reason: '' };
+  return { prompt: finish(src, st, body, 'REFRESH', names), selected, receive, announce, invite, reason: '', cap: eventCap(chat.scriptstate, rooms.some((x) => x.banter)) };
 }
 
 function personOfContact(c: Contact): PPerson {

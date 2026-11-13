@@ -10,6 +10,7 @@ import { OPENNESS_MAX, SEXUAL_CHARS, SLOT_META, TASTE_STAGES, opennessStage, slo
 import { axesLinesEn } from './axes';
 import { SEXUAL_POLICY, sexualDirectorPolicy } from './sexual';
 import { guideOr } from '../guides';
+import { SPEECH_ENTRY_CHARS, parseSpeechMarker } from './speech';
 
 const EXPRESS_TAIL: Record<0 | 1 | 2 | 3, string> = {
   0: 'Expression: almost never shown; appears only through actions and priorities, not words.',
@@ -17,6 +18,12 @@ const EXPRESS_TAIL: Record<0 | 1 | 2 | 3, string> = {
   2: 'Expression: visible but controlled.',
   3: 'Expression: open and immediate.',
 };
+/* 아래 꼬리 글·머리는 지침 「메인 요청에 붙는 글」 절에서 읽는다. 절이 없으면 위·아래 코드 글 그대로 (전수검사 11-13) */
+const expressTail = (n: 0 | 1 | 2 | 3): string => guideOr('Main', `PEOPLE.EXPRESS_${n}`, EXPRESS_TAIL[n]);
+const TASTE_NOTE = 'A separate axis from the relationship above; it never grants closeness by itself.';
+const OPENNESS_NOTE = "Applies only inside intimate contexts that actually arise; an explicit current condition or the other participant's choice takes priority.";
+const RHYTHM_HEAD = '## Scene rhythm (kept by the system; guidance, not content to narrate)';
+const RHYTHM_CLOCK_HEAD = 'Hook clock (counted by the system; never say turn numbers in the story):';
 
 export interface BlockOpts extends AffinityOpts {
   /** 시트 원문 (고정 절을 넣을 때). 없으면 기록만 */
@@ -41,6 +48,8 @@ export interface BlockOpts extends AffinityOpts {
   features?: Set<string>;
   /** 성적 욕망·이상성욕 글 (sexual.ts sexualTexts, 켜져 있고 글이 있을 때만). sexual_context_only 정책과 함께 넣는다 */
   sexual?: Partial<Record<'desire' | 'paraphilia', string>>;
+  /** 유저 대상 말투 항목에 갱신기 표지([말투 변화 조짐 …])를 남길지. Director 만 (지침이 표지를 설명함). 기본은 뗀다 (전수검사 11-13) */
+  speechMarks?: boolean;
 }
 
 const lines = (list: Entry[]) => list.map((e) => `- ${plain(e.text, 300)}`).join('\n');
@@ -102,21 +111,24 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, o);
   const addr = addressOf(p, changes);
   // 정성 모드면 단계 없이 (호감은 전용 칸의 글로만)
-  const relLine = [o.qual?.has('affinity') ? `Relationship → ${user}:` : `Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
+  const relLine = [o.qual?.has('affinity') ? `Relationship → ${user}:` : `Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, expressTail(p.express)].filter(Boolean).join(' ');
   out.push(relLine + (relUser.length ? '\n' + lines(relUser) : ''));
   if (o.taste) {
     const band = tasteOf(p, changes);
-    if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? '+' : ''}${band} — ${TASTE_STAGES[band]?.en ?? ''}. A separate axis from the relationship above; it never grants closeness by itself.`);
+    if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? '+' : ''}${band} — ${TASTE_STAGES[band]?.en ?? ''}. ${guideOr('Main', 'PEOPLE.TASTE_NOTE', TASTE_NOTE)}`);
   }
   if (o.openness && !o.qual?.has('openness')) {
     const v = opennessOf(p, changes);
     if (v !== null) {
       const st = opennessStage(v);
-      out.push(`Openness: ${st.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${st.contraceptionEn}. Applies only inside intimate contexts that actually arise; an explicit current condition or the other participant's choice takes priority.`);
+      out.push(`Openness: ${st.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${st.contraceptionEn}. ${guideOr('Main', 'PEOPLE.OPENNESS_NOTE', OPENNESS_NOTE)}`);
     }
   }
   if (relOther.length) out.push('Relationships with others:\n' + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join('\n'));
   if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? 'mixed'}.`);
+  // 유저 대상 말투 항목 (갱신기가 쓰는 말버릇·말투의 다변화 기록). 전에는 다른 인물 대상만 넣어 이 기록이 작가·Director 에 안 갔다 (전수검사 11-13)
+  const spUser = slot('speech').filter((e) => !e.target || e.target === '@user');
+  if (spUser.length) out.push(`Speech → ${user}:\n` + spUser.map((e) => `- ${plain(o.speechMarks ? e.text : parseSpeechMarker(e.text).base, SPEECH_ENTRY_CHARS)}`).join('\n'));
   // 기능별 전용 칸 (켜진 기능만)
   const enabled = new Set(slotsFor(o.features ?? new Set(), o.qual));
   for (const g of FEATURE_GROUPS) {
@@ -185,5 +197,5 @@ export function rhythmBlock(docs: { key: string; text: string }[], note: string 
   if (!docs.length && !note) return '';
   const order = (k: string) => (k === 'scene' ? 0 : k === 'chapter' ? 1 : k === 'arc' ? 2 : k.startsWith('hook:') ? 3 : 4);
   const lines = [...docs].sort((a, b) => order(a.key) - order(b.key)).map((d) => `- ${d.key}: ${plain(d.text, 300)}`);
-  return ['## Scene rhythm (kept by the system; guidance, not content to narrate)', ...lines, ...(clock.length && docs.some((d) => d.key.startsWith('hook:')) ? ['Hook clock (counted by the system; never say turn numbers in the story):', ...clock] : []), ...(note ? [`- Direction for this reply: ${plain(note, 200)}`] : [])].join('\n');
+  return [guideOr('Main', 'RHYTHM.HEAD', RHYTHM_HEAD), ...lines, ...(clock.length && docs.some((d) => d.key.startsWith('hook:')) ? [guideOr('Main', 'RHYTHM.CLOCK_HEAD', RHYTHM_CLOCK_HEAD), ...clock] : []), ...(note ? [`- Direction for this reply: ${plain(note, 200)}`] : [])].join('\n');
 }

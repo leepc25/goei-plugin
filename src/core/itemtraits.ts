@@ -41,7 +41,9 @@ export interface ItemTraits {
 /** 「쓰임」 칸 글 → 판정: 무기·장비·사용·소모N (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
 export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> {
   const out: Omit<ItemTraits, 'icon' | 'weight'> = { use: false };
-  for (const t0 of String(text ?? '').split(/[\s,，/·+]+/)) {
+  // 「소모 3」「소모3회」「소모(3)」「소모 x3」은 쪼개기 전에 「소모3」으로 붙인다: 띄우면 1회로, 글자가 붙으면 소모가 빠졌다 (전수검사 11-13)
+  const src = String(text ?? '').replace(/(소모|consumable|uses?)\s*[:：]?\s*[(（x×]?\s*(\d+)\s*[)）]?\s*(?:회|번|개)?/gi, '$1$2');
+  for (const t0 of src.split(/[\s,，/·+]+/)) {
     const t = t0.trim().toLowerCase();
     if (!t) continue;
     if (/^(무기|weapon)$/.test(t)) out.equip = 'weapon';

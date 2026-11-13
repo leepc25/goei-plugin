@@ -312,16 +312,32 @@ export function markRead(store: PeopleStore, chat: Chat, indexes: number[]): voi
 // ── 접기 ──
 
 export const LOG_CAP = 800;
-/** 변경 기록이 상한을 넘으면 오래된(최근 200개 메시지 밖) 계기를 인물별 합으로 접는다. 접은 것은 되돌릴 수 없다 */
-export function foldLog(store: PeopleStore, chat: Chat, computeDelta: (c: Change) => number): void {
-  if (store.log.length <= LOG_CAP) return;
+/** 변경 기록 줄이기 (전수검사 11-13, 예전엔 부르는 곳이 없어 끝없이 쌓였다).
+ *  ① 지워진 메시지(chatId 기준)에 붙은 변경은 되살아날 수 없으니 버린다 ('#N' 기준은 메시지가 다시 생기면 살아나서 둔다).
+ *  ② 상한을 넘으면 오래된(최근 200개 메시지 밖) 살아 있는 계기를 사람별 값으로 접는다. refold(그 사람, 접을 계기(순서대로), 지금 접힌 값) → 새 접힌 값, null 이면 그 사람은 접지 않는다.
+ *  고정(pin)이 든 사람, 묶음이 경계에 걸친 사람은 값이 달라질 수 있어 접지 않는다. 접은 것은 되돌릴 수 없다 */
+export function foldLog(store: PeopleStore, chat: Chat, refold: (who: string, cues: Change[], folded: number) => number | null): void {
   const live = liveness(chat);
+  store.log = store.log.filter((c) => c.anchor.startsWith('#') || live.at.has(c.anchor));
+  if (store.log.length <= LOG_CAP) return;
   const cut = msgs(chat).length - 200;
-  const keep: Change[] = [];
-  for (const c of store.log) {
-    const pos = live.at.get(c.anchor);
-    if (pos !== undefined && pos < cut && c.kind === 'cue' && isAlive(c, live)) store.folded[c.who] = (store.folded[c.who] ?? 0) + computeDelta(c);
-    else if (pos === undefined || pos >= cut || c.kind !== 'cue') keep.push(c);
+  if (cut <= 0) return;
+  const key = (c: Change) => c.group ?? c.anchor;
+  const pos = (c: Change) => live.at.get(c.anchor) ?? -1;
+  const cues = liveChanges(store, live).filter((c) => c.kind === 'cue');
+  const drop = new Set<string>();
+  for (const who of new Set(cues.map((c) => c.who))) {
+    const mine = cues.filter((c) => c.who === who);
+    const old = mine.filter((c) => pos(c) < cut);
+    if (!old.length || old.some((c) => c.pin !== undefined)) continue;
+    const oldKeys = new Set(old.map(key));
+    if (mine.some((c) => pos(c) >= cut && oldKeys.has(key(c)))) continue;
+    const v = refold(who, old, store.folded[who] ?? 0);
+    if (v === null || !Number.isFinite(v)) continue;
+    store.folded[who] = v;
+    for (const c of old) drop.add(c.id);
+    // 같은 사람의 오래된 죽은 계기도 함께 버린다 (예전 foldLog 와 같다)
+    for (const c of store.log) if (c.who === who && c.kind === 'cue' && !isAlive(c, live) && (live.at.get(c.anchor) ?? cut) < cut) drop.add(c.id);
   }
-  store.log = keep;
+  if (drop.size) store.log = store.log.filter((c) => !drop.has(c.id));
 }

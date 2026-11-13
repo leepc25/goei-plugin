@@ -407,7 +407,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
 .gx-canvas.ph { aspect-ratio: 4 / 5; }
 .gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
-.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 950px) - 210px); user-select: none; }
+.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min((100vh - 28px) * .9, 950px) - 210px); user-select: none; }
 .gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 14px; }
 .gx-pin {
   position: absolute; transform: translate(-50%, -50%);
@@ -459,7 +459,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
 .gx-step:disabled { opacity: .4; }
-.gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
+.gx-mbox { max-height: calc(min((100vh - 28px) * .9, 950px) - 222px); overflow-y: auto; }
 /* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
 .gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
 .gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--dim); display: flex; gap: 6px; align-items: baseline; }
@@ -2037,7 +2037,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-map > .gx-mapcol > .gx-sits { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .gx-map .gx-sits > .gx-sitbar { flex: none; }
   /* 목록 칸이 남도록 지도는 본문 높이의 55%까지 */
-  .gx-map .gx-mapimg { max-height: calc((min(100vh - 28px, 950px) - 98px) * .55); }
+  .gx-map .gx-mapimg { max-height: calc((min((100vh - 28px) * .9, 950px) - 98px) * .55); }
   .gx-map .gx-sits > .gx-evcs { flex: 1; align-content: start; grid-auto-rows: max-content; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 2px; }
 }
 /* 띠 다듬기 (2026-10-20 사용자): 세 줄을 세로 가운데로, 그림은 커스텀 띠처럼 채도를 낮춰 깔고 왼쪽부터 짙은 그라데이션 */
@@ -2276,9 +2276,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 
 /* 요원 사원증 창 (가로 명함 비율): 위 띠 · 직사각형 사진 + 신상 · 아래 번호와 톡·위키 */
 .gx-agcard { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(500px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto; box-sizing: border-box; border-radius: 16px; background: var(--panel); border: 1px solid var(--line2); color: var(--text); box-shadow: 0 22px 60px rgba(0, 0, 0, .5); }
-.gx-agcard-band { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 6px 0 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 22%, var(--panel2)), var(--panel2)); border-bottom: 1px solid var(--line); font: 700 11px var(--mono); letter-spacing: .2em; color: var(--signal); }
+.gx-agcard-band { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 6px 0 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 22%, var(--panel2)), var(--panel2)); border-bottom: 1px solid var(--line); font: 700 11px var(--mono); letter-spacing: .2em; color: var(--signal); }
 .gx-agcard-band b { font-family: inherit; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; color: var(--text); }
-.gx-agcard-x { margin-left: auto; width: 28px; height: 28px; border: 0; border-radius: 7px; background: none; color: var(--dim); font-size: 13px; cursor: pointer; }
+/* 닫기는 공통 36, 아래 단추는 작은 조작(--ctl-sm) 규격 (전수검사 11-13) */
+.gx-agcard-x { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 7px; background: none; color: var(--dim); font-size: 13px; cursor: pointer; }
 .gx-agcard-main { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding: 16px; }
 .gx-agcard-ph { position: relative; align-self: stretch; min-height: 168px; border-radius: 10px; overflow: hidden; background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line); }
 .gx-agcard-ph > img, .gx-agcard-ph > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; object-fit: cover; object-position: 50% 12%; font-size: 40px; }
@@ -2295,7 +2296,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-agcard-foot { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px dashed var(--line); }
 .gx-agcard-foot .code { margin-right: auto; display: flex; align-items: center; gap: 10px; font: 700 11.5px var(--mono); letter-spacing: .14em; color: var(--dim); white-space: nowrap; }
 .gx-agcard-foot .code u { width: 96px; height: 18px; text-decoration: none; opacity: .5; background: repeating-linear-gradient(90deg, var(--text) 0 1px, transparent 1px 3px, var(--text) 3px 5px, transparent 5px 6px, var(--text) 6px 7px, transparent 7px 10px); }
-.gx-agcard-foot button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 92px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.gx-agcard-foot button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 92px; height: var(--ctl-sm); padding: 0; border: 0; border-radius: 9px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
 .gx-agcard-foot button:hover { color: var(--signal); }
 .gx-agcard-foot button svg { width: 15px; height: 15px; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
@@ -2356,10 +2357,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 :where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
 :where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }
 /* PC 임무 탭 지도 (2026-10-21 사용자): 그림은 칸 폭을 꽉 채우고, 칸 높이는 줄여 위아래는 끌어서 본다.
+   본문 높이 기준은 패널과 같은 (100vh - 28px) × 90% (전수검사 11-13)
    칸 높이 = 본문 높이 − (지역 줄 34 + 칸 사이 10×2 + 필터·카드 세 줄 342 + 틀 2) */
 @media (min-width: 761px) and (min-height: 500px), (min-width: 761px) and (pointer: fine), (min-width: 761px) and (pointer: none) {
   .gx-map .gx-mapbar .gx-select, .gx-map .gx-mapbar .gx-search { height: var(--ctl-sm); min-height: var(--ctl-sm); }
-  .gx-map > .gx-mapcol > .gx-canvas:not(.ph) { width: 100%; margin: 0; height: calc(min(100vh - 28px, 950px) - 98px - 398px); background: #0c1315; }
+  .gx-map > .gx-mapcol > .gx-canvas:not(.ph) { width: 100%; margin: 0; height: calc(min((100vh - 28px) * .9, 950px) - 98px - 398px); background: #0c1315; }
   .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { width: 100%; }
   .gx-map .gx-mapimg { width: 100%; max-width: none; max-height: none; }
 }
@@ -3168,6 +3170,11 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
   .pp-fn-ctl .gx-segs { flex-wrap: wrap; justify-content: flex-end; }
   .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
 }
+/* PC 좁은 설정 본문(.gw-body)도 두 줄 배치: 한 줄은 본문 약 610px 이 있어야 안 잘린다 (전수검사 11-13) */
+@container (max-width: 660px) {
+  .pp-fn { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name go' 'calls ctl'; }
+  .pp-fn-ctl .gx-segs { flex-wrap: wrap; justify-content: flex-end; }
+}
 
 /* ── 소지품 메뉴 (2026-11-07, docs/인계/소지품_1107/초안/mock2.mjs) ── */
 .it-tabs.gx-rec-tabs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; } /* 가계부 · 포인트(백일몽) · 소지품: 있는 탭 수만큼 한 줄 */
@@ -3410,7 +3417,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .sh-tag.rare svg { width: 12px; height: 12px; fill: currentColor; }
 .sh-tag.sale { border-color: var(--red-ln); color: var(--red); }
 .sh-none { margin: 0; padding: 4px 30px 0 4px; font-size: 13.5px; line-height: 1.5; color: var(--sub); }
-.sh-err { margin: 0; white-space: pre-wrap; }
+/* 원문 보기로 긴 글이 펼쳐져도 아래 [닫기] 줄이 밀려나지 않게 알림 칸 안에서 스크롤 (전수검사 11-13) */
+.sh-err { flex: none; margin: 0; max-height: 40vh; overflow-y: auto; white-space: pre-wrap; }
 .sh-err .sh-raw { min-height: 26px; margin-left: 6px; font-size: 12px; }
 /* 도구 줄 */
 .sh-tools { gap: 8px; }
@@ -4917,9 +4925,32 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .ms-pairs .ms-tb-h > :nth-child(n), .ms-pairs .ms-tb-r > * { grid-area: auto; display: block; }
   .ms-pairs .ms-tb-r > .ms-tb-err { grid-column: 1 / -1; }
 }
+/* PC 좁은 설정 본문(.gw-body)에서도 값 등급·주사위 칸은 폰 배치: 넓은 표는 본문 약 1050px 이 있어야 설명 칸이 안 눌린다 (전수검사 11-13) */
+@container (max-width: 1050px) {
+  .ms-tb { gap: 0; }
+  .ms-tb > .ms-tb-h, .ms-tb > .ms-tb-r { grid-template-columns: minmax(0, 1fr) 104px 104px 34px; grid-template-areas: "n lo hi x" "d d w w"; column-gap: 6px; row-gap: 6px; }
+  .ms-tb > .ms-tb-r { padding: 9px 0; border-top: 1px solid var(--line); }
+  .ms-tb > .ms-tb-h { row-gap: 2px; padding-bottom: 6px; }
+  .ms-tb > .ms-tb-h > :nth-child(1), .ms-tb > .ms-tb-r > .n { grid-area: n; }
+  .ms-tb > .ms-tb-h > :nth-child(2), .ms-tb > .ms-tb-r > .d { grid-area: d; }
+  .ms-tb > .ms-tb-h > :nth-child(3), .ms-tb > .ms-tb-r > .lo { grid-area: lo; }
+  .ms-tb > .ms-tb-h > :nth-child(4), .ms-tb > .ms-tb-r > .hi { grid-area: hi; }
+  .ms-tb > .ms-tb-h > :nth-child(5), .ms-tb > .ms-tb-r > .w { grid-area: w; }
+  .ms-tb > .ms-tb-h > :nth-child(6) { display: none; }
+  .ms-tb > .ms-tb-r > .ms-tb-x { grid-area: x; }
+  .ms-tb > .ms-tb-r > .ms-tb-err { grid-area: auto; grid-column: 1 / -1; }
+  .ms-tb .ph-inline { display: flex; width: 100%; gap: 3px; min-width: 0; }
+  .ms-tb .ph-inline .ms-num { width: auto; flex: 1 1 0; min-width: 0; padding-left: 7px; padding-right: 4px; }
+  .ms-tb > .ms-tb-foot { padding-top: 8px; }
+  /* 주사위 칸: 칸 이름 | 값 | × 한 줄 */
+  .ms-axs > .ms-tb-h, .ms-axs > .ms-ax { grid-template-columns: 88px minmax(0, 1fr) 34px; grid-template-areas: none; column-gap: 6px; }
+  .ms-axs > .ms-tb-h > :nth-child(n) { grid-area: auto; display: block; }
+  .ms-axs > .ms-ax { padding: 3px 0; }
+  .ms-axs > .ms-ax > .ms-tb-err { grid-column: 1 / -1; }
+}
 .ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
 .ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
-.ms-sample i { color: var(--accent); font-style: normal; }
+.ms-sample i { color: var(--signal); font-style: normal; }
 /* 연어 마켓 윗줄 오른쪽 묶음(찾기칸·글쓰기·내 채팅): 사이 8px, 높이 36px 로 같게 (2026-11-10 사용자: 간격이 제각각) */
 .bs-sm .hd .sr + .wr, .bs-sm .hd .wr + .ch { margin-left: -14px; }
 .bs-sm .hd .wr, .bs-sm .hd .ch { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; white-space: nowrap; box-sizing: border-box; }

@@ -23,12 +23,19 @@ export const ruleId = (n: string): string => n.slice(5);
 const uid = () => `r${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 async function saveRules(next: UserRule[]): Promise<void> {
+  // 바로 저장할 때는 기다리던 글 저장을 끈다. 친 글은 이미 목록에 들어 있다. 안 끄면 0.4초 뒤 옛 목록이 켜기·새 규칙을 되돌리던 것 (전수검사 11-13)
+  dropPending();
   setUserRules(next);
   await savePrefs((p) => (next.length ? { ...p, rules: next } : (({ rules: _r, ...rest }) => rest)(p)));
 }
 
 let timer: ReturnType<typeof setTimeout> | null = null;
 let pending: UserRule[] | null = null;
+function dropPending(): void {
+  if (timer) clearTimeout(timer);
+  timer = null;
+  pending = null;
+}
 /** 글 입력은 0.4초 모아서 저장 (키 하나마다 저장소를 쓰지 않게) */
 function saveSoon(next: UserRule[]): void {
   setUserRules(next);

@@ -670,6 +670,8 @@
   /* 폰: 짝을 한 열로 쌓는다. 이름은 왼쪽, 상자는 오른쪽 끝 한 줄 */
   .gw .ps-ctl > .fam-set, .gw .ps-ctl > .fam-set:has(.st-step.lg) { grid-template-columns: minmax(0, 1fr); width: 100%; gap: 8px; }
   .gw .ps-ctl > .fam-set > .fam-set1 { grid-template-columns: minmax(0, 1fr) max-content; }
+  /* 360px 폰: 큰 수 상자 옆 긴 이름(「한 번에 받을 초대」)이 상자 위로 겹쳤다 → 두 줄 허용 (전수검사 11-13) */
+  .gw .ps-ctl > .fam-set .fam-l { white-space: normal; word-break: keep-all; line-height: 1.3; }
   .gw .mx-grid.ck-ph { display: block; }
   .gw .mx-grid.ck-ph .mx-cell { flex-wrap: wrap; align-items: center; }
   .gw .mx-grid.ck-ph .fam-set { display: flex; flex-wrap: nowrap; gap: 8px 12px; justify-content: flex-end; width: auto; }

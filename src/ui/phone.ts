@@ -373,6 +373,8 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
   return run(ctx, e, automatic ? '새 메시지를 자동으로 확인하는 중이에요.' : '새 메시지를 확인하는 중이에요.', async () => {
     const startLength = ctx.chat.message?.length ?? 0;
     const st = readPhone(ctx.chat);
+    // 요청 때 있던 방: 확인 중에 지워졌으면 옛 사본으로 되살리지 않는다 (전수검사 11-13)
+    const existed = new Set(Object.keys(st.rooms));
     const d = dir(ctx);
     // 확률 검사(Math.random)는 처음 한 번만: 토큰 상한에 맞춰 다시 만들 때는 같은 결과를 쓴다
     const rolls: number[] = [];
@@ -387,7 +389,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     const prompt = plan.prompt;
     const model = phoneSettings(ctx.chat.scriptstate).model;
     // 원본 설정(실패 시 재시도)과 같이 같은 자료로 다시 (횟수·모델은 고급 설정 → 생성 공통)
-    const { raw: refreshRaw, value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
+    const { raw: refreshRaw, value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode, plan.cap), {
       ...genSettings(ctx.chat.scriptstate),
       reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate,
       staticModel: featureModel(ctx.chat.scriptstate, 'ph'),
@@ -407,15 +409,20 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
       let received = 0;
       let unsolicitedGot = false;
       for (const u of result.updates) {
+        if (!cur.rooms[u.room] && existed.has(u.room)) {
+          u.events = [];
+          continue;
+        }
         const r = cur.rooms[u.room] ?? plan.selected.get(u.room)!;
         if (r.pending) throw new PhoneError('확인하는 동안 대화 상태가 바뀌었어요. 다시 확인해 주세요.');
         if (u.events.length && !refreshAllowed(chat, r, set)[0]) throw new PhoneError('선톡 받기 설정이 바뀌었어요.');
-        u.events = keepValid(u.events, r);
+        u.events = keepValid(u.events, r, [], plan.cap);
       }
       const visible = viewingRoom(e);
       for (const u of result.updates) {
         if (!u.events.length) continue;
         let r = cur.rooms[u.room];
+        if (!r && existed.has(u.room)) continue;
         const talk = u.events.some((x) => x.type === 'message');
         if (!r && !talk) continue;
         if (!r) {
@@ -483,11 +490,32 @@ export async function autoView(ctx: ChatContext, messageIndex: number, env?: Pho
 
 /** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답을 아직 확인하지 않았으면 한 번 확인 */
 export function openCheck(ctx: ChatContext, env: PhoneEnv): void {
+  const log = (what: string) => (error: unknown) => console.log(`[goei] ${what} 실패: ${error instanceof Error ? error.message : String(error)}`);
+  // 창을 닫은 사이 열린 방에 온 말풍선은 다시 보일 때 읽음 처리 (전수검사 11-13)
+  void readOpenRoom(ctx, env).catch(log('읽음 처리'));
   const at = lastReply(ctx.chat);
   if (at < 0) return;
-  if (viewSettings(ctx.chat.scriptstate).auto === 'open') void autoView(ctx, at, env).catch((error) => console.log(`[goei] 보기 전용 방 실패: ${error instanceof Error ? error.message : String(error)}`));
-  if (!phoneSettings(ctx.chat.scriptstate).autoOpen) return;
-  void autoRefresh(ctx, at, env).catch((error) => console.log(`[goei] 괴담톡 확인 실패: ${error instanceof Error ? error.message : String(error)}`));
+  // 둘을 동시에 띄우면 늦은 쪽이 도장만 찍고 「다시 눌러 주세요」로 끝난다: 본문 턴과 같은 차례로 하나씩 (전수검사 11-13)
+  void (async () => {
+    if (phoneSettings(ctx.chat.scriptstate).autoOpen) await autoRefresh(ctx, at, env).catch(log('괴담톡 확인'));
+    if (viewSettings(ctx.chat.scriptstate).auto === 'open') await autoView(ctx, at, env).catch(log('보기 전용 방'));
+  })();
+}
+
+/** 괴담톡 탭이 다시 보일 때: 열어 둔 방에 안 읽은 말풍선이 있으면 읽음으로 저장. 읽을 게 없으면 저장하지 않는다 (전수검사 11-13) */
+export async function readOpenRoom(ctx: ChatContext, env: PhoneEnv): Promise<void> {
+  if (!env.visible() || phone.view !== 'room' || !phone.room) return;
+  const rid = phone.room;
+  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    const st = readPhone(chat);
+    const r = st.rooms[rid];
+    if (!r) return null;
+    const latest = r.messages.reduce((n, m) => Math.max(n, m.id), 0);
+    if (!r.unread && (r.readThrough ?? 0) >= latest) return null;
+    readRoom(r);
+    return writePhone(chat, st);
+  });
+  if (saved) await env.refresh();
 }
 
 async function openDm(ctx: ChatContext, env: PhoneEnv, cid: string) {
@@ -788,11 +816,28 @@ function makeView(ctx: ChatContext, env: PhoneEnv, automatic = false) {
       // 11-07 사용자: 매 턴 새 방을 파지 않는다 — 같은 종류는 한 방에 이어 쓴다
       const cur = [...list].reverse().find((x) => x.preset === set.preset);
       const time = phoneTime(chat);
-      const seen = !automatic || (phone.sub === 'chats' && (phone.view === 'list' || (phone.view === 'view' && phone.viewId === cur?.id)));
+      // 창이 닫혀 있으면 마지막 화면이 목록이어도 안 본 것 (전수검사 11-13)
+      const seen = !automatic || (env.visible() && phone.sub === 'chats' && (phone.view === 'list' || (phone.view === 'view' && phone.viewId === cur?.id)));
       if (cur) {
         id = cur.id;
-        for (const p of value.people) if (!cur.people.some((x) => x.id === p.id)) cur.people.push(p);
-        cur.pov = value.pov;
+        // 모델은 매번 p1, p2…를 새로 매긴다: 사람은 이름으로 맞추고, 번호가 겹치는 새 인물은 새 번호로 (전수검사 11-13)
+        const remap = new Map<string, string>();
+        const used = new Set([...cur.people, ...value.people].map((x) => x.id));
+        for (const p of value.people) {
+          if (cur.people.some((x) => x.id === p.id && x.name === p.name)) continue;
+          const same = cur.people.find((x) => x.name === p.name);
+          if (same) remap.set(p.id, same.id);
+          else if (cur.people.some((x) => x.id === p.id)) {
+            let n = 1;
+            while (used.has(`p${n}`)) n++;
+            used.add(`p${n}`);
+            remap.set(p.id, `p${n}`);
+            cur.people.push({ ...p, id: `p${n}` });
+          } else cur.people.push(p);
+        }
+        const to = (x: string) => remap.get(x) ?? x;
+        for (const m of value.messages) if (m.type === 'text') m.sender = to(m.sender);
+        cur.pov = to(value.pov);
         cur.time = time;
         cur.unread = !seen;
         cur.messages.push({ sender: '-', type: 'time', text: time }, ...value.messages);
@@ -849,7 +894,7 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
     })
     .join('');
   const pending = r.pending
-    ? r.pending.status === 'working' || busy
+    ? busy // 새로고침·탭 종료로 남은 'working'은 작업이 없으니 다시 시도/건너뛰기로 (전수검사 11-13)
       ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>'
       : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc(r.id)}">건너뛰기</button></div>`
     : '';

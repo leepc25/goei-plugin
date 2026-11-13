@@ -265,7 +265,7 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string, tag = '') {
     let newId = 0;
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
-      const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat));
+      const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat), storyTurns(chat));
       // 연어 마켓은 글쓴이가 고른 거래 구분이 말머리 (2026-11-10 사용자: 글쓰기에 팝니다·삽니다 구분이 있어야 한다)
       if (tag || draft.tag) p.tag = tag || draft.tag;
       newId = p.id;
@@ -765,6 +765,8 @@ function galSide(st: GState): string {
 /** 목록 (사이트마다) */
 function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unreadDm: number): string {
   const all = shownPosts(st, site);
+  // 글이 줄어 쪽 수가 줄면 저장된 쪽 번호도 맞춘다. 목록·쪽 번호·Page 줄이 같은 값을 쓴다 (전수검사 11-13)
+  gnet.page = Math.min(Math.max(1, gnet.page), pages(all.length));
   const list = pageOf(all);
   const empty = !st.posts.length ? emptyList(busy, '게시글이 없어요.') : '';
   switch (site) {

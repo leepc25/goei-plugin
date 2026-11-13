@@ -45,6 +45,8 @@ export interface GPost {
    * (2026-11-10 사용자: 댓글을 단 그 턴에만 컨텍에 들어가야 한다)
    */
   back?: number;
+  /** 내가 이 글을 쓰거나 댓글을 단 이야기 턴 수. 그 턴의 본편 요청에는 꼭 넣고, 본편 응답이 오면 지운다 (전수검사 11-13) */
+  touch?: number;
 }
 /** 쪽지 상대와 처음 이어진 공개 글 (원본 T 줄) */
 export interface GSource {
@@ -299,6 +301,7 @@ export function decode(raw: unknown): GState {
           ...(p[9] ? { tag: cut(p[9], 12) } : {}), ...(p[10] === '1' ? { scrap: true } : {}),
           ...(p[11] === '1' ? { voted: true } : {}), ...(p[12] === '1' ? { down: true } : {}),
           ...(p[0] === 'P' && /^\d+$/.test(p[13] ?? '') ? { back: Number(p[13]) } : {}),
+          ...(p[0] === 'P' && /^\d+$/.test(p[14] ?? '') ? { touch: Number(p[14]) } : {}),
         };
         (p[0] === 'A' ? st.archive : st.posts).push(post);
         map.set(id, post);
@@ -323,7 +326,7 @@ export function decode(raw: unknown): GState {
 export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
-    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0', ...(p.back !== undefined ? [p.back] : [])].join('|'));
+    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0', ...(p.touch !== undefined ? [p.back ?? '', p.touch] : p.back !== undefined ? [p.back] : [])].join('|'));
     for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const p of st.archive ?? []) {
@@ -337,6 +340,11 @@ export function encode(st: GState): string {
 
 export function readGnet(chat: Chat): GState {
   const st = decode(chat.scriptstate?.[GN_RAW]);
+  // 이번 턴에 쓴 글·단 댓글 표시도 본편 응답이 오면 지운다 (전수검사 11-13)
+  if (st.posts.some((p) => p.touch !== undefined)) {
+    const turn = storyTurns(chat);
+    for (const p of st.posts) if (p.touch !== undefined && turn > p.touch) delete p.touch;
+  }
   // 잠깐 되돌아온 글은 그 턴의 본편 응답이 온 뒤(턴 수가 늘면) 다시 보관함으로. 읽을 때마다 같은 결과라 따로 저장하지 않아도 되고, 다음 저장 때 같이 적힌다
   if (st.posts.some((p) => p.back !== undefined)) {
     const turn = storyTurns(chat);
@@ -528,20 +536,23 @@ export function writeGnet(chat: Chat, st: GState, opts: { reconcile?: boolean; a
 
 // ── 사용자 기록 (앱이 직접 씀) ──
 
-export function addUserPost(st: GState, nick: string, title: string, body: string, date: string): GPost {
+/** turn = 지금 이야기 턴 수: 주면 그 턴의 본편 요청에 이 글을 꼭 넣는다 (전수검사 11-13) */
+export function addUserPost(st: GState, nick: string, title: string, body: string, date: string, turn?: number): GPost {
   st.seq += 1;
   const p: GPost = {
     id: st.seq, date: validDate(date), nick: cut(nick, 80), title: trimTokens(title, LIMITS.title_tokens), body: trimTokens(body, LIMITS.post_tokens),
-    views: 0, votes: 0, mine: true, comments: [],
+    views: 0, votes: 0, mine: true, comments: [], ...(turn !== undefined ? { touch: turn } : {}),
   };
   st.posts.unshift(p);
   return p;
 }
 
-export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = '', turn = 0): number {
-  const p = revivePost(st, postIdValue, turn);
+export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = '', turn?: number): number {
+  const p = revivePost(st, postIdValue, turn ?? 0);
   if (!p) throw new GnetError('대상 글이 없어졌어요.');
   if (parent > 0 && !p.comments[parent - 1]) throw new GnetError('답글을 달 댓글이 없어졌어요.');
+  // 게시판에 있던 옛 글에 단 댓글도 그 턴의 본편 요청에 꼭 넣는다 (전수검사 11-13)
+  if (turn !== undefined) p.touch = turn;
   p.comments.push({ parent, nick, body: trimTokens(body, LIMITS.comment_tokens), mine: true, unread: false });
   stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ''], now);
   return p.comments.length;
@@ -780,6 +791,9 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
       if (prev.scrap) q.scrap = true;
       if (prev.voted) q.voted = true;
       if (prev.down) q.down = true;
+      // 잠깐 되돌아온 글의 기한(back)·이번 턴 표시(touch)도 옮긴다. 빠지면 보관함으로 안 돌아간다 (전수검사 11-13)
+      if (prev.back !== undefined) q.back = prev.back;
+      if (prev.touch !== undefined) q.touch = prev.touch;
       for (const c of prev.comments) {
         q.comments.push(c);
         sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
@@ -1234,7 +1248,7 @@ export function parseDmBody(raw: string): string {
 
 /** site: 화면에 보이는 게시판 이름. 여러 게시판 덩어리를 모델이 가려 읽게 넣는다 (전수검사 11-13) */
 export function mainContext(st: GState, nick: string, rules: string, focus?: Focus | null, site?: string): string {
-  // pin: 보관함에서 잠깐 되살린 글(back)은 그 턴에 꼭 넣는다 (전수검사 11-13)
+  // pin: 보관함에서 잠깐 되살린 글(back)과 이번 턴에 쓴 글·댓글 단 글(touch)은 그 턴에 꼭 넣는다 (전수검사 11-13)
   const posts: (Pick<Record<string, unknown>> & { pin?: boolean })[] = [];
   // 내가 쓴 것만: 내 글, 내 댓글이 달린 글(그 댓글과 위쪽 댓글만), 내가 주고받은 쪽지는 원래 모두 내 것 (원본 context_own_only)
   for (const p of CONTEXT.includePosts ? st.posts : []) {
@@ -1254,7 +1268,7 @@ export function mainContext(st: GState, nick: string, rules: string, focus?: Foc
     const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: describe(c.body) })).filter((c) => wanted.has(c.id));
     posts.push({
       order: p.id,
-      pin: p.back !== undefined,
+      pin: p.back !== undefined || p.touch !== undefined,
       related: related(focus, [p.nick, p.title, ...comments.map((c) => c.author)], `${p.title}\n${p.body}\n${comments.map((c) => c.content).join('\n')}`),
       data: { kind: 'public_post', title: p.title, date: p.date, author: p.nick, content: describe(p.body), comments, access: 'publicly accessible; reading by each character is not established' },
     });

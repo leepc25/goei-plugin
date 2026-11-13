@@ -19,6 +19,7 @@ import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
 import { mentionsPoints, parsePoints } from '../points';
 import { cleanIcon, itemsRule, itemEquip, itemState, stripGrades, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
+import { leftWordIn, offWordIn } from '../itemrules';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -445,6 +446,8 @@ export function parseUpdate(raw: string): UpdateResult {
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
   for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'faction_stance', 'transactions', 'point_transactions', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
+    // null 은 빈 목록으로 받는다 (응답 전체를 버리지 않게, 전수검사 11-13). 글·객체는 그대로 오류
+    if (r[k] === null) delete (r as Record<string, unknown>)[k];
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -1369,12 +1372,15 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       if (nameCut.cut.length || descCut.cut.length) drop('items', t, `본문에 없는 등급 말을 뺌: ${[...nameCut.cut, ...descCut.cut].join(', ')}`, name);
       const outName = act === 'new' ? nameCut.text || name : listed ?? name;
       const place = plain(t.place, 30);
+      // 가진 물건을 또 얻은 new(→ update): uses 는 「받은 수」라 남은 횟수로 덮지 않는다. 설명의 두고 옴·벗음 말이 안전망에 걸리지 않게 그 설명도 뺀다 (전수검사 11-13)
+      const more = action === 'new' && !!listed;
+      const desc = more && (leftWordIn(descCut.text) || offWordIn(descCut.text)) ? '' : descCut.text;
       report.items.push({
         anchor: ev.anchor, name: outName, action: act,
-        desc: descCut.text, effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
+        desc, effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
         // 사용·장착 갈래는 새로 얻을 때만 받는다 (update 의 「equip: none」에 갈래가 지워지던 것)
         ...(act !== 'new' ? {} : typeof t.usable === 'boolean' ? { use: t.usable } : /^(true|false)$/i.test(str(t.usable).trim()) ? { use: /^true$/i.test(str(t.usable).trim()) } : {}),
-        ...(uses !== undefined ? { uses } : {}),
+        ...(uses !== undefined && !more ? { uses } : {}),
         ...(act === 'new' && eq !== undefined ? { equip: eq ?? null } : {}),
         ...(cond === 'ok' || cond === 'damaged' || cond === 'broken' ? { state: itemState(cond) } : {}),
         ...(icon ? { icon } : {}),

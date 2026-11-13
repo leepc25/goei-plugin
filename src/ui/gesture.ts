@@ -20,6 +20,8 @@ const SEG = 28;
 const RDP_EPS = 14;
 /** 가장 긴 획의 이 비율보다 짧은 획은 삐침으로 보고 버린다 */
 const HOOK_RATIO = 0.35;
+/** 이만큼 긴 획은 비율과 상관없이 진짜 획이다 (짧은 세로 + 긴 가로 ㄱ거꾸로·ㄴ, 전수검사 11-13) */
+const LEG_MIN = 45;
 /** 축에서 이 각도(도) 안이면 그 방향이 분명하다. 넘으면 비스듬한 획 */
 const AXIS_DEG = 32;
 const SKIP = 'input, textarea, select, [contenteditable]';
@@ -70,7 +72,7 @@ export function readStroke(pts: readonly Pt[]): Gesture | null {
   let vs = join(v.slice(1).map((p, i): Pt => [p[0] - v[i][0], p[1] - v[i][1]]));
   const longest = Math.max(...vs.map((s) => Math.hypot(s[0], s[1])));
   if (longest < SEG) return null;
-  vs = join(vs.filter((s) => Math.hypot(s[0], s[1]) >= Math.max(SEG * 0.6, longest * HOOK_RATIO)));
+  vs = join(vs.filter((s) => Math.hypot(s[0], s[1]) >= Math.max(SEG * 0.6, Math.min(LEG_MIN, longest * HOOK_RATIO))));
   if (!vs.length || vs.length > 3) return null;
   // 획마다: 축에 가까우면 그 방향, 비스듬하면 일단 비워 둔다
   const off = (s: Pt) => (Math.atan2(Math.min(Math.abs(s[0]), Math.abs(s[1])), Math.max(Math.abs(s[0]), Math.abs(s[1]))) * 180) / Math.PI;

@@ -38,7 +38,7 @@ import { bindMapZoom } from './mapzoom';
 import { setItemIconRedraw } from '../host/itemicons';
 import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
-import { setCurrentTheme, themeName } from './theme';
+import { currentTheme, setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
 import { bmDeskWinSpec, mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
@@ -527,6 +527,9 @@ function ensureRoot(): HTMLElement {
     if (view.kind === 'started' && inBrowser() && isBoardSite(curTab().site) && gnetDmOpen()) return void handle('gn-dm-close');
     // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
     if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');
+    // 아바타 창·인터넷 로그인 창은 상태로 떠 있다: 상태를 닫아야 다음 그리기에 다시 안 뜬다 (전수검사 11-13)
+    if (lookUi.open) return void handle('look-close');
+    if (view.kind === 'started' && inBrowser() && br.login) return void handle('br-login');
     const pop = document.querySelector('.gx-agpop');
     if (pop) return void pop.remove();
     if (evUi.pop || agUi.pop) {
@@ -729,9 +732,10 @@ async function addPhotos(prefix: string, files: File[]): Promise<void> {
   render();
 }
 
-/** quietIfNotLite: 플로팅 버튼에서 열 때는 괴이봇 Lite가 아니면 아무것도 띄우지 않는다. */
+/** quietIfNotLite: 플로팅 버튼에서 열 때는 괴이봇 Lite가 아니면 아무것도 띄우지 않는다.
+ *  check: 연 뒤 지금 탭의 「창을 열 때」 확인 (기본 켬. 스스로 화면을 옮기는 카드 길은 끈다) */
 let widthWatch = false;
-export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<void> {
+export async function openApp(opts: { quietIfNotLite?: boolean; check?: boolean } = {}): Promise<void> {
   ensureRoot();
   if (opts.quietIfNotLite) {
     const ctx = await loadContext().catch(() => null);
@@ -744,6 +748,12 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   if (root) startCctvFx(root);
   await showWindow();
   await refresh();
+  // 다시 열 때도 「창을 열 때」 자동 호출 확인 (처음 연 탭만 걸리던 문제, 전수검사 11-13)
+  const v = view as View; // refresh 가 바꾼다
+  if (opts.check !== false && v.kind === 'started') {
+    if (inBrowser()) siteOpened();
+    else if (tab === 'phone') openCheck(v.ctx, phoneEnv);
+  }
   // 에셋 모듈의 표정 세트(위키 인물 사진). 목록이 바뀌었으면 한 번 다시 그린다
   void loadModuleAssets().then((changed) => {
     if (shown && changed) render();
@@ -792,13 +802,13 @@ export async function openInstall(): Promise<void> {
 }
 
 export async function openWiki(title: string): Promise<void> {
-  await openApp({ quietIfNotLite: true });
+  await openApp({ quietIfNotLite: true, check: false });
   if (view.kind === 'started') await handle('wiki-goto', title);
 }
 
 /** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
 export async function openShop(site = ''): Promise<void> {
-  await openApp({ quietIfNotLite: true });
+  await openApp({ quietIfNotLite: true, check: false });
   // 고유 상점에 인터넷으로 접속한 카드(11-09 사용자): 상황판 없이 인터넷 창만 그 사이트로. 사고판 것은 상황판 인터넷 탭과 같은 저장소
   if (site && view.kind === 'started' && isSite(site)) {
     netSolo = true;
@@ -816,7 +826,7 @@ export async function openShop(site = ''): Promise<void> {
 
 /** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
 export async function openRecords(id: string): Promise<void> {
-  await openApp({ quietIfNotLite: true });
+  await openApp({ quietIfNotLite: true, check: false });
   if (view.kind === 'started') await handle('rec-open', id);
 }
 
@@ -847,6 +857,12 @@ async function refresh(): Promise<void> {
         resetHomeshop();
         restoreTabs(ctx.chat.scriptstate?.[BR_TABS_VAR]);
         tabsSaved = tabsJson();
+        // 인터넷 안이면 화면 탭·위키·괴담넷 상태를 새 채팅의 지금 탭에 맞춘다 (앞 채팅 것이 남던 문제, 전수검사 11-13)
+        if (inBrowser()) {
+          const s = tabState<NavState>();
+          if (s && BR_TABS.includes(s.tab)) applyNavState(s);
+          else tab = siteTab(curTab().site);
+        }
         resetPhone();
         resetSettings();
         resetDirectory();
@@ -1035,6 +1051,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
     document.querySelectorAll('.gx-agpop').forEach((b) => b.remove()); // 사원증 창이 설정 창 위에 남지 않게 (2026-11-05)
+    lookUi.open = false; // 아바타 창은 상태도 닫아야 다음 그리기에 다시 안 뜬다 (전수검사 11-13)
     // 설정·세계 편집 창 (별도 창 하나, 2026-10-27: 모든 설정은 이 창). 시작 전(시작 패널)에도 열 수 있다: ctx 가 있으면
     if (!(view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening')) return;
     if (view.kind === 'picker') pickerPrefs = true; // 시작 전: 설정 단추가 기본값 범위로 가게
@@ -1182,9 +1199,8 @@ async function handle(action: string, value?: string): Promise<void> {
       resetSettings();
       render();
       // 「창을 열 때」 확인: 본편이 진행됐으면 이 탭을 열 때 한 번
+      // 괴담넷·위키는 위에서 br-site 로 가며 siteOpened 가 확인한다 (전수검사 11-13)
       if (view.kind === 'started' && tab === 'phone') openCheck(view.ctx, phoneEnv);
-      if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv, tabBoard());
-      if (view.kind === 'started' && tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
       return;
     // ── 인터넷 브라우저 (ui/browser.ts) ──
     case 'br-site':
@@ -1521,13 +1537,18 @@ const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > 
 // 위키 문서 칸(.wk .wsc)도: 목록 서랍·그림 도착으로 다시 그리면 맨 위로 튀던 문제 (전수검사 11-13)
 const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc, .wk .wsc';
 const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
+/** 상태에 적지 않는 입력 칸 (소지품 넣기·고치기, 잔고 고치기, 인터넷 로그인 닉네임): 저절로 다시 그려도 적던 글을 지킨다 (전수검사 11-13) */
+const DRAFT_SEL = '[data-it-form] [name], input[name="wt-adj"], input[name="br-nick"]';
+/** 그 칸들이 같은 양식인지 (다른 물건·탭으로 넘어가면 지키지 않는다) */
+const draftKey = () => `${tab}|${itemsUi.sub}|${itemsUi.mode}|${itemsUi.open}|${walletTabUi.kind}|${walletTabUi.edit}|${br.login}|${curTab().id}`;
 
 function render(): void {
   if (!root) return;
   // 설정 창의 설정 페이지는 패널 상태를 그대로 보여 주므로 패널을 다시 그릴 때 같이 그린다 (2026-10-27)
   if (editorOpen() && editorOnSettings()) queueMicrotask(() => editorRender());
   // 카드에서 고유 상점 사이트로 접속한 인터넷 창만 (netSolo): 메뉴 없이
-  const nav = view.kind === 'started' && !(netSolo && tab === 'net');
+  // 괴담넷·위키(탭 gnet·wiki)로 가도 인터넷 창만 그대로 (전수검사 11-13)
+  const nav = view.kind === 'started' && !(netSolo && inBrowser());
   // 종료 알림 오버레이: 새 보고서가 있으면 한 번 띄운다 (창이 닫혀 있었으면 지금, 이 그리기에서)
   if (view.kind === 'started') syncCloseToast(view.ctx.chat, render);
   // 다시 그려도 읽던 자리를 지킨다
@@ -1557,6 +1578,11 @@ function render(): void {
     ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ''}`
     : '';
   const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
+  // 상태에 없는 입력 칸: 같은 양식이면 값·커서를 떠 두었다가 되살린다 (전수검사 11-13)
+  const dKey = draftKey();
+  const drafts = root.dataset.dk === dKey ? [...root.querySelectorAll<HTMLInputElement>(DRAFT_SEL)].map((el) => ({ n: el.name, v: el.value, c: el.checked })) : [];
+  const draftFocus = drafts.length > 0 && !!act && root.contains(act) && !focusSel && !!act.matches?.(DRAFT_SEL) ? act.name : '';
+  const draftCaret = draftFocus ? (() => { try { return typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null; } catch { return null; } })() : null;
   root.dataset.theme = themeOf();
   // 창 모양 (설정 → 화면): 메뉴 위치, 창 바깥 어둡기
   const pf = getPrefs();
@@ -1589,6 +1615,21 @@ function render(): void {
   if (toastEl) {
     toastEl.addEventListener('pointerenter', holdToast);
     toastEl.addEventListener('pointerleave', () => releaseToast(render));
+  }
+  root.dataset.dk = dKey;
+  if (drafts.length) {
+    const now = new Map([...root.querySelectorAll<HTMLInputElement>(DRAFT_SEL)].map((el) => [el.name, el] as const));
+    for (const d of drafts) {
+      const el = now.get(d.n);
+      if (!el) continue;
+      if (el.type === 'checkbox') el.checked = d.c;
+      else if (el.tagName !== 'SELECT' || [...(el as unknown as HTMLSelectElement).options].some((o) => o.value === d.v)) el.value = d.v;
+    }
+    const el = draftFocus ? now.get(draftFocus) : undefined;
+    if (el) {
+      el.focus({ preventScroll: true });
+      if (draftCaret) try { el.setSelectionRange(draftCaret[0], draftCaret[1]); } catch { /* 커서를 못 두는 칸 */ }
+    }
   }
   if (focusSel) {
     const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
@@ -1643,7 +1684,11 @@ function render(): void {
   if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
-  if (view.kind === 'started' && inBrowser()) recordTab(navState());
+  // 탭 기록에는 탭 id 를 넣지 않는다 (채팅을 다시 열면 id 가 바뀌어 같은 화면이 한 번 더 쌓인다, 전수검사 11-13)
+  if (view.kind === 'started' && inBrowser()) {
+    const { bt: _bt, ...ts } = navState();
+    recordTab(ts);
+  }
   saveTabsSoon();
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
   root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
@@ -1666,6 +1711,8 @@ interface NavState {
   a?: string;
   /** 인터넷: 지금 탭의 사이트 ('' 새 탭) */
   b?: string;
+  /** 인터넷: 그 탭의 id (전체 기록으로 뒤로 갈 때 그 탭으로 돌아간다, 전수검사 11-13) */
+  bt?: number;
 }
 const navHist = new NavHistory<NavState>();
 
@@ -1682,8 +1729,12 @@ function openWallet(): void {
 
 function navState(): NavState {
   const s: NavState = { tab };
-  if (inBrowser()) s.b = curTab().site;
-  if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen, q: wiki.query };
+  if (inBrowser()) {
+    s.b = curTab().site;
+    s.bt = curTab().id;
+  }
+  // 검색어는 검색 화면에서만 열쇠에 (대문·문서로 뒤로 가면 새 기록이 쌓여 더 뒤로 못 가던 문제, 전수검사 11-13)
+  if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen, ...(wiki.view === 'find' ? { q: wiki.query } : {}) };
   if (tab === 'records') s.r = recordsNav();
   if (tab === 'items') s.i = itemsNav();
   if (tab === 'phone') s.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
@@ -1703,6 +1754,14 @@ function navHistBar(): string {
 }
 
 function applyNav(s: NavState): void {
+  applyNavState(s);
+  // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
+  if (s.f && s.f !== field.step) return void run('field-step', s.f);
+  render();
+}
+
+/** 화면 상태만 되돌린다 (그리지 않음. 채팅을 바꿀 때 refresh 도 쓴다, 전수검사 11-13) */
+function applyNavState(s: NavState): void {
   tab = s.tab;
   if (s.b !== undefined) curTab().site = isSite(s.b) ? s.b : '';
   notice = '';
@@ -1715,9 +1774,6 @@ function applyNav(s: NavState): void {
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
   agUi.pop = s.a ?? '';
-  // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
-  if (s.f && s.f !== field.step) return void run('field-step', s.f);
-  render();
 }
 
 /** 모바일 쓸기가 할 일 (브라우저 ←·→ 처럼): dir -1 뒤로, 1 앞으로. 갈 곳이 없으면 null */
@@ -1731,7 +1787,14 @@ function navStep(dir: -1 | 1): (() => void) | null {
   if (!navHist.can(dir)) return null;
   return () => {
     const s = navHist.go(dir);
-    if (s) applyNav(s);
+    if (!s) return;
+    // 그 기록을 적은 인터넷 탭으로 먼저 (지금 탭에 앞 탭의 사이트를 덮던 문제). 닫힌 탭이면 새 탭에 (전수검사 11-13)
+    if (s.bt !== undefined) {
+      const i = br.tabs.findIndex((t) => t.id === s.bt);
+      if (i >= 0) br.cur = i;
+      else newTab();
+    }
+    applyNav(s);
   };
 }
 
@@ -1741,6 +1804,8 @@ function themeOf(): string {
   const v = String(ctx?.chat.scriptstate?.['$st_fixed_theme'] ?? '');
   if (v === 'light' || v === 'paper' || v === 'dark') return v;
   if (view.kind === 'picker') return getPrefs().theme ?? 'dark';
+  // 불러오는 중·오류: 지금 배색 그대로 (열 때마다 밝게 번쩍이던 문제, 전수검사 11-13)
+  if (view.kind === 'loading' || view.kind === 'error') return currentTheme();
   return 'light';
 }
 
@@ -1785,7 +1850,7 @@ function body(): string {
     case 'started':
       evSeenReset();
       if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
-      if (netSolo && tab === 'net') return `${header(TAB_TITLE.net)}<div class="gx-content gx-netsolo">${browserBody(view.ctx)}</div>${closeToastHtml()}`;
+      if (netSolo && inBrowser()) return `${header(TAB_TITLE.net)}<div class="gx-content gx-netsolo">${browserBody(view.ctx)}</div>${closeToastHtml()}`;
       return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
@@ -1990,7 +2055,12 @@ function openBrowserTab(): void {
   field.confirmEnd = null;
   resetSettings();
   const s = tabState<NavState>();
-  if (s) return applyNav(s);
+  if (s) {
+    // 기록이 있는 탭으로 돌아와도 「창을 열 때」 확인 (전수검사 11-13)
+    applyNav(s);
+    siteOpened();
+    return;
+  }
   tab = siteTab(curTab().site);
   render();
   siteOpened();

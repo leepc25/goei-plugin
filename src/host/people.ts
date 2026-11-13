@@ -6,7 +6,9 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, repairDirector, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun, foldLog } from '../core/people/store';
+import { sumCues } from '../core/people/affinity';
+import { genSettings } from '../core/advanced';
 import { hypaSummaries } from '../core/people/hypa';
 import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, shopKeyLine, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, consolidateUserText, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
@@ -37,7 +39,7 @@ import { guideSections } from '../core/guides';
 const routerBase = () => { const g = guideSections('Router'); return [g.ROLE, g.RULES].filter((x) => x?.trim()).join('\n'); };
 const directorBase = () => { const g = guideSections('Director'); return { facts: g.FACTS, scene: g.SCENE }; };
 import { parseIdentity } from '../core/people/identity';
-import type { Identity, PeopleStore } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, type Identity, type PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
 
@@ -209,7 +211,8 @@ export interface RunScope {
   clear?: string;
 }
 
-export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
+/** at: 응답이 붙은 채팅 (본편 응답 뒤). 그 채팅이 지금 열려 있지 않으면 읽지 않고 다음 턴에 미룬다 (전수검사 11-13: 다른 채팅을 읽고 거기에 적었다) */
+export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope; at?: { charIndex: number; chatIndex: number } } = {}): Promise<RunResult> {
   running++;
   const run = chain.then(() => runOnce(reason, o)).finally(() => {
     running--;
@@ -230,10 +233,15 @@ async function waitNotBusy(): Promise<void> {
   });
 }
 
-async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }): Promise<RunResult> {
+async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope; at?: { charIndex: number; chatIndex: number } }): Promise<RunResult> {
   const result: RunResult = { ran: 0, applied: 0, skipped: [], errors: [] };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return result;
+  // 응답이 끝난 채팅과 지금 열린 채팅이 다르면 손대지 않는다. 그 응답은 안 읽은 채로 남아 다음 갱신이 읽는다 (전수검사 11-13)
+  if (o.at && (o.at.charIndex !== ctx.charIndex || o.at.chatIndex !== ctx.chatIndex)) {
+    result.skipped.push('다른 채팅이 열려 있어 다음 턴에 읽음');
+    return result;
+  }
   const settings = peopleSettings(ctx.chat.scriptstate);
   if (!settings.on || (settings.when === 'manual' && !o.manual)) return result;
   const store = peopleStore(ctx.chat);
@@ -348,7 +356,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         { role: 'system', content: system },
         { role: 'user', content: dataText },
       ];
-      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: 1, retryModel: 'same', state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined, label: '갱신기' });
+      // 형식 오류 재시도·재시도 모델은 「생성 공통」 설정을 따른다 (전수검사 11-13: 1회·같은 모델로 박혀 있었다). 동시 요청 수는 세지 않는다
+      const g = genSettings(fresh.chat.scriptstate);
+      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: g.retries, retryModel: g.retryModel, state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined, label: '갱신기' });
       diag.raw = raw;
       diag.outChars = raw.length;
       // 쓰기: 응답 대기 중이면 기다리고, 같은 채팅인지·메시지가 그대로인지 확인
@@ -374,7 +384,15 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         });
         diag.report = report;
         // 되돌리기용 (리수폿 J-4): 이 갱신이 새로 만든 것. 다시 읽기(only)는 적지 않는다
-        if (!o.scope?.only) recordRun(s, before, new Date().toISOString());
+        if (!o.scope?.only) {
+          recordRun(s, before, new Date().toISOString());
+          // 변경 기록 줄이기: 지워진 응답의 변경은 버리고, 상한을 넘으면 오래된 호감 계기를 값으로 접는다. 세력 평판은 시작값이 바뀔 수 있어 접지 않는다 (전수검사 11-13)
+          foldLog(s, cur, (who, cues, folded) => {
+            const p = s.people[who];
+            if (!p) return null;
+            return sumCues(who, p.affinity.base, cues, folded, AFF_MIN, AFF_MAX, { temper: temperOf(who), speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }) - p.affinity.base;
+          });
+        }
         let next = cur;
         if (report.wallet.length) {
           let w = readWallet(cur.scriptstate, walletStart);
@@ -536,7 +554,8 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
       { role: 'system', content: input.system },
       { role: 'user', content: consolidateUserText(dataText) },
     ];
-    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined, label: '정리' });
+    const g = genSettings(ctx.chat.scriptstate);
+    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: g.retries, retryModel: g.retryModel, state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined, label: '정리' });
     diag.raw = raw;
     diag.outChars = raw.length;
     await waitNotBusy();

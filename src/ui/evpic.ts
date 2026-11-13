@@ -53,6 +53,8 @@ function rows(ctx: ChatContext): Map<string, Row> {
 }
 
 const descs = new Map<string, string>();
+// 설명은 채팅 위키 문서·로어북에서 읽으므로 둘이 바뀌면(문서 저장·채팅·캐릭터 바꿈) 비운다 (전수검사 11-13)
+let descSrc: { chat: unknown; lore: unknown } | null = null;
 
 /** 그림이 없는 상황의 종류별 공용 그림 (카드 에셋, assets/wiki/Situations) */
 // 괴이·사건은 장소, 특수는 종류로 고른 여러 장 중 카드에 있는 첫 그림 (core/sharedpics). 거점은 공용 거점 그림이 없으면 사건 그림
@@ -73,6 +75,11 @@ export function evArt(ctx: ChatContext, name: string, kind?: string, text = ''):
   const shared = (!r?.pic && kind && sharedFor(kind, name, text).find((n) => hasAsset(ctx.char, n))) || '';
   const pic = imageUrl(ctx.char, r?.pic || shared);
   const title = r?.title ?? name;
+  const src = ctx.chat.localLore ?? ctx.chat;
+  if (!descSrc || descSrc.chat !== src || descSrc.lore !== ctx.char.globalLore) {
+    descs.clear();
+    descSrc = { chat: src, lore: ctx.char.globalLore };
+  }
   let desc = descs.get(title);
   if (desc === undefined) {
     const doc = findDoc(ctx.chat, title, ctx.char.globalLore);

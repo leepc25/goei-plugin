@@ -668,11 +668,12 @@ function searchAll(ctx: ChatContext, d: Directory, q: string, names: Record<stri
   return hit.map(([, label, rows]) => `<h3 class="dir-group">${label}<small>${rows.length}</small></h3>${rows.join('')}`).join('');
 }
 
-export function directoryList(ctx: ChatContext): string {
+/** scoped: 설정 창 거점 화면처럼 한 종류만 보일 때는 통합 검색 대신 그 종류만 거른다 (전수검사 11-13) */
+export function directoryList(ctx: ChatContext, scoped = false): string {
   const d = draftOf(ctx);
   const q = dirUi.q.trim().toLowerCase();
   const names = namesOf(d, ctx.char.globalLore);
-  if (q) return searchAll(ctx, d, q, names);
+  if (q && !scoped) return searchAll(ctx, d, q, names);
   if (dirUi.kind === 'base') return baseList(ctx, d, q);
   if (dirUi.kind === 'appendix') return appendixList(ctx, d, q);
   if (dirUi.kind === 'org') {
@@ -724,7 +725,7 @@ export function directoryBar(): string {
   return barButtons(!dirty() || dirUi.busy);
 }
 
-export function directoryView(ctx: ChatContext): string {
+export function directoryView(ctx: ChatContext, scoped = false): string {
   const d = draftOf(ctx);
   const kinds: [Kind, string, number][] = [
     ['anomaly', '괴이', d.anomalies.length],
@@ -758,7 +759,7 @@ export function directoryView(ctx: ChatContext): string {
     </div>` : ''}
     ${dirUi.notice ? `<div class="gx-err" role="alert">${esc(dirUi.notice)}</div>` : ''}
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ''}
-    <div class="dir-list">${directoryList(ctx)}</div>
+    <div class="dir-list">${directoryList(ctx, scoped)}</div>
   </div>`;
 }
 

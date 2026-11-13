@@ -808,7 +808,9 @@ export function bindFootnotes(root: HTMLElement): void {
     pop.style.width = `${w}px`;
     const left = Math.max(12, Math.min(r.left - box.left - w / 2 + r.width / 2, box.width - w - 12));
     let top = r.bottom - box.top + doc.scrollTop + 6;
-    if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
+    // 위·아래 판단은 보이는 영역(.wsc) 기준. 문서 칸은 스크롤 칸이 아니라 문서 전체 길이다 (전수검사 11-13)
+    const view = (doc.closest<HTMLElement>('.wsc') ?? doc).getBoundingClientRect();
+    if (r.bottom + pop.offsetHeight + 12 > view.bottom && r.top - pop.offsetHeight - 12 > view.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
     pop.style.left = `${left}px`;
     pop.style.top = `${top}px`;
   };
@@ -889,7 +891,8 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     if (k) {
       const box = panel.querySelector<HTMLElement>('.wls');
       const sec = box?.querySelector<HTMLElement>(`[data-ksec="${k}"]`);
-      if (box && sec) box.scrollTop = sec.offsetTop;
+      // offsetTop 은 서랍(.wdr) 기준이라 검색칸·탭 줄만큼 지나쳤다. 목록 칸 기준으로 맞춘다 (전수검사 11-13)
+      if (box && sec) box.scrollTop += sec.getBoundingClientRect().top - box.getBoundingClientRect().top;
       grid.hidden = true;
       return;
     }

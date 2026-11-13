@@ -19,7 +19,7 @@ import { turnKey, acceptQuote, appendItems, applyShelf, applyTalk, buyNote, canc
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
 import { defChanged, defStored } from '../core/deftext';
-import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseAxes, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
+import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseAxes, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskLine, type DeskSource, type DeskState } from '../core/bmdesk';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, COS_READY_KEY, cosReadyMode, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, parseGenres, parseTiers, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
@@ -28,6 +28,9 @@ import { shopGive } from '../core/shopfn';
 import { itemPic } from './items';
 import { siteLogo } from './browser';
 import { isPhone } from './media';
+
+/** 상담 줄 + 그 줄을 쓴 때의 마지막 응답 키 (core/malls.ts mallEvents 가 이 키로 거른다) */
+type DeskLineK = DeskLine & { k?: string };
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -524,7 +527,9 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       if (site === 'bm') {
         const d = readDesk(ctx.chat.scriptstate);
         if (!said || v.dl || !d.agent) return true;
-        const next: DeskState = { ...d, talk: [...d.talk, { who: 'me', text: said.slice(0, 600) }] };
+        // 줄마다 그때의 마지막 응답 키를 적는다: 창을 열어 둔 채 다음 턴에 이어 말해도 메인 요청에 넘어가게 (전수검사 11-13)
+        const me: DeskLineK = { who: 'me', text: said.slice(0, 600), k: lastBot(ctx.chat)?.key ?? '' };
+        const next: DeskState = { ...d, talk: [...d.talk, me] };
         v.input = '';
         const saved = await saveDesk(ctx, next);
         if (saved) await deskRun({ ...ctx, chat: saved }, env, 'talk', next);
@@ -593,11 +598,11 @@ async function deskRun(ctx: ChatContext, env: MallEnv, kind: 'make' | 'talk', st
       const no = newDeskNo();
       const p = makePrompt(src, dice, st0.past.slice(0, ds.avoid), no);
       const { value } = await generate(craftMessages(p.messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts: p.thoughts }), s.model, (raw) => parseCard(raw, dice, no), opts);
-      next = { ...st0, agent: value.agent, anchor: key, talk: [{ who: 'sys', text: deskHello(value.agent) }, ...value.say.map((t) => ({ who: 'op' as const, text: t }))] };
+      next = { ...st0, agent: value.agent, anchor: key, talk: [{ who: 'sys', text: deskHello(value.agent) }, ...value.say.map((t): DeskLineK => ({ who: 'op', text: t, k: key }))] };
     } else {
       const p = deskTalkPrompt(src, st0);
       const { value } = await generate(craftMessages(p.messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts: p.thoughts }), s.model, parseSay, opts);
-      next = { ...st0, talk: [...st0.talk, ...value.map((t) => ({ who: 'op' as const, text: t }))] };
+      next = { ...st0, talk: [...st0.talk, ...value.map((t): DeskLineK => ({ who: 'op', text: t, k: key }))] };
     }
     const cur = env.current();
     if (!cur || chatKey(cur) !== chatKey(ctx)) return;
@@ -705,13 +710,19 @@ function cosOrders(ctx: ChatContext, v: View): string {
 }
 
 function opText(text: string, st: ShopState): string {
-  let html = esc(text);
+  const html = esc(text);
+  // 한 번에 훑어 바꾼다: 긴 이름 먼저, 이미 단추가 된 이름 안의 짧은 이름은 다시 안 바꾼다 (전수검사 11-13)
+  const byName = new Map<string, ShopItem>();
   for (const it of onShelf(st).slice().sort((a, b) => b.name.length - a.name.length)) {
     const n = esc(it.name);
-    if (!n || !html.includes(n)) continue;
-    html = html.split(n).join(`<button class="cs-ln" data-action="mall-show" data-value="${esc(it.id)}">${n} <b>${won(it.price)}</b></button>`);
+    if (n && !byName.has(n)) byName.set(n, it);
   }
-  return html;
+  if (!byName.size) return html;
+  const re = new RegExp([...byName.keys()].map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+  return html.replace(re, (n) => {
+    const it = byName.get(n)!;
+    return `<button class="cs-ln" data-action="mall-show" data-value="${esc(it.id)}">${n} <b>${won(it.price)}</b></button>`;
+  });
 }
 
 function cosCard(it: ShopItem, v: View): string {

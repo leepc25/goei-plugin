@@ -266,7 +266,8 @@ async function ask(d: ConsultDeps, ctx: ChatContext): Promise<void> {
     const pageOf = (id: string) => all.find((r) => r.id === id)?.page ?? '';
     const said = [...me.lines].reverse().find((l) => l.who === 'me');
     // 펼칠 메뉴: 지금 보는 메뉴 → 바꾸자고 한 줄·마지막 판의 메뉴 → 사용자 글에 이름이 나온 메뉴 → (다시 물을 때) 모델이 달라고 한 메뉴
-    const want = [catalogCurrent(), ...pending.map((p) => pageOf(p.id)), ...(lastCard?.who === 'card' ? lastCard.rows.map((r) => r.page) : []), ...menusInText(menus, said && said.who === 'me' ? said.text : '')].filter(Boolean);
+    const cur = catalogCurrent();
+    const want = [cur, ...pending.map((p) => pageOf(p.id)), ...(lastCard?.who === 'card' ? lastCard.rows.map((r) => r.page) : []), ...menusInText(menus, said && said.who === 'me' ? said.text : '')].filter(Boolean);
     const src = (opened: CatMenu[]): ConsultSource => ({ state: consultState(ctx, started), last, menus: consultMenus(menus), opened: opened.map((m) => ({ menu: m.menu, items: m.rows })), all, pending, talk });
     const last = await consultLast();
     const size = (m: { content: string }[]) => m.reduce((n, x) => n + tokens(x.content), 0);
@@ -276,7 +277,8 @@ async function ask(d: ConsultDeps, ctx: ChatContext): Promise<void> {
     let value = await call(want);
     // <open>: 모델이 메뉴를 더 달라고 하면 그 메뉴를 더해 한 번만 다시 묻는다 (그 답은 화면에 내지 않는다). 없는 메뉴 이름은 버린다
     const more = value.open.map((n) => menus.find((m) => flat(m.menu) === flat(n))?.page ?? '').filter((p) => p && !want.includes(p));
-    if (more.length) value = await call([...want, ...more]);
+    // 달라고 한 메뉴는 지금 메뉴 바로 다음에 둔다: 맨 뒤면 요청 토큰 상한에 먼저 걸려 빠졌다 (전수검사 11-13)
+    if (more.length) value = await call(cur && want[0] === cur ? [cur, ...more, ...want.slice(1)] : [...more, ...want]);
     if (!value.say) throw new Error('<say> 블록이 없어요.');
     const now = d.ctx();
     const same = !!now && chatKey(now) === key;
@@ -376,10 +378,15 @@ export async function consultAction(action: string, value: string | undefined, d
     d.render();
     const failed: string[] = [];
     // 거꾸로 차례로 되돌리고, 끝난 화면을 다시 읽어 줄마다 판정한다. 다른 줄에 묶여 잠겨 있던 줄은 그 줄이 풀린 뒤 한 번 더 해 본다
-    const back = (r: CardRow) => rowAt(r.page, r.id)?.cur === r.from;
-    for (let pass = 0; pass < 2; pass++) {
-      for (const r of [...card.rows].reverse()) if (!back(r)) await setOne(d, r.page, r.id, r.from);
-      if (card.rows.every(back)) break;
+    const back = (r: CardRow) => { try { return rowAt(r.page, r.id)?.cur === r.from; } catch { return false; } };
+    try {
+      for (let pass = 0; pass < 2; pass++) {
+        for (const r of [...card.rows].reverse()) if (!back(r)) await setOne(d, r.page, r.id, r.from);
+        if (card.rows.every(back)) break;
+      }
+    } catch (error) {
+      // 저장이 던져도 처리 중으로 잠기지 않게, 아래에서 줄마다 판정해 「되돌리지 못했어요」로 알린다 (전수검사 11-13)
+      console.log(`[goei] AI 상담 되돌리기 중 오류: ${error instanceof Error ? error.message : String(error)}`);
     }
     for (const r of card.rows) if (!back(r)) failed.push(r.title);
     if (failed.length) me.lines.push({ who: 'sys', text: `되돌리지 못했어요: ${failed.join(', ')}` });

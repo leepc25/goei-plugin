@@ -1,4 +1,4 @@
-import { hasSceneCard, stripSceneCard, withUserInput } from './dispatch';
+import { hasSceneCard, parseDirective, stripSceneCard, withUserInput, type Directive } from './dispatch';
 import { hasCall, stripCall } from './phone';
 import { applySeedLifetime, SEED_OPEN } from './seed';
 import type { Chat } from './types';
@@ -39,8 +39,22 @@ export function processRequest<M extends PromptMessage>(messages: M[], chat: Cha
  * 이동·커스텀 임무 지시문(SCENE_CARD)을 모델 요청용으로 푼다: 표식을 지우고,
  * 바로 뒤에 유저가 덧붙여 보낸 글이 있으면 "Situation:"으로 합친다 (원본 M.submit과 같은 결과).
  */
-export function unwrapScenes<M extends PromptMessage>(messages: M[]): { messages: M[]; changed: boolean } {
+export function unwrapScenes<M extends PromptMessage>(messages: M[], o?: { cardIsLast?: boolean }): { messages: M[]; changed: boolean } {
   if (!messages.some((m) => m?.role === 'user' && hasSceneCard(m.content))) return { messages, changed: false };
+  // 카드가 채팅의 마지막 메시지면 요청에서 그 뒤 user 글은 프리셋 글이다: 마지막 카드는 다음 글을 합치지 않는다 (전수검사 11-13)
+  const lastCard = o?.cardIsLast ? messages.map((m) => m?.role === 'user' && hasSceneCard(m.content)).lastIndexOf(true) : -1;
+  // Situation 틀은 지침 「Directive」 FORMAT.user_input. 못 읽으면 기본 글 (전수검사 11-13)
+  let directive: Pick<Directive, 'format'> | null | undefined;
+  const readDirective = () => {
+    if (directive === undefined) {
+      try {
+        directive = parseDirective();
+      } catch {
+        directive = null;
+      }
+    }
+    return directive;
+  };
   const out: M[] = [];
   for (let i = 0; i < messages.length; i++) {
     const m = messages[i];
@@ -54,12 +68,12 @@ export function unwrapScenes<M extends PromptMessage>(messages: M[]): { messages
     const tail = end >= 0 ? m.content.slice(end + END.length).trim() : '';
     let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
     const extra = tail ? [tail] : [];
-    const next = messages[i + 1];
+    const next = i === lastCard ? undefined : messages[i + 1];
     if (next?.role === 'user' && typeof next.content === 'string' && !hasSceneCard(next.content)) {
       if (next.content.trim()) extra.push(next.content.trim());
       i++;
     }
-    if (extra.length) content = withUserInput(null, content, extra.join('\n\n'));
+    if (extra.length) content = withUserInput(readDirective(), content, extra.join('\n\n'));
     out.push({ ...m, content });
   }
   return { messages: out, changed: true };
@@ -69,8 +83,10 @@ export function unwrapScenes<M extends PromptMessage>(messages: M[]): { messages
  * 전화 기록(PHONE_CALL)을 모델 요청용으로 푼다: 표식을 지우고 "… places a phone call to …" 본문만 남긴다.
  * 바로 뒤에 유저가 덧붙여 보낸 글이 있으면 통화 내용으로 이어 붙인다 (원본 submitCall과 같은 결과).
  */
-export function unwrapCalls<M extends PromptMessage>(messages: M[]): { messages: M[]; changed: boolean } {
+export function unwrapCalls<M extends PromptMessage>(messages: M[], o?: { callIsLast?: boolean }): { messages: M[]; changed: boolean } {
   if (!messages.some((m) => m?.role === 'user' && hasCall(m.content))) return { messages, changed: false };
+  // 전화 기록이 채팅의 마지막 메시지면 뒤의 user 글(프리셋)을 통화 내용으로 합치지 않는다 (전수검사 11-13)
+  const lastCall = o?.callIsLast ? messages.map((m) => m?.role === 'user' && hasCall(m.content)).lastIndexOf(true) : -1;
   const out: M[] = [];
   for (let i = 0; i < messages.length; i++) {
     const m = messages[i];
@@ -79,7 +95,7 @@ export function unwrapCalls<M extends PromptMessage>(messages: M[]): { messages:
       continue;
     }
     let content = stripCall(m.content);
-    const next = messages[i + 1];
+    const next = i === lastCall ? undefined : messages[i + 1];
     if (next?.role === 'user' && typeof next.content === 'string' && !hasCall(next.content) && !hasSceneCard(next.content) && next.content.trim()) {
       content = `${content}\n\n${next.content.trim()}`;
       i++;

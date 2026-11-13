@@ -60,8 +60,10 @@ export function stripLabel(v: string | undefined): string {
 }
 
 export function normGrade(v: string | undefined): string {
-  const g = stripLabel(v).toUpperCase().replace(/[^FEDCBAS]/g, '').charAt(0);
-  return g;
+  const s = stripLabel(v).toUpperCase();
+  // 따로 떨어진 등급 글자 먼저 (Grade B → B, B급 → B). 없을 때만 남은 첫 글자 (전수검사 11-13)
+  const alone = /(?:^|[^A-Z])([FEDCBAS])(?![A-Z])/.exec(s);
+  return alone ? alone[1] : s.replace(/[^FEDCBAS]/g, '').charAt(0);
 }
 
 export function normAnState(v: string | undefined): AnState {

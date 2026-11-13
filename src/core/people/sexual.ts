@@ -70,7 +70,9 @@ export function sexualWriterSection(s: Flags): string {
   const fields = [g.desire ? '`sexual_desire`' : '', g.paraphilia ? '`paraphilia`' : ''].filter(Boolean).join(' and ');
   const initDesire = g.desire ? `${guideOr('UpdaterExtra', 'SEXUAL.INIT_DESIRE', '`sexual_desire`: 3 to 5 short direct Korean sentences listing concretely what the adult character likes in bed.')} ` : '';
   const initParaphilia = g.paraphilia ? `${guideOr('UpdaterExtra', 'SEXUAL.INIT_PARAPHILIA', '`paraphilia`: chosen from named adult-consensual types.')} ` : '';
-  const plainFalse = plainStyle().replace('Use the 0.10.7 style', 'When false, use the 0.10.7 style');
+  // 지침의 첫 구절을 고쳐도 「거짓일 때」 조건이 빠지지 않게 (전수검사 11-13)
+  const plain0 = plainStyle();
+  const plainFalse = plain0.includes('Use the 0.10.7 style') ? plain0.replace('Use the 0.10.7 style', 'When false, use the 0.10.7 style') : `When false: ${plain0}`;
   const explicitTrue = explicitStyle().replace('Vocabulary rule, mandatory: write', 'write');
   const axis = `${g.desire ? '`sexual_desire`' : ''}${g.desire && g.paraphilia ? ' or ' : ''}${g.paraphilia ? '`paraphilia`' : ''}`;
   return guideOr('UpdaterExtra', 'SEXUAL.WRITER', () => [

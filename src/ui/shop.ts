@@ -27,13 +27,18 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { getPrefs } from '../core/settings';
 import {
-  applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, sayToOwner, shelfItems, shelfPrompt, shopOn, shopSettings, shopVars, shortWon, startSell, talkPrompt,
+  applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, reviveShop, sayToOwner, shelfItems, shelfPrompt, shopOn, shopSettings, shopVars, shortWon, startSell, talkPrompt,
   type ShopItem, type ShopSource, type ShopState,
 } from '../core/shop';
 import { ICONS } from './icons';
 import { imageUrl } from './images';
 import { equipBox, itemPic } from './items';
 
+/** 지금 방문 상태. 산 응답이 지워졌으면(다시 굴리기·삭제) 진열대의 「팔림」도 되살려 읽는다 (쇼핑몰 readMall 과 같게, 전수검사 11-13) */
+const liveShop = (chat: ChatContext['chat']): ShopState | null => {
+  const st = currentShop(chat);
+  return st ? reviveShop(st, aliveAnchors(chat)) : null;
+};
 /** 상품 그림: 소지품과 같은 PixelLab 그림 팩에서 그림 낱말·이름으로 (ui/items.ts itemPic, 표시 전용) */
 const pic = (name: string, icon?: string): string => itemPic({ name, icon });
 /** 판정 글: 「무기 · 소모 3」 · 「사용」 (상점 물건·팔 물건) */
@@ -102,7 +107,7 @@ const costText = (it: { price: number; pay?: string }) => (it.pay ? `${it.pay}${
 
 export function shopPopup(ctx: ChatContext): string {
   if (!shopUi.open) return '';
-  const st = currentShop(ctx.chat);
+  const st = liveShop(ctx.chat);
   pts = !!st?.identity.points;
   const phone = isPhone();
   if (!st) {
@@ -421,7 +426,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
 
 /** 상점 팝업의 data-action. 처리했으면 true. 'shop-say' 의 value 는 입력칸 글 */
 export async function shopAction(action: string, value: string | undefined, ctx: ChatContext, env: ShopEnv): Promise<boolean> {
-  const st = currentShop(ctx.chat);
+  const st = liveShop(ctx.chat);
   pts = !!st?.identity.points;
   switch (action) {
     case 'shop-open': {
@@ -587,10 +592,11 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       const start = getPrefs().walletStart ?? WALLET_START_DEFAULT;
       let bought = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readShop(chat.scriptstate);
+        const alive = aliveAnchors(chat);
+        const now0 = readShop(chat.scriptstate);
+        const now = now0 ? reviveShop(now0, alive) : null;
         const target = now?.items.find((x) => x.id === it.id && !x.sold);
         if (!now || !target) return null;
-        const alive = aliveAnchors(chat);
         // 포인트 상점은 포인트 장부에서 (원 가계부는 건드리지 않음)
         const p = !!now.identity.points;
         const w0 = p ? readPoints(chat.scriptstate) : readWallet(chat.scriptstate, start);
@@ -602,7 +608,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const paid = p ? { paidWith: `${target.price.toLocaleString('en-US')} Baekilmong points${target.pay ? ` + ${target.pay}` : ''}` } : { price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) };
         const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, truth: target.truth, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', store: 'shop', anchor: now.key, ...paid });
         bought = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id, now.key)) } }; // 산 응답 키를 적어 다시 굴리면 되살게 (전수검사 11-13)
       });
       shopUi.detail = '';
       shopUi.info = bought ? `「${it.name}」을 샀어요. 소지품에 들어갔어요.` : pts ? '포인트가 모자라거나 이미 팔린 물건이에요.' : '잔고가 모자라거나 이미 팔린 물건이에요.';
@@ -631,7 +637,7 @@ export function shopInput(v: string): void {
 
 /** 호출 흐름 미리 계산: 지금 열 수 있는 상점의 진열대 요청 (없으면 null) */
 export function previewShopShelf(ctx: ChatContext): LlmMessage[] | null {
-  const st = currentShop(ctx.chat);
+  const st = liveShop(ctx.chat);
   if (!st) return null;
   const s = shopSettings(ctx.chat.scriptstate);
   return shelfPrompt(shopSource(ctx, st, s, shopGive(ctx.chat.scriptstate, 'shop', 'shelf')), s);

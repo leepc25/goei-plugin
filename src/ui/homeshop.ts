@@ -388,6 +388,8 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
   const s = hsSettings(ctx.chat.scriptstate);
   const { show, part } = nowPart(ctx);
   if (!text || ui.saying || !s.say || !part) return;
+  // 새로 보낼 때 지난 실패 안내를 지운다 (전수검사 11-13)
+  ui.info = '';
   const nick = userInfo().name || '나';
   ui.input = '';
   ui.saying = true;
@@ -399,7 +401,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
     const art = homeshopArt();
     const g = guideSections('Hs');
     const w = cueWords();
-    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: range(s.sayCue), say_chat: range(s.sayChat), cuts: w.cuts, moods: w.moods_all, events: w.events }), fillGuide(g.HOST ?? '', {}), fillGuide(g.VIEWERS ?? '', {})].filter(Boolean).join('\n\n');
+    const system = [fillGuide(g.COMMON ?? '', {}), fillGuide(g.SAY ?? '', { say_cue: range(s.sayCue), say_chat: range(s.sayChat), cuts: w.cuts, moods: w.moods_all, events: w.events }), fillGuide(g.HOST ?? '', {}), fillGuide(g.VIEWERS ?? '', {}), genSettings(ctx.chat.scriptstate).language ?? ''].filter(Boolean).join('\n\n'); // 생성 언어 줄 (방송 편성과 같게, 전수검사 11-13)
     const st = playerState();
     const recent = part.cues.slice(Math.max(0, (st?.cue ?? 0) - 3), (st?.cue ?? 0) + 1).map((c) => `진행자: ${c.text}`).join('\n');
     // 방금까지 흐른 채팅 (내 줄은 playerSay 로 이미 맨 끝에 있다): 같은 닉네임·말투를 잇게

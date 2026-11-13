@@ -100,8 +100,12 @@ export function traitsFor(kind: string, icon: unknown, name: string, model: { us
 }
 
 const has = (text: string, words: string[]) => { const t = String(text ?? ''); return words.find((w) => t.includes(w)) ?? ''; };
-/** 설명에 「두고 옴」 말이 있나 → 걸린 말 */
-export const leftWordIn = (text: string): string => has(text, rules.left);
+/** 설명에 「두고 옴」 말이 있나 → 걸린 말. 「벗음」 말 자리는 지우고 본다: 「내려놓고」의 「놓고」가 두고 옴으로 걸려 물건이 빠졌다 (전수검사 11-13) */
+export const leftWordIn = (text: string): string => {
+  let t = String(text ?? '');
+  for (const w of rules.off) t = t.split(w).join(' ');
+  return has(t, rules.left);
+};
 /** 설명에 「벗음」 말이 있나 → 걸린 말 */
 export const offWordIn = (text: string): string => has(text, rules.off);
 

@@ -141,13 +141,14 @@ export function mountPlayer(root: HTMLElement): void {
 export function stopPlayer(): void {
   if (timer) clearInterval(timer);
   timer = null;
+  iconMemo = null;
   playerFlush();
 }
 
 // ── 시청 기록 모으기 (본편 참고 기록용, core/hslog.ts). 화면에 나온 줄을 모아 두었다가 묶어서 넘긴다 (줄마다 저장하지 않는다) ──
 
-/** 모아 둔 줄을 이만큼 지나면 넘긴다 (ms) */
-const LOG_FLUSH_MS = 5000;
+/** 모아 둔 줄을 이만큼 지나면 넘긴다 (ms). 저장마다 채팅 전체를 읽고 다시 쓰므로 길게 — 파트·주문·내 채팅·닫기 때는 따로 바로 넘긴다 (전수검사 11-13) */
+const LOG_FLUSH_MS = 30000;
 const seen: HsLogEntry[] = [];
 /** 모아 둔 줄이 나온 편성 · 첫 줄을 모은 때 */
 let seenShow: HsShow | null = null;
@@ -224,8 +225,15 @@ function layout(): void {
   if (small) stage.style.fontSize = '';
 }
 
+/** 마지막으로 찾은 물건 그림 주소: tick 마다 그림 팩(5천여 줄)을 다시 뒤지지 않게. 찾은 것만 기억한다(팩이 늦게 받혀도 다시 찾게) (전수검사 11-13) */
+let iconMemo: { key: string; src: string } | null = null;
 function iconOf(it: { name: string; icon?: string; id?: string }): HTMLImageElement | null {
-  const src = /src="([^"]+)"/.exec(itemPic(it))?.[1] ?? '';
+  const key = `${it.id ?? ''}|${it.name}|${it.icon ?? ''}`;
+  let src = iconMemo?.key === key ? iconMemo.src : '';
+  if (!src) {
+    src = /src="([^"]+)"/.exec(itemPic(it))?.[1] ?? '';
+    if (src) iconMemo = { key, src };
+  }
   if (!src) return null;
   let im = icons.get(src) ?? null;
   if (!im) {
@@ -244,7 +252,7 @@ function tick(): void {
   if (!stage.isConnected || !stage.offsetParent) return stopPlayer();
   const f = feed;
   const t = now();
-  // 시청 기록: 모아 둔 줄을 5초마다 (또는 내 채팅 반응이 다 나온 뒤 바로) 넘긴다
+  // 시청 기록: 모아 둔 줄을 30초마다 (또는 내 채팅 반응이 다 나온 뒤 바로) 넘긴다
   if (seen.length && (seenDue || t - seenAt >= LOG_FLUSH_MS)) playerFlush();
   if (!f.art || !f.show.loaded) return void drawNote(f, t);
   if (!run) run = freshRun(f.show.at);
