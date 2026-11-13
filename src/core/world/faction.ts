@@ -104,7 +104,7 @@ export function assembleRoster(dir: Directory, agents: Map<string, WorldRecord>,
     // 부서 영문 표기로 묶는다 (같은 표기면 한 묶음). 순서는 처음 나온 요원 순
     const groups = new Map<string, AgentRow[]>();
     for (const a of rows) {
-      const en = a.department ? depts[a.department] ?? agents.get(a.lore)?.fields.department_en ?? a.department : '';
+      const en = a.department ? depts[a.department] ?? '' : '';
       (groups.get(en) ?? groups.set(en, []).get(en)!).push(a);
     }
     for (const [en, list] of groups) {

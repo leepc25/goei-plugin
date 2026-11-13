@@ -42,7 +42,8 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
     // 태그를 붙였다(메인 모델 경로 body.ts withImgPrompt 는 지침을 안 넣음). 2026-10-28 QC (tests/browser.mjs 16절)
     if (!picked.length) throw new AssetError('이미지 자료 오류 (characters): 출력 대상이 없습니다. 명부에 요원이 있는지, 설정에서 전부 끄지 않았는지 확인하세요.');
     const tuned = imageDataFrom(t.lore, picked, cfg.keywords);
-    const data = s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned;
+    // 지침의 {{user}}를 풀 페르소나 이름 (보조 모델 요청은 Risu가 CBS를 풀지 않음. 전수검사 11-13)
+    const data = { ...(s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned), userName: userInfo().name || undefined };
     const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
     const job = planAsset(stripReadyTags(msg.data), data, s.assetLimit, exclude);
     if (!job) return;
@@ -87,7 +88,8 @@ export function previewAsset(lore: LoreEntry[] | undefined, chat: Chat): LlmMess
     const picked = imgCharacters(lore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: agent?.english || undefined, userName: userInfo().name });
     if (!picked.length) return null;
     const tuned = imageDataFrom(lore, picked, cfg.keywords);
-    const data = s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned;
+    // 지침의 {{user}}를 풀 페르소나 이름 (보조 모델 요청은 Risu가 CBS를 풀지 않음. 전수검사 11-13)
+    const data = { ...(s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned), userName: userInfo().name || undefined };
     const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
     return planAsset(msg.data, data, s.assetLimit, exclude)?.messages ?? null;
   } catch {

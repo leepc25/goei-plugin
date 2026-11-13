@@ -102,7 +102,14 @@ export interface ItemNow { name: string; desc: string; use: boolean; left?: numb
 export function cleanSpan(raw: string, cap: number): string {
   let t = String(raw ?? '');
   for (const tag of findStatusTags(t)) t = t.replace(tag.raw, '');
-  t = messageText(t).replace(/\n{3,}/g, '\n\n').trim();
+  // 생각·주석·그림 태그·상점 표식도 뺀다 (store.ts messageHash 와 같은 것. 지침은 「지웠다」고 말한다) (전수검사 11-13)
+  t = messageText(t)
+    .replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<img\s*=[^>]*>/g, '')
+    .replace(/\[\s*shop\s*[:：][^\]]*\]/giu, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   if (t.length <= cap) return t;
   const head = t.slice(0, Math.floor(cap * 0.6));
   const tail = t.slice(-Math.floor(cap * 0.35));
@@ -183,7 +190,8 @@ export interface BuildOpts {
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
 export const REVIEW_TURNS = 20;
-const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
+// 단서 무게는 지침·원본 리수폿 값 (약 +2·중 +5·강 +10). 닫기: 확인 → 80 이상, 해소 → 0, 묻음 → 그대로. 다시 열면 옛 점수 유지 (사용자 결정 11-13)
+const SUSP_WEIGHT: Record<string, number> = { 약: 2, 중: 5, 강: 10, '-약': -2, '-중': -5, '-강': -10 };
 /** 의심 사례 요약: 같은 대상·종류의 살아 있는 항목을 한 사례로. score 는 코드가 단서 무게로 계산 */
 export function suspicionCases(p: Person, live: Liveness) {
   const list = liveEntries(p.slots.suspicion, live);
@@ -194,13 +202,21 @@ export function suspicionCases(p: Person, live: Liveness) {
     let score = 0;
     let stage = '';
     let closed = false;
+    let started = false;
     for (const e of es) {
       const m = /^\[(시작|단서|반응|해소)(?:·([^\]]+))?\]/.exec(e.text);
       if (!m) continue;
-      if (m[1] === '시작') (score += 10), (closed = false);
-      else if (m[1] === '단서') score += SUSP_WEIGHT[m[2] ?? ''] ?? 10;
+      if (m[1] === '시작') {
+        if (!started) score += 10;
+        started = true;
+        closed = false;
+      } else if (m[1] === '단서') score += SUSP_WEIGHT[m[2] ?? ''] ?? 2;
       else if (m[1] === '반응') stage = m[2] ?? stage;
-      else if (m[1] === '해소') closed = true;
+      else if (m[1] === '해소') {
+        closed = true;
+        if (m[2] === '확인') score = Math.max(score, 80);
+        else if (m[2] === '해소') score = 0;
+      }
     }
     return { who: p.name, target, kind, status: closed ? 'closed' : 'open', score: Math.max(0, Math.min(100, score)), stage, text: es.at(-1)?.text ?? '' };
   });
@@ -294,7 +310,8 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const shopM = o.shop && !o.only?.length && confirmedIdx.has(o.shop.at) ? [...tags].find(([, i]) => i === o.shop!.at)?.[0] ?? '' : '';
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
-    cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES : [],
+    // 세력 평판 수치도 같은 계기 이름을 쓴다: 호감이 글로만·꺼짐이어도 세력 수치가 켜져 있으면 넣는다 (전수검사 11-13)
+    cues: (o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity')) || (o.settings.features.has('faction_rep') && !o.settings.factionQual) ? CUES : [],
     slots: slotsFor(o.settings.features, o.settings.qualitative),
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
@@ -1162,9 +1179,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('suspicion', s, '같은 뜻의 항목이 이미 있음', who);
         continue;
       }
-      // close 는 그 대상·종류의 살아 있는 항목을 모두 대체 (하나로 접음)
-      const replaces = s.op === 'close' ? cur.at(-1)?.id : undefined;
-      if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind, ...(replaces ? { replaces } : {}) })) report.applied.suspicion++;
+      // close 는 앞 항목을 대체하지 않는다: 대체하면 마지막 단서 무게가 점수에서 빠진다 (사용자 결정 11-13)
+      if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind })) report.applied.suspicion++;
     }
   }
 

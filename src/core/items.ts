@@ -317,7 +317,7 @@ function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unkno
 const paidNote = (e: ItemInput): string =>
   [Number.isSafeInteger(e.price) && (e.price! > 0 || !e.paidWith) ? `₩ ${e.price!.toLocaleString('en-US')}` : '', e.paidWith ? clean(e.paidWith, 60) : ''].filter(Boolean).join(' + ');
 
-/** 물건 더하기. 같은 이름이 살아 있으면 새 줄을 만들지 않고 설명·효과·판정만 갱신하고, 둘 다 소모성이면 횟수를 더한다.
+/** 물건 더하기. 같은 이름이 살아 있으면(상점에서 산 것은 빼고) 새 줄을 만들지 않고 설명·효과·판정만 갱신하고, 둘 다 소모성이면 횟수를 더한다.
  * 이름이 비면 그대로. 빈 설명은 있던 설명을 지우지 않는다 */
 export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   const name = clean(e.name, 30);
@@ -332,7 +332,8 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   const ruled = e.from === 'manual' ? undefined : traitsFor(kind, e.icon, name, { use: e.use, uses: e.uses, equip: e.equip });
   if (ruled) e = { ...e, use: ruled.use, uses: ruled.uses ?? (itemUses(e.uses) ? e.uses : undefined), equip: ruled.equip ?? '' };
   const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
-  if (found) {
+  // 상점·쇼핑몰에서 산 것(store)은 같은 이름이 있어도 늘 새 줄로: 「방금 샀다」·다시 굴리기 되돌림이 맞게. 합치기는 사용자가 「합치기」로 (전수검사 11-13)
+  if (found && e.from !== 'store') {
     if (ruled) e = { ...e, equip: ruled.equip ?? found.equip ?? '' };
     const addUses = itemUses(e.uses);
     const stack = !!addUses && found.uses !== undefined;

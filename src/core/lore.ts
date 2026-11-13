@@ -41,6 +41,10 @@ export const CONFIRM_KEYS = new Set([
   '교회', '강변', '지하실', '미술관', '병원', '극단', '세계정치', '세계 정치', '기독교 상점', '헐값 매입', '대박 알선', '사장', '국장',
   // 흔한 영어 이름·낱말과 같은 키 (2026-10-21: Jay는 흔한 이름, 브라우니는 과자)
   'Jay', 'Brownie', '브라우니', 'Yu-ri', 'Route 16', 'Red Lady',
+  // 명부 영문명·별칭으로 들어오는 흔한 낱말 (2026-11-12부터 명부의 부르는 말도 키로 쓴다. 한글 이름만 확증이던 항목의 영문명과, 10-19 키 정리 때 뺀 넓은 별칭)
+  'The Church', 'The Riverside', 'The Basement', 'Art Museum', 'Musical Theater', 'Folk Village', '민속촌', 'Adventure Park', 'Mystery World', 'Dark Garden', 'Giant World', 'Desire Room', 'In the Black Shadow',
+  'Midsummer Night', "Midsummer Night's Dream", 'Bio Factory', 'Corrupted cathedral', 'abandoned kindergarten', '버려진 유치원',
+  'Artist', 'Broadcast', 'broker', 'Fixer', 'Administration', 'manual review', 'Yuri', 'Loan Shark', 'moneylender', 'Vampire', '뱀파이어', '수녀', '마녀', '마법사',
 ]);
 
 /** 이름 뒤에 붙어도 되는 말: 조사·서술·부름·호칭. 이 뒤에는 무엇이 와도 된다 (여진이었다) */

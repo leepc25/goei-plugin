@@ -1,5 +1,6 @@
 // 보낸 뒤 (2026-11-12 사용자: 「채팅 보냈는데 왜 안 없어져」): 요청에 실려 나간 순간 숨긴다 (markUseSent). 전에는 응답이 다 붙은 뒤에야(settleItemUse) 사라져서,
 //  응답을 쓰는 동안·요청이 실패한 동안 방금 보낸 유저 메시지 아래에 그대로 남았다. 응답 알림 없이 기다림이 끝나면(실패) 아직 안 쓰인 것이니 다시 보인다.
+//  전수검사 11-13 (사용자 결정): 숨기면 실패 때 최대 3분 사라져 보이므로, 숨기지 않고 이름표를 「보내는 중」으로 바꿔 둔다.
 // 「사용」 상자 (2026-11-07 소지품): 소지품 메뉴에서 「사용」을 누른 물건을 채팅의 마지막 메시지 아래에 칩으로 보여 준다.
 // 다음 전송 때 [Inventory] 글의 This turn 에 같이 넘어가고(core/items.ts withInventory), 응답이 붙으면 settleItemUse 가 상자를 정리한다.
 // 자리 (2026-11-11 사용자): 브라우저 창에 고정하면 Risu 왼쪽 목록 위에 떴다 → 시작 안내(openinghint.ts)처럼 채팅 메시지 안에 붙인다.
@@ -24,13 +25,14 @@ export const USE_SLOT = `<div data-goei-card="use" style="display:none"><span da
 const cssStr = (s: string) => `"${s.replace(/[\r\n]+/g, ' ').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 
 /** 마지막 메시지의 자리에 이름을 채우는 CSS. 색은 채팅 카드 변수(ui/theme.ts cardVarsCss)를 쓴다 */
-export function useBoxCss(names: { label: string }[]): string {
+/** sending: 이번 요청에 실려 나간 칩이 있다 — 숨기지 않고 이름표만 「보내는 중」 (요청이 실패해도 칩이 사라져 보이지 않게, 전수검사 11-13) */
+export function useBoxCss(names: { label: string }[], sending = false): string {
   if (!names.length) return '';
   const show = names.slice(0, names.length > SLOTS ? SLOTS - 1 : SLOTS);
   const more = names.length - show.length;
   return [
     `${LAST} { display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px 8px; width: fit-content; min-width: min(100%, 420px); max-width: 100%; box-sizing: border-box; margin: 10px auto 0; padding: 10px 16px; border: 1px solid var(--goei-accentLine); border-radius: 14px; background: var(--goei-accentBg); color: var(--goei-sub); font-size: .92em; line-height: 1.5; }`,
-    `${LAST} [data-gu-label]::before { content: "다음 메시지에 사용"; color: var(--goei-signal); font-weight: 600; margin-right: 4px; }`,
+    `${LAST} [data-gu-label]::before { content: "${sending ? '보내는 중' : '다음 메시지에 사용'}"; color: var(--goei-signal); font-weight: 600; margin-right: 4px; }`,
     `${LAST} [data-gu] { display: none; align-items: center; gap: 6px; max-width: 100%; padding: 2px 4px 2px 10px; border: 1px solid var(--goei-accentLine); border-radius: 999px; color: var(--goei-text); }`,
     `${LAST} [data-gu]::before { max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }`,
     `${LAST} [data-gu-x] { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--goei-accentLine); color: var(--goei-signal); line-height: 1; cursor: pointer; }`,
@@ -48,17 +50,17 @@ let styleEl: El | null = null;
 let where = { charIndex: -1, chatIndex: -1 };
 let shown: { id: string; label: string }[] = [];
 let busy = false;
-/** 이번 요청에 실려 나간 것: 어느 채팅의 어느 유저 메시지 턴에 어떤 물건이 나갔나. 그 턴이 끝날 때까지 그 물건 칩은 숨긴다 */
+/** 이번 요청에 실려 나간 것: 어느 채팅의 어느 유저 메시지 턴에 어떤 물건이 나갔나. 그 턴이 끝날 때까지 이름표는 「보내는 중」 */
 let sent: { charIndex: number; chatIndex: number; userKey: string; ids: Set<string> } | null = null;
 
-/** 숨길 물건 id: 같은 채팅·같은 유저 턴이고 아직 응답이 정리하지 않았을 때만 (다른 턴이면 지난 일이니 잊는다) */
+/** 「보내는 중」인 물건 id: 같은 채팅·같은 유저 턴이고 아직 응답이 정리하지 않았을 때만 (다른 턴이면 지난 일이니 잊는다) */
 export function sentUseIds(chat: Chat | null, charIndex: number, chatIndex: number): Set<string> | null {
   if (!sent || !chat || sent.charIndex !== charIndex || sent.chatIndex !== chatIndex) return null;
   if (chat.scriptstate?.[ITEM_USE_AT_VAR] || lastUserKey(chat) !== sent.userKey) { sent = null; return null; }
   return sent.ids;
 }
 
-/** 본편 요청에 「사용」이 실려 나갔다 (body.ts onBeforeRequest, [Inventory] 를 넣은 바로 뒤). 칩을 바로 숨긴다 */
+/** 본편 요청에 「사용」이 실려 나갔다 (body.ts onBeforeRequest, [Inventory] 를 넣은 바로 뒤). 칩 이름표를 바로 「보내는 중」으로 */
 export async function markUseSent(charIndex: number, chatIndex: number, chat: Chat): Promise<void> {
   const userKey = lastUserKey(chat);
   const ids = pendingItemUse(chat.scriptstate, userKey).map((u) => u.id);
@@ -152,13 +154,17 @@ export async function refreshUseBox(charIndex: number, chatIndex: number, known?
   if (charIndex < 0 || chatIndex < 0) return hideUseBox();
   const chat = known ?? ((await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null);
   const hold = sentUseIds(chat, charIndex, chatIndex);
-  const names = useBoxNames(chat).filter((n) => !hold?.has(n.id));
+  // 보낸 뒤 새로 놓은 것이 있으면 그것만(다음 메시지에 사용), 없으면 보낸 것을 「보내는 중」으로 둔다
+  const all = useBoxNames(chat);
+  const fresh = all.filter((n) => !hold?.has(n.id));
+  const sending = !fresh.length && all.length > 0 && !!hold;
+  const names = sending ? all : fresh;
   where = { charIndex, chatIndex };
   if (!names.length) return hideUseBox();
   const e = await ensure();
   if (!e) return;
   shown = names.slice(0, names.length > SLOTS ? SLOTS - 1 : SLOTS);
-  await e.style.setTextContent(useBoxCss(names));
+  await e.style.setTextContent(useBoxCss(names, sending));
   armChatClick('use');
   await redrawLast(e.doc, charIndex, chatIndex).catch(() => {});
 }

@@ -17,7 +17,7 @@ import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from '.
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { viewSettings } from './core/phoneView';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
-import { advNum, applyAdvanced } from './core/advanced';
+import { advNum, applyAdvanced, genSettings } from './core/advanced';
 import { fitTotal, type ContextPart } from './core/budget';
 import { makeFocus, sceneText } from './core/focus';
 import { buildRegistry } from './core/world/registry';
@@ -428,7 +428,8 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const names = imgCharacters(char.globalLore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: me?.english || undefined, userName: userInfo().name });
   if (!names.length) return out;
-  return appendImgPrompt(out, buildImgPrompt(cfg, names, s.assetPlayer));
+  // 지침 속 {{user}}는 Risu 가 다시 풀지 않으니 여기서 푼다 (전수검사 11-13)
+  return appendImgPrompt(out, evaluate(buildImgPrompt(cfg, names, s.assetPlayer), { vars: chat.scriptstate ?? {}, char: char.name, user: me?.name || userOrTag() }));
 }
 
 /** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서, 망상홈쇼핑 시청 기록을 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
@@ -617,7 +618,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
     {
-      const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`))
+      const pp = requestPeopleUpdate('turn', { at: { charIndex: arg.characterIndex, chatIndex: arg.chatIndex } }).catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`))
         // 이번 응답에서 끝난 내 사건 보고서에 그 응답의 가계부 맞춤·호감 계기까지 넣는다 (전수검사 11-13)
         .then(() => (readReports(now).items.some((r) => r.mine && r.idx === arg.messageIndex)
           ? updateChat(arg.characterIndex, arg.chatIndex, (cur) => { const v = refreshClosures(cur, arg.messageIndex, walletStart); return v ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...v } } : null; }).catch(() => null)
@@ -651,7 +652,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         const gnetFail = (site: string) => (error: unknown) => console.log(`[goei] ${BOARD_NAME[site as keyof typeof BOARD_NAME] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
         // 덩어리마다: 둘 이상이면 Joint 로 한 요청(각 작업은 요청문을 만들어 맡기고, 다 모이면 한 번에 보냄), 하나면 그냥. 덩어리끼리는 차례로
         for (const group of jointGroups(now!.scriptstate)) {
-          const joint = group.length > 1 ? new Joint(group[0].model, group[0].fixed, group.map((t) => t.kind)) : undefined;
+          const joint = group.length > 1 ? new Joint(group[0].model, group[0].fixed, group.map((t) => t.kind), genSettings(now!.scriptstate).concurrent) : undefined;
           await Promise.all(group.map(async (t) => {
             try {
               if (t.kind === 'phone') await autoRefresh(await fresh(), arg.messageIndex, undefined, joint);
@@ -883,6 +884,7 @@ function startWatcher(fab: Fab | null): () => void {
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let shownChat = '';
+  let lastChar: number | undefined;
   const tick = async () => {
     try {
       const snap = await readSnapshot(fab);
@@ -890,6 +892,11 @@ function startWatcher(fab: Fab | null): () => void {
       if (stopped) return;
       const next = state.update(snap, lite);
       liteNow = state.lite;
+      // 캐릭터를 바꾸거나 봇 판정이 바뀌면 에셋 목록을 다시 읽는다 (안 읽으면 앞 캐릭터 목록으로 그림 태그를 골랐다. 첫 차례는 시작 때 읽음, 전수검사 11-13)
+      if (snap.charIndex >= 0) {
+        if (lastChar !== undefined && (snap.charIndex !== lastChar || (next.changed && next.fabVisible))) void loadModuleAssets().catch(() => false);
+        lastChar = snap.charIndex;
+      }
       // 같은 봇 안에서 채팅만 바꿔도(버튼은 그대로) 그 채팅의 배색·상태창 칸 구성·시작 안내로 (QC 2026-10-28: 앞 채팅 것이 남았다)
       const chatKey = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : '';
       if (next.fabVisible && (next.changed || chatKey !== shownChat)) {

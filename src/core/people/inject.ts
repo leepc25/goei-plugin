@@ -6,7 +6,7 @@ const REGISTER_EN: Record<string, string> = { 존댓말: 'formal (존댓말)', �
 import { liveEntries, plain, type Liveness } from './store';
 import { fixedSections } from './seed';
 import { norm } from './store';
-import { OPENNESS_MAX, SEXUAL_CHARS, SLOT_META, TASTE_STAGES, opennessStage, slotsFor, type Change, type Entry, type PeopleStore, type Person, type SlotId } from './types';
+import { OPENNESS_MAX, OPENNESS_STAGES, SEXUAL_CHARS, SLOT_META, STAGES, TASTE_STAGES, opennessStage, slotsFor, type Change, type OpennessStage, type Stage, type Entry, type PeopleStore, type Person, type SlotId } from './types';
 import { axesLinesEn } from './axes';
 import { SEXUAL_POLICY, sexualDirectorPolicy } from './sexual';
 import { guideOr } from '../guides';
@@ -24,6 +24,10 @@ const TASTE_NOTE = 'A separate axis from the relationship above; it never grants
 const OPENNESS_NOTE = "Applies only inside intimate contexts that actually arise; an explicit current condition or the other participant's choice takes priority.";
 const RHYTHM_HEAD = '## Scene rhythm (kept by the system; guidance, not content to narrate)';
 const RHYTHM_CLOCK_HEAD = 'Hook clock (counted by the system; never say turn numbers in the story):';
+/* 단계별 행동 글(호감·취향·피임 태도)도 지침 절에서 읽는다. 단계 이름·경계값은 types.ts 표에 그대로 (전수검사 11-13) */
+const stageBehavior = (st: Stage): string => guideOr('Main', `PEOPLE.AFFINITY.${STAGES.indexOf(st)}`, st.behavior);
+const tasteText = (band: number): string => guideOr('Main', `PEOPLE.TASTE.${band}`, TASTE_STAGES[band]?.en ?? '');
+const contraceptionText = (st: OpennessStage): string => guideOr('Main', `PEOPLE.OPENNESS.${OPENNESS_STAGES.indexOf(st)}`, st.contraceptionEn);
 
 export interface BlockOpts extends AffinityOpts {
   /** 시트 원문 (고정 절을 넣을 때). 없으면 기록만 */
@@ -48,6 +52,8 @@ export interface BlockOpts extends AffinityOpts {
   features?: Set<string>;
   /** 성적 욕망·이상성욕 글 (sexual.ts sexualTexts, 켜져 있고 글이 있을 때만). sexual_context_only 정책과 함께 넣는다 */
   sexual?: Partial<Record<'desire' | 'paraphilia', string>>;
+  /** 성적 프로필 줄에 SEXUAL.POLICY 긴 글을 붙일지 (기본 붙임). 여러 인물 블록에서는 처음 한 번만 (전수검사 11-13) */
+  sexualPolicy?: boolean;
   /** 유저 대상 말투 항목에 갱신기 표지([말투 변화 조짐 …])를 남길지. Director 만 (지침이 표지를 설명함). 기본은 뗀다 (전수검사 11-13) */
   speechMarks?: boolean;
 }
@@ -98,7 +104,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   if (per.length) out.push('Personality:\n' + lines(per));
   if (o.axes) out.push('Personality axes (baseline traits, not current feeling):\n' + axesLinesEn(p.axes).join('\n') + (p.patterns?.length ? '\nLong-term changes:\n' + p.patterns.map((t) => `- ${plain(t, 300)}`).join('\n') : ''));
   // 성적 욕망·이상성욕 (원본 people_profile 의 sexual_desire/paraphilia + policy sexual_context_only)
-  if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY} — ${sexualDirectorPolicy()})\n` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : '', o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ''].filter(Boolean).join('\n'));
+  if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY}${o.sexualPolicy === false ? '' : ` — ${sexualDirectorPolicy()}`})\n` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : '', o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ''].filter(Boolean).join('\n'));
   if (o.sheet && mode === 'split') for (const s of fixedSections(o.sheet)) out.push(`${s.name}:\n${s.body}`);
   const st = slot('state');
   if (st.length) out.push('Current state:\n' + lines(st));
@@ -111,17 +117,17 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, o);
   const addr = addressOf(p, changes);
   // 정성 모드면 단계 없이 (호감은 전용 칸의 글로만)
-  const relLine = [o.qual?.has('affinity') ? `Relationship → ${user}:` : `Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, expressTail(p.express)].filter(Boolean).join(' ');
+  const relLine = [o.qual?.has('affinity') ? `Relationship → ${user}:` : `Relationship → ${user}: ${aff.stage.label} (${stageBehavior(aff.stage)})`, expressTail(p.express)].filter(Boolean).join(' ');
   out.push(relLine + (relUser.length ? '\n' + lines(relUser) : ''));
   if (o.taste) {
     const band = tasteOf(p, changes);
-    if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? '+' : ''}${band} — ${TASTE_STAGES[band]?.en ?? ''}. ${guideOr('Main', 'PEOPLE.TASTE_NOTE', TASTE_NOTE)}`);
+    if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? '+' : ''}${band} — ${tasteText(band)}. ${guideOr('Main', 'PEOPLE.TASTE_NOTE', TASTE_NOTE)}`);
   }
   if (o.openness && !o.qual?.has('openness')) {
     const v = opennessOf(p, changes);
     if (v !== null) {
       const st = opennessStage(v);
-      out.push(`Openness: ${st.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${st.contraceptionEn}. ${guideOr('Main', 'PEOPLE.OPENNESS_NOTE', OPENNESS_NOTE)}`);
+      out.push(`Openness: ${st.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${contraceptionText(st)}. ${guideOr('Main', 'PEOPLE.OPENNESS_NOTE', OPENNESS_NOTE)}`);
     }
   }
   if (relOther.length) out.push('Relationships with others:\n' + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join('\n'));

@@ -3,6 +3,7 @@
 import type { Chat } from '../types';
 import { liveEntries, type Liveness } from './store';
 import { RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, type PeopleStore } from './types';
+import { guideOr } from '../guides';
 
 export type HookTier = (typeof RHYTHM_HOOK_TIERS)[number];
 export type HookStage = (typeof RHYTHM_HOOK_STAGES)[number];
@@ -121,6 +122,7 @@ export function rhythmClockLines(c: RhythmClock): string[] {
   const out = [`Turn ${c.turn} (confirmed replies). Active hooks: short ${c.active.short}/${HOOK_LIMIT.short}, mid ${c.active.mid}/${HOOK_LIMIT.mid}, long ${c.active.long}/${HOOK_LIMIT.long}. New plant ${c.plantAllowed ? 'allowed' : `not allowed: ${c.plantBlocked}`}.`];
   for (const h of c.hooks) if (ACTIVE.includes(h.stage)) out.push(`- ${h.key}: ${h.stage}, ${h.tier}, planted ${h.age} turn(s) ago, last advance ${h.sinceLast} turn(s) ago, payoff window ${h.window[0]}–${h.window[1]}${h.overdue ? ' — OVERDUE' : h.due ? ' — in window' : ''}${h.extended ? ' (extended)' : ''}`);
   if (c.priority.length) out.push(`Priority: ${c.priority.join(' · ')}`);
-  if (c.lastMethod && c.lastMethod !== 'none') out.push(`Previous staging method: ${c.lastMethod} — do not use the same anticipation method in consecutive turns.`);
+  // 글은 지침 「Main」 RHYTHM.METHOD 절. 절이 없으면 여기 글 (전수검사 11-13)
+  if (c.lastMethod && c.lastMethod !== 'none') { const method = c.lastMethod; out.push(guideOr('Main', 'RHYTHM.METHOD', () => `Previous staging method: ${method} — do not use the same anticipation method in consecutive turns.`, { method })); }
   return out;
 }

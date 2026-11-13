@@ -3,7 +3,7 @@
 // 저장: 플러그인 저장소 goei-trace 에 최근 TRACE_KEEP 턴의 id 목록, 턴마다 goei-trace:<id> (바뀐 턴만 다시 쓴다. 전수검사 11-13). 요청·응답 원문은 한 건당 TRACE_TEXT 자까지(앞 2/3 + 뒤 1/3). 화면은 ui/editor/trace.ts.
 import type { LlmMessage } from './llm';
 import { tokens } from '../core/gnet';
-import { progressBegin, progressMain, progressReply, progressTurn } from '../core/progress';
+import { progressBegin, progressMain, progressMainTokens, progressReply, progressTurn } from '../core/progress';
 
 export interface TraceCall {
   /** 호출 종류 (라우터·디렉터·갱신기·괴담넷·괴담톡·위키·소지품·상점·…) */
@@ -217,7 +217,7 @@ export function traceMain(messages: { role?: string; content?: unknown }[], fail
   const pt = progressTurn();
   setTimeout(() => {
     main.totalTokens = rows.reduce((n, r) => n + tokens(r.content), 0);
-    if (pt && !pt.manual && progressTurn() === pt) pt.mainTokens = main.totalTokens; // 진행 창은 1초마다 다시 그린다
+    if (pt) progressMainTokens(main.totalTokens, pt);
     save(t.id);
   }, 0);
 }

@@ -55,13 +55,24 @@ export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '�
 let aliases: Record<string, string> = parseIconAliases(ICON_ALIAS_DEFAULT);
 /** 지금 채팅의 대체 표를 올린다 (host/risu.ts loadContext). 빈 글이면 기본 표 */
 let poolOn = true;
+// 찾기 결과가 바뀔 수 있는 변경(대체 표·분류 설정·못 찾은 말 비우기) 횟수. host/itemicons.ts 가 결과를 기억하다 이 값이 바뀌면 비운다 (전수검사 11-13)
+let gen = 0;
+let aliasText = ICON_ALIAS_DEFAULT;
+export const iconGen = (): number => gen;
 /** 분류 말(과자·다과)을 그 분류 안에서 뽑아 보여 줄지 (설정 → 소지품 「분류 말은 골고루」, 기본 켬) */
 export function setIconPool(on: boolean): void {
+  if (poolOn === on) return;
   poolOn = on;
+  gen++;
 }
 export const iconPoolOn = (): boolean => poolOn;
 export function setIconAliases(text: string | undefined | null): void {
-  aliases = parseIconAliases(text && text.trim() ? text : ICON_ALIAS_DEFAULT);
+  // loadContext 마다 불려서 글이 같으면 그대로 둔다 (전수검사 11-13)
+  const t = text && text.trim() ? text : ICON_ALIAS_DEFAULT;
+  if (t === aliasText) return;
+  aliasText = t;
+  aliases = parseIconAliases(t);
+  gen++;
 }
 
 export type IconMissLevel = 'kind-near' | 'kind-base' | 'none';
@@ -72,6 +83,7 @@ const ICON_MISS_MAX = 100;
 export const readIconMisses = (): IconMiss[] => misses.slice();
 export function clearIconMisses(): void {
   misses.length = 0;
+  gen++;
 }
 /** 그 안의 매칭은 「그림 못 찾은 말」에 적지 않는다 (연어 마켓 매물 제목처럼 소지품 물건이 아닌 것, 릴리스 점검 11-09) */
 let quiet = 0;

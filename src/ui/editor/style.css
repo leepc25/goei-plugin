@@ -167,6 +167,12 @@
 .gw .gw-basepage .dir-group { margin: 14px 2px 6px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
 .gw .gw-basepage .dir-add { display: flex; gap: var(--gap); align-items: center; margin: 12px 0 0; }
 .gw .gw-basepage .dir-add input { flex: 1; min-width: 0; }
+/* 검색 칸 옆 단추도 설정 창 높이·모서리로. 폰에서도 검색 칸을 보인다 (패널은 서랍으로 숨기지만 설정 창엔 서랍이 없다) (전수검사 11-13) */
+.gw .gw-basepage .dir-tool { min-height: var(--h); height: var(--h); border-radius: var(--r); }
+.gw .gw-basepage .dir-tool.icon { width: var(--h); }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .gw-basepage .dir-qbox { display: block; }
+}
 
 /* ── 조작: 전부 같은 높이·모서리·선·글자 ── */
 .gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool:not(.ph-tools > .ph-tool), .gw .adv-num,
@@ -658,6 +664,10 @@
 /* 숫자가 든 격자(공통): 이름 칸은 모든 격자 96px(.ck-line·.mx-grid --label), 「최소·최대」 한 쌍은 붙이고 묶음 사이를 띄운다. 조작 크기는 그대로 */
 .gw .ck-hasnum .ck-cell.ck-pl { justify-content: flex-end; padding-right: 2px; }
 .gw .ck-hasnum .ck-cell.ck-pr { justify-content: flex-start; padding-left: 2px; }
+/* 창이 좁은 PC(1280·1366): 수 상자가 칸보다 넓어 옆 칸 상자와 겹쳐 + 가 옆 칸 − 를 눌렀다 → 상자 크기는 그대로, 격자만 옆으로 밀어 본다 (전수검사 11-13, 사용자 승인 ①).
+   칸 최소 폭(상자 + 6px)은 setrow.ts ckCols 가 준다 */
+.gw .ck.ck-pc > .ps-rows { overflow-x: auto; }
+.gw .ck.ck-pc .ck-line { min-width: max-content; }
 /* 같은 종류 수 여럿을 한 줄에: 「이름 + 상자」 짝이 나란히, 모자라면 다음 줄로 */
 .gw .fam-set { display: grid; width: 100%; grid-template-columns: repeat(auto-fill, calc(var(--fam-l) + 8px + var(--step-sm))); gap: 8px 22px; align-items: center; }
 .gw .fam-set:has(.st-step.lg) { grid-template-columns: repeat(auto-fill, calc(var(--fam-l) + 8px + var(--step-lg))); }
@@ -826,6 +836,41 @@
   .gw .flc-c > .gx-segs > .gx-seg { flex: 0 1 auto; white-space: nowrap; }
   .gw .flc-c .fl-help { margin: 0; }
 }
+/* 본문 칸이 한 줄(약 930px)보다 좁으면 (노트북 1280·1366, AI 상담을 연 창, 창 폭을 줄인 경우) PC 줄이 오른쪽에서 잘렸다 → 폰과 같은 카드로 (전수검사 11-13, 사용자 승인).
+   1002 = 줄 932(테두리 포함) + .gw-page 좌우 48 + .fl-page 오른쪽 22. 둘 중 하나가 바뀌면 다시 셈. 위 폰 규칙을 그대로 옮긴 것 (@media 와 @container 는 규칙을 나눠 쓸 수 없다) */
+@container (max-width: 1001px) {
+  .gw .fl-pc { display: none; }
+  .gw .fl-ph { display: flex; }
+  /* 폰: 오른쪽 숫자 칸은 왼쪽 두 줄(메인 + 보조 = 합)에 이미 있어 숨긴다. 글이 한 줄씩 들어가게 */
+  .gw .fl-bar { position: static; grid-template-columns: minmax(0, 1fr); padding: 8px 11px; margin-bottom: 14px; }
+  .gw .fl-bar > p { font-size: 12.5px; line-height: 1.35; }
+  .gw .fl-bar > div { display: none; }
+  .gw .fl-bar > div > span { font-size: 11.5px; }
+  .gw .fl-bar > div > b { font-size: 14px; }
+  .gw .fl-bar > i { display: none; }
+  .gw .fl .ps-rows.fl-ph { background: none; border: 0; box-shadow: none; padding: 0; flex-direction: column; gap: 8px; }
+  .gw .fl .ps-rows.fl-ph > .flc { border: 1px solid var(--line); }
+  .gw .flc { display: flex; flex-direction: column; gap: 6px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
+  .gw .flc.sub { margin-left: 18px; position: relative; }
+  .gw .flc.sub::before { content: ''; position: absolute; left: -13px; top: -9px; width: 9px; height: 34px; border-left: 1.5px solid var(--gline); border-bottom: 1.5px solid var(--gline); }
+  .gw .flc.sub { margin-top: -4px; }
+  .gw .flc-top { display: flex; align-items: center; gap: 8px; min-height: 34px; }
+  .gw .flc-nm { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; flex: 1 1 auto; min-width: 0; }
+  .gw .flc-calls { font-size: 12.5px; line-height: 1.35; color: var(--dim); }
+  .gw .flc.on .flc-calls { color: var(--text); }
+  .gw .flc-num { margin-top: -4px; font-size: 12.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .gw .flc-num b { font-weight: 600; color: var(--text); }
+  /* 조작 줄 (전수점검 B1): 조작 하나에 한 줄, 카드 안쪽 왼쪽 끝에서 시작. 격자 줄(.row)만 두 조작을 한 줄에 */
+  .gw .flc-sw { display: inline-flex; align-items: center; flex: none; }
+  .gw .flc-top > .fl-go { flex: none; }
+  .gw .flc-top > span.fl-go { width: 59px; height: 1px; }
+  .gw .flc-side { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .gw .flc-side.row { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+  .gw .flc-c { display: flex; align-items: center; gap: 8px; min-height: 34px; min-width: 0; max-width: 100%; }
+  .gw .flc-c > .gx-segs { display: flex; min-width: 0; }
+  .gw .flc-c > .gx-segs > .gx-seg { flex: 0 1 auto; white-space: nowrap; }
+  .gw .flc-c .fl-help { margin: 0; }
+}
 
 /* ── AI 상담 (설정 개편 6단계, 시안8): PC = 설정 창 옆 380px 창, 폰 = 아래에서 올라오는 판. 설정 창 머리의 「AI 상담」 단추로 연다 ── */
 .gw.ai-on { gap: 12px; }
@@ -834,7 +879,7 @@
 .gw-ai-top { display: flex; align-items: center; gap: 8px; height: 52px; flex: none; padding: 0 10px 0 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
 .gw-ai-top > b { font-size: 15px; font-weight: 700; }
 .gw-ai-top .gw-brand { margin-right: 0; }
-.gw-ai-top .ai-model { margin-left: 2px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: none; font: inherit; font-size: 12px; color: var(--dim); cursor: pointer; }
+.gw-ai-top .ai-model { margin-left: 2px; min-height: 34px; padding: 0 12px; display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: none; font: inherit; font-size: 12px; color: var(--dim); cursor: pointer; }
 .gw-ai-top .ai-model:hover:not(:disabled) { color: var(--text); border-color: var(--dim); }
 .gw-ai-top .gx-x { margin-left: auto; }
 /* 대화 지우기: 모델 칩과 같은 작은 단추, 닫기 바로 앞 (2026-11-12) */

@@ -11,6 +11,7 @@ import { digest, fetchPicture, mergePictures, PicError } from './picpack';
 import type { Picture } from '../core/pictures';
 import { ensureInstallData, getBytes, getText, type Progress } from './datapack';
 import { forgetImages } from '../ui/images';
+import { loadModuleAssets } from './assets';
 
 const WIKI_KEY = 'goei:wikibase';
 const TOK_KEY = 'goei:tok-o200k';
@@ -139,6 +140,8 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
     }
   }
   forgetImages();
+  // 채팅 속 그림 태그가 보는 에셋 목록도 다시 읽는다 (전수검사 11-13)
+  void loadModuleAssets().catch(() => false);
   return saved;
 }
 

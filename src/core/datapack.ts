@@ -110,7 +110,7 @@ export interface ItemIconPack {
   hit: (name: string, icon?: string, strict?: boolean) => { file: string; score: number; pool?: string[] } | null;
 }
 
-export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, setIconPool, splitIconWord } from './iconmatch';
+export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, iconGen, normIcon, parseIconAliases, readIconMisses, setIconAliases, setIconPool, splitIconWord } from './iconmatch';
 
 /** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
 function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>, same: Record<string, string>, cats: string[] | undefined) {

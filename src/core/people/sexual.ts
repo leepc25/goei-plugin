@@ -72,8 +72,9 @@ export function sexualWriterSection(s: Flags): string {
   const initParaphilia = g.paraphilia ? `${guideOr('UpdaterExtra', 'SEXUAL.INIT_PARAPHILIA', '`paraphilia`: chosen from named adult-consensual types.')} ` : '';
   // 지침의 첫 구절을 고쳐도 「거짓일 때」 조건이 빠지지 않게 (전수검사 11-13)
   const plain0 = plainStyle();
-  const plainFalse = plain0.includes('Use the 0.10.7 style') ? plain0.replace('Use the 0.10.7 style', 'When false, use the 0.10.7 style') : `When false: ${plain0}`;
-  const explicitTrue = explicitStyle().replace('Vocabulary rule, mandatory: write', 'write');
+  const plainFalse = /^when false\b/i.test(plain0) ? plain0 : plain0.includes('Use the 0.10.7 style') ? plain0.replace('Use the 0.10.7 style', 'When false, use the 0.10.7 style') : `When false: ${plain0}`;
+  const explicit0 = explicitStyle();
+  const explicitTrue = explicit0.startsWith('Vocabulary rule, mandatory: write') ? explicit0.replace('Vocabulary rule, mandatory: write', 'write') : explicit0;
   const axis = `${g.desire ? '`sexual_desire`' : ''}${g.desire && g.paraphilia ? ' or ' : ''}${g.paraphilia ? '`paraphilia`' : ''}`;
   return guideOr('UpdaterExtra', 'SEXUAL.WRITER', () => [
     '## 7b. Sexual desire and paraphilia (Risupot sexual profile; user setting)',

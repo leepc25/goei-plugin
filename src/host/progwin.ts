@@ -92,6 +92,8 @@ ${themeVars('[x-goei-prog]')}
 [x-goei-prog] [data-dot] [data-p="dots"] { display: none; }
 /* 폰: 상단 바 아래 오른쪽 가장자리에 붙은 막대 (점 다섯 개, 길이 고정). 카드는 눌렀을 때만 */
 [x-goei-prog][x-goei-phone="true"] { right: 0; top: 64px; }
+/* 폰에서 상황판이 열려 있으면 주소줄·즐겨찾기 줄 아래로 (주소줄의 탭 수 단추를 가렸다, 전수검사 11-13 사용자 승인) */
+[x-goei-prog][x-goei-phone="true"][x-goei-panel="true"] { top: 160px; }
 [x-goei-prog][x-goei-phone="true"] [data-dot] {
   width: 28px; height: auto; padding: 8px 0 9px; border-right: 0; border-radius: 10px 0 0 10px;
   display: flex; flex-direction: column; align-items: center; gap: 7px; box-shadow: 0 8px 18px -10px rgba(0,0,0,.6);
@@ -211,6 +213,8 @@ export function dotHtml(t: Turn | null): string {
 
 export interface ProgWin {
   setVisible(visible: boolean): Promise<void>;
+  /** 상황판이 떠 있나 (body.ts 가 매 초 appShown() 으로). PC 는 저절로 펴지 않고, 폰은 막대를 주소줄 아래로 */
+  setPanel(open: boolean): Promise<void>;
   setTheme(theme: ThemeName): Promise<void>;
   remove(): Promise<void>;
 }
@@ -248,6 +252,7 @@ export async function createProgWin(): Promise<ProgWin> {
 
   let visible = false;
   let phone = false;
+  let panelOpen = false;
   let open = false;
   let seen: Turn | null = null;
   let lastCard = '';
@@ -338,7 +343,8 @@ export async function createProgWin(): Promise<ProgWin> {
     if (t && t !== seen) {
       seen = t;
       clearHide();
-      if (!phone && visible) void setOpen(true);
+      // 상황판이 떠 있으면 저절로 펴지 않는다: 펼친 카드가 상황판 닫기 X·잔고·사원증을 가렸다 (전수검사 11-13, 사용자 승인). 단추를 누르면 펴진다
+      if (!phone && visible && !panelOpen) void setOpen(true);
     }
     if (t?.endAt && open && hideTimer === undefined) {
       hideTimer = setTimeout(() => {
@@ -487,6 +493,11 @@ export async function createProgWin(): Promise<ProgWin> {
         await setOpen(false);
       } else await applyPos();
       await host.setAttribute('x-goei-show', next ? 'true' : 'false');
+    },
+    async setPanel(next) {
+      if (next === panelOpen) return;
+      panelOpen = next;
+      await host.setAttribute('x-goei-panel', next ? 'true' : 'false');
     },
     async setTheme(theme) {
       await host.setAttribute('x-goei-theme', theme);

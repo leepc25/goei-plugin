@@ -1,9 +1,10 @@
 // 자동 전송이 막혀 아직 안 보낸 임무 요청·직접 입력: 채팅 속 메시지에 「전송 대기」와 취소 버튼.
 // 취소는 그 메시지를 지운다. 이미 보내져 응답을 만드는 중이면 지우지 않는다 (요청 도중 채팅을 저장하면 응답이 사라질 수 있다).
-import { isUnsent, setUnsent } from '../core/dispatch';
+import { hasSceneCard, isUnsent, setUnsent } from '../core/dispatch';
 import type { Chat } from '../core/types';
+import { dropPendingVars, worldOn } from '../core/world/output';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
-import { updateChat } from './risu';
+import { getChar, updateChat } from './risu';
 import { isWaiting } from './waiting';
 import { openRepick } from './openinghint';
 
@@ -39,11 +40,15 @@ onChatClick('unsent', async (_doc, x, y) => {
   try {
     const charIndex = await risuai.getCurrentCharacterIndex();
     const chatIndex = await risuai.getCurrentChatIndex();
+    const char = await getChar(charIndex);
     const saved = await updateChat(charIndex, chatIndex, (chat) => {
       const msgs = chat.message ?? [];
       const last = msgs[msgs.length - 1];
       if (!last || last.role !== 'user' || typeof last.data !== 'string' || !isUnsent(last.data)) return null;
       chat.message = msgs.slice(0, -1);
+      // 임무 요청 카드를 물리면 걸어 둔 커스텀 임무도 거둔다 (안 그러면 다음 요청에 NEW 지시가 남았다) (전수검사 11-13)
+      const vars = hasSceneCard(last.data) && worldOn(chat) ? dropPendingVars(chat, char?.globalLore) : null;
+      if (vars) chat.scriptstate = { ...(chat.scriptstate ?? {}), ...vars };
       return chat;
     });
     // 취소로 채팅이 비면(시작 화면 직접 입력·커스텀 임무를 물린 것) 다시 고르게 시작 화면을 연다 (사용자 11-07: 취소해도 선택 창이 안 열림)

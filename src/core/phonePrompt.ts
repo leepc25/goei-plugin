@@ -12,7 +12,7 @@ import { applyAdvanced, genSettings, type RefToggles } from './advanced';
 import { fnHistory, fnNum, fnRefs } from './reffn';
 import { previousView, viewSettings, type ViewRoom } from './phoneView';
 import { craftMessages, craftSettings, memoTexts, retryAnalyze, type CraftMessage } from './craft';
-import { fillVars } from './guides';
+import { fillVars, GUIDE_LABEL } from './guides';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { playerAgent } from './player';
 import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
@@ -32,13 +32,13 @@ const languageLine = (p: Record<string, string>): string => p.LANGUAGE?.trim() |
 function sections(src: RefSource): Record<string, string> {
   applyAdvanced(src.chat.scriptstate);
   const p = policySections(src.char.globalLore, 'Phone');
-  if (!Object.keys(p).length) throw new PhoneError('Phone 로어북을 찾지 못했어요.');
+  if (!Object.keys(p).length) throw new PhoneError(`${GUIDE_LABEL.Phone} 지침을 찾지 못했어요.`);
   return p;
 }
 
 function section(p: Record<string, string>, name: string, limits: Partial<Record<keyof typeof LIMITS, number>> = {}): string {
   const raw = p[name];
-  if (raw === undefined) throw new PhoneError(`Phone 로어북의 ${name} 항목이 없어요.`);
+  if (raw === undefined) throw new PhoneError(`${GUIDE_LABEL.Phone} 지침의 ${name} 섹션이 없어요.`);
   return raw
     .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(limits[k as keyof typeof LIMITS] ?? LIMITS[k as keyof typeof LIMITS]) : m))
     .replace(/<!--[\s\S]*?-->/g, '')
@@ -77,10 +77,12 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   const manual = body.participants.some((x) => x.manuallySavedContact);
   if (direct || group) {
     keys.push('CONVERSATION');
-    if (direct) keys.push('DIRECT_ROOMS');
+    // 내가 보낸 말에 답할 때는 「먼저 연락·기다리기」 규칙이 해당 없어 뺀다 (전수검사 11-13)
+    if (direct && body.room?.action?.type !== 'send') keys.push('DIRECT_ROOMS');
     if (group) keys.push('GROUP_ROOMS');
     if ((body.publicBoard as { posts?: unknown[] } | undefined)?.posts?.length) keys.push('PUBLIC_BOARD');
-    if (body.crossRoomMessages?.length || (body.rooms?.length ?? 0) > 1) keys.push('CROSS_ROOM');
+    // 빈 후보 방은 세지 않는다. 주고받은 말이 있는 방이 둘 이상일 때만 (전수검사 11-13)
+    if (body.crossRoomMessages?.length || (body.rooms?.filter((r) => r.messages.some((m) => m.type === 'text')).length ?? 0) > 1) keys.push('CROSS_ROOM');
     if (hasAttachment(JSON.stringify(body))) keys.push('ATTACHMENT_READ');
     keys.push('ATTACHMENT_OUTPUT', 'PATCH');
     // 이모지 반응 (라이트보드 미니톡, 2026-11-06). 옛 카드에 절이 없으면 붙이지 않는다
@@ -439,8 +441,9 @@ export function viewPrompt(src: RefSource, names: Record<string, string>, views:
   if (set.preset === 'side') keys.push('VIEW.SIDE', `VIEW.SIDE.SPEAK.${set.speak ? 1 : 0}`, `VIEW.SCOPE.${set.scope}`, ...(set.size === '0' ? [] : [`VIEW.SIZE.${set.size}`]));
   else keys.push('VIEW.MIND', set.preset === 'mono' ? 'VIEW.MONO' : 'VIEW.MULTI', ...(set.preset === 'multi' ? [`VIEW.MULTI.SPEAK.${set.speak ? 1 : 0}`] : []));
   keys.push('VIEW.OUTPUT');
+  // 지침 속 낱말이 아니라 절이 있는지로 본다 (전수검사 11-13)
+  if (p['VIEW.OUTPUT'] === undefined) throw new PhoneError(`${GUIDE_LABEL.Phone} 지침에 보기 전용 방 섹션이 없어요.`);
   const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
-  if (!system.includes('OUTPUT CONTRACT')) throw new PhoneError('Phone 로어북에 보기 전용 방 항목이 없어요.');
   const previousRoom = previousView(views, set.preset, fnHistory(src.chat.scriptstate, 'ph', 'view'));
   const owner = ownerCharacter(src).character;
   const body = {
@@ -454,5 +457,5 @@ export function viewPrompt(src: RefSource, names: Record<string, string>, views:
     { role: 'system', content: factionCodesToNames(system, names) },
     { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
   ];
-  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false };
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('VIEW.THOUGHTS') || read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false };
 }

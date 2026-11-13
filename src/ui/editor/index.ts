@@ -3,14 +3,14 @@
 import { loreCheckBox } from '../lorecheck';
 import { bindNeedFill } from '../needfill';
 import { directoryData, withDirectory, readDirectoryData, type Directory, type DirectoryData } from '../../core/world/directory';
-import type { WorldOverrides } from '../../core/world/records';
+import { renameOrgOverrides, type WorldOverrides } from '../../core/world/records';
 import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
 import { GUIDE_LABEL, type GuideName } from '../../core/guides';
 import { LEGACY_DATA } from '../../core/lorebooks';
 import { getPrefs } from '../../core/settings';
 import { updateCharacterLore, type ChatContext } from '../../host/risu';
 import { savePrefs } from '../../host/prefs';
-import { bindCropDrag, cropValue, directoryDraft, directoryExtList, directoryInput, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
+import { bindCropDrag, cropValue, directoryDraft, directoryExtList, directoryInput, directoryList, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
 import { GHOST_ICON, ICONS } from '../icons';
 import { labelSwitches } from '../controls';
@@ -277,6 +277,13 @@ function ensureRoot(): HTMLElement {
       if (btn) btn.disabled = !el.value.trim();
       return;
     }
+    // 거점 화면 검색: 패널 처리기는 패널 목록만 다시 그려 이 창 목록이 그대로였다. 거점만 걸러 이 창 목록을 (전수검사 11-13)
+    if (name === 'dir-q' && ctx) {
+      dirUi.q = el.value;
+      const box = root?.querySelector('.dir-list');
+      if (box) box.innerHTML = directoryList(ctx, true);
+      return;
+    }
     // 설정 페이지의 입력(슬라이더·검색·규칙 글칸 등)은 패널과 같은 처리기로
     host?.input?.(el as HTMLInputElement);
   });
@@ -289,6 +296,8 @@ function ensureRoot(): HTMLElement {
     if (el?.dataset?.change === 'man-with-chat') return void manageAction('man-with-chat', root, host?.ctx() ?? null, host?.canChat?.() ?? true).then(() => render());
     // 명부 드롭다운(거점 지역·시군구)·이미지 지침 체크는 이 창의 처리기로: 패널 처리기로 보내면 패널만 다시 그려 지도·시군구 목록·체크 표시가 그대로였다 (2026-10-28 QC)
     if (el?.dataset?.change?.startsWith('dir-') || el?.dataset?.change?.startsWith('ip-')) return void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+    // 인물 기록 점검의 「모든 채팅」 체크: 점검(manage:) 페이지는 패널을 다시 그려도 같이 안 그려지므로 이 창의 처리기로 (전수검사 11-13)
+    if (el?.dataset?.change === 'pp-diag-all') return void run('pp-diag-all', el.value);
     host?.change?.(el);
   });
   root.addEventListener('submit', (ev) => {
@@ -494,7 +503,10 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const sec = (s: SettingsSection) => settingsSection(ctx, scope, canChat, s);
   let body = '';
   let act = '';
+  // 기능 페이지·게시판 표는 시작 전에도 이 채팅에만 적힌다 → 머리 글을 「이 채팅 설정 (시작 전)」으로 (전수검사 11-13, 사용자 승인)
+  let chatOnly = false;
   const feat = (p: NonNullable<typeof settingsUi.page> & string) => {
+    chatOnly = true;
     const r = featurePane(ctx, p, canChat);
     act = r.act;
     return r.body;
@@ -513,7 +525,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'wallet': case 'items': body = sec('items') + sec('wallet'); break;
     // 상점 표는 아래 「열리는 조건」과 같은 범위(시작 전 = 새 채팅 기본값)의 값을 보이고 고친다. 게시판 표는 기능 페이지처럼 늘 이 채팅
     case 'shop': body = shopTable(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, settingsUi.busy) + sec('shop'); break;
-    case 'net': body = boardTable(ctx.chat.scriptstate); break;
+    case 'net': chatOnly = true; body = boardTable(ctx.chat.scriptstate); break;
     case 'factions': body = feat('factions'); break;
     // 2026-11-10 사용자: 점검에 따로 있던 「다음 호출 로어북」을 여기로 합침 (고르는 설정 바로 아래에서 결과를 본다)
     case 'lore': body = sec('lore') + (canChat ? loreCheckBox(ctx, true) : '<section class="ps-group"><h3>다음 호출 로어북</h3><p class="ps-note">채팅을 시작하면 볼 수 있어요.</p></section>'); break;
@@ -526,7 +538,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   // 「기본값으로 저장」「기본값 불러오기」는 설정 전부를 한 번에 다루므로 페이지마다 두지 않고 창 머리(render)에 한 번만 둔다 (2026-10-29 사용자). 확인 띠는 어느 페이지에서든 그 자리에
   const chatPage = page !== 'screen' && page !== 'update';
   act = act.replace(/<span class="ps-defaults">[\s\S]*?<\/span>/, '').trim();
-  const right = chatPage && !canChat ? `<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>${act}` : act;
+  const right = chatPage && !canChat ? `<span class="gw-tokens">${chatOnly ? '이 채팅 설정 (시작 전)' : '새 채팅 기본값 (시작 전)'}</span>${act}` : act;
   const info = FEATURE_INFO[page];
   const on = featureState(ctx)[`set:${page}`];
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
@@ -736,7 +748,7 @@ function body(ctx: ChatContext): string {
   if (n === 'base') {
     // 거점: 지도에 찍히는 장소. 명부 패널의 거점 탭을 그대로 (종류 탭·사용법은 CSS 로 숨김). 호칭·괴담톡 탭은 조직 기록의 기본 정보에
     dirUi.kind = 'base';
-    return `<div class="gw-page gw-basepage"><header class="gw-head"><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
+    return `<div class="gw-page gw-basepage"><header class="gw-head"><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx, true)}</div>`;
   }
   if (n === 'start') {
     // 시작 화면: 명부 초안의 조직·묶음·첫 장면을 고친다. 사진 고르기(dir-photo-*)는 조직 줄 기준이라 kind 를 조직으로
@@ -1046,7 +1058,30 @@ export async function handle(action: string, value?: string): Promise<void> {
   }
   if (!ctx) return;
   if (action.startsWith('dir-')) {
+    // 조직 기록의 거점 칩: 이 창의 거점 화면으로. ed-node 는 resetDirectory 로 고치던 초안을 버리므로 거치지 않는다 (전수검사 11-13)
+    if (action === 'dir-base-goto') {
+      if (value && directoryDraft(ctx).bases.some((b) => b.name === value)) {
+        edUi.node = 'base';
+        dirUi.kind = 'base';
+        dirUi.open = value;
+        dirUi.q = '';
+      }
+      return render();
+    }
+    // 조직 이름 바꾸기: 패널 처리기는 dirUi.open 으로 조직을 찾는데 이 창에서는 고른 기록이 edUi.sel 에만 있다 (전수검사 11-13)
+    const oldOrg = action === 'dir-org-rename' && edUi.node === 'org' ? (dirUi.open = edUi.sel.org ?? '') : '';
     await handleDirectory(action, value, ctx, env);
+    if (oldOrg && dirUi.open !== oldOrg) {
+      const d = directoryDraft(ctx);
+      if (!d.orgs.some((o) => o.name === oldOrg) && d.orgs.some((o) => o.name === dirUi.open)) {
+        edUi.sel.org = dirUi.open;
+        // 기록 칸·관계 덧쓰기도 새 이름으로 (안 옮기면 옛 이름이 목록에 유령 줄로 남았다)
+        setOverrides(renameOrgOverrides(overridesOf(ctx), oldOrg, dirUi.open));
+        touched();
+        render();
+      }
+      return;
+    }
     // 다른 폴더에서 넣은 후보는 바로 골라 기본 정보(발생 후보·빼기)를 보여 준다
     if (action === 'dir-ext-add' && value && isKind(edUi.node) && directoryDraft(ctx)[edUi.node === 'site' ? 'sites' : 'anomalies'].some((p) => p.lore === value)) {
       edUi.sel[edUi.node] = value;

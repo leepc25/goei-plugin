@@ -14,7 +14,7 @@ import {
   AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, isChatSettingVar, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
-import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
+import { savePrefs, saveVarDefaults, varDefaultsToLoad } from '../host/prefs';
 import { activeBooksRow, advSections } from './advanced';
 import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
@@ -812,17 +812,23 @@ export async function handleSettings(action: string, value: string | undefined, 
       let before: Record<string, string | number | boolean | undefined> | null = null;
       let shopOff = false;
       await save(ctx, env, (chat) => {
-        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(ALL_PREFIXES, chat.scriptstate) };
+        // 기본값에 없는 항목은 ''로 덮지 않고 지운다: ''를 0으로 읽어 소지 칸·한도·선쪽지 확률이 최솟값이 됐다 (전수검사 11-13)
+        const r = varDefaultsToLoad(ALL_PREFIXES, chat.scriptstate);
+        const prev = chat.scriptstate;
+        const base = { ...(chat.scriptstate ?? {}) };
+        for (const k of r.drop) delete base[k];
+        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...r.set };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
         if (worldOn(chat)) {
-          const ss = { ...(chat.scriptstate ?? {}), ...vars };
+          const ss = { ...base, ...vars };
           Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? '')));
         }
-        const side = bulkSideVars(chat, chat.scriptstate, { ...(chat.scriptstate ?? {}), ...vars });
+        const side = bulkSideVars(chat, prev, { ...base, ...vars });
         shopOff = side.shopOff;
         Object.assign(vars, side.vars);
         before = {};
-        for (const k of Object.keys(vars)) before[k] = chat.scriptstate?.[k];
+        for (const k of [...Object.keys(vars), ...r.drop]) before[k] = prev?.[k];
+        if (r.drop.length) chat.scriptstate = base;
         return vars;
       });
       if (shopOff) {

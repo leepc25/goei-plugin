@@ -318,7 +318,8 @@ export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ct
     // 「참조 로어북」 수: 관련 로어북·2차 참조를 실제로 이 수까지만. 가게 이름·주인 이름에 걸린 것을 끝까지 남긴다
     const registry = buildRegistry(src.char.globalLore);
     const named = matchedBooks(registry, `${st.shop}\n${st.owner}`);
-    rows = limitRefs(collectRefs(src, { scope: 'gnet', text, ...give.toggles, registry, extra }), give.refs, { hard: true, first: (r) => r.sources.some((x) => named.has(x.trim().toLowerCase())) });
+    // 가게 이름과 같은 위키 문서는 「관련 로어북」 칸을 켰을 때만 (전수검사 11-13)
+    rows = limitRefs(collectRefs(src, { scope: 'gnet', text, ...give.toggles, registry, extra: give.toggles.related ? extra : [] }), give.refs, { hard: true, first: (r) => r.sources.some((x) => named.has(x.trim().toLowerCase())) });
   } else {
     // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
     rows = limitRefs(collectRefs(src, { scope: 'gnet', text, authors: false, persona: false, related: true, extra }), sh.refs);
@@ -351,7 +352,7 @@ function saleDone<C extends ChatContext['chat']>(chat: C, shop: string, itemId: 
   const w = addWalletEntry(l0, { id: freshWalletId(l0, `sl_${itemId}_${now.sales.length}`, now.key), anchor: now.key, amount: o.price, memo: o.name, src: 'store' });
   // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
   const items = sellItem(it0, itemId, now.key, `${now.shop}에 팖`);
-  const nextShop = closeSale(now);
+  const nextShop = closeSale(now, now.key);
   if (!nextShop) return null;
   const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
   const use = q && q.some((u) => u.id === itemId) ? itemUseVars(dropUse(q, itemId)) : {};

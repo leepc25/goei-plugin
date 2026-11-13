@@ -103,8 +103,8 @@ function chipItems(html = ''): string[] {
  *  초록 = 우리 요원·우리 세력, 노랑 = 다른 세력·외부인만, 회색 = 아무도 없음. 우리와 다른 세력이 함께면 초록 + 노랑 점.
  *  누가 갔는지는 상세 창에 */
 function depMark(c: EvCard): string {
-  // 사건은 투입 기록이 없다 (상황판 태그에 투입 칸이 없음). 늘 「미투입」으로 보이면 틀린 말이라 표시하지 않는다
-  if (!c.key || c.kind === 'in') return '';
+  // 사건도 [IN|…|배치|…] 칸으로 배치를 가진다 → 괴이 카드처럼 표시 (전수검사 11-13, 사용자 승인)
+  if (!c.key) return '';
   const items = chipItems(c.chips);
   const strip = (h: string) => h.replace(/<[^>]+>/g, '').trim();
   const ours = items.filter((h) => h.startsWith('<span class="gx-pchip"') || h.startsWith('<span class="gx-badge own"')).map(strip);

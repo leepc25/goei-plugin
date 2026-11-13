@@ -42,6 +42,8 @@ export const peopleUi = {
   notice: '',
   info: '',
   busy: false,
+  /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기) */
+  undoAsk: false,
   /** 호감 숫자 보이기 (ⓘ) */
   showNum: false,
   /** 호감 직접 수정 칸 */
@@ -231,7 +233,7 @@ async function setVars(ctx: ChatContext, env: PeopleEnv, vars: Record<string, st
 
 const FEATURE_HELP: Record<Feature, [string, string]> = {
   affinity: ['호감', '계기(작은친절·도움·배신…)를 기록하고 8단계로 계산해요'],
-  axes: ['성격 6축', '인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 사원증에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요. 리수폿 People'],
+  axes: ['성격 6축', '인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 기록 › 인물 상세에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요. 리수폿 People'],
   register: ['호칭·말투', '이 인물이 주인공을 부르는 말과 존댓말·반말 변화'],
   perception: ['인식', '이 인물이 아는 것·모르는 것(비밀 누설 방지)'],
   perception_ext: ['인식 확장', '감각 경로·관찰 성향까지 기록해요'],
@@ -240,9 +242,9 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
   docs_location: ['장소 문서', '장소마다 바뀐 것'],
   docs_faction: ['세력 문서', '세력마다 바뀐 것'],
   docs_item: ['물건 문서', '물건마다 바뀐 것'],
-  taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축'],
-  openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능'],
-  rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪치면 꺼 두세요. 리수폿 리듬'],
+  taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸.'],
+  openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 성인용 기능'],
+  rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪치면 꺼 두세요.'],
   faction_rep: ['세력 평판', '세력이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 본문 근거를 들어 판단해요. 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요.'],
   npc_emotion: ['인물끼리 감정', '인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)'],
 };
@@ -301,7 +303,7 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): { toggle: string; body: 
           <div class="gx-row-btns">
             ${keepRaw && r.system ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc(`${id}:prompt`)}">보낸 프롬프트 보기</button>` : ''}
             ${r.raw ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc(`${id}:raw`)}">응답 원문 보기</button>` : ''}
-            ${!keepRaw ? '<small class="ps-note">원문은 인물 설정 고급 → 「원문 보관」을 켰을 때만 남아요.</small>' : ''}
+            ${!keepRaw ? '<small class="ps-note">원문은 인물 설정 → 「갱신 (메인 응답 뒤)」 → 「원문 보관」을 켰을 때만 남아요.</small>' : ''}
           </div>
           ${peopleUi.diagShow === `${id}:prompt` ? `<textarea class="gx-search pp-raw" readonly rows="10">${esc(`${r.system ?? ''}\n\n---\n\n${prettyJson(r.data ?? '')}`)}</textarea>` : ''}
           ${peopleUi.diagShow === `${id}:raw` ? `<textarea class="gx-search pp-raw" readonly rows="10">${esc(r.raw ?? '')}</textarea>` : ''}
@@ -576,9 +578,13 @@ export function peopleListView(ctx: ChatContext): string {
   const empty = !Object.keys(store.people).length && !pending.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>메인 응답에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : '';
   const undoN = store.lastRun ? store.lastRun.entries.length + store.lastRun.docs.length + store.lastRun.changes.length + store.lastRun.observations.length + store.lastRun.newPeople.length : 0;
   const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목은 변경 기록에서 다시 살릴 수 있어요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? 'disabled' : ''}>↶</button>` : '';
+  const newN = store.lastRun?.newPeople.length ?? 0;
+  const undoAsk = undoN && peopleUi.undoAsk
+    ? `<div class="gx-hint">마지막 갱신 ${undoN}개를 취소할까요?${newN ? ` 새 인물 ${newN}명은 지워져요.` : ''} <button class="gx-mini danger" data-action="pp-undo-run-yes" ${peopleUi.busy ? 'disabled' : ''}>취소하기</button><button class="gx-mini" data-action="pp-undo-run-no">그만</button></div>`
+    : '';
   return `<div class="ph-room nw-pane pp-pane">${head('이 채팅의 인물', `${Object.keys(store.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
     <article class="nw-doc pp-doc">
-      ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
+      ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}${undoAsk}
       ${updateBar(ctx)}
       ${pendingHtml}${sections}${empty}
       ${docsN ? `<button class="gx-mini nw-more-btn" data-action="rec-docs">${ICONS.book}사건·장소·세력·물건 기록 ${docsN}개</button>` : ''}
@@ -597,7 +603,7 @@ export function factionListView(ctx: ChatContext): string {
   const n = s.features.has('faction_rep') ? knownFactionCodes(store, names).length : 0;
   const body = s.features.has('faction_rep')
     ? factionSection(ctx, store, changes) || '<div class="ph-blank"><p>아직 평판이 기록된 세력이 없어요.</p></div>'
-    : '<div class="ph-blank"><p>세력 평판 기능이 꺼져 있어요.<br>설정 → 인물 기록 → 기능에서 「세력 평판」을 켜면 여기에 쌓여요.</p></div>';
+    : '<div class="ph-blank"><p>세력 평판 기능이 꺼져 있어요.<br>설정 → 기록 → 세력에서 「사용」을 켜면 여기에 쌓여요.</p></div>';
   return `<div class="ph-room nw-pane pp-pane">${head('세력', n ? `${n}곳` : '', '', false)}
     <article class="nw-doc pp-doc">${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}${body}</article>${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
@@ -765,7 +771,7 @@ function sexualCard(ctx: ChatContext, p: Person): string {
     const btns = `<span class="pp-entry-btns"><button class="gx-mini pp-mini${on ? ' on' : ''}" data-action="pp-sex-on" data-value="${esc(key)}" aria-pressed="${on}" title="이 인물에서 이 칸을 쓸지">${on ? 'ON' : 'OFF'}</button>${on && !editing ? `<button class="gx-mini pp-mini" data-action="pp-sex-edit" data-value="${esc(key)}">편집</button>${text ? `<button class="gx-mini pp-mini danger" data-action="pp-sex-clear" data-value="${esc(key)}" title="글을 지워요. 다음 갱신에서 모델이 다시 써요">삭제</button>` : ''}` : ''}</span>`;
     return `<section class="pp-slot"><h4>${SEXUAL_LABEL[f]}${btns}</h4>${body}</section>`;
   }).join('');
-  return `<section class="pp-card"><h4 title="리수폿 성적 프로필: 성적 상황에서만 쓰는 글. 변경은 실제 성적 장면의 관찰이 쌓여 승인해야 돼요">성적 욕망·이상성욕</h4><div class="pp-card-body">${style}${cards}</div></section>`;
+  return `<section class="pp-card"><h4 title="성적 프로필: 성적 상황에서만 쓰는 글. 변경은 실제 성적 장면의 관찰이 쌓여 승인해야 돼요">성적 욕망·이상성욕</h4><div class="pp-card-body">${style}${cards}</div></section>`;
 }
 
 /** 선택 기능 카드: 취향 띠·음란도 (켜져 있을 때만) */
@@ -866,7 +872,10 @@ export function personView(ctx: ChatContext, name: string): string {
   const hiddenN = FEATURE_SLOTS.filter((s) => !enabledSlots.has(s) && (p.slots[s]?.length ?? 0) > 0).length;
   const slots = CORE_SLOTS.map(slotSection).join('') + groups + (hiddenN ? `<p class="ps-note">꺼진 기능의 칸 ${hiddenN}개는 숨겨져 있어요 (기능을 켜면 돌아와요).</p>` : '');
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
-  const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
+  // 최근 50줄만 그리고 나머지는 「더 보기」 (지난 항목과 같은 단추) (전수검사 11-13)
+  const logKey = `pp-log:${name}`;
+  const logShown = peopleUi.oldAll.has(logKey) ? mine : mine.slice(0, 50);
+  const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${logShown.map((c) => changeRow(ctx, c, live)).join('')}</ul>${mine.length > logShown.length ? `<button class="gx-mini nw-more-btn" data-action="pp-old-more" data-value="${esc(logKey)}">${mine.length - logShown.length}개 더 보기</button>` : ''}` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
   const busyNow = peopleUi.busy || peopleStatus().busy ? 'disabled' : '';
   const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[['10', '최근 10개'], ['20', '최근 20개'], ['50', '최근 50개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
@@ -887,17 +896,17 @@ export function peopleDocsView(ctx: ChatContext): string {
   const live = liveness(ctx.chat);
   const byType = new Map<DocType, Doc[]>();
   for (const d of Object.values(store.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)!).push(d);
-  const docEntry = (docKey: string, e: Entry, st: EntryState) => {
+  const docEntry = (docKey: string, e: Entry, st: EntryState, storeKey: string) => {
     const no = msgNo(e.anchor, live);
     const key = `doc|${docKey}|${e.id}`;
     const meta = [e.date ? `<span title="일시">${esc(e.date)}</span>` : '', e.place ? `<span title="장소">${esc(e.place)}</span>` : '', e.who?.length ? `<span title="관련 인물">${esc(e.who.join(', '))}</span>` : '', no ? evidenceButton(key, no) : '', e.quote ? `<q title="근거 메시지에서 따온 인용">${esc(e.quote)}</q>` : ''].filter(Boolean).join('');
-    return `<li class="pp-entry${st !== 'alive' && !e.void ? ' dead' : ''}${e.void ? ' void' : ''}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}</div>${evidenceBox(ctx, live, key, e.anchor, e.quote)}</li>`;
+    return `<li class="pp-entry${st !== 'alive' && !e.void ? ' dead' : ''}${e.void ? ' void' : ''}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}<span class="pp-entry-btns">${voidBtn('pp-doc-void', `${storeKey}|${e.id}`, !!e.void)}</span></div>${evidenceBox(ctx, live, key, e.anchor, e.quote)}</li>`;
   };
   const sections = DOC_TYPES.filter((t) => byType.has(t)).map((t) => {
     const docs = byType.get(t)!;
     const inner = docs.map((d) => {
       const aliveN = liveEntries(d.entries, live).length;
-      return `<section class="pp-slot"><h4>${esc(d.key)}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(d.entries, live, `pp-old:doc:${d.type}:${d.key}`, (e, st) => docEntry(d.key, e, st))}</section>`;
+      return `<section class="pp-slot"><h4>${esc(d.key)}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(d.entries, live, `pp-old:doc:${d.type}:${d.key}`, (e, st) => docEntry(d.key, e, st, `${d.type}:${d.key}`))}</section>`;
     }).join('');
     return `<section class="nw-hsec pp-sec"><h3>${DOC_LABEL[t]}<b>${docs.length}</b></h3>${inner}</section>`;
   }).join('');
@@ -1007,7 +1016,17 @@ export async function handlePeople(action: string, value: string | undefined, ct
       if (k === 'explicit_style') await mutate(ctx, env, (store) => { let n = 0; for (const p of Object.values(store.people)) if (p.sexual && p.sexual.explicit !== null) { p.sexual.explicit = null; n++; } return n > 0; });
       return true;
     }
-    case 'pp-undo-run': {
+    case 'pp-undo-run':
+      // 바로 되돌리지 않고 한 번 더 묻는다 (전수검사 11-13, 사용자 승인)
+      peopleUi.undoAsk = true;
+      env.render();
+      return true;
+    case 'pp-undo-run-no':
+      peopleUi.undoAsk = false;
+      env.render();
+      return true;
+    case 'pp-undo-run-yes': {
+      peopleUi.undoAsk = false;
       let n = 0;
       await mutate(ctx, env, (store) => (n = undoLastRun(store)) > 0);
       peopleUi.info = n ? `마지막 갱신을 되돌렸어요 (${n}개 취소).` : '되돌릴 갱신이 없어요.';
@@ -1175,6 +1194,17 @@ export async function handlePeople(action: string, value: string | undefined, ct
       env.render();
       return true;
     }
+    case 'pp-doc-void':
+      // 문서 항목 취소·되살리기 (전수검사 11-13, 사용자 승인: 「마지막 갱신 되돌리기」로 취소된 문서 줄도 되살릴 수 있게). 값 「문서 열쇠|항목 id」
+      await mutate(ctx, env, (store) => {
+        const cut = v.lastIndexOf('|');
+        const e = store.docs[v.slice(0, cut)]?.entries.find((x) => x.id === v.slice(cut + 1));
+        if (cut < 0 || !e) return false;
+        if (e.void) delete e.void;
+        else e.void = true;
+        return true;
+      });
+      return true;
     case 'pp-change-void':
       await mutate(ctx, env, (store) => {
         const c = store.log.find((x) => x.id === v);

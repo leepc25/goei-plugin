@@ -19,6 +19,8 @@ export interface ImageData {
   aliases: Map<string, string | false>;
   /** 「주인공 이미지」 ON: 「{{user}} 태그 금지」 줄을 뺀다 (메인모델 Asset 로어북과 같음) */
   allowUser?: boolean;
+  /** 페르소나 이름: 지침의 {{user}}를 이 이름으로 푼다 (보조 모델 요청은 Risu가 CBS를 풀지 않음. 전수검사 11-13) */
+  userName?: string;
 }
 
 /** 「주인공 이미지」 ON일 때의 자료. self(캐릭터로 플레이하지 않을 때의 페르소나 이름)는 명단에 넣는다 */
@@ -121,7 +123,9 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
     })
     .filter(Boolean);
   // 글은 지침 「이미지(보조 모델)」 PROMPT · NO_TAG · NO_TAG_USER · ALIASES_HEAD 절 (설정 → 지침에서 고침). PROMPT 절이 없으면 아래에 남긴 글
-  const noTag = d.allowUser ? guideOr('Asset', 'NO_TAG', '- DO NOT tag the narrator or undefined NPCs.') : guideOr('Asset', 'NO_TAG_USER', '- DO NOT tag {{user}}, the narrator, or undefined NPCs.');
+  const noTag0 = d.allowUser ? guideOr('Asset', 'NO_TAG', '- DO NOT tag the narrator or undefined NPCs.') : guideOr('Asset', 'NO_TAG_USER', '- DO NOT tag {{user}}, the narrator, or undefined NPCs.');
+  // 이름을 알면 {{user}}를 푼다 (모르면 그대로. 전수검사 11-13)
+  const noTag = d.userName?.trim() ? noTag0.replace(/\{\{user\}\}/g, () => d.userName!.trim()) : noTag0;
   const aliasHead = guideOr('Asset', 'ALIASES_HEAD', '## Aliases (for presence verification — still use the full English name in tag)');
   const narrative = paras.map((p, i) => `[${i + 1}] ${p}`).join('\n\n');
   const tpl = guideSec('Asset', 'PROMPT');
@@ -231,10 +235,13 @@ export function applyPatches(paras: string[], patches: { line: number; tag: stri
     const inner = m?.[1]?.trim();
     if (!inner) continue;
     const name = sorted.find((c) => inner.startsWith(`${c}_`));
-    if (!name || !d.keywordSet.has(inner.slice(name.length + 1))) continue;
+    // 띄어쓰기 표정을 밑줄로 쓴 것(forced_smiling)도 받아 띄어쓰기 꼴로 넣는다 (전수검사 11-13)
+    const kw = name ? inner.slice(name.length + 1).trim() : '';
+    const kwFix = d.keywordSet.has(kw) ? kw : kw.replace(/_/g, ' ');
+    if (!name || !d.keywordSet.has(kwFix)) continue;
     const cur = count.get(name) ?? 0;
     if (cur >= limit) continue;
-    inserts.set(ln, `<img=${inner}>`);
+    inserts.set(ln, `<img=${name}_${kwFix}>`);
     count.set(name, cur + 1);
   }
   const out: string[] = [];

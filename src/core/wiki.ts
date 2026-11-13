@@ -2,9 +2,10 @@
 // 문서는 채팅 로어북 "WIKI｜제목" 항목(키 없음, 비활성)에 meta + <lightboard-namuwiki> 본문으로 둔다.
 import { advNum, advOn, genSettings, refToggles } from './advanced';
 import { related, type Focus } from './focus';
-import { tokens } from './gnet';
+import { tokens, trimTokens } from './gnet';
 import { trimPrevious, trimRelated, trimSecondary, trimTurns } from './budget';
 import { craftMessages, craftSettings, memoTexts, type CraftMessage } from './craft';
+import { GUIDE_LABEL } from './guides';
 import { collectRefs, factionCodesToNames, hasBook, limitRefs, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
 import type { Chat, LoreEntry } from './types';
 import { buildRegistry, resolveName, type Registry } from './world/registry';
@@ -248,7 +249,7 @@ export interface WikiRequest {
   docRequest?: string;
   direct: boolean;
   /** 본문에 넣을 수 있는 그림 (에셋 이름·한글 이름). 참고 자료에 나온 것만 골라 보낸다 */
-  images?: { name: string; label: string }[];
+  images?: { name: string; label: string; subject?: boolean }[];
   /** 정보칸 인물 그림으로 고를 수 있는 표정 (그 인물의 그림이 있는 것만) */
   moods?: string[];
 }
@@ -261,7 +262,7 @@ export interface WikiPrompt {
 
 export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, factionNames: Record<string, string>, registry?: Registry): WikiPrompt {
   const sec = policySections(src.char.globalLore, 'Wiki');
-  for (const k of REQUIRED) if (!sec[k]) throw new WikiError(`Wiki 로어북의 ${k} 섹션이 없어요.`);
+  for (const k of REQUIRED) if (!sec[k]) throw new WikiError(`${GUIDE_LABEL.Wiki} 지침의 ${k} 섹션이 없어요.`);
   const r = registry ?? buildRegistry(src.char.globalLore);
   const n = trimTurns(s.chatTurns);
   const story = n ? storyText(recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages)) : '';
@@ -281,16 +282,17 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   if (previous && sec['NW.PREVIOUS']) system.push(sec['NW.PREVIOUS']);
   // 본문 그림·정보칸 표정 (라이트보드 나무위키 W3, 2026-11-06). 참고 자료나 제목에 나온 그림만, 30장까지
   const pool = `${req.title}\n${refText(rows)}\n${story}`;
-  const images = (req.images ?? []).filter((x, i) => i === 0 || (x.label && pool.includes(x.label))).slice(0, 30);
+  // 주제 그림은 표시(subject)로 가린다. 표시가 없는 옛 호출만 첫 항목을 주제로 본다 (전수검사 11-13)
+  const images = (req.images ?? []).filter((x, i) => (x.subject ?? i === 0) || (x.label && pool.includes(x.label))).slice(0, 30);
   if (images.length && sec['NW.IMAGES']) system.push(sec['NW.IMAGES'].replace('__NW_IMAGES__', images.map((x) => `- ${x.name} = ${x.label}`).join('\n')));
   if (req.moods?.length && sec['NW.PORTRAIT']) system.push(sec['NW.PORTRAIT'].replace('__NW_MOODS__', req.moods.join(', ')));
   const language = genSettings(src.chat.scriptstate).language;
   if (language) system.push(language);
   let user = `문서 제목: ${req.title}\n\n[참고 자료]\n${refText(rows)}`;
   if (story) user += `\n\n[최근 챗로그]\n${story}`;
-  if (previous) user += `\n\n[이전 위키 — 원본 사실과 최근 확인된 본문을 우선]\n${innerBody(previous)}`;
-  if (req.writingRequest.trim()) user += `\n\n[사용자 작성 지침 — 모든 문서 공통]\n${req.writingRequest.trim()}`;
-  if (req.docRequest?.trim()) user += `\n\n[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n${req.docRequest.trim()}`;
+  if (previous) user += `\n\n[이전 위키]\n${innerBody(previous)}`;
+  if (req.writingRequest.trim()) user += `\n\n[사용자 작성 지침: 모든 문서 공통]\n${req.writingRequest.trim()}`;
+  if (req.docRequest?.trim()) user += `\n\n[사용자 작성 지침: 이 문서만]\n${req.docRequest.trim()}`;
   const sources = [...new Set(rows.flatMap((x) => x.sources))];
   const primarySources = [...new Set(rows.filter((x) => x.kind === 'primary').flatMap((x) => x.sources))];
   const messages: CraftMessage[] = [
@@ -337,14 +339,16 @@ export function acceptArticle(raw: string, title: string, canon: (t: string) => 
 export function reviewLinks(body: string, title: string, canon: (t: string) => string): string {
   const seen = new Set<string>();
   const self = canon(title);
-  return body.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label: string) => {
+  const fix = (line: string, set: Set<string>) => line.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label: string) => {
     const t = label.trim();
     if (!t || /[[\]|]/.test(t) || !validTitle(t)) return label;
     const c = canon(t);
-    if (c === self || seen.has(c)) return label;
-    seen.add(c);
+    if (c === self || set.has(c)) return label;
+    set.add(c);
     return `➡️${t}➡️`;
   });
+  // 분류 표는 탐색용이라 본문과 겹쳐도 링크를 둔다. 표 안에서만 중복을 지운다 (전수검사 11-13)
+  return body.split('\n').map((line) => fix(line, line.startsWith('[CategoryTable]') ? new Set<string>() : seen)).join('\n');
 }
 
 // ── 화면 ──
@@ -508,7 +512,9 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
         const head = fields.find(([k]) => k === 'Head')?.[1];
         const rows = fields.filter(([k]) => k === 'Row' || k === 'RowHead');
         const cells = (v: string, tagName: string) => v.split(';;').map((x) => `<${tagName}>${inline(x.trim())}</${tagName}>`).join('');
-        out.push(`<table class="nw-table${b.tag === 'CategoryTable' ? ' cat' : ''}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ''}${head ? `<tr>${cells(head, 'th')}</tr>` : ''}${rows.map(([k, v]) => `<tr>${cells(v, k === 'RowHead' ? 'th' : 'td')}</tr>`).join('')}</table>`);
+        // RowHead 는 왼쪽 첫 칸만 머리 칸 (원본 렌더러와 같게, 전수검사 11-13)
+        const rowHead = (v: string) => v.split(';;').map((x, i) => { const t = i ? 'td' : 'th'; return `<${t}>${inline(x.trim())}</${t}>`; }).join('');
+        out.push(`<table class="nw-table${b.tag === 'CategoryTable' ? ' cat' : ''}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ''}${head ? `<tr>${cells(head, 'th')}</tr>` : ''}${rows.map(([k, v]) => `<tr>${k === 'RowHead' ? rowHead(v) : cells(v, 'td')}</tr>`).join('')}</table>`);
         break;
       }
       default:
@@ -528,6 +534,8 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
 // 이 채팅에서 쓴 문서를 최근에 만든 것부터 정한 개수만큼. 카드 기본 문서는 넣지 않는다 (원본도 저장 문서만).
 
 export const NW_CONTEXT = '$nw_context';
+/** 본편에 넣는 위키 문서를 자를 때 남아야 하는 최소 토큰 (이보다 적으면 그 문서는 뺀다) */
+const WIKI_CTX_MIN_TRIM = 500;
 export const wikiContextOn = (state: Record<string, unknown> | undefined): boolean => String(state?.[NW_CONTEXT] ?? '') === '1';
 
 export function wikiMainContext(chat: Chat, rules: string, focus?: Focus | null, capOverride?: number): string {
@@ -540,17 +548,33 @@ export function wikiMainContext(chat: Chat, rules: string, focus?: Focus | null,
   const onlyMentioned = advOn(s, 'nw', 'ctx_focus');
   const withLore = advOn(s, 'nw', 'ctx_lore');
   const created = advOn(s, 'nw', 'ctx_created');
+  // 링크로 쓴 하위 문서는 부모 원본을 물려받으니, 원본에 자기 제목이 있을 때만 로어북 있는 문서로 본다 (전수검사 11-13)
+  const ownLore = (d: WikiDoc) => (d.meta?.primarySources ?? []).some((x) => x.trim().toLowerCase() === d.title.trim().toLowerCase());
   const docs = listDocs(chat)
-    .filter((d) => ((d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created))
+    .filter((d) => (ownLore(d) ? withLore : created))
     .filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title))
     .map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i }))
-    .sort((a, b) => b.at - a.at || b.i - a.i)
-    .slice(0, count);
-  const kept: Record<string, unknown>[] = [];
+    .sort((a, b) => b.at - a.at || b.i - a.i);
+  const kept: { kind: string; title: string; mode: string; content: string }[] = [];
   const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'wiki', records: kept })}\n[MODULE_CONTEXT_END]`;
+  // 상한을 넘는 문서는 빼고 다음 문서로 빈자리를 채운다. 남은 몫이 충분하면 긴 문서는 그만큼 잘라 넣는다 (전수검사 11-13, 사용자 결정)
+  const CUT = '\n…(이하 생략)';
   for (const { d } of docs) {
-    kept.unshift({ kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: innerBody(d.body) });
-    if (cap > 0 && tokens(payload()) > cap) kept.shift();
+    if (kept.length >= count) break;
+    const rec = { kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: innerBody(d.body) };
+    kept.unshift(rec);
+    if (cap <= 0 || tokens(payload()) <= cap) continue;
+    const full = rec.content;
+    rec.content = '';
+    let room = cap - tokens(payload()) - tokens(CUT);
+    while (room >= WIKI_CTX_MIN_TRIM) {
+      rec.content = trimTokens(full, room) + CUT;
+      const over = tokens(payload()) - cap;
+      if (over <= 0) break;
+      room -= over;
+    }
+    if (room < WIKI_CTX_MIN_TRIM) { kept.shift(); continue; }
+    break;
   }
   return kept.length ? payload() : '';
 }
@@ -582,11 +606,11 @@ export function docSummary(body: string, max = 150): string {
 export function wikiTitlePrompt(src: RefSource, candidates: string[], written: string[], names: Record<string, string>): CraftMessage[] {
   const sec = policySections(src.char.globalLore, 'Wiki');
   const rule = sec['NW.AUTO_TITLE'];
-  if (!rule) throw new WikiError('Wiki 로어북의 NW.AUTO_TITLE 섹션이 없어요.');
+  if (!rule) throw new WikiError(`${GUIDE_LABEL.Wiki} 지침의 NW.AUTO_TITLE 섹션이 없어요.`);
   const n = trimTurns(wikiSettings(src.chat.scriptstate).chatTurns);
   const story = n ? storyText(recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages)) : '';
   let user = `[후보 제목]\n${candidates.map((t) => `- ${t}`).join('\n')}`;
-  if (written.length) user += `\n\n[이미 쓴 문서 — 되도록 피하고, 최근 이야기로 내용이 크게 달라졌을 때만]\n${written.map((t) => `- ${t}`).join('\n')}`;
+  if (written.length) user += `\n\n[이미 쓴 문서]\n${written.map((t) => `- ${t}`).join('\n')}`;
   if (story) user += `\n\n[최근 챗로그]\n${story}`;
   return [
     { role: 'system', content: factionCodesToNames(rule, names) },

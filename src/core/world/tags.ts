@@ -76,7 +76,8 @@ export function normAnState(v: string | undefined): AnState {
 }
 
 export function normAgState(v: string | undefined): AgState | null {
-  const s = (v ?? '').trim();
+  // 「상태: 휴게」처럼 라벨을 붙여도 (전수검사 11-13)
+  const s = stripLabel(v);
   if ((AG_STATES as readonly string[]).includes(s)) return s as AgState;
   const hit = AG_ALIAS[s] ?? AG_ALIAS[s.toLowerCase().replace(/\s+/g, ' ')];
   if (hit) return hit;
@@ -88,10 +89,15 @@ export function normAgState(v: string | undefined): AgState | null {
 
 function fields(text: string, kind: string): string[][] {
   const out: string[][] = [];
-  const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]*)\\]`, 'g');
+  // 한 줄 안에서만: 닫는 ]가 빠진 줄이 다음 태그 줄과 합쳐지지 않게 (전수검사 11-13)
+  const re = new RegExp(`\\[${kind}\\s*\\|([^\\]\\r\\n]*)\\]`, 'g');
   for (const m of text.matchAll(re)) out.push(m[1].split('|').map((s) => s.trim()));
   return out;
 }
+
+/** 요청 NEW 줄의 <발생지점>·<배치> 같은 안 채운 자리표 (전수검사 11-13) */
+const SLOT = /^<[^<>]*>$/;
+const unslot = (v: string) => (SLOT.test(v.trim()) ? '' : v);
 
 /** 앞의 슬롯 번호는 건너뛴다. 지역 뒤로 이름|상태|등급|배치, 그다음이 상황 (2026-10-21: 상황 칸 추가, 옛 다섯 칸 태그도 읽는다) */
 export function scanAnomalies(text: string): AnTag[] {
@@ -100,20 +106,26 @@ export function scanAnomalies(text: string): AnTag[] {
     const region = f[slot] ?? '';
     const r = f.slice(slot + 1);
     if (r.length < 4 || !region) return [];
-    return [{ region, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(' ')) }];
+    const name = stripLabel(r[0]);
+    // 이름·지역이 자리표 그대로면 안 채운 줄이라 건너뛰고(발생대기 유지), 배치·상황 자리표는 빈 값으로 (전수검사 11-13)
+    if (SLOT.test(name) || SLOT.test(region)) return [];
+    return [{ region, name, state: normAnState(r[1]), grade: normGrade(r[2]), deploy: unslot(stripLabel(r[3])), situation: stripLabel(r.slice(4).map(unslot).join(' ')) }];
   });
 }
 
 /** 상태 칸을 찾아 그 앞을 이름, 뒤를 차례로 읽는다 (IN: 상황, MS: 방문자|상황) */
 function scanSites<S extends string>(text: string, kind: string, states: readonly S[]) {
   return fields(text, kind).flatMap((f) => {
-    // 「출현 (Appeared)」처럼 괄호 설명을 붙여도 상태로 본다
-    const bare = (v: string) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, '').trim();
+    // 「출현 (Appeared)」처럼 괄호 설명을 붙여도, 「진행 중」「종료됨」처럼 써도 상태로 본다 (전수검사 11-13)
+    const bare = (v: string) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, '').replace(/[\s.。!]/g, '').replace(/(?:중|됨)$/, '').trim();
     const i = f.findIndex((v, k) => k >= 2 && (states as readonly string[]).includes(bare(v)));
     if (i < 0) return [];
     let region = f[0] ?? '';
     if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? '';
-    return [{ region, name: stripLabel(f[i - 1]), state: bare(f[i]) as S, rest: f.slice(i + 1).map(stripLabel) }];
+    const name = stripLabel(f[i - 1]);
+    // 이름·지역이 자리표 그대로면 건너뛰고, 배치·방문자·상황 자리표는 빈 값으로 (전수검사 11-13)
+    if (SLOT.test(name) || SLOT.test(region)) return [];
+    return [{ region, name, state: bare(f[i]) as S, rest: f.slice(i + 1).map((v) => unslot(stripLabel(v))) }];
   });
 }
 
@@ -155,7 +167,8 @@ export function scanStatus(text: string): StatusLine {
   // 상태창은 너그럽게 읽는다 (status.ts). 태그가 둘 이상이면 목표는 정하지 않는다
   const tags = findStatusTags(text);
   const first = tags[0];
-  const minute = first ? statusMinute(first.date, first.time) : null;
+  // 시각 칸을 못 읽었으면 그날 0시로 돌리지 않는다 (전수검사 11-13)
+  const minute = first && first.time ? statusMinute(first.date, first.time) : null;
   const target = tags.length === 1 && (first.target || first.hasTarget) ? first.target : null;
   return { minute, target };
 }
@@ -181,6 +194,27 @@ export function hasWorldTags(text: string): boolean {
 const AGE_META = /\{\s*(?:\d+\s*시간\s+\d+\s*분\s*전|유지\s*기한[^}]*)\s*\}/;
 const MARKERS = ['USER 관여 상태', 'RP 시간 제한', 'USER 관여 상태 규칙', 'USER 탐험 상태 규칙', '탐험 추적', '자동 종료'];
 
+/** 태그를 지우고 빈 줄만 남은 ``` 코드 상자 쌍을 버린다 (여는·닫는 울타리를 짝지어 본다) (전수검사 11-13) */
+function dropEmptyFences(lines: string[]): string[] {
+  const out: string[] = [];
+  let open = -1;
+  for (const l of lines) {
+    if (!/^\s*```/.test(l)) {
+      out.push(l);
+      continue;
+    }
+    if (open < 0) {
+      open = out.length;
+      out.push(l);
+    } else {
+      if (out.slice(open + 1).every((x) => !x.trim())) out.length = open;
+      else out.push(l);
+      open = -1;
+    }
+  }
+  return out;
+}
+
 /**
  * 저장·표시용 본문: 상황판 태그와 {N시간 N분 전} 메타, [AC] 줄을 지우고 일반 본문은 남긴다.
  * 상태창 [▣] 줄은 본문 맨 끝으로 옮긴다 (원본 envToEnd).
@@ -190,19 +224,24 @@ export function cleanOutput(text: string): string {
   const keep: string[] = [];
   let prev: string | null = null;
   let prevHadTag = false;
+  let anyTag = false;
   const ageOnly = (l: string | null) => l !== null && new RegExp(`^\\s*${AGE_META.source}\\s*$`).test(l);
   for (const raw of lines) {
     let line = raw;
     if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line))) line = '';
     if (prevHadTag) line = line.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), '');
     let count = 0;
-    line = line.replace(/\[(?:AN|IN|MS|AG)\s*\|[^\]]*\]/g, () => {
+    // [AC|…]도 줄 어디에 있든 태그만 지운다 (전수검사 11-13)
+    line = line.replace(/\[(?:AN|IN|MS|AG|AC)\s*\|[^\]]*\]/g, () => {
       count++;
       return '';
     });
     const hadTag = count > 0;
+    if (hadTag) anyTag = true;
     if (prev !== null && !(hadTag && ageOnly(prev))) keep.push(prev);
     if (hadTag) line = line.replace(new RegExp(AGE_META.source, 'g'), '');
+    // 태그를 지우고 「NEW」·글머리표만 남은 줄은 버린다 (전수검사 11-13)
+    if (hadTag && /^\s*(?:NEW\b)?\s*[-*•]?\s*(?:NEW\b)?\s*$/i.test(line)) line = '';
     prev = line;
     prevHadTag = hadTag;
   }
@@ -213,9 +252,9 @@ export function cleanOutput(text: string): string {
       envs.push(l.trim());
       return false;
     }
-    return !/^\s*\[AC\s*\|/.test(l) && !/^\s*\[◎\s*\|/.test(l);
+    return !/^\s*\[◎\s*\|/.test(l);
   });
-  let s = body.join('\n').replace(/\n\s*\n\s*\n+/g, '\n\n').trim();
+  let s = (anyTag ? dropEmptyFences(body) : body).join('\n').replace(/\n\s*\n\s*\n+/g, '\n\n').trim();
   if (envs.length) s = (s ? `${s}\n` : '') + envs.join('\n');
   return s;
 }

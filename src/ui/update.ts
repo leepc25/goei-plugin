@@ -6,6 +6,7 @@ import type { ChatContext } from '../host/risu';
 import { fetchPictures } from '../host/picpack';
 import { dropAssets, planPictures, type PicPlan } from '../core/pictures';
 import { forgetImages } from './images';
+import { loadModuleAssets } from '../host/assets';
 import type { SettingsEnv } from './settings';
 
 const esc = (s: unknown) =>
@@ -281,7 +282,11 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
       // 새 카드에서 뺀 사진(옛 요원 그림 등)은 카드에서도 뺀다. 직접 넣은 사진은 매니페스트에 없어 그대로
       if (pics.drop.length) plan.next.additionalAssets = dropAssets(plan.next.additionalAssets ?? char.additionalAssets, pics.drop) as typeof plan.next.additionalAssets;
       await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
-      if (pics.get.length || pics.drop.length) forgetImages();
+      if (pics.get.length || pics.drop.length) {
+        forgetImages();
+        // 채팅 속 그림 태그가 보는 에셋 목록도 다시 읽는다 (안 읽으면 새 표정 그림이 창을 다시 열 때까지 안 뜸. 전수검사 11-13)
+        await loadModuleAssets().catch(() => false);
+      }
       updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요.${pics.get.length ? ` 사진 ${pics.get.length}장도 바꿨어요.` : ''}${pics.drop.length ? ` 안 쓰는 사진 ${pics.drop.length}장은 뺐어요.` : ''} 채팅을 다시 열면 새 내용이 보여요.`;
       updateUi.payload = null;
       updateUi.plan = null;

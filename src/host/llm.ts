@@ -7,7 +7,7 @@ import { applyAdvanced } from '../core/advanced';
 import { retryAnalyze } from '../core/craft';
 import { guideOr } from '../core/guides';
 import { imageMissingLine } from '../core/attach';
-import { progressCallChunk, progressCallEnd, progressCallStart, progressTurn } from '../core/progress';
+import { progressCallChunk, progressCallEnd, progressCallStart, progressCallTokens } from '../core/progress';
 export type ModelChoice = 'main' | 'aux';
 
 export interface LlmMessage {
@@ -68,6 +68,21 @@ async function withPhotos(messages: (LlmMessage & { images?: string[] })[]): Pro
   );
 }
 
+/** 모델 호출 시간 제한 (전수검사 11-13 나-7, 사용자 결정 (2)): 응답이 이만큼 오지 않으면(받는 중이면 마지막 조각부터) 실패로 본다.
+ * 모델 연결이 멈춰도 응답 뒤 처리(갱신기·이미지 태그 보충)가 채팅을 영영 묶어 두지 않게. raw 'timeout' 이라 일시 오류로 다시 보낸다 */
+const MODEL_IDLE_MS = 300_000;
+function idleLimit<T>(run: (tick: () => void) => Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return new Promise<T>((resolve, reject) => {
+    const arm = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => reject(new LlmError(`모델이 ${MODEL_IDLE_MS / 1000}초 동안 응답하지 않아 멈췄어요. Risu의 모델 연결을 확인해 주세요.`, 'timeout')), MODEL_IDLE_MS);
+    };
+    arm();
+    run(arm).then(resolve, reject).finally(() => clearTimeout(timer));
+  });
+}
+
 /** staticModel: 기능별 전용 모델 ID (있으면 메인·보조 대신 그 모델) */
 export async function runModel(messages: LlmMessage[], model: ModelChoice, staticModel?: string, label = '기타'): Promise<string> {
   // 호출 흐름 기록 (host/trace.ts): 성공·실패 모두 한 건으로 남긴다
@@ -81,8 +96,7 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice, stati
   const countReq = (): number => {
     if (reqTokens === undefined) {
       reqTokens = tokens(req);
-      const row = progressTurn()?.calls.find((c) => c.id === pid);
-      if (row) row.reqTokens = reqTokens; // 진행 창은 1초마다 다시 그린다
+      progressCallTokens(pid, reqTokens);
     }
     return reqTokens;
   };
@@ -95,7 +109,10 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice, stati
     void traceCall({ label, at, ms, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, requestTokens: countReq(), response: clip(response), responseChars: response.length, responseTokens }).catch(() => {});
   };
   try {
-    const text = await runModelRaw(messages, model, staticModel, (n) => progressCallChunk(pid, n));
+    const text = await idleLimit((tick) => runModelRaw(messages, model, staticModel, (n) => {
+      tick();
+      progressCallChunk(pid, n);
+    }));
     done(true, text);
     return text;
   } catch (error) {
@@ -118,7 +135,7 @@ async function runModelRaw(messages: LlmMessage[], model: ModelChoice, staticMod
   else if (res && typeof res === 'object') {
     const r = res as { type?: string; result?: unknown };
     if (r.type === 'fail' && /Plugin calls are blocked/i.test(String(r.result ?? ''))) {
-      throw new LlmError('Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.', String(r.result));
+      throw new LlmError('Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 이 기능이 쓰는 모델(또는 Risu의 메인·보조 모델)을 플러그인 모델이 아닌 것으로 바꿔 보세요.', String(r.result));
     }
     if (r.type === 'fail') throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.\n${String(r.result ?? '').slice(0, 300)}`, String(r.result ?? ''));
     if (r.type === 'multiline' && Array.isArray(r.result)) text = (r.result as [string, string][]).filter(([role]) => role === 'char').map(([, t]) => t).join('\n');

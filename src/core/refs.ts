@@ -113,7 +113,8 @@ function readBook(books: LoreEntry[], name: string, env: CbsEnv): string[] {
   const key = name.trim().toLowerCase();
   return books
     .filter((e) => String(e.comment ?? '').trim().toLowerCase() === key && allowedBook(e))
-    .map((e) => stripModules(evaluate(String(e.content ?? ''), env)))
+    // 첫 줄의 Risu 표식 @@dont_activate 는 모델에게 뜻 없는 줄이라 뗀다 (전수검사 11-13)
+    .map((e) => stripModules(evaluate(String(e.content ?? '').replace(/^\s*@@dont_activate[ \t]*\r?\n?/, ''), env)))
     .filter(Boolean);
 }
 

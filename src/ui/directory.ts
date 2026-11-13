@@ -51,10 +51,12 @@ export const dirUi = {
   pickQ: '',
   /** 얼굴 틀을 맞추는 항목 (열쇠) */
   crop: '',
+  /** 지우기 확인 중인 항목 「base|거점 이름」·「scene|칸 코드|장면 번호」 (전수검사 11-13, 사용자 승인: 묶음 지우기처럼 한 번 더 묻기) */
+  confirmDel: '',
 };
 
 export function resetDirectory(): void {
-  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', help: false, pick: '', pickQ: '', crop: '' });
+  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', help: false, pick: '', pickQ: '', crop: '', confirmDel: '' });
 }
 
 const esc = (s: unknown) =>
@@ -526,7 +528,8 @@ function basePanel(b: BaseRow, ctx: ChatContext, d: Directory): string {
     ${input(k('aliases'), b.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
     <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
       <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc(b.name)}">지우기</button></div>
+      ${dirUi.confirmDel === `base|${b.name}` ? '' : `<button class="gx-mini danger" data-action="dir-base-del" data-value="${esc(`ask|${b.name}`)}">지우기</button>`}</div>
+    ${dirUi.confirmDel === `base|${b.name}` ? `<div class="gx-hint">「${esc(b.name)}」 거점을 지울까요? <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc(`yes|${b.name}`)}">지우기</button><button class="gx-mini" data-action="dir-base-del" data-value="${esc(`no|${b.name}`)}">취소</button></div>` : ''}
   </div>`;
 }
 
@@ -1163,11 +1166,20 @@ export async function handleDirectory(action: string, value: string | undefined,
       dirUi.done = '';
       break;
     }
-    case 'dir-base-del':
-      d.bases = d.bases.filter((b) => b.name !== v);
-      dirUi.open = '';
-      dirUi.done = '';
+    case 'dir-base-del': {
+      // ask → 「지울까요? 지우기/취소」, yes 일 때만 지운다 (전수검사 11-13, 사용자 승인)
+      const [how, ...rest] = v.split('|');
+      const name = rest.join('|');
+      if (how === 'ask') dirUi.confirmDel = `base|${name}`;
+      else if (how === 'no') dirUi.confirmDel = '';
+      else if (how === 'yes' && dirUi.confirmDel === `base|${name}`) {
+        dirUi.confirmDel = '';
+        d.bases = d.bases.filter((b) => b.name !== name);
+        dirUi.open = '';
+        dirUi.done = '';
+      }
       break;
+    }
     // ── 시작 화면 (설정 창 세계 › 시작 화면, ui/editor/start.ts) ──
     case 'dir-start-open':
       stUi.sel = stUi.sel === v ? '' : v;
@@ -1254,7 +1266,15 @@ export async function handleDirectory(action: string, value: string | undefined,
       break;
     }
     case 'dir-scene-del': {
-      const [code, fm] = v.split('|');
+      // ask|칸|장면 → 「지울까요? 지우기/취소」, yes 일 때만 지운다 (전수검사 11-13, 사용자 승인). 앞말 없는 옛 꼴 「칸|장면」은 바로 지운다
+      const parts = v.split('|');
+      const how = ['ask', 'yes', 'no'].includes(parts[0] ?? '') ? parts.shift() : 'now';
+      const [code, fm] = parts;
+      const key = `scene|${code}|${fm}`;
+      if (how === 'ask') { dirUi.confirmDel = key; break; }
+      if (how === 'no') { dirUi.confirmDel = ''; break; }
+      if (how === 'yes' && dirUi.confirmDel !== key) break;
+      dirUi.confirmDel = '';
       const rows = d.scenes.세력?.[code ?? ''];
       if (rows && fm && Number(fm) >= CUSTOM_FM) delete rows[fm];
       dirUi.done = '';

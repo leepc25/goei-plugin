@@ -38,7 +38,7 @@ import { guideSections } from '../core/guides';
 /** Router 기본 지침: 지침 탭 「Router」의 ROLE·RULES 절 */
 const routerBase = () => { const g = guideSections('Router'); return [g.ROLE, g.RULES].filter((x) => x?.trim()).join('\n'); };
 const directorBase = () => { const g = guideSections('Director'); return { facts: g.FACTS, scene: g.SCENE }; };
-import { parseIdentity } from '../core/people/identity';
+import { parseIdentity, rankLevel } from '../core/people/identity';
 import { AFF_MAX, AFF_MIN, type Identity, type PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
@@ -186,7 +186,10 @@ export function statusIdentity(chat: Chat): ReturnType<typeof parseIdentity> {
     const tags = findStatusTags(String(list[i].data ?? ''));
     const t = tags.at(-1);
     if (!t) continue;
-    return t.identity ? parseIdentity(t.identity, messageKey(list[i], i)) : null;
+    const id = t.identity ? parseIdentity(t.identity, messageKey(list[i], i)) : null;
+    // 가짜 관리국(B00) 소속은 자기 조직을 「관리국」이라 부른다 (Faction 지침). 「가짜」 없이 적힌 관리국은 이 채팅의 소속으로 읽는다 (전수검사 11-13)
+    if (id && id.faction === 'A00' && userFaction(chat) === 'B00' && !/가짜|fake/i.test(t.identity)) return { ...id, faction: 'B00', level: rankLevel('B00', id.rank) };
+    return id;
   }
   return null;
 }

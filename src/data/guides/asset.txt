@@ -50,7 +50,7 @@ Correct output:
 ### POSITIVE (do this)
 Narrative:
 [1] {first} walked into the room with a quiet smile.
-[2] She glanced at the figure standing by the desk, her expression hardening into something sharper.
+[2] {first} glanced at the figure standing by the desk, her expression hardening into something sharper.
 
 Correct output:
 [{"line":1,"tag":"<img=\"{first}_default\">"},{"line":2,"tag":"<img=\"{first}_serious\">"}]
@@ -68,6 +68,14 @@ Correct output:
 
 @@SECTION NO_TAG_USER
 - DO NOT tag {{user}}, the narrator, or undefined NPCs.
+@@END
+
+@@SECTION MAIN_USER_RULE
+- Do not create tags for {{user}}.
+@@END
+
+@@SECTION MAIN_USER_SKIP
+{{user}}
 @@END
 
 @@SECTION ALIASES_HEAD

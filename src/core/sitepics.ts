@@ -3,6 +3,7 @@
 // 목록은 명부(인물·괴이·특수)에서 그림이 있는 것만 자동으로 만든다. 보낼 곳·때는 모델이 정한다 (제한 없음).
 import { readDirectory, type AgentRow, type PlaceRow } from './world/directory';
 import { EMOTIONS } from './imgtag';
+import { fillVars } from './guides';
 import type { LoreEntry } from './types';
 
 type Char = { globalLore?: LoreEntry[] } & Record<string, unknown>;
@@ -52,25 +53,36 @@ function pics(char: Char): Pic[] {
   return out;
 }
 
-/** 모델에게 줄 목록 (지침의 __SITE_PICS__ 자리) */
-export function sitePicList(char: Char): string {
+/** 모델에게 줄 목록 (지침의 __SITE_PICS__ 자리).
+ *  sec: 지침 절 읽기 (PICS_NONE · PICS_PEOPLE · PICS_EXPR · PICS_THINGS, {list} 자리). 절이 없으면 코드에 남긴 옛 글 (전수검사 11-13) */
+export function sitePicList(char: Char, sec?: (name: string) => string | null | undefined): string {
   const list = pics(char);
   const people = list.filter((p) => p.person).map((p) => p.name);
   const things = list.filter((p) => !p.person).map((p) => p.name);
-  if (!people.length && !things.length) return 'Available pictures: none.';
+  const line = (name: string, old: string, items?: string[]): string => {
+    const t = sec?.(name)?.trim() || old;
+    return items ? fillVars(t, { list: items.join(', ') }) : t;
+  };
+  if (!people.length && !things.length) return line('PICS_NONE', 'Available pictures: none.');
   return [
-    people.length ? `People (may add _expression): ${people.join(', ')}` : '',
-    people.length ? `Expressions: ${[...EMOTIONS].join(', ')}` : '',
-    things.length ? `Anomalies, people and places (no expression): ${things.join(', ')}` : '',
+    people.length ? line('PICS_PEOPLE', 'People (may add _expression): {list}', people) : '',
+    people.length ? line('PICS_EXPR', 'Expressions: {list}', [...EMOTIONS]) : '',
+    things.length ? line('PICS_THINGS', 'Anomalies, people and places (no expression): {list}', things) : '',
   ].filter(Boolean).join('\n');
 }
+
+/** 표정 (긴 것부터: angry smile 이 smile 보다 먼저) */
+const EMO_LONGEST = [...EMOTIONS].sort((a, b) => b.length - a.length);
 
 /** [사진:…] 안의 글 → 에셋 이름. 목록에 없으면 null (그때는 사진 설명 틀로 보여 준다) */
 export function resolveSitePic(char: Char, raw: string): string | null {
   const text = raw.trim();
-  const cut = text.lastIndexOf('_');
-  const expr = cut > 0 ? text.slice(cut + 1).trim().toLowerCase() : '';
-  const name = cut > 0 && EMOTIONS.has(expr) ? text.slice(0, cut).trim() : text;
+  // 끝이 맞는 가장 긴 표정을 고른다: 띄어쓰기 표정(forced smiling)을 밑줄로 써도 받는다 (전수검사 11-13)
+  const low0 = text.toLowerCase();
+  let at = -1;
+  const hit = EMO_LONGEST.find((e) => (at = low0.search(new RegExp(`_\\s*${e.replace(/ /g, '[ _]')}$`))) > 0);
+  const expr = hit ?? '';
+  const name = hit ? text.slice(0, at).trim() : text;
   const low = name.toLowerCase();
   const p = pics(char).find((x) => x.terms.some((t) => t && t.toLowerCase() === low));
   if (!p) return null;

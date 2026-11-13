@@ -17,7 +17,7 @@ import { userTurns } from '../core/request';
 import { userInfo } from '../host/user';
 import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
-import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsNumVars, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, turnStep, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
+import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, HsError, hsNumVars, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, turnStep, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { ensureHomeshop, homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
 import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
@@ -129,7 +129,12 @@ async function ask(ctx: ChatContext, env: HsEnv): Promise<void> {
     const show = readShow(ctx.chat.scriptstate);
     const g = genSettings(ctx.chat.scriptstate);
     const moods = moodMap(homeshopArt()?.pack ?? null);
-    const { value } = await generate(showPrompt(ctx, show, s), s.shop.model, (raw) => parseShow(raw, moods), { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${HS_NAME} 편성` });
+    const { value } = await generate(showPrompt(ctx, show, s), s.shop.model, (raw) => {
+      const r = parseShow(raw, moods);
+      // 값은 할부(「무이자 N회」)만: 원 값이 오면 그 편성을 다시 받는다 — 주문은 가계부를 건드리지 않아 공짜가 되므로 (전수검사 11-13)
+      if (r.items.some((x) => x.price > 0 && !installments(x))) throw new HsError('값은 「무이자 N회」로 적어야 해요 (원 값이 왔어요).');
+      return r;
+    }, { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${HS_NAME} 편성` });
     const cur = env.current();
     if (!cur || chatKey(cur) !== chatKey(ctx)) return;
     const key = lastBot(cur.chat)?.key ?? '';
@@ -432,8 +437,8 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
 
 function scaleOf(s: HsSettings, phone: boolean): number {
   const v: HsScale = phone ? s.scalePhone : s.scalePc;
-  // 0 = 칸 폭에 맞춤 (재생기가 꽂힌 칸의 폭으로 잰다)
-  if (v === 'fit') return 0;
+  // -1 = 폭 맞춤: 높이 제한 없이 칸 폭에 꼭 맞춘다 (ui/hsplayer.ts, 전수검사 11-13)
+  if (v === 'fit') return -1;
   if (v !== 'auto') return Number(v);
   // 자동 = 보이는 자리에 맞춤 (PC·폰 모두, ui/hsplayer.ts fitScale)
   void phone;

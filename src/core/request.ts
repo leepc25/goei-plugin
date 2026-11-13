@@ -66,7 +66,12 @@ export function unwrapScenes<M extends PromptMessage>(messages: M[], o?: { cardI
     const END = '%%/SCENE_CARD%%';
     const end = m.content.lastIndexOf(END);
     const tail = end >= 0 ? m.content.slice(end + END.length).trim() : '';
-    let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
+    let card = end >= 0 ? m.content.slice(0, end + END.length) : m.content;
+    // 이미 답이 붙은 지난 지시문은 지시 문장(COMMON·OPENING·CONTINUATION)을 빼고 맥락(맨 끝 CONTEXT 절)만 남긴다 (전수검사 11-13 나-12)
+    if (messages.slice(i + 1).some((n) => n?.role === 'assistant')) {
+      card = card.replace(/(%%SCENE_CARD:[0-9a-f]+%%\r?\n)([\s\S]*?)(\r?\n%%\/SCENE_CARD%%)/g, (_, a: string, body: string, b: string) => a + (body.split(/\r?\n\r?\n/).at(-1) ?? body) + b);
+    }
+    let content = stripSceneCard(card);
     const extra = tail ? [tail] : [];
     const next = i === lastCard ? undefined : messages[i + 1];
     if (next?.role === 'user' && typeof next.content === 'string' && !hasSceneCard(next.content)) {

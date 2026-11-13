@@ -70,11 +70,14 @@ export function affinityView(person: Person, changes: Change[], folded = 0, o: A
   return { value, stage, last };
 }
 
-/** 호칭 현재값: 고정이면 시작값, 아니면 마지막 살아 있는 address 변경 */
+/** 호칭 현재값: 고정이면 시작값, 아니면 호칭은 호칭이 있는 마지막 address 변경, 말투는 말투가 있는 마지막 address 변경 */
 export function addressOf(person: Person, changes: Change[]): { toUser: string; register: Person['address']['register'] } {
   if (person.address.pin) return { toUser: person.address.toUser, register: person.address.register };
-  const last = [...changes].reverse().find((c) => c.who === person.name && c.kind === 'address' && c.toUser);
-  return last ? { toUser: last.toUser!, register: last.register ?? person.address.register } : { toUser: person.address.toUser, register: person.address.register };
+  // 호칭·말투를 따로 읽는다: 말투만 고친 수동 변경도 반영 (전수검사 11-13)
+  const mine = [...changes].reverse().filter((c) => c.who === person.name && c.kind === 'address');
+  const named = mine.find((c) => c.toUser);
+  const reg = mine.find((c) => c.register)?.register;
+  return { toUser: named?.toUser ?? person.address.toUser, register: reg ?? person.address.register };
 }
 
 /** 취향 띠 현재값: 마지막 살아 있는 taste 변경의 띠. 아직 판정 전이면 null */

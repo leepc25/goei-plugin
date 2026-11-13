@@ -156,7 +156,7 @@ export function walletTools(ctx: ChatContext): string {
 export function walletPane(ctx: ChatContext, kind: 'won' | 'p' = 'won'): string {
   walletUi.kind = kind;
   if (kind === 'won' && !walletOn(ctx)) {
-    return `<div class="gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 상황판 → 상태창 칸에서 켜면 가계부가 생겨요.</div></div>`;
+    return `<div class="gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 소지품 → 가계부에서 켜면 가계부가 생겨요.</div></div>`;
   }
   const { rows, today, start } = rowsOf(ctx);
   const sum = (f: (r: Row) => boolean) => rows.filter(f).reduce((n, r) => n + r.e.amount, 0);

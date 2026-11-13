@@ -3,7 +3,7 @@
  "kind": "org",
  "records": {
   "관리국": {
-   "keys": "관리국",
+   "keys": "Management Bureau, 관리국",
    "fields": {
     "intro": "A secret organization that protects humanity and its civilization from abnormal phenomena. The Bureau relies on a few elite superhumans rather than mass manpower, hides in plain sight through perception technology.",
     "doctrine": "- Codename system: The codename system is total. From the moment of issue the real name is forbidden, and the Bureau performs recognition-alteration on everyone around the recruit.\n- Its work is fourfold: control, exterminate, surveil, and contain.\n- Rule-sheet placement: for anomalies that cannot be capped or cleared, the Bureau writes survival rulebooks and delivers them inside.\n- Outside organizations and practitioners: the Bureau recognizes no independent authority over the abnormal. Groups may be watched, pressured, temporarily cooperated with, or exploited when necessary, but never accepted as equals.",
@@ -27,7 +27,7 @@
   "가짜 관리국": {
    "keys": "Fake Anomaly Management Bureau, Fake Management Bureau, Fake Bureau, 가짜 관리국, 가짜관리국",
    "fields": {
-    "intro": "the Bureau's absolute enemy and an organizational anomaly officially classified as \"anomaly; communication impossible.\" No recognition, negotiation, or coexistence is permitted; every confirmed manifestation is subject to immediate elimination.\n\nThe organization that controls this world's secrets under the creed, \"We serve mankind from the world's other side.\" Its agents call anomalies deviant phenomena and hostile entities 'I-mul', and answer both with systematized force. To ordinary people, it is an urban legend about black-suited men who come for those who learn too much.\n\n- Attire: black suits; all listed officers except Sa-jang wear sunglasses.\n- Sword Corps: Equipment: katanas.",
+    "intro": "the Bureau's absolute enemy and an organizational anomaly officially classified as \"anomaly; communication impossible.\" No recognition, negotiation, or coexistence is permitted; every confirmed manifestation is subject to immediate elimination.\n\nThe organization that controls this world's secrets under the creed, \"We serve mankind from the world's other side.\" Its agents call anomalies deviant phenomena and hostile entities 'I-mul', and answer both with systematized force. To ordinary people, it is an urban legend about black-suited men who come for those who learn too much.\n\n- Attire: black suits; all listed officers except Sa-jang wear sunglasses.",
     "doctrine": "##### Doctrine of Force\n- Immediate firepower: mass agents in black suits and sunglasses, submachine guns first, and a professional Sword Corps for what bullets cannot solve.\n- Civilian policy: no survivors are left in a corrupted zone. Any civilian may be foreign matter wearing a face, and any true human still inside is already lost.\n- Public policy: the truth is suppressed because \"the more who know, the worse it gets.\"\n- Anomalous powers and their users: all supernatural abilities, entities, organizations, and practitioners are classified as foreign matter or its collaborators, regardless of whether they call their power miracle, faith, commerce, or sorcery. Parley is forbidden and engagement is authorized.",
     "hq": "##### Headquarters\n- HQ Location: Jongno-gu, Seoul\n- Headquarters is a large office building staffed wall to wall with black suits. It contains administration, team offices, the armory, auditorium, underground hall, a vast indoor training complex where the Sword Corps drills, and sealed basement corridors leading to the Database chamber.",
     "structure": "The Bureau runs on mass manpower organized into specialist corps.\n- Sword Corps (검사부대): The Bureau's strongest strike force, an elite close-combat unit for foreign matter that firepower cannot stop. The standard weapon is a Bureau-made black katana, effectively indestructible. A bounding run in which each lateral sway adds inexplicable acceleration beyond human limits.\n- Suppression Corps (진압부대): open-field mass engagement. Project suppressive fire in disciplined sectors.\n- Incineration Corps (소각부대): Burn corrupted zones to the foundations, with no-survivor perimeters enforced as written.\n- Interrogation and Information Security: The disposition of every captured civilian, the recruitment pitch for the useful, extraction routing for the failed.\n- Recruit Education: operates the underground hall, the Education Device, and the orientation ceremony.\n- Above the corps sit the Office of the Guk-jang, the Bureau's political and institutional apparatus, and the Office of the Sa-jang, which no formation chart explains.",
@@ -57,7 +57,13 @@
     "인재개발부": "Recruit Education",
     "진압부대": "Suppression Corps",
     "검사부대": "Sword Corps"
-   }
+   },
+   "roster_notes": [
+    {
+     "department": "검사부대",
+     "label": "Equipment: katanas."
+    }
+   ]
   },
   "백일몽": {
    "keys": "Baekilmong, 백일몽, 백일몽 주식회사",
@@ -125,7 +131,7 @@
     "현장탐사팀 R조": "Field Exploration Team",
     "현장탐사팀 Y조": "Field Exploration Team",
     "연구팀": "Research Team 1",
-    "메뉴얼 심사팀": "Administrative Support",
+    "매뉴얼 심사팀": "Administrative Support",
     "경비팀": "Guard Team"
    }
   },
@@ -147,14 +153,20 @@
    "title": "Special Disaster Response Association (특수재난대응협회) / SDRA"
   },
   "중림 지하상가": {
-   "keys": "Jungrim, Jungrim Underground, 중림",
+   "keys": "Jungnim, Jungnim Underground, Jungrim, Jungrim Underground, 중림",
    "fields": {
-    "intro": "The underground economy beneath Jungnim-dong for goods and services no legal channel provides, run by fixers, fences, backalley doctors, and loan sharks. Business is openly predatory, payment comes first.\n\n- The Jungrim Underground Shopping Center is an informal underground economy dealing in goods and services that cannot be obtained through legal or semi-legal channels.\n- It is not a faction or unified organization, but a loose network of self-interested operators held together by profit, necessity, and mutual distrust.\n- It located beneath Jungrim-dong, Seoul. At street level, it appears to be little more than a failing basement mall filled with aging shops and low-traffic vendors.",
+    "intro": "The underground economy beneath Jungnim-dong for goods and services no legal channel provides, run by fixers, fences, backalley doctors, and loan sharks. Business is openly predatory, payment comes first.\n\n- The Jungnim Underground Shopping Center is an informal underground economy dealing in goods and services that cannot be obtained through legal or semi-legal channels.\n- It is not a faction or unified organization, but a loose network of self-interested operators held together by profit, necessity, and mutual distrust.\n- It located beneath Jungnim-dong, Seoul. At street level, it appears to be little more than a failing basement mall filled with aging shops and low-traffic vendors.",
     "assets": "##### Characteristic\n- Business within the Shopping Center is openly predatory. Prices are inflated, information is treated as a commodity, and trust is both scarce and expensive. There is no expectation of loyalty, and refunds are effectively nonexistent.\n- Disputes are settled privately between the parties involved or submitted to a broker for arbitration, with no recognized process for appeal.\n- Cash remains the standard form of payment, but anomalous materials, Bureau equipment, favors, services, and personal collateral are also accepted.\n- Debt is enforced without exception. Default usually results in exclusion from the market, followed by recovery through hired intermediaries.",
     "personnel": "##### Core Participants\n- Fixers connect buyers with sellers, contractors with clients, and available personnel with jobs.\n- Fence Operations distribute stolen, confiscated, or unregistered anomalous items, including Bureau equipment and unauthorized Baekilmong products.\n- Backalley Doctors provide unlicensed treatment for ordinary injuries and anomalous conditions.\n- Loan Sharks provide high-risk loans to people access to legitimate financial institutions. Their interest rates are extreme, and accepted collateral may include abilities, or body parts."
    },
    "extra": [],
-   "title": "Jungrim Underground Shopping Center (중림 지하상가)"
+   "title": "Jungnim Underground Shopping Center (중림 지하상가)",
+   "departments": {
+    "손길 의원": "",
+    "헐값 매입": "",
+    "대박 알선": "",
+    "영창 컨설팅": ""
+   }
   },
   "교황청": {
    "keys": "Blaret, 블라렛, Papal Court, Vatican, 교황청, 바티칸, Christian goods shop, 기독교 상점",
@@ -162,7 +174,10 @@
     "intro": "The Holy See's covert combat arm, dispatching battle nuns and paladins against vampires, sorcerers, and heresies. It operates in Korea under civilian cover, outside the institutional order, and cooperates only when a shared threat outranks doctrine.\n\n- The Holy See's covert combat arm: popes and clergy have secretly fought monsters throughout history, and its exorcism tradition is the stuff of legend even among rival factions.\n- Deploys special-class battle nuns, paladins, and crusader assets worldwide against vampires, sorcerers, and heresies; sorcerers regard Vatican paladins with genuine dread, and a witch of standing treats a slain paladin's relics as trophies of the highest grade\n- Maintains overseas stations under civilian cover; the Korean presence operates through a Christian goods shop (기독교 상점) whose blessed crosses and relics are genuine anti-vampire equipment\n- Classified by the Management Bureau as a hostile organization, though field-level pragmatic cooperation occurs when a shared threat outranks doctrine\n- Standing blood-feud hostility with the Islamic crusader force; their elites cannot share a room without hands drifting to weapons, and only third-party mediation keeps joint operations functional"
    },
    "extra": [],
-   "title": "The Vatican (교황청)"
+   "title": "The Vatican (교황청)",
+   "departments": {
+    "기독교 상점": ""
+   }
   },
   "이슬람": {
    "keys": "Islamic, Islam, Jihad, Saladin, 이슬람, 살라딘, 지하드",
@@ -170,22 +185,31 @@
     "intro": "The militant holy arm of Islam, whose champions summon legions of warrior spirits from Mecca. Like the Vatican it overwhelms sorcery as a matter of natural law, and the two share a standing blood-feud.\n\n- The militant holy arm of Islam, fielding jihad crusaders against supernatural threats; its apex operatives rank among the most dangerous individuals on the planet\n- Commands legions of warrior spirits: Mamluk heavy cavalry and crusader hosts summoned from Mecca, whose reserves are described as endless as fish in the ocean\n- Mecca functions as the faction's sanctum and arsenal; its champions can summon designated enemies to Mecca itself for judgment and execution\n- Clergy of this faction, like the Vatican's, hard-counter sorcerers; the mage world's failure to rise is attributed directly to the priesthoods' one-sided advantage over them\n- Standing blood-feud with the Vatican; the Management Bureau classifies the faction as untouchable, with standing orders to flee on sight of its champion"
    },
    "extra": [],
-   "title": "Islam"
+   "title": "Islam",
+   "departments": {
+    "이슬람 지하드": ""
+   }
   },
   "발푸르기스": {
-   "keys": "Walpurgis, 발푸르기스, Avensha, 아벤샤, 마도사",
+   "keys": "Walpurgis, 발푸르기스, 발푸르기스 협회, Avensha, 아벤샤, 마도사",
    "fields": {
     "intro": "The organized body of the world's sorcerers, ruled by the Society Head with the Ten Witches beneath. Individually its practitioners are devastating, but the priesthoods counter them so thoroughly that the mage world has never risen openly and survives hidden among humans.\n\n- The organized body of the world's sorcerers; a hierarchy crowned by the Society Head, beneath whom stand the Ten Witches, the faction's most renowned practitioners, with all lesser mages ranked far below\n- Mage culture is built on absolute seniority worship: juniors prostrate themselves before superior practitioners, self-abase in florid vocabulary, and treat murderous caprice from seniors as an occupational hazard; courtesy and lethality are not in tension\n- Sorcerers are individually powerful and collectively suppressed: the priesthoods (Vatican, Islam) hard-counter magecraft so thoroughly that the mage world has never risen openly, surviving instead through concealment among humans and evasion tradecraft\n- Classified as a hostile grouping by the Management Bureau; hunted on identification by both priesthoods"
    },
    "extra": [],
-   "title": "Walpurgis Society (발푸르기스 협회)"
+   "title": "Walpurgis Society (발푸르기스 협회)",
+   "departments": {
+    "발푸르기스 협회": ""
+   }
   },
   "흡혈귀": {
    "keys": "Vampires, 흡혈귀, Secriem, 세크리엠",
    "fields": {
     "intro": "An ancient bloodline power under the True Ancestor, expanding by turning humans into ghouls and raising the chosen into vampires. Its society is riven by factional and territorial struggle. The Vatican hunts it, and the classic banes hold in full.\n\n- An ancient bloodline power structured around the True Ancestor at its apex, descending through elder vampires to fledglings and ghouls; vampires convert humans by bite into ghouls, and cultivate chosen ghouls upward into true vampires\n- Vampire society is intensely political: factions, territorial claims, and independence bids are constant, and powerful individuals surface publicly when building their own power bases\n- Standard vampiric capabilities include superhuman speed sufficient to dodge gunfire on reaction, bat-swarm dispersal, blood-blade projection, regeneration through feeding, and mass hypnosis via ocular wave\n- Classic banes apply with full force: garlic, holy power, and blessed implements; silver wounds but does not decide; sunlight constrains operations\n- Hunted by the Vatican as a standing mandate and monitored by the Management Bureau; a True Ancestor-level manifestation is treated by every faction as a regional catastrophe in progress"
    },
-   "extra": []
+   "extra": [],
+   "departments": {
+    "흡혈귀": ""
+   }
   },
   "무명찬란교": {
    "keys": "Mumyeong, Chanran-gyo, Nameless Brilliant, Nameless Radiance, 무명찬란교, 이름님",
@@ -217,7 +241,7 @@
   "세계정치 게시판": {
    "keys": "World Politics Forum, WPF, 세계정치, 세계 정치, 세정게, 세계정치 게시판",
    "fields": {
-    "intro": "An internet board with a madhouse reputation, where a meaningful share of the lunacy is real survivor testimony. Both Bureaus monitor it, and users who post or search carelessly disappear.{{getvar::fac_extra}}\n\n##### Overview\n- An internet board nominally about world politics, but in practice one of the internet's densest concentrations of conspiracy theories: the deep state, aliens, brain parasites, rigged lotteries, and similar claims. Its public reputation is that of a gathering place for lunatics.\n- That reputation conceals the fact that a meaningful portion of its content is true. Many of its regular users are survivors of genuine anomalous encounters sharing what they witnessed.\n- The board's knowledge is fragmentary and limited to the survivor's side of events. Its users know that suited agents abduct people and that those taken never return, but they do not know who the agents are, which organization they belong to, or why they take people.\n- Genuine testimony and fabrication look almost identical on the board and are mocked equally. Even so, reports of real phenomena often appear there years before any organization acknowledges them, making the board a genuine source of early warning.",
+    "intro": "An internet board with a madhouse reputation, where a meaningful share of the lunacy is real survivor testimony. Both Bureaus monitor it, and users who post or search carelessly disappear.\n\n##### Overview\n- An internet board nominally about world politics, but in practice one of the internet's densest concentrations of conspiracy theories: the deep state, aliens, brain parasites, rigged lotteries, and similar claims. Its public reputation is that of a gathering place for lunatics.\n- That reputation conceals the fact that a meaningful portion of its content is true. Many of its regular users are survivors of genuine anomalous encounters sharing what they witnessed.\n- The board's knowledge is fragmentary and limited to the survivor's side of events. Its users know that suited agents abduct people and that those taken never return, but they do not know who the agents are, which organization they belong to, or why they take people.\n- Genuine testimony and fabrication look almost identical on the board and are mocked equally. Even so, reports of real phenomena often appear there years before any organization acknowledges them, making the board a genuine source of early warning.",
     "structure": "##### User Structure\n- Floaters are the anonymous majority: tourists, mockers, and one-time survivors who post an experience once and never mention it again.\n- Named regulars use fixed nicknames and accumulate traceable posting histories. They are either unaware of the risk or skilled at concealing themselves.\n- True regulars form the inner circle. They retain their board nicknames but communicate through a separate invitation-only hidden messenger, and every member has survived at least one genuine anomalous encounter.\n- The Sub-moderator serves as the board's visible manager. They oversee the deletion of dangerous exposure posts, represent the group in negotiations, and conceal their identity, methods, and information holdings.",
     "personnel": "##### The Survivor Collective\n- The group existed before internet forums and now uses the World Politics Forum as its public gathering place.\n- Its principle is that someone untouched by the hidden world is safest knowing nothing, while someone already exposed to it may die without information. It therefore collects information about the hidden world for survival and trades that information when necessary. Loyalty among members is genuine, and anyone who obtains survival-critical information passes it to the group."
    },
@@ -260,7 +284,8 @@
     }
    ],
    "title": "Baekilmong Namhae Branch (백일몽 남해지사)",
-   "noSummary": true
+   "noSummary": true,
+   "relOff": true
   },
   "민간인": {
    "keys": "",
@@ -285,6 +310,7 @@
     "intro": "A singular art entity, the only individual counted among the great powers. It kills people as compositions and never forgets a work. Official guidance for an encounter is to run."
    },
    "extra": [],
+   "title": "The Aestheticism",
    "summaryOnly": true
   }
  }

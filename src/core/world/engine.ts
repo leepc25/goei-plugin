@@ -393,6 +393,8 @@ export function expire(w: WorldState, s: WorldSettings) {
 export function tick(w: WorldState, c: Catalog, s: WorldSettings, rng: Rng) {
   w.epoch += 1;
   w.ended = (w.ended ?? []).filter((e) => e.until >= w.epoch);
+  // 지난 회차의 이름 막기는 더 뜻이 없으니 지운다 (안 지우면 채팅 저장값이 계속 커졌다) (전수검사 11-13)
+  for (const k of Object.keys(w.blocks ?? {})) if (w.blocks[k] < w.epoch) delete w.blocks[k];
   expire(w, s);
   const groups = ['preset', 'random', 'incident', 'mystic'];
   for (let i = groups.length - 1; i > 0; i--) {

@@ -3,9 +3,10 @@
 import { buildClosures, journalSettings, readJournal, readReports, recordVars, rewindClosures } from '../journal';
 import { messageKey } from '../people/store';
 import { findFaction } from '../scenarios';
-import type { Chat, ScriptState } from '../types';
-import type { Catalog } from './catalog';
-import { applyOutput, bootstrap, parseWorld, reports, serializeWorld, type Rng, type WorldSettings, type WorldState } from './engine';
+import type { Chat, LoreEntry, ScriptState } from '../types';
+import { parseCatalog, type Catalog } from './catalog';
+import { worldSettings } from '../settings';
+import { applyOutput, bootstrap, cancelMission, parseWorld, reports, serializeWorld, type Rng, type WorldSettings, type WorldState } from './engine';
 import { cleanOutput, hasWorldTags } from './tags';
 import { splitThoughts } from '../thoughts';
 
@@ -55,6 +56,18 @@ export function worldVars(w: WorldState, c: Catalog, s: WorldSettings, faction: 
     $ms_report: r.ms,
     $ag_report: r.ag,
   };
+}
+
+/** 안 보낸 임무 요청 카드를 취소할 때: 걸어 둔 커스텀 임무(an·ms·in)를 함께 거둔 상황판 변수. 걸린 게 없으면 null (전수검사 11-13) */
+export function dropPendingVars(chat: Chat, lore: LoreEntry[] | undefined): ScriptState | null {
+  const w = readWorld(chat);
+  if (!w || !(['an', 'ms', 'in'] as const).some((k) => w.pending?.[k])) return null;
+  for (const k of ['an', 'ms', 'in'] as const) cancelMission(w, k);
+  try {
+    return worldVars(w, parseCatalog(lore), worldSettings(lore, chat.scriptstate), String(chat.scriptstate?.$st_faction ?? ''));
+  } catch {
+    return null; // 카탈로그를 못 읽으면 취소(메시지 지우기)만 한다
+  }
 }
 
 /** START 때 넣을 상황판 변수 (첫 발생 추첨 포함) */

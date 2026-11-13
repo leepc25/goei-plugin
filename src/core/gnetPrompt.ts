@@ -48,7 +48,8 @@ export function gnetBooks(src: RefSource): GnetBooks {
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
-        .replace(/__SITE_PICS__/g, () => sitePicList(src.char))
+        // 사진 목록 머리말도 이 사이트 지침의 절 (PICS_*. 전수검사 11-13)
+        .replace(/__SITE_PICS__/g, () => sitePicList(src.char, (k) => g[k]))
         .replace(/__GN_POST_RANGE__/g, countText(cs.post))
         .replace(/__GN_CMT_RANGE__/g, countText(cs.cmt))
         .replace(/__GN_ACT_RANGE__/g, countText(cs.act))
@@ -300,7 +301,8 @@ export function dmPrompt(src: RefSource, st: GState, nick: string, latest: strin
       `Title: ${source.title}`,
       `Posted by: ${source.author}`,
       `Post text: ${source.body}`,
-      source.quote ? `Referenced public comment — author: ${source.quoteAuthor.trim() || '[not retained; do not attribute to the contact]'}\n${source.quote}` : '',
+      // 작성자 모름 문장은 지침 절 DM.QUOTE_UNKNOWN (없으면 옛 글. 전수검사 11-13)
+      source.quote ? `Referenced public comment — author: ${source.quoteAuthor.trim() || orOld(b, 'DM.QUOTE_UNKNOWN', '[not retained; do not attribute to the contact]')}\n${source.quote}` : '',
     ].join('\n');
   }
   const lines: unknown[] = [];
@@ -316,7 +318,8 @@ export function dmPrompt(src: RefSource, st: GState, nick: string, latest: strin
   const pub = publicBoard(st, `${latest}\n${anchor}`, b.read('PUBLIC.ACCESS'));
   if (pub) task += `\nPUBLIC BOARD REFERENCE:\n${JSON.stringify(pub)}`;
   const identity = { speaker: { role: 'npc_correspondent', handle: nick }, owner: { role: 'user', handle: userHandle, personaName: '주인공', referenceOnly: true } };
-  return pack(src, b, 'dm', 'THOUGHTS.DM', `${b.read('DM.GUIDELINE')}\n\n${b.read('ATTACHMENTS')}`, b.read('DM.FORMAT'), task, factionNames, identity);
+  const about = /^## About the board\n[^\n]+/m.exec(b.read('LB'))?.[0] ?? '';
+  return pack(src, b, 'dm', 'THOUGHTS.DM', [about, b.read('DM.GUIDELINE'), b.read('ATTACHMENTS')].filter(Boolean).join('\n\n'), b.read('DM.FORMAT'), task, factionNames, identity);
 }
 
 /** 쪽지 답장이 형식에 안 맞을 때 한 번 더 (원본 재시도 문구) */

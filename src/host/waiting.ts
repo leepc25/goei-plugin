@@ -15,6 +15,19 @@ export function setWaiting(w: boolean, late = false): void {
 
 export const isWaiting = () => on;
 
+/** 응답을 기다리는 중에 누른 「취소」: 한 번 누르면 막고, 5초 안에 한 번 더 누르면 통과 (전수검사 11-13, 사용자 승인).
+ *  리수는 요청 실패·중지를 알려 주지 않아, 실패한 뒤 3분 동안 취소가 안 눌렸다. 기다리는 중이 아니면 늘 통과 */
+let askedAt = 0;
+export function passWaiting(now = Date.now()): boolean {
+  if (!on) return true;
+  if (now - askedAt <= 5000) {
+    askedAt = 0;
+    return true;
+  }
+  askedAt = now;
+  return false;
+}
+
 export function onWaiting(cb: (w: boolean, late?: boolean) => void): () => void {
   subs.add(cb);
   return () => void subs.delete(cb);

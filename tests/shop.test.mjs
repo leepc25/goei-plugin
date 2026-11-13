@@ -128,7 +128,7 @@ test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하�
   // 확정 → 판 것 목록, 팔기 비움. 값 없으면 못 함
   assert.equal(closeSale(cancelSell(st)), null);
   const done = closeSale(st);
-  assert.deepEqual(done.sales, [{ name: '낡은 손전등', price: 14000 }]);
+  assert.deepEqual(done.sales, [{ name: '낡은 손전등', price: 14000, k: st0.key }]);
   assert.equal(done.sell, null);
   assert.match(shopEvents(chat('x\n[shop: 철물점|주인]', shopVars(done)))[0], /just sold 낡은 손전등 \(14,000 won\)/);
   // 거래 끊기면 팔기도 비움

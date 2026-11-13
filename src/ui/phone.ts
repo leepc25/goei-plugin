@@ -214,6 +214,8 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
       const events = keepValid(result.events, room);
       const unsolicitedRefresh = room.pending.action.type === 'refresh' && unsolicited(room);
       const added = applyEvents(cur, room, events, phoneTime(chat));
+      // 이름을 비우고 만든 단톡이면 모델이 지은 방 이름을 붙인다. 직접 적은 이름은 그대로 (전수검사 11-13, 사용자 결정)
+      if (result.title && room.kind === 'group' && !room.name && room.pending.action.type === 'invite_initial') room.name = result.title;
       room.pending = undefined;
       if (viewingRoom(env) === rid) readRoom(room);
       if (!added) note = room.kind === 'group' ? '아무도 말하지 않았어요.' : '답장이 없어요.';

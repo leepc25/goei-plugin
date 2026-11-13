@@ -20,7 +20,7 @@ export const SITES: Site[] = [
   { id: 'gn', name: '괴담넷', title: '괴담넷 - 자유게시판', host: 'goedam.net', path: '/board/free' },
   { id: 'gal', name: '괴담 갤러리', title: '괴담 갤러리 - 괴담갤', host: 'gall.goedam.co.kr', path: '/board/lists/?id=horror' },
   { id: 'wpf', name: '세정게', title: '::: 世界政治 게시판 :::', host: 'www.wpf.or.kr', path: '/zboard/zboard.php?id=politics' },
-  { id: 'sm', name: '연어 마켓', title: '연어 마켓 | 이면의 중고거래', host: 'salmon-market.kr', path: '' },
+  { id: 'sm', name: '연어 마켓', title: '연어 마켓 | 수상한 중고거래', host: 'salmon-market.kr', path: '' },
   { id: 'cos', name: '우주 쇼핑몰', title: '★우주 쇼핑몰★에 오는 것을 환영하는 것이다', host: 'cosmic-mall.alien', path: '/~shop/index.html' },
   { id: 'wk', name: '괴이위키', title: '괴이위키', host: 'goei.wiki', path: '/w/괴이위키:대문' },
   { id: 'bm', name: '백일몽 포인트몰', title: '백일몽 포인트몰', host: 'point.baekilmong.intra', path: '/mall/main' },

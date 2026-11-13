@@ -1,6 +1,6 @@
 // 괴담톡·괴담넷·위키 설정 오른쪽 위 「덮어쓰기」「불러오기」 (v0.16.26, 사용자 설계: 메인 설정과 같은 동작).
 // 덮어쓰기: 지금 채팅의 값을 새 채팅 기본값으로. 불러오기: 저장해 둔 기본값을 지금 채팅에. 누르면 확인을 한 번 더 받는다.
-import { loadVarDefaults, saveVarDefaults } from '../host/prefs';
+import { saveVarDefaults, varDefaultsToLoad } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 import { ICONS } from './icons';
 
@@ -67,7 +67,13 @@ export async function defaultsAction(pane: DefaultsPane, action: string, value: 
     return `지금 ${NAME[pane]} 설정을 새 채팅 기본값으로 저장했어요.`;
   }
   if (what === 'load') {
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...loadVarDefaults(PREFIXES[pane], chat.scriptstate) } }));
+    // 기본값에 없는 항목은 ''로 덮지 않고 지워 코드 기본값으로 (전수검사 11-13)
+    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+      const r = varDefaultsToLoad(PREFIXES[pane], chat.scriptstate);
+      const ss = { ...(chat.scriptstate ?? {}), ...r.set };
+      for (const k of r.drop) delete ss[k];
+      return { ...chat, scriptstate: ss };
+    });
     await refresh();
     return `새 채팅 기본값을 지금 ${NAME[pane]}에 불러왔어요.`;
   }

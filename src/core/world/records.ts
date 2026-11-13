@@ -92,7 +92,11 @@ export function setWorldData(d: WorldData): void {
   if (!d.relations || typeof d.relations.pairs !== 'object' || typeof d.relations.common !== 'string') throw new Error('세계 자료 형식이 달라요 (relations).');
   if (d.scenes && (typeof d.scenes !== 'object' || typeof d.scenes.세력 !== 'object' || typeof d.scenes.인물 !== 'object')) throw new Error('세계 자료 형식이 달라요 (scenes).');
   data = d;
+  dataGen++;
 }
+let dataGen = 0;
+/** 세계 자료를 몇 번 넣었나 (가상 로어북 캐시가 자료 교체를 알아보는 데 씀) (전수검사 11-13) */
+export const worldDataGen = (): number => dataGen;
 /** 첫 장면 기본값. 팩에 없으면(옛 팩) 빈 값 */
 export const defaultScenes = (): ScenesDefaults => world().scenes ?? { 세력: {}, 인물: {} };
 /** 세계 자료가 들어왔나 (본체 부팅 순서 확인용) */
@@ -116,6 +120,28 @@ export interface WorldOverrides {
   relations?: { pairs?: Record<string, RelationCell | null>; common?: string };
   /** 괴이 공통 머리말 (없으면 schema.ts ANOMALY_NOTE). 요청의 괴이 묶음 맨 앞에 한 번만 들어간다 (2026-10-27 사용자: 괴이마다 박지 말고 한 곳에서 고치게) */
   anomalyNote?: string;
+}
+
+/** 조직 이름을 바꿀 때 덧쓰기를 새 이름으로 옮긴다: 조직 기록 칸과 관계 쌍 「보는 쪽>대상」의 이름 (전수검사 11-13) */
+export function renameOrgOverrides(over: WorldOverrides, from: string, to: string): WorldOverrides {
+  if (!from || !to || from === to) return over;
+  const next: WorldOverrides = { ...over };
+  if (over.org && from in over.org && !(to in over.org)) {
+    const org = { ...over.org };
+    org[to] = org[from];
+    delete org[from];
+    next.org = org;
+  }
+  const pairs = over.relations?.pairs;
+  if (pairs && Object.keys(pairs).some((k) => k.split('>').includes(from))) {
+    const moved: Record<string, RelationCell | null> = {};
+    for (const [k, v] of Object.entries(pairs)) {
+      const [a, b] = k.split('>');
+      moved[b === undefined ? k : `${a === from ? to : a}>${b === from ? to : b}`] = v;
+    }
+    next.relations = { ...over.relations, pairs: moved };
+  }
+  return next;
 }
 
 /** 괴이 공통 머리말 (덧쓰기 → 기본) */

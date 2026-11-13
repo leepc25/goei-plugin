@@ -33,9 +33,10 @@ test('요청 가공: 장면 인물 블록을 마지막 유저 메시지 앞에, 
   assert.match(out[3].content, /Voice:\n- Short orders\./, '고정 절은 블록 안에');
   assert.doesNotMatch(out[0].content, /Short orders/, '시트 원문은 요청에서 빠짐');
   assert.match(out[3].content, /Relationship → 주인공/);
-  // append 모드: 시트는 그대로 두고 블록만 더함
+  // append 모드: 시트 전체가 블록 안에 있으므로 원래 시트는 빼서 두 번 안 들어간다 (전수검사 11-13)
   const out2 = R.withPeopleBlock(msgs, chat, { ...o, settings: St.peopleSettings({ $pp_inject: 'append' }) });
-  assert.match(out2[0].content, /Short orders/);
+  assert.doesNotMatch(out2[0].content, /Short orders/, '시트 원문은 요청에서 빠짐');
+  assert.equal(out2[3].content.split('Short orders').length - 1, 1, '블록 안에 시트가 한 번');
   // 끔
   // 2026-11-11 사용자: 넣지 않는 선택지(off)는 뺐다. 옛 값이 남아 있으면 기본 방식으로 넣는다
   assert.equal(R.withPeopleBlock(msgs, chat, { ...o, settings: St.peopleSettings({ $pp_inject: 'off' }) }).length, 5);

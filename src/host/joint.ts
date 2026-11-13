@@ -3,7 +3,7 @@
 // 한 작업이 모델을 부르지 않고 끝나면(done) 남은 것끼리만 보낸다. 각 작업의 검사·재시도·저장은 그대로 각자 한다.
 import { JOINT_KEY, JOINT_LABEL, type JointKind } from '../core/netjoint';
 import { guideOr } from '../core/guides';
-import { runModel, type LlmMessage, type ModelChoice } from './llm';
+import { limited, runModel, type LlmMessage, type ModelChoice } from './llm';
 import { markPrepared, prepareAttachmentGroups } from '../core/attach';
 
 export type { JointKind } from '../core/netjoint';
@@ -163,7 +163,8 @@ export class Joint {
   private left: Set<JointKind>;
   private fired = false;
 
-  constructor(private model: ModelChoice, private staticModel?: string, kinds: JointKind[] = ['gn', 'phone']) {
+  // concurrent: 「동시 요청 수」 설정. 묶음이 보내는 요청도 한 건마다 칸 하나를 쓴다 (기다리는 작업은 칸을 안 잡아 교착 없음, 전수검사 11-13)
+  constructor(private model: ModelChoice, private staticModel?: string, kinds: JointKind[] = ['gn', 'phone'], private concurrent?: number) {
     this.left = new Set<JointKind>(kinds);
   }
 
@@ -172,7 +173,7 @@ export class Joint {
     // 사진이 붙은 요청이나 이미 보낸 뒤면 혼자 보낸다
     if (this.fired || !this.left.has(kind) || messages.some((m) => m.images?.length)) {
       this.done(kind);
-      return runModel(messages, this.model, this.staticModel, JOINT_LABEL[kind]);
+      return limited(this.concurrent, () => runModel(messages, this.model, this.staticModel, JOINT_LABEL[kind]));
     }
     return new Promise<string>((resolve, reject) => {
       this.waits.set(kind, { messages, resolve, reject });
@@ -190,7 +191,7 @@ export class Joint {
     if (this.fired || [...this.left].some((k) => !this.waits.has(k))) return;
     this.fired = true;
     if (this.waits.size >= 2) void this.all();
-    else for (const [k, w] of this.waits) runModel(w.messages, this.model, this.staticModel, JOINT_LABEL[k]).then(w.resolve, w.reject);
+    else for (const [k, w] of this.waits) limited(this.concurrent, () => runModel(w.messages, this.model, this.staticModel, JOINT_LABEL[k])).then(w.resolve, w.reject);
   }
 
   /** 작업들을 한 요청으로. 첨부는 작업마다 먼저 바꾸고(번호는 이어서) 합친 요청은 runModel 에서 다시 바꾸지 않는다 (전수검사 11-13) */
@@ -201,7 +202,7 @@ export class Joint {
 
   private alone(k: JointKind): void {
     const w = this.waits.get(k)!;
-    runModel(w.messages, this.model, this.staticModel, `${JOINT_LABEL[k]} (통합 뒤 따로)`).then(w.resolve, w.reject);
+    limited(this.concurrent, () => runModel(w.messages, this.model, this.staticModel, `${JOINT_LABEL[k]} (통합 뒤 따로)`)).then(w.resolve, w.reject);
   }
 
   private async all(): Promise<void> {
@@ -211,7 +212,7 @@ export class Joint {
     const prompt = this.prompt(kinds);
     let raw = '';
     try {
-      raw = await runModel(prompt, this.model, this.staticModel, label);
+      raw = await limited(this.concurrent, () => runModel(prompt, this.model, this.staticModel, label));
     } catch (error) {
       for (const w of this.waits.values()) w.reject(error);
       return;
@@ -223,7 +224,7 @@ export class Joint {
       // (11-09 사용자: 따로 도는 것처럼 보였다). 모델 연결 오류(LlmError)는 형식 재시도가 없어서 여기서 버리면 그 턴의 자동 확인이 통째로 사라졌다 (QC 2026-10-28)
       console.log('[goei] 통합 자동 확인 응답을 가르지 못해 겉 모양을 다시 묻어요');
       try {
-        const fix = await runModel(markPrepared([...prompt, { role: 'assistant', content: raw }, { role: 'user', content: jointRetryText(keys) }]), this.model, this.staticModel, `${label} 다시 묻기`);
+        const fix = await limited(this.concurrent, () => runModel(markPrepared([...prompt, { role: 'assistant', content: raw }, { role: 'user', content: jointRetryText(keys) }]), this.model, this.staticModel, `${label} 다시 묻기`));
         parts = splitCombined(fix, keys, true);
       } catch (again) {
         console.log(`[goei] 통합 자동 확인 응답을 끝내 가르지 못해 따로 보내요: ${again instanceof Error ? again.message : String(again)}`);
@@ -246,7 +247,7 @@ export class Joint {
       const again = missing.map((k) => JOINT_KEY[k]);
       let more: Record<string, string | null> = {};
       try {
-        more = splitCombined(await runModel(this.prompt(missing), this.model, this.staticModel, `${missing.map((k) => JOINT_LABEL[k]).join('+')} 통합`), again, true);
+        more = splitCombined(await limited(this.concurrent, () => runModel(this.prompt(missing), this.model, this.staticModel, `${missing.map((k) => JOINT_LABEL[k]).join('+')} 통합`)), again, true);
       } catch (error) {
         console.log(`[goei] 남은 통합 자동 확인을 가르지 못해 따로 보내요: ${error instanceof Error ? error.message : String(error)}`);
       }

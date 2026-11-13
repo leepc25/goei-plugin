@@ -547,11 +547,6 @@ LORE_DROP_BULLETS = {
 LORE_PATCHES = [
     # 괴담넷 성격 전환 (2026-10-26 사용자): 설정 lb_cfg_lb-gn.style = gal 괴담갤(일반) / net 괴담넷(업계, 기본) / wpf 세정게. 큰 틀은 그대로, 소개·기본 말투·기본 주제만 분기. 문안은 card/gnet-style.json
     *[('GNet', v['old'], v['new']) for v in json.loads((ROOT / 'card' / 'gnet-style.json').read_text(encoding='utf-8')).values()],
-    # 콘쥬스 20세 대학생 (2026-10-26 사용자 지시). 위키·게임 시트·대사도 같이 바꿈
-    ('콘쥬스', '- Age: 17, a high school student', '- Age: 20, a university student'),
-    ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),
-    ('콘쥬스', 'cover her eyes for age-inappropriate sights', 'cover her eyes for gruesome sights'),
-    ('콘쥬스', "A teenager's frame that gives no warning", 'A small frame that gives no warning'),
     # 블라렛: 하프 뱀파이어를 수치로 여겨 숨기는 설정 복구 (2026-11-05 사용자: 로어북 최적화 때 통째로 빠져 해석이 뒤집힘. 빠진 부분만 짧게)
     ('블라렛', '- Enemy taunts of "half-blood of the Vatican" touch a wound her sincere confidence in God and habit cannot fully close.',
      '- Her half-vampire blood is an open sore she keeps hidden: it shows only in her grace and in what vampires smell on her, and she never volunteers it. Enemy taunts of "half-blood of the Vatican" land on a wound her doctrine-grade confidence in God and habit never quite closes; her answer is scripture, not denial: "Even if I happen to be a monster, it makes no difference."'),
@@ -638,6 +633,11 @@ FIRST_MES_SPELL = [
     (r'\bLee Do-hyung\b', 'Lee Do-hyeong'),
     (r'\bCuras\b', 'Kyuras'),
     (r'\bWorld Politics Board\b', 'World Politics Forum'),
+    # 관리국 첫 장면 부서 이름·금지어 「이면」 (전수검사 11-13, 사용자 「전부 추천대로」: 종합대응팀으로 맞춤, 이면 3곳만 뒤편으로)
+    (r'종합대응반', '종합대응팀'),
+    (r'이 세상의 이면에 그 누구보다도', '이 세상의 뒤편에 그 누구보다도'),
+    (r'세상의 이면에서 인류를', '세상의 뒤편에서 인류를'),
+    (r'세상의 이면엔 일반인들이', '세상의 뒤편엔 일반인들이'),
 ]
 
 

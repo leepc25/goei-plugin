@@ -71,7 +71,7 @@ export function readWallet(vars: Record<string, unknown> | undefined, defaultSta
   try {
     const o = JSON.parse(raw) as Partial<Wallet>;
     if (!o || typeof o !== 'object') return empty;
-    return { start: Number.isSafeInteger(o.start) ? (o.start as number) : defaultStart, log: Array.isArray(o.log) ? o.log.filter(isEntry).slice(-400) : [] };
+    return { start: Number.isSafeInteger(o.start) ? (o.start as number) : defaultStart, log: Array.isArray(o.log) ? o.log.filter(isEntry) : [] };
   } catch {
     return empty;
   }
@@ -116,12 +116,37 @@ export function freshWalletId(w: Wallet, base: string, anchor: string): string {
   while (used(`${b}_${i}`)) i++;
   return `${b}_${i}`;
 }
-/** 거래 더하기 (같은 id 가 있으면 그대로). 금액 0·범위 밖은 무시 */
-export function addWalletEntry(w: Wallet, e: Omit<WalletEntry, 'id' | 'at'> & { id?: string; at?: string }): Wallet {
+/** 거래 정리 (전수검사 11-13): 400줄을 넘으면 오래된 것부터 ① 기준 응답이 사라진 거래 → ② 살아 있는 거래는 금액을 start 에 합친 뒤 뺀다 (잔고가 그대로).
+ *  예전엔 뒤 400줄만 남겨 살아 있는 옛 거래가 잘리면 잔고가 바뀌었다. 방금 넣은 마지막 줄은 빼지 않고, alive 를 모르면 자르지 않는다 */
+function compactWallet(w: Wallet, alive?: Set<string>): Wallet {
+  let over = w.log.length - 400;
+  if (over <= 0 || !alive) return w;
+  const drop = new Set<WalletEntry>();
+  let start = w.start;
+  const old = w.log.slice(0, -1);
+  for (const e of old) {
+    if (over <= 0) break;
+    if (e.anchor && !alive.has(e.anchor)) {
+      drop.add(e);
+      over--;
+    }
+  }
+  for (const e of old) {
+    if (over <= 0) break;
+    if (drop.has(e)) continue;
+    start += e.amount;
+    drop.add(e);
+    over--;
+  }
+  return drop.size ? { ...w, start, log: w.log.filter((e) => !drop.has(e)) } : w;
+}
+
+/** 거래 더하기 (같은 id 가 있으면 그대로). 금액 0·범위 밖은 무시. alive(살아 있는 응답 키)를 주면 400줄을 넘을 때 정리한다 */
+export function addWalletEntry(w: Wallet, e: Omit<WalletEntry, 'id' | 'at'> & { id?: string; at?: string }, alive?: Set<string>): Wallet {
   if (!Number.isSafeInteger(e.amount) || e.amount === 0 || Math.abs(e.amount) > WALLET_MAX) return w;
   const id = e.id ?? walletEntryId(e.anchor, e.amount, e.memo);
   if (w.log.some((x) => x.id === id)) return w;
-  return { ...w, log: [...w.log, { ...e, id, memo: e.memo.slice(0, 30), at: e.at ?? new Date().toISOString() }].slice(-400) };
+  return compactWallet({ ...w, log: [...w.log, { ...e, id, memo: e.memo.slice(0, 30), at: e.at ?? new Date().toISOString() }] }, alive);
 }
 
 /** 필드 거래 (게임 다리, 출처 field). 기준 메시지는 필드 사건·막간과 같은 자리(들어갈 때의 마지막 메시지)라 그 메시지를 다시 굴리면 같이 빠진다.
@@ -140,7 +165,7 @@ export function removeWalletEntry(w: Wallet, id: string): Wallet {
 export function adjustWallet(w: Wallet, alive: Set<string>, target: number, memo = '잔고 수정'): Wallet {
   const diff = Math.trunc(target) - walletBalance(w, alive);
   if (!diff) return w;
-  return addWalletEntry(w, { anchor: '', amount: diff, memo, src: 'manual', id: `m_${Date.now().toString(36)}_${w.log.length}` });
+  return addWalletEntry(w, { anchor: '', amount: diff, memo, src: 'manual', id: `m_${Date.now().toString(36)}_${w.log.length}` }, alive);
 }
 
 /** 상태창 잔고 맞춤 거래의 메모 (아래 syncWalletToStatus) */
@@ -185,7 +210,7 @@ export function syncWalletToStatus(w: Wallet, chat: Chat): Wallet | null {
   // 갱신기가 늦게 끝나 다시 맞출 때 방금 산 값이 「상태창 잔고」 줄로 되돌려지지 않게
   const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor) && !later(e)) };
   const diff = target - walletBalance(before, alive);
-  const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: WALLET_SYNC_MEMO, src: 'story' });
+  const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: WALLET_SYNC_MEMO, src: 'story' }, alive);
   return JSON.stringify(next) === JSON.stringify(w) ? null : next;
 }
 

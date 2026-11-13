@@ -1912,7 +1912,11 @@ function picker(): string {
   // 아바타 기본값: 마지막에 고른 것, 없으면 처음 기본 (2026-11-08 사용자: 매번 고르기 귀찮다)
   const lookRowsNow = lookRows();
   if (needLook && !draft.look && lookRowsNow) draft.look = defaultLook(lookRowsNow, getPrefs().look);
-  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing) && (!needLook || !!draft.look);
+  // 아바타 그림 팩을 못 받았으면 지난번 아바타 번호로, 그것도 없으면 아바타 없이 출발 (나중에 소지품 화면에서 고른다) (전수검사 11-13, 사용자 승인)
+  const lookFailed = needLook && !lookRowsNow && !!looksStatus().failed;
+  if (lookFailed && !draft.look && getPrefs().look) draft.look = getPrefs().look;
+  const noLook = lookFailed && !draft.look;
+  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing) && (!needLook || !!draft.look || noLook);
   // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
   const ctxP = view.kind === 'picker' ? view.ctx : null;
   const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
@@ -1946,6 +1950,7 @@ function picker(): string {
   <footer class="gx-foot">
     ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(list.indexOf(sc) + 1).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
     ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
+    ${noLook ? '<div class="gx-hint">아바타 그림을 받지 못해 아바타 없이 시작해요. 소지품 화면에서 나중에 고를 수 있어요.</div>' : ''}
     <button class="gx-start" data-action="start" ${ready && !busy ? '' : 'disabled'}>${busy ? '시작하는 중…' : '출 발'}</button>
   </footer>`;
 }
@@ -2059,6 +2064,8 @@ function openBrowserTab(): void {
     // 기록이 있는 탭으로 돌아와도 「창을 열 때」 확인 (전수검사 11-13)
     applyNav(s);
     siteOpened();
+    // 홈쇼핑은 들어올 때 방송 화면으로 돌리므로 다시 그린다 (전수검사 11-13)
+    if (tab === 'net' && curTab().site === 'hs') render();
     return;
   }
   tab = siteTab(curTab().site);

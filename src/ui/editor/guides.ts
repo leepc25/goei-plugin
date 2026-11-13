@@ -25,7 +25,7 @@ const HELP: Record<GuideName, string> = {
   Gal: '괴담갤 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Wpf: '세정게 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Salmon: '연어 마켓 거래 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
-  Hs: '망상홈쇼핑 지침: 편성(상품)·큐시트·채팅을 한 번에 짓는 글이에요. 상점 지침과 같은 절에 방송 절(BROADCAST)이 붙어 있어요. {cue}·{chat}·{cuts}·{moods}·{moods_b}·{events} 자리는 설정과 방송 그림에서 채워져요.',
+  Hs: '망상홈쇼핑 지침: 편성(상품)·큐시트·채팅을 한 번에 짓는 글이에요. 방송 전용 절(COMMON·BROADCAST·HOST·VIEWERS 등)에 물건 줄 꼴·값 기준·지난 목록 절(SHELF·SHELF_PLAIN·PRICE_GUIDE·AVOID_PREV)은 상점 지침 기본 글을 옮겨 붙였어요. {cue}·{chat}·{cuts}·{moods}·{moods_b}·{events} 자리는 설정과 방송 그림에서 채워져요.',
   Cos: '우주 쇼핑몰 지침: 물건 목록 짜기·운영자 문의 답. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{price}·{prev} 자리는 플러그인이 채워요.',
   Bm: '백일몽 포인트몰 지침: 물건 목록 짜기. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{price}·{prev} 자리는 플러그인이 채워요.',
   BmDesk: '백일몽 포인트몰 1:1 상담 지침: 상담사 만들기(MAKE)·복지몰 상담 매뉴얼(MANUAL, 작중 규정)·대화 규칙(TALK). 예시 대사·소재 목록을 넣으면 상담사들이 같은 말을 되풀이하니 규칙만 적어 주세요. 상담사 주사위 칸은 포인트몰 설정에 있어요.',
@@ -34,15 +34,15 @@ const HELP: Record<GuideName, string> = {
   Wiki: '위키 문서 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Directive: '요원 이동·커스텀 임무 때 모델에 주는 장면 지시문. COMMON·OPENING·CONTINUATION·CONTEXT·FORMAT(JSON) 절.',
   RP: '카드 description 에 있던 RP 지침(세계 설정·진행 원칙). 요청 맨 앞 로어 덩어리에 들어가요. 카드 description 에 「## RP Guidance」가 남아 있으면 넣지 않아요.',
-  Tag: '상황판 태그 지침(괴이·사건·거점 출력 규칙). 상태창 절은 `{status_section}` 자리에 설정 「상황판 → 상태창 칸」의 구성대로 자동으로 만들어져요(형식·규칙·예시). 그 자리표와 {{getvar::…}} 자리표는 그대로 두세요.',
+  Tag: '상황판 태그 지침(괴이·사건·거점 출력 규칙). 상태창 절은 `{status_section}` 자리에 설정 「상태창 → 칸」의 구성대로 자동으로 만들어져요(형식·규칙·예시). 그 자리표와 {{getvar::…}} 자리표는 그대로 두세요.',
   Shop: '상점 지침: 진열대 짜기·주인 대화·판매 값·메인 응답의 상점 표식. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{price}·{prev} 자리는 플러그인이 채워요. 상점 판단: SHOP_RULE 은 「지금 상점이 있나」 공용 기준이라 메인 모델 표식 지침(MAIN_TAG)과 갱신기가 같은 글을 읽어요(한 곳만 고치면 양쪽에 들어가요). OWN_SHOPS 는 설정 → 상점 「고유 상점」 표의 켜진 줄({list})이 있을 때 SHOP_RULE 의 {own} 자리에 붙어요. SHOP_JUDGE 는 상점 판단을 갱신기가 맡을 때 갱신기만 더 받는 판단 요령이에요.',
   Updater: '인물 기록 갱신기(자세히판): 응답마다 보조 모델이 인물·사건·장소·세력·소지품 기록을 고칠 때 주는 지침. <<SECTION:이름>>…<<END:이름>> 표식은 설정에서 끈 기능의 절을 빼는 자리라 지우지 마세요.',
-  UpdaterCompact: '인물 기록 갱신기(간결판): 설정 「갱신기 지침」을 간결로 골랐을 때 쓰는 지침. 표식은 자세히판과 같아요.',
+  UpdaterCompact: '인물 기록 갱신기(간결판): 설정 「인물 → 갱신 → 지침」을 간결로 골랐을 때 쓰는 지침. 표식은 자세히판과 같아요.',
   Director: 'Director 기본 지침: 메인 요청 전에 보조 모델이 이번 턴 인물 자료를 정리할 때 주는 글. FACTS 절은 사실형·연출형 모두, SCENE 절은 연출형에만 붙어요. 기능별 절(APPLY.*)·검색(SEARCH·PASS2)·출력 형식(OUTPUT)·고침 요청(REPAIR)은 설정에 따라 플러그인이 골라 덧붙이고, MAIN_NOTE 는 메인 요청에 넣는 메모의 머리말이에요. {{LANG}}·{{LINES}} 자리는 그대로 두세요.',
   Common: '여러 기능의 요청에 공통으로 붙는 글이에요: 인터넷·괴담톡 자동 확인을 한 번에 묶는 틀(JOINT.*), 형식이 틀렸을 때 다시 묻는 글(RETRY.*), 다시 보기(REITERATE), 생각 단계 머리말(THOUGHTS.*), 첨부 안내(ATTACH.*), 생성 언어 문장(LANGUAGE.*). {count}·{keys}·{reason} 같은 자리는 플러그인이 채워요.',
   Main: '메인 요청에 플러그인이 붙이는 글이에요: 직전 상태창 안내(STATUS.NOTE·STATUS.FIRST), 상태창 칸 규칙(STATUS.RULE.*, 상황판 태그 지침의 상태창 절에 들어가요), 소지품 안내(INVENTORY.*), 잠긴 부록 안내(LORE.LOCKED), 인물 기록 머리말(PEOPLE.*·SEXUAL.POLICY), 세력·명부 머리말(FACTION.*·ROSTER.INTRO). {이름} 자리는 플러그인이 채워요.',
   UpdaterExtra: '인물 기록 갱신기에 설정에 따라 덧붙는 글이에요: 기록 언어 영어(LANG_EN), 추적 인물(TRACKING_RULE), 태그 신호(SIGNAL_STATE), 상점 판단 칸(SHOP_KEY), 말투 다변화(SPEECH.*), 성적 프로필(SEXUAL.*). CONSOLIDATE 는 기록 정리 요청의 지침이에요. {이름} 자리는 플러그인이 채워요.',
-  Asset: '보조 모델이 완성된 본문에 캐릭터 이미지 태그를 넣을 때 주는 지침이에요 (설정 → 캐릭터 이미지에서 「보조 모델」 방식일 때). {limit}·{names}·{keywords}·{narrative} 같은 자리는 플러그인이 채워요. 메인 모델이 직접 넣는 방식의 지침은 「이미지(메인 모델)」 항목에 있어요.',
+  Asset: '보조 모델이 완성된 본문에 캐릭터 이미지 태그를 넣을 때 주는 지침이에요 (설정 → 캐릭터 이미지에서 「보조 모델」 방식일 때). {limit}·{names}·{keywords}·{narrative} 같은 자리는 플러그인이 채워요. 메인 모델이 직접 넣는 방식의 지침은 「이미지(메인 모델)」 항목에 있어요. 출력 대상 캐릭터·표정 세트는 두 방식이 같이 쓰고, 「이미지(메인 모델)」 항목에서 고쳐요.',
   Router: 'Router 기본 지침: 메인 요청 전에 보조 모델이 장면에 필요한 인물을 고를 때 주는 글. ROLE(역할·입력)·RULES(고르는 규칙·출력) 절. {{MAX}} 자리(최대 인원)는 그대로 두세요.',
 };
 
@@ -67,7 +67,7 @@ export function guidePage(name: GuideName, crumb = ''): string {
     })
     .join('');
   const title = crumb
-    ? `<h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
+    ? `<h2>${esc(GUIDE_LABEL[name])}<small>${esc(crumb)} · 이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
     : `<h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h3>`;
   return `<div class="gw-page${crumb ? ' gw-set' : ''}"><header class="gw-head">${title}
       <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰</span></div>

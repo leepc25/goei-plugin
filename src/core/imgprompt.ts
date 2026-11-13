@@ -2,6 +2,7 @@
 // 지침 본문(틀)·출력 대상 캐릭터(명부 영문명에서 고름 + 임의 추가)·표정 세트를 설정에서 관리한다. 보조 모델 경로(core/asset.ts)도 같은 목록을 쓴다.
 import type { LoreEntry } from './types';
 import { readDirectory } from './world/directory';
+import { guideOr } from './guides';
 
 /** 표정 세트 기본 (카드 그림 assets/portraits 42종: 기본 27 + 추가 15, 사용자 11-06) */
 export const IMG_KEYWORDS_DEFAULT = ['default', 'angry', 'annoyed', 'bored', 'confused', 'contemptuous', 'crying', 'curious', 'dumbfounded', 'embarrassed', 'excited', 'exhausted', 'happy', 'laughing', 'lovestruck', 'lustful', 'nervous', 'proud', 'sad', 'scared', 'serious', 'shy', 'smile', 'smirk', 'smug', 'surprised', 'thinking', 'suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous', 'pleading', 'forced smiling', 'indifferent', 'guilty', 'pouting', 'angry smile', 'expressionless', 'tormented', 'crazy smile'];
@@ -102,8 +103,9 @@ export function imgCharacters(lore: LoreEntry[] | undefined, cfg: ImgPromptConfi
 
 /** 지침 조립. userName을 주면 {{user}}를 그 이름으로 푼다 (플러그인이 붙이는 글은 Risu가 CBS를 풀지 않음. 전수검사 11-13) */
 export function buildImgPrompt(cfg: ImgPromptConfig, characters: string[], assetPlayer: boolean, userName?: string): string {
-  const userSkip = assetPlayer ? '' : '{{user}}, ';
-  const userRule = assetPlayer ? '' : '- Do not create tags for {{user}}.';
+  // 주인공 금지 문장은 지침 「Asset」 절 MAIN_USER_SKIP · MAIN_USER_RULE (없으면 옛 글. 전수검사 11-13)
+  const userSkip = assetPlayer ? '' : `${guideOr('Asset', 'MAIN_USER_SKIP', '{{user}}')}, `;
+  const userRule = assetPlayer ? '' : guideOr('Asset', 'MAIN_USER_RULE', '- Do not create tags for {{user}}.');
   // 바꿀 글은 함수로 넘긴다: 이름·표정에 $& 같은 글자가 있어도 replace 특수 문자로 풀리지 않게 (QC 2026-10-28)
   return cfg.template
     .replace(/\{characters\}/g, () => characters.join(', '))
