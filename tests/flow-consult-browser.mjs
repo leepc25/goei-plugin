@@ -65,7 +65,14 @@ if (!process.env.CONSULT_ONLY) {
   const n = await clickAll(page, () => 'chat');
   ok(n >= 85, `조작 ${n}개를 눌렀다`);
   // 맨 위 띠와 줄의 호출 글이 바로 바뀐다
-  const say = (row) => page.evaluate((row) => [...document.querySelectorAll('.gw .fl-pc .fl-line')].find((l) => l.querySelector('.fl-name')?.textContent === row)?.querySelector('.fl-said')?.textContent ?? '', row);
+  // 호출 칸은 횟수(<b>)와 조건(<small>)으로 나뉜다 (c3464c79b). 시험은 「횟수 (조건)」으로 다시 붙여 읽는다
+  const say = (row) => page.evaluate((row) => {
+    const s = [...document.querySelectorAll('.gw .fl-pc .fl-line')].find((l) => l.querySelector('.fl-name')?.textContent === row)?.querySelector('.fl-said');
+    if (!s) return '';
+    const main = s.querySelector('b')?.textContent ?? s.textContent ?? '';
+    const note = s.querySelector('small')?.textContent ?? '';
+    return note ? `${main} (${note})` : main;
+  }, row);
   const before = await bar(page);
   const routerTo = (await say('Router')) === '1회' ? 'code' : 'model';
   await clickSel(page, `${DO}[data-value="pp-set|router=${routerTo}"]`);

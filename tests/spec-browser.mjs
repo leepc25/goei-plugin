@@ -101,15 +101,20 @@ const probe = () => {
     if (l.querySelector('.fl-pair')) add('ctl', L(l.querySelector('.fl-pair')), row);
     if (l.querySelector('.ck-cell')) add('gridCell', L(l.querySelector('.ck-cell')), row);
     for (const lab of l.querySelectorAll('.fl-l')) add('label', L(lab), row);
-    const said = l.querySelector('.fl-said'); if (said && said.textContent.trim()) add('said', tx(said), row);
+    // 호출 칸은 오른쪽 맞춤(횟수 크게 + 조건 작은 글, 2026-11-12 c3464c79b·3136c5a28): 자리는 횟수 글의 오른쪽 끝으로 잰다
+    const said = l.querySelector('.fl-said'); if (said && said.textContent.trim()) add('said', Rr(said.querySelector(':scope > b') ?? said), row);
     // 호출 글은 한 줄: 두 줄로 꺾이거나 칸을 넘치면 안 된다 (2026-11-12 사용자)
     if (said && said.textContent.trim()) {
-      const rg = document.createRange(); rg.selectNodeContents(said);
-      const tops = new Set([...rg.getClientRects()].map((c) => Math.round(c.top)));
+      // 횟수(b)는 한 줄, 조건(small)은 좁은 호출 칸 안에서 꺾여도 된다(3136c5a28 「호출 칸 좁게」, small white-space: normal). 둘 다 옆 칸을 넘치면 안 된다
       const go = l.querySelector('.fl-go'); const st0 = [...l.querySelectorAll('.fl-st')].find(vis);
       const limit = (st0 ?? go)?.getBoundingClientRect().left ?? Infinity;
-      if (tops.size > 1) out.clip.push(`호출 글 두 줄: ${row} 「${said.textContent.trim()}」`);
-      else if (rg.getBoundingClientRect().right > limit + 0.5) out.clip.push(`호출 글이 옆 칸을 넘음: ${row} 「${said.textContent.trim()}」 ${R(rg.getBoundingClientRect().right)} > ${R(limit)}`);
+      for (const part of (said.querySelector(':scope > b, :scope > small') ? said.querySelectorAll(':scope > b, :scope > small') : [said])) {
+        if (!part.textContent.trim()) continue;
+        const rg = document.createRange(); rg.selectNodeContents(part);
+        const tops = new Set([...rg.getClientRects()].map((c) => Math.round(c.top)));
+        if (tops.size > 1 && part.tagName !== 'SMALL') out.clip.push(`호출 글 두 줄: ${row} 「${part.textContent.trim()}」`);
+        if (rg.getBoundingClientRect().right > limit + 0.5) out.clip.push(`호출 글이 옆 칸을 넘음: ${row} 「${part.textContent.trim()}」 ${R(rg.getBoundingClientRect().right)} > ${R(limit)}`);
+      }
     }
     const help = l.querySelector('.fl-help'); if (help) add('help', tx(help), row);
     const st = l.querySelectorAll('.fl-st'); add('st1', L(st[0]), row); add('st2', L(st[1]), row);

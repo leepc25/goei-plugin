@@ -306,10 +306,10 @@ for (const vp of vps) {
       const heads = await page.evaluate((t) => [...document.querySelectorAll(`.gw ${t}`)].filter((g) => g.querySelector('h3')?.textContent === '넘길 내용').map((g) => [...g.querySelectorAll('.ck-h2 > span')].slice(1).map((s) => s.textContent)), twin);
       assert.deepEqual(heads, Array(2).fill(['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영']), `[${vp}] 「넘길 내용」 격자 둘의 칸 이름`);
       // 가게 표: 기본값 (봇 설명·상시·관련·맥락 켬, 작가 노트·페르소나·2차 끔) → 우주 쇼핑몰의 작가 노트만 켠다
-      for (const shop of ['shop', 'cos', 'bm']) {
+      for (const shop of ['shop', 'cos', 'bm', 'hs']) { // 망상홈쇼핑도 가게 표에 제 줄 (2026-11-13, src/core/shopfn.ts GIVE_SHOPS)
         assert.deepEqual(await Promise.all(['give_desc', 'give_authors', 'give_persona', 'give_active', 'give_related', 'give_secondary', 'ctx'].map((k) => pressed(`s:${shop}:${k}`))), ['true', 'false', 'false', 'true', 'true', 'false', 'true'], `[${vp}] 가게 표 기본값 ${shop}`);
       }
-      assert.equal(await page.$(cell('s:hs:give_desc')), null, '망상홈쇼핑 줄은 없다');
+      assert.equal(!!(await page.$(cell('s:hs:give_desc'))), true, '망상홈쇼핑 줄이 있다 (2026-11-13: 가게 표·기능 표 「채팅 반응」에 연결)'); // ElementHandle 을 assert 에 그대로 넘기면 실패 때 비교 출력이 메모리를 다 먹는다
       await tap('s:cos:give_authors');
       assert.equal((await ss()).$cos_sh_give_authors, '1');
       assert.equal(await pressed('s:cos:give_authors'), 'true', '다시 그린 칸이 켜져 있다');
@@ -319,8 +319,8 @@ for (const vp of vps) {
       assert.equal((await ss()).$bm_sh_ctx, '0');
       assert.deepEqual([await pressed('s:bm:ctx'), await pressed('s:cos:ctx'), await pressed('s:shop:ctx')], ['false', 'true', 'true']);
       // 기능 표: 세 가게가 같이 쓰는 한 값. 1:1 상담의 맥락 반영은 없는 칸(「–」)
-      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'true', 'true']);
-      assert.equal(await page.$(cell('s:shop:fn_desk_ctx')), null, '1:1 상담 · 맥락 반영 칸은 조작이 없다');
+      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk', 'say'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'true', 'true', 'true']);
+      assert.equal(!!(await page.$(cell('s:shop:fn_desk_ctx'))), false, '1:1 상담 · 맥락 반영 칸은 조작이 없다');
       await tap('s:shop:fn_talk_persona');
       assert.equal((await ss()).$sh_fn_talk_persona, '0');
       assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'false', 'true'], '그 기능의 줄만 꺼진다');
