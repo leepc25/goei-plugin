@@ -1,0 +1,22 @@
+---
+name: goei-main-fix-1109
+description: 11-09 릴리스본(v0.21.4) 수정 스레드 「릴리스본 버그 고치기」 — 브랜치 claude/project-thread-swxqg6, 사용자가 정한 새 규칙(고른 표시 안쪽 2px, 물건 그림 몸통 말 매칭)과 고친 목록
+metadata:
+  type: project
+  modified: 2026-11-09T11:10:36.727Z
+---
+Thread 릴리스본 버그 고치기 (cmsg_01SMy6spzkHA3Ttz9fg54ZY87h4WoyKA1zbvRj5NtnxCx5). User dictates bugs one by one; fix immediately, commit each, push to `claude/project-thread-swxqg6` (from main v0.21.4). Release is done by the separate 「수정본 릴리스하기」 thread; hand confirmed fixes there.
+
+**User rules set 11-09 (apply everywhere, not case by case — user: 「건바이건으로 해결하면 또 규격이 틀어진다」):**
+- Selected state = INSIDE the box only: 1px border + 1px inner line (::after inset 0 / inset box-shadow) = 2px. NO outline, NO outer box-shadow, nothing drawn at -1px — it clips at PC display scaling (125/150%) and overflow. Shared rule in src/ui/style.css (`.gx-mlist li.gx-mx.sel::after, .gx-evc.sel::after, .gx-acard.pick.on::after, .it-c.sel::after, .it-slot.sel::after`); select/search focus = border + inset shadow.
+- Item icon matching (core/iconmatch.ts = game-src/items/match_icon.mjs, parity test): with ~2,800 pictures, an item must never fall to the misc box when its head noun (몸통 말, e.g. 재킷) exists in the table — use the same-head row with fewest extra modifiers. Misc box only when head noun itself is absent.
+
+**Fixed on this branch:** .gx-evc.sel rule missing in 0.21.4 (목표 card no border); selection ring gaps; 기본 지급용 재킷 → box; 괴담톡 보기 전용 방(사이드스토리) 정말 삭제 dead (ph-view-del missing from confirm-keep list in phone.ts handlePhone); first-turn wallet → model wrote 0 and ledger synced to 0 (now withStatusBlock sends Starting values when no prior status line); people sexual desire/paraphilia edit save (pp-sex-save got textarea text as value via data-take, key now from peopleUi.sexEdit).
+
+**Pending user decision:** 괴담넷 글쓰기 뒤로 단추 34 vs 36 (handoff said intentional; audit thread flagged, style.css ~4598 `.bs .ph-room-head > .ph-tool.ph-back`).
+
+**Later 11-09 (same thread):** user-defined board identities (내용이 아니라 관점!): 괴담넷 = insiders ONLY (업계인), anomaly/trade info focus; 괴담갤 = fully civilian DC horror gallery, knows nothing of the trade, 흥미 위주; 세정게 = old conspiracy forum where 음모론자·은둔자·생존자·미친놈 all gather, 음모·비밀 focus (see wiki/orgs 「세계정치 게시판」). These are centers of gravity, not quotas. Guides in src/data/guides/gnet.txt (3 branches), gnetPrompt SITE_LORE adds 세계정치 게시판 org lore as primary ref for wpf. Also fixed: 연어 마켓 thumbs from item pack by title item name (smItemName), detail grid broken by `.bs .gn-post{display:block}`, pager hidden when 0 posts, gal comment row broken by `.bs .cm.gn-c` reset. Pattern: late generic `.bs …` reset rules in style.css silently override per-site layout — check for that first on site layout bugs.
+
+**Late 11-09 (same thread, commits c18f79c…cc7def3):** 우주 쇼핑몰 = NEVER expose lore/alien identity on the site (user: 「우주인임을 노골적으로 드러내라는 게 아닌데」): no 우주인/지구인/먼 별; operator is nameless 「운영자」; 왈도체 = cheap-translator Korean (literal word order, wrong dictionary sense, space before 하다/됩니다, stiff -합니다 + odd blunt line), accidental not performed — defined in COS_COMMON (src/core/guides.ts). Popups standard: ui/popwin.ts (drag title, resize corner, outside-click/Esc close) used by 우주몰 질문창 + board 쪽지함 (PC; phone unchanged). PC mouse gestures ui/gesture.ts: right-drag ← back → forward (whole 상황판 via navStep), ㄴ close tab, ㄱ reopen (br.closed). Board layout decisions: 괴담넷 left = post title list + 내 메뉴 (tags kept per post, not as filter); 괴담갤 right = 힛갤 (views-desc list) fixed beside body; 세정게 left MENU must persist on post view (user undecided on its content; suggested title list). 호출 흐름 (editor/flow.ts) must list all 6 internet sites separately (settings are per-site via boardView/mallSettings). Internet-split audit delegated to 전수점검 thread; findings come here.
+- 전수점검 thread id (11-09): cmsg_01SMy6spzkHA3Ttz9fg54ZY8WKzoShgaRtnQd2icpLKskA (checks branch swxqg6 latest, sends findings here).
+- 11-09 20:xx user decision: internet auto calls = 게시판 넷+괴담톡 one request (malls separate), with ON/OFF switch 「한 번에 요청」 ($net_joint, default on) on ALL five pages (user: 「전부 둬야지」). Impl core/netjoint.ts (jointGroups by model+fixed id), host/joint.ts generalized (N keys; envelope repair ask before fallback), llm.ts first() outside concurrency slot. Lesson: never say a feature 「살아 있다」 from code alone — user tested and it looked separate (actually per-site label bug + phone skipped). Trace labels now per site.
