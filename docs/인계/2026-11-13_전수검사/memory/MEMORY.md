@@ -42,6 +42,7 @@
 
 ## Releases / threads
 - v0.21.5–0.21.9 (PR 48–52). v0.21.10 (PR 53) 설정창 개편 1–4 → [[goei-settings-step4-1111]]. v0.21.11 (PR 54) 관제 화면 + AI 상담 창 → [[goei-control-screen-1112]].
+- **11-13 ~12:00 KST: v0.21.12 RELEASED (PR #55) = audit release; handoff for new account in repo docs/인계/2026-11-13_전수검사/ → [[goei-release-1113]]**
 - **11-13 09:10 KST: all 17 audit decisions answered → [[goei-audit-decisions-1113]] (card build regenerates directory.json/greetings.json — hand edits lost).**
 - **11-13 01:33 KST orders for the release thread (full audit, full test once, release authorized, tests must not hold for hours) → [[goei-fullaudit-1113]].**
 - **MAIN (ONLY) release thread now: 전수검사하고 릴리스하기 (cmsg_01SMy6spzkHA3Ttz9fg54ZY8CaV8MmZNJMr6i4WjnuBNit), started 11-13 01:31 KST.** User: ultra code review (울트라코드) of every part of the bot INCLUDING lorebook & guides (모순·불일치·과토큰), fix problems, then release. Branch claude/project-thread-9rc8hb; doc /mnt/project-files/release_check_1113/넘김_1113_전수검사.md; results release_check_1113/audit_results/검사결과_499건.json; user decisions release_check_1113/사용자_결정_17건.md. **11-13 08:28 KST plan (user OK'd):** Fable quota out until 11-16 05:00 KST; finish verify/fix/test with Opus, release WITHOUT 5 missing find-checks (시작기·업데이트, 갱신기 지침 대조, 지침 토큰 측정, 로어북 조직·장소, 괴이 뒷부분); then full handoff INSIDE GitHub repo (doc + memory copy + results + scripts, CLAUDE.md top pointer) because user will switch to a different account (no memory/project files carry over). 호출 흐름 (고침5) not yet user-confirmed. Keep 아바타 & unfake threads open (user).
