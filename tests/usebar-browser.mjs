@@ -1,5 +1,5 @@
 // 「다음 메시지에 사용」 칩 (host/usebox.ts) — 2026-11-12 사용자: 「채팅 보냈는데 왜 안 없어져」
-// 보는 것: 놓으면 마지막 메시지 아래에 보임 → 보내면(요청 조립) 바로 숨음, 요청에는 한 번만 실림 → 응답이 붙어도 숨은 채 기록만 남음 → 다음 턴엔 안 실림
+// 보는 것: 놓으면 마지막 메시지 아래에 보임 → 보내면(요청 조립) 이름표가 「보내는 중」(전수검사 11-13), 요청에는 한 번만 실림 → 응답이 붙으면 숨고 기록만 남음 → 다음 턴엔 안 실림
 //         빈 입력 이어 쓰기 · 다시 굴리기 · 요청 실패(기다림 시간 초과) · 새로 고침.
 // 사용법: node tests/usebar-browser.mjs [out-dir]   (out-dir 을 주면 PC·폰 사진을 남긴다)
 import { mkdirSync } from 'node:fs';
@@ -78,6 +78,7 @@ for (const vp of ['pc', 'phone']) {
     const card = on[0];
     return {
       shown: on.length,
+      label: card ? getComputedStyle(card.querySelector('[data-gu-label]'), '::before').content.replace(/^"|"$/g, '') : '',
       under: card ? card.closest('.chat-message-container').dataset.role : '',
       last: card ? card.closest('.chat-message-container') === list.firstElementChild : false,
       names: card ? [...card.querySelectorAll('[data-gu]')].filter(vis).map((e) => getComputedStyle(e, '::before').content.replace(/^"|"$/g, '')) : [],
@@ -115,7 +116,7 @@ for (const vp of ['pc', 'phone']) {
   if (r.uses.length !== 1 || !/소형 손전등/.test(r.uses[0]) || !/딸기맛 막대사탕/.test(r.uses[0])) bad(`요청에 uses 줄이 한 번 실려야 한다: ${JSON.stringify(r.uses)}`);
   s = await bar();
   console.log(vp, '1 sent', JSON.stringify(s), JSON.stringify(r.uses));
-  if (s.shown !== 0) bad(`보낸 뒤(응답 전) 칩이 남아 있다: ${JSON.stringify(s)}`);
+  if (s.shown !== 1 || s.label !== '보내는 중' || s.names.length !== 2) bad(`보낸 뒤(응답 전) 칩은 이름표 「보내는 중」으로 남아야 한다: ${JSON.stringify(s)}`);
   await shot('2_sent_waiting');
   await respond();
   s = await bar();
@@ -134,7 +135,7 @@ for (const vp of ['pc', 'phone']) {
   await reset(); await queue();
   r = await send(null);
   s = await bar();
-  if (r.uses.length !== 1 || s.shown) bad(`빈 입력 이어 쓰기: 요청에 한 번 실리고 칩은 숨어야 한다: ${JSON.stringify(r.uses)} ${JSON.stringify(s)}`);
+  if (r.uses.length !== 1 || s.shown !== 1 || s.label !== '보내는 중') bad(`빈 입력 이어 쓰기: 요청에 한 번 실리고 칩은 「보내는 중」이어야 한다: ${JSON.stringify(r.uses)} ${JSON.stringify(s)}`);
   await respond();
   v = await vars(); s = await bar();
   console.log(vp, '2 continue', JSON.stringify(v));
@@ -167,7 +168,7 @@ for (const vp of ['pc', 'phone']) {
   await queue();
   await send('쓴다');
   s = await bar();
-  if (s.shown) bad(`실패 시험: 보낸 직후엔 숨어야 한다: ${JSON.stringify(s)}`);
+  if (s.shown !== 1 || s.label !== '보내는 중') bad(`실패 시험: 보낸 직후엔 이름표가 「보내는 중」이어야 한다: ${JSON.stringify(s)}`);
   await page.clock.fastForward(181_000);
   await sleep(400);
   s = await bar();

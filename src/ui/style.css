@@ -4870,8 +4870,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-fx-head .ms-num { width: 64px; }
 .ms-fx-wide { flex: 1; min-width: 0; }
 .ms-fx-wide > input { flex: 1; min-width: 0; }
-/* 폰에서 「인터넷 접속」 고르기가 카드 밖으로 나가 마지막 칸이 잘렸다 → 넘치면 두 줄로 (전수검사 11-13) */
-.gw .ms-fx .ph-inline > .gx-segs { flex-wrap: wrap; height: auto; max-height: none; max-width: 100%; }
+/* 폰에서 「인터넷 접속」 고르기가 카드 밖으로 나가 마지막 칸이 잘렸다 → 높이 34 규격은 그대로, 폰에서만 칸 안 여백을 줄여 한 줄로 카드 안에 (390·360 폭 확인, 전수검사 11-13) */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .ms-fx .ph-inline > .gx-segs > .gx-seg { padding: 0 4px; }
+}
 /* 칸 입력 표 (값 등급·상담사 주사위 칸·그림 대체 말, 2026-11-12 사용자: 글 상자에 줄을 치게 하지 말고 칸으로) — 조작은 전부 공통 규격 그대로(.gx-search·.ms-num·.st-step·.gx-mini), 배치만 여기서 */
 .gw .ps-row.ms-wide > .ps-ctl { display: block; }
 .ms-tb { display: flex; flex-direction: column; gap: 6px; width: 100%; }
