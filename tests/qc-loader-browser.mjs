@@ -551,7 +551,8 @@ if (!skip()) {
   await frame.click('[data-action="ed-inst-all"]');
   await frame.waitForFunction(() => /끝났어요|바꿀 것이 없었어요/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 30000 });
   assert.match(await frame.textContent('.gw-install .gx-hint'), /^로어북·인사말(·봇 이름)? — 끝났어요\.$/, '두 번째: 로어북만 다시 맞춤');
-  assert.equal((await fetched(frame)).length, f0, '두 번째는 아무것도 안 받음');
+  // 위키 팩이 낡았는지 보려고 목록(wiki-base.json)만 읽는다 (전수검사 11-13 wiki#8). 팩·사진은 안 받음
+  assert.deepEqual((await fetched(frame)).slice(f0).filter((u) => u !== 'wiki-base.json'), [], '두 번째는 아무것도 안 받음');
   // 저장소 사용량(설정 내보내기)에 본체·위키·토크나이저가 보인다
   await frame.click('[data-action="ed-node"][data-value="manage:backup"]');
   await frame.waitForFunction(() => /플러그인 본체/.test(document.querySelector('.gw')?.textContent ?? '') && !/…/.test(document.querySelector('.gw-tokens')?.textContent ?? ''), null, { timeout: 5000 });
@@ -661,7 +662,8 @@ if (!skip()) {
   assert.match(await frame.textContent('.gw-install'), /모두 갖춰져 있어요/, '위키·토크나이저가 있으면 빠진 것 없음 (아이콘만 다름)');
   await frame.click('[data-action="ed-node"][data-value="manage:diag"]');
   assert.match(await frame.textContent('.gw'), /o200k_base/, '다시 읽은 토크나이저');
-  assert.ok(!(await fetched(frame)).some((n) => /tok-o200k|wiki-base|goei-body|goei-data-world/.test(n)), '토크나이저·위키·본체·세계 자료는 받지 않음 (창을 열면 version.json 과 설치 자료 팩만)');
+  // 위키는 낡았는지 보려고 목록(wiki-base.json)만 읽는다 (전수검사 11-13 wiki#8). 팩 조각은 받지 않음
+  assert.ok(!(await fetched(frame)).some((n) => /tok-o200k|wiki-base\.\d|goei-body|goei-data-world/.test(n)), '토크나이저·위키·본체·세계 자료는 받지 않음 (창을 열면 version.json·설치 자료 팩·위키 목록만)');
   // 깨진 저장값: 어림값으로
   await page.close();
   const bad = await boot([fixture], 0, emptyChat(), { body: bodyCode, store: { 'p:goei:tok-o200k': '{"pat_str":1}'.padEnd(2000, ' '), 'p:goei:wikibase': 'NOTAPACK' }, serve: installFiles });

@@ -67,7 +67,7 @@ test('자료 팩 조각: 이어 붙이면 팩 글, 지문이 본체에 박혀 �
   }
   const w = JSON.parse(worldPackText());
   assert.deepEqual([w.schema, w.kind], [1, 'world']);
-  assert.deepEqual([Object.keys(w.agent).length, Object.keys(w.org).length, Object.keys(w.anomaly).length, Object.keys(w.site).length, Object.keys(w.appendix).length, Object.keys(w.relations.pairs).length], [55, 17, 63, 11, 4, 78]);
+  assert.deepEqual([Object.keys(w.agent).length, Object.keys(w.org).length, Object.keys(w.anomaly).length, Object.keys(w.site).length, Object.keys(w.appendix).length, Object.keys(w.relations.pairs).length], [55, 17, 63, 11, 6, 78]);
   const i = JSON.parse(installPackText());
   assert.deepEqual([i.schema, i.kind, i.greetings.texts.length], [1, 'install', 1]);
   assert.match(i.icon.file, /^icon\.(png|webp)$/);

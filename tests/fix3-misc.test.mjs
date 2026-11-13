@@ -72,9 +72,10 @@ test('그림 찾기 바뀜 횟수: 같은 대체 표·같은 분류 설정은 �
   assert.equal((src.match(/hits\.clear\(\);/g) ?? []).length, 4, '팩을 바꾸는 세 곳 + 바뀜 횟수');
 });
 
-test('폰 「인터넷 접속」 고르기는 넘치면 접힌다 (css#5)', async () => {
+test('폰 「인터넷 접속」 고르기는 높이 34 한 줄로 카드 안에: 폰에서만 칸 여백을 줄인다 (css#5)', async () => {
   const css = await read('src/ui/style.css');
-  assert.match(css, /\.gw \.ms-fx \.ph-inline > \.gx-segs \{ flex-wrap: wrap; height: auto; max-height: none; max-width: 100%; \}/);
+  assert.match(css, /\.gw \.ms-fx \.ph-inline > \.gx-segs > \.gx-seg \{ padding: 0 4px; \}/);
+  assert.doesNotMatch(css, /\.gw \.ms-fx \.ph-inline > \.gx-segs \{ flex-wrap: wrap/, '두 줄로 접으면 높이 34 규격이 깨진다');
 });
 
 test('실패 기록의 게시판 이름은 보고 있는 사이트 (wording#1)', async () => {
