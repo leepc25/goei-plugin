@@ -957,8 +957,8 @@ if (want('W1')) {
   assert.equal(call.mode, 'submodel');
   assert.ok(call.messages[0].content.includes('SELECTED LENGTH: SHORT'), '길이 짧게');
   assert.ok(!call.messages[0].content.includes('SELECTED LENGTH: DETAILED'));
-  assert.ok(call.messages[1].content.includes('[사용자 작성 지침 — 모든 문서 공통]\n존댓말로 쓸 것'));
-  assert.ok(call.messages[1].content.includes('[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n출구를 자세히'));
+  assert.ok(call.messages[1].content.includes('[사용자 작성 지침: 모든 문서 공통]\n존댓말로 쓸 것'));
+  assert.ok(call.messages[1].content.includes('[사용자 작성 지침: 이 문서만]\n출구를 자세히'));
   assert.ok(call.messages[1].content.includes('[최근 챗로그]'));
   assert.ok(!call.messages[1].content.includes('[이전 위키'), '처음 쓸 땐 이전 문서 없음');
   // 성공: 확장 모드로 바꾸고 생성 → 저장 → 문서 화면 (XSS 포함)

@@ -265,14 +265,14 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 
   await R.section('3-1 에셋 on/off × main/aux × 주인공 에셋 × 캐릭터로 플레이 → 이미지 지침', async () => {
     let out = await request(page, base());
-    assert.ok(imgPrompt(out)?.includes('Do not create tags for {{user}}'), '기본: main·주인공 OFF');
+    assert.ok(imgPrompt(out)?.includes('Do not create tags for Tester.'), '기본: main·주인공 OFF (지침 속 {{user}}는 유저 이름으로 푼다, 전수검사 11-13)');
     await setVars(page, { $st_asset_on: '0' });
     assert.equal(imgPrompt(await request(page, base())), null, '에셋 끔');
     await setVars(page, { $st_asset_on: '1', $st_asset_model: 'aux' });
     assert.equal(imgPrompt(await request(page, base())), null, '보조 모델이면 메인 지침 없음');
     await setVars(page, { $st_asset_model: 'main', $st_asset_player: '1' });
     out = await request(page, base());
-    assert.ok(!imgPrompt(out).includes('Do not create tags for {{user}}') && imgPrompt(out).includes('Tester'), '주인공 ON: 페르소나 이름이 명단에');
+    assert.ok(!imgPrompt(out).includes('Do not create tags for') && imgPrompt(out).includes('Tester'), '주인공 ON: 페르소나 이름이 명단에');
     // 옛 카드의 Asset 로어북 본문이 요청에 남아 있으면 지운다
     out = await request(page, [sys('## Inserting Character Visual Images\n옛 본문\nOnly use those provided.\n---'), ...base()]);
     assert.equal(out.filter((m) => m.content.includes('## Inserting Character Visual Images')).length, 1, '옛 Asset 본문 제거');
@@ -286,7 +286,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     // 11-07 사용자: 페르소나 자리에는 그 요원 로어북만 (틀 지침 「대사·행동을 쓰지 마라」 없음, core/player.ts playerBlock)
     assert.ok(s0.includes('### Character - Jyaldi') && !s0.includes('## Player Character') && !s0.includes('The user plays') && !s0.includes('loves coffee'), `페르소나 자리에 요원 로어북만: ${s0.slice(0, 120)}`);
     assert.ok(!out.some((m) => /\bTester\b/.test(m.content)), '페르소나 이름 → 요원 이름');
-    assert.ok(out.at(-2).content.includes('쟈알디가 웃었다'));
+    assert.ok(out.at(-1).content.includes('쟈알디가 웃었다'), '끝 assistant(프리필)는 이미지 지침 뒤에 그대로 마지막 (전수검사 11-13)');
     assert.ok(!imgPrompt(out).includes('Jyaldi'), '주인공 OFF: 주인공 요원은 이미지 명단에서 뺌');
     assert.ok(!loreOf(out).content.includes('### Character - Jyaldi'), '주인공 요원 로어는 고르지 않음 (주인공 글로 대신)');
     await setVars(page, { $st_asset_player: '1' });
@@ -314,7 +314,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
       assert.equal(out.indexOf(b), out.length - 3, `${inject}: 마지막 사용자 앞 (이미지 지침은 맨 끝)`);
       const lore = loreOf(out).content;
       if (inject === 'split' || inject === 'record') assert.ok(!lore.includes('### Character - Jyaldi'), `${inject}: 시트 원문은 요청에서 뺀다`);
-      else assert.ok(lore.includes('### Character - Jyaldi'), 'append: 시트 그대로');
+      else assert.ok(!lore.includes('### Character - Jyaldi') && b.content.includes('### Character - Jyaldi'), 'append: 시트는 원래 자리에서 빼고 기록 블록 안에 한 번 (전수검사 11-13)');
     }
     // 「컨텍스트 포함」 끔은 「사용」과 합쳐졌다 (2026-11-11 설정 개편 3단계): 인물 기록을 끄면 블록이 없다
     await setVars(page, { $pp_on: '0' });

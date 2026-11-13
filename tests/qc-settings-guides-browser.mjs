@@ -25,7 +25,8 @@ const defaults = {
   Directive: readFileSync(new URL('../src/data/guides/directive.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   RP: readFileSync(new URL('../src/data/guides/rp.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   Tag: readFileSync(new URL('../src/data/guides/tag.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
-  Shop: readFileSync(new URL('../src/data/guides/shop.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+  // 상점 지침은 우주몰 전용 절을 뺀 글 (전수검사 11-13 guides#4: core/guides.ts dropSections(shop, MALL_ONLY))
+  Shop: (await import('../dist-test/core.mjs')).guideDefault('Shop'),
   Updater: readFileSync(new URL('../src/data/guides/updater-detailed.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   UpdaterCompact: readFileSync(new URL('../src/data/guides/updater-compact.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
 };

@@ -933,7 +933,19 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const users = (r) => r.filter((m) => m.role === 'user');
   assert.equal(users(req).length, 1);
   assert.ok(!users(req)[0].content.includes('SCENE_CARD') && users(req)[0].content.endsWith('Situation:\n조용히 진입한다'), users(req)[0].content);
-  const req2 = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '그리고 문을 연다' }], 'model'), rec.data);
+  // 카드가 채팅의 마지막이면 뒤의 user 글은 프리셋 글이라 합치지 않는다 (전수검사 11-13 pipeline#7)
+  const preset2 = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '<프리셋 끝 지시>' }], 'model'), rec.data);
+  assert.equal(users(preset2).length, 2);
+  assert.ok(users(preset2)[0].content.endsWith('Situation:\n조용히 진입한다') && users(preset2)[1].content === '<프리셋 끝 지시>', JSON.stringify(users(preset2)));
+  // 채팅에 실제로 덧붙여 보낸 글이면 합친다
+  const req2 = await page.evaluate(async (t) => {
+    window.__chat.message.push({ role: 'user', data: '그리고 문을 연다' });
+    try {
+      return await window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '그리고 문을 연다' }], 'model');
+    } finally {
+      if (window.__chat.message.at(-1)?.data === '그리고 문을 연다') window.__chat.message.pop();
+    }
+  }, rec.data);
   assert.equal(users(req2).length, 1);
   assert.ok(users(req2)[0].content.endsWith('Situation:\n조용히 진입한다\n\n그리고 문을 연다'), users(req2)[0].content);
   // 장소 자체 선택: 아직 안 보낸 카드는 바꿔 끼운다
@@ -1248,7 +1260,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(call.messages.length, 2);
   assert.ok(call.messages[1].content.startsWith('문서 제목: 소라 랜드\n\n[참고 자료]'), call.messages[1].content.slice(0, 200));
   assert.ok(call.messages[1].content.includes('[주제 원본: 소라 랜드]'));
-  assert.ok(call.messages[1].content.endsWith('이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n폐장 이유 위주로'), '이 문서 지침');
+  assert.ok(call.messages[1].content.endsWith('[사용자 작성 지침: 이 문서만]\n폐장 이유 위주로'), '이 문서 지침');
   const lore = await page.evaluate(() => window.__chat.localLore);
   assert.equal(lore.length, 1);
   assert.equal(lore[0].comment, 'WIKI｜소라 랜드');
@@ -1671,7 +1683,15 @@ if (fixture.globalLore.some(packed)) {
   const rec = await page.evaluate(() => window.__chat.message.at(-1).data);
   const card = await page.evaluate((r) => window.__calls.handlers.display(r), rec);
   assert.ok(card.includes('쟈알디') && card.includes('전화를 걸었다') && !card.includes('현장 상황 보고'));
-  const req = await page.evaluate(async (r) => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model')), rec);
+  // 전화 기록 뒤 user 글은 채팅에 실제로 덧붙인 글일 때만 통화 내용으로 합친다 (전수검사 11-13 pipeline#7: 기록이 채팅 마지막이면 뒤 글은 프리셋)
+  const req = await page.evaluate(async (r) => {
+    window.__chat.message.push({ role: 'user', data: '빨리 받아' });
+    try {
+      return window.__core(await window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model'));
+    } finally {
+      if (window.__chat.message.at(-1)?.data === '빨리 받아') window.__chat.message.pop();
+    }
+  }, rec);
   assert.equal(req[req.length - 1].content, '{{user}} places a phone call to 쟈알디.\n\n현장 상황 보고\n\n빨리 받아');
   // 본편 반영: 대화·공지가 마지막 사용자 메시지 바로 앞 system 메시지로
   // 사용자 메시지 앞 system 들 가운데 (소지품 [Inventory] 등 다른 기능 글도 붙는다, 11-07)
@@ -1922,11 +1942,11 @@ if (fixture.globalLore.some(packed)) {
   // 종류별 개수: 명부 탭 머리(.dir-kinds) 대신 왼쪽 목록의 개수.
   // 조직은 명부 17 + 세계 기록에만 있는 조직까지 센다(record.ts recordCount: 명부 줄 ∪ 세계 기록) → 18
   const treeN = (k) => page.textContent(`.gw .gw-tree-item[data-value="${k}"] em`).then(Number);
-  assert.deepEqual([await treeN('anomaly'), await treeN('agent'), await treeN('org'), await treeN('appendix')], [63, 55, 17, 4]);
+  assert.deepEqual([await treeN('anomaly'), await treeN('agent'), await treeN('org'), await treeN('appendix')], [63, 55, 17, 6]);
   // 부록: 펼치면 본 항목·조건·해금 (해금은 이 채팅에 바로 적는다). 모두 본 항목을 찾음 (못 찾으면 기본 정보에 「본 항목을 찾지 못했어요」)
   await edGo(page, 'appendix');
   const apps = await page.$$eval('.gw .gw-list .gw-row', (rows) => rows.map((r) => r.dataset.value));
-  assert.equal(apps.length, 4);
+  assert.equal(apps.length, 6);
   for (const name of apps) {
     await page.click(`.gw .gw-row[data-value="${name}"]`);
     await page.waitForFunction((n) => document.querySelector('.gw .gw-detail h2')?.textContent?.includes(n), name);
