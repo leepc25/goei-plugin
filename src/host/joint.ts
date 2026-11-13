@@ -4,6 +4,7 @@
 import { JOINT_KEY, JOINT_LABEL, type JointKind } from '../core/netjoint';
 import { guideOr } from '../core/guides';
 import { runModel, type LlmMessage, type ModelChoice } from './llm';
+import { markPrepared, prepareAttachmentGroups } from '../core/attach';
 
 export type { JointKind } from '../core/netjoint';
 type Msg = LlmMessage & { images?: string[] };
@@ -68,9 +69,13 @@ export function combinedPrompts(tasks: JointTask[]): LlmMessage[] {
   return [{ role: 'system', content: instruction(tasks.map((t) => t.key)) }, { role: 'user', content: JSON.stringify(body) }];
 }
 
-/** 통합 응답에서 각 결과의 JSON 글을 경계만 찾아 자른다 (원본 splitCombined). 한 칸이 깨져도 다른 칸은 산다. null이면 그 작업은 결과 없음 */
-export function splitCombined(raw: string, keys: string[] = ['gnet', 'phone']): Record<string, string | null> {
-  let s = raw.replace(/^﻿/, '').trim();
+/** 통합 응답에서 각 결과의 JSON 글을 경계만 찾아 자른다 (원본 splitCombined). 한 칸이 깨져도 다른 칸은 산다. null이면 그 작업은 결과 없음.
+ *  partial: 겉 모양이 어긋나도 던지지 않고 다 읽은 칸만 돌려준다. 잘렸거나 빠진 칸·모르는 칸은 키가 없다 (전수검사 11-13) */
+export function splitCombined(raw: string, keys: string[] = ['gnet', 'phone'], partial = false): Record<string, string | null> {
+  let s = raw.replace(/^\uFEFF/, '').trim();
+  // 괴담톡 말버릇 칸(<ph-habits>)은 봉투 밖에 붙어 온다: 떼어 두었다가 phone 칸 끝에 돌려준다
+  const habits = (s.match(/<ph-habits>[\s\S]*?<\/ph-habits>/gi) ?? []).join('');
+  if (habits) s = s.replace(/<ph-habits>[\s\S]*?<\/ph-habits>/gi, '').trim();
   const fence = /^```(?:json)?\s*\n([\s\S]*?)\n?```$/i.exec(s);
   if (fence) s = fence[1].trim();
   // 앞뒤에 설명문이 붙었으면 첫 { 부터 마지막 } 까지만 (11-09: 가르기 실패 → 따로 두 번 부르던 것을 줄임)
@@ -94,42 +99,61 @@ export function splitCombined(raw: string, keys: string[] = ['gnet', 'phone']): 
     }
     return fail('끝나지 않은 문자열');
   };
-  if (s[i++] !== '{') fail('JSON 객체가 없음');
+  // { 나 [ 로 시작하는 값 하나를 괄호 짝까지 넘긴다
+  const nested = () => {
+    const stack = [s[i] === '{' ? '}' : ']'];
+    i++;
+    while (i < n && stack.length) {
+      const c = s[i];
+      if (c === '"') quoted();
+      else if (c === '{' || c === '[') (stack.push(c === '{' ? '}' : ']'), i++);
+      else if (c === '}' || c === ']') {
+        if (c !== stack.pop()) fail('괄호');
+        i++;
+      } else i++;
+    }
+    if (stack.length) fail('중간에 잘림');
+  };
+  // 쓰지 않을 값 하나를 넘긴다 (partial 에서 모르는 칸·객체가 아닌 값)
+  const skip = () => {
+    if (s[i] === '"') quoted();
+    else if (s[i] === '{' || s[i] === '[') nested();
+    else while (i < n && s[i] !== ',' && s[i] !== '}') i++;
+  };
   const parts: Record<string, string | null> = {};
-  for (;;) {
-    space();
-    const key = JSON.parse(quoted()) as string;
-    if (!keys.includes(key) || key in parts) fail(`알 수 없는 칸 ${key}`);
-    space();
-    if (s[i++] !== ':') fail('구분자');
-    space();
-    const first = i;
-    if (s.startsWith('null', i)) {
-      i += 4;
-      parts[key] = null;
-    } else {
-      if (s[i] !== '{') fail('결과가 객체가 아님');
-      const stack = ['}'];
-      i++;
-      while (i < n && stack.length) {
-        const c = s[i];
-        if (c === '"') quoted();
-        else if (c === '{' || c === '[') (stack.push(c === '{' ? '}' : ']'), i++);
-        else if (c === '}' || c === ']') {
-          if (c !== stack.pop()) fail('괄호');
-          i++;
-        } else i++;
+  try {
+    if (s[i++] !== '{') fail('JSON 객체가 없음');
+    for (;;) {
+      space();
+      const key = JSON.parse(quoted()) as string;
+      const known = keys.includes(key) && !(key in parts);
+      if (!known && !partial) fail(`알 수 없는 칸 ${key}`);
+      space();
+      if (s[i++] !== ':') fail('구분자');
+      space();
+      const first = i;
+      if (!known) skip();
+      else if (s.startsWith('null', i)) {
+        i += 4;
+        parts[key] = null;
+      } else if (s[i] !== '{') {
+        if (!partial) fail('결과가 객체가 아님');
+        skip();
+      } else {
+        nested();
+        parts[key] = s.slice(first, i);
       }
-      if (stack.length) fail('중간에 잘림');
-      parts[key] = s.slice(first, i);
+      space();
+      const c = s[i++];
+      if (c === '}') break;
+      if (c !== ',') fail('결과 구분자');
     }
     space();
-    const c = s[i++];
-    if (c === '}') break;
-    if (c !== ',') fail('결과 구분자');
+    if (!partial && (i < n || keys.some((k) => !(k in parts)))) fail('결과가 빠졌거나 뒤에 다른 글이 붙음');
+  } catch (error) {
+    if (!partial) throw error;
   }
-  space();
-  if (i < n || keys.some((k) => !(k in parts))) fail('결과가 빠졌거나 뒤에 다른 글이 붙음');
+  if (habits && typeof parts.phone === 'string') parts.phone += habits;
   return parts;
 }
 
@@ -169,11 +193,22 @@ export class Joint {
     else for (const [k, w] of this.waits) runModel(w.messages, this.model, this.staticModel, JOINT_LABEL[k]).then(w.resolve, w.reject);
   }
 
+  /** 작업들을 한 요청으로. 첨부는 작업마다 먼저 바꾸고(번호는 이어서) 합친 요청은 runModel 에서 다시 바꾸지 않는다 (전수검사 11-13) */
+  private prompt(kinds: JointKind[]): LlmMessage[] {
+    const pre = prepareAttachmentGroups(kinds.map((k) => this.waits.get(k)!.messages));
+    return markPrepared([...combinedPrompts(kinds.map((k, i) => ({ key: JOINT_KEY[k], messages: pre.groups[i] }))), ...(pre.data ? [pre.data] : [])]);
+  }
+
+  private alone(k: JointKind): void {
+    const w = this.waits.get(k)!;
+    runModel(w.messages, this.model, this.staticModel, `${JOINT_LABEL[k]} (통합 뒤 따로)`).then(w.resolve, w.reject);
+  }
+
   private async all(): Promise<void> {
     const kinds = [...this.waits.keys()];
     const keys = kinds.map((k) => JOINT_KEY[k]);
     const label = `${kinds.map((k) => JOINT_LABEL[k]).join('+')} 통합`;
-    const prompt = combinedPrompts(kinds.map((k) => ({ key: JOINT_KEY[k], messages: this.waits.get(k)!.messages })));
+    const prompt = this.prompt(kinds);
     let raw = '';
     try {
       raw = await runModel(prompt, this.model, this.staticModel, label);
@@ -181,27 +216,45 @@ export class Joint {
       for (const w of this.waits.values()) w.reject(error);
       return;
     }
-    let parts: Record<string, string | null>;
-    try {
-      parts = splitCombined(raw, keys);
-    } catch (error) {
-      // 통합 응답을 못 가르면 (울타리·설명문·중간 잘림) 겉 모양만 고쳐 달라고 한 번 더 묻고, 그래도 안 되면 각 작업을 따로 한 번씩 보낸다
+    // 다 읽은 칸은 쓰고, 잘렸거나 빠진 칸만 다시 보낸다 (전수검사 11-13: 한 칸만 잘려도 전부 버리고 2+N번 불렀다)
+    let parts = splitCombined(raw, keys, true);
+    if (!Object.keys(parts).length) {
+      // 칸을 하나도 못 읽으면 (거절문·객체 없음) 겉 모양만 고쳐 달라고 한 번 더 묻고, 그래도 안 되면 각 작업을 따로 한 번씩 보낸다
       // (11-09 사용자: 따로 도는 것처럼 보였다). 모델 연결 오류(LlmError)는 형식 재시도가 없어서 여기서 버리면 그 턴의 자동 확인이 통째로 사라졌다 (QC 2026-10-28)
-      console.log(`[goei] 통합 자동 확인 응답을 가르지 못해 겉 모양을 다시 묻어요: ${error instanceof Error ? error.message : String(error)}`);
+      console.log('[goei] 통합 자동 확인 응답을 가르지 못해 겉 모양을 다시 묻어요');
       try {
-        const fix = await runModel([...prompt, { role: 'assistant', content: raw }, { role: 'user', content: jointRetryText(keys) }], this.model, this.staticModel, `${label} 다시 묻기`);
-        parts = splitCombined(fix, keys);
+        const fix = await runModel(markPrepared([...prompt, { role: 'assistant', content: raw }, { role: 'user', content: jointRetryText(keys) }]), this.model, this.staticModel, `${label} 다시 묻기`);
+        parts = splitCombined(fix, keys, true);
       } catch (again) {
         console.log(`[goei] 통합 자동 확인 응답을 끝내 가르지 못해 따로 보내요: ${again instanceof Error ? again.message : String(again)}`);
         parts = {};
       }
     }
-    // null이면 그 작업만 따로 한 번 더 (다른 결과로 대신 채우지 않는다)
+    const missing: JointKind[] = [];
+    let alive = 0;
     for (const k of kinds) {
-      const w = this.waits.get(k)!;
-      const part = parts[JOINT_KEY[k]];
-      if (part) w.resolve(part);
-      else runModel(w.messages, this.model, this.staticModel, `${JOINT_LABEL[k]} (통합 뒤 따로)`).then(w.resolve, w.reject);
+      const key = JOINT_KEY[k];
+      const part = parts[key];
+      if (part) {
+        this.waits.get(k)!.resolve(part);
+        alive++;
+      } else if (key in parts) this.alone(k); // null이면 그 작업만 따로 한 번 더 (다른 결과로 대신 채우지 않는다)
+      else missing.push(k);
     }
+    // 잘렸거나 빠진 칸이 둘 이상이고 살아난 칸이 있으면 그것들만 한 번 더 묶는다 (1회). 나머지는 따로
+    if (missing.length >= 2 && alive > 0) {
+      const again = missing.map((k) => JOINT_KEY[k]);
+      let more: Record<string, string | null> = {};
+      try {
+        more = splitCombined(await runModel(this.prompt(missing), this.model, this.staticModel, `${missing.map((k) => JOINT_LABEL[k]).join('+')} 통합`), again, true);
+      } catch (error) {
+        console.log(`[goei] 남은 통합 자동 확인을 가르지 못해 따로 보내요: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      for (const k of missing) {
+        const part = more[JOINT_KEY[k]];
+        if (part) this.waits.get(k)!.resolve(part);
+        else this.alone(k);
+      }
+    } else for (const k of missing) this.alone(k);
   }
 }

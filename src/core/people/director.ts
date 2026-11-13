@@ -6,6 +6,7 @@ import { messageText } from '../refs';
 import { listDocs } from '../wiki';
 import { addressOf, affinityView } from './affinity';
 import { axesLinesEn } from './axes';
+import { temperOf } from './base';
 import { knowledgeRule, personBlock, unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
 import { rhythmClock, rhythmClockLines } from './rhythm';
@@ -85,7 +86,8 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const persons = people.map((n) => {
     const p = store.people[n];
     const slot = (k: 'state' | 'threads' | 'knowledge' | 'suspicion') => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
-    const aff = affinityView(p, changes, store.folded[n] ?? 0, { speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap });
+    // 성격 계수(temper)도 본편·화면과 같이 넣는다 (전수검사 11-13)
+    const aff = affinityView(p, changes, store.folded[n] ?? 0, { temper: temperOf(n), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap });
     const slots: Record<string, { text: string; target?: string }[]> = {};
     for (const k of featureSlots) {
       const es = liveEntries(p.slots[k as SlotId], live).slice(-4).map((e) => ({ text: e.text, ...(e.target ? { target: e.target } : {}) }));
@@ -100,7 +102,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
       ...(s.directorFeatures && s.features.has('axes') ? { axes: axesLinesEn(p.axes), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
       // 성적 욕망·이상성욕 (원본 director people_profile: text + policy sexual_context_only)
       ...(() => { const t = sexualTexts(p, s); return { ...(t.desire ? { sexual_desire: { text: t.desire, policy: SEXUAL_POLICY } } : {}), ...(t.paraphilia ? { paraphilia: { text: t.paraphilia, policy: SEXUAL_POLICY } } : {}) }; })(),
-      record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
+      record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], temper: temperOf(n), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
       state: slot('state'),
       threads: slot('threads'),
       knowledge: slot('knowledge'),

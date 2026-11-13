@@ -1385,7 +1385,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-agpop-txt .gx-acard-top b { font-size: 16px; }
 .gx-agpop-txt small { font-size: 13px; color: var(--dim); }
 .gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
-.gx-agpop-x { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); } /* 그림은 상자 한가운데 (2026-11-13 사용자: X 가 삐뚤어짐 — 단추 기본 안쪽 여백 때문) */
+.gx-agpop-x { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); } /* 그림은 상자 한가운데 (2026-11-13 사용자: X 가 삐뚤어짐 — 단추 기본 안쪽 여백 때문) */
 .gx-agpop-x svg { display: block; }
 
 /* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
@@ -2892,13 +2892,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-oplog-foot button { min-height: var(--ctl-sm); padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .gx-oplog-foot button:hover { background: var(--accent-bg); }
 /* 종료 알림 오버레이 (2026-10-29): 창 머리 아래 가운데, 흐름 밖. 6초 뒤 사라짐·마우스 올리면 멈춤·X 닫기 (ui/records.ts 종료 알림 절) */
-.gx-rectoast { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 10px; width: max-content; max-width: min(92%, 560px); padding: 10px 8px 10px 14px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--void); background-image: linear-gradient(var(--accent-bg), var(--accent-bg)); color: var(--text); font-size: 14px; box-shadow: var(--shadow); animation: gx-rectoast-in .22s ease-out; }
+.gx-rectoast { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 10px; width: max-content; max-width: min(92%, 560px); padding: 10px 8px 10px 14px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--void); background-image: linear-gradient(var(--accent-bg), var(--accent-bg)); color: var(--text); font-size: 14px; animation: gx-rectoast-in .22s ease-out; }
 @keyframes gx-rectoast-in { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 .gx-rectoast > span { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
 .gx-rectoast > span svg { flex: none; width: 18px; height: 18px; color: var(--signal); }
 .gx-rectoast > span b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-rectoast .gx-mini { flex: none; }
-.gx-rectoast-x { flex: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--dim); cursor: pointer; }
+.gx-rectoast-x { flex: none; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--dim); cursor: pointer; }
 .gx-rectoast-x:hover { color: var(--text); background: color-mix(in srgb, var(--sub) 12%, transparent); }
 .gx-rectoast-x svg { width: 16px; height: 16px; }
 
@@ -3226,11 +3226,11 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-log .it-ic img { width: 42.5px; height: 42.5px; object-fit: contain; image-rendering: pixelated; } /* 원본 85px 의 꼭 절반 (2026-11-07 사용자) */
 /* 팝업 */
 .it-card { align-items: stretch; width: 380px; gap: 0; padding: 16px; }
-.it-ph { display: flex; gap: 10px; align-items: center; padding-right: 30px; }
+.it-ph { display: flex; gap: 10px; align-items: center; padding-right: 36px; }
 /* 삭제(빨간 휴지통): 닫기 바로 왼쪽. 휴지통이 있으면 이름 줄이 두 단추만큼 비켜 선다 */
-.it-del { right: 46px; color: var(--danger, #e5484d); }
+.it-del { right: 52px; color: var(--danger, #e5484d); }
 .it-del svg { width: 18px; height: 18px; }
-.it-del ~ .it-ph { padding-right: 66px; }
+.it-del ~ .it-ph { padding-right: 78px; }
 .it-ph .it-ic { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 10px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-ph .it-ic svg { width: 26px; height: 26px; }
 .it-ph b { display: block; font-size: 15px; }
@@ -3498,7 +3498,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .sh-det .it-btns { margin-top: 12px; }
 .sh-det .it-btns .gx-chip { font-size: 13px; }
 .it-btns .gx-chip:disabled { opacity: .45; }
-.sh-det .gx-agpop-x, .sh-wrap-card .gx-agpop-x { width: 30px; height: 30px; border-radius: var(--ri, 8px); }
+.sh-det .gx-agpop-x, .sh-wrap-card .gx-agpop-x { border-radius: var(--ri, 8px); } /* X 36px (사용자 11-13 14-1) */
 .sh-det .gx-agpop-x { top: 16px; right: 16px; } /* 카드 안쪽 여백과 같게 (2026-11-08 사용자: X 가 치우침) */
 /* 폰: 조작 40 · 전체 화면 · 3열 · 아래 [문의][닫기] · 문의 → 2/3 높이 주인 서랍 */
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {

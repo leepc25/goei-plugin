@@ -242,13 +242,13 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
   docs_item: ['물건 문서', '물건마다 바뀐 것'],
   taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축'],
   openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능'],
-  rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬'],
+  rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪치면 꺼 두세요. 리수폿 리듬'],
   faction_rep: ['세력 평판', '세력이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 본문 근거를 들어 판단해요. 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요.'],
   npc_emotion: ['인물끼리 감정', '인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)'],
 };
 
 const NUMERIC_HELP: Record<NumericFeature, string> = {
-  affinity: '끄면 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 메인 요청에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)',
+  affinity: '끄면 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 메인 요청에도 글만 들어가요. 숫자는 지금 값에 멈춰요',
   suspicion: '끄면 정성 모드. 단서 점수·단계 없이 「의심 내용·의심에 따른 말투·행동」 칸의 글로만',
   openness: '끄면 정성 모드. 0~300 값·단계·피임 표 없이 「성적 태도·태도에 따른 말투·행동」 칸의 글로만',
 };
@@ -872,7 +872,7 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 메인 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${ps.qualitative.has('affinity') ? `<p class="pp-extra"><b>정성 모드</b> — 숫자 없이 「호감 설명」 칸의 글로만 기록해요. 숫자는 ${aff.value}(${esc(aff.stage.label)})에 멈춰 있고 게임 대사 칸 고르기에만 쓰여요.</p>` : affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${sexualCard(ctx, p)}${extraCards(ctx, p, changes)}
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 메인 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${ps.qualitative.has('affinity') ? `<p class="pp-extra"><b>정성 모드</b> — 숫자 없이 「호감 설명」 칸의 글로만 기록해요. 숫자는 ${aff.value}(${esc(aff.stage.label)})에 멈춰 있어요.</p>` : affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${sexualCard(ctx, p)}${extraCards(ctx, p, changes)}
       <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}

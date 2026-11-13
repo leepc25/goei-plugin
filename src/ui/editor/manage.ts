@@ -175,7 +175,7 @@ function backupPage(ctx: ChatContext, canChat: boolean): string {
   const defaults = `<section class="ps-group"><h3>기본값</h3><div class="ps-rows">
       ${defRow('기본값으로 저장', '지금 설정을 기본값으로 저장해요. 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.', 'save', '기본값으로 저장')}
       ${defRow('기본값 불러오기', canChat ? '저장해 둔 기본값을 지금 채팅에 가져와요.' : '채팅을 시작한 뒤에 쓸 수 있어요. 새 채팅은 기본값으로 시작해요.', 'load', '불러오기', !canChat)}
-      ${defRow('초기화', '지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 플러그인 원래 값으로 되돌려요. 세계(카드 명부)는 그대로 둬요.', 'reset', '초기화', !canChat)}
+      ${defRow('초기화', '지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 플러그인 원래 값으로 되돌려요. 세계(카드 명부)와 추가 규칙은 그대로 둬요.', 'reset', '초기화', !canChat)}
     </div></section>${mainDefaultsConfirm(ctx)}`;
   return `<div class="gw-page gw-set">${head('', '저장·불러오기', '설정은 고치는 즉시 저장돼요. 여기서는 기본값을 저장·불러오기·초기화하고, 설정을 글(JSON)로 내보내고 가져와요.')}
     <div class="gx-settings gw-setbody">

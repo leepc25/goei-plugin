@@ -76,7 +76,19 @@ export function rhythmClock(store: PeopleStore, chat: Chat, live: Liveness, upto
     if (!es.length) continue;
     const head = parseHookHead(es[es.length - 1].text);
     if (!head) continue;
-    const planted = turnAt(chat, live.at.get(es[0].anchor) ?? 0);
+    // 심은 턴 = 대체 사슬 맨 처음 항목의 턴. 진전(upsert)마다 시계가 0으로 돌아가던 것 고침 (전수검사 11-13)
+    const byId = new Map(d.entries.map((e) => [e.id, e]));
+    const rootPos = (e: (typeof es)[number]): number => {
+      let min = live.at.get(e.anchor) ?? 0;
+      const seen = new Set<string>([e.id]);
+      for (let r = e.replaces ? byId.get(e.replaces) : undefined; r && !seen.has(r.id); r = r.replaces ? byId.get(r.replaces) : undefined) {
+        seen.add(r.id);
+        const pos = live.at.get(r.anchor);
+        if (!r.void && !r.folded && pos !== undefined) min = Math.min(min, pos);
+      }
+      return min;
+    };
+    const planted = turnAt(chat, Math.min(...es.map(rootPos)));
     const last = turnAt(chat, live.at.get(es[es.length - 1].anchor) ?? 0);
     lastPlant = lastPlant === null ? planted : Math.max(lastPlant, planted);
     const [lo, hi0] = HOOK_WINDOW[head.tier];

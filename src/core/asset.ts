@@ -75,13 +75,18 @@ export function stripImageTags(content: string): string {
   return content.replace(/\n\s*\n\s*<img\s*=[^>]*>\s*\n\s*\n/g, '\n\n').replace(/<img\s*=[^>]*>\s*/g, '');
 }
 
-/** 이미지 태그를 붙일 본문과, 건드리지 않을 뒤쪽(상태창 [▣| / [◎| 블록부터) */
-export function splitNarrative(content: string): { narrative: string; trailing: string } {
-  const cut = ['[▣|', '[◎|'].map((p) => content.indexOf(p)).filter((i) => i >= 0);
+/** 이미지 태그를 붙일 본문과, 건드리지 않을 앞쪽(Risu 생각 칸 <Thoughts>)·뒤쪽(상태창 [▣| / [◎| 블록부터) */
+export function splitNarrative(content: string): { leading: string; narrative: string; trailing: string } {
+  // 맨 앞 생각 칸은 번호·인물 판정에서 빼고 저장 본문에는 그대로 둔다 (전수검사 11-13)
+  const head = /^\s*(?:<Thoughts>[\s\S]*?<\/Thoughts>\s*)+/.exec(content);
+  const leading = head ? head[0] : '';
+  const rest = content.slice(leading.length);
+  const cut = ['[▣|', '[◎|'].map((p) => rest.indexOf(p)).filter((i) => i >= 0);
   const at = cut.length ? Math.min(...cut) : -1;
-  const narrative = at >= 0 ? content.slice(0, at) : content;
-  const trailing = at >= 0 ? content.slice(at) : '';
+  const narrative = at >= 0 ? rest.slice(0, at) : rest;
+  const trailing = at >= 0 ? rest.slice(at) : '';
   return {
+    leading,
     narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/gi, '').replace(/<!--[\s\S]*?-->/g, '')).trim(),
     trailing,
   };
@@ -245,6 +250,8 @@ export interface AssetJob {
   /** 이 본문으로 요청했다 (저장 전에 그대로인지 다시 확인) */
   original: string;
   paras: string[];
+  /** 앞에 그대로 붙일 생각 칸 */
+  leading: string;
   trailing: string;
   messages: { role: 'user'; content: string }[];
 }
@@ -252,18 +259,19 @@ export interface AssetJob {
 /** 태그를 붙일 것이 없으면 null */
 /** exclude: 태그하지 않을 영문명 (주인공 이미지를 끈 채 캐릭터로 플레이할 때 그 요원) */
 export function planAsset(content: string, d: ImageData, limit: number, exclude: string[] = []): AssetJob | null {
-  const { narrative, trailing } = splitNarrative(content);
+  const { leading, narrative, trailing } = splitNarrative(content);
   if (!narrative) return null;
   const active = activeCharacters(narrative, d).filter((name) => !exclude.includes(name));
   if (!active.length) return null;
   const paras = paragraphs(narrative);
   if (!paras.length) return null;
-  return { original: content, paras, trailing, messages: assetPrompt(active, paras, d, limit) };
+  return { original: content, paras, leading, trailing, messages: assetPrompt(active, paras, d, limit) };
 }
 
 export function finishAsset(job: AssetJob, response: string, d: ImageData, limit: number): string | null {
   const patches = parsePatches(response);
   if (!patches.length) return null;
   const body = applyPatches(job.paras, patches, limit, d);
-  return job.trailing ? `${body}\n${job.trailing}` : body;
+  const out = job.trailing ? `${body}\n${job.trailing}` : body;
+  return (job.leading ?? '') + out;
 }

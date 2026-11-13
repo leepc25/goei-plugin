@@ -54,7 +54,7 @@ export function shopMainLines(vars: Vars): number {
 export const capLines = <T>(lines: T[], max: number): T[] => (max > 0 && lines.length > max ? lines.slice(-max) : lines);
 
 /** 물건에 적어 두는 산 곳 (core/items.ts Item.store): 가게 이름 그대로, 우주 쇼핑몰 맞춤 주문을 받은 것은 'cos-order' */
-export type ItemStore = ShopPlace | 'cos-order';
+export type ItemStore = ShopPlace | 'cos-order' | 'hs';
 /** 새로 산 물건을 메인 요청에 「방금 삼」으로 붙이나. 산 곳이 안 적힌 것(망상홈쇼핑 등)은 거르지 않는다 */
 export function boughtPasses(vars: Vars, store: unknown): boolean {
   if (store === 'cos-order') return shopMain(vars, 'cos').has('order');

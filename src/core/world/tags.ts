@@ -115,8 +115,8 @@ function scanSites<S extends string>(text: string, kind: string, states: readonl
   });
 }
 
-/** 요원 코드 목록이나 「없음」뿐인 칸 (배치 칸으로 본다) */
-const DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
+/** 요원 코드 목록이나 「없음」뿐인 칸 (배치 칸으로 본다). 새 요원 코드(P39611)도 코드로 (전수검사 11-13) */
+const DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3,}(?:\s*[,/·]\s*[A-Z]\d{3,})*)$/i;
 
 /** 상태 뒤로 배치|상황 (2026-10-21 배치 칸 추가). 칸이 하나뿐이면 옛 태그라 상황으로 읽는다 (코드·없음뿐이면 상황을 빼먹은 새 태그) */
 export function scanIncidents(text: string): InTag[] {

@@ -76,7 +76,10 @@ test('망상홈쇼핑 설정: 줄이 적는 변수를 읽는 쪽이 읽는다 (�
   assert.deepEqual(hsSettings({ $hs_read: '웃음, 끄덕임' }).read, ['웃음', '끄덕임']);
   assert.deepEqual(hsSettings({ $hs_read: '' }).read, ['고개 꺾기', '굳은 응시'], '비우면 기본값');
   // 네 곳이 같이 쓰는 값은 기본 상점 자리($sh_*) 하나: 망상홈쇼핑 이름으로 적어도 읽지 않는다 (그래서 그런 줄·처리기를 두지 않는다)
-  for (const k of ['ctx', 'turns', 'refs', 'thoughts', 'diverse', 'prev']) assert.equal(JSON.stringify(hsSettings({ [`$hs_sh_${k}`]: k === 'thoughts' ? 'note' : k === 'turns' || k === 'refs' ? '7' : '0' })), base, `$hs_sh_${k}`);
+  // 맥락 반영만은 가게 표의 제 줄($hs_sh_ctx)이 있다 (core/shopfn.ts, 전수검사 11-13)
+  assert.equal(hsSettings({ $hs_sh_ctx: '0' }).shop.context, false);
+  assert.equal(hsSettings({ $sh_ctx: '0' }).shop.context, false, '제 값이 없으면 기본 상점 값');
+  for (const k of ['turns', 'refs', 'thoughts', 'diverse', 'prev']) assert.equal(JSON.stringify(hsSettings({ [`$hs_sh_${k}`]: k === 'thoughts' ? 'note' : k === 'turns' || k === 'refs' ? '7' : '0' })), base, `$hs_sh_${k}`);
   assert.equal(hsSettings({ $sh_turns: '7' }).shop.turns, 7);
 });
 

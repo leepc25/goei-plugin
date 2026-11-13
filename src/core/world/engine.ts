@@ -431,7 +431,8 @@ function applyAgents(w: WorldState, c: Catalog, s: WorldSettings, faction: strin
   const roster = rosterFor(w, c, faction, s.agent_limit);
   for (const t of scanAgents(text)) {
     // 코드(P001·p-001·「쟈알디(P001)」)를 먼저, 없으면 이름·영문명으로 찾는다
-    const key = (/[A-Z]-?\d{3}/i.exec(t.who)?.[0] ?? t.who).replace(/-/g, '').toUpperCase();
+    // 새 요원 코드(P39611)처럼 숫자가 셋보다 길어도 다 읽는다 (전수검사 11-13)
+    const key = (/[A-Z]-?\d{3,}/i.exec(t.who)?.[0] ?? t.who).replace(/-/g, '').toUpperCase();
     const who = t.who.trim().toLowerCase();
     const p = roster.find((r) => r.id === key) ?? roster.find((r) => r.name === t.who.trim() || (!!r.english && r.english.toLowerCase() === who));
     if (!p) continue;
@@ -495,7 +496,15 @@ function firstRegion(region: string): string | null {
 function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: string, text: string) {
   const pending = w.pending.an;
   let handled = false;
-  for (const t of scanAnomalies(text)) {
+  const tags = scanAnomalies(text);
+  // 이 응답에서 제 이름으로 불린 항목: 같은 지역의 다른 이름 태그가 덮거나 끝내지 못하게 한다 (전수검사 11-13)
+  const named = new Set<AnEntry>();
+  for (const t of tags) {
+    const key = presetCanon(c, t.name) ?? t.name;
+    if (!validName(key)) continue;
+    for (const x of w.an) if ((x.name === key || x.presetName === key) && regionMatch(t.region, locName(x.loc))) named.add(x);
+  }
+  for (const t of tags) {
     const canon = presetCanon(c, t.name);
     const manualIncoming = !!pending && canon === pending;
     let e: AnEntry | undefined;
@@ -527,6 +536,8 @@ function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: st
       }
     } else {
       e = matchAn(w, t.region, canon ?? t.name);
+      const key = canon ?? t.name;
+      if (e && named.has(e) && key !== e.name && key !== e.presetName) continue; // 지역만 맞은 다른 이름 태그는 버린다 (전수검사 11-13)
       if (!e && t.state === '활성' && validName(t.name) && !w.an.some((x) => x.name === t.name)) {
         // 모델이 스스로 낸 괴이는 추가 여유분 안에서만 받는다 (요청 대기 중인 커스텀 임무 몫은 남김)
         const extra = w.an.filter((x) => x.origin !== 'auto').length + (pending ? 1 : 0);
@@ -548,7 +559,7 @@ function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: st
         w.cleared = [...new Set([...(w.cleared ?? []), ...names])].slice(-200);
       }
       // 종료 태그(격리·소멸·클리어)에 적힌 상황 글은 보고서 「결과」(마지막 상황 글)가 된다 — 끝내기 전에 경과에 넣는다 (사용자 결정 2026-10-29)
-      const end = takeEndAt(w, e, t.situation);
+      const end = takeEndAt(w, e, t.situation, e.exploring ? null : dueAt(e, e.kind, s));
       closingText(w, e, end.text, c, faction);
       endAn(w, e, 'model', t.state === '클리어', end.minute);
       continue;
@@ -597,7 +608,7 @@ function applyIncidents(w: WorldState, c: Catalog, s: WorldSettings, faction: st
     }
     if (w.pending.in === t.name) w.pending.in = undefined;
     if (t.state === '종료') {
-      const end = takeEndAt(w, e, t.situation);
+      const end = takeEndAt(w, e, t.situation, dueAt(e, 'incident', s));
       closingText(w, e, end.text, c, faction);
       endIn(w, e, 'model', end.minute);
       continue;
@@ -627,7 +638,7 @@ function applyMysticSites(w: WorldState, c: Catalog, s: WorldSettings, faction: 
     }
     if (w.pending.ms === t.name) w.pending.ms = undefined;
     if (t.state === '소실') {
-      const end = takeEndAt(w, e, t.situation);
+      const end = takeEndAt(w, e, t.situation, dueAt(e, 'mystic', s));
       closingText(w, e, end.text, c, faction);
       endMs(w, e, 'model', end.minute);
       continue;
@@ -707,11 +718,17 @@ function dueMeta(e: { born: number | null }, group: 'preset' | 'random' | 'incid
   if (e.born === null || s[`${group}_expire`] !== 1 || !(hours > 0)) return '';
   return ` {유지 기한 ${clock(e.born + hours * 60)}}`;
 }
+/** 유지 기한 시각(분). 자동 종료가 꺼진 묶음이면 null (전수검사 11-13) */
+function dueAt(e: { born: number | null }, group: 'preset' | 'random' | 'incident' | 'mystic', s: WorldSettings): number | null {
+  const hours = s[`${group}_ttl`];
+  return e.born === null || s[`${group}_expire`] !== 1 || !(hours > 0) ? null : e.born + hours * 60;
+}
 const END_AT = /\(\s*종료\s*(\d{1,2})\s*\.\s*(\d{1,2})\s+(\d{1,2})\s*:\s*(\d{2})\s*\)/u;
-/** 종료 태그 상황 칸 끝의 「(종료 MM.DD HH:MM)」: 모델이 고른 실제 종료 시각. 발생~지금 사이면 그 시각, 아니면 지금. 글에서는 지운다 (2026-11-05 사용자: 종료 시각을 현재로 찍지 말고 합리적으로) */
-function takeEndAt(w: WorldState, e: { born: number | null; since: number | null }, situation: string | undefined): { text: string | undefined; minute: number | null } {
+/** 종료 태그 상황 칸 끝의 「(종료 MM.DD HH:MM)」: 모델이 고른 실제 종료 시각. 발생~지금 사이면 그 시각, 아니면 기한이 지났으면 기한, 안 지났으면 지금 (전수검사 11-13). 글에서는 지운다 (2026-11-05 사용자: 종료 시각을 현재로 찍지 말고 합리적으로) */
+function takeEndAt(w: WorldState, e: { born: number | null; since: number | null }, situation: string | undefined, due: number | null): { text: string | undefined; minute: number | null } {
+  const fallback = w.minute !== null && due !== null && due < w.minute ? due : w.minute;
   const m = situation ? END_AT.exec(situation) : null;
-  if (!m || w.minute === null) return { text: situation, minute: w.minute };
+  if (!m || w.minute === null) return { text: situation, minute: fallback };
   const text = situation!.replace(END_AT, '').replace(/\s{2,}/g, ' ').trim();
   const now = w.minute;
   const year = new Date(now * 60000).getUTCFullYear();
@@ -725,7 +742,7 @@ function takeEndAt(w: WorldState, e: { born: number | null; since: number | null
     minute = cand;
     break;
   }
-  return { text, minute: minute ?? now };
+  return { text, minute: minute ?? fallback };
 }
 
 function age(w: WorldState, since: number | null): string {
@@ -772,7 +789,8 @@ export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   const map: string[] = [];
   for (const p of rosterFor(w, c, faction, s.agent_limit)) {
     const rec = w.agents[p.id];
-    map.push(`${p.id} ${p.name && p.name !== p.english ? `${p.name} (${p.english})` : p.name || p.english}`);
+    // 영문명이 비면 빈 괄호 없이 이름만 (전수검사 11-13)
+    map.push(`${p.id} ${p.name && p.english && p.name !== p.english ? `${p.name} (${p.english})` : p.name || p.english}`);
     if (!rec || rec.st === '미정') lines.push(`NEW [AG|${p.id}|<상태>|<상황>]`);
     else lines.push(`[AG|${p.id}|${rec.st}|${rec.situation}]${age(w, rec.since)}`);
   }

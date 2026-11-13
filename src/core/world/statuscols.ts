@@ -141,6 +141,9 @@ export function shapeFor(count: number): ColId[] | null {
 /** 파서가 지금 쓰는 모양 (시험용) */
 export const activeShapes = () => active;
 
+/** 이 채팅의 지금 구성. 알리지 않았으면 null (전수검사 11-13) */
+export const currentShape = (): ColId[] | null => active[0] ?? null;
+
 // ── 줄 만들기 ──
 
 export const NONE = '없음';

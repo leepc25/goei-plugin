@@ -37,10 +37,12 @@ export function journalSettings(state: Record<string, unknown> | undefined): Jou
     return Math.max(min, Math.min(max, Number.isFinite(n) ? n : Number(JR_DEFAULTS[k])));
   };
   const card = v('chat_card');
+  const journalCap = num('journal_cap', JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max);
   return {
     chatCard: card === 'off' || card === 'all' ? card : 'mine',
-    journalCap: num('journal_cap', JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max),
-    reportCap: num('report_cap', JR_REPORT_CAP.min, JR_REPORT_CAP.max),
+    journalCap,
+    // 보고서 상한은 일지 상한을 넘지 못한다: 줄은 지워졌는데 보고서만 남아 열 길이 없는 일을 막는다 (전수검사 11-13, 사용자 13-2 (다))
+    reportCap: Math.min(num('report_cap', JR_REPORT_CAP.min, JR_REPORT_CAP.max), journalCap),
     listPage: num('list_page', JR_LIST_PAGE.min, JR_LIST_PAGE.max),
   };
 }

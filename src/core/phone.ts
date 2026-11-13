@@ -1083,6 +1083,8 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
   const kept = pickRecords(items, {
     focus: HISTORY.focus, recent: HISTORY.contextRecent, max: HISTORY.context,
     fits: (k) => !(HISTORY.contextTokens > 0 && tokens(payload(k)) > HISTORY.contextTokens),
+    // 기록마다 한 번만 센다 (전수검사 11-13: 후보마다 묶음 전체를 다시 세서 기록이 많으면 몇 초씩 늦었다)
+    cost: (d) => tokens(JSON.stringify(d)) + 1, room: HISTORY.contextTokens > 0 ? HISTORY.contextTokens - tokens(payload([])) : Infinity,
   });
   return kept.length ? payload(kept) : '';
 }

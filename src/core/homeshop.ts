@@ -3,7 +3,7 @@
 // 상품 줄·요청문·참고 자료는 상점(core/shop.ts)을 그대로 쓰고, 설정 값만 사이트 것($hs_sh_*, 우주몰·포인트몰과 같은 방식).
 // 여기는 순수 계산: 설정·저장 모양·응답 해석·동작 고르기. 화면은 ui/homeshop.ts, 그림은 host/homeshop.ts.
 import { expectOf, type PackSpec } from './datapack';
-import { lastBot, parseShelf, shopSettings, ShopError, SHOP_SHARED_VARS, type ShopIdentity, type ShopItem, type ShopSettings } from './shop';
+import { lastBot, parseShelf, shopSettings, ShopError, SHOP_CTX_VAR, SHOP_SHARED_VARS, type ShopIdentity, type ShopItem, type ShopSettings } from './shop';
 import type { Chat } from './types';
 import { userTurns, type PromptMessage } from './request';
 import { aliveAnchors } from './wallet';
@@ -95,11 +95,17 @@ export function parseHomeshopPack(text: string): HsPack {
 
 /** 상점 설정 이름($sh_*) → 망상홈쇼핑 이름($hs_sh_*) */
 export const hsKey = (shKey: string): string => `$hs_${shKey.slice(1)}`;
-/** 상점 설정 함수에 넘길 변수: $hs_sh_* 를 $sh_* 로 비춘다 (core/malls.ts mallVars 와 같은 방식) */
+/** 상점 설정 함수에 넘길 변수: $hs_sh_* 를 $sh_* 로 비춘다 (core/malls.ts mallVars 와 같은 방식)
+ *  맥락 반영은 제 값($hs_sh_ctx)이 '1'/'0'이면 그 값, 없으면 기본 상점 값 (가게 표와 맞춤, 전수검사 11-13) */
 export function hsVars(vars: Vars): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith('$sh_') || SHOP_SHARED_VARS.includes(k)) out[k] = v;
-  for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith('$hs_sh_') && !SHOP_SHARED_VARS.includes(`$sh_${k.slice(7)}`)) out[`$sh_${k.slice(7)}`] = v;
+  for (const [k, v] of Object.entries(vars ?? {})) {
+    if (!k.startsWith('$hs_sh_')) continue;
+    const sh = `$sh_${k.slice(7)}`;
+    if (sh === SHOP_CTX_VAR ? v !== '1' && v !== '0' : SHOP_SHARED_VARS.includes(sh)) continue;
+    out[sh] = v;
+  }
   return out;
 }
 
@@ -216,6 +222,20 @@ export interface HsSettings {
   peek: boolean;
   say: boolean;
   barter: boolean;
+}
+/** 수 칸 하나를 적을 값. 최소·최대 줄(pair)이면 최소가 최대를 넘을 때 짝도 같이 맞춘다 (가게 표·게시판 표와 같은 방식, 전수검사 11-13) */
+export function hsNumVars(vars: Vars, k: string, raw: number, pair?: readonly [string, string]): Record<string, string> {
+  const d = HS_NUM[k];
+  if (!d || !Number.isFinite(raw)) return {};
+  const v = Math.max(d.lo, Math.min(d.hi, Math.round(raw)));
+  const out: Record<string, string> = { [d.key]: String(v) };
+  if (!pair || !pair.includes(k)) return out;
+  const [a, b] = pair;
+  const other = HS_NUM[k === a ? b : a];
+  if (!other) return out;
+  const cur = numIn(vars?.[other.key], other.def, other.lo, other.hi);
+  if ((k === a && v > cur) || (k === b && v < cur)) out[other.key] = String(v);
+  return out;
 }
 const n = (vars: Vars, k: keyof typeof HS_NUM) => numIn(vars?.[HS_NUM[k].key], HS_NUM[k].def, HS_NUM[k].lo, HS_NUM[k].hi);
 const scaleOf = (v: unknown, def: HsScale): HsScale => (v === '0.5' || v === '1' || v === '2' || v === 'auto' || v === 'fit' ? v : def);
@@ -398,13 +418,14 @@ export function parseShow(raw: string, moods: Map<string, string>): ShowReply {
   return { title: clean(block(raw, 'title'), 40), items, cues: cues.slice(0, items.length), chat, chats: chats.slice(0, items.length), peeks, ops };
 }
 
-/** 채팅 줄 「닉|말」. 「#n」 머리 아래 줄은 그 부의 것, 머리 앞 줄은 공용 */
+/** 채팅 줄 「닉|말」. 「#n」 머리 아래 줄은 그 부의 것, 머리 앞 줄은 공용.
+ *  머리는 「|」 없는 줄이 꾸밈 뒤 #숫자로 시작하면 (뒤 상품명·「.」·「:」는 버림, 전수검사 11-13) */
 export function parseChat(text: string): { shared: HsChatLine[]; parts: HsChatLine[][] } {
   const shared: HsChatLine[] = [];
   const parts: HsChatLine[][] = [];
   let cur: HsChatLine[] = shared;
   for (const line of text.split('\n')) {
-    const head = /^\s*#\s*(\d+)\s*$/.exec(line);
+    const head = line.includes('|') ? null : /^[\s*_\[(【\-]*[#＃]\s*(\d+)/.exec(line);
     if (head) {
       const n = Math.max(1, Math.min(20, Number(head[1])));
       while (parts.length < n) parts.push([]);
@@ -425,6 +446,12 @@ const itemId = (key: string, i: number) => `ms${(Date.now() % 1e9).toString(36)}
 export function applyShow(st: HsShow, r: ShowReply, key: string): HsShow {
   const parts = r.items.map((it, i) => ({ item: { ...it, id: itemId(key, i) }, cues: r.cues[i], ...(r.peeks?.[i] ? { peek: r.peeks[i] } : {}), ...(r.chats?.[i]?.length ? { chat: r.chats[i] } : {}) }));
   return { loaded: true, key, title: r.title, parts, chat: r.chat, at: 0, prev: [...st.prev, ...st.parts.map((p) => p.item.name)].slice(-24), ...(r.ops ? { ops: r.ops } : {}), tk: key };
+}
+
+/** 본편 턴이 넘어갔으면 편성 한 칸 넘긴 상태, 아니면 null (다시 굴리기는 턴이 아니다). 자동 호출이 수동이어도 넘긴다 (전수검사 11-13) */
+export function turnStep(show: HsShow, turnOn: boolean, key: string): HsShow | null {
+  if (!turnOn || !show.loaded || show.tk === undefined || show.tk === key || show.at >= show.parts.length) return null;
+  return { ...show, at: Math.min(show.at + 1, show.parts.length), tk: key };
 }
 
 export function readShow(vars: Vars): HsShow {

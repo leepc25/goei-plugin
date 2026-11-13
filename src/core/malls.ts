@@ -9,6 +9,8 @@ import { liveOrders, readyNotes } from './orders';
 import { readDesk } from './bmdesk';
 import { aliveAnchors } from './wallet';
 import { capLines, shopMain, shopMainLines } from './shopctx';
+import { hsBuyPasses } from './hslog';
+import { pointsOn } from './points';
 
 export type MallSite = 'cos' | 'bm';
 export const MALL_SITES: MallSite[] = ['cos', 'bm'];
@@ -282,8 +284,15 @@ export function mallEvents(chat: Chat): string[] {
 /** 판 것(core/items.ts soldNow 의 「…에 팖」 자리 이름)을 메인 요청에 붙이나: 우주 쇼핑몰에 판 것은 문의 창에서 운영자와 흥정해 파는 것이라 「문의」를 따르고,
  *  포인트몰에 판 것은 그 줄의 「컨텍스트 포함」만 따른다(팔기 칸이 없다). 그 밖의 이름은 기본 상점의 「팔기」. 「…에 팖」이 아닌 기록(망상홈쇼핑 맞교환 등)은 거르지 않는다 */
 export function soldPasses(vars: Vars, place: string, plain: boolean): boolean {
-  if (!plain) return true;
+  // 망상홈쇼핑 맞교환 줄도 망상홈쇼핑 「구매」 칸을 따른다 (전수검사 11-13)
+  if (!plain) return place.startsWith('망상홈쇼핑') ? hsBuyPasses(vars) : true;
   if (place === MALL_NAME.cos) return shopMain(vars, 'cos').has('ask');
   if (place === MALL_NAME.bm) return shopMain(vars, 'bm').on;
   return shopMain(vars, 'shop').has('sell');
 }
+
+/** 이 쇼핑몰을 턴마다 부르나: 켜짐 · 「매 턴」 · 포인트몰은 백일몽 로그인과 포인트 칸이 있을 때만 (화면에 안 보이는 포인트몰을 부르지 않게, 전수검사 11-13) */
+export const mallAutoTurn = (chat: Chat, site: MallSite): boolean => {
+  const m = mallSettings(chat.scriptstate, site);
+  return m.on && m.auto === 'turn' && (site !== 'bm' || (String(chat.scriptstate?.['$br_login'] ?? '') === '1' && pointsOn(chat)));
+};

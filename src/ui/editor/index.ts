@@ -2,7 +2,7 @@
 // 저장은 전부 카드 명부(Directory)로: 명부 줄(기존 dirUi 초안)과 세계 덧쓰기(edUi.over)를 한 번에 쓴다.
 import { loreCheckBox } from '../lorecheck';
 import { bindNeedFill } from '../needfill';
-import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
+import { directoryData, withDirectory, readDirectoryData, type Directory, type DirectoryData } from '../../core/world/directory';
 import type { WorldOverrides } from '../../core/world/records';
 import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
 import { GUIDE_LABEL, type GuideName } from '../../core/guides';
@@ -299,7 +299,8 @@ function ensureRoot(): HTMLElement {
   });
   root.addEventListener('keydown', (ev) => {
     const el = ev.target as HTMLInputElement;
-    if (ev.key === 'Enter' && el?.dataset?.enter && !(el instanceof HTMLTextAreaElement)) {
+    // 한글 조합을 끝내는 Enter 는 보내지 않는다 (전수검사 11-13)
+    if (ev.key === 'Enter' && !ev.isComposing && ev.keyCode !== 229 && el?.dataset?.enter && !(el instanceof HTMLTextAreaElement)) {
       ev.preventDefault();
       void run(el.dataset.enter, el.value);
     }
@@ -896,12 +897,16 @@ async function save(ctx: ChatContext): Promise<void> {
   edUi.notice = '';
   try {
     const d: Directory = directoryDraft(ctx);
-    const over = overridesOf(ctx);
-    const data = { ...directoryData(d), 세계: over as unknown as Record<string, unknown> };
+    // 보낸 그대로의 사본을 남겨, 저장하는 동안 친 글자는 버리지 않고 다음 저장으로 넘긴다 (전수검사 11-13)
+    const dirSent = JSON.stringify(directoryData(d));
+    const overSent = JSON.stringify(overridesOf(ctx));
+    const data = { ...(JSON.parse(dirSent) as DirectoryData), 세계: JSON.parse(overSent) as Record<string, unknown> };
     await updateCharacterLore(ctx.charIndex, (lore) => withDirectory(lore, data).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ''))));
-    dirUi.draft = null;
-    edUi.from = null;
     await host?.refresh();
+    if (dirUi.draft && JSON.stringify(directoryData(dirUi.draft)) === dirSent) dirUi.draft = null;
+    else if (dirUi.draft) dirUi.base = dirSent;
+    if (JSON.stringify(edUi.over) === overSent) edUi.from = null;
+    else edUi.base = overSent;
   } catch (error) {
     edUi.notice = `저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
   }
@@ -1038,7 +1043,8 @@ export async function handle(action: string, value?: string): Promise<void> {
     await handleImgPrompt(action, value, { render });
     return;
   }
-  if (action.startsWith('ed-rel-') || action.startsWith('ed-rules')) {
+  // 조직 기록의 「세력 관계도에 포함」(ed-rel-member-toggle)은 기록 처리기로 보낸다 (전수검사 11-13)
+  if ((action.startsWith('ed-rel-') && action !== 'ed-rel-member-toggle') || action.startsWith('ed-rules')) {
     if (await relationsAction(action, value, ctx)) render();
     return;
   }

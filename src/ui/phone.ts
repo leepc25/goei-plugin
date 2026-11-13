@@ -1427,7 +1427,8 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       };
       const r = range[k];
       const n = Math.floor(Number(val));
-      if (r && Number.isFinite(n)) await setVars(ctx, env, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n))) });
+      // 칸을 비우면 저장하지 않고 원래 값을 다시 보인다 (Number('') 이 0 이라 최솟값으로 저장되던 것, 전수검사 11-13)
+      if (r && String(val ?? '').trim() !== '' && Number.isFinite(n)) await setVars(ctx, env, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n))) });
       else env.render();
       return true;
     }

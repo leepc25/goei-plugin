@@ -30,7 +30,8 @@ const chars = (n: number) => `${n.toLocaleString('ko-KR')}자`;
 const tok = (n: number | undefined) => (n === undefined ? '' : ` ${n.toLocaleString('ko-KR')}토큰`);
 const modelName = (m: string) => (m === 'main' ? '메인' : m === 'aux' ? '보조' : m);
 
-type Node = { key: string; kind: 'main' | 'call' | 'reply'; title: string; meta: string; ok: boolean | null; error?: string; body: string };
+type Node = { key: string; kind: 'main' | 'call' | 'reply'; title: string; meta: string; ok: boolean | null; error?: string; body: (() => string) | null };
+// 본문은 펼친 칸만 만든다: 큰 기록에서 안 보이는 칸까지 글을 다 찍지 않게 (전수검사 11-13)
 
 function nodes(t: TraceTurn): Node[] {
   const out: Node[] = [];
@@ -41,7 +42,7 @@ function nodes(t: TraceTurn): Node[] {
     meta: `${modelName(c.model)} · ${sec(c.ms)} · ${hms(c.at)} · 요청 ${chars(c.requestChars)}${tok(c.requestTokens)} → 응답 ${chars(c.responseChars)}${tok(c.responseTokens)}`,
     ok: c.ok,
     ...(c.error ? { error: c.error } : {}),
-    body: `<div class="gw-flow-io gw-copyto"><b>요청 ${copyBtn()}</b><textarea readonly rows="8">${esc(c.request)}</textarea></div><div class="gw-flow-io gw-copyto"><b>받은 값 ${copyBtn()}</b><textarea readonly rows="8">${esc(c.response || (c.ok ? '' : '(없음)'))}</textarea></div>`,
+    body: () => `<div class="gw-flow-io gw-copyto"><b>요청 ${copyBtn()}</b><textarea readonly rows="8">${esc(c.request)}</textarea></div><div class="gw-flow-io gw-copyto"><b>받은 값 ${copyBtn()}</b><textarea readonly rows="8">${esc(c.response || (c.ok ? '' : '(없음)'))}</textarea></div>`,
   });
   const before = t.calls.map((c, i) => [c, i] as const).filter(([c]) => c.phase === 'before');
   const after = t.calls.map((c, i) => [c, i] as const).filter(([c]) => c.phase === 'after');
@@ -56,12 +57,13 @@ function nodes(t: TraceTurn): Node[] {
       meta: `Risu 메인 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
       ok: m.failed.length ? false : true,
       // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
-      body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg gw-copyto" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, false)}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i>${copyBtn()}</summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
+      body: () => `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg gw-copyto" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, false)}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i>${copyBtn()}</summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
     });
   }
   for (const [c, i] of before) out.push(call(c, i));
-  if (t.reply) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '메인 응답', meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}${tok(t.reply.tokens)}`, ok: true, body: `<div class="gw-flow-io gw-copyto"><b>받은 글 ${copyBtn()}</b><textarea readonly rows="10">${esc(t.reply.text)}</textarea></div>` });
-  else if (t.main) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '메인 응답', meta: '아직 없음 (응답 전이거나 Risu 가 응답을 붙이지 않음)', ok: null, body: '' });
+  const reply = t.reply;
+  if (reply) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '메인 응답', meta: `${hms(reply.at)} · ${chars(reply.chars)}${tok(reply.tokens)}`, ok: true, body: () => `<div class="gw-flow-io gw-copyto"><b>받은 글 ${copyBtn()}</b><textarea readonly rows="10">${esc(reply.text)}</textarea></div>` });
+  else if (t.main) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '메인 응답', meta: '아직 없음 (응답 전이거나 Risu 가 응답을 붙이지 않음)', ok: null, body: null });
   for (const [c, i] of after) out.push(call(c, i));
   for (const [c, i] of manual) out.push({ ...call(c, i), title: `${c.label} (수동)` });
   return out;
@@ -76,7 +78,7 @@ function nodeHtml(n: Node): string {
       <div class="gw-flow-top"><b>${esc(n.title)}</b><span class="gw-state ${state}">${n.ok === null ? '대기' : n.ok ? '성공' : '실패'}</span>${n.body ? `<button class="gx-mini" data-action="man-trace-toggle" data-value="${esc(n.key)}" aria-expanded="${open}">${open ? ICONS.up : ICONS.down}${open ? '접기' : '펼치기'}</button>` : ''}</div>
       <small class="gw-flow-meta">${esc(n.meta)}</small>
       ${n.error ? `<small class="gw-flow-err">${esc(n.error)}</small>` : ''}
-      ${open ? `<div class="gw-flow-body">${n.body}</div>` : ''}
+      ${open && n.body ? `<div class="gw-flow-body">${n.body()}</div>` : ''}
     </div></li>`;
 }
 

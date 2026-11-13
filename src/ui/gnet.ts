@@ -165,7 +165,8 @@ function withVars(chat: Chat, vars: Record<string, string>): Chat {
 /** 선쪽지 반영 (실패해도 본 결과는 둔다). 알림 문장을 돌려준다 */
 function saveIncoming(chat: Chat, st: GState, rows: unknown, plan: IncomingPlan, post?: GPost): { vars: Record<string, string>; note: string } {
   try {
-    if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: uiSite === 'sm' ? '새 채팅이 왔어요.' : '새 쪽지가 왔어요.' };
+    // 문구는 보고 있는 사이트가 아니라 이 작업의 사이트로 (전수검사 11-13)
+    if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: chat.scriptstate?.[BOARD_SITE_VAR] === 'sm' ? '새 채팅이 왔어요.' : '새 쪽지가 왔어요.' };
     return { vars: {}, note: '' };
   } catch (error) {
     return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
@@ -174,7 +175,8 @@ function saveIncoming(chat: Chat, st: GState, rows: unknown, plan: IncomingPlan,
 
 async function run(ctx: ChatContext, env: GnetEnv, label: string, work: () => Promise<string>): Promise<void> {
   const key = chatKey(ctx);
-  const u = uiFor(siteOf(ctx));
+  const site = siteOf(ctx);
+  const u = uiFor(site);
   if (jobs.has(key)) {
     u.notice = `${jobs.get(key)} 끝난 뒤 다시 눌러 주세요.`;
     env.render();
@@ -186,13 +188,16 @@ async function run(ctx: ChatContext, env: GnetEnv, label: string, work: () => Pr
   env.render();
   // 방금 저장한 것(보낸 쪽지·내 댓글)이 기다리는 동안에도 바로 보이게 채팅을 다시 읽어 그린다 (2026-11-10 사용자: 보낸 쪽지가 답장 올 때까지 안 보였다)
   await env.refresh().catch(() => undefined);
+  // 기다리는 사이 다른 게시판으로 옮겼을 수 있어 await 뒤에는 그 사이트 화면 상태를 다시 잡는다 (전수검사 11-13)
   try {
-    u.notice = await work();
+    const note = await work();
+    uiFor(site).notice = note;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    u.notice = msg;
+    const ui = uiFor(site);
+    ui.notice = msg;
     const raw = (error as { raw?: string }).raw;
-    if (raw) u.failure = { label, reason: msg, raw };
+    if (raw) ui.failure = { label, reason: msg, raw };
   } finally {
     jobs.delete(key);
     await env.refresh();
@@ -275,11 +280,13 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string, tag = '') {
       if (inc.note) note += ` ${inc.note}`;
       return writeGnet(withVars(chat, { ...inc.vars, [ORIGIN_KEY]: JSON.stringify({ post: p.id }) }), cur, { ack: { post: p.id } });
     });
-    gnet.compose = null;
-    gnet.draft = '';
-    gnet.attach = [];
-    gnet.sub = 'board';
-    gnet.open = newId;
+    // 보고 있는 사이트가 아니라 글을 올린 사이트의 화면 상태를 비운다 (전수검사 11-13)
+    const ui = uiFor(siteOf(ctx));
+    ui.compose = null;
+    ui.draft = '';
+    ui.attach = [];
+    ui.sub = 'board';
+    ui.open = newId;
     return note;
   });
 }
@@ -342,9 +349,11 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
     index = addUserComment(st, postId, parent, nick, body, dateNow(chat), storyTurns(chat));
     return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId, comment: index }) }), st);
   });
-  gnet.compose = null;
-  gnet.draft = '';
-  gnet.attach = [];
+  // await 뒤라 그 사이트 화면 상태에 쓴다 (전수검사 11-13)
+  const cu = uiFor(siteOf(ctx));
+  cu.compose = null;
+  cu.draft = '';
+  cu.attach = [];
   if (!saved) return env.refresh();
   return run({ ...ctx, chat: saved }, env, '댓글 반응을 기다리는 중이에요.', async () => {
     const st = readGnet(saved);
@@ -401,13 +410,15 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
     return writeGnet(chat, st);
   });
   // 답장을 못 받으면 보낸 쪽지를 지우고 쓴 내용을 입력칸에 돌려놓는다 (사용자 요청 v0.16.26)
-  const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
-  gnet.compose = null;
-  gnet.draft = '';
-  gnet.attach = [];
-  gnet.to = '';
-  gnet.sub = 'dm';
-  gnet.openDm = nick;
+  // await 뒤라 보고 있는 사이트가 아니라 보낸 사이트의 화면 상태에 쓴다 (전수검사 11-13)
+  const du = uiFor(siteOf(ctx));
+  const before = { draft: du.draft, compose: du.compose, attach: du.attach, to: du.to };
+  du.compose = null;
+  du.draft = '';
+  du.attach = [];
+  du.to = '';
+  du.sub = 'dm';
+  du.openDm = nick;
   if (!saved) return env.refresh();
   return run({ ...ctx, chat: saved }, env, `${nick}의 답장을 기다리는 중이에요.`, async () => {
     const st = readGnet(saved);
@@ -426,8 +437,9 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
         cur.dms.splice(i, 1);
         return writeGnet(chat, cur);
       }).catch(() => null);
-      if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
-      throw new GnetError(`${dmWo()} 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
+      const ui = uiFor(siteOf(ctx));
+      if (!ui.draft && !ui.attach.length) Object.assign(ui, before);
+      throw new GnetError(`${siteOf(ctx) === 'sm' ? '채팅을' : '쪽지를'} 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
@@ -591,12 +603,16 @@ function settingsView(ctx: ChatContext, back = true): string {
 const PAGE = 20;
 const LOGO_SM = (id: BoardSite, cls = 'bs-logo') => siteLogo(id === 'gal' ? 'gal' : id === 'wpf' ? 'wpf' : id === 'sm' ? 'sm' : 'gn', cls);
 /** 목록에 보일 글 (분류·찾기·정렬) */
-function shownPosts(st: GState): GPost[] {
+/** 연어 마켓 말머리 (전수검사 11-13, 사용자 8-1): 「구합니다」류도 삽니다, 「정보」가 들어간 말머리도 오컬트 정보 */
+const smWant = (p: GPost): boolean => /삽니다|구합니다|구해요|구함|구매|매입/.test(p.tag ?? '');
+const tagHit = (site: BoardSite, p: GPost, cat: string): boolean =>
+  site === 'sm' && cat === '삽니다' ? smWant(p) : site === 'sm' && cat === '정보' ? (p.tag ?? '').includes('정보') : p.tag === cat;
+function shownPosts(st: GState, site: BoardSite): GPost[] {
   const q = gnet.q.trim().toLowerCase();
   // 보관함의 글(새로고침으로 게시판에서 빠진 내 글·스크랩)은 「내가 쓴 글」「스크랩」에만 이어 붙는다 (2026-11-10 사용자)
   const pool = gnet.cat === '@mine' ? [...st.posts, ...(st.archive ?? []).filter((p) => p.mine)] : gnet.cat === '@scrap' ? [...st.posts, ...(st.archive ?? []).filter((p) => p.scrap)] : st.posts;
   let list = pool.filter((p) =>
-    (gnet.cat === '' || (gnet.cat === '@mine' ? p.mine || p.comments.some((c) => c.mine) : gnet.cat === '@scrap' ? !!p.scrap : p.tag === gnet.cat))
+    (gnet.cat === '' || (gnet.cat === '@mine' ? p.mine || p.comments.some((c) => c.mine) : gnet.cat === '@scrap' ? !!p.scrap : tagHit(site, p, gnet.cat)))
     && (!q || `${p.title}\n${p.body}`.toLowerCase().includes(q)));
   if (gnet.sort === 'hot') list = [...list].sort((a, b) => b.votes - a.votes || b.views - a.views);
   if (gnet.sort === 'cmt') list = [...list].sort((a, b) => b.comments.length - a.comments.length);
@@ -664,7 +680,7 @@ function priceOf(p: GPost): string {
   const m = /(\d[\d,]*\s*(?:만\s*)?원)/.exec(s);
   if (m) return m[1].replace(/\s+/g, '');
   if (p.tag === '나눔' || /나눔/.test(s)) return '나눔';
-  if (p.tag === '삽니다') return '가격 제안';
+  if (smWant(p)) return '가격 제안';
   return '';
 }
 /** 연어 마켓 매물 그림: 본문 [사진:…]이 있으면 그것, 없으면 제목의 물건 이름으로 소지품 그림 팩(host/itemicons.ts)에서 (11-09 사용자: 매칭이 전혀 안 됐다).
@@ -748,7 +764,7 @@ function galSide(st: GState): string {
 
 /** 목록 (사이트마다) */
 function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unreadDm: number): string {
-  const all = shownPosts(st);
+  const all = shownPosts(st, site);
   const list = pageOf(all);
   const empty = !st.posts.length ? emptyList(busy, '게시글이 없어요.') : '';
   switch (site) {
@@ -785,7 +801,7 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
     }
     case 'sm': {
       const cards = list.map((p) => {
-        const want = p.tag === '삽니다';
+        const want = smWant(p);
         const u = smPicUrl(p);
         const img = u ? `<img src="${esc(u)}" alt="">` : ICONS.bag;
         const ph = want
@@ -885,7 +901,7 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
       const price = priceOf(p);
       // 위는 사진 | 내용(판매자·제목·값·본문)만 두 칸, 단추 줄과 문의는 그 아래 한 칸 — 전체를 가운데 좁게(720px) (2026-11-10 사용자: 사진 아래가 텅 비고, 문의를 넓게 펴면 휑하다).
       // 삽니다 글은 물건 그림 없이 빈 사진 칸만 (사용자: 포맷상 칸은 있어야 한다)
-      const want = p.tag === '삽니다';
+      const want = smWant(p);
       const u = want ? null : smPicUrl(p);
       const pic = want ? '<div class="ph want"><span class="tag">삽니다</span></div>' : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div>`;
       // 판매자와 관심·댓글·조회는 사진 아래 한 묶음(왼쪽 칸), 오른쪽은 제목 → 값 → 말머리·날짜 → 본문
@@ -1048,6 +1064,12 @@ export async function handleGnet(action: string, value: string | undefined, base
   const v = value ?? '';
   const [a, b] = v.split(':').map(Number);
   const st = () => readGnet(ctx.chat);
+  // 펼쳐 보이는 대화의 안 읽음 쪽지를 읽음 처리 (쪽지함 다시 열기·닉네임으로 열기, 전수검사 11-13)
+  const ackDm = async (nick: string | null): Promise<boolean> => {
+    if (!nick || !dmUnread(st(), nick)) return false;
+    await mutate(ctx, env, (s) => acknowledge(s, undefined, nick), {}, false);
+    return true;
+  };
   if (!action.startsWith('gn-')) return false;
   if (action !== 'gn-del-post' && action !== 'gn-del-comment' && action !== 'gn-del-thread') gnet.confirm = null;
   if (action.startsWith('gn-def-')) {
@@ -1067,6 +1089,7 @@ export async function handleGnet(action: string, value: string | undefined, base
     case 'gn-sub':
       gnet.sub = v === 'dm' ? 'dm' : 'board';
       if (gnet.compose?.kind === 'comment' || gnet.compose?.kind === 'dm') gnet.compose = null;
+      if (gnet.sub === 'dm' && gnet.compose?.kind !== 'newdm' && (await ackDm(gnet.openDm))) return true;
       break;
     case 'gn-back':
       // 오른쪽 칸 닫기 (모바일은 목록으로)
@@ -1222,6 +1245,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       gnet.compose = { kind: 'dm', nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 ${dmW()} · 「${p.title}」` };
       gnet.draft = '';
       gnet.attach = [];
+      if (await ackDm(contact.nick)) return true;
       break;
     }
     case 'gn-dm-reply':

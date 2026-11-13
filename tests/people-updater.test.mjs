@@ -118,12 +118,12 @@ test('반영: 항목 add/upsert/remove 보류, 계기 상한·중복, 호칭, �
     next_note: [{ who: '쟈알디', now: 'Guards the door.', must_not_reveal: ['유저의 전직'] }, { who: '잼트리', now: 'x' }],
   };
   const rep = U.applyUpdate(store, c, input, r, { settings: settings() });
-  assert.equal(rep.applied.entries, 4, 'upsert 1 + add 2(쟈알디 지식, 데쥬레 지식) + 부장→쟈알디 history 1');
+  assert.equal(rep.applied.entries, 5, 'upsert 1 + add 2(쟈알디 지식, 데쥬레 지식) + 부장→쟈알디 history 1 + remove 1(낱말 검사 없음, 사용자 11-13)');
   assert.ok(rep.dropped.some((d) => d.reason === '같은 뜻의 항목이 이미 있음'));
   assert.ok(rep.dropped.some((d) => d.reason === '인용이 원문에 없음'));
   assert.ok(rep.dropped.some((d) => d.reason === '명단에 없는 이름' && d.who === '아무개'));
   assert.ok(rep.dropped.some((d) => d.reason === '확정 구간 밖 메시지'));
-  assert.ok(rep.held.some((h) => h.reason === '삭제 근거가 분명하지 않음'));
+  assert.ok(!rep.held.some((h) => h.reason === '삭제 근거가 분명하지 않음'));
   const live = S.liveness(c);
   const state = S.liveEntries(store.people.쟈알디.slots.state, live);
   assert.deepEqual(state.map((e) => e.text), ['왼팔 부상 (유저를 감싸다)']);

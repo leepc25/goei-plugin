@@ -162,14 +162,32 @@ interface Msg {
   content: string;
 }
 
+// 이미 첨부를 바꿔 둔 요청 (통합 요청은 작업마다 먼저 바꾼 뒤 합친다). 이 배열은 prepareAttachments 가 다시 손대지 않는다 (전수검사 11-13)
+const PREPARED = new WeakSet<object>();
+/** 첨부를 이미 바꾼 요청이라고 표시한다 (host/joint.ts 통합 요청 → host/llm.ts 에서 다시 바꾸지 않게) */
+export function markPrepared<T extends object>(messages: T[]): T[] {
+  PREPARED.add(messages);
+  return messages;
+}
+
 /**
  * 자료 메시지(system이 아닌 것) 속 첨부를 [ATTACHMENT An]으로 바꾸고, 끝에 ATTACHMENT DATA를 붙인다.
  * system 메시지에는 출력 형식 예시([[ATTACH:photo]]…)가 있어서 건드리지 않는다.
  */
 export function prepareAttachments<T extends Msg>(messages: T[]): T[] {
+  if (PREPARED.has(messages)) return messages;
+  const r = prepareAttachmentGroups([messages]);
+  return r.data ? [...r.groups[0], r.data] : r.groups[0];
+}
+
+/**
+ * 여러 요청(통합 요청의 작업들)의 첨부를 번호를 이어 가며 한꺼번에 바꾼다. system 은 작업마다 건너뛰고,
+ * ATTACHMENT DATA 는 하나로 따로 돌려준다 (실제 사진은 맨 위 메시지에만 붙는다). 합친 뒤에 바꾸면 각 작업의 system 예시까지 바뀌었다 (전수검사 11-13)
+ */
+export function prepareAttachmentGroups<T extends Msg>(groups: T[][]): { groups: T[][]; data: T | null } {
   const list: { kind: string; content: string; asset?: string }[] = [];
   const known = new Map<string, number>();
-  const out = messages.map((m) => {
+  const outGroups = groups.map((messages) => messages.map((m) => {
     if (m.role === 'system' || typeof m.content !== 'string' || !hasAttachment(m.content)) return m;
     const content = m.content.replace(ANY(), (whole, kind: string | undefined, body: string | undefined, code: string | undefined) => {
       let a: { kind: string; content: string; asset?: string } | null = null;
@@ -190,8 +208,8 @@ export function prepareAttachments<T extends Msg>(messages: T[]): T[] {
       return `[ATTACHMENT A${n}]`;
     });
     return { ...m, content };
-  });
-  if (!list.length) return out;
+  }));
+  if (!list.length) return { groups: outGroups, data: null };
   // 글은 지침 「요청 공통」의 ATTACH.* 절. 절이 없으면 여기 남긴 글
   const lines = [guideOr('Common', 'ATTACH.DATA', DATA_HEAD)];
   const images: string[] = [];
@@ -207,5 +225,5 @@ export function prepareAttachments<T extends Msg>(messages: T[]): T[] {
     } else lines.push(`A${i + 1} ${JSON.stringify({ kind: a.kind, content: a.content })}`);
   });
   if (images.length) lines.push(guideOr('Common', 'ATTACH.IMAGES', () => `Actual images are attached to this message in order: image 1 to image ${images.length}. If an image cannot be seen, say nothing about its visual details.`, { count: images.length }));
-  return [...out, { role: 'user', content: lines.join('\n'), ...(images.length ? { images } : {}) } as T];
+  return { groups: outGroups, data: { role: 'user', content: lines.join('\n'), ...(images.length ? { images } : {}) } as unknown as T };
 }

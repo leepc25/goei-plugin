@@ -188,7 +188,7 @@ test('내가 출동한 사건이 종료되면 일지 줄과 전체 보고서(경
   assert.equal(rep.agents[1].situation, '치료 중');
   assert.equal(rep.statusKey, ST('12:30 PM', '없음', '없음', '없음'));
   // 인물: 기간(3~7) 안 살아 있는 cue 만 (인용이 본문에 있어야 산다), 세력 평판은 빼고, 합과 근거 인용
-  assert.deepEqual(rep.people.map((p) => [p.who, p.delta, p.quote, p.cue]), [['사장', 4, '고맙소', '도움']]);
+  assert.deepEqual(rep.people.map((p) => [p.who, p.delta, p.quote, p.cue]), [['사장', 2.8, '고맙소', '도움']], '성격 계수까지 인물 기록 화면과 같게 (전수검사 11-13)');
   assert.equal(rep.people[0].stage, '무관심');
   // 가계부: 기간 안 거래만, 수동 조정은 잔고에만, 종료 뒤 거래는 빠짐
   assert.deepEqual(rep.wallet, [{ memo: '수당', amount: 50000, quote: '5만 원' }]);
@@ -425,3 +425,13 @@ test('PNG 줄바꿈: 글자 단위, 최대 줄 수를 넘으면 마지막 줄 �
   assert.deepEqual(wrapText(g, '짧다', 400, 1), ['짧다']);
 });
 
+
+test('고정한 보고서의 일지 줄은 상한에 밀려도 남고, 보고서 상한은 일지 상한을 넘지 못한다 (사용자 11-13 13번)', () => {
+  const rows = Array.from({ length: 6 }, (_, i) => ({ id: `j${i}`, rpt: `r${i}` }));
+  const j = { v: 1, rows };
+  assert.deepEqual(trimJournal(j, 3).rows.map((r) => r.id), ['j3', 'j4', 'j5']);
+  assert.deepEqual(trimJournal(j, 3, new Set(['r0'])).rows.map((r) => r.id), ['j0', 'j3', 'j4', 'j5'], '고정 줄은 상한 밖');
+  assert.equal(trimJournal(j, 5, new Set(['r0'])), j, '넘치지 않으면 그대로');
+  assert.equal(journalSettings({ [JR('journal_cap')]: '100', [JR('report_cap')]: '300' }).reportCap, 100);
+  assert.equal(journalSettings({ [JR('journal_cap')]: '500', [JR('report_cap')]: '300' }).reportCap, 300);
+});

@@ -13,6 +13,7 @@ import type { ItemChange, ItemNow } from './people/updater';
 import { currentShop, shopEvents, shopOn, shopGuide } from './shop';
 import { mallEvents, soldPasses } from './malls';
 import { boughtPasses } from './shopctx';
+import { hsBuyPasses } from './hslog';
 import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, itemWeight, type ItemEquip, type ItemState } from './itemtraits';
 export * from './itemtraits';
 import type { StartItem } from './startitems';
@@ -787,7 +788,7 @@ export function inventoryText(chat: Chat): string {
     carry: itemCarry(vars),
     left,
     use,
-    bought: newlyBought(live, lastBotKey(chat)).filter((e) => boughtPasses(vars, e.store)).map(boughtLine),
+    bought: newlyBought(live, lastBotKey(chat)).filter((e) => (e.store === 'hs' ? hsBuyPasses(vars) : boughtPasses(vars, e.store))).map(boughtLine),
     events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),

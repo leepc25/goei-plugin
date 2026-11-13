@@ -197,7 +197,7 @@ let running = 0;
 let chain: Promise<unknown> = Promise.resolve();
 export const peopleUpdating = () => running > 0;
 
-export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[] }
+export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[]; /** 다시 읽기: 첫 성공 저장 때 비운 기록 수 */ cleared?: number }
 
 /** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 이어서 (읽을 것이 없으면 바로 끝난다) */
 export interface RunScope {
@@ -205,6 +205,8 @@ export interface RunScope {
   indexes?: number[];
   /** 이 인물만 반영하고 읽음 표시는 그대로 (다시 읽기) */
   only?: string[];
+  /** 다시 읽기: 첫 성공 저장 때 이 인물의 이야기 기록을 비운다 (실패하면 그대로 둠, 전수검사 11-13) */
+  clear?: string;
 }
 
 export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
@@ -262,6 +264,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
   }
   const batches = planBatches(ctx.chat, unread, settings.spanCap);
   const id = chatId(ctx);
+  // 다시 읽기의 비우기는 첫 성공 저장과 함께 한다. 그 전엔 자료용 사본에서만 비운다 (전수검사 11-13)
+  let pendingClear = o.scope?.clear;
+  let clearedNow = 0;
   for (let b = 0; b < batches.length; b++) {
     setStatus({ busy: true, label: batches.length > 1 ? `관계 갱신 중… (${b + 1}/${batches.length})` : '관계 갱신 중…' });
     const t0 = Date.now();
@@ -275,6 +280,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         break;
       }
       const curStore = peopleStore(fresh.chat);
+      if (pendingClear) clearStoryRecords(curStore, pendingClear);
       // 가계부: 상태창 잔고 칸을 쓰는 채팅이면 장부 잔고를 자료에 넣고 거래 절을 켠다 (core/wallet.ts)
       const walletOn = colConfig(fresh.chat.scriptstate).wallet !== 'off';
       const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
@@ -352,6 +358,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         if (chatId({ ...fresh, chat: cur }) !== id) return null;
         for (const [i, k] of keys) if (!cur.message[i] || messageKey(cur.message[i], i) !== k) return null;
         const s = peopleStore(cur);
+        if (pendingClear) clearedNow = clearStoryRecords(s, pendingClear);
         const before = snapshotRun(s);
         const report = applyUpdate(s, cur, input, value, {
           settings,
@@ -415,6 +422,10 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         diag.error = '저장 직전에 채팅이 달라져 이번 결과를 버림';
         result.skipped.push(diag.error);
         continue;
+      }
+      if (pendingClear) {
+        result.cleared = clearedNow;
+        pendingClear = undefined;
       }
       diag.ok = true;
       result.ran++;
@@ -487,15 +498,18 @@ export async function rereadPerson(name: string, turns: number): Promise<RunResu
   const p = store.people[name];
   if (!p) return { ran: 0, applied: 0, skipped: ['기록이 없는 인물'], errors: [], cleared: 0 };
   const indexes = mentionIndexes(ctx.chat, name, [...p.aliases, ...(allNames().find((n) => n.name === name)?.aliases ?? [])], turns);
-  let cleared = 0;
-  await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
-    const s = peopleStore(cur);
-    cleared = clearStoryRecords(s, name);
-    return withPeople(cur, s);
-  });
-  if (!indexes.length) return { ran: 0, applied: 0, skipped: ['최근 응답에 이 인물이 나오지 않아요 (기록만 비움)'], errors: [], cleared };
-  const r = await requestPeopleUpdate('reread', { manual: true, scope: { indexes, only: [name] } });
-  return { ...r, cleared };
+  if (!indexes.length) {
+    let cleared = 0;
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
+      const s = peopleStore(cur);
+      cleared = clearStoryRecords(s, name);
+      return withPeople(cur, s);
+    });
+    return { ran: 0, applied: 0, skipped: ['최근 응답에 이 인물이 나오지 않아요 (기록만 비움)'], errors: [], cleared };
+  }
+  // 비우기는 다시 읽기가 저장될 때 같이 한다 — 모델이 실패하면 기록이 그대로 남는다 (전수검사 11-13)
+  const r = await requestPeopleUpdate('reread', { manual: true, scope: { indexes, only: [name], clear: name } });
+  return { ...r, cleared: r.cleared ?? 0 };
 }
 
 /** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */

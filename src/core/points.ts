@@ -59,13 +59,17 @@ export const POINTS_SYNC_MEMO = '상태창 포인트';
 
 /** 두 번 센 흔적 지우기 (2026-11-13 사용자: 틀린 걸 뒤늦게 맞췄으면 기록도 고쳐야 한다).
  *  같은 응답에 맞춤 줄(+x)과 본문 거래(+x)가 같이 있고, 그 뒤에 맞춤 줄(−x)이 있으면 맞춤 줄 둘은 같은 돈을 두 번 셌다가 되돌린 것이라 둘 다 지운다. 잔고는 그대로다 */
-export function dropDoubleSync(w: Wallet): Wallet {
-  const isSync = (e: Wallet['log'][number]) => e.memo === POINTS_SYNC_MEMO && e.id.startsWith('ps_');
+export function dropDoubleSync(w: Wallet, alive?: Set<string>): Wallet {
+  type E = Wallet['log'][number];
+  const isSync = (e: E) => e.memo === POINTS_SYNC_MEMO && e.id.startsWith('ps_');
+  // 되돌림 줄은 a와 생사가 같은 것을 먼저 고른다: 리롤로 죽은 줄과 짝지어 산 줄을 남기지 않게 (전수검사 11-13)
+  const live = (e: E) => !e.anchor || !alive || alive.has(e.anchor);
   const drop = new Set<string>();
   w.log.forEach((a, i) => {
     if (!isSync(a) || drop.has(a.id) || !a.amount) return;
     if (!w.log.some((e) => !isSync(e) && e.src === 'story' && e.anchor === a.anchor && e.amount === a.amount)) return;
-    const back = w.log.find((e, k) => k > i && isSync(e) && !drop.has(e.id) && e.amount === -a.amount);
+    const cand = (e: E, k: number) => k > i && isSync(e) && !drop.has(e.id) && e.amount === -a.amount;
+    const back = w.log.find((e, k) => cand(e, k) && live(e) === live(a)) ?? w.log.find(cand);
     if (back) { drop.add(a.id); drop.add(back.id); }
   });
   return drop.size ? { ...w, log: w.log.filter((e) => !drop.has(e.id)) } : w;
@@ -73,7 +77,8 @@ export function dropDoubleSync(w: Wallet): Wallet {
 
 /** 마지막 응답의 상태창 포인트 칸에 장부를 맞춘다 (가계부 syncWalletToStatus 와 같은 방식). 바뀐 게 없으면 null */
 export function syncPointsToStatus(w0: Wallet, chat: Chat): Wallet | null {
-  const w = dropDoubleSync(w0);
+  const alive = aliveAnchors(chat);
+  const w = dropDoubleSync(w0, alive);
   const msgs = chat.message ?? [];
   let i = msgs.length - 1;
   while (i >= 0 && msgs[i].role === 'user') i--;
@@ -93,7 +98,6 @@ export function syncPointsToStatus(w0: Wallet, chat: Chat): Wallet | null {
   const anchor = messageKey(m, i);
   const id = `ps_${anchor}`;
   const base = removeWalletEntry(w, id);
-  const alive = aliveAnchors(chat);
   // 그 응답에 묶인 상점 거래는 상태창 다음 일이라 맞춤 셈에서 뺀다 (가계부와 같음)
   const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor)) };
   const diff = target - walletBalance(before, alive);

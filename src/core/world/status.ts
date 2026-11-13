@@ -1,7 +1,7 @@
 // 상태창 [▣|날짜|시각|날씨|기온|위치|목표(|동행|투입|신분|잔고)]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
 // 플러그인이 너그럽게 읽는다: 칸이 모자라거나 남아도, 전각 기호·공백이 섞여도, 닫는 괄호가 없어도.
 // 칸 구성(statuscols.ts): 이 채팅의 지금 구성·기록된 구성·알려진 모양 중 칸 수가 맞는 것으로 먼저 읽고, 아니면 모양으로 날짜·시각·기온을 찾는다.
-import { parseWalletCell, shapeFor, type ColId } from './statuscols';
+import { currentShape, parseWalletCell, shapeFor, type ColId } from './statuscols';
 
 export interface StatusTag {
   /** 원문 (화면에서 바꿀 자리) */
@@ -85,12 +85,46 @@ function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
   };
 }
 
+/** 칸 값이 그 모양 자리에 말이 되는가: 기온 자리는 기온, 잔고·포인트는 숫자, 신분은 숫자가 아님, 투입은 투입 (전수검사 11-13) */
+function plausible(f: string[], shape: ColId[]): boolean {
+  return shape.every((id, i) => {
+    const cell = (f[i] ?? '').trim();
+    if (id === 'temp') return none(cell) || TEMP_RE.test(cell);
+    if (TEMP_RE.test(cell)) return false;
+    if (id === 'wallet') return none(cell) || parseWalletCell(cell) !== null;
+    if (id === 'points') return none(cell) || pointsText(cell) !== '';
+    if (id === 'identity') return none(cell) || parseWalletCell(cell) === null;
+    if (id === 'deployed') return none(cell) || /투입|deployed/i.test(cell);
+    if (id === 'companions') return cell !== '투입';
+    return true;
+  });
+}
+
+const WEATHER_TEMP = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/;
+const LOOSE: ColId[] = ['weather', 'temp', 'target', 'companions', 'deployed', 'identity', 'wallet', 'points'];
+
 /** 칸을 나눠 이름 붙이기. 칸 수가 아는 모양과 맞고 날짜·시각 자리가 맞으면 그 순서대로, 아니면 모양으로 날짜·시각·기온을 먼저 찾는다 */
 function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
   const f = inner.split(/[|｜]/).map((s) => s.trim());
   while (f.length && f[f.length - 1] === '') f.pop();
+  const fits = (shape: ColId[]) => DATE_RE.test(f[shape.indexOf('date')] ?? '') && TIME_RE.test(f[shape.indexOf('time')] ?? '');
   const shape = shapeFor(f.length);
-  if (shape && DATE_RE.test(f[shape.indexOf('date')] ?? '') && TIME_RE.test(f[shape.indexOf('time')] ?? '')) return byShape(f, shape);
+  const known = shape && fits(shape) ? shape : null;
+  const cur = currentShape();
+  if (known && (!cur || f.length >= cur.length || plausible(f, known))) return byShape(f, known);
+  // 지금 구성보다 한 칸 모자라고 자리가 안 맞으면: 빠진 칸을 오른쪽부터 하나씩 빼 보고 맞는 모양으로 읽는다 (전수검사 11-13)
+  if (cur && cur.length - f.length === 1) {
+    for (let i = cur.length - 1; i >= 0; i--) {
+      if (!LOOSE.includes(cur[i])) continue;
+      const cand = cur.filter((_, j) => j !== i);
+      if (!fits(cand) || !plausible(f, cand)) continue;
+      const out = byShape(f, cand);
+      // 기온 칸이 빠졌으면 날씨와 한 칸에 붙어 온 것일 수 있다 (☀️ 12°C)
+      const m = cur[i] === 'temp' ? WEATHER_TEMP.exec(out.weather) : null;
+      return m && m[1] ? { ...out, weather: m[1], temp: m[2] } : out;
+    }
+  }
+  if (known) return byShape(f, known);
   const rest = [...f];
   const take = (re: RegExp) => {
     const i = rest.findIndex((x) => re.test(x));
@@ -105,7 +139,7 @@ function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
   if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
   // 날씨와 기온이 한 칸에 붙어 온 경우 (☀️ 12°C)
   if (!temp && weather) {
-    const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
+    const m = WEATHER_TEMP.exec(weather);
     if (m) return { date, time, weather: m[1], temp: m[2], place: rest[0] ?? '', ...tail(rest) };
   }
   return { date, time, weather, temp, place: rest[0] ?? '', ...tail(rest) };

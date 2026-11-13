@@ -188,7 +188,8 @@ function articlePrompt(ctx: ChatContext, title: string, o: { inherited: string[]
 
 // ── 생성 ──
 
-async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean, docRequest = '', usePrevious?: boolean): Promise<void> {
+// 새 문서의 물려받기(fresh)는 작성 화면만 넘긴다. 자동 작성은 빈 값 (전수검사 11-13)
+async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean, docRequest = '', usePrevious?: boolean, fresh: { inherited: string[]; previousTitle: string | null; direct: boolean } = { inherited: [], previousTitle: null, direct: false }): Promise<void> {
   const key = chatKey(ctx);
   if (jobs.has(key)) {
     wiki.notice = `「${jobs.get(key)!.title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
@@ -197,9 +198,9 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
   }
   const s: WikiSettings = wikiSettings(ctx.chat.scriptstate);
   const old = findDoc(ctx.chat, title, ctx.char.globalLore);
-  const inherited = regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : wiki.inherited;
-  const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-  const previousDoc = regenerate ? ((usePrevious ?? s.refreshPrevious) ? old : null) : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle, ctx.char.globalLore) : null;
+  const inherited = regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : fresh.inherited;
+  const direct = regenerate ? !!old?.meta?.direct : fresh.direct;
+  const previousDoc = regenerate ? ((usePrevious ?? s.refreshPrevious) ? old : null) : fresh.previousTitle ? findDoc(ctx.chat, fresh.previousTitle, ctx.char.globalLore) : null;
   const writingRequest = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   jobs.set(key, { title, started: Date.now() });
   wiki.failure = null;
@@ -1017,7 +1018,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.listOpen = false;
       break;
     case 'wiki-start':
-      if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false, wiki.docReq);
+      if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false, wiki.docReq, undefined, { inherited: wiki.inherited, previousTitle: wiki.previousTitle, direct: wiki.direct });
       break;
     case 'wiki-rewrite': {
       // 다시 쓰기 칸을 연다: 지난번 이 문서 지침을 채워 둔다

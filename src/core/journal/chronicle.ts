@@ -80,6 +80,7 @@ function factionNames(lore: LoreEntry[] | undefined): Record<string, string> {
 export function buildChronicle(chat: Chat, lore: LoreEntry[] | undefined): ChronEntry[] {
   const out: ChronEntry[] = [];
   const day = dayLabels(chat);
+  const live = liveness(chat);
   // 1) 내가 나간 사건: 종료 한 줄 (일지와 같은 말: 직접 종료·시간 경과·클리어)
   for (const r of readJournal(chat).rows) {
     if (!r.mine || r.kind === 'fd') continue;
@@ -87,14 +88,15 @@ export function buildChronicle(chat: Chat, lore: LoreEntry[] | undefined): Chron
     const durText = dur === null ? '' : `소요 ${Math.floor(dur / 60) ? `${Math.floor(dur / 60)}시간 ` : ''}${dur % 60}분`;
     const how = r.cleared ? '클리어' : r.cause === 'manual' ? '직접 종료' : r.cause === 'ttl' ? '시간 경과로 종료' : '종료';
     const kind = `${JOURNAL_KIND_LABEL[r.kind]}${r.grade ? ` ${r.grade}` : ''}`;
+    // 지금 자리: 앞 메시지가 지워져도 어긋나지 않게 열쇠로 찾고, 없으면 저장 번호 (전수검사 11-13)
+    const p = live.at.get(r.anchor) ?? r.idx;
     out.push({
-      pos: r.idx, seq: 0, kind: 'event', day: day(r.idx) || dayOfMinute(r.at), title: r.name, jk: r.kind, grade: r.grade, rpt: r.rpt,
+      pos: p, seq: 0, kind: 'event', day: day(p) || dayOfMinute(r.at), title: r.name, jk: r.kind, grade: r.grade, rpt: r.rpt,
       text: [kind, locName(r.loc) || r.loc, hhmm(r.at), durText, how].filter(Boolean).join(' · '),
     });
   }
   // 2) 인물 호감 단계·세력 평판 구간: 기준 메시지 하나를 다 더한 뒤 단계가 달라진 곳만 (한 메시지 안 오르내림은 올리지 않는다)
   const store = peopleStore(chat);
-  const live = liveness(chat);
   const changes = liveChanges(store, live);
   const s = peopleSettings(chat.scriptstate);
   const uf = userFactionOf(store, chat);
@@ -108,7 +110,8 @@ export function buildChronicle(chat: Chat, lore: LoreEntry[] | undefined): Chron
     if (isFac ? !code : !store.people[who]) continue;
     const base = isFac ? factionBase(code, uf) : store.people[who].affinity.base;
     const folded = store.folded[who] ?? 0;
-    const o = isFac ? { speed: s.speed, turnCap: s.turnCap } : { temper: temperOf(who), speed: s.speed, turnCap: s.turnCap };
+    // 감소 승수도 인물·세력 화면과 같게 (전수검사 11-13)
+    const o = isFac ? { speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap } : { temper: temperOf(who), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap };
     const [min, max] = isFac ? [FACTION_MIN, FACTION_MAX] : [AFF_MIN, AFF_MAX];
     const label = (v: number) => (isFac ? factionStage(v, s.factionBounds).label : stageOf(v).label);
     let prev = label(sumCues(who, base, [], folded, min, max, o));

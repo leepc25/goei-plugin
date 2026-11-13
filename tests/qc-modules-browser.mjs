@@ -742,11 +742,11 @@ if (want('P2')) {
   await page.click(`[data-action="ph-dm"][data-value="${cid}"]`);
   await page.waitForSelector('.ph-room');
   await page.fill('[data-input="ph-draft"]', '형 뭐해');
-  await llm(page, [ok(JSON.stringify({ contacts: [], result: { patch: [{ op: 'add', path: '/messages/-', value: msg(cid, '알바 중') }] } }))]);
+  await llm(page, [ok(`<lb-minitalk-patch>${JSON.stringify([{ op: 'add', path: '/messages/-', value: msg(cid, '알바 중') }])}</lb-minitalk-patch>`)]);
   await page.click('[data-action="ph-send"]');
   await page.waitForSelector('.ph-msg.npc >> text=알바 중', { timeout: 6000 });
   const cm = await page.evaluate(() => window.__calls.llm.at(-1));
-  assert.ok(JSON.parse(cm.messages[1].content).singlePassContact === true, '직접 추가한 연락처는 한 번에 판단 모드');
+  assert.ok(JSON.parse(cm.messages[1].content).participants.some((x) => x.manuallySavedContact), '직접 추가한 연락처 (근거 뽑기 없음, 사용자 11-13)');
   await page.click('[data-action="ph-back"]');
   await page.click('[data-action="ph-add"]');
   await page.fill('[data-input="ph-add-name"]', '쟈알디');

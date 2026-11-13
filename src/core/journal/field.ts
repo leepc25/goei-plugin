@@ -172,7 +172,7 @@ export function buildFieldReport(input: FieldBuildInput): FieldBuildResult | nul
     trail, agents, result, people: fieldPeople(chat, (enter ?? exitEv).anchor, exitEv.visit), wallet: trades, balance: walletBalance(w, aliveAnchors(chat)),
     idx: index, anchor, savedAt: now,
   };
-  journal = trimJournal({ v: 1, rows: [...journal.rows, row] }, settings.journalCap);
+  journal = trimJournal({ v: 1, rows: [...journal.rows, row] }, settings.journalCap, new Set(reports.items.filter((x) => x.pin).map((x) => x.id)));
   const t = trimReports({ v: 1, items: [...reports.items, report] }, journal, settings.reportCap);
   return { journal: t.journal, reports: t.reports, row, report, added: true };
 }

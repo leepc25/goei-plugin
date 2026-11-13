@@ -184,18 +184,8 @@ Distinguish direct expression, teasing or provocation, avoidance, a cold mask, q
 - Judge by THIS person's `values` and the response actually given; each person needs their own `reason` (Korean ≤40).
 - ≤2 cues per person per span; merge several small acts of one kind into the stronger single cue; never split one act or restate one piece of evidence into several cues.
 - Initial values already exist; a newly registered person starts at 0; never propose an initial value or count past relationship evidence as a cue. 무관심 is a real value, not a missing one.
-- Stages (program-assigned; upper bounds −71, −31, −1, 60, 120, 180, 240, 300), for reading `affinity_now` and describing attitude:
-| Stage | Range | Direction |
-|---|---|---|
-| 극도의 적대 | −100 to −71 | Keep the actual cause and constraints; no newly invented harmful act from the stage alone. |
-| 적대 | to −31 | Real distance or hostility per personality. |
-| 혐오 | to −1 | Evidence-grounded resentment or coldness. |
-| 무관심 | to 60 | Base politeness, small talk, cooperation; no special favor or forced coldness. |
-| 인식 | to 120 | Remembers details, notices absence, slightly more willing to ask and answer. |
-| 관심 | to 180 | Seeks shared time; reliable help, concern, explanation, personal worries. |
-| 끌림 | to 240 | Makes time and space; more sincere concern, preferences, vulnerability. |
-| 애정 | to 300 | Deep care, voluntary support, closeness within the person's personality. |
-A stage never authorizes romance, 반말, pet names, consent or obedience; nonromantic stays nonromantic; never bend reactions or relationships to fit the number or write labels, consent or address changes because the stage allows. Negative stages show as shorter answers, fewer questions, cold exact formality, never a fixed insult. Formal may stay formal while warmer; reticent may care concisely.
+- Stages (program-assigned), by upper bound, for reading `affinity_now`: 극도의 적대 −71 · 적대 −31 · 혐오 −1 · 무관심 60 · 인식 120 · 관심 180 · 끌림 240 · 애정 300.
+A stage never authorizes romance, 반말, pet names, consent or obedience; nonromantic stays nonromantic; never bend reactions or relationships to fit the number or write labels, consent or address changes because the stage allows.
 <<END:affinity_num>>
 <<SECTION:affinity_qual>>
 ### 7.8 Qualitative mode (no score exists)

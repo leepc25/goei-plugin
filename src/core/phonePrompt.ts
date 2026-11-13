@@ -59,8 +59,6 @@ interface Body {
   announcementCheck?: Omit<AnnouncementCheck, 'channel'>;
   activityCheck?: { incoming: boolean; groupInvites: boolean };
   invitationCheck?: InvitationCheck;
-  recipientEvidenceSources?: { id: string; kind: string; text: string; sender?: string }[];
-  singlePassContact?: boolean;
   textingHabits?: { sender: string; note: string }[];
 }
 
@@ -98,8 +96,9 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
     if (body.invitationCheck?.allowed) keys.push('GROUP_INVITES');
     if (body.announcementCheck?.allowed) keys.push('ANNOUNCEMENTS');
   }
-  if (manual) keys.push('MANUAL_CONTACT', 'CONTACT_CONTEXT', 'SINGLE_PASS_CONTACT');
-  keys.push(`OUTPUT_${manual ? 'CONTACT_' : ''}${mode}`);
+  // 직접 추가한 연락처: 「저장한 이름만으로는 친분이 없다」 규칙만. 관계·지식 근거 뽑기는 뺐고, 처음 연락하는 사이는 앱이 판정해 relationshipToOwner 로 넘긴다 (사용자 11-13 7번 (가))
+  if (manual) keys.push('MANUAL_CONTACT');
+  keys.push(`OUTPUT_${mode}`);
   // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
   if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   const br = phoneSettings(src.chat.scriptstate).banterRows;
@@ -168,6 +167,7 @@ interface Participant {
   hasCharacterLore: boolean;
   manuallySavedContact: boolean;
   contactMemo?: string;
+  relationshipToOwner?: string;
   narratorOnlyAgentStatus?: unknown;
 }
 
@@ -274,41 +274,23 @@ function crossRoom(body: Body, st: PState, limit: number): void {
   if (records.length) body.crossRoomMessages = records.reverse();
 }
 
-/** 직접 추가한 연락처: 관계·지식 근거로 고를 원문 목록 (원본 contactSources) */
-function contactSources(body: Body): NonNullable<Body['recipientEvidenceSources']> {
-  const out: NonNullable<Body['recipientEvidenceSources']> = [];
-  const add = (kind: string, text: unknown, sender?: string) => {
-    const t = String(text ?? '').trim();
-    if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...(sender ? { sender } : {}) });
-  };
+/** 직접 추가한 연락처가 주인과 처음 연락하는 사이인지 앱이 판정한다 (사용자 11-13 7번 (가): 수동으로 추가한 사람이 무조건 아는 사이로 그려지던 문제).
+ *  메모가 비고, 인물 로어북이 없고, 넘기는 스토리·설정·로어북에 그 이름이 없고, 어느 방에서도 말을 주고받은 적이 없으면 처음 연락하는 사이 */
+function firstContact(p: Participant, body: Body, st: PState): boolean {
+  if (!p.manuallySavedContact || p.contactMemo?.trim() || p.hasCharacterLore) return false;
+  const name = p.name.trim();
   const u = body.narratorOnly.universe;
-  add('world', u.characterDescription);
-  add('author_note', u.authorsNote);
-  for (const b of u.activeLoreBooks) add('world', b.content);
-  for (const m of body.narratorOnly.recentStory) add(m.role === 'user' ? 'story_input' : 'story', m.text);
-  for (const p of body.participants) {
-    add('character', p.lore, p.sender);
-    add('contact_memo', p.contactMemo, p.sender);
-    if (p.narratorOnlyAgentStatus) add('status', JSON.stringify(p.narratorOnlyAgentStatus), p.sender);
-  }
-  for (const r of body.rooms ?? (body.room ? [body.room] : [])) {
-    for (const c of r.activeMembers) add('private_direction', r.privateDirection, c);
-    for (const m of r.messages) if (m.type === 'text') for (const c of m.audience ?? []) if (c !== m.sender) add('received_message', m.content, c);
-  }
-  for (const m of (body.crossRoomMessages ?? []) as { knownBy: string[]; sender: string; content: string }[]) for (const c of m.knownBy) if (c !== m.sender) add('received_message', m.content, c);
-  for (const post of ((body.publicBoard as { posts?: unknown[] } | undefined)?.posts ?? [])) add('public_board', JSON.stringify(post));
-  return out;
+  const texts = [u.characterDescription, u.authorsNote, u.userPersona ?? '', ...u.activeLoreBooks.map((b) => b.content), ...body.narratorOnly.recentStory.map((m) => m.text)];
+  if (name.length >= 2 && texts.some((t) => t.includes(name))) return false;
+  if ((body.rooms ?? (body.room ? [body.room] : [])).some((r) => r.messages.some((m) => m.sender === p.sender))) return false;
+  return !Object.values(st.rooms).some((r) => r.messages.some((m) => m.kind === 'message' && m.sender === p.sender));
 }
 
-function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Record<string, string>): PhonePrompt {
+function finish(src: RefSource, st: PState, body: Body, mode: 'REPLY' | 'REFRESH', names: Record<string, string>): PhonePrompt {
   // 인물 로어북이 participants[].lore 와 universe.activeLoreBooks 에 똑같이 두 번 실리지 않게 참여자 쪽만 남긴다 (전수검사 11-13, 확인 1회 약 1.7만 토큰)
   const ownLore = body.participants.map((p) => p.lore).filter((l): l is string => typeof l === 'string' && !!l);
   if (ownLore.length) body.narratorOnly.universe.activeLoreBooks = body.narratorOnly.universe.activeLoreBooks.filter((b) => !ownLore.some((l) => l.includes(b.content)));
-  const contactMode = body.participants.some((p) => p.manuallySavedContact);
-  if (contactMode) {
-    body.recipientEvidenceSources = contactSources(body);
-    body.singlePassContact = true;
-  }
+  for (const p of body.participants) if (firstContact(p, body, st)) p.relationshipToOwner = 'none: never met or talked with the owner before; the owner only saved this contact';
   if (phoneSettings(src.chat.scriptstate).habits) {
     const ids = new Set(body.participants.map((x) => x.sender));
     const rows = readHabits(src.chat.scriptstate).filter((h) => ids.has(h.id)).map((h) => ({ sender: h.id, note: h.note }));
@@ -321,7 +303,7 @@ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Re
     { role: 'system', content: factionCodesToNames(system, names) },
     { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
   ];
-  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode, retryRule: read('RETRY.REFRESH') };
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false, retryRule: read('RETRY.REFRESH') };
 }
 
 function gnetBoard(src: RefSource, query: string): unknown {
@@ -342,7 +324,7 @@ export function replyPrompt(src: RefSource, st: PState, r: PRoom, dir: Directory
   const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, 'reply', t, JSON.stringify(packet)) };
   crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(packet));
-  return finish(src, body, 'REPLY', names);
+  return finish(src, st, body, 'REPLY', names);
 }
 
 export interface RefreshPlan {
@@ -419,7 +401,7 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   };
   crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(rooms));
-  return { prompt: finish(src, body, 'REFRESH', names), selected, receive, announce, invite, reason: '' };
+  return { prompt: finish(src, st, body, 'REFRESH', names), selected, receive, announce, invite, reason: '' };
 }
 
 function personOfContact(c: Contact): PPerson {

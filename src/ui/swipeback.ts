@@ -3,7 +3,9 @@
 // 가로로 넘기는 줄, 입력칸)에서 시작한 쓸기는 건드리지 않는다.
 import { isPhone } from './media';
 
-const SKIP = 'input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer';
+// 지금 위키 목록 서랍(.wdr·.wgrab·.wscrim)도 비킨다 (전수검사 11-13)
+export const SWIPE_SKIP = 'input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .wk .wdr, .wk .wgrab, .wk .wscrim, .ph-drawer';
+const SKIP = SWIPE_SKIP;
 const FIRE = 72;
 const bound = new WeakSet<HTMLElement>();
 

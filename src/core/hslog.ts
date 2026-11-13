@@ -139,6 +139,8 @@ export function hsMainSettings(vars: Vars): HsMainSettings {
   };
 }
 /** 본편에 넘길 것이 있나 (기록이 있고 켜져 있을 때) */
+/** 망상홈쇼핑에서 산 물건을 메인 요청에 넘기나: 망상홈쇼핑 줄 「컨텍스트 포함」과 「구매」 칸 (전수검사 11-13) */
+export const hsBuyPasses = (vars: Vars): boolean => { const m = hsMainSettings(vars); return m.on && m.kinds.includes('buy'); };
 export const hsMainOn = (vars: Vars): boolean => !!vars?.[HS_LOG_VAR] && hsMainSettings(vars).on && hsMainSettings(vars).kinds.length > 0;
 
 /** 지침 「망상홈쇼핑」에 MAIN_CONTEXT 절이 아직 없을 때 쓰는 머리말 */

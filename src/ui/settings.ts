@@ -32,7 +32,7 @@ import { keepOpen } from './panels';
 import { invOn, ITEM_SCOPE_VAR, ITEM_SKIP_MAX, ITEM_SKIP_VAR, itemScope, itemSkip, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_AMOUNTS, isGiveKey, isGiveShop, isShopAmount, isShopFn, shopFnNone, shopFnVar, shopGiveVar } from '../core/shopfn';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
-import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
 import { drawerBox } from './drawer';
@@ -286,7 +286,7 @@ const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load' | 'reset', [string
   chat: {
     save: ['지금 설정을 기본값으로 저장할까요? 저장해 둔 기본값을 덮어써서, 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.', '기본값으로 저장'],
     load: ['저장해 둔 기본값을 지금 채팅에 불러올까요? 지금 채팅의 설정이 기본값으로 바뀌어요. 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
-    reset: ['지금 채팅의 설정과 저장해 둔 기본값, 고친 지침과 세계를 모두 버리고 플러그인 원래 값으로 초기화할까요? 상황판 켜기·끄기는 그대로 둬요.', '초기화'],
+    reset: ['지금 채팅의 설정과 저장해 둔 기본값, 고친 지침과 세계를 모두 버리고 플러그인 원래 값으로 초기화할까요? 상황판 켜기·끄기와 추가 규칙은 그대로 둬요.', '초기화'],
   },
   card: {
     save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
@@ -658,6 +658,8 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
   const [key, op] = v.split(':');
   const f = WORLD_SPEC.find((x) => x.key === key);
   if (!f || op === undefined) return null;
+  // 칸을 비운 채 빠져나오면 0으로 저장하지 않는다 (전수검사 11-13)
+  if (op.trim() === '') return null;
   const cur = w[f.key];
   const step = worldStep(f.key);
   const n = op === '+' ? cur + step : op === '-' ? cur - step : Number(op);
@@ -844,11 +846,18 @@ export async function handleSettings(action: string, value: string | undefined, 
           before[k] = ss[k] as string | number | boolean | undefined;
           delete ss[k];
         }
+        // 배색은 지우지 않고 플러그인 기본(다크)으로 적는다. 없던 채팅은 되돌릴 때 다시 지운다 (전수검사 11-13)
+        if (!(THEME_KEY in before)) before[THEME_KEY] = undefined;
         const side = bulkSideVars(chat, prev, ss);
         shopOff = side.shopOff;
         for (const k of Object.keys(side.vars)) if (!(k in before)) before[k] = prev?.[k] as string | number | boolean | undefined;
         chat.scriptstate = ss;
-        const vars: ScriptState = { ...side.vars };
+        const vars: ScriptState = { ...side.vars, [THEME_KEY]: 'dark' };
+        // 시작 잔고 기본값도 지우므로, 이야기 중인데 장부가 아직 없는 채팅은 지금 시작값을 고정해 잔고가 튀지 않게 (전수검사 11-13, 사용자 16-1)
+        if (walletStarted(chat) && !ss[WALLET_VAR]) {
+          Object.assign(vars, walletVars(readWallet(ss, getPrefs().walletStart ?? WALLET_START_DEFAULT)));
+          if (!(WALLET_VAR in before)) before[WALLET_VAR] = undefined;
+        }
         if (worldOn(chat)) {
           const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? ''));
           for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k] as string | number | boolean | undefined;
@@ -863,13 +872,13 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 고친 지침도 원래 글로 (2026-11-08 사용자: 지침마다 있던 「기본으로」를 없애고 초기화 한 곳으로)
       if (!settingsUi.notice) {
         for (const g of GUIDE_NAMES) setGuideOverride(g, '');
-        await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {}, guides: undefined, imgPrompt: undefined, imgKeywords: undefined }));
+        await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {}, guides: undefined, imgPrompt: undefined, imgKeywords: undefined, walletStart: undefined, imgNamesOff: undefined, imgNamesExtra: undefined }));
         imgUi.template = null;
         imgUi.keywords = null;
         for (const f of resetHooks) f();
       }
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
-      if (!settingsUi.notice) settingsUi.info = '지금 채팅 설정·기본값·지침·세계를 플러그인 원래 값으로 초기화했어요.';
+      if (!settingsUi.notice) settingsUi.info = '지금 채팅 설정·기본값·지침·세계를 플러그인 원래 값으로 초기화했어요. 추가 규칙은 그대로 둬요.';
       env.render();
     } else env.render();
     return true;
@@ -1122,6 +1131,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-world': {
         const hit = nextWorld(d.world, v.replace('=', ':'));
         if (hit) await saveDefaults(env, (p) => ({ ...p, world: { ...p.world, [hit[0]]: hit[1] } }));
+        else env.render(); // 빈 칸은 저장된 값으로 다시 그린다 (전수검사 11-13)
         return true;
       }
     }

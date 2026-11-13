@@ -7,7 +7,7 @@ import { basicSettings } from './settings';
 import { jointGroups, JOINT_LABEL } from './netjoint';
 import { viewSettings } from './phoneView';
 import { wikiSettings } from './wiki';
-import { MALL_NAME, MALL_SITES, mallSettings } from './malls';
+import { MALL_NAME, MALL_SITES, mallAutoTurn } from './malls';
 import { MAIN_STAGE, type Stage } from './progress';
 
 export function turnPlan(char: { globalLore?: LoreEntry[] }, chat: Chat): Stage[] {
@@ -42,8 +42,7 @@ export function turnPlan(char: { globalLore?: LoreEntry[] }, chat: Chat): Stage[
   }
   if (viewSettings(ss).auto === 'turn') out.push({ id: 'view', label: '관전', group: 'net', match: ['관전'] });
   for (const site of MALL_SITES) {
-    const m = mallSettings(ss, site);
-    if (m.on && m.auto === 'turn' && (site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1')) out.push({ id: `mall:${site}`, label: MALL_NAME[site], group: 'net', match: [`${MALL_NAME[site]} 진열`] });
+    if (mallAutoTurn(chat, site)) out.push({ id: `mall:${site}`, label: MALL_NAME[site], group: 'net', match: [`${MALL_NAME[site]} 진열`] });
   }
   return out;
 }

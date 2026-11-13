@@ -5,11 +5,12 @@ import { messageText } from '../refs';
 import { guideOr } from '../guides';
 import { scanAgents } from '../world/tags';
 import { findStatusTags } from '../world/status';
-import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
+import { addressOf, affinityView, opennessOf, tasteOf, type AffinityOpts } from './affinity';
 import { SPEECH_ENTRY_CHARS, applySpeechSign, parseSpeechMarker, speechVariety } from './speech';
 import { SEXUAL_FIELDS, SEXUAL_AXIS_OF, explicitOn, isSexualAxis, sexualAnyOn, sexualFieldOn, sexualGlobal, setSexualText } from './sexual';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
+import { temperOf } from './base';
 import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
 import { axesView, ensureAxes, isAxis, isDirection, observe, readAxes, setAxes, pruneCandidates } from './axes';
 import { AXES } from './types';
@@ -94,10 +95,7 @@ export interface UpdateInput {
 /** 소지품 절 자료: 지금 가진 것 (core/items.ts). 판정(사용·남은 횟수·장착)과 상태를 같이 준다 */
 export interface ItemNow { name: string; desc: string; use: boolean; left?: number; weight?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState; /** 상태에 따라 그림이 여러 장인 물건: 고를 수 있는 그림 이름들 */ pictures?: string[] }
 
-const CUE_MEANING: Record<Cue, string> = {
-  작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
-  실망: '실제로 생긴 작은 실망', 무시: '분명한 무시·무례, 믿음에 금', 배신: '의미 있는 배신·굴욕', 파탄: '심각한 신뢰·관계 파괴', 중대위반: '설정상 용서받기 어려운 일',
-};
+// 계기 뜻풀이는 지침 표에만 둔다 — 자료에 같은 뜻을 두 번 싣지 않음 (전수검사 11-13)
 
 /** 응답 본문 정리: 상태창·상황판 태그·플러그인 표식은 messageText 가 지운다. 길면 중간을 접는다 */
 export function cleanSpan(raw: string, cap: number): string {
@@ -116,14 +114,15 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string>; sexual?: PeopleSettings } = {}) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string>; sexual?: PeopleSettings; aff?: AffinityOpts; folded?: number } = {}) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string; pin?: true }[]> = {};
   for (const s of extra.slots ?? SLOTS) {
     const list = liveEntries(p.slots[s], live);
     if (!list.length) continue;
     entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}), ...(e.pin ? { pin: true as const } : {}) }));
   }
-  const aff = affinityView(p, changes, 0, { turnCap: extra.turnCap });
+  // 본편·Director 와 같은 계수(temper·speed·speedDown)·접힌 값으로 계산 (전수검사 11-13)
+  const aff = affinityView(p, changes, extra.folded ?? 0, extra.aff ?? { turnCap: extra.turnCap });
   const addr = addressOf(p, changes);
   return {
     name: p.name,
@@ -294,12 +293,12 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const shopM = o.shop && !o.only?.length && confirmedIdx.has(o.shop.at) ? [...tags].find(([, i]) => i === o.shop!.at)?.[0] ?? '' : '';
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
-    cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
+    cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES : [],
     slots: slotsFor(o.settings.features, o.settings.qualitative),
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings, aff: { temper: temperOf(n), speed: o.settings.speed, speedDown: o.settings.speedDown, turnCap: o.settings.turnCap }, folded: store.folded[n] ?? 0 }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     ...(o.hints?.length ? { name_hints: o.hints.filter((h) => !store.people[h.name]).slice(0, 12) } : {}),
@@ -715,10 +714,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('entry', e, '고정된 항목', who);
         continue;
       }
-      if (!/끝|해소|풀|지켰|이행|완료|회복|나았|돌아|밝혀|밝혔|사라|아니었|아님|취소|resolved|done|no longer|healed|revealed/i.test(e.quote + ' ' + (e.text ?? ''))) {
-        report.held.push({ kind: 'entry', who, reason: '삭제 근거가 분명하지 않음', item: e });
-        continue;
-      }
+      // 낱말 검사는 뺐다: 인용이 실제 메시지에 있으면 바로 해소 (전수검사 11-13, 사용자 12-1)
       // 삭제 = 빈 텍스트로 대체하는 항목 (대체 항목이 죽으면 이전 항목이 돌아온다)
       const seq = nextSeq(ev.anchor);
       putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, `-${target.id}`), text: `(해소) ${target.text}`.slice(0, 200), src: 'story', anchor: ev.anchor, seq, quote: e.quote, replaces: target.id, ...(target.target ? { target: target.target } : {}) });

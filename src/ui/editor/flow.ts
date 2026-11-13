@@ -20,7 +20,7 @@ import { previewShopShelf } from '../shop';
 import { shopJudgeBy, shopOn } from '../../core/shop';
 import { previewMallShelf } from '../malls';
 import { boardView, BOARD_NAME, BOARD_SITES } from '../../core/boards';
-import { MALL_NAME, mallSettings, type MallSite } from '../../core/malls';
+import { MALL_NAME, mallAutoTurn, mallSettings, type MallSite } from '../../core/malls';
 import { autoTasks, JOINT_LABEL, jointGroups, jointMates, jointOn, type JointKind } from '../../core/netjoint';
 import { traceUi } from './trace';
 
@@ -188,8 +188,8 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     ...(['cos', 'bm'] as MallSite[]).map((site): Node => {
       const m = mallSettings(ss, site);
       const login = site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1';
-      const on = m.on && m.auto === 'turn' && login;
-      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (login ? '1회' : '로그인했을 때 1회 (지금 로그아웃)') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:shop', to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
+      const on = mallAutoTurn(ctx.chat, site);
+      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (!login ? '로그인했을 때 1회 (지금 로그아웃)' : on ? '1회' : '호출 없음') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:shop', to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
     }),
   ];
   const manual: Node[] = [

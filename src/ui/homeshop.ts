@@ -17,7 +17,7 @@ import { userTurns } from '../core/request';
 import { userInfo } from '../host/user';
 import { fillGuide, guideSections } from '../core/guides';
 import { defStored } from '../core/deftext';
-import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
+import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsNumVars, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, turnStep, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { ensureHomeshop, homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
 import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
@@ -25,6 +25,7 @@ import { itemPic } from './items';
 import { isPhone } from './media';
 import { playerFlush } from './hsplayer';
 import { appendLog, sameProgram, type HsLogEntry } from '../core/hslog';
+import { isWaiting, onWaiting } from '../host/waiting';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -158,12 +159,12 @@ export function homeshopOpenCheck(ctx: ChatContext, env: HsEnv): void {
   // 사이트에 들어오면 늘 방송 화면부터
   ui.page = '';
   const s = hsSettings(ctx.chat.scriptstate);
-  if (!s.on || s.auto === 'manual' || ui.loading) return;
+  if (!s.on || ui.loading) return;
   const show = readShow(ctx.chat.scriptstate);
   // 턴 열쇠: 응답을 다시 굴린 것은 턴이 넘어간 것이 아니다 (11-11 사용자)
   const key = turnKey(ctx.chat);
-  // 본편 턴이 넘어갔으면 편성 한 칸 (보던 부는 지나간다)
-  if (s.turn && show.loaded && show.tk !== undefined && show.tk !== key && show.at < show.parts.length) {
+  // 본편 턴이 넘어갔으면 편성 한 칸 (보던 부는 지나간다). 모델 호출이 없으니 수동이어도 넘긴다 (전수검사 11-13)
+  if (turnStep(show, s.turn, key)) {
     void updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       const cur = readShow(chat.scriptstate);
       if (!cur.loaded || cur.tk === turnKey(chat)) return null;
@@ -171,6 +172,8 @@ export function homeshopOpenCheck(ctx: ChatContext, env: HsEnv): void {
     }).then(() => env.refresh()).then(() => { const c = env.current(); if (c) homeshopOpenCheck(c, env); });
     return;
   }
+  // 새 편성 호출만 수동에서 막는다
+  if (s.auto === 'manual') return;
   if (show.loaded && String(ctx.chat.scriptstate?.[HS_AT_VAR] ?? '') === key) return;
   if (show.loaded && show.at < show.parts.length) return;
   void ask(ctx, env);
@@ -261,18 +264,31 @@ function advance(at: number): void {
   }).then(() => env.refresh());
 }
 
+/** 본편 응답 대기가 풀릴 때까지 (host/people.ts waitNotBusy 와 같은 방식) */
+function whenIdle(): Promise<void> {
+  if (!isWaiting()) return Promise.resolve();
+  return new Promise((resolve) => {
+    const off = onWaiting((w) => {
+      if (w) return;
+      off();
+      resolve();
+    });
+  });
+}
+
 /**
  * 시청 기록 저장 (core/hslog.ts): 재생기가 모아 준 「화면에 나온 줄」 묶음을 그 채팅의 `$hs_log` 에 덧붙인다. 본편 요청이 참고 기록으로 읽는다 (body.ts moduleContext).
  * 줄마다가 아니라 묶음으로만 부른다 (재생기 playerFlush). 그 채팅의 편성이 그사이 바뀌었으면 버린다
  */
 function saveLog(charIndex: number, chatIndex: number, entries: HsLogEntry[], show: HsShow): void {
   if (!entries.length) return;
-  void updateChat(charIndex, chatIndex, (chat) => {
+  // 본편 응답을 기다리는 동안에는 채팅을 쓰지 않고, 대기가 풀리면 차례로 적는다 (응답과 겹쳐 덮지 않게, 전수검사 11-13)
+  void whenIdle().then(() => updateChat(charIndex, chatIndex, (chat) => {
     const cur = readShow(chat.scriptstate);
     if (!sameProgram(cur, show)) return null;
     const vars = appendLog(chat.scriptstate, cur, entries);
     return Object.keys(vars).length ? { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } } : null;
-  }).catch((error) => console.log(`[goei] ${HS_NAME} 시청 기록 저장 실패: ${error instanceof Error ? error.message : String(error)}`));
+  })).catch((error) => console.log(`[goei] ${HS_NAME} 시청 기록 저장 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 // ── 주문·상자·방청·채팅 (설계 8-4 ~ 8-10) ──
@@ -317,7 +333,7 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
     let name = HS_BOX.name(part.item.name);
     for (let k = 2; k < 20 && mine.some((x) => x.id === itemId(anchor, name) || x.name === name); k++) name = `${HS_BOX.name(part.item.name).slice(0, 27)} ${k}`;
     const paidWith = gave ? `「${gave.name}」 맞교환 (${HS_NAME})` : o.n ? `무이자 할부 ${o.n}회 (${HS_NAME})` : `${part.item.pay || '방송 특가'} (${HS_NAME})`;
-    items = addItem(items, alive, { name, desc: HS_BOX.desc, icon: HS_BOX.icon, weight: part.item.weight, from: 'store', anchor, paidWith });
+    items = addItem(items, alive, { name, desc: HS_BOX.desc, icon: HS_BOX.icon, weight: part.item.weight, from: 'store', store: 'hs', anchor, paidWith });
     o.boxId = itemId(anchor, name);
     ok = true;
     usedBarter = !!gave;
@@ -349,7 +365,7 @@ async function openBox(ctx: ChatContext, env: HsEnv, boxId: string): Promise<voi
       ? addItemLog({ ...items, list: items.list.map((x) => (x.id === boxId ? { ...x, soldAt: anchor } : x)) }, { name: box.name, item: boxId, ...(box.icon ? { icon: box.icon } : {}), what: 'use', by: 'manual', anchor, note: '상자를 열었다' })
       : removeItem(items, boxId, 'use', 'manual', '', { note: '상자를 열었다' });
     const it = o.item;
-    items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, paidWith: box.paidWith ?? HS_NAME });
+    items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', store: 'hs', anchor, paidWith: box.paidWith ?? HS_NAME });
     const orders = readOrders(chat.scriptstate).map((x) => (x.id === o.id ? { ...x, openKey: anchor } : x));
     return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(orders) } };
   });
@@ -604,7 +620,8 @@ async function homeshopSettingsAction(action: string, value: string | undefined,
     const d = HS_NUM[k];
     const n = Math.round(Number(v));
     if (!d || !Number.isFinite(n) || v.trim() === '') return env.render(), true;
-    return set({ [d.key]: String(Math.max(d.lo, Math.min(d.hi, n))) });
+    // 최소·최대 줄은 짝도 같이 맞춘다 (전수검사 11-13)
+    return set(hsNumVars(ctx.chat.scriptstate, k, n, Object.values(HS_PAIRS).find((p) => p.includes(k))));
   }
   // hs-text
   if (HS_DEF_TEXT[k]) { const [name, def, max] = HS_DEF_TEXT[k]; return set({ [name]: defStored(v.replace(/\s+/g, ' '), def, undefined, max) }); }

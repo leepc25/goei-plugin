@@ -54,6 +54,9 @@ export const TRACE_KEEP = 5;
 export const TRACE_TEXT = 400000;
 /** 본편 요청 메시지 하나의 보관 한도 */
 export const TRACE_MAIN_TEXT = 400000;
+/** 한 턴 원문(요청+응답) 합계 한도. 넘으면 그 턴의 오래된 호출부터 원문만 비운다. 이름·시간·글자 수·토큰 수는 남는다 (전수검사 11-13, 사용자 17-1) */
+export const TRACE_TURN_CHARS = 3_000_000;
+const EMPTIED = '(한 턴 기록이 300만 자를 넘어 오래된 호출부터 원문을 비웠어요)';
 const KEY = 'goei-trace';
 
 let turns: TraceTurn[] | null = null;
@@ -205,6 +208,14 @@ export async function traceCall(c: Omit<TraceCall, 'phase' | 'at'> & { at: strin
     phase = 'manual';
   }
   t.calls.push({ ...c, phase });
+  let sum = t.calls.reduce((n, x) => n + x.request.length + x.response.length, 0);
+  for (const x of t.calls) {
+    if (sum <= TRACE_TURN_CHARS) break;
+    if (x.request === EMPTIED) continue;
+    sum -= x.request.length + x.response.length - EMPTIED.length;
+    x.request = EMPTIED;
+    x.response = '';
+  }
   save();
 }
 

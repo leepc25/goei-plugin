@@ -28,9 +28,10 @@ import { autoWriteWiki } from './ui/wiki';
 import { wikiSettings } from './core/wiki';
 import { autoRefreshGnet } from './ui/gnet';
 import { autoRefreshMall } from './ui/malls';
-import { MALL_SITES, mallSettings } from './core/malls';
+import { MALL_SITES, mallAutoTurn } from './core/malls';
 import { Joint } from './host/joint';
 import { autoTasks, jointGroups } from './core/netjoint';
+import { readReports, refreshClosures } from './core/journal';
 import { BOARD_NAME } from './core/boards';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
@@ -387,7 +388,15 @@ async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }
   return out;
 }
 
-/** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
+/** 요청 맨 끝에 system 한 줄. 끝이 assistant(프리필·이어 쓰기)면 그 앞에 넣어 프리필이 마지막으로 남게 한다 (전수검사 11-13) */
+function appendImgPrompt<M extends PromptMessage>(messages: M[], text: string): M[] {
+  let end = messages.length;
+  while (end > 0 && messages[end - 1]?.role === 'assistant') end--;
+  const add = { role: 'system', content: text } as M;
+  return end === messages.length || end === 0 ? [...messages, add] : [...messages.slice(0, end), add, ...messages.slice(end)];
+}
+
+/** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에, 끝이 assistant 프리필이면 그 앞에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
 function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): M[] {
   const s = basicSettings(char.globalLore, chat.scriptstate);
   const out = stripImgLore(messages);
@@ -396,7 +405,7 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const names = imgCharacters(char.globalLore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: me?.english || undefined, userName: userInfo().name });
   if (!names.length) return out;
-  return [...out, { role: 'system', content: buildImgPrompt(cfg, names, s.assetPlayer) } as M];
+  return appendImgPrompt(out, buildImgPrompt(cfg, names, s.assetPlayer));
 }
 
 /** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서, 망상홈쇼핑 시청 기록을 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
@@ -417,10 +426,11 @@ function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const focus = makeFocus(scene, buildRegistry(char.globalLore));
   // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
   const parts: ContextPart[] = [];
-  for (const { view } of boardsOn) {
+  for (const { site, view } of boardsOn) {
     const rule = mainContextRules({ char: src.char, chat: view });
     const st = readGnet(view);
-    if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: GN_CONTEXT.tokens, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rule, focus)) });
+    // 어느 게시판 글인지 이름을 붙인다 (전수검사 11-13: 네 게시판이 모두 feature:'gnet' 으로만 갔다)
+    if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: GN_CONTEXT.tokens, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rule, focus, BOARD_NAME[site])) });
   }
   if (wantPhone && rules.phone) {
     try {
@@ -584,7 +594,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
     {
-      const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+      const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`))
+        // 이번 응답에서 끝난 내 사건 보고서에 그 응답의 가계부 맞춤·호감 계기까지 넣는다 (전수검사 11-13)
+        .then(() => (readReports(now).items.some((r) => r.mine && r.idx === arg.messageIndex)
+          ? updateChat(arg.characterIndex, arg.chatIndex, (cur) => { const v = refreshClosures(cur, arg.messageIndex, walletStart); return v ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...v } } : null; }).catch(() => null)
+          : null));
       after.push(pp);
       if (!peopleSettings(now.scriptstate).parallel) await pp;
     }
@@ -597,8 +611,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     const netTasks = autoTasks(now.scriptstate);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
-    // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했을 때만)
-    const malls = MALL_SITES.filter((site) => { const m = mallSettings(now!.scriptstate, site); return m.on && m.auto === 'turn' && (site !== 'bm' || String(now!.scriptstate?.['$br_login'] ?? '') === '1'); });
+    // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했고 백일몽 소속(포인트 켬)일 때만. 탭이 안 보이는 채팅에서 부르지 않게, 전수검사 11-13)
+    const malls = MALL_SITES.filter((site) => mallAutoTurn(now!, site));
     if (netTasks.length || viewAuto || wikiAuto || malls.length) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;

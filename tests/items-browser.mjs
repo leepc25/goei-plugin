@@ -151,4 +151,6 @@ for (const vp of ['pc', 'phone']) {
   await page.close();
 }
 await b.close();
-console.log(errorsAll.length ? `ERRORS\n${errorsAll.join('\n')}` : 'ok (no page errors)');
+// 틀린 것이 있으면 실패로 끝낸다 — 전에는 찍기만 하고 0으로 끝났다 (전수검사 11-13)
+if (errorsAll.length) { console.error('FAIL\n' + errorsAll.join('\n')); process.exit(1); }
+console.log('ok (no page errors)');

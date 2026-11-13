@@ -517,6 +517,8 @@ function ensureRoot(): HTMLElement {
     // 설정·세계 편집 창이 떠 있으면 그 창이 닫힌다 (editor/index.ts). 뒤의 패널까지 같이 닫지 않는다
     if (editorOpen()) return;
     // 사원증·요원 정보 작은 창이 떠 있으면 그것만 닫는다 (2026-11-05: Esc가 창을 지나쳐 패널 전체를 닫던 문제)
+    // 보고서 이미지 미리보기는 보고서 위에 뜬다: 그것만 닫는다 (전수검사 11-13)
+    if (document.querySelector('.gx-pngpop')) return void handle('rec-png-x');
     // 보고서 팝업은 상태(rec.view)로 떠 있으니 뒤로 처리로 닫는다
     if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
     if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
@@ -1516,7 +1518,8 @@ function renderPicker(): void {
 const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups, .gx-lookg';
 /** 설정 기능 페이지(인물 기록 설정 등)·위키 문서 칸(인물 상세·기록 문서): .gx-body 가 아니라 이 칸이 실제로 스크롤된다.
  *  같은 페이지(pageKey)를 다시 그릴 때만 자리를 지킨다 (다른 문서로 넘어가면 맨 위부터) */
-const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc';
+// 위키 문서 칸(.wk .wsc)도: 목록 서랍·그림 도착으로 다시 그리면 맨 위로 튀던 문제 (전수검사 11-13)
+const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc, .wk .wsc';
 const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
 
 function render(): void {
@@ -1534,6 +1537,8 @@ function render(): void {
   const inner = root.dataset.tab === tab ? [...root.querySelectorAll<HTMLElement>(INNER_SCROLL)].map((el) => el.scrollTop) : [];
   // 설정 기능 페이지·위키 문서 칸: 진단 행 펼치기·📌·취소처럼 전체를 다시 그려도 그 칸의 자리를 지킨다 (맨 위로 튀던 문제, 2026-10-26)
   const pageKeep = root.dataset.pk === pageKey() ? [...root.querySelectorAll<HTMLElement>(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
+  // 같은 위키 문서면 펼쳐 둔 스포일러 접기도 그대로 (전수검사 11-13)
+  const openKeep = root.dataset.pk === pageKey() ? [...root.querySelectorAll<HTMLDetailsElement>('.wk .wsc details')].map((d) => d.open) : [];
   // 괴담톡 대화: 맨 아래를 보고 있었으면(또는 방을 새로 열면) 다시 그린 뒤에도 맨 아래로
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
@@ -1596,6 +1601,7 @@ function render(): void {
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
   root.dataset.pk = pageKey();
+  if (openKeep.length) root.querySelectorAll<HTMLDetailsElement>('.wk .wsc details').forEach((d, i) => openKeep[i] && (d.open = true));
   if (pageKeep.length) root.querySelectorAll<HTMLElement>(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
   // 탭 줄이 넘치면 보고 있는 탭이 보이게 (2026-11-08 사용자)
   const tabsRow = root.querySelector<HTMLElement>('.br-tabs');

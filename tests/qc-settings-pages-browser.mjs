@@ -397,14 +397,22 @@ for (const vp of vps) {
       if (d === '0') assert.ok(/rgba\(\d+, \d+, \d+, 0\)/.test(bg), `0% → 투명 (${bg})`);
       if (d === '100') assert.ok(/^rgb\(/.test(bg), `100% → 불투명 (${bg})`);
     }
-    // details(접는 칸)는 조작 뒤 다시 그려도 펼친 채로 (인물 기록 「기능」 칸)
-    await goNode(page, 'set:people');
-    const det = await page.$('.gw details[data-keep="pp-feat"]');
-    if (det) {
-      await page.evaluate(() => { const d = document.querySelector('.gw details[data-keep="pp-feat"]'); d.open = true; d.dispatchEvent(new Event('toggle')); });
-      await page.evaluate(() => [...document.querySelectorAll('.gw [data-action="pp-set"][role="switch"]')].pop().click());
+    // details(접는 칸)는 조작 뒤 다시 그려도 펼친 채로 (소지품 판정 표 칸)
+    // 인물 페이지의 pp-feat 칸은 없어져 늘 건너뛰었다 → 있는 칸으로 옮기고 없으면 실패 (전수검사 11-13)
+    {
+      await goNode(page, 'set:items');
       await settle(page);
-      assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="pp-feat"]')?.open), true, '접는 칸은 조작 뒤에도 펼친 채');
+      const sel = '.gw details[data-keep="items-rules"]';
+      const sw = '.gw [data-action="set-items-edit"][role="switch"]';
+      assert.ok(await page.$(sel), '접는 칸(items-rules)이 있어야 한다');
+      assert.ok(await page.$(sw), '소지품 「고치기」 스위치가 있어야 한다');
+      await page.evaluate((sel) => { const d = document.querySelector(sel); d.open = true; d.dispatchEvent(new Event('toggle')); }, sel);
+      await page.evaluate((sw) => document.querySelector(sw).click(), sw);
+      await settle(page);
+      assert.equal(await page.evaluate((sel) => document.querySelector(sel)?.open, sel), true, '접는 칸은 조작 뒤에도 펼친 채');
+      // 값 되돌림 (뒤 시험에 영향 없게)
+      await page.evaluate((sw) => document.querySelector(sw).click(), sw);
+      await settle(page);
     }
     // 다시 열었을 때 같은 값 (상황판·이미지 페이지, 이 채팅 범위)
     for (const p of ['board', 'image']) {
