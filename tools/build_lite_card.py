@@ -604,6 +604,24 @@ EMOTIONS = set('default angry annoyed bored confused contemptuous crying curious
     'suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous', 'pleading', 'forced smiling', 'indifferent', 'guilty', 'pouting', 'angry smile', 'expressionless', 'tormented', 'crazy smile'}
 
 
+# 원본 카드 첫 장면 글의 영어 철자를 로어북 키·명부와 맞춘다 (전수검사 11-13, 사용자 5-가). 옛 철자가 하나도 없으면 빌드를 멈춘다
+FIRST_MES_SPELL = [
+    (r'\bJin-seop\b', 'Jin-seob'),
+    (r'\bYeong-hun\b', 'Young-hoon'),
+    (r'\bLee Do-hyung\b', 'Lee Do-hyeong'),
+    (r'\bCuras\b', 'Kyuras'),
+    (r'\bWorld Politics Board\b', 'World Politics Forum'),
+]
+
+
+def fix_first_mes_spelling(text):
+    for old, new in FIRST_MES_SPELL:
+        text, n = re.subn(old, new, text)
+        if not n:
+            raise SystemExit(f'첫 장면 철자 고침 대상이 없습니다: {old}')
+    return text
+
+
 def fix_emotion_tags(text):
     """<img=이름_표정> 의 표정이 세트에 없으면 빌드를 멈춘다"""
     def one(m):
@@ -910,7 +928,7 @@ def main(src, dst):
 
     # 첫 장면 글은 플러그인이 메시지로 넣는다 (2026-11-05 사용자: Risu 추가 첫 메시지를 안 씀). 카드에는 직접 입력용 빈 인사말 하나만,
     # 글 전체는 세계 자료 팩(src/data/world/greetings.json → scripts/data-pack.mjs scenesData)으로
-    scene_texts, scene_index = build_openings(fix_emotion_tags(data['first_mes']), scenarios)
+    scene_texts, scene_index = build_openings(fix_first_mes_spelling(fix_emotion_tags(data['first_mes'])), scenarios)
     greetings = ['']
     greeting_index = {k: 0 for k, n in scene_index.items() if not scene_texts[n]}
     pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
