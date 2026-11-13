@@ -150,11 +150,11 @@ export function addWalletEntry(w: Wallet, e: Omit<WalletEntry, 'id' | 'at'> & { 
 }
 
 /** 필드 거래 (게임 다리, 출처 field). 기준 메시지는 필드 사건·막간과 같은 자리(들어갈 때의 마지막 메시지)라 그 메시지를 다시 굴리면 같이 빠진다.
- * 같은 물건을 두 번 사도 따로 적히게 id 는 부르는 쪽이 매번 새로 준다 */
-export function withFieldTrade(w: Wallet, anchor: string, amount: number, memo: string, id: string, where: { place?: string; time?: string } = {}): Wallet {
+ * 같은 물건을 두 번 사도 따로 적히게 id 는 부르는 쪽이 매번 새로 준다. alive(살아 있는 응답 키)를 주면 addWalletEntry 처럼 400줄을 넘을 때 정리한다 (전수검사 11-13) */
+export function withFieldTrade(w: Wallet, anchor: string, amount: number, memo: string, id: string, where: { place?: string; time?: string } = {}, alive?: Set<string>): Wallet {
   const place = typeof where.place === 'string' ? where.place.trim().slice(0, 30) : '';
   const time = typeof where.time === 'string' ? where.time.trim().slice(0, 10) : '';
-  return addWalletEntry(w, { anchor, amount: Math.trunc(amount), memo: memo.trim() || '필드 거래', src: 'field', id, ...(place ? { place } : {}), ...(time ? { time } : {}) });
+  return addWalletEntry(w, { anchor, amount: Math.trunc(amount), memo: memo.trim() || '필드 거래', src: 'field', id, ...(place ? { place } : {}), ...(time ? { time } : {}) }, alive);
 }
 
 export function removeWalletEntry(w: Wallet, id: string): Wallet {

@@ -179,7 +179,7 @@ test('새 인물: 2턴 규칙·역할 명사·별명 충돌·상한, 확인 모�
   assert.ok(rep.dropped.some((d) => d.reason === '턴당 2명 상한'));
 });
 
-test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 접는다', () => {
+test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 앞 항목을 남긴다', () => {
   const { c, store, input } = setup();
   const rep = U.applyUpdate(store, c, input, {
     docs: [
@@ -203,7 +203,7 @@ test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 접는다',
   assert.ok(rep.dropped.some((d) => d.reason === '없는 의심 종류'));
   const live = S.liveness(c);
   const su = S.liveEntries(store.people.데쥬레.slots.suspicion, live);
-  assert.deepEqual(su.map((e) => e.text), ['[시작] 유저가 명단을 봤다는 말을 의심', '[해소] 오해로 밝혀짐'], '해소는 마지막 단서를 대체');
+  assert.deepEqual(su.map((e) => e.text), ['[시작] 유저가 명단을 봤다는 말을 의심', '[단서] 비밀번호를 알고 있었다', '[해소] 오해로 밝혀짐'], '해소는 앞 항목을 대체하지 않는다 (점수 유지)');
   // 기능 끔
   const rep2 = U.applyUpdate(store, c, input, { suspicion: [{ who: '데쥬레', target: '@user', kind: '정체', op: 'open', text: 'q', m: 'm4', quote: '팔을' }] }, { settings: settings({ features: new Set(['affinity']) }) });
   assert.equal(rep2.applied.suspicion, 0);

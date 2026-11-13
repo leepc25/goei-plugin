@@ -132,9 +132,9 @@ for (const vp of ['pc', 'phone']) {
     await page.evaluate(() => { const d = document.querySelector('.gw details[data-keep="items-rules"]'); d.open = true; d.dispatchEvent(new Event('toggle')); d.scrollIntoView({ block: 'start' }); }); await sleep(300);
     await page.screenshot({ path: `${out}/${vp}_9_설정_판정표.png` });
     const cell = (k) => `.gw [data-change="set-items-rules-cell"][data-key="${k}"]`;
-    assert.deepEqual([await val(cell('12:a')), await val(cell('12:b'))], ['도구', '장비·사용']);
-    await setInput(page, cell('12:b'), '사용'); await sleep(400);
-    assert.ok(String((await ss()).$it_rules).includes('도구 → 사용'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
+    assert.deepEqual([await val(cell('12:a')), await val(cell('12:b'))], ['도구', '사용']);
+    await setInput(page, cell('12:b'), '장비·사용'); await sleep(400);
+    assert.ok(String((await ss()).$it_rules).includes('도구 → 장비·사용'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
     await page.evaluate(() => document.querySelector('.gw [data-action="set-items-rules-reset"]')?.click()); await sleep(400);
     assert.ok(!(await ss()).$it_rules, '기본값으로');
     // 조작 높이 34px · 가로 넘침 없음

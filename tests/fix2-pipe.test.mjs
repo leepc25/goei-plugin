@@ -114,3 +114,20 @@ test('호출 기록: 턴마다 따로 저장하고 다시 읽으면 같다', asy
   assert.equal(store.get('goei-trace'), '[]');
   assert.ok(![...store.keys()].some((k) => k.startsWith('goei-trace:')));
 });
+
+test('호출 기록: 본편에 덧붙인 글의 토큰 수를 main.added 에 남긴다 (pipeline#10)', async () => {
+  const P = await import(`${url}?v=4`);
+  await P.traceBegin();
+  P.traceMain([{ role: 'user', content: '안녕하세요' }], [], ['abc']);
+  await new Promise((r) => setTimeout(r, 20)); // 토큰 수는 보낸 뒤에 센다
+  const t = (await P.loadTrace()).at(-1);
+  assert.equal(typeof t.main.added, 'number');
+  assert.ok(t.main.added > 0, `added=${t.main.added}`);
+  // 덧붙인 글이 없으면 칸도 없다
+  await P.traceBegin();
+  P.traceMain([{ role: 'user', content: '안녕하세요' }], []);
+  await new Promise((r) => setTimeout(r, 20));
+  assert.equal((await P.loadTrace()).at(-1).main.added, undefined);
+  await new Promise((r) => setTimeout(r, 1700)); // 모아 쓰기가 끝난 뒤 정리
+  await P.clearTrace();
+});

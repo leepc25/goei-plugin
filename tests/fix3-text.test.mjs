@@ -75,7 +75,9 @@ test('우주 쇼핑몰만 흥정 문장이 없다 (gshop#6 = 사용자 승인 �
   const bm = G.guideDefault('Bm');
   assert.match(shop, / Haggling: the owner may refuse/);
   assert.doesNotMatch(cos, /Haggling:/);
-  assert.match(bm, /Haggling:/);
+  // 포인트몰은 주인 대화가 1:1 상담(BmDesk)으로 가서 TALK 절 자체가 빠졌다 (나-52 사용자 승인)
+  assert.doesNotMatch(bm, /@@SECTION TALK\n/);
+  assert.doesNotMatch(bm, /Haggling:/);
 });
 
 test('로어 원문 첫 줄의 @@dont_activate 는 떼고 보낸다 (ggnet#13)', () => {

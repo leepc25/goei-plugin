@@ -127,13 +127,13 @@ test('다 쓴 소모품·상점 맞교환은 지금처럼 줄을 지운다', () 
   assert.equal(removeItem(s, s.list[0].id, 'sell', 'store').list.length, 0);
 });
 
-test('갈래 표: 종류 → 판정. 손전등(기기)은 장비·사용, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
+test('갈래 표: 종류 → 판정. 손전등(기기)은 사용, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
   setItemRules(undefined);
   const t = (icon, name, model = {}) => traitsFor(icon.split('/')[0] && { 옷: 'wear', 음식: 'food', 도구: 'tool', 기기: 'device', 의료: 'medical', 소모품: 'consumable', 부적: 'charm', 무기: 'weapon', 서류: 'paper', 귀중품: 'valuable', 열쇠: 'key', 봉인: 'seal', 괴이: 'anomaly', 잡동사니: 'misc', 성인: 'adult' }[icon.split('/')[0]], icon, name, model);
-  assert.deepEqual(t('기기/손전등/flashlight', '손전등', { use: true }), { use: true, equip: 'gear' });
-  assert.deepEqual(t('도구/라이터/lighter', '라이터', { use: true }), { use: true, equip: 'gear' });
-  assert.deepEqual(t('기기/무전기/radio', '무전기'), { use: true, equip: 'gear' });
-  assert.deepEqual(t('기기/카메라/camera', '카메라'), { use: true, equip: 'gear' });
+  assert.deepEqual(t('기기/손전등/flashlight', '손전등', { use: true }), { use: true });
+  assert.deepEqual(t('도구/라이터/lighter', '라이터', { use: true }), { use: true });
+  assert.deepEqual(t('기기/무전기/radio', '무전기'), { use: true });
+  assert.deepEqual(t('기기/카메라/camera', '카메라'), { use: true });
   assert.deepEqual(t('잡동사니/우산/umbrella', '우산', { use: true }), { use: false });
   assert.deepEqual(t('열쇠/열쇠/key', '열쇠'), { use: true });
   assert.deepEqual(t('의료/안정제/sedative', '안정제', { uses: 3 }), { use: true, uses: 3 }, '횟수는 모델이 적은 것');
@@ -142,7 +142,7 @@ test('갈래 표: 종류 → 판정. 손전등(기기)은 장비·사용, 물건
   assert.deepEqual(t('무기/권총/pistol', '권총'), { use: false, equip: 'weapon' });
   assert.deepEqual(t('부적/부적/talisman', '부적'), { use: true });
   assert.deepEqual(t('옷/정장/suit', '정장', { use: true }), { use: false, equip: 'gear' });
-  assert.deepEqual(t('도구/성냥/match', '성냥', { uses: 10 }), { use: true, uses: 10, equip: 'gear' }, '표에 소모가 없어도 모델이 적은 횟수는 둔다');
+  assert.deepEqual(t('도구/성냥/match', '성냥', { uses: 10 }), { use: true, uses: 10 }, '표에 소모가 없어도 모델이 적은 횟수는 둔다');
   assert.equal(t('성인/콘돔/condom', '콘돔', { use: true }), undefined, '표에 없는 종류 → 모델 값');
   assert.equal(traitsFor('', undefined, '녹음기', { use: true }), undefined, '종류를 모르면 모델 값');
   // 설정으로 고침: 물건말 줄
@@ -155,7 +155,7 @@ test('갈래 표: 종류 → 판정. 손전등(기기)은 장비·사용, 물건
   assert.equal(parseItemRules('도구 → 뭐지\n → 장비\n칼 → 무기').words.size, 1, '판정 말이 없는 줄·빈 줄은 안 쓴다');
   // 들어올 때: 본문·상점은 표, 직접은 적힌 대로
   let s = addItem(empty, alive, { name: '손전등', use: true, equip: undefined, icon: '기기/손전등/flashlight', from: 'story', anchor: 'c1' });
-  assert.deepEqual([s.list[0].use, s.list[0].equip, s.list[0].kind], [true, 'gear', 'device']);
+  assert.deepEqual([s.list[0].use, s.list[0].equip, s.list[0].kind], [true, undefined, 'device']);
   s = addItem(empty, alive, { name: '손전등', use: true, icon: '기기/손전등/flashlight', from: 'manual', anchor: '' });
   assert.deepEqual([s.list[0].use, s.list[0].equip], [true, undefined]);
   s = addItem(empty, alive, { name: '낡은 코트', use: true, equip: '', icon: '옷/코트/coat', from: 'store', anchor: 'c1' });

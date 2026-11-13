@@ -99,7 +99,7 @@ test('reply prompt picks sections and carries the room packet', { skip: !realLor
   const sys = p.messages[0].content;
   assert.match(sys, /OUTPUT CONTRACT/);
   assert.match(sys, /send: reply to the owner's exact text/);
-  assert.match(sys, /### Direct rooms/);
+  assert.doesNotMatch(sys, /### Direct rooms/, '내 말에 답하는 요청엔 먼저 연락 규칙을 붙이지 않는다 (gphone#7)');
   assert.doesNotMatch(sys, /Obey announcementCheck|When invitationCheck.allowed/);
   const body = JSON.parse(p.messages[1].content);
   assert.equal(body.room.messages[0].content, '팀장님 지금 어디세요?');

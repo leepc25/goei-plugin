@@ -24,13 +24,17 @@ test('더하기: 기준 메시지가 사라지면 빠지고, 직접 넣은 건 �
 
 test('같은 이름이 또 들어오면 새 줄 없이 갱신, 둘 다 소모성이면 횟수를 더한다', () => {
   let it = addItem(empty, alive, { name: '소금 봉지', desc: '두 봉지', uses: 2, from: 'story', anchor: 'c1' });
-  it = addItem(it, alive, { name: '소금봉지', desc: '새로 샀다', uses: 3, from: 'store', anchor: 'c2' });
+  it = addItem(it, alive, { name: '소금봉지', desc: '새로 샀다', uses: 3, from: 'story', anchor: 'c2' });
   assert.equal(it.list.length, 1);
   assert.equal(it.list[0].desc, '새로 샀다');
   assert.equal(it.list[0].uses, 5);
   assert.equal(it.list[0].anchor, 'c1');
   it = addItem(it, alive, { name: '소금 봉지', from: 'story', anchor: 'c2' });
   assert.equal(it.list[0].desc, '새로 샀다', '빈 설명은 있던 설명을 지우지 않는다');
+  // 상점·쇼핑몰에서 산 것(store)은 같은 이름이 있어도 새 줄로 (전수검사 11-13)
+  const st = addItem(it, alive, { name: '소금봉지', uses: 3, from: 'store', anchor: 'c2' });
+  assert.equal(st.list.length, 2);
+  assert.deepEqual([st.list[0].uses, st.list[1].from, st.list[1].anchor, st.list[1].uses], [5, 'store', 'c2', 3]);
 });
 
 test('쓰임 글 읽기·쓰기', () => {

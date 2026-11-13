@@ -80,8 +80,12 @@ test('폰 「인터넷 접속」 고르기는 넘치면 접힌다 (css#5)', asyn
 test('실패 기록의 게시판 이름은 보고 있는 사이트 (wording#1)', async () => {
   const src = await read('src/ui/editor/manage.ts');
   assert.doesNotMatch(src, /fail\('괴담넷', gnet\.failure\)/);
-  assert.match(src, /fail\(BOARD_NAME\[boardSiteNow\(\)\], gnet\.failure\)/);
-  assert.match(src, /\$\{BOARD_NAME\[boardSiteNow\(\)\]\}: \$\{gnet\.failure\.reason\}/);
+  // 네 게시판 실패를 모두, 각 사이트 이름으로 (전수검사 11-13: boardFailures)
+  assert.match(src, /boardFailures\(\)\.map\(\(f\) => fail\(f\.name, f\)\)\.join\(''\)/);
+  assert.match(src, /boardFailures\(\)\.map\(\(f\) => `\$\{f\.name\}: \$\{f\.reason\}`\)/);
+  assert.match(src, /clearBoardFailures\(\);/);
+  const g = await read('src/ui/gnet.ts');
+  assert.match(g, /if \(u\?\.failure\) out\.push\(\{ site: s, name: BOARD_NAME\[s\]/);
 });
 
 test('기록 있는 홈쇼핑 탭으로 돌아오면 다시 그린다 (wiki#4)', async () => {

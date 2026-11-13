@@ -11,7 +11,7 @@ test('기본 세계: 카드 로어북에서 옮긴 기록 수와 칸', () => {
   assert.equal(worldRecords('org').size, 17);
   assert.equal(worldRecords('anomaly').size, 63);
   assert.equal(worldRecords('site').size, 11);
-  assert.equal(worldRecords('appendix').size, 5);
+  assert.equal(worldRecords('appendix').size, 6);
   const j = worldRecord('agent', '쟈알디');
   assert.equal(j.fields.age, '30s');
   assert.match(j.fields.intro, /^\(early 30s\/F, Boo-jang\)/);
@@ -49,7 +49,7 @@ const slots = ['Faction', 'Mystic', 'Anomaly', 'Agent'].map((n) => ({ comment: `
 test('가상 로어북: 빈 카드에도 기본 세계가 폴더 항목으로 붙고, 저장 때는 빠진다', () => {
   const out = withWorldLore([...slots]);
   const virt = out.filter((e) => isVirtual(e) && e.mode !== 'folder' && !e.alwaysActive);
-  assert.equal(virt.length, 55 + 14 + 63 + 11 + 5, '요약 전용 조직 3개는 세력 로어를 만들지 않음');
+  assert.equal(virt.length, 55 + 14 + 63 + 11 + 6, '요약 전용 조직 3개는 세력 로어를 만들지 않음');
   assert.equal(out.filter((e) => isVirtual(e) && e.mode === 'folder').length, 6, '다섯 폴더 + 🌐세계(상시 지침)');
   const j = virt.find((e) => e.comment === '쟈알디');
   assert.equal(j.key, 'Jyaldi, 쟈알디', '검색 키는 원문 그대로');

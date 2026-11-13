@@ -89,6 +89,9 @@ for (const vp of vps) {
     assert.equal((await dirOf(page)).세계?.[kind]?.[pick], undefined, `${kind}: 원래 글 → 덧쓰기 없음`);
     // 지우기 (기본 세계 기록) → 지움 배지 → 되살리기
     await clickSel(page, '.gw [data-action="ed-delete"]');
+    // 한 번 더 묻는다 (전수검사 11-13): 「정말 지우기」
+    await page.waitForSelector('.gw [data-action="ed-delete-yes"]');
+    await clickSel(page, '.gw [data-action="ed-delete-yes"]');
     await page.waitForSelector('.gw [data-action="ed-restore"]');
     assert.ok((await page.textContent('.gw .gw-detail')).includes('지웠어요'), `${kind}: 지움 안내`);
     await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
@@ -112,6 +115,9 @@ for (const vp of vps) {
     assert.ok((await dirOf(page)).세계?.[kind]?.[`새 ${kind}`], `${kind}: 새 기록 저장`);
     // 저장 뒤 명부 줄이 생겼는지 (요원·괴이·파밍·조직·부록 모두 명부 줄은 세계 기록과 별개 — 「명부 줄이 없어요」 안내만 없으면 된다)
     await clickSel(page, '.gw [data-action="ed-delete"]');
+    // 한 번 더 묻는다 (전수검사 11-13): 「정말 지우기」
+    await page.waitForSelector('.gw [data-action="ed-delete-yes"]');
+    await clickSel(page, '.gw [data-action="ed-delete-yes"]');
     await page.waitForFunction((k) => !document.querySelector('.gw .gw-detail h2')?.textContent?.includes(`새 ${k}`), kind);
     await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
     assert.equal((await dirOf(page)).세계?.[kind]?.[`새 ${kind}`], undefined, `${kind}: 삭제 저장`);
@@ -199,6 +205,9 @@ for (const vp of vps) {
   assert.equal((await dirOf(page)).세계.org['극단'].variants.B00.intro, 'B00 시점 소개', '세력별 글 저장');
   // 지우기 → 되살리기로 기본 기록으로 (칸마다 되돌리기 단추는 없음)
   await clickSel(page, '.gw [data-action="ed-delete"]');
+  // 한 번 더 묻는다 (전수검사 11-13): 「정말 지우기」
+  await page.waitForSelector('.gw [data-action="ed-delete-yes"]');
+  await clickSel(page, '.gw [data-action="ed-delete-yes"]');
   await page.waitForSelector('.gw [data-action="ed-restore"]');
   await clickSel(page, '.gw [data-action="ed-restore"]');
   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
@@ -297,8 +306,11 @@ for (const vp of vps) {
   await setInput(page, '.gw [name="dir-base-name"]', '시험 거점 2', 'input');
   await clickSel(page, '.gw [data-action="dir-base-rename"]');
   await settle();
-  assert.ok(await page.$('.gw [data-action="dir-base-del"][data-value="시험 거점 2"]'), '이름 바꾸기');
-  await clickSel(page, '.gw [data-action="dir-base-del"][data-value="시험 거점 2"]');
+  assert.ok(await page.$('.gw [data-action="dir-base-del"][data-value="ask|시험 거점 2"]'), '이름 바꾸기');
+  // 지우기는 한 번 더 묻는다 (전수검사 11-13): ask → yes
+  await clickSel(page, '.gw [data-action="dir-base-del"][data-value="ask|시험 거점 2"]');
+  await page.waitForSelector('.gw [data-action="dir-base-del"][data-value="yes|시험 거점 2"]');
+  await clickSel(page, '.gw [data-action="dir-base-del"][data-value="yes|시험 거점 2"]');
   await settle();
   assert.equal(await page.locator('.gw .gw-basepage .dir-row').count(), baseN, '지우기');
   await revertAll(page);
