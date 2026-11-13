@@ -2,6 +2,7 @@
 // 기능마다 접힌 칸 하나에 모은다. 손대지 않아도 원본 기본값으로 돌아간다. 값은 이 채팅의 변수에 두고,
 // 각 설정 화면의 「덮어쓰기」로 새 채팅 기본값에 같이 담긴다.
 import { CONTEXT as GN_CONTEXT, HISTORY as GN_HISTORY, LIMITS as GN_LIMITS } from './gnet';
+import { guideOr } from './guides';
 import { COOLDOWN as PH_COOLDOWN, HISTORY as PH_HISTORY, LIMITS as PH_LIMITS } from './phone';
 
 export type AdvFeature = 'gn' | 'ph' | 'nw' | 'gen';
@@ -53,15 +54,15 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     {
       title: '생성 공통',
       items: [
-        { key: 'lang', label: '생성 언어', type: 'pick', def: 'auto', opts: [['auto', '대화 언어'], ['ko', '한국어'], ['en', '영어'], ['ja', '일본어']], hint: '괴담넷·괴담톡·위키가 쓸 언어' },
+        { key: 'lang', label: '생성 언어', type: 'pick', def: 'auto', opts: [['auto', '대화 언어'], ['ko', '한국어'], ['en', '영어'], ['ja', '일본어']], hint: '괴담넷·괴담톡·위키·상점·쇼핑몰·망상홈쇼핑이 쓸 언어' },
         num('retries', '형식 오류 재시도', 1, 0, 3, '회'),
         { key: 'retry_model', label: '재시도 모델', type: 'pick', def: 'same', opts: [['same', '같은 모델'], ['main', '메인 모델'], ['aux', '보조 모델']] },
         num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요' }),
-        num('ctx_total', '컨텍스트 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 메인 요청에 붙는 양의 합. 넘치면 기능별 컨텍스트 토큰 상한 비율로 나눠요' }),
+        num('ctx_total', '컨텍스트 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '게시판(괴담넷 등)·괴담톡·위키 기록과 망상홈쇼핑 시청 기록이 메인 요청에 붙는 양의 합. 넘치면 기능별 컨텍스트 토큰 상한 비율로 나눠요' }),
         // 라이트보드 5.0.0에서 옮김 (2026-11-06 사용자 「전부 넣어야지」)
         num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '안 함', hint: '첫 응답을 받은 뒤 「지침과 형식을 빠짐없이 지켰나 다시 읽고, 괜찮으면 그대로, 아니면 고쳐서」를 이만큼 더 물어요. 형식·규칙을 더 잘 지키지만 한 번마다 호출이 하나 늘어요. 기능마다 따로 정할 수도 있어요' }),
-        { key: 'user_msgs', label: '유저 메시지', type: 'pick', def: '1', opts: [['1', '포함'], ['0', '빼기']], hint: '괴담넷·괴담톡·위키 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 내가 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요' },
-        num('concurrent', '동시 요청', 0, 0, 5, '개', { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청을 한 번에 몇 개까지 보낼지예요. 넘으면 앞 요청이 끝날 때까지 기다려요. 느린 모델이나 요청 한도가 낮을 때 줄이세요. 인물 기록 요청은 세지 않아요' }),
+        { key: 'user_msgs', label: '유저 메시지', type: 'pick', def: '1', opts: [['1', '포함'], ['0', '빼기']], hint: '괴담넷·괴담톡·위키·상점 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 내가 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요' },
+        num('concurrent', '동시 요청', 0, 0, 5, '개', { zero: '제한 없음', hint: '괴담넷·괴담톡·위키·상점·쇼핑몰·망상홈쇼핑 요청을 한 번에 몇 개까지 보낼지예요. 넘으면 앞 요청이 끝날 때까지 기다려요. 느린 모델이나 요청 한도가 낮을 때 줄이세요. 인물 기록 요청은 세지 않아요' }),
       ],
     },
     {
@@ -75,7 +76,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     craftGroup(),
     {
       title: '참조',
-      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 0), chip('secondary', '2차 참조', 0)],
+      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 1), chip('secondary', '2차 참조', 0)],
       items: [
         turns(8),
         num('refresh_posts', '새로고침에 참조할 글', 10, 1, 200, '개'),
@@ -121,12 +122,12 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     craftGroup(),
     {
       title: '참조',
-      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '인물 로어북', 0, '$ph_related'), chip('secondary', '2차 참조', 0)],
+      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '인물 로어북', 1, '$ph_related'), chip('secondary', '2차 참조', 0)],
       items: [turns(8), num('room_history', '방마다 참조할 말풍선', 100, 10, 1000, '개'), budget],
     },
     {
       title: '컨텍스트 포함',
-      chips: [chip('ctx_focus', '장면 관련 먼저', 1), chip('ctx_messages', '메시지', 1, '$ph_context_messages'), chip('ctx_notices_on', '공지', 1, '$ph_context_announcements')],
+      chips: [chip('ctx_focus', '장면에 나온 것만', 1), chip('ctx_messages', '메시지', 1, '$ph_context_messages'), chip('ctx_notices_on', '공지', 1, '$ph_context_announcements')],
       items: [
         num('ctx_history', '넣을 말풍선', 200, 1, 1000, '개'),
         num('ctx_notices', '넣을 공지', 1, 0, 50, '개'),
@@ -245,11 +246,16 @@ const LANG: Record<string, string> = {
   en: 'Write all output in English.',
   ja: 'Write all output in Japanese.',
 };
+/** 생성 언어 문장: 지침 「요청 공통」의 LANGUAGE.KO·EN·JA 절 (없으면 위 글) */
+const langLine = (k: string): string | null => {
+  const base = LANG[k] ?? null;
+  return typeof base === 'string' ? guideOr('Common', `LANGUAGE.${k.toUpperCase()}`, base) : base;
+};
 
 export function genSettings(state: State): GenSettings {
   const m = advValue(state, 'gen', 'retry_model');
   return {
-    language: LANG[advValue(state, 'gen', 'lang')] ?? null, retries: advNum(state, 'gen', 'retries'), retryModel: m === 'main' || m === 'aux' ? m : 'same',
+    language: langLine(advValue(state, 'gen', 'lang')), retries: advNum(state, 'gen', 'retries'), retryModel: m === 'main' || m === 'aux' ? m : 'same',
     userMessages: advValue(state, 'gen', 'user_msgs') !== '0', concurrent: advNum(state, 'gen', 'concurrent'),
   };
 }

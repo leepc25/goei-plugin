@@ -6,7 +6,7 @@ import { readWorld } from './world/output';
 import { phoneTabsSection, readDirectory, rosterOf } from './world/directory';
 import { BUILTIN, extraFactions, extraTabs, factionType, isFactionCode } from './factions';
 import { dateNow, storyTurns, tokens, cut } from './gnet';
-import { attachmentRecords, describe, stripForged } from './attach';
+import { attachmentRecords, describe, sitePicAsPhoto, stripForged } from './attach';
 import { pickRecords, related, type Focus, type Pick } from './focus';
 export { hasAttachment } from './attach';
 
@@ -30,7 +30,7 @@ export const BANTER_ROWS: [number, number] = [1, 40];
 
 export const PH_DEFAULTS: Record<string, string> = {
   model: 'aux', auto: '0', status: '1', announcements: '1', all_contacts: '0', anomaly_contacts: '0', incoming: '1', group_invites: '1',
-  incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '0',
+  incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '1',
   /** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
   reactions: '1',
   /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */
@@ -566,6 +566,16 @@ export function decodeJson(raw: string): unknown {
   try {
     return JSON.parse(text);
   } catch {
+    // 첫 JSON 값 뒤에 붙은 군말은 버리고 다시 읽는다 (전수검사 11-13)
+    const end = jsonEnd(text);
+    if (end > 0 && end < text.length) {
+      text = text.slice(0, end);
+      try {
+        return JSON.parse(text);
+      } catch {
+        // 아래에서 쉼표·줄바꿈을 고쳐 한 번 더
+      }
+    }
     const fixed = text.replace(/,(\s*[}\]])/g, '$1').replace(/[\u0000-\u001f]/g, (c) => (c === '\n' || c === '\r' || c === '\t' ? c : ''));
     try {
       return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')));
@@ -573,6 +583,25 @@ export function decodeJson(raw: string): unknown {
       throw new PhoneError(`JSON 문법 오류예요. 응답이 중간에 끊겼을 수 있어요. (${(error as Error).message.slice(0, 120)})`, raw);
     }
   }
+}
+
+/** 맨 앞 JSON 값({…} 또는 […])이 끝나는 자리 바로 다음. 문자열 속 괄호는 세지 않는다. 짝이 안 맞으면 -1 (전수검사 11-13) */
+function jsonEnd(text: string): number {
+  const stack: string[] = [];
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '\\') i++;
+      else if (c === '"') quoted = false;
+    } else if (c === '"') quoted = true;
+    else if (c === '{' || c === '[') stack.push(c === '{' ? '}' : ']');
+    else if (c === '}' || c === ']') {
+      if (stack.pop() !== c) return -1;
+      if (!stack.length) return i + 1;
+    }
+  }
+  return -1;
 }
 
 export type PEvent =
@@ -587,7 +616,8 @@ export type PEvent =
 export const PH_HABITS = PH('habits_list');
 export interface Habit { id: string; name: string; note: string }
 const HABITS_RE = /<ph-habits>\s*([\s\S]*?)\s*<\/ph-habits>/gi;
-export const stripHabits = (raw: string) => raw.replace(HABITS_RE, '').trim();
+// 닫히지 않은 말버릇 칸(길이 제한으로 끊김)도 끝까지 떼어 낸다. 그 칸은 저장하지 않는다 (전수검사 11-13)
+export const stripHabits = (raw: string) => raw.replace(HABITS_RE, '').replace(/<ph-habits>[\s\S]*$/i, '').trim();
 
 export function readHabits(state: Record<string, unknown> | undefined): Habit[] {
   try {
@@ -664,7 +694,7 @@ function fail(msg: string): never {
 
 /** 미니톡 패치 → 대화 이벤트 (원본 eventsFromPatch + validateEvents).
  * 원본은 말풍선 하나만 틀려도 응답 전체를 버렸다. 여기서는 틀린 항목만 빼고, 남은 게 하나도 없을 때만 실패로 본다 */
-export function eventsFromPatch(patch: unknown, r: PRoom, allowTitle: boolean, dropped: string[] = []): { events: PEvent[]; title?: string } {
+export function eventsFromPatch(patch: unknown, r: PRoom, allowTitle: boolean, dropped: string[] = [], cap = LIMITS.events): { events: PEvent[]; title?: string } {
   if (!Array.isArray(patch)) fail('대화 변경 목록이 배열이 아니에요.');
   const events: PEvent[] = [];
   const before = dropped.length;
@@ -673,7 +703,7 @@ export function eventsFromPatch(patch: unknown, r: PRoom, allowTitle: boolean, d
     const reason = readOp(op, r, allowTitle && title === undefined, events, (t) => (title = t));
     if (reason) dropped.push(reason);
   }
-  const kept = keepValid(events, r, dropped);
+  const kept = keepValid(events, r, dropped, cap);
   if (!kept.length && title === undefined && dropped.length > before) fail(dropped[before]);
   return { events: kept, title };
 }
@@ -708,8 +738,13 @@ function readOp(op: Record<string, unknown>, r: PRoom, allowTitle: boolean, even
   return null;
 }
 
+/** 한 방에 한 번에 넣을 말풍선 수. 단톡 수다가 든 확인 요청은 수다 줄 수 설정까지 (전수검사 11-13) */
+export function eventCap(state: Record<string, unknown> | undefined, banter: boolean): number {
+  return banter ? Math.max(LIMITS.events, phoneSettings(state).banterRows[1]) : LIMITS.events;
+}
+
 /** 이 방에 넣을 수 있는 이벤트만 남긴다. 저장 직전에 최신 방 상태로 한 번 더 거른다 */
-export function keepValid(events: PEvent[], r: PRoom, dropped: string[] = []): PEvent[] {
+export function keepValid(events: PEvent[], r: PRoom, dropped: string[] = [], cap = LIMITS.events): PEvent[] {
   const active = new Set(r.members);
   const out: PEvent[] = [];
   for (const e of events) {
@@ -718,7 +753,7 @@ export function keepValid(events: PEvent[], r: PRoom, dropped: string[] = []): P
       dropped.push(why);
       continue;
     }
-    if (out.length >= LIMITS.events) {
+    if (out.length >= cap) {
       dropped.push('한 번에 추가할 수 있는 말풍선 수를 넘었어요.');
       break;
     }
@@ -746,7 +781,8 @@ function eventProblem(e: PEvent, r: PRoom, active: Set<string>): string | null {
 /** 대화방 답장 응답 (<lb-minitalk-patch>[…]</lb-minitalk-patch>, 직접 추가한 연락처는 {contacts,result:{patch}}) */
 export function parseReply(raw: string, r: PRoom, contactMode: boolean): { events: PEvent[]; title?: string } {
   let patch: unknown;
-  const tagged = /<lb-minitalk-patch>\s*([\s\S]*?)\s*<\/lb-minitalk-patch>/i.exec(raw);
+  // 닫는 표식이 빠져도 여는 표식 뒤 끝까지를 본문으로 (전수검사 11-13)
+  const tagged = /<lb-minitalk-patch>\s*([\s\S]*?)\s*(?:<\/lb-minitalk-patch>|$)/i.exec(raw);
   if (tagged) patch = decodeJson(tagged[1]);
   else {
     const value = decodeJson(raw) as Record<string, unknown> | unknown[];
@@ -941,7 +977,7 @@ export function invitationPacket(st: PState, candidates: string[], allowed: bool
 }
 
 /** 틀린 초대만 빼고, 받을 수 있는 수를 넘으면 앞에서부터 그만큼만 */
-export function validateInvitations(rows: unknown, packet: InvitationCheck | null, st: PState, dir: Directory, dropped: string[] = []): PRoom[] {
+export function validateInvitations(rows: unknown, packet: InvitationCheck | null, st: PState, dir: Directory, dropped: string[] = [], cap = LIMITS.events): PRoom[] {
   if (rows != null && !Array.isArray(rows)) fail('단톡방 초대 목록이 배열이 아니에요.');
   const allowed = new Set(packet?.candidates ?? []);
   const sig = (m: string[]) => [...m].sort().join(',');
@@ -969,7 +1005,7 @@ export function validateInvitations(rows: unknown, packet: InvitationCheck | nul
       if (fresh.has(key)) fail('같은 단톡방 초대가 중복됐어요.');
       for (const r of Object.values(st.rooms)) if (r.kind === 'group' && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail('같은 이름과 참여자의 단톡방이 이미 있어요.');
       const room: PRoom = { id: '', kind: 'group', name, members: [...members], people, messages: [], draft: '', unread: 0, inviter: row.inviter };
-      (room as PRoom & { events?: PEvent[] }).events = eventsFromPatch(row.patch, room, false, dropped).events;
+      (room as PRoom & { events?: PEvent[] }).events = eventsFromPatch(row.patch, room, false, dropped, cap).events;
       fresh.add(key);
       out.push(room);
     } catch (error) {
@@ -1009,6 +1045,7 @@ export interface RefreshResult {
 
 export function parseRefresh(
   raw: string, selected: Map<string, PRoom>, receive: Map<string, boolean>, announce: AnnouncementCheck, invite: InvitationCheck, st: PState, dir: Directory, contactMode: boolean,
+  cap = LIMITS.events,
 ): RefreshResult {
   try {
     let value = decodeJson(raw) as Record<string, unknown>;
@@ -1019,7 +1056,7 @@ export function parseRefresh(
     // 틀린 방·공지·초대·말풍선은 그것만 빼고 나머지를 쓴다. 다 빠져서 남은 게 없을 때만 실패
     const dropped: string[] = [];
     const announcements = validateAnnouncements(value.announcements, announce, dropped);
-    const invitations = validateInvitations(value.invitations, invite, st, dir, dropped);
+    const invitations = validateInvitations(value.invitations, invite, st, dir, dropped, cap);
     const used = new Set<string>();
     const out: RefreshResult['updates'] = [];
     for (const u of updates) {
@@ -1027,7 +1064,7 @@ export function parseRefresh(
         if (!u || typeof u.room !== 'string' || !selected.has(u.room) || used.has(u.room)) fail('중복되거나 허용되지 않은 대화방이에요.');
         used.add(u.room);
         const r = selected.get(u.room)!;
-        const { events } = eventsFromPatch(u.patch ?? [], r, false, dropped);
+        const { events } = eventsFromPatch(u.patch ?? [], r, false, dropped, cap);
         if (events.length && receive.get(u.room) === false) fail('선톡 받기 설정이나 이번 확률 검사에서 허용하지 않은 방이에요.');
         out.push({ room: u.room, events });
       } catch (error) {
@@ -1065,14 +1102,15 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
           order: m.id, related: roomHit || related(focus, [], m.text),
           data: {
             room: r.id, title: roomLabel(r), recipients: m.audience.map((c) => r.people[c]?.name ?? c), kind: m.kind,
-            sender: m.sender === 'me' ? '주인공' : m.sender === 'system' ? 'system' : r.people[m.sender]?.name ?? m.sender, text: describe(m.text), time: m.time, order: m.id,
+            sender: m.sender === 'me' ? '주인공' : m.sender === 'system' ? 'system' : r.people[m.sender]?.name ?? m.sender, text: describe(sitePicAsPhoto(m.text)), time: m.time, order: m.id,
           },
         });
       }
     }
   }
   if (set.contextAnnouncements) {
-    for (const a of b.items.slice(-HISTORY.contextNotices)) {
+    // 0개면 slice(-0)이 전부가 되므로 따로 막는다 (전수검사 11-13)
+    for (const a of (HISTORY.contextNotices > 0 ? b.items.slice(-HISTORY.contextNotices) : [])) {
       items.push({
         order: a.order, related: true, free: true,
         data: { kind: 'announcement', channel: a.channel, title: a.title, sender: a.issuer, text: a.text, time: a.time, order: a.order, recipients: ['주인공'], access: 'received by owner; audience bounded by channel' },
@@ -1083,6 +1121,8 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
   const kept = pickRecords(items, {
     focus: HISTORY.focus, recent: HISTORY.contextRecent, max: HISTORY.context,
     fits: (k) => !(HISTORY.contextTokens > 0 && tokens(payload(k)) > HISTORY.contextTokens),
+    // 기록마다 한 번만 센다 (전수검사 11-13: 후보마다 묶음 전체를 다시 세서 기록이 많으면 몇 초씩 늦었다)
+    cost: (d) => tokens(JSON.stringify(d)) + 1, room: HISTORY.contextTokens > 0 ? HISTORY.contextTokens - tokens(payload([])) : Infinity,
   });
   return kept.length ? payload(kept) : '';
 }

@@ -6,6 +6,7 @@
 import { findStatusTags } from './world/status';
 import { colDef, formatStatusLine, walletCell, type ColId } from './world/statuscols';
 import type { PromptMessage } from './request';
+import { guideOr } from './guides';
 
 /** 이 채팅의 상태창 모양: 사용하는 칸 + 장부 잔고 (잔고 칸을 쓸 때) */
 export interface StatusShape {
@@ -49,7 +50,8 @@ export function stripStatusLines<M extends PromptMessage>(messages: M[]): M[] {
 
 export function statusBlock(line: string, cols?: ColId[]): string {
   const fields = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(' | ')}\n` : '';
-  return `${STATUS_HEAD}\n${line}\n${fields}${NOTE}`;
+  // 안내 글은 지침 「메인 요청에 붙는 글」 STATUS.NOTE 절. 절이 없으면 위 글
+  return `${STATUS_HEAD}\n${line}\n${fields}${guideOr('Main', 'STATUS.NOTE', NOTE)}`;
 }
 
 /**
@@ -99,7 +101,9 @@ export function withStatusBlock<M extends PromptMessage>(messages: M[], identity
     ].filter(Boolean);
     if (!starts.length) return messages;
     const fields = shape?.cols?.length ? `Fields: ${shape.cols.map((c) => colDef(c).label).join(' | ')}\n` : '';
-    const block = { role: 'system', content: `${STATUS_HEAD}\nNo status line yet: this is the first turn.\nStarting values: ${starts.join(', ')}\n${fields}Treat them as the previous values (copy them unless the story changes them) and output exactly one new [▣] line at the very end of your response.` } as M;
+    // 글은 지침 「메인 요청에 붙는 글」 STATUS.FIRST 절. 절이 없으면 여기 남긴 글
+    const first = guideOr('Main', 'STATUS.FIRST', () => `No status line yet: this is the first turn.\nStarting values: ${starts.join(', ')}\n${fields}Treat them as the previous values (copy them unless the story changes them) and output exactly one new [▣] line at the very end of your response.`, { starts: starts.join(', '), fields });
+    const block = { role: 'system', content: `${STATUS_HEAD}\n${first}` } as M;
     const at = messages.map((m) => m?.role).lastIndexOf('user');
     return at < 0 ? [...messages, block] : [...messages.slice(0, at), block, ...messages.slice(at)];
   }
@@ -108,6 +112,9 @@ export function withStatusBlock<M extends PromptMessage>(messages: M[], identity
   const at = out.map((m) => m?.role).lastIndexOf('user');
   const recent = (shape?.recent ?? []).filter(Boolean);
   const recentP = (shape?.recentPoints ?? []).filter(Boolean);
-  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${recent.length ? `\nRecent cash transactions (oldest first): ${recent.join('; ')}` : ''}${recentP.length ? `\nRecent Baekilmong point transactions (oldest first): ${recentP.join('; ')}` : ''}` } as M;
+  // 거래 내역 줄은 지침 「Main」 STATUS.RECENT_CASH·STATUS.RECENT_POINT 절. 절이 없으면 여기 남긴 글 (전수검사 11-13)
+  const cash = recent.length ? `\n${guideOr('Main', 'STATUS.RECENT_CASH', () => `Recent cash transactions (oldest first): ${recent.join('; ')}`, { list: recent.join('; ') })}` : '';
+  const points = recentP.length ? `\n${guideOr('Main', 'STATUS.RECENT_POINT', () => `Recent Baekilmong point transactions (oldest first): ${recentP.join('; ')}`, { list: recentP.join('; ') })}` : '';
+  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${cash}${points}` } as M;
   return at < 0 ? [...out, block] : [...out.slice(0, at), block, ...out.slice(at)];
 }

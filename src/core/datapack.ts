@@ -2,7 +2,8 @@
 // (goei-data-world.json + goei-data-world.N.txt, goei-data-install.*) 으로 받는다. 빌드(scripts/build.mjs)가 팩마다 지문을 여기 박아 두어
 // 본체는 자기와 맞는 자료만 쓴다 (판이 다르면 다시 받음). 받기·저장은 host/datapack.ts, 여기는 순수 계산(지문 비교·형식 검사·넣기).
 import { setInstallData } from './install';
-import { iconPoolOn, makeIconIndex, normIcon, pickIconFromPool } from './iconmatch';
+import { iconPoolOn, makeIconIndex, normIcon, pickIconFromPool, splitIconWord as splitWord } from './iconmatch';
+import { FORM_EMPTY, ITEM_FORM_DEFAULT, isGrade, saysEmpty } from './itemrules';
 import { textHash } from './texthash';
 import { setWorldData } from './world/records';
 
@@ -109,7 +110,7 @@ export interface ItemIconPack {
   hit: (name: string, icon?: string, strict?: boolean) => { file: string; score: number; pool?: string[] } | null;
 }
 
-export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, setIconPool, splitIconWord } from './iconmatch';
+export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, iconGen, normIcon, parseIconAliases, readIconMisses, setIconAliases, setIconPool, splitIconWord } from './iconmatch';
 
 /** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
 function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>, same: Record<string, string>, cats: string[] | undefined) {
@@ -141,11 +142,78 @@ export function applyItemsPack(text: string): ItemIconPack {
 }
 
 /** 이름(+모델이 쓴 그림 찾기 낱말) → 그림 파일 (표시 전용). 맞는 게 없으면 공통 그림(base.misc), 그것도 없으면 null */
-export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string, seed?: string): string | null {
+export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string, seed?: string, more?: ItemPicMore): string | null {
+  // 상태에 따라 그림이 여러 장인 물건(꿈결 수집기)은 저장된 상태 값으로 먼저 고른다
+  const byForm = formIcon(pack, itemName, icon, more);
+  if (byForm) return byForm;
   // seed(물건 id)가 있고 이름이 분류 말(과자·다과)이면 그 분류 그림 가운데 물건마다 하나 (2026-11-10 사용자)
   const h = pack.hit(itemName, icon);
   if (h?.pool && seed !== undefined && iconPoolOn()) return pickIconFromPool(h.pool.filter((f) => typeof pack.icons[f] === 'string'), seed) ?? h.file;
   return h?.file ?? pack.base.misc ?? null;
+}
+
+// ── 상태 그림 (2026-11-12 사용자: 수집기가 찼는데 빈 그림 · 「하나만 땜빵하지 말고 전체적으로」) ──
+// 그림 팩에서 「<물건> F등급 … S등급」처럼 등급 그림이 묶음으로 있는 물건을 찾아 한 묶음으로 본다 (물건 이름을 코드에 박지 않는다). 같은 물건의 「빈 <물건>」 그림은 빈 상태.
+// 어느 그림인지는 갱신기가 상태가 바뀔 때마다 그림 말로 고른다 (그림일 뿐, 등급을 물건의 사실로 저장하지 않는다). 코드는 등급을 짐작하지 않는다.
+// 차례: ① 그림 말이 묶음의 그림을 가리킴(「꿈결 수집기 B등급」「빈 꿈결 수집기」) → 그 그림 ② 이름에 등급이 적힘 → 그 등급 그림
+//       ③ 이름·설명에 「빈」이 낱말로 적힘 → 빈 그림 ④ 그 밖(어느 그림인지 안 적힘) → 임시 그림 (itemrules ITEM_FORM_DEFAULT)
+//       — 등급 없는 말 「꿈결 수집기」가 표에서 빈 그림을 가리켜, 찬 수집기가 빈 그림으로 나오던 것을 막는다
+export interface ItemPicMore { desc?: string }
+export interface FormFamily { base: string; grades: Record<string, string>; empty?: string }
+const packFamilies = new WeakMap<ItemIconPack, FormFamily[]>();
+const flatIcon = (t: string) => normIcon(t).replace(/ /g, '');
+export function formFamilies(pack: ItemIconPack): FormFamily[] {
+  let fams = packFamilies.get(pack);
+  if (!fams) {
+    const by = new Map<string, FormFamily>();
+    const names = new Map<string, string>();
+    for (const r of pack.table) {
+      const n0 = String(r.k[0] ?? '').trim();
+      if (!names.has(n0)) names.set(n0, r.f);
+      const m = /^(.+) ([A-Z])등급$/.exec(n0);
+      if (!m || !isGrade(m[2])) continue;
+      const f = by.get(m[1]) ?? { base: m[1], grades: {} };
+      f.grades[m[2]] ??= r.f;
+      by.set(m[1], f);
+    }
+    fams = [...by.values()].filter((f) => Object.keys(f.grades).length >= 2).map((f) => ({ ...f, ...(names.has(`${FORM_EMPTY} ${f.base}`) ? { empty: names.get(`${FORM_EMPTY} ${f.base}`) } : {}) }));
+    packFamilies.set(pack, fams);
+  }
+  return fams;
+}
+/** 글이 어느 묶음의 물건을 가리키나 → 묶음 · 적힌 등급 글자 · 「빈」이 적혔나. 등급 글자(「B등급」「B급」「B」)는 떼고, 남은 말의 끝이 그 물건 이름이어야 한다 */
+function familyOf(pack: ItemIconPack, text: string): { fam: FormFamily; grade: string; empty: boolean } | null {
+  let grade = '';
+  const rest = normIcon(text).split(' ').filter(Boolean).filter((w) => {
+    const m = /^([a-z])(?:등급|급)?$/.exec(w);
+    if (m && isGrade(m[1].toUpperCase())) { grade = m[1].toUpperCase(); return false; }
+    return w !== '등급';
+  }).join('');
+  if (!rest) return null;
+  for (const fam of formFamilies(pack)) {
+    const b = flatIcon(fam.base);
+    if (b && rest.endsWith(b)) return { fam, grade, empty: saysEmpty(text) };
+  }
+  return null;
+}
+function formIcon(pack: ItemIconPack, itemName: string, icon?: string, more?: ItemPicMore): string | null {
+  const byWord = familyOf(pack, splitWord(icon).word);
+  const byName = familyOf(pack, itemName);
+  const fam = (byWord ?? byName)?.fam;
+  if (!fam) return null;
+  if (byWord?.grade && fam.grades[byWord.grade]) return fam.grades[byWord.grade];
+  if (byWord?.empty && fam.empty) return fam.empty;
+  if (byName?.grade && byName.fam === fam && fam.grades[byName.grade]) return fam.grades[byName.grade];
+  // 빈 그림이 없는 묶음(재생 물약)은 어느 그림인지 안 적혔으면 여느 물건처럼 이름으로 찾는다
+  if (!fam.empty) return null;
+  if (byName?.empty || saysEmpty(more?.desc ?? '')) return fam.empty;
+  return fam.grades[ITEM_FORM_DEFAULT] ?? null;
+}
+/** 상태 그림 묶음들의 그림 이름 (갱신기 자료: 어떤 그림이 있는지 알려 고르게 한다). 물건 이름이 묶음의 것일 때만 */
+export function itemPictureNames(pack: ItemIconPack, itemName: string, icon?: string): string[] | null {
+  const fam = (familyOf(pack, splitWord(icon).word) ?? familyOf(pack, itemName))?.fam;
+  if (!fam) return null;
+  return [...(fam.empty ? [`${FORM_EMPTY} ${fam.base}`] : []), ...Object.keys(fam.grades).map((g) => `${fam.base} ${g}등급`)];
 }
 
 interface PicWords { heads: Set<string>; mods: Set<string> }

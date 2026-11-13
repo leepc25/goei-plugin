@@ -1,7 +1,7 @@
 // 상태창 [▣|날짜|시각|날씨|기온|위치|목표(|동행|투입|신분|잔고)]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
 // 플러그인이 너그럽게 읽는다: 칸이 모자라거나 남아도, 전각 기호·공백이 섞여도, 닫는 괄호가 없어도.
 // 칸 구성(statuscols.ts): 이 채팅의 지금 구성·기록된 구성·알려진 모양 중 칸 수가 맞는 것으로 먼저 읽고, 아니면 모양으로 날짜·시각·기온을 찾는다.
-import { parseWalletCell, shapeFor, type ColId } from './statuscols';
+import { currentShape, parseWalletCell, shapeFor, type ColId } from './statuscols';
 
 export interface StatusTag {
   /** 원문 (화면에서 바꿀 자리) */
@@ -13,6 +13,8 @@ export interface StatusTag {
   place: string;
   /** '없음'이면 빈 문자열 */
   target: string;
+  /** 이 줄에 목표 칸이 있었는가 (값이 없음이어도 true. 목표 칸을 끈 구성이거나 칸이 모자라면 false) */
+  hasTarget: boolean;
   /** 지금 주인공과 같이 있는 이름 있는 인물들 (8칸 상태창의 동행 칸. 칸이 없거나 없음이면 빈 목록) */
   companions: string[];
   /** 투입 칸: 투입이면 true, 없음이면 false, 칸이 없는 옛 6칸 상태창이면 null */
@@ -27,8 +29,10 @@ export interface StatusTag {
 
 // 여는 기호: [▣ 【▣ ［▣ (▣ 앞 공백 허용). 닫는 기호가 없으면 줄 끝까지
 const TAG_RE = /[[【［]\s*▣\s*[|｜]([^\]】］\r\n]*)(?:[\]】］]|(?=\r?\n|$))/g;
-const DATE_RE = /^\d{3,4}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\s*일?(?:\s*[(（]?\s*[일월화수목금토]\s*(?:요일)?\s*[)）]?)?$/;
-const TIME_RE = /^(?:(?:오전|오후|AM|PM|am|pm)\s*)?\d{1,2}\s*[:시]\s*\d{0,2}\s*분?\s*(?:AM|PM|am|pm|a\.m\.|p\.m\.)?$/;
+// 한국식 끝 점(2025.03.14. · 2025. 3. 14.(금))도 날짜로 읽는다. 영어 요일 (Wed)·(Wednesday)도 (전수검사 11-13)
+const DATE_RE = /^\d{3,4}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\s*[.일]?(?:\s*[(（]?\s*(?:[일월화수목금토]\s*(?:요일)?|(?:sun|mon|tue|wed|thu|fri|sat)[a-z]*\.?)\s*[)）]?)?\s*\.?$/i;
+// 초가 붙은 시각(02:47:10 AM)도 시각으로 읽는다 (전수검사 11-13)
+const TIME_RE = /^(?:(?:오전|오후|AM|PM|am|pm)\s*)?\d{1,2}\s*[:시]\s*\d{0,2}(?:\s*:\s*\d{2})?\s*분?\s*(?:AM|PM|am|pm|a\.m\.|p\.m\.)?$/;
 const TEMP_RE = /^[-−+]?\s*\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃|도)$/;
 
 export function hasStatusTag(text: string): boolean {
@@ -52,11 +56,11 @@ function extras(x: string[]): { companions: string[]; deployed: boolean | null; 
 }
 
 /** 위치 뒤 칸들: 목표(괴이), 동행, 투입, 신분, 잔고. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
-function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
+function tail(rest: string[]): { target: string; hasTarget: boolean; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
   const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
   const after = rest.slice(1);
-  if (after.length <= 1) return { target: clean(after[0] ?? ''), ...extras([]) };
-  return { target: clean(after[0]), ...extras(after.slice(1, 6)) };
+  if (after.length <= 1) return { target: clean(after[0] ?? ''), hasTarget: after.length >= 1, ...extras([]) };
+  return { target: clean(after[0]), hasTarget: true, ...extras(after.slice(1, 6)) };
 }
 
 /** 칸 구성대로 이름 붙이기 (구성에 없는 칸은 빈 값, 투입 칸이 없으면 null) */
@@ -68,6 +72,7 @@ function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
   };
   const d = get('deployed');
   return {
+    hasTarget: shape.includes('target'),
     date: get('date'),
     time: get('time'),
     weather: clean(get('weather')),
@@ -82,12 +87,46 @@ function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
   };
 }
 
+/** 칸 값이 그 모양 자리에 말이 되는가: 기온 자리는 기온, 잔고·포인트는 숫자, 신분은 숫자가 아님, 투입은 투입 (전수검사 11-13) */
+function plausible(f: string[], shape: ColId[]): boolean {
+  return shape.every((id, i) => {
+    const cell = (f[i] ?? '').trim();
+    if (id === 'temp') return none(cell) || TEMP_RE.test(cell);
+    if (TEMP_RE.test(cell)) return false;
+    if (id === 'wallet') return none(cell) || parseWalletCell(cell) !== null;
+    if (id === 'points') return none(cell) || pointsText(cell) !== '';
+    if (id === 'identity') return none(cell) || parseWalletCell(cell) === null;
+    if (id === 'deployed') return none(cell) || /투입|deployed/i.test(cell);
+    if (id === 'companions') return cell !== '투입';
+    return true;
+  });
+}
+
+const WEATHER_TEMP = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/;
+const LOOSE: ColId[] = ['weather', 'temp', 'target', 'companions', 'deployed', 'identity', 'wallet', 'points'];
+
 /** 칸을 나눠 이름 붙이기. 칸 수가 아는 모양과 맞고 날짜·시각 자리가 맞으면 그 순서대로, 아니면 모양으로 날짜·시각·기온을 먼저 찾는다 */
 function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
   const f = inner.split(/[|｜]/).map((s) => s.trim());
   while (f.length && f[f.length - 1] === '') f.pop();
+  const fits = (shape: ColId[]) => DATE_RE.test(f[shape.indexOf('date')] ?? '') && TIME_RE.test(f[shape.indexOf('time')] ?? '');
   const shape = shapeFor(f.length);
-  if (shape && DATE_RE.test(f[shape.indexOf('date')] ?? '') && TIME_RE.test(f[shape.indexOf('time')] ?? '')) return byShape(f, shape);
+  const known = shape && fits(shape) ? shape : null;
+  const cur = currentShape();
+  if (known && (!cur || f.length >= cur.length || plausible(f, known))) return byShape(f, known);
+  // 지금 구성보다 한 칸 모자라고 자리가 안 맞으면: 빠진 칸을 오른쪽부터 하나씩 빼 보고 맞는 모양으로 읽는다 (전수검사 11-13)
+  if (cur && cur.length - f.length === 1) {
+    for (let i = cur.length - 1; i >= 0; i--) {
+      if (!LOOSE.includes(cur[i])) continue;
+      const cand = cur.filter((_, j) => j !== i);
+      if (!fits(cand) || !plausible(f, cand)) continue;
+      const out = byShape(f, cand);
+      // 기온 칸이 빠졌으면 날씨와 한 칸에 붙어 온 것일 수 있다 (☀️ 12°C)
+      const m = cur[i] === 'temp' ? WEATHER_TEMP.exec(out.weather) : null;
+      return m && m[1] ? { ...out, weather: m[1], temp: m[2] } : out;
+    }
+  }
+  if (known) return byShape(f, known);
   const rest = [...f];
   const take = (re: RegExp) => {
     const i = rest.findIndex((x) => re.test(x));
@@ -102,7 +141,7 @@ function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
   if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
   // 날씨와 기온이 한 칸에 붙어 온 경우 (☀️ 12°C)
   if (!temp && weather) {
-    const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
+    const m = WEATHER_TEMP.exec(weather);
     if (m) return { date, time, weather: m[1], temp: m[2], place: rest[0] ?? '', ...tail(rest) };
   }
   return { date, time, weather, temp, place: rest[0] ?? '', ...tail(rest) };

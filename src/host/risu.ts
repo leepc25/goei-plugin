@@ -1,7 +1,7 @@
 import { stripVirtual, withWorldLore } from '../core/world/virtual';
 import { setStatusColumns } from '../core/world/statuscols';
 import { setIconAliases, setIconPool } from '../core/iconmatch';
-import { ITEM_ICON_ALIAS_VAR, itemIconPoolOn } from '../core/items';
+import { ITEM_ICON_ALIAS_VAR, itemIconPoolOn, setItemRules } from '../core/items';
 import type { Chat, LoreEntry } from '../core/types';
 import { applyAdvanced } from '../core/advanced';
 
@@ -36,6 +36,8 @@ export async function loadContext(): Promise<ChatContext | null> {
   // 소지품 그림 대체 말 표 (core/iconmatch.ts)
   setIconAliases(String(chat.scriptstate?.[ITEM_ICON_ALIAS_VAR] ?? ''));
   setIconPool(itemIconPoolOn(chat.scriptstate));
+  // 소지품 판정 표·「두고 옴」 말·「벗음」 말 (core/itemrules.ts)
+  setItemRules(chat.scriptstate);
   return { charIndex, chatIndex, char, chat };
 }
 

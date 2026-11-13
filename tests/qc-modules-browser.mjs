@@ -742,11 +742,11 @@ if (want('P2')) {
   await page.click(`[data-action="ph-dm"][data-value="${cid}"]`);
   await page.waitForSelector('.ph-room');
   await page.fill('[data-input="ph-draft"]', '형 뭐해');
-  await llm(page, [ok(JSON.stringify({ contacts: [], result: { patch: [{ op: 'add', path: '/messages/-', value: msg(cid, '알바 중') }] } }))]);
+  await llm(page, [ok(`<lb-minitalk-patch>${JSON.stringify([{ op: 'add', path: '/messages/-', value: msg(cid, '알바 중') }])}</lb-minitalk-patch>`)]);
   await page.click('[data-action="ph-send"]');
   await page.waitForSelector('.ph-msg.npc >> text=알바 중', { timeout: 6000 });
   const cm = await page.evaluate(() => window.__calls.llm.at(-1));
-  assert.ok(JSON.parse(cm.messages[1].content).singlePassContact === true, '직접 추가한 연락처는 한 번에 판단 모드');
+  assert.ok(JSON.parse(cm.messages[1].content).participants.some((x) => x.manuallySavedContact), '직접 추가한 연락처 (근거 뽑기 없음, 사용자 11-13)');
   await page.click('[data-action="ph-back"]');
   await page.click('[data-action="ph-add"]');
   await page.fill('[data-input="ph-add-name"]', '쟈알디');
@@ -957,8 +957,8 @@ if (want('W1')) {
   assert.equal(call.mode, 'submodel');
   assert.ok(call.messages[0].content.includes('SELECTED LENGTH: SHORT'), '길이 짧게');
   assert.ok(!call.messages[0].content.includes('SELECTED LENGTH: DETAILED'));
-  assert.ok(call.messages[1].content.includes('[사용자 작성 지침 — 모든 문서 공통]\n존댓말로 쓸 것'));
-  assert.ok(call.messages[1].content.includes('[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n출구를 자세히'));
+  assert.ok(call.messages[1].content.includes('[사용자 작성 지침: 모든 문서 공통]\n존댓말로 쓸 것'));
+  assert.ok(call.messages[1].content.includes('[사용자 작성 지침: 이 문서만]\n출구를 자세히'));
   assert.ok(call.messages[1].content.includes('[최근 챗로그]'));
   assert.ok(!call.messages[1].content.includes('[이전 위키'), '처음 쓸 땐 이전 문서 없음');
   // 성공: 확장 모드로 바꾸고 생성 → 저장 → 문서 화면 (XSS 포함)

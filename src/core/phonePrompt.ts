@@ -1,16 +1,18 @@
 // 괴담톡 요청문 (원본 buildPrompt·refreshPrompt·ruleBuilder·contactPrompts).
 // 지침은 카드의 Phone 로어북 @@SECTION을 요청 조건에 맞는 것만 골라 이어 붙이고, 자료는 JSON 하나로 보낸다.
-import { fillSitePics } from './sitepics';
-import { publicBoard } from './gnetPrompt';
+import { sitePicAsPhoto } from './attach';
+import { publicAccess, publicBoard } from './gnetPrompt';
 import { readGnet } from './gnet';
 import {
-  agentStatus, announcementPacket, chancePassed, conversationState, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
+  agentStatus, announcementPacket, chancePassed, conversationState, eventCap, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
   type PState, phoneTime, hiddenPause, cooldownReady, readHabits,
 } from './phone';
-import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { applyAdvanced, genSettings, type RefToggles } from './advanced';
+import { fnHistory, fnNum, fnRefs } from './reffn';
 import { previousView, viewSettings, type ViewRoom } from './phoneView';
-import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
+import { craftMessages, craftSettings, memoTexts, retryAnalyze, type CraftMessage } from './craft';
+import { fillVars, GUIDE_LABEL } from './guides';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { playerAgent } from './player';
 import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
@@ -18,22 +20,27 @@ import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySecti
 export interface PhonePrompt {
   messages: CraftMessage[];
   contactMode: boolean;
+  /** 새로고침 응답이 형식에 안 맞을 때 다시 묻는 글 (지침 절 RETRY.REFRESH). 없으면 코드에 남긴 글 */
+  retryRule?: string;
 }
 
 const LANGUAGE = 'Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.';
 
+/** 언어 문장: 지침 「괴담톡」 LANGUAGE 절 (없으면 위 글) */
+const languageLine = (p: Record<string, string>): string => p.LANGUAGE?.trim() || LANGUAGE;
+
 function sections(src: RefSource): Record<string, string> {
   applyAdvanced(src.chat.scriptstate);
   const p = policySections(src.char.globalLore, 'Phone');
-  if (!Object.keys(p).length) throw new PhoneError('Phone 로어북을 찾지 못했어요.');
+  if (!Object.keys(p).length) throw new PhoneError(`${GUIDE_LABEL.Phone} 지침을 찾지 못했어요.`);
   return p;
 }
 
-function section(p: Record<string, string>, name: string): string {
+function section(p: Record<string, string>, name: string, limits: Partial<Record<keyof typeof LIMITS, number>> = {}): string {
   const raw = p[name];
-  if (raw === undefined) throw new PhoneError(`Phone 로어북의 ${name} 항목이 없어요.`);
+  if (raw === undefined) throw new PhoneError(`${GUIDE_LABEL.Phone} 지침의 ${name} 섹션이 없어요.`);
   return raw
-    .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(LIMITS[k as keyof typeof LIMITS]) : m))
+    .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(limits[k as keyof typeof LIMITS] ?? LIMITS[k as keyof typeof LIMITS]) : m))
     .replace(/<!--[\s\S]*?-->/g, '')
     .trim();
 }
@@ -52,8 +59,6 @@ interface Body {
   announcementCheck?: Omit<AnnouncementCheck, 'channel'>;
   activityCheck?: { incoming: boolean; groupInvites: boolean };
   invitationCheck?: InvitationCheck;
-  recipientEvidenceSources?: { id: string; kind: string; text: string; sender?: string }[];
-  singlePassContact?: boolean;
   textingHabits?: { sender: string; note: string }[];
 }
 
@@ -72,10 +77,12 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   const manual = body.participants.some((x) => x.manuallySavedContact);
   if (direct || group) {
     keys.push('CONVERSATION');
-    if (direct) keys.push('DIRECT_ROOMS');
+    // 내가 보낸 말에 답할 때는 「먼저 연락·기다리기」 규칙이 해당 없어 뺀다 (전수검사 11-13)
+    if (direct && body.room?.action?.type !== 'send') keys.push('DIRECT_ROOMS');
     if (group) keys.push('GROUP_ROOMS');
     if ((body.publicBoard as { posts?: unknown[] } | undefined)?.posts?.length) keys.push('PUBLIC_BOARD');
-    if (body.crossRoomMessages?.length || (body.rooms?.length ?? 0) > 1) keys.push('CROSS_ROOM');
+    // 빈 후보 방은 세지 않는다. 주고받은 말이 있는 방이 둘 이상일 때만 (전수검사 11-13)
+    if (body.crossRoomMessages?.length || (body.rooms?.filter((r) => r.messages.some((m) => m.type === 'text')).length ?? 0) > 1) keys.push('CROSS_ROOM');
     if (hasAttachment(JSON.stringify(body))) keys.push('ATTACHMENT_READ');
     keys.push('ATTACHMENT_OUTPUT', 'PATCH');
     // 이모지 반응 (라이트보드 미니톡, 2026-11-06). 옛 카드에 절이 없으면 붙이지 않는다
@@ -91,12 +98,15 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
     if (body.invitationCheck?.allowed) keys.push('GROUP_INVITES');
     if (body.announcementCheck?.allowed) keys.push('ANNOUNCEMENTS');
   }
-  if (manual) keys.push('MANUAL_CONTACT', 'CONTACT_CONTEXT', 'SINGLE_PASS_CONTACT');
-  keys.push(`OUTPUT_${manual ? 'CONTACT_' : ''}${mode}`);
+  // 직접 추가한 연락처: 「저장한 이름만으로는 친분이 없다」 규칙만. 관계·지식 근거 뽑기는 뺐고, 처음 연락하는 사이는 앱이 판정해 relationshipToOwner 로 넘긴다 (사용자 11-13 7번 (가))
+  if (manual) keys.push('MANUAL_CONTACT');
+  keys.push(`OUTPUT_${mode}`);
   // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
   if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   const br = phoneSettings(src.chat.scriptstate).banterRows;
-  return [...keys.map((k) => fillSitePics(section(p, k), src.char).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  // 수다가 든 확인 요청은 방마다 말풍선 상한을 수다 줄 수까지: 지침 숫자와 저장 상한을 맞춘다 (전수검사 11-13)
+  const limits = { events: eventCap(src.chat.scriptstate, mode === 'REFRESH' && !!body.rooms?.some((x) => x.banter)) };
+  return [...keys.map((k) => dropSitePicGuide(section(p, k, limits)).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
 }
 
 // ── 자료 ──
@@ -119,15 +129,20 @@ interface RoomPacket {
   banter?: boolean;
 }
 
-export function roomPacket(r: PRoom, reactions = false): RoomPacket {
+/** 인물이 에셋 그림을 사진으로 보내던 기능은 괴담톡에서 뺐다 (2026-11-12 사용자: 감정 표시처럼 썼다). 고쳐 저장해 둔 옛 지침에 그 줄이 남아 있으면 지운다 */
+const SITE_PIC_GUIDE = 'Real photos: when the subject is one of the pictures listed below, an NPC may send [사진:Name] instead of a photo description, or [사진:Name_expression] for a person in the People list; the app shows the actual picture. Write the listed name exactly, on its own line inside the content/body string. Anything not listed stays a described [[ATTACH:photo]]. Send one only when that character would plausibly have or take such a photo.';
+const dropSitePicGuide = (text: string): string => (text.includes('__SITE_PICS__') ? text.split('\n').filter((l) => l.trim() !== '__SITE_PICS__' && l.trim() !== SITE_PIC_GUIDE).join('\n') : text);
+
+/** limit = 넘길 말풍선 수 (양 표의 그 기능 줄 「지난 기록」) */
+export function roomPacket(r: PRoom, reactions = false, limit = HISTORY.room): RoomPacket {
   const messages = r.messages
-    .slice(-HISTORY.room)
+    .slice(-limit)
     .filter((m) => m.kind !== 'pause' || !hiddenPause(m.text))
     .map((m) => ({
       sender: m.sender === 'system' ? '-' : m.sender,
       type: m.kind === 'message' ? 'text' : m.kind === 'invite' ? 'invited' : m.kind,
       time: m.time,
-      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.kind === 'skip' ? '-' : m.text,
+      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.kind === 'skip' ? '-' : sitePicAsPhoto(m.text),
       audience: m.audience,
       recordID: m.id,
       ...(reactions && m.kind === 'message' ? { reactions: m.reactions || '-' } : {}),
@@ -156,6 +171,7 @@ interface Participant {
   hasCharacterLore: boolean;
   manuallySavedContact: boolean;
   contactMemo?: string;
+  relationshipToOwner?: string;
   narratorOnlyAgentStatus?: unknown;
 }
 
@@ -195,9 +211,10 @@ function ownerCharacter(src: RefSource): { character?: string; rank?: string } {
   return a ? { character: a.name, ...(a.rank ? { rank: a.rank } : {}) } : {};
 }
 
-function narrator(src: RefSource, names: Record<string, string>, related: boolean, text: string): Narrator {
+/** fn = 기능(요청 종류): 넘길 내용·챗로그 턴 수를 기능 표·양 표의 그 줄에서 읽는다 (core/reffn.ts) */
+function narrator(src: RefSource, names: Record<string, string>, fn: string, t: RefToggles, text: string): Narrator {
   applyAdvanced(src.chat.scriptstate);
-  const n = trimTurns(HISTORY.turns);
+  const n = trimTurns(fnNum(src.chat.scriptstate, 'ph', fn, 'turns'));
   const turns = n ? recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages) : [];
   const recentStory: Narrator['recentStory'] = [];
   turns.forEach((t, i) => {
@@ -206,10 +223,9 @@ function narrator(src: RefSource, names: Record<string, string>, related: boolea
   });
   const last = turns[turns.length - 1];
   const faction = String(src.chat.scriptstate?.['$st_faction'] ?? '') || 'none';
-  const t = refToggles(src.chat.scriptstate, 'ph');
   const rows = collectRefs(src, {
     scope: 'phone', text: `${text}\n${recentStory.map((m) => m.text).join('\n')}`, description: t.description, authors: t.authors, persona: t.persona,
-    active: t.active, related: related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
+    active: t.active, related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
   });
   const universe: Narrator['universe'] = { characterDescription: '', authorsNote: '', activeLoreBooks: [] };
   for (const r of rows) {
@@ -225,7 +241,7 @@ function narrator(src: RefSource, names: Record<string, string>, related: boolea
 }
 
 /** 다른 방에서 이 참여자들이 보내거나 받은 말 (원본 P.bindCrossRoomMemory) */
-function crossRoom(body: Body, st: PState): void {
+function crossRoom(body: Body, st: PState, limit: number): void {
   const wanted = new Set(body.participants.map((p) => p.sender));
   if (!wanted.size) return;
   const covered = new Set((body.rooms ?? (body.room ? [body.room] : [])).map((r) => r.id));
@@ -247,7 +263,7 @@ function crossRoom(body: Body, st: PState): void {
     const knownBy: string[] = [];
     for (const c of e.allowed) {
       const n = counts.get(c) ?? 0;
-      if (n < HISTORY.room) {
+      if (n < limit) {
         counts.set(c, n + 1);
         knownBy.push(c);
       }
@@ -255,45 +271,30 @@ function crossRoom(body: Body, st: PState): void {
     if (knownBy.length) {
       records.push({
         room: e.room.id, roomName: e.room.kind === 'group' ? roomLabel(e.room) : undefined, kind: e.room.kind, recordID: e.m.id, sender: e.m.sender,
-        senderName: e.room.people[e.m.sender]?.name, time: e.m.time, content: e.m.text, knownBy: knownBy.sort(),
+        senderName: e.room.people[e.m.sender]?.name, time: e.m.time, content: sitePicAsPhoto(e.m.text), knownBy: knownBy.sort(),
       });
     }
   }
   if (records.length) body.crossRoomMessages = records.reverse();
 }
 
-/** 직접 추가한 연락처: 관계·지식 근거로 고를 원문 목록 (원본 contactSources) */
-function contactSources(body: Body): NonNullable<Body['recipientEvidenceSources']> {
-  const out: NonNullable<Body['recipientEvidenceSources']> = [];
-  const add = (kind: string, text: unknown, sender?: string) => {
-    const t = String(text ?? '').trim();
-    if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...(sender ? { sender } : {}) });
-  };
+/** 직접 추가한 연락처가 주인과 처음 연락하는 사이인지 앱이 판정한다 (사용자 11-13 7번 (가): 수동으로 추가한 사람이 무조건 아는 사이로 그려지던 문제).
+ *  메모가 비고, 인물 로어북이 없고, 넘기는 스토리·설정·로어북에 그 이름이 없고, 어느 방에서도 말을 주고받은 적이 없으면 처음 연락하는 사이 */
+function firstContact(p: Participant, body: Body, st: PState): boolean {
+  if (!p.manuallySavedContact || p.contactMemo?.trim() || p.hasCharacterLore) return false;
+  const name = p.name.trim();
   const u = body.narratorOnly.universe;
-  add('world', u.characterDescription);
-  add('author_note', u.authorsNote);
-  for (const b of u.activeLoreBooks) add('world', b.content);
-  for (const m of body.narratorOnly.recentStory) add(m.role === 'user' ? 'story_input' : 'story', m.text);
-  for (const p of body.participants) {
-    add('character', p.lore, p.sender);
-    add('contact_memo', p.contactMemo, p.sender);
-    if (p.narratorOnlyAgentStatus) add('status', JSON.stringify(p.narratorOnlyAgentStatus), p.sender);
-  }
-  for (const r of body.rooms ?? (body.room ? [body.room] : [])) {
-    for (const c of r.activeMembers) add('private_direction', r.privateDirection, c);
-    for (const m of r.messages) if (m.type === 'text') for (const c of m.audience ?? []) if (c !== m.sender) add('received_message', m.content, c);
-  }
-  for (const m of (body.crossRoomMessages ?? []) as { knownBy: string[]; sender: string; content: string }[]) for (const c of m.knownBy) if (c !== m.sender) add('received_message', m.content, c);
-  for (const post of ((body.publicBoard as { posts?: unknown[] } | undefined)?.posts ?? [])) add('public_board', JSON.stringify(post));
-  return out;
+  const texts = [u.characterDescription, u.authorsNote, u.userPersona ?? '', ...u.activeLoreBooks.map((b) => b.content), ...body.narratorOnly.recentStory.map((m) => m.text)];
+  if (name.length >= 2 && texts.some((t) => t.includes(name))) return false;
+  if ((body.rooms ?? (body.room ? [body.room] : [])).some((r) => r.messages.some((m) => m.sender === p.sender))) return false;
+  return !Object.values(st.rooms).some((r) => r.messages.some((m) => m.kind === 'message' && m.sender === p.sender));
 }
 
-function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Record<string, string>): PhonePrompt {
-  const contactMode = body.participants.some((p) => p.manuallySavedContact);
-  if (contactMode) {
-    body.recipientEvidenceSources = contactSources(body);
-    body.singlePassContact = true;
-  }
+function finish(src: RefSource, st: PState, body: Body, mode: 'REPLY' | 'REFRESH', names: Record<string, string>): PhonePrompt {
+  // 인물 로어북이 participants[].lore 와 universe.activeLoreBooks 에 똑같이 두 번 실리지 않게 참여자 쪽만 남긴다 (전수검사 11-13, 확인 1회 약 1.7만 토큰)
+  const ownLore = body.participants.map((p) => p.lore).filter((l): l is string => typeof l === 'string' && !!l);
+  if (ownLore.length) body.narratorOnly.universe.activeLoreBooks = body.narratorOnly.universe.activeLoreBooks.filter((b) => !ownLore.some((l) => l.includes(b.content)));
+  for (const p of body.participants) if (firstContact(p, body, st)) p.relationshipToOwner = 'none: never met or talked with the owner before; the owner only saved this contact';
   if (phoneSettings(src.chat.scriptstate).habits) {
     const ids = new Set(body.participants.map((x) => x.sender));
     const rows = readHabits(src.chat.scriptstate).filter((h) => ids.has(h.id)).map((h) => ({ sender: h.id, note: h.note }));
@@ -306,12 +307,12 @@ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Re
     { role: 'system', content: factionCodesToNames(system, names) },
     { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
   ];
-  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode };
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false, retryRule: read('RETRY.REFRESH') };
 }
 
 function gnetBoard(src: RefSource, query: string): unknown {
   try {
-    return publicBoard(readGnet(src.chat), query) ?? undefined;
+    return publicBoard(readGnet(src.chat), query, publicAccess(src)) ?? undefined;
   } catch {
     return undefined;
   }
@@ -320,12 +321,14 @@ function gnetBoard(src: RefSource, query: string): unknown {
 /** 한 방에 대한 답장 요청 (보내기·단톡 만들기·초대·방 새로고침) */
 export function replyPrompt(src: RefSource, st: PState, r: PRoom, dir: Directory, names: Record<string, string>): PhonePrompt {
   const set = phoneSettings(src.chat.scriptstate);
-  const packet = roomPacket(r, set.reactions);
-  const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
-  const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, set.related, JSON.stringify(packet)) };
-  crossRoom(body, st);
+  const t = fnRefs(src.chat.scriptstate, 'ph', 'reply');
+  const history = fnHistory(src.chat.scriptstate, 'ph', 'reply');
+  const packet = roomPacket(r, set.reactions, history);
+  const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related && !trimRelated(), set.status, names));
+  const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, 'reply', t, JSON.stringify(packet)) };
+  crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(packet));
-  return finish(src, body, 'REPLY', names);
+  return finish(src, st, body, 'REPLY', names);
 }
 
 export interface RefreshPlan {
@@ -336,12 +339,16 @@ export interface RefreshPlan {
   invite: InvitationCheck;
   /** 확률·대기로 이번에 아무것도 묻지 않은 이유 */
   reason: string;
+  /** 방마다 한 번에 넣을 말풍선 상한 (수다가 들면 수다 줄 수까지, 전수검사 11-13) */
+  cap: number;
 }
 
 /** 전체 새 메시지 확인 (원본 refreshPrompt): 대화 중인 방 + 공개된 연락처 전부 + 공지 + 단톡 초대 */
 export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names: Record<string, string>, rng: () => number): RefreshPlan {
   const chat = src.chat;
   const set = phoneSettings(chat.scriptstate);
+  const t = fnRefs(chat.scriptstate, 'ph', 'check');
+  const history = fnHistory(chat.scriptstate, 'ph', 'check');
   const inviteOn = set.invites && cooldownReady(chat, 'invitation') && chancePassed(set.inviteChance, rng);
   const incomingOn = set.incoming && cooldownReady(chat, 'incoming') && chancePassed(set.incomingChance, rng);
   const announce = announcementPacket(chat, set, names, src.char.globalLore);
@@ -369,19 +376,20 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   const emptyInvite = invitationPacket(st, [], false);
   if (!candidates.length && !announce.allowed) {
     const why = !set.incoming && !set.invites ? '선톡·단톡 초대 받기가 모두 꺼져 있어요.' : '이번 확인은 대기 턴이나 요청 확률에 따라 건너뛰었어요.';
-    return { prompt: null, selected, receive, announce, invite: emptyInvite, reason: why };
+    return { prompt: null, selected, receive, announce, invite: emptyInvite, reason: why, cap: LIMITS.events };
   }
   const rooms: RoomPacket[] = [];
   const memo = new Map<string, Participant>();
   for (const r of candidates) {
-    const packet = roomPacket(r, set.reactions);
+    const packet = roomPacket(r, set.reactions, history);
     packet.action = { type: 'refresh' };
     packet.receiveMessages = refreshAllowed(chat, r, set, incomingOn)[0];
-    rooms.push(packet);
+    // 대화가 없는 연락처 방은 빈 칸(대화 상태·참여자·pov·action 등)을 싣지 않는다
+    rooms.push(packet.candidateOnly && !packet.messages.length ? ({ id: packet.id, kind: packet.kind, name: packet.name, activeMembers: packet.activeMembers, messages: packet.messages, candidateOnly: true, receiveMessages: packet.receiveMessages } as RoomPacket) : packet);
     selected.set(r.id, r);
     receive.set(r.id, packet.receiveMessages);
     for (const cid of r.members) {
-      if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
+      if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, t.related && !trimRelated(), set.status, names));
     }
   }
   // 단톡 수다: NPC가 둘 이상인 내 단톡방 하나를 골라 대화 한 조각을 꼭 만들게 한다
@@ -394,12 +402,12 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   void _channel;
   const invite = invitationPacket(st, participants.map((p) => p.sender), inviteOn);
   const body: Body = {
-    rooms, participants, narratorOnly: narrator(src, names, set.related, JSON.stringify(rooms)), announcementCheck: publicAnnounce,
+    rooms, participants, narratorOnly: narrator(src, names, 'check', t, JSON.stringify(rooms)), announcementCheck: publicAnnounce,
     activityCheck: { incoming: incomingOn, groupInvites: inviteOn }, invitationCheck: invite,
   };
-  crossRoom(body, st);
+  crossRoom(body, st, history);
   body.publicBoard = gnetBoard(src, JSON.stringify(rooms));
-  return { prompt: finish(src, body, 'REFRESH', names), selected, receive, announce, invite, reason: '' };
+  return { prompt: finish(src, st, body, 'REFRESH', names), selected, receive, announce, invite, reason: '', cap: eventCap(chat.scriptstate, rooms.some((x) => x.banter)) };
 }
 
 function personOfContact(c: Contact): PPerson {
@@ -412,10 +420,12 @@ function personOfContact(c: Contact): PPerson {
 /** 새로고침 응답이 형식에 안 맞을 때 같은 자료로 한 번 더 (원본 재시도 문구) */
 export function refreshRetry(prompt: PhonePrompt, reason: string): PhonePrompt['messages'] {
   const [sys, ...rest] = prompt.messages;
+  // 글은 지침 「괴담톡」 RETRY.REFRESH 절. 절이 없으면 아래에 남긴 글
+  const rule = prompt.retryRule?.trim();
   return [
     {
       role: 'system',
-      content: `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}\n${RETRY_ANALYZE}`,
+      content: rule ? `${sys.content}\n${fillVars(rule, { reason: reason.slice(0, 600), analyze: retryAnalyze() })}` : `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}\n${retryAnalyze()}`,
     },
     ...rest,
   ];
@@ -431,20 +441,21 @@ export function viewPrompt(src: RefSource, names: Record<string, string>, views:
   if (set.preset === 'side') keys.push('VIEW.SIDE', `VIEW.SIDE.SPEAK.${set.speak ? 1 : 0}`, `VIEW.SCOPE.${set.scope}`, ...(set.size === '0' ? [] : [`VIEW.SIZE.${set.size}`]));
   else keys.push('VIEW.MIND', set.preset === 'mono' ? 'VIEW.MONO' : 'VIEW.MULTI', ...(set.preset === 'multi' ? [`VIEW.MULTI.SPEAK.${set.speak ? 1 : 0}`] : []));
   keys.push('VIEW.OUTPUT');
-  const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
-  if (!system.includes('OUTPUT CONTRACT')) throw new PhoneError('Phone 로어북에 보기 전용 방 항목이 없어요.');
-  const previousRoom = previousView(views, set.preset);
+  // 지침 속 낱말이 아니라 절이 있는지로 본다 (전수검사 11-13)
+  if (p['VIEW.OUTPUT'] === undefined) throw new PhoneError(`${GUIDE_LABEL.Phone} 지침에 보기 전용 방 섹션이 없어요.`);
+  const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? languageLine(p)].join('\n\n');
+  const previousRoom = previousView(views, set.preset, fnHistory(src.chat.scriptstate, 'ph', 'view'));
   const owner = ownerCharacter(src).character;
   const body = {
     viewpoint: { name: set.pov || owner || '주인공', isPhoneOwner: !set.pov || set.pov === owner },
     kind: set.preset,
     ...(previousRoom ? { previousRoom } : {}),
-    narratorOnly: narrator(src, names, phoneSettings(src.chat.scriptstate).related, `${set.pov}\n${JSON.stringify(previousRoom ?? '')}`),
+    narratorOnly: narrator(src, names, 'view', fnRefs(src.chat.scriptstate, 'ph', 'view'), `${set.pov}\n${JSON.stringify(previousRoom ?? '')}`),
   };
   const read = (k: string) => opt(k);
   const messages: CraftMessage[] = [
     { role: 'system', content: factionCodesToNames(system, names) },
     { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
   ];
-  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false };
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('VIEW.THOUGHTS') || read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false };
 }

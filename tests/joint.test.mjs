@@ -68,7 +68,8 @@ test('joint with four boards and phone sends one request and splits five ways', 
 test('joint repairs an unparsable envelope with one more ask before falling back', async () => {
   calls.length = 0;
   let n = 0;
-  reply = () => (n++ === 0 ? 'Sure! {"gnet": {"a": 1}, "phone": {"b": 2}' : '{"gnet": {"a": 1}, "phone": {"b": 2}}');
+  // 첫 답에서 한 칸도 못 읽어야 다시 묻는다 (부분 읽기, 전수검사 11-13)
+  reply = () => (n++ === 0 ? 'Sorry, I cannot do that.' : '{"gnet": {"a": 1}, "phone": {"b": 2}}');
   const j = new Joint('aux');
   const [g, p] = await Promise.all([j.ask('gn', [{ role: 'user', content: 'g' }]), j.ask('phone', [{ role: 'user', content: 'p' }])]);
   assert.equal(calls.length, 2);

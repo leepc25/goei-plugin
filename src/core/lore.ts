@@ -5,6 +5,7 @@
 // 넘치면 오래된 채팅을 지금처럼 지운다. 키는 로어북에 그대로 있어 사용자가 고칠 수 있다.
 // 규칙 표: docs/호출키_검토_1019.md
 import { evaluate, type CbsEnv } from './cbs';
+import { guideOr } from './guides';
 import { tokens } from './gnet';
 import { messageText } from './refs';
 import type { Chat, LoreEntry } from './types';
@@ -40,6 +41,10 @@ export const CONFIRM_KEYS = new Set([
   '교회', '강변', '지하실', '미술관', '병원', '극단', '세계정치', '세계 정치', '기독교 상점', '헐값 매입', '대박 알선', '사장', '국장',
   // 흔한 영어 이름·낱말과 같은 키 (2026-10-21: Jay는 흔한 이름, 브라우니는 과자)
   'Jay', 'Brownie', '브라우니', 'Yu-ri', 'Route 16', 'Red Lady',
+  // 명부 영문명·별칭으로 들어오는 흔한 낱말 (2026-11-12부터 명부의 부르는 말도 키로 쓴다. 한글 이름만 확증이던 항목의 영문명과, 10-19 키 정리 때 뺀 넓은 별칭)
+  'The Church', 'The Riverside', 'The Basement', 'Art Museum', 'Musical Theater', 'Folk Village', '민속촌', 'Adventure Park', 'Mystery World', 'Dark Garden', 'Giant World', 'Desire Room', 'In the Black Shadow',
+  'Midsummer Night', "Midsummer Night's Dream", 'Bio Factory', 'Corrupted cathedral', 'abandoned kindergarten', '버려진 유치원',
+  'Artist', 'Broadcast', 'broker', 'Fixer', 'Administration', 'manual review', 'Yuri', 'Loan Shark', 'moneylender', 'Vampire', '뱀파이어', '수녀', '마녀', '마법사',
 ]);
 
 /** 이름 뒤에 붙어도 되는 말: 조사·서술·부름·호칭. 이 뒤에는 무엇이 와도 된다 (여진이었다) */
@@ -136,6 +141,13 @@ export function stripDecorators(content: string): string {
 
 const cache = new WeakMap<LoreEntry[], ManagedEntry[]>();
 
+/** 키 말고도 그 항목을 부르는 말: 로어북 이름과 명부의 이름·영문명·별칭 (한 글자는 뺀다) */
+function callNames(name: string, kind: LoreKind, called: Map<string, string[]>): string[] {
+  const all = [name, ...(called.get(`${kind}:${name}`) ?? [])].map((t) => (typeof t === 'string' ? t.trim() : '')).filter((t) => syllables(t) >= 2);
+  // 띄어쓰기만 다른 말(호이사·호 이사)도 따로 둔다: 사람 이름 키는 키에 없는 띄어쓰기를 봐주지 않는다
+  return all.filter((t, i) => all.findIndex((x) => x.toLowerCase() === t.toLowerCase()) === i);
+}
+
 /** 자리 항목 4개가 다 있는 카드인지 (없으면 고른 글이 들어갈 곳이 없어 아무것도 하지 않는다) */
 export function hasSlots(lore: LoreEntry[] | undefined): boolean {
   const names = new Set((lore ?? []).map((e) => str(e.comment)));
@@ -207,6 +219,10 @@ export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
     const a = dir.agents.find((x) => x.lore === name || x.name === name || x.aliases.includes(name));
     return a ? [...new Set([a.name, a.lore, a.english, ...a.aliases].filter(Boolean))] : [name];
   };
+  const called = new Map<string, string[]>();
+  for (const r of dir.agents) called.set(`agent:${r.lore}`, [r.name, r.english, ...r.aliases]);
+  for (const r of dir.anomalies) called.set(`anomaly:${r.lore}`, [r.english, ...r.aliases]);
+  for (const r of dir.sites) called.set(`site:${r.lore}`, [r.english, ...r.aliases]);
   const out: ManagedEntry[] = [];
   books.forEach((e, index) => {
     const folderKind = kinds.get(str(e.folder));
@@ -232,9 +248,12 @@ export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
       kind = folderKind;
     }
     const raw = appendix && !appendix.when.keys ? [] : keysOf(e);
-    const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
+    // 부르는 말: 키 + 로어북 이름 + 명부의 이름·영문명·별칭 (2026-11-12 사용자: 「착한 친구」가 브라우니 별칭인데 키에 없어 안 켜짐).
+    // 키에 빠져 있어도 명부에서 그 항목을 가리키는 말이면 켠다. 흔한 낱말은 아래 확증·두 글자 규칙이 그대로 거른다
+    const calls = appendix ? raw : [...raw, ...callNames(str(e.comment), kind, called).filter((t) => !raw.some((k) => k.toLowerCase() === t.toLowerCase()))];
+    const longKo = calls.filter((k) => hangul(k) && syllables(k) >= 3);
     const keys: LoreKey[] = [];
-    for (const text of raw) {
+    for (const text of calls) {
       const en = !hangul(text);
       const re = keyRegex(text, en, kind === 'agent');
       if (!re) continue;
@@ -400,11 +419,13 @@ export function loreState(chat: Chat): LoreState {
   return { target, board, deployed, place, companions, unlocked: readUnlocked(chat.scriptstate) };
 }
 
-const sameName = (a: string, b: string) => a.replace(/\s+/g, '').toLowerCase() === b.replace(/\s+/g, '').toLowerCase();
+function sameName(a: string, b: string): boolean {
+  return a.replace(/\s+/g, '').toLowerCase() === b.replace(/\s+/g, '').toLowerCase();
+}
 
 /** 항목 이름이나 키 중 하나가 이 이름과 같은지 */
 function names(e: ManagedEntry, name: string): boolean {
-  return !!name.trim() && (sameName(e.name, name) || e.rawKeys.some((k) => sameName(k, name)));
+  return !!name.trim() && (sameName(e.name, name) || e.rawKeys.some((k) => sameName(k, name)) || e.keys.some((k) => sameName(k.text, name)));
 }
 
 /**
@@ -501,8 +522,9 @@ export function lockedAppendices(entries: ManagedEntry[], picks: LorePick[], unl
 
 /** 해금 안내 한 줄 (본 항목과 같은 자리에) */
 export function unlockHint(e: ManagedEntry): string {
-  return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix!.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix!.when.unlock}\n`
-    + `Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line at the very end.`;
+  // 글은 지침 「메인 요청에 붙는 글」 LORE.LOCKED 절. 절이 없으면 여기 남긴 글
+  return guideOr('Main', 'LORE.LOCKED', () => `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix!.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix!.when.unlock}\n`
+    + `Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line after the prose.`, { name: e.name, parent: e.appendix!.parent, when: e.appendix!.when.unlock });
 }
 
 /** Risu 방식: 키를 소문자로, 띄어쓰기를 모두 지우고 메시지마다 포함 검사 (v2026.8.250 lorebook.svelte.ts) */

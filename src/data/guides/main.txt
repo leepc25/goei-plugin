@@ -1,0 +1,360 @@
+<!-- Main: 메인 요청에 플러그인이 붙이는 글 (직전 상태창·상태창 칸 규칙·소지품·잠긴 부록·인물 기록·세력표 머리말). {이름} 자리는 플러그인이 채웁니다. 절 구분 줄은 그대로 두세요. -->
+@@SECTION STATUS.NOTE
+This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.
+@@END
+
+@@SECTION STATUS.FIRST
+No status line yet: this is the first turn.
+Starting values: {starts}
+{fields}Treat them as the previous values (copy them unless the story changes them) and output exactly one new [▣] line at the very end of your response.
+@@END
+
+@@SECTION STATUS.RECENT_CASH
+Recent cash transactions (oldest first): {list}
+@@END
+
+@@SECTION STATUS.RECENT_POINT
+Recent Baekilmong point transactions (oldest first): {list}
+@@END
+
+@@SECTION STATUS.RULE.TARGET
+Anomaly = the exact Korean name of {{user}}'s current encounter, visit, or assigned target, including briefing and travel; otherwise `없음`.
+@@END
+
+@@SECTION STATUS.RULE.COMPANIONS
+Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.
+@@END
+
+@@SECTION STATUS.RULE.DEPLOYED
+Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.
+@@END
+
+@@SECTION STATUS.RULE.IDENTITY
+Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).
+@@END
+
+@@SECTION STATUS.RULE.POINTS
+Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert. Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted.
+@@END
+
+@@SECTION STATUS.RULE.WALLET
+Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it.
+@@END
+
+@@SECTION STATUS.RULE.ONE_LINE
+- Output exactly one [▣] at the very end of every response.
+@@END
+
+@@SECTION STATUS.RULE.FIELDS
+- Fields in order: {labels}. Never add, drop or reorder fields.
+@@END
+
+@@SECTION STATUS.RULE.PREVIOUS
+- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.
+@@END
+
+@@SECTION INVENTORY.NOTE
+What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. Never print this list back.
+@@END
+
+@@SECTION INVENTORY.RESUMED
+item tracking was switched off for a while and just came back on — this list may not match what happened in the story since; follow the story and treat the list as a starting point
+@@END
+
+@@SECTION INVENTORY.REALLY
+Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):
+@@END
+
+@@SECTION INVENTORY.REALLY_UNKNOWN
+- {name}: not even its seller knows{label_note} — decide what it really does now, then keep it the same from here on.
+@@END
+
+@@SECTION LORE.LOCKED
+[Locked appendix: 「{name}」] Hidden information about {parent} that no character knows yet. Unlock it when this happens in the story: {when}
+Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|{name}] on its own line after the prose.
+@@END
+
+@@SECTION PEOPLE.KNOWLEDGE_RULE
+Do not have a character mention or act on a secret or fact they have not witnessed, learned, or otherwise demonstrably known. Never invent how they acquired information. Keep facts, beliefs, guesses, and misunderstandings distinct. A missing record does not prove ignorance: actual evidence in the conversation may establish knowledge.
+@@END
+
+@@SECTION PEOPLE.RULE
+Living records of the characters in this scene, kept by the system from what actually happened in this chat. They override the static character sheets where they differ. Treat them as background facts, not as events to narrate; never mention scores or these notes themselves. {knowledge_rule}
+@@END
+
+@@SECTION SEXUAL.POLICY
+sexual_context_only fields are inactive during ordinary conversation, work, dating, flirting, handholding, hugs, and light kisses. Use them only after a clear adult sexual proposition, sexual touching, sexually intended exposure, foreplay, mutually acknowledged imminent sexual activity, or ongoing sexual activity. Current consent and explicit boundaries always override them.
+@@END
+
+@@SECTION PEOPLE.EXPRESS_0
+Expression: almost never shown; appears only through actions and priorities, not words.
+@@END
+
+@@SECTION PEOPLE.EXPRESS_1
+Expression: restrained; small, deniable cues (pauses, gaze, delayed replies).
+@@END
+
+@@SECTION PEOPLE.EXPRESS_2
+Expression: visible but controlled.
+@@END
+
+@@SECTION PEOPLE.EXPRESS_3
+Expression: open and immediate.
+@@END
+
+@@SECTION PEOPLE.TASTE_NOTE
+A separate axis from the relationship above; it never grants closeness by itself.
+@@END
+
+@@SECTION PEOPLE.OPENNESS_NOTE
+Applies only inside intimate contexts that actually arise; an explicit current condition or the other participant's choice takes priority.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.0
+Extreme hostility. Keep the actual cause and constraints; the stage alone never compels a newly invented harmful act.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.1
+Hostility. Real distance or antagonism, expressed in this character's own manner.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.2
+Aversion. Evidence-grounded resentment or coldness; shorter answers, discretionary effort withheld.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.3
+Indifference. Base-personality politeness, small talk and work cooperation. No special favor, no forced coldness.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.4
+Recognition. Remembers personal details, notices absence, a little more willing to ask or answer.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.5
+Interest. Seeks shared time; offers reliable help, concern, explanation or appropriately personal worries.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.6
+Attraction. Makes time and space for this person; reveals more sincere concern, preferences or vulnerability.
+@@END
+
+@@SECTION PEOPLE.AFFINITY.7
+Affection. Deep care, voluntary support and emotional closeness, within this character's own personality.
+@@END
+
+@@SECTION PEOPLE.TASTE.-3
+strong aversion; ends or avoids contact
+@@END
+
+@@SECTION PEOPLE.TASTE.-2
+clear dislike; more friction and distance, less voluntary kindness
+@@END
+
+@@SECTION PEOPLE.TASTE.-1
+slightly grating or not to taste; responds only as needed
+@@END
+
+@@SECTION PEOPLE.TASTE.0
+no particular pull or aversion; treats as the relationship stands
+@@END
+
+@@SECTION PEOPLE.TASTE.1
+weakly drawn; pays a little more attention, remembers, keeps talking
+@@END
+
+@@SECTION PEOPLE.TASTE.2
+core tastes clearly match; asks first, spends more time and effort
+@@END
+
+@@SECTION PEOPLE.TASTE.3
+several core tastes strongly match; priorities of attention may shift
+@@END
+
+@@SECTION PEOPLE.OPENNESS.0
+must use contraception and says so as a prerequisite
+@@END
+
+@@SECTION PEOPLE.OPENNESS.1
+hesitant while still asking for contraception (hesitation is not abandoning the condition)
+@@END
+
+@@SECTION PEOPLE.OPENNESS.2
+believes non-use is acceptable on a "safe day" (an attitude; never compute a real safe date)
+@@END
+
+@@SECTION PEOPLE.OPENNESS.3
+pays little attention to checking or requesting contraception
+@@END
+
+@@SECTION PEOPLE.OPENNESS.4
+prefers non-use, distinct from mere indifference
+@@END
+
+@@SECTION PEOPLE.AXIS.relationalInitiative.0
+almost never initiates contact
+@@END
+
+@@SECTION PEOPLE.AXIS.relationalInitiative.1
+mostly responds when the other leads
+@@END
+
+@@SECTION PEOPLE.AXIS.relationalInitiative.2
+alternates between leading and responding
+@@END
+
+@@SECTION PEOPLE.AXIS.relationalInitiative.3
+approaches first when needed and steers the relationship
+@@END
+
+@@SECTION PEOPLE.AXIS.relationalInitiative.4
+steadily drives the direction of relationships
+@@END
+
+@@SECTION PEOPLE.AXIS.expressionDirectness.0
+almost never states intent directly
+@@END
+
+@@SECTION PEOPLE.AXIS.expressionDirectness.1
+prefers indirection and hints
+@@END
+
+@@SECTION PEOPLE.AXIS.expressionDirectness.2
+adjusts between direct and roundabout
+@@END
+
+@@SECTION PEOPLE.AXIS.expressionDirectness.3
+states intent and demands fairly plainly
+@@END
+
+@@SECTION PEOPLE.AXIS.expressionDirectness.4
+expresses thoughts and intent very directly
+@@END
+
+@@SECTION PEOPLE.AXIS.emotionalExpressiveness.0
+almost never shows emotion outwardly
+@@END
+
+@@SECTION PEOPLE.AXIS.emotionalExpressiveness.1
+small, limited emotional cues
+@@END
+
+@@SECTION PEOPLE.AXIS.emotionalExpressiveness.2
+shows or hides emotion depending on the situation
+@@END
+
+@@SECTION PEOPLE.AXIS.emotionalExpressiveness.3
+emotion often shows in words and actions
+@@END
+
+@@SECTION PEOPLE.AXIS.emotionalExpressiveness.4
+expresses emotion vividly and immediately
+@@END
+
+@@SECTION PEOPLE.AXIS.guardedness.0
+trusts easily, hardly any guard
+@@END
+
+@@SECTION PEOPLE.AXIS.guardedness.1
+low initial guard, opens up fairly fast
+@@END
+
+@@SECTION PEOPLE.AXIS.guardedness.2
+adjusts trust and guard to the situation
+@@END
+
+@@SECTION PEOPLE.AXIS.guardedness.3
+does not reveal inner thoughts easily, keeps guard
+@@END
+
+@@SECTION PEOPLE.AXIS.guardedness.4
+strong guard; strictly limits approach and self-disclosure
+@@END
+
+@@SECTION PEOPLE.AXIS.impulsivity.0
+strongly suppresses impulse and deliberates
+@@END
+
+@@SECTION PEOPLE.AXIS.impulsivity.1
+mostly thinks before acting
+@@END
+
+@@SECTION PEOPLE.AXIS.impulsivity.2
+mix of deliberation and spontaneous action
+@@END
+
+@@SECTION PEOPLE.AXIS.impulsivity.3
+acts quickly on feeling and desire
+@@END
+
+@@SECTION PEOPLE.AXIS.impulsivity.4
+acts very impulsively before weighing consequences
+@@END
+
+@@SECTION PEOPLE.AXIS.relationshipPersistence.0
+lets relationships go easily
+@@END
+
+@@SECTION PEOPLE.AXIS.relationshipPersistence.1
+tends to withdraw when conflict or distance appears
+@@END
+
+@@SECTION PEOPLE.AXIS.relationshipPersistence.2
+keeps or drops a relationship by its value
+@@END
+
+@@SECTION PEOPLE.AXIS.relationshipPersistence.3
+tries to keep relationships through difficulty
+@@END
+
+@@SECTION PEOPLE.AXIS.relationshipPersistence.4
+very persistent in keeping and repairing relationships
+@@END
+
+@@SECTION RHYTHM.HEAD
+## Scene rhythm (kept by the system; guidance, not content to narrate)
+@@END
+
+@@SECTION RHYTHM.CLOCK_HEAD
+Hook clock (counted by the system; never say turn numbers in the story):
+@@END
+
+@@SECTION RHYTHM.METHOD
+Previous staging method: {method} — do not use the same anticipation method in consecutive turns.
+@@END
+
+@@SECTION FACTION.INTRO
+This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC's actual access.
+@@END
+
+@@SECTION ROSTER.INTRO
+- Purpose: GM reference for consistent character introductions before individual lore is active.
+- Detail: Use active character lore for fuller characterization.
+@@END
+
+@@SECTION FACTION.RELATIONS_LEGEND
+How the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.
+@@END
+
+@@SECTION FACTION.HEAD
+## Factions → {user} (standing of each organization toward {user}, kept by the system; members act accordingly)
+@@END
+
+@@SECTION FACTION.STAGE.friendly
+Friendly. Members welcome {{user}}, share information freely and take {{user}}'s side in a fight.
+@@END
+
+@@SECTION FACTION.STAGE.favorable
+Favorable. Members greet {{user}}, make way and extend small favors.
+@@END
+
+@@SECTION FACTION.STAGE.neutral
+Neutral. Ordinary procedure; members take no special notice.
+@@END
+
+@@SECTION FACTION.STAGE.wary
+Wary. Members watch and verify; on their own ground they warn {{user}} off or expel; elsewhere they only observe.
+@@END
+
+@@SECTION FACTION.STAGE.hostile
+Hostile. Members attack {{user}} on sight, even outside their own ground.
+@@END

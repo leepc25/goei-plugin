@@ -39,18 +39,48 @@ export interface Pick<T> {
   related: boolean;
   /** 개수 제한에 세지 않는 기록 (괴담톡 공지) */
   free?: boolean;
+  /** 이번 턴에 꼭 넣을 기록 (보관함에서 잠깐 되살린 글). 맨 먼저 고른다 (전수검사 11-13) */
+  pin?: boolean;
   data: T;
 }
 
 /**
  * 넣을 기록을 고른다. 관련 기록을 고르는 장면이 없으면(focus 끔) 원본처럼 최근 순.
  * 순서: 아주 최근 recent개 → 관련 기록 최근 순. 개수(max)·토큰(fits) 안에서만. 결과는 시간 순.
+ * cost·room 을 주면 기록마다 토큰을 한 번씩만 세어 합으로 고르고, fits 는 끝에 한 번만 확인한다
+ * (후보마다 묶음 전체를 다시 세서 기록이 많으면 전송이 몇 초씩 늦었다, 전수검사 11-13)
  */
-export function pickRecords<T>(items: Pick<T>[], o: { focus: boolean; recent: number; max: number; fits: (kept: T[]) => boolean }): T[] {
+export function pickRecords<T>(items: Pick<T>[], o: { focus: boolean; recent: number; max: number; fits: (kept: T[]) => boolean; cost?: (data: T) => number; room?: number }): T[] {
   const newest = items.slice().sort((a, b) => b.order - a.order);
-  const queue = o.focus
+  const rest = o.focus
     ? [...newest.filter((x, i) => x.free || i < o.recent), ...newest.filter((x, i) => !x.free && i >= o.recent && x.related)]
     : newest;
+  const queue = [...newest.filter((x) => x.pin), ...rest.filter((x) => !x.pin)];
+  if (o.cost && o.room !== undefined) {
+    const accepted: Pick<T>[] = [];
+    const seen = new Set<Pick<T>>();
+    const freeLeft = (from: number) => queue.slice(from).some((x) => x.free && !seen.has(x));
+    let counted = 0;
+    let used = 0;
+    for (let q = 0; q < queue.length; q++) {
+      const item = queue[q];
+      if (seen.has(item)) continue;
+      if (!item.free && counted >= o.max) {
+        if (!freeLeft(q + 1)) break;
+        continue;
+      }
+      const c = o.cost(item.data);
+      if (used + c > o.room) continue;
+      used += c;
+      seen.add(item);
+      accepted.push(item);
+      if (!item.free) counted++;
+    }
+    const byTime = () => accepted.slice().sort((a, b) => a.order - b.order).map((x) => x.data);
+    // 건별 합은 거의 늘 실제보다 크지만 보장은 아니다: 실제 상한은 여기서 지킨다 (나중에 넣은 것부터 뺀다)
+    while (accepted.length && !o.fits(byTime())) accepted.pop();
+    return byTime();
+  }
   const kept: Pick<T>[] = [];
   let counted = 0;
   for (const item of queue) {

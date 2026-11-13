@@ -163,7 +163,7 @@ test('prompts from the real card: frame, CBS settled, privacy branch, references
   assert.equal(r.messages.length, 2);
   const [sys, user] = r.messages.map((m) => m.content);
   assert.ok(!sys.includes('{{') && !user.includes('{{'), 'CBS가 남지 않음');
-  assert.ok(sys.includes('## User-controlled protagonist (narrator reference only)'));
+  assert.ok(!sys.includes('## User-controlled protagonist') && !sys.includes('End of the log'), '주인공 머리말·로그 끝 문장은 지침에서 빠짐 (ggnet#10)');
   assert.ok(sys.includes('조용한 아저씨 말투'));
   assert.ok(sys.includes('Do not discuss the protagonist or partners themselves'), '사생활 4단계 문장');
   assert.ok(!sys.includes('Users may discuss the protagonist'), '다른 단계 문장은 빠짐');

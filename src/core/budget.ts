@@ -31,7 +31,7 @@ export function fitPrompt<P extends { messages: { content: string }[] }>(cap: nu
       const p = build();
       const n = promptTokens(p);
       if (n <= cap) return p;
-      if (level >= LAST) throw new BudgetError(`요청이 토큰 상한(${cap.toLocaleString()})을 넘어요. 참고 자료를 줄여도 약 ${n.toLocaleString()}토큰이에요. 고급 설정에서 상한을 올려 주세요.`);
+      if (level >= LAST) throw new BudgetError(`요청이 토큰 상한(${cap.toLocaleString()})을 넘어요. 참고 자료를 줄여도 약 ${n.toLocaleString()}토큰이에요. 설정 → 생성 공통(또는 그 기능의 설정)에서 요청 토큰 상한을 올려 주세요.`);
     }
   } finally {
     level = 0;

@@ -24,13 +24,17 @@ test('더하기: 기준 메시지가 사라지면 빠지고, 직접 넣은 건 �
 
 test('같은 이름이 또 들어오면 새 줄 없이 갱신, 둘 다 소모성이면 횟수를 더한다', () => {
   let it = addItem(empty, alive, { name: '소금 봉지', desc: '두 봉지', uses: 2, from: 'story', anchor: 'c1' });
-  it = addItem(it, alive, { name: '소금봉지', desc: '새로 샀다', uses: 3, from: 'store', anchor: 'c2' });
+  it = addItem(it, alive, { name: '소금봉지', desc: '새로 샀다', uses: 3, from: 'story', anchor: 'c2' });
   assert.equal(it.list.length, 1);
   assert.equal(it.list[0].desc, '새로 샀다');
   assert.equal(it.list[0].uses, 5);
   assert.equal(it.list[0].anchor, 'c1');
   it = addItem(it, alive, { name: '소금 봉지', from: 'story', anchor: 'c2' });
   assert.equal(it.list[0].desc, '새로 샀다', '빈 설명은 있던 설명을 지우지 않는다');
+  // 상점·쇼핑몰에서 산 것(store)은 같은 이름이 있어도 새 줄로 (전수검사 11-13)
+  const st = addItem(it, alive, { name: '소금봉지', uses: 3, from: 'store', anchor: 'c2' });
+  assert.equal(st.list.length, 2);
+  assert.deepEqual([st.list[0].uses, st.list[1].from, st.list[1].anchor, st.list[1].uses], [5, 'store', 'c2', 3]);
 });
 
 test('쓰임 글 읽기·쓰기', () => {
@@ -113,7 +117,8 @@ test('버리기·합치기·파괴는 기록 한 줄. 합치기는 둘 다 소�
   assert.deepEqual(mergedNow(it, 'c1'), ['combined 소금 into 소금 봉지']);
   assert.deepEqual(mergedNow(it, 'c2'), []);
   it = removeItem(it, b.id, 'destroy', 'story', 'c1');
-  assert.equal(it.list.length, 2);
+  assert.equal(it.list.length, 3, '줄은 지우지 않고 숨긴다 (11-12)');
+  assert.equal(liveItems(it, alive).length, 2);
   assert.deepEqual(it.log.filter((l) => l.what !== 'get').map((l) => l.what), ['merge', 'destroy']);
   assert.equal(removeItem(it, 'nope', 'drop', 'manual'), it);
 });
@@ -123,8 +128,8 @@ test('무게: 1개당 무게 × 개수·합계(장착 포함)·소지 한도(명
   assert.equal(itemWeight(-1), undefined);
   assert.equal(itemWeight('abc'), undefined);
   assert.equal(weightText(0.25), '250g');
-  assert.equal(weightText(1.23), '1.2kg');
-  assert.equal(weightText(12.4), '12kg');
+  assert.equal(weightText(1.23), '1.23kg');
+  assert.equal(weightText(12.4), '12.4kg');
   let it = addItem(empty, alive, { name: '권총', equip: 'weapon', weight: 1.2, wear: true, from: 'manual', anchor: '' });
   it = addItem(it, alive, { name: '물병', uses: 2, weight: 1, from: 'manual', anchor: '' });
   it = addItem(it, alive, { name: '물병', uses: 1, weight: 0.5, from: 'manual', anchor: '' });
@@ -220,4 +225,25 @@ test('팔기: 판 응답이 살아 있는 동안만 숨고 장착 칸에서 빠�
   const back = liveItems(it, new Set(['c1']));
   assert.deepEqual(back.map((e) => e.name), ['단검']);
   assert.equal(back[0].slot, undefined);
+});
+
+// 2026-11-13: 삭제(기록까지 지움), 물건으로 만드는 범위, 만들지 않을 것
+import { applyItemChanges as _apply, purgeItem as _purge, itemScope as _scope, itemsRule as _rule, ITEM_SCOPE_SKIP as _skip } from '../dist-test/core.mjs';
+test('삭제: 목록과 그 물건의 기록 줄이 같이 지워진다', () => {
+  let it = addItem(empty, alive, { name: '정장', desc: '', from: 'story', anchor: 'c1' });
+  it = addItem(it, alive, { name: '손전등', desc: '', from: 'story', anchor: 'c1' });
+  const id = it.list.find((x) => x.name === '정장').id;
+  const out = _purge(it, id);
+  assert.deepEqual(out.list.map((x) => x.name), ['손전등']);
+  assert.ok(!out.log.some((l) => l.item === id));
+  assert.equal(_purge(out, 'none'), out);
+});
+test('물건으로 만드는 범위: 기본은 넓게, 좁게는 옷을 새로 만들지 않고 갖고 있던 것은 받는다', () => {
+  assert.equal(_scope({}), 'wide');
+  assert.equal(_scope({ $it_scope: 'narrow' }), 'narrow');
+  assert.equal(_rule({}), undefined);
+  assert.match(_rule({ $it_scope: 'mid', $it_skip: '명함, 영수증' }), /Do not report food.*Never report as `new`: 명함, 영수증/);
+  const ch = [{ name: '정장', action: 'new', desc: '', icon: '옷/정장/suit', anchor: 'c1' }, { name: '권총', action: 'new', desc: '', icon: '무기/권총/pistol', anchor: 'c1' }];
+  assert.deepEqual(_apply(empty, alive, ch, { skipKinds: _skip.narrow }).list.map((x) => x.name), ['권총']);
+  assert.deepEqual(_apply(empty, alive, ch, { skipKinds: _skip.wide }).list.map((x) => x.name).sort(), ['권총', '정장'].sort());
 });

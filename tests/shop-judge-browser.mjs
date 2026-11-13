@@ -41,25 +41,26 @@ for (const vp of ['pc', 'phone']) {
   await closeWin(page); await sleep(200);
   await openWin(page); await sleep(300);
   if (!(await page.evaluate(() => [...document.querySelectorAll('.gx-tabs, .gx-nav')].some((e) => e.offsetParent)))) errorsAll.push(`[${vp}] solo stuck after close`);
-  // 3. 설정 → 상점: 상점 판단(대신 안내)·고유 상점 표, 줄 더하고 이름 적기
-  await openEditor(page, 'set:items'); await sleep(300);
+  // 3. 설정 → 상점: 판단(대신 안내)·고유 상점 표, 줄 더하고 이름 적기 (v0.21.10 설정창 개편: 상점은 따로 쪽, 줄 이름 「판단」)
+  await openEditor(page, 'set:shop'); await sleep(300);
   const row = await page.evaluate(() => {
     const rows = [...document.querySelectorAll('.gw .ps-row')];
-    const j = rows.find((r) => r.querySelector('.ps-label b')?.textContent?.startsWith('상점 판단'));
+    const j = rows.find((r) => r.querySelector('.ps-label b')?.textContent?.trim() === '판단');
     j?.scrollIntoView({ block: 'start' });
     return { judge: j?.querySelector('small')?.textContent ?? '', own: document.querySelectorAll('.gw [data-key$=":name"][data-change="set-own"]').length };
   });
-  if (!row.judge.includes('메인 모델로 대신합니다') || row.own !== 2) errorsAll.push(`[${vp}] settings: ${JSON.stringify(row)}`);
+  if (!row.judge.includes('메인 모델로 대신합니다') || row.own !== 3) errorsAll.push(`[${vp}] settings: ${JSON.stringify(row)}`);
   await shot('settings-judge');
+  // 기본 표는 우주 쇼핑몰·백일몽 포인트몰·망상홈쇼핑 세 줄 (v0.21.6에서 망상홈쇼핑 더함) → 네 번째 줄을 더해 이름 적기
   await page.evaluate(() => document.querySelector('.gw [data-action="set-own-add"]').click()); await sleep(400);
-  const inp = page.locator('.gw [data-change="set-own"][data-key$=":name"]').nth(2);
-  await inp.fill('망상홈쇼핑'); await inp.blur(); await sleep(600);
+  const inp = page.locator('.gw [data-change="set-own"][data-key$=":name"]').nth(3);
+  await inp.fill('심야편의점'); await inp.blur(); await sleep(600);
   const own = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$sh_own || '[]').map((o) => `${o.name}|${o.web}|${o.visit}`));
-  if (own.length !== 3 || own[2] !== '망상홈쇼핑||shop') errorsAll.push(`[${vp}] own add: ${JSON.stringify(own)}`);
+  if (own.length !== 4 || own[3] !== '심야편의점||shop') errorsAll.push(`[${vp}] own add: ${JSON.stringify(own)}`);
   await sleep(500);
   const shown = await page.evaluate(() => [...document.querySelectorAll('.gw [data-change="set-own"][data-key$=":name"]')].map((e) => e.value));
-  if (shown[2] !== '망상홈쇼핑') errorsAll.push(`[${vp}] own shown: ${JSON.stringify(shown)}`);
-  await page.evaluate(() => document.querySelectorAll('.gw .ms-fx')[2]?.scrollIntoView({ block: 'center' })); await sleep(200);
+  if (shown[3] !== '심야편의점') errorsAll.push(`[${vp}] own shown: ${JSON.stringify(shown)}`);
+  await page.evaluate(() => document.querySelectorAll('.gw .ms-fx')[3]?.scrollIntoView({ block: 'center' })); await sleep(200);
   await shot('settings-own');
   await closeEditor(page, true);
   await closeWin(page);

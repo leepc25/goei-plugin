@@ -1,16 +1,21 @@
 // 틀별 설정 표 (설정 개편 4단계): 게시판 표(괴담넷·괴담갤·세정게·연어 마켓)와 상점 표(기본 상점·우주 쇼핑몰·포인트몰·망상홈쇼핑).
 // 격자: 줄 = 메뉴, 칸 = 메뉴마다 있는 설정. 그 밖의 값은 같은 틀의 메뉴가 한 값을 같이 쓴다. 사이트에만 있는 줄은 그 사이트 페이지에 남는다.
-import { BOARD_NAME, BOARD_SITES, boardState, isBoardSite, type BoardSite } from '../core/boards';
+import { BOARD_NAME, BOARD_REF_CFG, BOARD_SITES, boardState, isBoardSite, type BoardSite } from '../core/boards';
+import { REF_CHIP_KEYS } from '../core/reffn';
+import { fnGrids, refChipLabels } from './fngrid';
 import { CFG, COUNT_RANGE, GN_DEFAULTS, STORAGE_MAX, gnetRetention, gnetSettings, type CountKey } from '../core/gnet';
 import { jointOn } from '../core/netjoint';
 import { MALL_NAME, mallSettings } from '../core/malls';
 import { HS_NAME, hsSettings } from '../core/homeshop';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO, shopBlocked, shopSettings, type ShopSettings } from '../core/shop';
+import { HS_MAIN_SET, hsMainSettings, type HsLogKind } from '../core/hslog';
+import { SHOP_MAIN_ALL, SHOP_MAIN_KINDS, SHOP_MAIN_LABEL, SHOP_MAIN_LINES, SHOP_PLACES, shopMain, shopMainLines, type ShopPlace } from '../core/shopctx';
 import { advChipsCtl, advCtl } from './advanced';
 import { advValue } from '../core/advanced';
+import { GIVE_SHOPS, SHOP_AMOUNTS, SHOP_FNS, SHOP_GIVE_KEYS, shopFnNone, shopFnNum, shopFnOn, shopGiveOn, type GiveShop } from '../core/shopfn';
 import { siteLogo } from './browser';
 import { ICONS } from './icons';
-import { ckWide, helpBox, mxGrid, numCtl, setGroup, setRow, setSeg, type CkBand } from './setrow';
+import { ckWide, helpBox, mxGrid, numCtl, numSet, setGroup, setRow, setSeg, stepSize, type CkBand } from './setrow';
 import type { ShopCol } from './settings';
 
 type State = Record<string, unknown> | undefined;
@@ -27,6 +32,7 @@ const nm = (icon: string, name: string) => `<span class="mx-name">${icon}<span>$
 const BOARD_PICK: Record<string, string[]> = {
   lazy: ['1', 'open', '0'], mode: ['1', '2'], context: ['0', '1'], privacy: ['0', '1', '2', '3', '4'], incoming: ['1', '0'],
   sampling: ['1', '0'], keyfigures: ['1', '0'], keepown: ['1', '0'], keepreplied: ['1', '0'], joint: ['1', '0'], storage: ['1', '0'],
+  ...Object.fromEntries(BOARD_REF_CFG.map((k) => [k, ['1', '0']])),
 };
 const BOARD_TEXT = ['subject', 'mood', 'protagonist'];
 
@@ -79,32 +85,43 @@ export function boardTable(state: State, busy = false): string {
     foot: helpBox('', [
       ['게시글 수', '새로고침 한 번에 새로 만드는 글의 수예요. 많을수록 토큰을 더 써요.'],
       ['새 글 댓글 수', '새로 만드는 글마다 달리는 댓글의 수예요.'],
-      ['활동 댓글 수', '새로고침이나 답장 때 지난 글에 새로 붙는 댓글의 수예요.'],
+      ['활동 댓글 수', '새 글·댓글·답장 때 지난 글에 새로 붙는 댓글의 수예요.'],
       ['선쪽지 받기', '켜면 게시판 사람이 먼저 쪽지를 보낼 수 있어요.'],
       ['선쪽지 확률', '새로고침 한 번에 선쪽지가 올 확률이에요.'],
     ]) };
 
-  /* ── 2. 네 게시판이 같이 쓰는 값: 한 번의 호출 순서대로 묶음 다섯. 값은 괴담넷 자리 하나 (core/boards.ts boardShared) ── */
+  /** 넘길 내용: 게시판마다의 칩 (값은 그 게시판 자리의 adv_ 칩, core/boards.ts BOARD_REF_CFG). 기능 표와 둘 다 켜진 것만 넘긴다 (core/reffn.ts) */
+  const refs: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: refChipLabels('gn'), kind: 'check' }],
+    marks: each((st) => REF_CHIP_KEYS.map((k) => advValue(st as never, 'gn', k) === '1')),
+    acts: each((st, site) => REF_CHIP_KEYS.map((k) => `b:${site}:adv_${k}=${advValue(st as never, 'gn', k) === '1' ? '0' : '1'}`)),
+    foot: helpBox('', [
+      ['상시 로어북', '조건 없이 늘 넘기는 로어북이에요.'],
+      ['관련 로어북', '지금 하는 작업과 최근 챗로그에 이름이 나온 로어북이에요. 토큰을 더 써요.'],
+      ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
+    ]) };
+
+  /* ── 2. 기능마다 따로 정하는 값: 줄 = 기능(요청 종류). 네 게시판이 한 값을 같이 쓴다 (core/reffn.ts) ── */
+  const byFn = fnGrids('gn', views[0], {
+    refs: helpBox('게시판 표와 기능 표에서 모두 켠 것만 넘겨요.'),
+    amount: helpBox('요청 토큰 상한을 넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요.', [
+      ['챗로그', '0이면 안 봐요.'],
+      ['지난 기록', '그 요청을 보낼 때 모델에 보여 주는 최근 기록의 수예요. 새로고침과 글 쓰기는 글, 댓글은 댓글, 쪽지는 쪽지예요.'],
+      ['요청 토큰 상한', '0이면 생성 공통 값을 따라요.'],
+    ]),
+  }, busy);
+
+  /* ── 3. 네 게시판이 같이 쓰는 값: 한 번의 호출 순서대로 묶음 넷. 값은 괴담넷 자리 하나 (core/boards.ts boardShared) ── */
   const st0 = views[0];
   /** 수는 전부 공통 규격의 「− 값 +」 상자 (세부 값 표의 조작 그대로) */
   const N = (k: string) => advCtl('gn', k, st0 as never);
   /** 같은 종류 수 여럿: 이름·상자 짝 */
-  const set = (items: [string, string][]) => `<div class="fam-set">${items.map(([l, c]) => `<span class="fam-set1"><span class="fam-l">${esc(l)}</span>${c}</span>`).join('')}</div>`;
+  const set = numSet;
   const SW = (k: string) => setSeg('adv-set', `gn:${k}`, advValue(st0 as never, 'gn', k) === '1' ? '1' : '0', ONOFF, busy);
   const C = (k: string, on: boolean) => setSeg('fam-set', `b:gn:${k}`, on ? '1' : '0', ONOFF, busy);
   const R = (label: string, ctl: string, lead = '', items: [string, string][] = []) => setRow(label, ctl, lead || items.length ? helpBox(lead, items) : '');
   const ret = gnetRetention(st0);
   const s0 = gnetSettings(st0);
 
-  const give = setGroup('모델에 넘기는 것', [
-    R('넘길 내용', advChipsCtl('gn', ['desc', 'authors', 'persona', 'active', 'related', 'secondary'], st0 as never), '', [
-      ['상시 로어북', '조건 없이 늘 넘기는 로어북이에요.'],
-      ['관련 로어북', '지금 하는 작업과 최근 챗로그에 이름이 나온 로어북이에요. 토큰을 더 써요.'],
-      ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
-    ]),
-    R('넘길 양', set([['챗로그', N('turns')], ['요청 토큰 상한', N('budget')]]), '요청 토큰 상한을 넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요.'),
-    R('요청별 지난 기록', set([['새로고침 때 글', N('refresh_posts')], ['답글 때 댓글', N('comments')], ['쪽지 때 쪽지', N('dm_history')]]), '그 요청을 보낼 때 모델에 보여 주는 최근 기록의 수예요.'),
-  ].join(''));
   const write = setGroup('모델이 쓰는 방식', [
     R('한 번에 요청', setSeg('fam-set', 'b:gn:joint', jointOn(state as never) ? '1' : '0', ONOFF, busy), '켜면 자동 호출이 「매 턴」이고 모델이 같은 게시판과 괴담톡을 한 요청으로 묶어요. 괴담톡 설정의 같은 줄과 한 값이에요.'),
     R('생각 단계', advCtl('gn', 'thoughts', st0 as never), '모델이 결과를 쓰기 전에 상황을 먼저 정리하게 해요.', [
@@ -133,8 +150,9 @@ export function boardTable(state: State, busy = false): string {
     R('최대 양', set([['게시글', N('ctx_post_count')], ['글마다 댓글', N('ctx_comment_count')], ['쪽지', N('ctx_dm_count')], ['토큰 상한', N('ctx_tokens')]]), '토큰 상한을 넘는 것은 빼요.'),
   ].join(''));
 
-  return `<h2 class="fam-h">게시판마다 따로 정하는 값</h2>${ckWide([call, priv], L, busy)}${texts}${ckWide([amount], L, busy)}`
-    + `<h2 class="fam-h">네 게시판이 같이 쓰는 값</h2>${give}${write}${limit}${keep}${attach}`;
+  return `<h2 class="fam-h">게시판마다 따로 정하는 값</h2>${ckWide([call, priv], L, busy)}${texts}${ckWide([amount], L, busy)}${ckWide([refs], L, busy)}`
+    + `<h2 class="fam-h">기능마다 따로 정하는 값</h2>${byFn}`
+    + `<h2 class="fam-h">네 게시판이 같이 쓰는 값</h2>${write}${limit}${keep}${attach}`;
 }
 
 /** 인터넷·상점 격자와 그 아래 줄의 단추. 게시판 값은 게시판 처리기(gn-*)에 사이트를 붙여 넘긴다 */
@@ -171,7 +189,7 @@ const SHOP_ROWS: { id: ShopCol; name: string; icon: string }[] = [
 ];
 const isShopCol = (v: string): v is ShopCol => SHOP_ROWS.some((r) => r.id === v);
 
-/** 설정 → 상점: 상점마다 따로 정하는 값(격자) + 네 곳이 같이 쓰는 값 + 기본 상점에만 있는 값의 머리.
+/** 설정 → 상점: 상점마다 따로 정하는 값(격자) + 기능마다 따로 정하는 값(격자) + 네 곳이 같이 쓰는 값 + 기본 상점에만 있는 값의 머리.
  *  vars = 그 페이지의 범위(이 채팅 · 시작 전에는 새 채팅 기본값)의 변수 */
 export function shopTable(vars: State, busy = false): string {
   const v = vars as never;
@@ -208,15 +226,70 @@ export function shopTable(vars: State, busy = false): string {
   const price = mxGrid([{ name: '모델에 알려 줄 말' }], SHOP_ROWS.map(({ id, name, icon }) => ({ label: nm(icon, name), cells: [text('fam-text', `s:${id}:price`, set[id].price, '', 80, `${name} 값 기준`, busy)] })),
     helpBox('물건값을 매길 때 모델이 따를 기준이에요. 비우면 그곳에 어울리는 값으로 매겨요.'), '값 기준');
 
-  /* ── 2. 네 곳이 같이 쓰는 값: 기본 상점 자리의 값 하나 (core/shop.ts SHOP_SHARED_VARS) ── */
+  /* ── 1-2. 메인 요청에 붙이는 것 (상점 → 메인 요청, core/shopctx.ts): 줄 = 가게, 칸 = 그 가게에서 생기는 것. 없는 것은 빈 칸 (2026-11-12 사용자: 「메뉴마다 다른데」).
+   *  맨 앞 「컨텍스트 포함」은 게시판 격자의 같은 칸과 같은 조작(그 가게 것 전부 켬/끔). 꺼지면 그 줄의 나머지 칸은 잠긴다. 망상홈쇼핑 줄은 칸이 달라 따로 붙인다 ── */
+  const places = SHOP_ROWS.filter((r): r is { id: ShopPlace; name: string; icon: string } => (SHOP_PLACES as string[]).includes(r.id));
+  // 망상홈쇼핑 줄 (2026-11-13): 방송에서 생기는 것은 다른 가게와 달라 칸 셋(방송 내용·시청자 채팅·내 채팅)을 더한다. 주문은 「구매」 칸. 값은 core/hslog.ts ($hs_main·$hs_main_kinds·$hs_main_tokens)
+  const hsRow = SHOP_ROWS.find((r) => r.id === 'hs')!;
+  const hm = hsMainSettings(v);
+  const HS_EXTRA: [HsLogKind, string][] = [['show', '방송 내용'], ['chat', '시청자 채팅'], ['say', '내 채팅']];
+  const hsCell = (k: HsLogKind) => hm.kinds.includes(k);
+  const hsAct = (k: HsLogKind) => (hm.on ? `s:hs:main_hs_${k}=${hsCell(k) ? '0' : '1'}` : null);
+  const attach: CkBand = { title: '메인 요청에 붙이는 것', groups: [
+    { name: '메인 요청', opts: ['컨텍스트 포함'], kind: 'check' },
+    { name: '붙일 것', opts: [...SHOP_MAIN_ALL.map((k) => SHOP_MAIN_LABEL[k]), ...HS_EXTRA.map(([, l]) => l)], kind: 'check' },
+  ], marks: [
+    ...places.map(({ id }) => { const m = shopMain(v, id); return [m.on, ...SHOP_MAIN_ALL.map((k) => (SHOP_MAIN_KINDS[id].includes(k) ? m.kinds[k] : null)), ...HS_EXTRA.map(() => null)]; }),
+    [hm.on, ...SHOP_MAIN_ALL.map((k) => (k === 'buy' ? hsCell('buy') : null)), ...HS_EXTRA.map(([k]) => hsCell(k))],
+  ],
+    acts: [
+      ...places.map(({ id }) => { const m = shopMain(v, id); return [`s:${id}:main=${m.on ? '0' : '1'}`, ...SHOP_MAIN_ALL.map((k) => (m.on && SHOP_MAIN_KINDS[id].includes(k) ? `s:${id}:main_${k}=${m.kinds[k] ? '0' : '1'}` : null)), ...HS_EXTRA.map(() => null)]; }),
+      [`s:hs:main=${hm.on ? '0' : '1'}`, ...SHOP_MAIN_ALL.map((k) => (k === 'buy' ? hsAct('buy') : null)), ...HS_EXTRA.map(([k]) => hsAct(k))],
+    ],
+    foot: helpBox('켜면 그 상점에서 한 일을 다음 메인 요청에 한 번 붙여요. 망상홈쇼핑은 다음 편성을 받기 전까지 본 방송 기록을 메인 요청마다 붙여요. 본문을 상점 모델에 넘기는 「맥락 반영」과는 방향이 반대예요.', [
+      ['문의', '주인이나 운영자와 나눈 말이에요. 기본 상점은 거래가 끊긴 일도, 우주 쇼핑몰은 문의 창에서 물건을 판 일도 여기에 들어요.'],
+      ['맞춤 주문', '주문한 일, 완성된 일, 받은 물건이에요. 완성된 일은 우주 쇼핑몰 설정의 「완성 알림」이 「카드 + 메인 요청」일 때만 붙어요.'],
+      ['방송 내용', '망상홈쇼핑에서 본 편성 제목, 상품, 진행자 대사예요.'],
+      ['내 채팅', '방송 채팅에 내가 친 말과 거기에 돌아온 반응이에요.'],
+    ]) };
+  const numBox = (key: string, n: number, lo: number, hi: number, unit: string, label: string) => `<div class="st-step adv-step${stepSize(hi, unit, '제한 없음')}"><button class="gx-step" data-action="fam-num" data-value="${key}=${Math.max(lo, n - 1)}" ${n <= lo || busy ? 'disabled' : ''} aria-label="최대 양 ${label} 줄이기">−</button><input class="adv-val" type="number" inputmode="numeric" min="${lo}" max="${hi}" step="1" data-change="fam-num" data-key="${key}" value="${n === 0 ? '' : n}" placeholder="제한 없음" aria-label="최대 양 ${label}"${busy ? ' disabled' : ''}><span>${unit}</span><button class="gx-step" data-action="fam-num" data-value="${key}=${Math.min(hi, n + 1)}" ${n >= hi || busy ? 'disabled' : ''} aria-label="최대 양 ${label} 늘리기">+</button></div>`;
+  const HT = HS_MAIN_SET.tokens;
+  const attachMax = setGroup('', setRow('최대 양', numSet([['대화', numBox('s:shop:main_lines', shopMainLines(v), SHOP_MAIN_LINES.min, SHOP_MAIN_LINES.max, '줄', '대화')], [HS_NAME, numBox('s:hs:main_tokens', hm.tokens, HT.lo, HT.hi, HT.unit, HS_NAME)]]), helpBox('', [
+    ['대화', '「문의」와 「1:1 상담」으로 붙이는 대화의 줄 수예요. 넘으면 최근 줄만 붙여요.'],
+    [HS_NAME, '망상홈쇼핑에서 붙이는 것의 토큰 상한이에요. 넘으면 오래된 시청자 채팅부터 빼요.'],
+  ])));
+  /* ── 1-2. 가게 표: 줄 = 가게 넷, 칸 = 넘길 내용 여섯 + 맥락 반영 (core/shopfn.ts) ── */
+  const GIVE_OPTS = ['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영'];
+  const giveRows = SHOP_ROWS.filter((r) => (GIVE_SHOPS as string[]).includes(r.id));
+  const giveShop: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: GIVE_OPTS, kind: 'check' }],
+    marks: giveRows.map((r) => SHOP_GIVE_KEYS.map((k) => shopGiveOn(v, r.id as GiveShop, k))),
+    acts: giveRows.map((r) => SHOP_GIVE_KEYS.map((k) => `s:${r.id}:${k === 'ctx' ? 'ctx' : `give_${k}`}=${shopGiveOn(v, r.id as GiveShop, k) ? '0' : '1'}`)),
+    foot: helpBox('가게 표와 기능 표에서 모두 켠 것만 넘겨요.', [
+      ['상시 로어북', '조건 없이 늘 넘기는 로어북이에요.'],
+      ['관련 로어북', '가게 이름과 최근 챗로그에 이름이 나온 로어북이에요. 토큰을 더 써요.'],
+      ['2차 참조', '관련 로어북의 글 안에 이름이 나온 다른 로어북이에요. 토큰을 더 써요.'],
+      ['맥락 반영', '켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'],
+    ]) };
+  /* ── 2. 기능마다 따로 정하는 값: 줄 = 진열·문의·1:1 상담·채팅 반응(망상홈쇼핑). 가게들이 한 값을 같이 쓴다 ($sh_fn_*) ── */
+  const FL = SHOP_FNS.map((f) => nm('', f.label));
+  const giveFn: CkBand = { title: '넘길 내용', groups: [{ name: '', opts: GIVE_OPTS, kind: 'check' }],
+    marks: SHOP_FNS.map((f) => SHOP_GIVE_KEYS.map((k) => (shopFnNone(f.key, k) ? null : shopFnOn(v, f.key, k)))),
+    acts: SHOP_FNS.map((f) => SHOP_GIVE_KEYS.map((k) => (shopFnNone(f.key, k) ? null : `s:shop:fn_${f.key}_${k}=${shopFnOn(v, f.key, k) ? '0' : '1'}`))),
+    foot: helpBox('가게 표와 기능 표에서 모두 켠 것만 넘겨요. 「–」는 그곳에 없는 값이에요.') };
+  const AMT = ['turns', 'refs'] as const;
+  const amountFn: CkBand = { title: '넘길 양', groups: AMT.map((k) => ({ name: SHOP_AMOUNTS[k].label, opts: [SHOP_AMOUNTS[k].unit], kind: 'num' as const })),
+    marks: SHOP_FNS.map((f) => AMT.map((k) => ({ n: shopFnNum(v, f.key, k), lo: SHOP_AMOUNTS[k].min, hi: SHOP_AMOUNTS[k].max }))),
+    acts: SHOP_FNS.map((f) => AMT.map((k) => `s:shop:fn_${f.key}_${k}`)),
+    foot: helpBox('', [
+      ['챗로그', '맥락 반영이 켜져 있을 때 넘기는 최근 턴의 수예요. 꺼져 있어도 관련 로어북을 고를 때는 이만큼 읽어요.'],
+      ['참조 로어북', '관련 로어북과 2차 참조 가운데 넘기는 수예요.'],
+    ]) };
+  const fnPart = `<h2 class="fam-h">기능마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([giveFn], FL, busy)}${ckWide([amountFn], FL, busy)}</div>`;
+
+  /* ── 3. 네 곳이 같이 쓰는 값: 기본 상점 자리의 값 하나 (core/shop.ts SHOP_SHARED_VARS) ── */
   const s0 = set.shop;
   const R = (label: string, ctl: string, lead = '', items: [string, string][] = []) => setRow(label, ctl, lead || items.length ? helpBox(lead, items) : '');
   const sw = (k: string, on: boolean) => setSeg('fam-set', `s:shop:${k}`, on ? '1' : '0', ONOFF, busy);
-  const give = setGroup('모델에 넘기는 것', [
-    R('맥락 반영', sw('ctx', s0.context), '켜면 최근 챗로그, 상태창, 진행 중인 괴이, 신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'),
-    R('챗로그 포함', numCtl('s:shop:turns', { n: s0.turns, lo: 1, hi: 8 }, '챗로그 포함', '턴', busy), '맥락 반영이 켜져 있을 때 넘기는 최근 턴의 수예요. 꺼져 있어도 참조 로어북을 고를 때는 이만큼 읽어요.'),
-    R('참조 로어북', numCtl('s:shop:refs', { n: s0.refs, lo: 0, hi: 12 }, '참조 로어북', '개', busy), '봇 설명, 켜진 로어북, 가게 이름이 걸리는 로어북 가운데 넘기는 수예요.'),
-  ].join(''));
   const write = setGroup('모델이 쓰는 방식', [
     R('생각 단계', setSeg('fam-set', 's:shop:thoughts', s0.thoughts, THOUGHTS, busy), '모델이 결과를 쓰기 전에 상황을 먼저 정리하게 해요.', [
       ['속으로만', '정리하되 적지 않게 해요.'],
@@ -228,5 +301,5 @@ export function shopTable(vars: State, busy = false): string {
   const note = blocked ? `<p class="gx-hint">${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 기본 상점과 쇼핑몰 둘을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>` : '';
   /* ── 3. 기본 상점에만 있는 값: 거래 끊음 + (ui/settings.ts 가 잇는) 열리는 조건 ── */
   const own = s0.on ? `<h2 class="fam-h">기본 상점에만 있는 값</h2>${setGroup('', R('거래 끊음', sw('kick', s0.kick), '켜면 주인이 모욕이나 끝없는 흥정에 거래를 끊을 수 있어요.'))}` : '';
-  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}</div><h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${give}${write}${own}`;
+  return `${note}<h2 class="fam-h">상점마다 따로 정하는 값</h2><div class="fam-wide">${ckWide([call, shelf], L, busy)}${price}${ckWide([giveShop], giveRows.map(({ name, icon }) => nm(icon, name)), busy)}${ckWide([attach], [...places, hsRow].map(({ name, icon }) => nm(icon, name)), busy)}${attachMax}</div>${fnPart}<h2 class="fam-h">네 곳이 같이 쓰는 값</h2>${write}${own}`;
 }

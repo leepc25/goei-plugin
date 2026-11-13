@@ -2,13 +2,15 @@
 // 모델은 여기서 부르지 않는다 (host/people.ts). 모든 판정은 결정적이라 시험할 수 있다.
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
+import { guideOr } from '../guides';
 import { scanAgents } from '../world/tags';
 import { findStatusTags } from '../world/status';
-import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
+import { addressOf, affinityView, opennessOf, tasteOf, type AffinityOpts } from './affinity';
 import { SPEECH_ENTRY_CHARS, applySpeechSign, parseSpeechMarker, speechVariety } from './speech';
 import { SEXUAL_FIELDS, SEXUAL_AXIS_OF, explicitOn, isSexualAxis, sexualAnyOn, sexualFieldOn, sexualGlobal, setSexualText } from './sexual';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
+import { temperOf } from './base';
 import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
 import { axesView, ensureAxes, isAxis, isDirection, observe, readAxes, setAxes, pruneCandidates } from './axes';
 import { AXES } from './types';
@@ -16,7 +18,8 @@ import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFaction
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
 import { mentionsPoints, parsePoints } from '../points';
-import { cleanIcon, itemEquip, itemState, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
+import { cleanIcon, itemsRule, itemEquip, itemState, stripGrades, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
+import { leftWordIn, offWordIn } from '../itemrules';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -82,6 +85,8 @@ export interface UpdateInput {
   points: boolean;
   /** 소지품 절 켜짐(설정 「보조 모델이 읽기」)이면 지금 목록의 이름들, 꺼져 있으면 null. update·gone 은 이 이름만 받는다 */
   items: string[] | null;
+  /** 지금 장착 칸에 놓인 물건 이름 (unequip 검사) */
+  itemsWorn?: string[];
   /** 이 묶음에서 「사용」한 물건 (자료 used_now). 인용 없이도 그 응답을 기준으로 받는다 */
   used: UsedNow[];
   /** 상점 판단 (설정 「상점 판단」이 갱신기일 때, core/shop.ts shopJudgeBy): 판단할 응답의 m 꼬리표. 없으면 null */
@@ -89,18 +94,22 @@ export interface UpdateInput {
 }
 
 /** 소지품 절 자료: 지금 가진 것 (core/items.ts). 판정(사용·남은 횟수·장착)과 상태를 같이 준다 */
-export interface ItemNow { name: string; desc: string; use: boolean; left?: number; weight?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState }
+export interface ItemNow { name: string; desc: string; use: boolean; left?: number; weight?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState; /** 상태에 따라 그림이 여러 장인 물건: 고를 수 있는 그림 이름들 */ pictures?: string[] }
 
-const CUE_MEANING: Record<Cue, string> = {
-  작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
-  실망: '실제로 생긴 작은 실망', 무시: '분명한 무시·무례, 믿음에 금', 배신: '의미 있는 배신·굴욕', 파탄: '심각한 신뢰·관계 파괴', 중대위반: '설정상 용서받기 어려운 일',
-};
+// 계기 뜻풀이는 지침 표에만 둔다 — 자료에 같은 뜻을 두 번 싣지 않음 (전수검사 11-13)
 
 /** 응답 본문 정리: 상태창·상황판 태그·플러그인 표식은 messageText 가 지운다. 길면 중간을 접는다 */
 export function cleanSpan(raw: string, cap: number): string {
   let t = String(raw ?? '');
   for (const tag of findStatusTags(t)) t = t.replace(tag.raw, '');
-  t = messageText(t).replace(/\n{3,}/g, '\n\n').trim();
+  // 생각·주석·그림 태그·상점 표식도 뺀다 (store.ts messageHash 와 같은 것. 지침은 「지웠다」고 말한다) (전수검사 11-13)
+  t = messageText(t)
+    .replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<img\s*=[^>]*>/g, '')
+    .replace(/\[\s*shop\s*[:：][^\]]*\]/giu, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   if (t.length <= cap) return t;
   const head = t.slice(0, Math.floor(cap * 0.6));
   const tail = t.slice(-Math.floor(cap * 0.35));
@@ -113,14 +122,15 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string>; sexual?: PeopleSettings } = {}) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string>; sexual?: PeopleSettings; aff?: AffinityOpts; folded?: number } = {}) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string; pin?: true }[]> = {};
   for (const s of extra.slots ?? SLOTS) {
     const list = liveEntries(p.slots[s], live);
     if (!list.length) continue;
     entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}), ...(e.pin ? { pin: true as const } : {}) }));
   }
-  const aff = affinityView(p, changes, 0, { turnCap: extra.turnCap });
+  // 본편·Director 와 같은 계수(temper·speed·speedDown)·접힌 값으로 계산 (전수검사 11-13)
+  const aff = affinityView(p, changes, extra.folded ?? 0, extra.aff ?? { turnCap: extra.turnCap });
   const addr = addressOf(p, changes);
   return {
     name: p.name,
@@ -172,13 +182,16 @@ export interface BuildOpts {
   items?: ItemNow[] | null;
   /** 이 묶음 응답에서 「사용」 자리로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 소모성 횟수는 프로그램이 이미 뺐다 */
   used?: UsedNow[];
+  /** 치워 둔 물건 (두고 옴·버림·잃음, core/items.ts itemsAwayOf). 자료 items_away: 되찾으면 이 이름 그대로 new 를 쓰게 */
+  away?: { name: string; place?: string }[];
   /** 상점 판단 (갱신기가 판단할 때): 판단할 응답 위치(가장 최근 응답)와 주인공 이름들 */
   shop?: { at: number; self: string[] } | null;
 }
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
 export const REVIEW_TURNS = 20;
-const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
+// 단서 무게는 지침·원본 리수폿 값 (약 +2·중 +5·강 +10). 닫기: 확인 → 80 이상, 해소 → 0, 묻음 → 그대로. 다시 열면 옛 점수 유지 (사용자 결정 11-13)
+const SUSP_WEIGHT: Record<string, number> = { 약: 2, 중: 5, 강: 10, '-약': -2, '-중': -5, '-강': -10 };
 /** 의심 사례 요약: 같은 대상·종류의 살아 있는 항목을 한 사례로. score 는 코드가 단서 무게로 계산 */
 export function suspicionCases(p: Person, live: Liveness) {
   const list = liveEntries(p.slots.suspicion, live);
@@ -189,13 +202,21 @@ export function suspicionCases(p: Person, live: Liveness) {
     let score = 0;
     let stage = '';
     let closed = false;
+    let started = false;
     for (const e of es) {
       const m = /^\[(시작|단서|반응|해소)(?:·([^\]]+))?\]/.exec(e.text);
       if (!m) continue;
-      if (m[1] === '시작') (score += 10), (closed = false);
-      else if (m[1] === '단서') score += SUSP_WEIGHT[m[2] ?? ''] ?? 10;
+      if (m[1] === '시작') {
+        if (!started) score += 10;
+        started = true;
+        closed = false;
+      } else if (m[1] === '단서') score += SUSP_WEIGHT[m[2] ?? ''] ?? 2;
       else if (m[1] === '반응') stage = m[2] ?? stage;
-      else if (m[1] === '해소') closed = true;
+      else if (m[1] === '해소') {
+        closed = true;
+        if (m[2] === '확인') score = Math.max(score, 80);
+        else if (m[2] === '해소') score = 0;
+      }
     }
     return { who: p.name, target, kind, status: closed ? 'closed' : 'open', score: Math.max(0, Math.min(100, score)), stage, text: es.at(-1)?.text ?? '' };
   });
@@ -258,7 +279,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     for (const a of scanAgents(str(lastBot.data))) {
       const b = before.get(a.who);
       if (b && b.state !== a.state && store.people[a.who]) {
-        signals.push({ who: a.who, tag: '상태', from: b.state, to: a.state, note: 'Record how and why in `state`; add one `history` line.' });
+        signals.push({ who: a.who, tag: '상태', from: b.state, to: a.state, note: signalStateNote() });
         push(a.who);
       }
     }
@@ -289,12 +310,13 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const shopM = o.shop && !o.only?.length && confirmedIdx.has(o.shop.at) ? [...tags].find(([, i]) => i === o.shop!.at)?.[0] ?? '' : '';
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
-    cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
+    // 세력 평판 수치도 같은 계기 이름을 쓴다: 호감이 글로만·꺼짐이어도 세력 수치가 켜져 있으면 넣는다 (전수검사 11-13)
+    cues: (o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity')) || (o.settings.features.has('faction_rep') && !o.settings.factionQual) ? CUES : [],
     slots: slotsFor(o.settings.features, o.settings.qualitative),
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings, aff: { temper: temperOf(n), speed: o.settings.speed, speedDown: o.settings.speedDown, turnCap: o.settings.turnCap }, folded: store.folded[n] ?? 0 }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     ...(o.hints?.length ? { name_hints: o.hints.filter((h) => !store.people[h.name]).slice(0, 12) } : {}),
@@ -306,7 +328,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
     ...(clock ? { rhythm_clock: rhythmClockLines(clock) } : {}),
     ...(review.length ? { relationship_review: review } : {}),
-    ...(tracked.some((n) => chosen.includes(n)) ? { tracking_review: { refs: tracked.filter((n) => chosen.includes(n)), rule: 'Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.' } } : {}),
+    ...(tracked.some((n) => chosen.includes(n)) ? { tracking_review: { refs: tracked.filter((n) => chosen.includes(n)), rule: trackingRule() } } : {}),
     factions_now: o.settings.features.has('faction_rep')
       ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return o.settings.factionQual ? { code: f.code, name: f.name, stage: f.stage.label, stage_en: f.stage.id, ...(f.note ? { reason: f.note } : {}) } : { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
       : undefined,
@@ -324,15 +346,26 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
     items_now: o.items
-      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
+      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
       : undefined,
+    // 물건으로 만드는 범위·만들지 않을 것 (설정 → 소지품, core/items.ts itemsRule)
+    items_rule: o.items ? itemsRule(chat.scriptstate) : undefined,
+    items_away: o.items && o.away?.length ? o.away.map((e) => ({ name: e.name, place: e.place || undefined })) : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
     // 상점 판단 (11-09): 가장 최근 응답 끝에 주인공이 물건을 살 수 있는 곳이 있나. 기준 글은 지침 「상점」 SHOP_RULE (본편 표식 지침과 같은 글)
     shop_check: shopM ? { m: shopM, protagonist: o.shop!.self.filter(Boolean) } : undefined,
     want: { shop: !!shopM || undefined, new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', point_transactions: typeof o.points === 'number' || undefined, items: !!o.items },
   };
-  return { shop: shopM ? { m: shopM } : null, system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
+  return { shop: shopM ? { m: shopM } : null, system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, itemsWorn: o.items ? o.items.filter((e) => e.equipped).map((e) => e.name) : [], used: o.items ? o.used ?? [] : [] };
 }
+
+// ── 자료에 싣는 안내 글: 지침 「인물 기록 갱신기(덧붙임)」의 절 (설정 → 지침에서 고침). 절이 없으면 여기 남긴 글 ──
+/** 태그 신호(요원 상태가 바뀜)의 note */
+export const signalStateNote = (): string => guideOr('UpdaterExtra', 'SIGNAL_STATE', 'Record how and why in `state`; add one `history` line.');
+/** 추적 인물 검토 규칙 (tracking_review.rule) */
+export const trackingRule = (): string => guideOr('UpdaterExtra', 'TRACKING_RULE', 'Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.');
+/** 고쳐 둔 갱신기 지침에 상점 절이 없을 때 덧붙이는 출력 칸 안내 (host/people.ts updaterSystem) */
+export const shopKeyLine = (): string => guideOr('UpdaterExtra', 'SHOP_KEY', 'Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.');
 
 // ── 지침 조립 ──
 
@@ -351,7 +384,8 @@ export function sectionBody(text: string, name: string): string | null {
 }
 export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', extra = '', sexualRules = ''): string {
   // extra: 설정으로 켠 덧붙임 지침(말투 다변화 등). 사용자 지침보다 앞에 둔다 (원본 V3: 내장 규칙이 사용자 규칙 앞)
-  const rules = [lang === 'en' ? LANG_EN_RULE : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
+  // 기록 언어 규칙은 지침 「인물 기록 갱신기(덧붙임)」 LANG_EN 절. 절이 없으면 위 글
+  const rules = [lang === 'en' ? guideOr('UpdaterExtra', 'LANG_EN', LANG_EN_RULE) : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
@@ -404,7 +438,7 @@ export interface UpdateResult {
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   point_transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소지품: 본문에 분명히 적힌 얻음(new)·상태 바뀜(update)·없어짐(gone)만. update·gone 은 목록의 이름 그대로 */
-  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; weight?: number | string | null; m: string; quote: string }[];
+  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; weight?: number | string | null; place?: string | null; m: string; quote: string }[];
   /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
   observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
   /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
@@ -429,6 +463,8 @@ export function parseUpdate(raw: string): UpdateResult {
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
   for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'faction_stance', 'transactions', 'point_transactions', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
+    // null 은 빈 목록으로 받는다 (응답 전체를 버리지 않게, 전수검사 11-13). 글·객체는 그대로 오류
+    if (r[k] === null) delete (r as Record<string, unknown>)[k];
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -456,11 +492,12 @@ export interface ApplyReport {
 export interface ItemChange {
   anchor: string;
   name: string;
-  action: 'new' | 'update' | 'gone' | 'destroyed';
+  /** unequip = 벗음·내려놓음(아직 지님), left = 두고 옴·맡김(place), gone = 버림·잃음·줌, destroyed = 파괴 */
+  action: 'new' | 'update' | 'unequip' | 'left' | 'gone' | 'destroyed';
   desc: string;
   effect: string;
   quote: string;
-  /** 판정 (new 에서 정하고, update 에서는 준 칸만 바꾼다). uses: new 는 처음 횟수, update 는 지금 남은 횟수 */
+  /** 판정 (new 에서만 — 갈래는 들어올 때 정한다. update 에서는 받지 않는다). uses: new 는 처음 횟수, update 는 지금 남은 횟수 */
   use?: boolean;
   uses?: number;
   /** null = 장착 갈래 없음 */
@@ -469,6 +506,8 @@ export interface ItemChange {
   icon?: string;
   /** 무게 kg (new 에서 정하고, update 에서는 바뀌었을 때만) */
   weight?: number;
+  /** left: 두고 온 자리 (≤30) */
+  place?: string;
 }
 
 export interface ApplyCtx {
@@ -695,10 +734,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('entry', e, '고정된 항목', who);
         continue;
       }
-      if (!/끝|해소|풀|지켰|이행|완료|회복|나았|돌아|밝혀|밝혔|사라|아니었|아님|취소|resolved|done|no longer|healed|revealed/i.test(e.quote + ' ' + (e.text ?? ''))) {
-        report.held.push({ kind: 'entry', who, reason: '삭제 근거가 분명하지 않음', item: e });
-        continue;
-      }
+      // 낱말 검사는 뺐다: 인용이 실제 메시지에 있으면 바로 해소 (전수검사 11-13, 사용자 12-1)
       // 삭제 = 빈 텍스트로 대체하는 항목 (대체 항목이 죽으면 이전 항목이 돌아온다)
       const seq = nextSeq(ev.anchor);
       putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, `-${target.id}`), text: `(해소) ${target.text}`.slice(0, 200), src: 'story', anchor: ev.anchor, seq, quote: e.quote, replaces: target.id, ...(target.target ? { target: target.target } : {}) });
@@ -720,8 +756,17 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     let replaces: string | undefined;
-    if (op === 'upsert') {
-      const target = cur.find((x) => x.id === e.replace);
+    // replace 없는 upsert (전수검사 11-13: 안내서대로 처음 쓰는 항목이 버려졌다): 같은 대상의 항목이 없으면 add, 대상 칸에 하나뿐이면 그것을 고친다
+    const rid = typeof e.replace === 'string' ? e.replace.trim() : '';
+    let opx = op;
+    let found: (typeof cur)[number] | undefined;
+    if (op === 'upsert' && !rid) {
+      const same = meta.targeted ? cur.filter((x) => (x.target ?? '@user') === (target ?? '@user')) : cur;
+      if (!same.length) opx = 'add';
+      else if (meta.targeted && target && same.length === 1) found = same[0];
+    } else if (op === 'upsert') found = cur.find((x) => x.id === rid);
+    if (opx === 'upsert') {
+      const target = found;
       if (!target) {
         drop('entry', e, 'replace 가 실제 항목이 아님', who);
         continue;
@@ -744,7 +789,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         continue;
       }
       replaces = target.id;
-    } else if (op === 'add') {
+    } else if (opx === 'add') {
       if (slot === 'speech') text = applySpeechSign('', text, variety);
       if (cur.some((x) => similar(x.text, text))) {
         drop('entry', e, '같은 뜻의 항목이 이미 있음', who);
@@ -1071,8 +1116,11 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     let replaces: string | undefined;
-    if (d.op === 'upsert' || d.op === 'remove') {
-      const target = cur.find((x) => x.id === d.replace);
+    // replace 없는 upsert: 문서가 비어 있으면 add, 항목이 하나뿐이면 그것을 고친다 (전수검사 11-13)
+    const drid = typeof d.replace === 'string' ? d.replace.trim() : '';
+    const dop = d.op === 'upsert' && !drid && cur.length === 0 ? 'add' : d.op;
+    if (dop === 'upsert' || dop === 'remove') {
+      const target = drid ? cur.find((x) => x.id === drid) : dop === 'upsert' && cur.length === 1 ? cur[0] : undefined;
       if (!target) {
         drop('doc', d, 'replace 가 실제 항목이 아님');
         continue;
@@ -1083,16 +1131,16 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       }
       replaces = target.id;
     }
-    if (d.op !== 'remove' && !text) {
+    if (dop !== 'remove' && !text) {
       drop('doc', d, '본문 없음');
       continue;
     }
-    if (d.op === 'add' && cur.some((x) => similar(x.text, text))) {
+    if (dop === 'add' && cur.some((x) => similar(x.text, text))) {
       drop('doc', d, '같은 뜻의 항목이 이미 있음');
       continue;
     }
     const seq = nextSeq(ev.anchor);
-    const body = d.op === 'remove' ? `(해소) ${cur.find((x) => x.id === replaces)!.text}`.slice(0, 200) : text;
+    const body = dop === 'remove' ? `(해소) ${cur.find((x) => x.id === replaces)!.text}`.slice(0, 200) : text;
     if (putDoc(store, type, key, { id: entryId(`${type}:${key}`, 'doc', ev.anchor, seq, body), text: body, src: 'story', anchor: ev.anchor, seq, ...(norm(str(d.quote)).length >= 3 ? { quote: d.quote } : {}), ...(replaces ? { replaces } : {}), ...(d.date ? { date: plain(d.date, 20) } : {}), ...(d.place ? { place: plain(d.place, 40) } : {}), ...(Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {}) })) report.applied.docs++;
   }
 
@@ -1131,9 +1179,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('suspicion', s, '같은 뜻의 항목이 이미 있음', who);
         continue;
       }
-      // close 는 그 대상·종류의 살아 있는 항목을 모두 대체 (하나로 접음)
-      const replaces = s.op === 'close' ? cur.at(-1)?.id : undefined;
-      if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind, ...(replaces ? { replaces } : {}) })) report.applied.suspicion++;
+      // close 는 앞 항목을 대체하지 않는다: 대체하면 마지막 단서 무게가 점수에서 빠진다 (사용자 결정 11-13)
+      if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind })) report.applied.suspicion++;
     }
   }
 
@@ -1298,46 +1345,63 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('items', t, '이름 없음');
         continue;
       }
-      if (action !== 'new' && action !== 'update' && action !== 'gone' && action !== 'destroyed') {
-        drop('items', t, '모르는 action');
+      if (action !== 'new' && action !== 'update' && action !== 'unequip' && action !== 'left' && action !== 'gone' && action !== 'destroyed') {
+        drop('items', t, '모르는 action', name);
         continue;
       }
-      // 「사용」한 물건(used_now)은 인용이 없어도 그 응답을 기준으로 받는다 (프로그램이 이미 아는 사실)
-      const usedAt = (input.used ?? []).find((u) => sameItemName(u.name, name));
+      // 「사용」한 물건(used_now)은 인용이 없어도 그 응답을 기준으로 받는다 (프로그램이 이미 아는 사실). 벗음·두고 옴은 늘 인용이 있어야 한다
+      const usedAt = action === 'unequip' || action === 'left' ? undefined : (input.used ?? []).find((u) => sameItemName(u.name, name));
       const ev0 = evidence(str(t.m), str(t.quote));
       const ev = typeof ev0 === 'string' && usedAt ? { anchor: usedAt.anchor, index: -1 } : ev0;
       if (typeof ev === 'string') {
-        drop('items', t, ev);
+        drop('items', t, ev, name);
         continue;
       }
       const listed = has(name);
       if (action !== 'new' && !listed) {
-        drop('items', t, '목록에 없는 이름');
+        drop('items', t, '목록에 없는 이름', name);
+        continue;
+      }
+      if (action === 'unequip' && !(input.itemsWorn ?? []).some((x) => sameItemName(x, name))) {
+        drop('items', t, '장착하지 않은 물건', name);
         continue;
       }
       if (seen.has(norm(listed ?? name))) {
-        drop('items', t, '같은 물건 중복');
+        drop('items', t, '같은 물건 중복', name);
         continue;
       }
       if (report.items.length >= 4) {
-        drop('items', t, '한 번에 4개까지');
+        drop('items', t, '한 번에 4개까지', name);
         continue;
       }
       seen.add(norm(listed ?? name));
+      const act = action === 'new' && listed ? 'update' : (action as ItemChange['action']);
       const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase());
       const uses = t.uses === undefined || t.uses === null ? undefined : str(t.uses).trim() === '0' ? 0 : itemUses(t.uses);
       const cond = t.condition ? str(t.condition).trim().toLowerCase() : '';
       const icon = cleanIcon(t.icon);
       const weight = t.weight === undefined || t.weight === null ? undefined : itemWeight(t.weight);
+      // 등급은 본문이 정한다 (2026-11-12 사용자): 갱신기가 이름·설명에 넣은 등급 말(「B등급」「어둠 등급」)은 인용에 그 등급이 적혀 있을 때만 둔다. 없으면 그 말만 뺀다
+      const quote = str(t.quote);
+      const nameCut = act === 'new' ? stripGrades(name, quote) : { text: name, cut: [] };
+      const descCut = stripGrades(plain(t.desc, 80), quote);
+      if (nameCut.cut.length || descCut.cut.length) drop('items', t, `본문에 없는 등급 말을 뺌: ${[...nameCut.cut, ...descCut.cut].join(', ')}`, name);
+      const outName = act === 'new' ? nameCut.text || name : listed ?? name;
+      const place = plain(t.place, 30);
+      // 가진 물건을 또 얻은 new(→ update): uses 는 「받은 수」라 남은 횟수로 덮지 않는다. 설명의 두고 옴·벗음 말이 안전망에 걸리지 않게 그 설명도 뺀다 (전수검사 11-13)
+      const more = action === 'new' && !!listed;
+      const desc = more && (leftWordIn(descCut.text) || offWordIn(descCut.text)) ? '' : descCut.text;
       report.items.push({
-        anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : (action as ItemChange['action']),
-        desc: plain(t.desc, 80), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
-        ...(typeof t.usable === 'boolean' ? { use: t.usable } : /^(true|false)$/i.test(str(t.usable).trim()) ? { use: /^true$/i.test(str(t.usable).trim()) } : {}),
-        ...(uses !== undefined ? { uses } : {}),
-        ...(eq !== undefined ? { equip: eq ?? null } : {}),
+        anchor: ev.anchor, name: outName, action: act,
+        desc, effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
+        // 사용·장착 갈래는 새로 얻을 때만 받는다 (update 의 「equip: none」에 갈래가 지워지던 것)
+        ...(act !== 'new' ? {} : typeof t.usable === 'boolean' ? { use: t.usable } : /^(true|false)$/i.test(str(t.usable).trim()) ? { use: /^true$/i.test(str(t.usable).trim()) } : {}),
+        ...(uses !== undefined && !more ? { uses } : {}),
+        ...(act === 'new' && eq !== undefined ? { equip: eq ?? null } : {}),
         ...(cond === 'ok' || cond === 'damaged' || cond === 'broken' ? { state: itemState(cond) } : {}),
         ...(icon ? { icon } : {}),
         ...(weight !== undefined ? { weight } : {}),
+        ...(act === 'left' && place ? { place } : {}),
       });
       report.applied.items++;
     }

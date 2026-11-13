@@ -24,7 +24,9 @@ test('truth: 안 쓰는 턴엔 Really 없음, 쓰는 턴엔 Really 에 진짜, ?
   const used = I.itemsBlock(live, { ...base, use: [{ name: '빛의 돌', n: 1 }, { name: '돌', n: 1 }] });
   assert.ok(used.includes('Really') && used.includes('- 빛의 돌: 쥐면 주변 전등이 전부 꺼진다 (the label says 「어둠을 밝힌다」)'), used);
   assert.ok(used.includes('- 돌: not even its seller knows (the label says 「???」 and may be false) — decide what it really does now'), used);
-  assert.ok(I.INVENTORY_NOTE.includes('Really'));
+  // Really 설명은 쓰는 턴의 Really 머리줄에만 (11-13 전수검사: INVENTORY_NOTE 에서 뺌)
+  assert.ok(used.includes('Really (what these actually do — decided by no one in advance'), used);
+  assert.ok(!I.INVENTORY_NOTE.includes('Really'));
 });
 
 test('쪽지 내용(text): 저장되고 본편 줄에 reads 로 간다', () => {

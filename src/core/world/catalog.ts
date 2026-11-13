@@ -138,12 +138,19 @@ export function factionNames(catalog: Catalog, viewer: string | undefined): Reco
   return m;
 }
 
-/** 프리셋 괴이 이름에 맞는 정식 이름 (긴 이름 우선) */
+/** 프리셋 괴이 이름에 맞는 정식 이름 (긴 이름 우선).
+ *  「교회」「강변」처럼 짧은 이름은 통째로 같거나 그 이름으로 시작해 띄어 쓰거나 괄호가 올 때만 (「망우동 교회」는 새 괴이) (전수검사 11-13) */
 export function presetCanon(catalog: Catalog, name: string | undefined): string | null {
   if (!name?.trim()) return null;
+  const norm = (v: string) => v.replace(/[(（][^)）]*[)）]/g, '').replace(/\s+/g, '');
+  const n = norm(name);
+  const raw = name.trim();
   let best: string | null = null;
   for (const a of catalog.anomalies) {
-    if ((name === a.name || name.includes(a.name)) && (!best || a.name.length > best.length)) best = a.name;
+    const p = norm(a.name);
+    if (!p) continue;
+    const hit = n === p || (p.length >= 4 && n.includes(p)) || (raw.startsWith(a.name) && /^(?:$|[\s(（])/.test(raw.slice(a.name.length)));
+    if (hit && (!best || a.name.length > best.length)) best = a.name;
   }
   return best;
 }

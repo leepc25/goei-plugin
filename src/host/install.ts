@@ -11,8 +11,11 @@ import { digest, fetchPicture, mergePictures, PicError } from './picpack';
 import type { Picture } from '../core/pictures';
 import { ensureInstallData, getBytes, getText, type Progress } from './datapack';
 import { forgetImages } from '../ui/images';
+import { loadModuleAssets } from './assets';
 
 const WIKI_KEY = 'goei:wikibase';
+// 받은 위키 묶음의 릴리스 지문 (전수검사 11-13)
+const WIKI_DIGEST_KEY = 'goei:wikibase-digest';
 const TOK_KEY = 'goei:tok-o200k';
 const ICON_KEY = 'goei:icon';
 
@@ -58,7 +61,8 @@ export async function checkInstall(charIndex: number, progress?: Progress): Prom
     alternateGreetings: char.alternateGreetings,
     assets: char.additionalAssets,
     iconOurs: !!note && note.ours === String(char.image ?? ''),
-    wikiPack: packInLore || !!storedWikiPack(),
+    // 받아 둔 묶음이 릴리스 판과 다르면 「없음」으로 보아 설치·점검이 다시 받게 한다 (전수검사 11-13)
+    wikiPack: packInLore || (!!storedWikiPack() && !(await wikiPackStale())),
     tokenizer: !!tokenizerName(),
   });
   return { state, iconPrev: note?.prev ?? '' };
@@ -139,6 +143,8 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
     }
   }
   forgetImages();
+  // 채팅 속 그림 태그가 보는 에셋 목록도 다시 읽는다 (전수검사 11-13)
+  void loadModuleAssets().catch(() => false);
   return saved;
 }
 
@@ -195,7 +201,7 @@ export async function restoreIcon(charIndex: number): Promise<boolean> {
 export async function installWikiPack(progress: Progress): Promise<number> {
   if (!UPDATE_BASE) throw new Error('받을 곳이 정해지지 않은 빌드예요.');
   progress('위키 기본 문서 목록 받는 중…');
-  let index: { parts?: unknown; length?: unknown } | null = null;
+  let index: { parts?: unknown; length?: unknown; digest?: unknown } | null = null;
   try {
     index = JSON.parse((await getText('wiki-base.json')).replace(/^﻿/, ''));
   } catch {
@@ -212,8 +218,24 @@ export async function installWikiPack(progress: Progress): Promise<number> {
   if (typeof index.length === 'number' && text.length !== index.length) throw new Error(`위키 기본 문서를 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
   if (!text.startsWith(WIKI_PACK_HEAD)) throw new Error('위키 기본 문서 묶음 형식이 달라요.');
   await risuai.pluginStorage.setItem(WIKI_KEY, text);
+  // 받은 판의 지문을 적어 두고 다음 점검 때 릴리스 지문과 견준다 (전수검사 11-13)
+  if (typeof index.digest === 'string') await risuai.pluginStorage.setItem(WIKI_DIGEST_KEY, index.digest);
   setStoredWikiPack(text);
   return text.length;
+}
+
+/** 받아 둔 위키 묶음이 릴리스 판(wiki-base.json digest)과 다른가. 못 받거나 지문이 없으면 false (오프라인 점검이 다시 받게 만들지 않게, 전수검사 11-13) */
+async function wikiPackStale(): Promise<boolean> {
+  if (!storedWikiPack() || !UPDATE_BASE) return false;
+  try {
+    const idx: unknown = JSON.parse((await getText('wiki-base.json')).replace(/^\uFEFF/, ''));
+    const want = idx && typeof idx === 'object' ? (idx as { digest?: unknown }).digest : undefined;
+    if (typeof want !== 'string') return false;
+    const saved: unknown = await risuai.pluginStorage.getItem(WIKI_DIGEST_KEY);
+    return saved !== want;
+  } catch {
+    return false;
+  }
 }
 
 /** 저장소의 토크나이저 순위표를 올린다 (본체 시작 때 한 번, 화면을 막지 않게 뒤로 미룸) */
@@ -257,6 +279,7 @@ export async function dropTokenizer(): Promise<void> {
 /** 저장소의 위키 묶음을 지운다 (카드에 묶음이 들어 있는 옛 카드면 그걸 쓴다) */
 export async function dropWikiPack(): Promise<void> {
   await risuai.pluginStorage.removeItem(WIKI_KEY).catch(() => {});
+  await risuai.pluginStorage.removeItem(WIKI_DIGEST_KEY).catch(() => {});
   setStoredWikiPack(null);
 }
 

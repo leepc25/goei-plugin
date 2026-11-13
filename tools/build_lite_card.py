@@ -285,6 +285,33 @@ def add_start_items(entries):
     return entries
 
 
+DIRECTORY_FIX_FILE = ROOT / 'card' / 'directory-fix.json'
+
+
+def add_directory_fix(entries):
+    """명부 칸 덮어쓰기 (card/directory-fix.json): 요원·거점은 칸만, 시작 로어북은 목록째. 없는 이름이면 빌드를 멈춘다 (전수검사 11-13)"""
+    if not DIRECTORY_FIX_FILE.exists():
+        return entries
+    want = json.loads(DIRECTORY_FIX_FILE.read_text(encoding='utf-8'))
+    d = next(e for e in entries if e.get('comment') == 'Directory')
+    data = json.loads(d['content'])
+    for group, rows in want.items():
+        if group.startswith('_'):
+            continue
+        have = data.get(group)
+        if not isinstance(have, dict):
+            raise SystemExit(f'directory-fix.json: 명부에 {group} 묶음이 없음')
+        for k, v in rows.items():
+            if k not in have:
+                raise SystemExit(f'directory-fix.json: 명부 {group}에 {k} 없음')
+            if isinstance(v, dict):
+                have[k].update(v)
+            else:
+                have[k] = v
+    d['content'] = json.dumps(data, ensure_ascii=False, indent=1)
+    return entries
+
+
 CARRY_FILE = ROOT / 'card' / 'carry.json'
 
 
@@ -436,7 +463,6 @@ KEY_EDITS = {
     '한설인육공장': (['butcher shop', 'Human Meat Factory'], []),
     '광기로 점철된 성당': (['Corrupted cathedral', 'Beelzebub'], []),
     '기괴한 방탈출 카페': (['방탈출', 'Escape Room'], ['기괴한 방탈출 카페']),
-    '유쾌 테마파크': (['AMUSEMENT THEME PARK'], []),
     '헝그리 행맨': (['abandoned kindergarten', '버려진 유지원'], []),
     '반짝반짝 용궁': (['용궁', 'Dragon Palace'], ['반짝반짝 용궁']),
     '성 안티쿠스 기숙학교': (['기숙학교', 'Boarding School'], []),
@@ -520,11 +546,6 @@ LORE_DROP_BULLETS = {
 LORE_PATCHES = [
     # 괴담넷 성격 전환 (2026-10-26 사용자): 설정 lb_cfg_lb-gn.style = gal 괴담갤(일반) / net 괴담넷(업계, 기본) / wpf 세정게. 큰 틀은 그대로, 소개·기본 말투·기본 주제만 분기. 문안은 card/gnet-style.json
     *[('GNet', v['old'], v['new']) for v in json.loads((ROOT / 'card' / 'gnet-style.json').read_text(encoding='utf-8')).values()],
-    # 콘쥬스 20세 대학생 (2026-10-26 사용자 지시). 위키·게임 시트·대사도 같이 바꿈
-    ('콘쥬스', '- Age: 17, a high school student', '- Age: 20, a university student'),
-    ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),
-    ('콘쥬스', 'cover her eyes for age-inappropriate sights', 'cover her eyes for gruesome sights'),
-    ('콘쥬스', "A teenager's frame that gives no warning", 'A small frame that gives no warning'),
     # 블라렛: 하프 뱀파이어를 수치로 여겨 숨기는 설정 복구 (2026-11-05 사용자: 로어북 최적화 때 통째로 빠져 해석이 뒤집힘. 빠진 부분만 짧게)
     ('블라렛', '- Enemy taunts of "half-blood of the Vatican" touch a wound her sincere confidence in God and habit cannot fully close.',
      '- Her half-vampire blood is an open sore she keeps hidden: it shows only in her grace and in what vampires smell on her, and she never volunteers it. Enemy taunts of "half-blood of the Vatican" land on a wound her doctrine-grade confidence in God and habit never quite closes; her answer is scripture, not denial: "Even if I happen to be a monster, it makes no difference."'),
@@ -602,6 +623,29 @@ EMOTIONS = set('default angry annoyed bored confused contemptuous crying curious
                'lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split()) | {
     # 추가 15종 (사용자 11-06)
     'suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous', 'pleading', 'forced smiling', 'indifferent', 'guilty', 'pouting', 'angry smile', 'expressionless', 'tormented', 'crazy smile'}
+
+
+# 원본 카드 첫 장면 글의 영어 철자를 로어북 키·명부와 맞춘다 (전수검사 11-13, 사용자 5-가). 옛 철자가 하나도 없으면 빌드를 멈춘다
+FIRST_MES_SPELL = [
+    (r'\bJin-seop\b', 'Jin-seob'),
+    (r'\bYeong-hun\b', 'Young-hoon'),
+    (r'\bLee Do-hyung\b', 'Lee Do-hyeong'),
+    (r'\bCuras\b', 'Kyuras'),
+    (r'\bWorld Politics Board\b', 'World Politics Forum'),
+    # 관리국 첫 장면 부서 이름·금지어 「이면」 (전수검사 11-13, 사용자 「전부 추천대로」: 종합대응팀으로 맞춤, 이면 3곳만 뒤편으로)
+    (r'종합대응반', '종합대응팀'),
+    (r'이 세상의 이면에 그 누구보다도', '이 세상의 뒤편에 그 누구보다도'),
+    (r'세상의 이면에서 인류를', '세상의 뒤편에서 인류를'),
+    (r'세상의 이면엔 일반인들이', '세상의 뒤편엔 일반인들이'),
+]
+
+
+def fix_first_mes_spelling(text):
+    for old, new in FIRST_MES_SPELL:
+        text, n = re.subn(old, new, text)
+        if not n:
+            raise SystemExit(f'첫 장면 철자 고침 대상이 없습니다: {old}')
+    return text
 
 
 def fix_emotion_tags(text):
@@ -910,7 +954,7 @@ def main(src, dst):
 
     # 첫 장면 글은 플러그인이 메시지로 넣는다 (2026-11-05 사용자: Risu 추가 첫 메시지를 안 씀). 카드에는 직접 입력용 빈 인사말 하나만,
     # 글 전체는 세계 자료 팩(src/data/world/greetings.json → scripts/data-pack.mjs scenesData)으로
-    scene_texts, scene_index = build_openings(fix_emotion_tags(data['first_mes']), scenarios)
+    scene_texts, scene_index = build_openings(fix_first_mes_spelling(fix_emotion_tags(data['first_mes'])), scenarios)
     greetings = ['']
     greeting_index = {k: 0 for k, n in scene_index.items() if not scene_texts[n]}
     pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
@@ -932,7 +976,7 @@ def main(src, dst):
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
     # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 로어북은 ⚙️설정 폴더·Directory·매니페스트
-    lore = drop_plugin_lore(drop_wiki_lore(add_carry(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore)))))))))
+    lore = drop_plugin_lore(drop_wiki_lore(add_directory_fix(add_carry(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore))))))))))
     lore, _prints = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     # 폴더 key: 플러그인이 이름 대신 key 로 폴더를 찾고(이름을 바꿔도 됨), 점검이 없어진 것을 안다 (2026-10-27 설계안 9절)

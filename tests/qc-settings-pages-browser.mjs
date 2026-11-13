@@ -14,7 +14,7 @@ const PAGES = ['screen', 'image', 'board', 'status', 'net', 'phone', 'wiki', 'jo
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
 const FEATURE = new Set(['net', 'phone', 'wiki', 'people', 'journal', 'factions']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
-const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|man-|ip-|dir-|mk-|nav-|tab|close)/;
+const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|man-|ip-|dir-|mk-|nav-|tab|close|adv-book$)/; // adv-book: 「상시 로어북」 목록의 체크(카드의 로어북 수만큼, 150개쯤)는 아래 「상시 로어북」 절에서 따로 본다
 const CHANGE_SKIP = /^(ed-|dir-|ip-|pp-diag-all|pp-backfill-turns|pp-reread-turns)/;
 
 /** 저장 상태 스냅샷 */
@@ -268,8 +268,8 @@ for (const vp of vps) {
       await settle(page);
       assert.ok(await page.$(worldBtn('preset_ttl', '+')), '자동 종료 ON → 유지 시간 줄');
     }
-    // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수 (가계부 묶음은 기록 페이지, 2026-11-05 사용자)
-    await goNode(page, 'set:wallet');
+    // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수 (가계부 묶음은 소지품 페이지, 2026-11-12 사용자)
+    await goNode(page, 'set:items');
     const won = '.gw .st-won';
     if (await page.$(won)) {
       const chatWon = async () => JSON.parse((await chatOf(page)).scriptstate.$st_wallet ?? '{}');
@@ -293,6 +293,59 @@ for (const vp of vps) {
       assert.deepEqual(await tryWon('1,000,000,000,000'), ['1,000,000,000,000', 1000000000000], '상한 1조');
       assert.equal((await tryWon('1,000,000,000,001'))[1], 1000000000000, '1조 넘으면 저장 안 함');
       assert.deepEqual(await tryWon('0'), ['0', 0], '0원');
+    }
+    // 상점 페이지의 가게 표·기능 표·양 표 (2026-11-12): 칸을 누르면 그 칸의 변수에만 저장되고 다시 그린 칸에 그 값이 보인다
+    await goNode(page, 'set:shop');
+    await settle(page);
+    {
+      const twin = isPhoneVp(vp) ? '.ck-ph' : '.ck-pc';
+      const ss = async () => (await chatOf(page)).scriptstate;
+      const cell = (key) => `.gw ${twin} [data-action="fam-set"][data-value^="${key}="]`;
+      const pressed = (key) => page.$eval(cell(key), (e) => e.getAttribute('aria-pressed'));
+      const tap = async (key) => { await page.evaluate((s) => document.querySelector(s).click(), cell(key)); await settle(page); };
+      const heads = await page.evaluate((t) => [...document.querySelectorAll(`.gw ${t}`)].filter((g) => g.querySelector('h3')?.textContent === '넘길 내용').map((g) => [...g.querySelectorAll('.ck-h2 > span')].slice(1).map((s) => s.textContent)), twin);
+      assert.deepEqual(heads, Array(2).fill(['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영']), `[${vp}] 「넘길 내용」 격자 둘의 칸 이름`);
+      // 가게 표: 기본값 (봇 설명·상시·관련·맥락 켬, 작가 노트·페르소나·2차 끔) → 우주 쇼핑몰의 작가 노트만 켠다
+      for (const shop of ['shop', 'cos', 'bm', 'hs']) { // 망상홈쇼핑도 가게 표에 제 줄 (2026-11-13, src/core/shopfn.ts GIVE_SHOPS)
+        assert.deepEqual(await Promise.all(['give_desc', 'give_authors', 'give_persona', 'give_active', 'give_related', 'give_secondary', 'ctx'].map((k) => pressed(`s:${shop}:${k}`))), ['true', 'false', 'false', 'true', 'true', 'false', 'true'], `[${vp}] 가게 표 기본값 ${shop}`);
+      }
+      assert.equal(!!(await page.$(cell('s:hs:give_desc'))), true, '망상홈쇼핑 줄이 있다 (2026-11-13: 가게 표·기능 표 「채팅 반응」에 연결)'); // ElementHandle 을 assert 에 그대로 넘기면 실패 때 비교 출력이 메모리를 다 먹는다
+      await tap('s:cos:give_authors');
+      assert.equal((await ss()).$cos_sh_give_authors, '1');
+      assert.equal(await pressed('s:cos:give_authors'), 'true', '다시 그린 칸이 켜져 있다');
+      assert.deepEqual([await pressed('s:shop:give_authors'), await pressed('s:bm:give_authors'), (await ss()).$sh_give_authors, (await ss()).$bm_sh_give_authors], ['false', 'false', undefined, undefined], '다른 가게는 그대로');
+      // 맥락 반영은 가게마다 따로
+      await tap('s:bm:ctx');
+      assert.equal((await ss()).$bm_sh_ctx, '0');
+      assert.deepEqual([await pressed('s:bm:ctx'), await pressed('s:cos:ctx'), await pressed('s:shop:ctx')], ['false', 'true', 'true']);
+      // 기능 표: 세 가게가 같이 쓰는 한 값. 1:1 상담의 맥락 반영은 없는 칸(「–」)
+      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk', 'say'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'true', 'true', 'true']);
+      assert.equal(!!(await page.$(cell('s:shop:fn_desk_ctx'))), false, '1:1 상담 · 맥락 반영 칸은 조작이 없다');
+      await tap('s:shop:fn_talk_persona');
+      assert.equal((await ss()).$sh_fn_talk_persona, '0');
+      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'false', 'true'], '그 기능의 줄만 꺼진다');
+      // 양 표: − + 와 직접 치기, 범위 밖은 끝값으로
+      const num = (key) => `.gw ${isPhoneVp(vp) ? '.mx-grid.ck-ph' : '.ck-pc'} input.adv-val[data-change="fam-num"][data-key="s:shop:${key}"]`;
+      assert.deepEqual([await page.$eval(num('fn_shelf_turns'), (e) => e.value), await page.$eval(num('fn_desk_refs'), (e) => e.value)], ['3', '6'], '정하지 않은 기능은 챗로그 3턴·참조 로어북 6개');
+      await page.evaluate((s) => document.querySelector(s).closest('.st-step').querySelectorAll('button.gx-step')[1].click(), num('fn_talk_turns'));
+      await settle(page);
+      assert.equal((await ss()).$sh_fn_talk_turns, '4');
+      assert.deepEqual([await page.$eval(num('fn_talk_turns'), (e) => e.value), await page.$eval(num('fn_shelf_turns'), (e) => e.value)], ['4', '3']);
+      await setInput(page, num('fn_desk_refs'), '99');
+      await settle(page);
+      assert.equal((await ss()).$sh_fn_desk_refs, '12', '상한 12');
+      await setInput(page, num('fn_desk_refs'), '0');
+      await settle(page);
+      assert.deepEqual([(await ss()).$sh_fn_desk_refs, await page.$eval(num('fn_desk_refs'), (e) => e.value), (await ss()).$sh_refs], ['0', '0', undefined], '0개 · 같이 쓰던 값($sh_refs)은 건드리지 않는다');
+      // 옮겨 간 줄은 「같이 쓰는 값」에 없다
+      const rows = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row > .ps-label > b')].map((b) => b.textContent.trim()));
+      for (const gone of ['맥락 반영', '챗로그 포함', '참조 로어북']) assert.ok(!rows.includes(gone), `「${gone}」 줄은 격자로 옮겨 갔다`);
+      for (const kept of ['생각 단계', '다양성 강화', '지난 목록 피하기']) assert.ok(rows.includes(kept), `「${kept}」 줄은 그대로`);
+      // 다시 열어도 같은 값
+      await closeEditor(page);
+      await openEditor(page, 'set:shop');
+      await settle(page);
+      assert.deepEqual([await pressed('s:cos:give_authors'), await pressed('s:bm:ctx'), await pressed('s:shop:fn_talk_persona'), await page.$eval(num('fn_talk_turns'), (e) => e.value)], ['true', 'false', 'false', '4'], `[${vp}] 다시 열어도 같은 값`);
     }
     // 고급(생성 공통) 숫자 칸: 음수·소수·빈 칸·너무 큰 수·글자
     await goNode(page, 'set:adv');
@@ -344,14 +397,22 @@ for (const vp of vps) {
       if (d === '0') assert.ok(/rgba\(\d+, \d+, \d+, 0\)/.test(bg), `0% → 투명 (${bg})`);
       if (d === '100') assert.ok(/^rgb\(/.test(bg), `100% → 불투명 (${bg})`);
     }
-    // details(접는 칸)는 조작 뒤 다시 그려도 펼친 채로 (인물 기록 「기능」 칸)
-    await goNode(page, 'set:people');
-    const det = await page.$('.gw details[data-keep="pp-feat"]');
-    if (det) {
-      await page.evaluate(() => { const d = document.querySelector('.gw details[data-keep="pp-feat"]'); d.open = true; d.dispatchEvent(new Event('toggle')); });
-      await page.evaluate(() => [...document.querySelectorAll('.gw [data-action="pp-set"][role="switch"]')].pop().click());
+    // details(접는 칸)는 조작 뒤 다시 그려도 펼친 채로 (소지품 판정 표 칸)
+    // 인물 페이지의 pp-feat 칸은 없어져 늘 건너뛰었다 → 있는 칸으로 옮기고 없으면 실패 (전수검사 11-13)
+    {
+      await goNode(page, 'set:items');
       await settle(page);
-      assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="pp-feat"]')?.open), true, '접는 칸은 조작 뒤에도 펼친 채');
+      const sel = '.gw details[data-keep="items-rules"]';
+      const sw = '.gw [data-action="set-items-edit"][role="switch"]';
+      assert.ok(await page.$(sel), '접는 칸(items-rules)이 있어야 한다');
+      assert.ok(await page.$(sw), '소지품 「고치기」 스위치가 있어야 한다');
+      await page.evaluate((sel) => { const d = document.querySelector(sel); d.open = true; d.dispatchEvent(new Event('toggle')); }, sel);
+      await page.evaluate((sw) => document.querySelector(sw).click(), sw);
+      await settle(page);
+      assert.equal(await page.evaluate((sel) => document.querySelector(sel)?.open, sel), true, '접는 칸은 조작 뒤에도 펼친 채');
+      // 값 되돌림 (뒤 시험에 영향 없게)
+      await page.evaluate((sw) => document.querySelector(sw).click(), sw);
+      await settle(page);
     }
     // 다시 열었을 때 같은 값 (상황판·이미지 페이지, 이 채팅 범위)
     for (const p of ['board', 'image']) {
@@ -369,6 +430,99 @@ for (const vp of vps) {
     await closeEditor(page, true);
     await closeWin(page);
     assert.deepEqual(errors, [], `${vp}: 시작 뒤 오류`);
+    await page.close();
+  }
+  // ── 로어북 호출 「상시 로어북」: 줄·목록·검색·체크 저장 (시작 전 = 새 채팅 기본값, 시작 뒤 = 이 채팅) ──
+  for (const mode of ['pre', 'chat']) {
+    const VAR = '$gen_active_books';
+    const chat0 = mode === 'pre' ? { message: [], scriptstate: {} } : { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } };
+    const { page, errors } = await boot(browser, fx, chat0, vp);
+    await openWin(page);
+    await openEditor(page, 'set:lore');
+    await page.waitForSelector('.gw .gw-setbody');
+    const saved = async () => (mode === 'pre' ? (await prefsOf(page)).vars?.[VAR] : (await chatOf(page)).scriptstate?.[VAR]) ?? '';
+    const row = () => page.evaluate(() => {
+      const btn = document.querySelector('.gw .gw-setbody [data-action="adv-books"]');
+      const r = btn?.closest('.ps-row');
+      if (!r) return null;
+      const name = r.querySelector(':scope > .ps-label > b');
+      const rg = document.createRange(); rg.selectNodeContents(name);
+      const b = btn.getBoundingClientRect();
+      return {
+        name: name.textContent.trim(), lines: new Set([...rg.getClientRects()].map((c) => Math.round(c.top))).size, group: r.closest('.ps-group')?.querySelectorAll('.ps-row').length,
+        count: btn.previousElementSibling?.textContent ?? '', btn: btn.textContent.trim(), h: Math.round(b.height), clip: btn.scrollWidth > btn.clientWidth + 1, help: r.querySelector(':scope > .ps-label > small')?.textContent ?? '',
+        open: !!r.querySelector('.dir-ext'), items: [...r.querySelectorAll('.dir-ext-item')].map((e) => [e.querySelector('b').textContent, e.getAttribute('aria-pressed') === 'true', e.querySelector('.ck-m').classList.contains('on'), e.querySelector('small')?.textContent ?? '']),
+        over: [...r.querySelectorAll('.dir-ext, .dir-ext-item, .gx-search')].filter((e) => e.getBoundingClientRect().right > r.getBoundingClientRect().right + 0.5 || e.getBoundingClientRect().left < r.getBoundingClientRect().left - 0.5).length,
+        qh: Math.round(r.querySelector('.gx-search')?.getBoundingClientRect().height ?? 0), empty: r.querySelector('.dir-ext-list > p')?.textContent ?? '',
+      };
+    });
+    const click = async (sel) => { await page.evaluate((s) => document.querySelector(s).click(), sel); await settle(page); };
+    const item = (n) => `.gw .gw-setbody .dir-ext-item[data-value="${n}"]`;
+    let r = await row();
+    const at = `${vp} 상시 로어북(${mode})`;
+    assert.ok(r, `${at}: 줄이 있다`);
+    assert.equal(r.name, '상시 로어북'); assert.equal(r.lines, 1, `${at}: 줄 이름 한 줄`);
+    assert.equal(r.count, '2개 선택'); assert.equal(r.btn, '로어북 선택'); assert.equal(r.h, 34); assert.ok(!r.clip, `${at}: 단추 글 안 잘림`);
+    assert.equal(r.help, '조건 없이 늘 넘기는 로어북이에요.'); assert.ok(!r.open, `${at}: 처음엔 닫힘`);
+    await click('.gw .gw-setbody [data-action="adv-books"]');
+    r = await row();
+    assert.ok(r.open && r.items.length > 2, `${at}: 목록이 열린다 (${r.items.length}개)`);
+    assert.equal(r.qh, 34); assert.equal(r.over, 0, `${at}: 목록이 줄 밖으로 안 넘침`);
+    assert.equal(new Set(r.items.map((i) => i[0].trim().toLowerCase())).size, r.items.length, `${at}: 같은 이름은 한 번`);
+    assert.deepEqual(r.items.slice(0, 2).map((i) => i[0]).sort(), ['🙂Roster', '📜Faction'].sort(), `${at}: 고른 것이 맨 위`);
+    assert.deepEqual(r.items.filter((i) => i[1]).map((i) => i[0]).sort(), ['🙂Roster', '📜Faction'].sort(), `${at}: 기본은 둘만 체크`);
+    assert.ok(r.items.every((i) => i[1] === i[2] && !i[3]), `${at}: 체크 모양 = 값, 카드에 없는 것 없음`);
+    assert.equal(await saved(), '', `${at}: 열기만 해서는 저장 안 함`);
+    // 검색: 목록만 걸러진다 (입력 칸은 그대로)
+    const pick = r.items.find((i) => !i[1])[0];
+    await page.evaluate((v) => { const q = document.querySelector('.gw .gw-setbody [data-input="adv-books-q"]'); q.focus(); q.value = v; q.dispatchEvent(new Event('input', { bubbles: true })); }, pick);
+    await sleep(150);
+    r = await row();
+    assert.ok(r.items.length >= 1 && r.items.every((i) => i[0].toLowerCase().includes(pick.toLowerCase())), `${at}: 검색 「${pick}」`);
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset?.input), 'adv-books-q', `${at}: 검색 칸에 그대로`);
+    // 체크: 바로 저장, 개수 글이 바뀐다
+    await click(item(pick));
+    assert.deepEqual(JSON.parse(await saved()), ['📜Faction', '🙂Roster', pick], `${at}: 체크하면 바로 저장`);
+    if (mode === 'pre') assert.equal((await chatOf(page)).scriptstate?.[VAR] ?? '', '', `${at}: 시작 전엔 채팅에 안 섞임`);
+    else assert.equal((await prefsOf(page)).vars?.[VAR] ?? '', '', `${at}: 시작 뒤엔 기본값에 안 섞임`);
+    r = await row();
+    assert.equal(r.count, '3개 선택'); assert.ok(r.open, `${at}: 체크해도 목록은 열려 있다`);
+    assert.ok(r.items.find((i) => i[0] === pick)[1], `${at}: 체크 표시`);
+    await page.evaluate(() => { const q = document.querySelector('.gw .gw-setbody [data-input="adv-books-q"]'); q.value = '없는이름zz'; q.dispatchEvent(new Event('input', { bubbles: true })); });
+    await sleep(150);
+    assert.equal((await row()).empty, '검색 결과가 없어요.');
+    await page.evaluate(() => { const q = document.querySelector('.gw .gw-setbody [data-input="adv-books-q"]'); q.value = ''; q.dispatchEvent(new Event('input', { bubbles: true })); });
+    await sleep(150);
+    // 풀기 → 기본값과 같아지면 변수를 비운다
+    await click(item(pick));
+    assert.equal(await saved(), '', `${at}: 기본값과 같아지면 비움`);
+    assert.equal((await row()).count, '2개 선택');
+    await click(item('🙂Roster'));
+    assert.deepEqual(JSON.parse(await saved()), ['📜Faction'], `${at}: 기본 로어북도 뺄 수 있다`);
+    await click(item('📜Faction'));
+    assert.equal(await saved(), '[]'); assert.equal((await row()).count, '0개 선택');
+    await click(item('📜Faction')); await click(item('🙂Roster'));
+    assert.equal(await saved(), '', `${at}: 다시 둘을 고르면 기본값`);
+    // 닫기
+    await click('.gw .gw-setbody [data-action="adv-books"]');
+    assert.ok(!(await row()).open, `${at}: 다시 누르면 닫힘`);
+    if (mode === 'chat') {
+      // 카드에 없는 이름: 목록 맨 위에 「카드에 없음」으로 남고, 풀 수 있다
+      await setChat(page, { ...chat0, scriptstate: { ...chat0.scriptstate, [VAR]: JSON.stringify(['📜Faction', '지워진 로어북 zz']) } });
+      await closeEditor(page, true); await closeWin(page); await openWin(page); await openEditor(page, 'set:lore');
+      assert.equal((await row()).count, '2개 선택');
+      await click('.gw .gw-setbody [data-action="adv-books"]');
+      r = await row();
+      assert.deepEqual(r.items[0], ['지워진 로어북 zz', true, true, '카드에 없음'], `${at}: 카드에 없는 이름`);
+      await click(item('지워진 로어북 zz'));
+      assert.deepEqual(JSON.parse(await saved()), ['📜Faction']);
+      assert.ok(!(await row()).items.some((i) => i[0] === '지워진 로어북 zz'), `${at}: 풀면 목록에서 사라짐`);
+      // AI 상담 목록: 설명만 있는 줄 (바꾸기 못 함), 목록의 체크는 상담 조작이 아니다
+      const a = await auditDom(page, '.gw');
+      assert.deepEqual(a.missing, [], `${at}: 글자·aria-label 없는 단추`);
+      if (vp !== 'pc') assert.deepEqual(a.overflow, [], `${at}: 가로 넘침`);
+    }
+    assert.deepEqual(errors, [], `${at}: 오류`);
     await page.close();
   }
   console.log(`PASS 설정 페이지 [${vp}]: 조작 ${total}회`);

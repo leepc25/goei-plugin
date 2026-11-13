@@ -121,6 +121,8 @@ function poisonedChat() {
   ps.mid = 2;
   chat = phone.writePhone(chat, ps);
   chat.scriptstate[phone.PH_CONTACTS] = JSON.stringify({ version: 1, seq: 1, items: [{ id: 'c1', name: P1, note: P2 }] });
+  // 공지 하나 (공지 탭에 그릴 것이 있게, 전수검사 11-13)
+  chat.scriptstate[phone.PH_BULLETINS] = JSON.stringify({ version: 2, seq: 1, items: [{ id: 1, order: 1, read: false, channel: 'A00', channelName: P2, issuer: P1, category: P1, title: P1, text: `${P1}\n${P3}`, time: '2025.01.01 10:00' }], checks: {}, seen: {} });
   // 인물 기록
   const entry = (id, text, extra = {}) => ({ id, text, src: 'manual', anchor: '', seq: 0, ...extra });
   chat.goeiPeopleV1 = {
@@ -215,17 +217,30 @@ async function seen(page, where) {
   // 커스텀 임무는 따로 메뉴가 없고 임무 화면의 전환 단추로 (2026-10-29 사용자)
   await page.click('.gx-mswap[data-value="mission"]'); await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'mission'); await audit(page, errors, '커스텀 임무'); total++;
   await tab('gnet'); await audit(page, errors, '괴담넷 목록'); total++;
+  // 쪽지함: 없는 단추(gn-dm)를 찾아 늘 건너뛰었다 → 진짜 단추로 열고, 없으면 실패 (전수검사 11-13). 글 화면 뒤 창이 이미 공격 글자를 보여서 seen() 대신 쪽지 창만 본다
+  await page.click('[data-action="gn-sub"][data-value="dm"]');
+  await page.waitForSelector('.gn-dmwin [data-action="gn-open-dm"]'); await audit(page, errors, '괴담넷 쪽지 목록'); total++;
+  assert.ok((await page.evaluate(() => document.querySelector('.gn-dmwin').innerText)).includes('onerror'), '괴담넷 쪽지 목록: 공격 문자열(받는 이)이 글자로 보여야 함');
+  await page.click('.gn-dmwin [data-action="gn-open-dm"]'); await page.waitForSelector('.gn-dmwin .ph-bubble'); await audit(page, errors, '괴담넷 쪽지'); total++;
+  assert.ok((await page.evaluate(() => document.querySelector('.gn-dmwin .ph-bubble').innerText)).includes('onload'), '괴담넷 쪽지: 공격 문자열(본문)이 글자로 보여야 함');
+  await page.click('[data-action="gn-dm-close"]');
   await page.click('[data-action="gn-open"]'); await page.waitForSelector('.gn-c'); await audit(page, errors, '괴담넷 글·댓글'); await seen(page, '괴담넷 글'); total++;
-  if (await page.$('[data-action="gn-dm"], [data-action="gn-dms"]')) { await page.click('[data-action="gn-dm"], [data-action="gn-dms"]'); await audit(page, errors, '괴담넷 쪽지'); total++; }
   await tab('phone'); await audit(page, errors, '괴담톡 목록(연락처)'); await seen(page, '괴담톡 연락처'); total++;
   await page.click('[data-action="ph-sub"][data-value="chats"]'); await page.waitForSelector('[data-action="ph-room"]'); await audit(page, errors, '괴담톡 대화 목록'); total++;
   if (await page.$('[data-action="ph-room"]')) { await page.click('[data-action="ph-room"]'); await page.waitForSelector('.ph-msg'); await audit(page, errors, '괴담톡 방'); await seen(page, '괴담톡 방'); total++; } else assert.fail('괴담톡 방이 목록에 없음');
-  for (const sub of ['contacts', 'chats', 'notice']) {
-    const b = await page.$(`[data-action="ph-sub"][data-value="${sub}"]`);
-    if (b) { await b.click(); await audit(page, errors, `괴담톡 ${sub}`); total++; }
+  // 탭 id 가 'notice' 로 틀려 공지를 늘 건너뛰었고, 검색 칸도 없는 이름이라 30초 기다린 뒤 빈 검색을 봤다 → 진짜 이름, 없으면 실패 (전수검사 11-13)
+  const contentHas = async (sel, where) => assert.ok((await page.evaluate((sel) => document.querySelector(sel)?.innerText ?? '', sel)).includes('onerror'), `${where}: 공격 문자열이 글자로 보여야 함`);
+  for (const sub of ['contacts', 'chats', 'notices']) {
+    await page.click(`[data-action="ph-sub"][data-value="${sub}"]`); await audit(page, errors, `괴담톡 ${sub}`); total++;
+    if (sub === 'notices') {
+      await page.waitForSelector('.ph-notice'); await audit(page, errors, '괴담톡 공지 목록'); await contentHas('.ph-content', '괴담톡 공지 목록'); total++;
+      await page.click('[data-action="ph-notice"]'); await page.waitForSelector('.ph-ndoc-text'); await audit(page, errors, '괴담톡 공지'); await contentHas('.ph-ndoc', '괴담톡 공지'); total++;
+    }
   }
-  await page.fill('[data-input="ph-search"], .ph-search input', P1).catch(() => {});
-  await audit(page, errors, '괴담톡 검색'); total++;
+  await page.fill('[data-input="ph-query"]', P1);
+  await page.waitForSelector('.ph-content .ph-sec');
+  await audit(page, errors, '괴담톡 검색'); await contentHas('.ph-content', '괴담톡 검색'); total++;
+  await page.fill('[data-input="ph-query"]', '');
   await tab('wiki'); await audit(page, errors, '위키 홈'); total++;
   await page.fill('[data-input="wiki-home-query"]', '시험 문서');
   await page.press('[data-input="wiki-home-query"]', 'Enter');

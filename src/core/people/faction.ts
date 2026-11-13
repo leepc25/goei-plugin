@@ -6,6 +6,7 @@ import { factionBase } from './base';
 import { factionCodesIn, ORG_NAMES } from './identity';
 import type { PeopleSettings } from './settings';
 import { FACTION_STAGES, factionWho, type Change, type FactionStage, type PeopleStore } from './types';
+import { guideOr } from '../guides';
 
 export interface FactionNow { code: string; name: string; value: number; stage: FactionStage; base: number; /** 정성 모드: 마지막 판단의 이유 */ note?: string }
 
@@ -42,9 +43,10 @@ export function sceneFactionCodes(store: PeopleStore, people: string[], texts: s
 
 /** 본편에 넣을 세력 절: 중립은 생략. 비어 있으면 '' */
 export function factionsBlock(list: FactionNow[], user = '{{user}}'): string {
-  const lines = list.filter((f) => f.stage.id !== 'neutral').map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}${f.note ? ` (why: ${f.note})` : ''}`);
+  // 단계 글·머리는 지침 「Main」 FACTION.STAGE.<단계>·FACTION.HEAD 절에서 읽는다. 절이 없으면 표·코드 글 (전수검사 11-13)
+  const lines = list.filter((f) => f.stage.id !== 'neutral').map((f) => `- ${f.name} → ${user}: ${guideOr('Main', `FACTION.STAGE.${f.stage.id}`, f.stage.behavior).replace(/\{\{user\}\}/g, () => user)}${f.note ? ` (why: ${f.note})` : ''}`);
   if (!lines.length) return '';
-  return ['## Factions → ' + user + ' (standing of each organization toward ' + user + ', kept by the system; members act accordingly)', ...lines].join('\n');
+  return [guideOr('Main', 'FACTION.HEAD', () => '## Factions → ' + user + ' (standing of each organization toward ' + user + ', kept by the system; members act accordingly)', { user }), ...lines].join('\n');
 }
 
 export const stageLabel = (id: FactionStage['id']) => FACTION_STAGES[id].label;

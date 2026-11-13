@@ -190,6 +190,21 @@ export function progressCallStart(label: string, model: string, reqTokens: numbe
   return id;
 }
 
+/** 요청을 보낸 뒤에 센 요청 토큰을 호출 줄에 채운다 (host/llm.ts, 전수검사 11-13) */
+export function progressCallTokens(id: number, reqTokens: number): void {
+  const c = turn?.calls.find((x) => x.id === id);
+  if (!c) return;
+  c.reqTokens = reqTokens;
+  notify();
+}
+
+/** 본편 요청을 보낸 뒤에 센 토큰을 채운다. t 를 주면 그 턴이 아직 열린 턴일 때만 (host/trace.ts, 전수검사 11-13) */
+export function progressMainTokens(tokens: number, t?: Turn | null): void {
+  if (!turn || turn.manual || (t !== undefined && t !== turn)) return;
+  turn.mainTokens = tokens;
+  notify();
+}
+
 export function progressCallChunk(id: number, chars: number): void {
   const c = turn?.calls.find((x) => x.id === id);
   if (!c || c.ms !== undefined) return;

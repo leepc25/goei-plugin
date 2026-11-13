@@ -62,7 +62,8 @@ test('지침: 수치 절과 정성 절은 하나만 들어가고 겹친 절도 �
 });
 
 test('갱신기: 정성 모드면 자료에 계기·단계·숫자가 없고, 계기는 무시되고, 정성 칸 항목은 들어간다', () => {
-  const s = St.peopleSettings(qualState);
+  // 세력 평판 수치가 켜져 있으면 계기표가 들어가므로 (전수검사 11-13) 세력도 정성으로
+  const s = St.peopleSettings({ ...qualState, $pp_num_faction_rep: '0' });
   const store = T.emptyStore();
   store.people.쟈알디 = person('쟈알디');
   const input = U.buildUpdate(c, store, [1], { settings: s, system: 'SYS', values: {}, names });

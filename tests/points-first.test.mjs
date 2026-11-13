@@ -17,3 +17,14 @@ test('같은 값이면 잔액이 그대로 (거래 한 줄만)', () => {
   assert.equal(w2.log.length, 1);
   assert.equal(w2.log.reduce((a, e) => a + e.amount, 0), 900);
 });
+
+test('같은 정산을 두 번 셌다가 되돌린 맞춤 줄 짝은 지운다 (거래 한 줄만 남는다)', () => {
+  // 턴0: 상태창 5000 → 맞춤 +5000. 갱신기가 같은 응답에 「정산 지급 +5000」을 또 적음(옛 버그) → 턴1 상태창 5000 → 맞춤 −5000
+  const c1 = chat('5000');
+  const w1 = syncPointsToStatus(readPoints({}), c1);
+  const anchor = w1.log[0].anchor;
+  const dup = { ...w1, log: [...w1.log, { id: 'x1', anchor, amount: 5000, memo: '정산 지급', src: 'story', at: '' }] };
+  const c2 = chat('5000', '5000');
+  const healed = syncPointsToStatus({ ...dup, log: [...dup.log, { id: 'ps_later', anchor: 'zz', amount: -5000, memo: '상태창 포인트', src: 'story', at: '' }] }, c2);
+  assert.deepEqual(healed.log.map((e) => e.memo), ['정산 지급']);
+});

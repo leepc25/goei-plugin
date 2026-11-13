@@ -8,19 +8,21 @@
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { refreshUseBox } from '../host/usebox';
-import { itemIconStatus, itemIconUrl } from '../host/itemicons';
+import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
-  readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
+  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
+  purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
 import { findStatusTags } from '../core/world/status';
+import { splitIconWord } from '../core/iconmatch';
 import { messageKey } from '../core/people/store';
 import { drawerBox, drawerHtml } from './drawer';
 import { ICONS } from './icons';
 import { ITEM_ICON } from './itemIcons';
 import { isPhone } from './media';
+import { moreCut } from './more';
 import { toast } from './toast';
 import { walletOn, walletPane, walletTools, walletUi } from './wallet';
 import { pointsOn } from '../core/points';
@@ -39,7 +41,7 @@ export const itemsUi = {
   logFilter: 'all' as 'all' | 'get' | 'out',
   q: '',
   open: '',
-  mode: 'view' as 'view' | 'edit' | 'merge' | 'add' | 'drop',
+  mode: 'view' as 'view' | 'edit' | 'merge' | 'add' | 'drop' | 'purge',
   /** 버리기 띠에 끌어다 놓아 연 확인창: 취소하면 물건 팝업으로 가지 않고 닫는다 (2026-11-08 사용자) */
   dragDrop: false,
   notice: '',
@@ -54,13 +56,25 @@ export function applyItemsNav(n: ItemsNav): void {
   Object.assign(itemsUi, { sub: n.sub === 'wallet' || n.sub === 'points' ? n.sub : 'items', view: n.view === 'log' ? 'log' : 'grid', open: n.open ?? '', mode: 'view', notice: '' });
 }
 
-export const itemsOf = (ctx: ChatContext): Items => readItems(ctx.chat.scriptstate);
+// 같은 저장 글이면 다시 풀지 않는다: 그리기 한 번에 칸마다 저장 글 전체를 다시 풀었다 (전수검사 11-13).
+// readItems 는 이 두 값만 보니 같으면 결과도 같다. 받은 Items 는 고치지 않고 읽기만 한다
+let itemsMemo: { raw: unknown; spent: unknown; it: Items } | null = null;
+export const itemsOf = (ctx: ChatContext): Items => {
+  const v = ctx.chat.scriptstate;
+  const raw = v?.[ITEMS_VAR];
+  const spent = v?.[ITEM_SPENT_VAR];
+  if (itemsMemo && itemsMemo.raw === raw && itemsMemo.spent === spent) return itemsMemo.it;
+  const it = readItems(v);
+  itemsMemo = { raw, spent, it };
+  return it;
+};
 export const liveOf = (ctx: ChatContext): Item[] => liveItems(itemsOf(ctx), aliveAnchors(ctx.chat));
 
 /** 물건 그림: PixelLab 그림 팩(host/itemicons.ts)에서 그림 낱말·이름으로 찾고, 없거나 아직 못 받았으면 공통 선 아이콘 */
-export function itemPic(it: { name: string; icon?: string; id?: string }): string {
+export function itemPic(it: { name: string; icon?: string; id?: string; desc?: string }): string {
   // 분류 말(과자·다과)은 물건마다(id) 그 분류의 그림 하나. id 가 없는 곳(상점 진열)은 이름으로 — 같은 진열품은 늘 같은 그림
-  const u = itemIconUrl(it.name, it.icon, it.id ?? it.name);
+  // 상태에 따라 그림이 여러 장인 물건(꿈결 수집기)은 그림 말이 가리키는 그림 (core/datapack.ts formIcon)
+  const u = itemIconUrl(it.name, it.icon, it.id ?? it.name, { desc: it.desc });
   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
 }
 
@@ -136,7 +150,9 @@ const addButton = (cls: string) => `<button class="${cls} it-add" data-action="i
 /** 합칠 상대가 있는 물건 (둘 다 소모성 + 이름에 같은 낱말) */
 const mergeMates = (ctx: ChatContext, it: Item): Item[] => liveOf(ctx).filter((o) => canMerge(it, o));
 function mergeButton(ctx: ChatContext, cls: string): string {
-  const any = liveOf(ctx).some((it) => mergeMates(ctx, it).length);
+  // 살아 있는 목록은 한 번만 구해 그 안에서 짝을 본다 (전수검사 11-13)
+  const live = liveOf(ctx);
+  const any = live.some((a) => live.some((b) => canMerge(a, b)));
   return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any ? '' : 'disabled'}>${ICONS.refresh}<span class="${cls === 'ph-tool' ? 'ph-tool-l' : ''}">합치기</span></button>`;
 }
 
@@ -166,7 +182,9 @@ function itemsPane(ctx: ChatContext): string {
 /** 무게 합 알약 (2026-11-08 사용자): 장착한 것까지 전부 더한 무게 / 소지 한도. 넘으면 넘은 만큼 붉은색이 점점 진해진다 (막지 않음).
  *  --ov: 0~1 = 넘은 무게 ÷ 한도 (한도의 두 배면 가장 진함) */
 function weightPill(ctx: ChatContext, live: Item[]): string {
-  const w = totalWeight(live, (e) => leftOf(ctx, e));
+  const items = itemsOf(ctx);
+  const alive = aliveAnchors(ctx.chat);
+  const w = totalWeight(live, (e) => itemLeft(items, e, alive));
   const cap = itemCarry(ctx.chat.scriptstate);
   const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
   const num = (n: number) => String(Number(n.toFixed(1)));
@@ -181,7 +199,9 @@ export function setAvatarHtml(fn: (ctx: ChatContext) => string): void {
 
 /**
  * 「장착」 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 | 장착 칸 | 사용칸].
- * 장착 칸 차례는 무기 2 → 장비 4 — PC 3열(무기·무기·장비 / 장비·장비·장비), 폰 2열(무기·무기 / 장비·장비 / 장비·장비). 무기 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
+ * 장착 칸 차례는 무기 2 → 장비 6 (2026-11-12 사용자) — PC 4열(무기·무기·장비·장비 / 장비 4), 폰 2열 4줄(무기·무기 / 장비·장비 ×3). 무기 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
+ * PC: 아바타 자리와 장착 칸 묶음은 data-drop="auto" — 물건을 놓으면 장착 물건은 맞는 갈래 빈 칸으로, 쓰는 물건은 사용 예정으로 (itemsAction items-dnd). 칸에 직접 놓기는 그대로.
+ * 폰: 사용칸을 그리지 않는다 (끌기가 없다). 물건 팝업의 「사용」「사용 취소」와 칸의 「사용 예정」 딱지로 한다.
  * where = 'items'(끌어다 놓기·누르면 팝업, 오른쪽에 사용칸) · 'sell'(상점 팔기: 아바타·사용칸 없이 칸만, 누르면 그 물건을 팔 물건으로)
  * 칸 data-drop="equip:갈래:번호" — 끌어 온 물건이 그 갈래가 아니면 놓이지 않는다 (app.ts 끌기 처리)
  */
@@ -189,24 +209,30 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
   const { av, slots } = equipParts(ctx, where, sel);
   // 상점 팔기 (2026-11-08 사용자): 장착한 게 없어도 아바타와 빈 칸을 늘 보인다. 사용은 소지품 화면에서만 (사용자: 상점에서까지 쓰면 복잡)
   if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}</div></section>`;
-  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}<div class="it-eqcol">${statsRow(ctx, liveOf(ctx))}${slots}</div>${useBox(ctx)}</div></section>`;
+  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av" data-drop="auto">${av}</div>` : ''}<div class="it-eqcol" data-drop="auto">${statsRow(ctx, liveOf(ctx))}${slots}</div>${isPhone() ? '' : useBox(ctx)}</div></section>`;
 }
 
-/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 4). 상점 팔기(PC)는 이 둘을 소지품 격자와 한 상자에 엮는다 (ui/shop.ts pickHtml) */
+/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 6) */
 export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''): { av: string; slots: string } {
-  const live = liveOf(ctx);
+  // 소지품·살아 있는 메시지·RP 때는 한 번만 구한다 (전수검사 11-13: 장착 칸마다 다시 구했다)
+  const items = itemsOf(ctx);
+  const alive = aliveAnchors(ctx.chat);
+  const live = liveItems(items, alive);
   const eq = equippedOf(live);
+  let when: When | undefined;
   const slot = (k: ItemEquip, i: number) => {
     const it = eq[k][i];
     if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
     const act = where === 'sell' ? 'shop-sell-pick' : 'items-open';
-    return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ''}` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, leftOf(ctx, it))}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
+    const left = itemLeft(items, it, alive);
+    when ??= whenOf(ctx);
+    return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ''}` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when)}</button>`;
   };
   const slots = `<div class="it-eqslots">${(['weapon', 'gear'] as const).flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join('')}</div>`;
   return { av: avatarHtml(ctx), slots };
 }
 
-/** 「사용」칸 (장착 띠 오른쪽): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
+/** 「사용」칸 (장착 띠 오른쪽, PC만): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
 function useBox(ctx: ChatContext): string {
   const live = liveOf(ctx);
   const q = useQueue(ctx).flatMap((u) => {
@@ -214,7 +240,7 @@ function useBox(ctx: ChatContext): string {
     return it ? [{ it, n: u.n }] : [];
   });
   const chips = q.map(({ it, n }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${n > 1 ? `<em>×${n}</em>` : ''}<button class="it-ux" data-action="items-unuse" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 사용 취소">${ICONS.close}</button></span>`).join('');
-  return `<div class="it-usebox${q.length ? '' : ' empty'}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips || `<p class="it-uhint">${isPhone() ? '물건을 눌러 「사용」을 고르면 여기에 모여요.' : '쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.'}</p>`}</div></div>`;
+  return `<div class="it-usebox${q.length ? '' : ' empty'}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips || '<p class="it-uhint">쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.</p>'}</div></div>`;
 }
 
 /** 무게 (2026-11-08 사용자): 그림 오른쪽 아래에 작게. 1개당 무게 × 남은 개수 */
@@ -236,25 +262,27 @@ function tipOf(it: Item, left: number | undefined, w: When): string {
 export function gridHtml(ctx: ChatContext): string {
   const slots = itemSlots(ctx.chat.scriptstate);
   const q = itemsUi.q.trim();
-  const live = liveOf(ctx);
-  const list = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).items : gridItems(live);
+  // 소지품·살아 있는 메시지는 한 번만 구해 칸마다 넘긴다 (전수검사 11-13)
+  const items = itemsOf(ctx);
+  const alive = aliveAnchors(ctx.chat);
+  const list = q ? searchItems(items, alive, q).items : gridItems(liveItems(items, alive));
   if (q && !list.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
   const w = whenOf(ctx);
   const queued = new Map(useQueue(ctx).map((u) => [u.id, u.n]));
-  const cells = list.map((it, i) => cell(ctx, it, !q && i >= slots, w, queued.get(it.id) ?? 0));
+  const cells = list.map((it, i) => cell(it, itemLeft(items, it, alive), !q && i >= slots, w, queued.get(it.id) ?? 0));
   if (!q) for (let i = list.length; i < slots; i++) cells.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
   return `<div class="it-grid" data-drop="grid">${cells.join('')}</div>`;
 }
 
-function cell(ctx: ChatContext, it: Item, over: boolean, w: When, queued: number): string {
-  const left = leftOf(ctx, it);
+function cell(it: Item, left: number | undefined, over: boolean, w: When, queued: number): string {
   // 「사용 예정」: 소모성은 남은 횟수를 다 놓았을 때만 흐리게, 아니면 놓은 수만 표시
   const all = queued > 0 && (left === undefined || queued >= left);
   const drag = !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ''}${canUse(it) ? ' data-usable="1"' : ''}` : '';
   return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}${all ? ' queued' : ''}${stateCls(it)}" data-action="items-open" data-value="${esc(it.id)}"${drag} aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}${queued ? ' (사용 예정)' : ''}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued ? `<span class="it-q8">사용 예정${queued > 1 ? ` ×${queued}` : ''}</span>` : ''}<b>${esc(it.name)}</b>${tipOf(it, left, w)}</button>`;
 }
 
-const WHAT: Record<ItemLog['what'], string> = { get: '획득', use: '사용', drop: '버림', gone: '없어짐', destroy: '파괴', merge: '합침', sell: '팖' };
+// 두고 온 것은 「없어짐」 + 메모 「두고 옴: 자리」, 본문에서 벗은 것은 「장착 풀기」 (새 말을 만들지 않는다)
+const WHAT: Record<ItemLog['what'], string> = { get: '획득', use: '사용', drop: '버림', gone: '없어짐', destroy: '파괴', merge: '합침', sell: '팖', left: '없어짐', off: '장착 풀기' };
 const BY: Record<ItemLog['by'], string> = { story: '본문', manual: '직접', use: '사용 단추', store: '상점' };
 const WEEK = '일월화수목금토';
 /** 「2025.05.10 15:41」 → 「2025.05.10 (토)」 (가계부 날짜 줄과 같은 꼴) */
@@ -268,7 +296,10 @@ function dayOf(when: string): string {
 /** 기록: 가계부와 같은 꼴 — 거르기 칩(전체·획득·사용) + RP 날짜별 묶음, 줄 앞 물건 그림, 최근 것부터 (2026-11-07 사용자) */
 function logList(ctx: ChatContext): string {
   const q = itemsUi.q.trim();
-  const all = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).log : itemsOf(ctx).log.slice().reverse();
+  const items = itemsOf(ctx);
+  const alive = aliveAnchors(ctx.chat);
+  // 다시 굴리거나 지운 응답에 묶인 줄은 보이지 않는다 (지우지는 않음 — 그 응답이 돌아오면 다시 보인다). 기준 없는 줄(직접 넣기·버리기)은 늘 (전수검사 11-13)
+  const all = (q ? searchItems(items, alive, q).log : items.log.slice().reverse()).filter((l) => !l.anchor || alive.has(l.anchor));
   const rows = all.filter((l) => (itemsUi.logFilter === 'get' ? l.what === 'get' : itemsUi.logFilter === 'out' ? l.what !== 'get' : true));
   const chip = (v: typeof itemsUi.logFilter, label: string, n: number) => `<button class="gx-chip${itemsUi.logFilter === v ? ' on' : ''}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label}${n ? ` <small>${n}</small>` : ''}</button>`;
   const got = all.filter((l) => l.what === 'get').length;
@@ -289,11 +320,13 @@ function logList(ctx: ChatContext): string {
     if (g && g.day === day) g.rows.push(l);
     else groups.push({ day, rows: [l] });
   }
-  return `${chips}<div class="gx-wallettab it-log">${groups.map((g) => {
+  // 처음엔 최근 것부터 정한 줄 수만, 나머지는 「더 보기」 (ui/more.ts). 날짜 머리의 획득·사용 수는 그날 전체
+  const cut = moreCut('items-log', `${itemsUi.logFilter}|${q}`, ctx.chat.scriptstate, groups);
+  return `${chips}<div class="gx-wallettab it-log">${cut.groups.map((g) => {
     const gi = g.rows.filter((l) => l.what === 'get').length;
     const go = g.rows.length - gi;
-    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${[gi ? `획득 ${gi}` : '', go ? `사용 ${go}` : ''].filter(Boolean).join(' · ')}</em></h3><ul>${g.rows.map(row).join('')}</ul></section>`;
-  }).join('')}</div>`;
+    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${[gi ? `획득 ${gi}` : '', go ? `사용 ${go}` : ''].filter(Boolean).join(' · ')}</em></h3><ul>${g.shown.map(row).join('')}</ul></section>`;
+  }).join('')}${cut.more}</div>`;
 }
 
 // ── 팝업 ──
@@ -308,6 +341,9 @@ function popup(ctx: ChatContext): string {
   const head = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc(it.name)}</b><small>${esc([traitsLine(it, leftOf(ctx, it)), sourceLine(it, whenOf(ctx))].filter(Boolean).join(' · '))}</small></div></div>`;
   if (itemsUi.mode === 'drop') {
     return shell('버리기', `${head}<p>버릴까요? 목록에서 빠지고 기록에 남아요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-drop" data-value="${esc(it.id)}">버리기</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
+  }
+  if (itemsUi.mode === 'purge') {
+    return shell('삭제', `${head}<p>삭제할까요? 목록과 기록에서 지워지고 되돌릴 수 없어요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-purge" data-value="${esc(it.id)}">삭제</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
   }
   const queued = useQueue(ctx).find((u) => u.id === it.id)?.n ?? 0;
   const left = leftOf(ctx, it);
@@ -329,14 +365,18 @@ function popup(ctx: ChatContext): string {
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc(it.id)}">버리기</button>
     </div>
     ${queued ? '<p class="dim">다음 메시지를 보낼 때 메인 요청에 「이번 턴 사용」으로 넘어가요.</p>' : ''}`;
-  return shell(it.name, body);
+  return shell(it.name, body, it.id);
 }
 
-const shell = (label: string, inner: string) => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc(label)}"><div class="gx-agpop-card it-card" data-action="items-keep"><button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
+/** del = 물건 id 를 주면 닫기 왼쪽에 빨간 휴지통(삭제) 단추 (2026-11-13 사용자) */
+const shell = (label: string, inner: string, del = '') => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc(label)}"><div class="gx-agpop-card it-card" data-action="items-keep">${del ? `<button class="gx-agpop-x it-del" data-action="items-purge-ask" data-value="${esc(del)}" aria-label="삭제" title="삭제">${ICONS.trash}</button>` : ''}<button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
 
 function form(it: Item | null, left?: number): string {
   const eq = it?.equip ?? '';
   const opt = (v: string, l: string) => `<option value="${v}"${eq === v ? ' selected' : ''}>${l}</option>`;
+  // 그림: 상태에 따라 그림이 여러 장인 물건(꿈결 수집기)만 칸이 나온다. 고른 그림 이름이 그림 말의 물건말이 된다 (그림일 뿐 — 물건의 등급을 정하지 않는다)
+  const pics = it ? itemPictures(it.name, it.icon) : null;
+  const picNow = it ? splitIconWord(it.icon).word : '';
   // 폼 요소를 쓰지 않는다: 플러그인 창 iframe 에 allow-forms 가 없어 submit 이 오지 않는다 (tests/qc-settings-static). 저장은 단추의 data-action 으로
   return `<div class="it-form" data-it-form="1">
     <label><span>이름</span><input name="name" maxlength="30" required value="${esc(it?.name ?? '')}" placeholder="예: 소금 봉지"></label>
@@ -346,6 +386,7 @@ function form(it: Item | null, left?: number): string {
     <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? ' checked' : ''}> 쓸 수 있음</span></label>
     <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ''}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
     <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ''}" placeholder="kg"></label>
+${pics ? `<label><span>그림</span><select name="pic">${pics.some((n) => n === picNow) ? '' : '<option value="" selected>그대로</option>'}${pics.map((n) => `<option value="${esc(n)}"${n === picNow ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>` : ''}
     <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc(it?.id ?? '')}">${it ? '저장' : '넣기'}</button><button type="button" class="gx-chip" data-action="${it ? 'items-back' : 'items-close'}">취소</button></div>
   </div>`;
 }
@@ -453,9 +494,30 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       itemsUi.dragDrop = false;
       env.render();
       return true;
+    case 'items-purge-ask':
+      if (!value) return true;
+      itemsUi.open = value;
+      itemsUi.mode = 'purge';
+      itemsUi.dragDrop = false;
+      env.render();
+      return true;
+    case 'items-purge': {
+      if (!value) return true;
+      await write((it) => purgeItem(it, value));
+      await dropFromUse(ctx, value);
+      itemsUi.open = '';
+      itemsUi.mode = 'view';
+      itemsUi.dragDrop = false;
+      itemsUi.info = '삭제했어요.';
+      await env.refresh();
+      return true;
+    }
     case 'items-drop': {
       if (!value) return true;
-      await write((it) => removeItem(it, value, 'drop', 'manual'));
+      // 숨기기만 한다 (지우지 않음): 버린 뒤의 본문이 다시 줍는다고 쓰면 같은 물건으로 돌아온다. 버린 때의 마지막 메시지를 적어 둔다
+      const msgs = ctx.chat.message ?? [];
+      const key = msgs.length ? messageKey(msgs[msgs.length - 1], msgs.length - 1) : '';
+      await write((it) => removeItem(it, value, 'drop', 'manual', '', { key }));
       await dropFromUse(ctx, value);
       itemsUi.open = '';
       itemsUi.mode = 'view';
@@ -479,7 +541,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       }
       const wRaw = get('weight');
       const weight = wRaw ? itemWeight(wRaw) : undefined;
-      const patch = { name, desc: get('desc'), effect: get('effect'), use, equip: get('equip'), ...(weight !== undefined ? { weight } : {}) };
+      const patch = { name, desc: get('desc'), effect: get('effect'), use, equip: get('equip'), ...(weight !== undefined ? { weight } : {}), ...(get('pic') ? { icon: get('pic') } : {}) };
       if (value) {
         // 횟수 칸: 소모성이면 「지금 남은 횟수」로 맞춘다. 비소모 ↔ 소모성 바꿈도 여기서
         await write((it, alive) => {
@@ -522,7 +584,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       return true;
     }
     case 'items-dnd': {
-      // 끌어다 놓기 (app.ts): 「id|자리」. 자리 = equip:갈래:번호 · grid · use · drop
+      // 끌어다 놓기 (app.ts): 「id|자리」. 자리 = equip:갈래:번호 · auto(아바타·장착 칸 쪽) · grid · use · drop
       const [id, to = ''] = (value ?? '').split('|');
       const it = liveOf(ctx).find((x) => x.id === id);
       if (!it) return true;
@@ -537,6 +599,18 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       } else if (to === 'grid') {
         if (!isEquipped(it, liveOf(ctx))) return true;
         await write((x) => unequipItem(x, id));
+      } else if (to === 'auto') {
+        // 아바타·장착 칸 쪽에 놓기 (2026-11-12 사용자): 장착 물건은 맞는 갈래의 빈 칸으로, 쓰는 물건은 사용 예정으로. 둘 다 되면 장착
+        if (it.equip) {
+          if (isEquipped(it, liveOf(ctx))) return true;
+          if (!equippedOf(liveOf(ctx))[it.equip].some((x) => !x)) {
+            itemsUi.info = `${EQUIP_LABEL[it.equip]} 칸이 다 찼어요. 칸에 있는 것을 먼저 풀거나, 칸으로 끌어다 바꾸세요.`;
+            env.render();
+            return true;
+          }
+          await write((x, alive) => equipItem(x, alive, id));
+        } else if (canUse(it)) await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)));
+        else return true;
       } else if (to === 'use') {
         if (!canUse(it)) {
           itemsUi.info = it.state === 'broken' ? `「${it.name}」은 고장 나서 쓸 수 없어요.` : `「${it.name}」은 쓰는 물건이 아니에요.`;

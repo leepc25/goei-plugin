@@ -64,10 +64,23 @@ export const journalVars = (j: JournalStore): ScriptState => ({ [JOURNAL_KEY]: J
 export const reportVars = (r: ReportStore): ScriptState => ({ [REPORTS_KEY]: JSON.stringify(r) });
 export const recordVars = (j: JournalStore, r: ReportStore): ScriptState => ({ ...journalVars(j), ...reportVars(r) });
 
-/** 일지 상한: 넘치면 앞(오래된 것)부터 지운다 */
-export function trimJournal(j: JournalStore, cap: number): JournalStore {
-  if (j.rows.length <= cap) return j;
-  return { v: 1, rows: j.rows.slice(j.rows.length - cap) };
+/** 일지 줄을 최근 종료 시각이 위로 오게. 시각이 같으면 나중에 저장된 줄이 위, 시각 없는 줄은 맨 뒤 (전수검사 11-13) */
+export function journalNewestFirst<T extends { at: number | null }>(rows: T[]): T[] {
+  return rows.map((r, i) => ({ r, i })).sort((a, b) =>
+    a.r.at === null ? (b.r.at === null ? b.i - a.i : 1) : b.r.at === null ? -1 : (b.r.at - a.r.at) || (b.i - a.i)).map((x) => x.r);
+}
+
+/** 일지 상한: 넘치면 앞(오래된 것)부터 지운다. 고정한 보고서(keep)의 줄은 상한에 들지 않고 남는다 (전수검사 11-13, 사용자 13-1: 그 줄이 지워지면 보고서를 열 수도 고정을 풀 수도 없다) */
+export function trimJournal(j: JournalStore, cap: number, keep: ReadonlySet<string> = new Set()): JournalStore {
+  const kept = (r: JournalRow) => !!r.rpt && keep.has(r.rpt);
+  const loose = j.rows.filter((r) => !kept(r)).length;
+  if (loose <= cap) return j;
+  let drop = loose - cap;
+  return { v: 1, rows: j.rows.filter((r) => {
+    if (kept(r) || drop <= 0) return true;
+    drop -= 1;
+    return false;
+  }) };
 }
 
 /** 보고서 상한: 고정 안 된 것 가운데 오래된 것부터. 지워진 보고서를 가리키던 일지 줄의 rpt 는 끊는다 (줄은 남는다) */

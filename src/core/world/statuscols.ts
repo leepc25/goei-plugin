@@ -2,6 +2,7 @@
 // 사용을 끈 칸은 태그에서 아예 빠진다 (빈 칸 유지를 요구하지 않음). 모양은 `[Previous status]` 블록이 모델에 알려 준다.
 // 칸 구성은 채팅 변수 `$st_col_<id>` (on=사용·표시, hide=사용·숨김, off=미사용), 바뀐 기록은 `$st_col_log` (메시지 N부터 이 칸들).
 // 파서(status.ts)는 지금 칸 구성과 기록된 구성으로 먼저 읽고, 칸 수가 안 맞으면 알려진 모양(6·8·9·10)으로 읽는다.
+import { guideOr } from '../guides';
 
 export type ColId = 'date' | 'time' | 'weather' | 'temp' | 'place' | 'target' | 'companions' | 'deployed' | 'identity' | 'wallet' | 'points';
 export type ColMode = 'on' | 'hide' | 'off';
@@ -140,6 +141,9 @@ export function shapeFor(count: number): ColId[] | null {
 /** 파서가 지금 쓰는 모양 (시험용) */
 export const activeShapes = () => active;
 
+/** 이 채팅의 지금 구성. 알리지 않았으면 null (전수검사 11-13) */
+export const currentShape = (): ColId[] | null => active[0] ?? null;
+
 // ── 줄 만들기 ──
 
 export const NONE = '없음';
@@ -176,7 +180,7 @@ const RULE: Record<ColId, string> = {
   companions: 'Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.',
   deployed: 'Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.',
   identity: "Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).",
-  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted.",
+  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert. Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted.",
   wallet: "Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it.",
 };
 
@@ -186,17 +190,18 @@ const EXAMPLE_B: Record<ColId, string> = { date: '2025.01.01', time: '10:15 PM',
 /** 🏷️Tag 지침의 상태창 절: 칸 구성에서 형식 줄·규칙·예시를 만든다 */
 export function statusSection(cols: ColId[]): string {
   const fmt = `[▣|${cols.map((id) => colDef(id).token).join('|')}]`;
-  const rules = cols.map((id) => RULE[id]).filter(Boolean).map((r) => `- ${r}`);
+  // 칸 규칙·고정 줄은 지침 「메인 요청에 붙는 글」 STATUS.RULE.* 절. 절이 없으면 여기 남긴 글
+  const rules = cols.map((id) => (RULE[id] ? guideOr('Main', `STATUS.RULE.${id.toUpperCase()}`, RULE[id]) : '')).filter(Boolean).map((r) => `- ${r}`);
   // 포인트 칸이 있으면 백일몽 소속이라 예시 신분도 백일몽으로
   const ex = (v: Record<ColId, string>) => `[▣|${cols.map((id) => (id === 'identity' && cols.includes('points') ? '백일몽/사원' : v[id])).join('|')}]`;
   return [
     '## Status',
     fmt,
     '',
-    '- Output exactly one [▣] at the very end of every response, as the final line.',
-    `- Fields in order: ${cols.map((id) => colDef(id).label).join(' | ')}. Never add, drop or reorder fields.`,
+    guideOr('Main', 'STATUS.RULE.ONE_LINE', '- Output exactly one [▣] at the very end of every response.'),
+    guideOr('Main', 'STATUS.RULE.FIELDS', () => `- Fields in order: ${cols.map((id) => colDef(id).label).join(' | ')}. Never add, drop or reorder fields.`, { labels: cols.map((id) => colDef(id).label).join(' | ') }),
     ...rules,
-    '- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.',
+    guideOr('Main', 'STATUS.RULE.PREVIOUS', '- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.'),
     `- Example${cols.includes('target') ? ' (no current anomaly)' : ''}:`,
     ex(EXAMPLE_A),
     ...(cols.includes('target') || cols.includes('companions') || cols.includes('deployed') ? [`- Example (inside an anomaly${cols.includes('companions') ? ' with two companions' : ''}):`, ex(EXAMPLE_B)] : []),

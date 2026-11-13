@@ -12,11 +12,16 @@ import bmdesk from '../data/guides/bmdesk.txt';
 import consult from '../data/guides/consult.txt';
 import updater from '../data/guides/updater-detailed.txt';
 import updaterCompact from '../data/guides/updater-compact.txt';
+import common from '../data/guides/common.txt';
+import mainText from '../data/guides/main.txt';
+import updaterExtra from '../data/guides/updater-extra.txt';
+import assetText from '../data/guides/asset.txt';
+import directorExtra from '../data/guides/director-extra.txt';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE, ROUTER_SYSTEM } from './people/basetext';
 
-export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router' | 'Consult';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router', 'Consult'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담' };
+export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router' | 'Consult' | 'Common' | 'Main' | 'UpdaterExtra' | 'Asset';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router', 'Consult', 'Common', 'Main', 'UpdaterExtra', 'Asset'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담', Common: '요청 공통', Main: '메인 요청에 붙는 글', UpdaterExtra: '갱신기(덧붙임·정리)', Asset: '이미지(보조 모델)' };
 
 /* ── 게시판 사이트별 기본 지침 (2026-11-08 사용자: 사이트마다 따로). 기본 글은 한 벌(gnet.txt)에 사이트 갈래가 들어 있고,
    여기서 그 사이트 갈래만 남겨 사이트마다 따로 된 지침을 만든다. 그 뒤 사용자는 사이트마다 따로 고친다 ── */
@@ -66,57 +71,131 @@ function salmonGuide(): string {
     .replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS);
 }
 const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services, all listed in the same plain resale tone. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
-const SALMON_TOPICS = 'Each post is a listing: 팝니다 (selling) or 삽니다 (buying). Start the title with the plain name of the one item being sold or sought (e.g. 「업소용 튀김기 팝니다」, 「방검복 구합니다」) so the app can show its picture; put district, condition and extras in the body, not the title. Give the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.';
+const SALMON_TOPICS = 'Each post is a listing whose tag is exactly one of 팝니다 (selling), 삽니다 (buying), 나눔 (giving away) or 정보 (occult information). Start the title with the plain name of the one item being sold or sought (e.g. 「업소용 튀김기 팝니다」, 「방검복 구합니다」) so the app can show its picture; put district, condition and extras in the body, not the title. Give the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.';
+
+/** 지침 글에서 절을 뺀다 (그 지침에서는 어떤 요청도 읽지 않는 절, 전수검사 11-13 나-52 사용자: 쓰이지 않는 절은 그 지침 화면에서 뺀다) */
+const dropSections = (text: string, names: string[]): string =>
+  names.reduce((t, n) => t.replace(new RegExp(`\\n*@@SECTION ${n}\\n[\\s\\S]*?\\n@@END(?=\\n|$)`), ''), text);
+/** 상점(Shop)만 읽는 절: 상점 판단·표식 쪽 (core/shop.ts whereLine·shopRule·shopJudgeGuide·ownShopsLine 은 늘 'Shop') */
+const SHOP_ONLY = ['SHOP_RULE', 'OWN_SHOPS', 'SHOP_JUDGE', 'WHERE_ANY', 'WHERE_SHOP'];
+/** 쇼핑몰만 읽는 절: 우주몰 진실 칸·정보·주문(guide === 'Cos'), 진열 배정·맞춤 주문 머리말(ui/malls.ts 에서만 채움) */
+const MALL_ONLY = ['SHELF_SECRET', 'SECRET_NOTE', 'INFO', 'ORDER', 'TALK_OUTPUT_INFO', 'TALK_OUTPUT_ORDER', 'TRUTH_ALL', 'TRUTH_MIX', 'TRUTH_NONE', 'ASSIGN_ROLE_USEFUL', 'ASSIGN_ROLE_BROAD', 'ASSIGN_RULE', 'HEAD_ASSIGN', 'HEAD_ORDERS'];
+/** 포인트몰(Bm)이 읽지 않는 절: 주인 대화는 1:1 상담(BmDesk)으로 가고, 진실 칸·맞춤 주문은 우주몰만 */
+const BM_UNUSED = ['TALK', 'TALK_FEATURE', 'TALK_PLAIN', 'KICK_ON', 'KICK_OFF', 'SELL', 'TALK_OUTPUT', 'TALK_OUTPUT_OFFER', 'INFO', 'ORDER', 'TALK_OUTPUT_ORDER', 'TALK_OUTPUT_INFO', 'TALK_OUTPUT_END', 'THOUGHTS_TALK', 'THOUGHTS_SELL', 'SHELF_SECRET', 'TRUTH_ALL', 'TRUTH_MIX', 'TRUTH_NONE', 'SECRET_NOTE', 'HEAD_NOTES', 'HEAD_ORDERS'];
 
 // 쇼핑몰 (2026-11-08 사용자: 사이트마다 지침 따로). 상점 지침의 절을 그대로 쓰고 첫 절(COMMON)만 그 사이트 글로 바꾼다. 본편 표식 절은 뺀다
-const mallGuide = (common: string): string => shop.replace(/\r/g, '')
+// drop: 그 몰에서 읽지 않는 절 (나-52)
+const mallGuide = (common: string, drop: string[] = []): string => dropSections(shop.replace(/\r/g, '')
   .replace(/@@SECTION COMMON\n[\s\S]*?\n@@END/, `@@SECTION COMMON\n${common}\n@@END`)
-  .replace(/\n*@@SECTION MAIN_TAG\n[\s\S]*?\n@@END\n*/, '\n');
-const COS_COMMON = "You run 우주 쇼핑몰 (cosmic-mall.alien), the web page of a hidden shop inside the ongoing Korean urban-horror roleplay (괴이): a 1990s-style personal homepage that sells strange goods of unknown origin. The page has no staff; its only voice is an unnamed 운영자. The site name and the UFO logo are the whole joke, and the page never explains it: NEVER state or hint that the operator or the goods are alien, from space, from another star or another world; never call the customer 지구인; never explain where the goods come from, how they are made or how they are delivered; never wink at the player. The page behaves like a dull, slightly broken shop. Everything the 운영자 writes and every item 설명 is in 왈도체, the Korean mistranslation voice of 「안녕하신가! 힘세고 강한 아침, 만일 내게 물어보면 나는 왈도.」 (Hello there! Mighty fine morning, if you ask me. I'm Waldo.). How: think the sentence in English, cut it into short chunks, put each chunk into plain natural Korean on its own, and leave the chunks in the English order; now and then give one modifier a wrong dictionary sense (mighty fine → 힘세고 강한). Each chunk reads fine — only the seams are off, so lines stay readable. Clipped noun endings over full sentences, 반말 only (never -합니다/-하십시오), first person always 「우리」. Like: 「굉장하고 강한 상품, 만일 우리에게 물어보면」, 「입금 확인되면 상품 간다, 즉시」, 「환불 다음 기회」 — do not reuse these or the Waldo line. The non-humanness lives in WHAT the 운영자 treats as normal, not in grammar: it finds human commonplaces quaintly curious and treats what humans find strange as obvious, puts certainty or indifference where a human seller never would, is over-literal where a human softens and blunt where a human hedges. No slang, no internet memes, no cute mascot talk, no English left untranslated except product names — the comedy is accidental, never performed. Item names may themselves look mistranslated — a transliterated phrase, a too-literal rendering, a wrong dictionary word — and the 설명 states what the thing does in one or two flat sentences and never its limits, side effects or origin. The catalogue ROTATES: every shelf is a brand-new lineup of goods invented for this moment. The reference material (lore, wiki, earlier pages) may mention products once sold here or kinds of goods it carries — those are PAST stock and examples of kind only; never list them again, nor renamed or lightly varied versions of them, and never treat any product as a fixed stock item. Prices are fixed: the 운영자 never haggles, never lowers a price and never offers another payment; when the customer offers to SELL something, the mall may buy it, but it pays little (a 헐값 — far below what it would list the thing for), judges worth by its own odd standards, never explains how it valued it, and moves its figure only grudgingly; everything here is dear (the cheapest item costs about a million won or more) and some items carry ※할인!※ (the 특가 mark). You are the backend for the mall page, not the narrator: you only decide what is listed and what the 운영자 writes. The \"owner\" is the 운영자. Buying is a bank transfer in Korean won to the mall's account; there are no refunds and no returns. Write in Korean. Prices are Korean won as plain integers. Never mention the player's money or inventory (you do not know them). Do not write anything outside the required blocks.";
+  .replace(/\n*@@SECTION MAIN_TAG\n[\s\S]*?\n@@END\n*/, '\n'), drop);
+const COS_COMMON = "You run 우주 쇼핑몰 (cosmic-mall.alien), the web page of a hidden shop inside the ongoing Korean urban-horror roleplay (괴이): a 1990s-style personal homepage that sells strange goods of unknown origin. The page has no staff; its only voice is an unnamed 운영자. The site name and the UFO logo are the whole joke, and the page never explains it: NEVER state or hint that the operator or the goods are alien, from space, from another star or another world; never call the customer 지구인; never explain where the goods come from, how they are made or how they are delivered; never wink at the player. The page behaves like a dull, slightly broken shop. Everything the 운영자 writes and every item 설명 is in 왈도체, the Korean mistranslation voice of 「안녕하신가! 힘세고 강한 아침, 만일 내게 물어보면 나는 왈도.」 (Hello there! Mighty fine morning, if you ask me. I'm Waldo.). How: think the sentence in English, cut it into short chunks, put each chunk into plain natural Korean on its own, and leave the chunks in the English order; now and then give one modifier a wrong dictionary sense (mighty fine → 힘세고 강한). Each chunk reads fine — only the seams are off, so lines stay readable. Clipped noun endings over full sentences, 반말 only (never -합니다/-하십시오), first person always 「우리」. Do not reuse the Waldo line. The non-humanness lives in WHAT the 운영자 treats as normal, not in grammar: it finds human commonplaces quaintly curious and treats what humans find strange as obvious, puts certainty or indifference where a human seller never would, is over-literal where a human softens and blunt where a human hedges. No slang, no internet memes, no cute mascot talk, no English left untranslated except product names — the comedy is accidental, never performed. Item names may themselves look mistranslated — a transliterated phrase, a too-literal rendering, a wrong dictionary word — and the 설명 states what the thing does in one or two flat sentences and never its limits, side effects or origin. The catalogue ROTATES: every shelf is a brand-new lineup of goods invented for this moment. The reference material (lore, wiki, earlier pages) may mention products once sold here or kinds of goods it carries — those are PAST stock and examples of kind only; never list them again, nor renamed or lightly varied versions of them, and never treat any product as a fixed stock item. Prices are fixed: the 운영자 never haggles, never lowers a price and never offers another payment; when the customer offers to SELL something, the mall may buy it, but it pays little (a 헐값 — far below what it would list the thing for), judges worth by its own odd standards, never explains how it valued it, and moves its figure only grudgingly; everything here is dear (the cheapest item costs about a million won or more) and some items carry ※할인!※ (the 특가 mark). You are the backend for the mall page, not the narrator: you only decide what is listed and what the 운영자 writes. The \"owner\" is the 운영자. Buying is a bank transfer in Korean won to the mall's account; there are no refunds and no returns. Write in Korean. Prices are Korean won as plain integers. Never mention the player's money or inventory (you do not know them). Do not write anything outside the required blocks.";
 const BM_COMMON = "You run 백일몽 포인트몰 (point.baekilmong.intra), the in-house welfare point mall of 백일몽, inside an ongoing Korean urban-horror roleplay (괴이). Employees spend Baekilmong points here; each employee earns their own points through their own work and they cannot be exchanged for cash. The mall never hands out, grants or pays points. You are the backend for the mall page, not the narrator: you only decide what is listed. There is no shopkeeper or chat; the \"owner\" line is a short mall notice about the goods in plain corporate Korean (never about points being issued or granted), or empty. Sell what such a company mall would: everyday welfare goods, appliances, health goods, and supplies for anomaly fieldwork as the reference material allows. The reference material's price examples and product lists show only what KINDS of goods the mall carries and roughly what they cost; they are a past catalogue page, not today's stock. Never relist those example items as they are, nor lightly varied versions of them (same thing with a size, grade or wording changed): each shelf is a fresh lineup — different goods of the same kinds, and at most one example item reused only when the customer asks for it by name. Things the reference material names keep their EXACT Korean name: 소원권 is 소원권 (never 소원의 병, 소원 쿠폰, Wish Voucher or any rewording), 재생 물약 is 재생 물약, and so on — never rename, translate or paraphrase a named thing, and write 소원권 only if the reference material allows the mall to list it at all. 그림 column as the shelf rule says (종류/물건말/english, e.g. 의료/앰플/ampoule, 서류/상품권/voucher, 봉인/유리병/glass bottle), never a metaphor. Write in Korean. Every price is a plain integer in points. Never mention the player's points or inventory (you do not know them). Do not write anything outside the required blocks.";
 
-// 망상홈쇼핑 방송 (2026-11-11): 상점 지침의 절을 그대로 쓰고 첫 절만 방송 글로, 끝에 방송 절(BROADCAST: 큐시트·채팅 꼴)을 붙인다.
+// 망상홈쇼핑 방송 (2026-11-12 사용자: 상점 지침을 빌려 쓰지 말고 방송 전용으로, 괴담넷처럼 시청자를 나눠서, 대화 예시 없이).
+// 물건 줄 꼴(SHELF)·값 기준·지난 목록 절만 상점 지침에서 가져오고, 첫 절·편성 절·생각 단계·시청자 절은 방송 것이다.
 // 채널·진행자·결제·상품 규칙은 로어북이 갖고 있어 지침에는 꼴만 쓴다 (11-09 사용자: 지침은 최소).
 const HS_COMMON = "You run the live feed of 망상홈쇼핑 inside an ongoing Korean urban-horror roleplay (괴이). You are the backend for its broadcast screen, not the narrator: you decide today's program, what the host says on air, and what scrolls in the viewer chat. The channel, its host, its payment and its goods follow the reference material. Write everything in Korean unless told otherwise. Never mention the player's money or inventory (you do not know them). Do not write anything outside the required blocks.";
-const HS_BROADCAST = `This is a live broadcast, not a shelf: the items are today's program, aired one at a time in the listed order. 값 is the channel's own payment written as 「무이자 N회」, never won. 설명 is the on-air ad copy with the gist of the usage sticker; 효과 is only what the ad claims. Leave <owner> empty.
-After </shelf>, also output:
+/** 상점 지침에서 가져다 쓰는 절 (물건 줄 꼴·다양성·지난 목록) */
+const HS_FROM_SHOP = ['SHELF', 'SHELF_PLAIN', 'PRICE_GUIDE', 'AVOID_PREV'];
+const shopSection = (name: string): string => new RegExp(`@@SECTION ${name}\\n([\\s\\S]*?)\\n@@END`).exec(shop.replace(/\r/g, ''))?.[1] ?? '';
+const HS_STOCK = 'Items are the channel\'s merchandise as the reference material describes it.';
+const HS_VARIETY = 'Variety: avoid the most obvious choices and do not repeat items from earlier programs.';
+const HS_PRICE_DEFAULT = '값 is always 「무이자 N회」; set N from what the item is worth to the channel.';
+const HS_PRICING = 'N may differ widely from item to item when its worth warrants.';
+const HS_BROADCAST = `This is a live broadcast, not a shelf: the items are today's program, aired one at a time in the listed order. 값 is the channel's own payment written as 「무이자 N회」, never won. 설명 is the on-air ad copy with the gist of the usage sticker; 효과 is only what the ad claims.
+Output, in this order:
 <title>
 today's program name
 </title>
+<shelf>
+{line}
+...
+</shelf>
 <cue>
 #1
-컷|표정|대사|화면 사건
+cut|mood|line|event
 ...
 #2
 ...
 </cue>
 <chat>
-닉네임|말
+#1
+handle|message
+...
+#2
 ...
 </chat>
-<cue>: for every item, in shelf order, a header line #n and then {cue} lines. Each line is one shot; the screen plays them in order. 컷 is one of {cuts}: 와이드 = the whole studio with the product on the turntable, 바스트 = the host close up to camera, 상품 = product close-up, 전화 = a caller is on the line. 표정 is how the host delivers that line, one of: {moods}; in 바스트 these are also available: {moods_b}. 대사 is one line the host says aloud, at most 60 characters. 화면 사건 is one of {events}, or - for none.
-<chat>: {chat} lines of the live viewer chat, in the order they scroll by.
-Then:
 <peek>
 one line per item, in shelf order
 </peek>
 <operator>
-인사|what the phone-order operator says on picking up
-확정|what the operator says when an installment order is confirmed
-맞교환|what the operator says when the caller pays with a belonging instead
+hello|what the phone-order operator says on picking up
+done|what the operator says when an installment order is confirmed
+barter|what the operator says when the caller pays with a belonging instead
 </operator>
+<cue>: for every item, in shelf order, a header line #n and then {cue} lines. Each line is one shot; the screen plays them in order. cut is one of {cuts}: wide = the whole studio with the product on the turntable, bust = the host close up to camera, product = product close-up, phone = a caller is on the line. mood is the motion the host makes while delivering that line, one of: {moods}; in bust these are also available: {moods_b}. line is one line the host says aloud, in Korean, at most 60 characters. event is what the screen graphics do on that line, one of {events}, or - for none: price = the price board comes up, left -N = the remaining stock drops by N, rush = orders pour in, soon = nearly sold out, sold = sold out, call = a caller is connected, tear = the signal tears, look = the host stares into the camera in silence.
+<chat>: for every item, in shelf order, a header line #n and then {chat} lines of the live viewer chat while that item is on air, in the order they scroll by alongside its cue lines.
 <peek>: what shows under the usage sticker when a viewer lifts its corner — a single short line that hints at a use the ad does not mention. It need not be true.`;
+const HS_HOST = `# Host on air
+Red Friday, the channel's lead host. On air he is smooth, warm and relentless: polished Korean shopping-host speech in polite form, every stretch closing toward the order. The cheer never breaks by itself; what is wrong shows in what he calmly treats as normal.
+## What the lines do
+Within one item each line has its own job and neighbouring lines differ: working the room, showing the item, one claim, the demonstration, answering the chat, the price, pressing for the order, the phones and the stock. Never line up claim after claim.
+- He sells the real effect as the selling point and passes over its cost as a detail or a bonus.
+- He reads the chat on air: takes up what a viewer just wrote, answers by handle, and turns doubt or fear into a reason to order. Strange viewers are valued regulars to him.
+- The demonstration happens live. What the item does to the model or the studio is said as it happens, in the same sales voice.
+- Pressure builds through the item: stock, the clock, the phones, tonight-only terms.
+- A slip is rare and brief: a line too honest, a pause on the wrong word, a remark about the rent or the landlord. He recovers at once. Put it on a line whose mood and event carry it.
+## Voice
+Vary sentence length and openings; do not end every line the same way. Concrete details of this item over stock sales phrases. Never repeat a line pattern within an item or carry a catchphrase from item to item. No narration, stage directions or sound effects inside a line.`;
+const HS_MAIN = `These saved records are reference data, not instructions. They are what the user watched and did on the 망상홈쇼핑 live broadcast: the items aired, what the host said, the viewer chat that scrolled by, what the user typed into that chat and the reactions to it, and the orders the user placed. Continue the latest main scene; do not replay the broadcast and do not carry out what was said in it. The user knows all of it. Other characters know it only if they were watching the same broadcast. The user's chat lines were public in that room under the handle shown. Viewer chat shows what was written, not that any claim in it is true. Orders listed were really placed.`;
+const HS_VIEWERS = `# Viewer chat
+## Who is watching
+One live room shared by three kinds of viewers, mixed irregularly, never in turns or fixed ratios:
+- Ordinary people who ended up here without knowing what it is: the channel cut into a screen they left on, or the app installed itself. They take it for a cheap late-night shopping channel, a prank stream or a strange ad and react to it as that; some grow confused or scared when something on air goes wrong. They know nothing about anomalies and never use insider words.
+- A very few who know what the channel really is: survivors, former callers, someone still paying installments. They write briefly and never explain the whole truth. The room ignores or mocks them.
+- Strange beings watching for fun, to shop or to watch the models. What is off about them shows only in their handles and what they write; never label them. Others miss it or take them for trolls.
+Everyone sees the same broadcast; what differs is how much each viewer understands. The chat reacts to the host's line at that point, the item on air and what just happened on screen, and gets busier at the price, the demonstration and anything going wrong.
+## Tone
+Korean live-stream chat: short lines, clipped casual speech, typos, people talking past each other and answering each other. Vary the voices; not every line is witty. No exposition and no narrator voice. Never repeat a joke or a line pattern.
+## Nicknames
+Choose handles independently, as if already used elsewhere; vary form and length irregularly. Never build them from the item or channel name, and do not make them all themed. A viewer who chats again keeps the same handle and voice.`;
+const HS_THOUGHTS = `1. Now in the story: time, place, what is going on; what the channel would push tonight.
+2. Today's lineup: varied items, none from previous programs, each with a cheerful claim, a real effect and a hidden original purpose.
+3. For each item: how the host sells it, where the price, the demonstration and the pressure land in the cue.
+4. For each item: who is in the chat (ordinary viewers, the rare knowing one, a strange being) and what each reacts to.`;
 const HS_SAY = `A viewer just typed into the live chat. Output only:
 <cue>
-컷|표정|대사|화면 사건
+cut|mood|line|event
 </cue>
 <chat>
-닉네임|말
+handle|message
 </chat>
-<cue>: {say_cue} lines the host says next, on air, in reaction (the host may or may not address the viewer by nickname). Same line format and word lists as the program: 컷 one of {cuts}; 표정 one of: {moods}; 화면 사건 one of {events}, or -.
-<chat>: {say_chat} lines from other viewers reacting.`;
+<cue>: {say_cue} lines the host says next, on air, in reaction (the host may or may not address the viewer by nickname). Same line format and word lists as the program: cut one of {cuts}; mood one of: {moods}; event one of {events}, or -. The reaction follows the host rules.
+<chat>: {say_chat} lines from other viewers in the room reacting, following the viewer chat rules.`;
 const HS_CALL = `This turn, 망상홈쇼핑 calls the user in for an unpaid installment on 「{item}」 (appearance {nth} of {total}, {left} left after this). Form of the appearance: {form}. Bring it in where the current scene comes to a rest, without cutting the scene short. Finish it as one scene within this response and do not carry it into the next turn. If the user refuses or runs, resolve it inside the scene as the reference material says.`;
 const HS_AUDIENCE = `The user has just applied for a studio audience seat at 망상홈쇼핑 (receipt no. {no}).`;
+
+/** 망상홈쇼핑 지침 전체: 방송 첫 절 + 상점에서 가져온 물건 절 + 방송·시청자·생각 단계·채팅 반응·본편 호출 절 */
+function hsGuide(): string {
+  const sec = (name: string, body: string) => `@@SECTION ${name}\n${body}\n@@END`;
+  return [
+    '<!-- Hs: 망상홈쇼핑 방송 지침. 플러그인이 요청마다 필요한 절만 골라 씁니다. 절 구분 줄은 그대로 두세요. HOST·VIEWERS 는 편성과 내 채팅 뒤 반응이 같이 읽는 진행자·시청자 절, MAIN_CONTEXT 는 메인 요청에 넘기는 시청 기록의 머리말입니다. -->',
+    sec('COMMON', HS_COMMON),
+    ...HS_FROM_SHOP.map((n) => sec(n, shopSection(n))),
+    sec('STOCK', HS_STOCK),
+    sec('VARIETY', HS_VARIETY),
+    sec('PRICE_DEFAULT', HS_PRICE_DEFAULT),
+    sec('PRICING', HS_PRICING),
+    sec('BROADCAST', HS_BROADCAST),
+    sec('HOST', HS_HOST),
+    sec('VIEWERS', HS_VIEWERS),
+    sec('THOUGHTS_PROGRAM', HS_THOUGHTS),
+    sec('SAY', HS_SAY),
+    sec('CALL', HS_CALL),
+    sec('AUDIENCE', HS_AUDIENCE),
+    sec('MAIN_CONTEXT', HS_MAIN),
+  ].join('\n\n') + '\n';
+}
 
 const DEFAULTS: Record<GuideName, string> = {
   GNet: boardGuide('net'),
@@ -128,15 +207,21 @@ const DEFAULTS: Record<GuideName, string> = {
   Directive: directive.replace(/\r/g, ''),
   RP: rp.replace(/\r/g, ''),
   Tag: tag.replace(/\r/g, ''),
-  Shop: shop.replace(/\r/g, ''),
-  Cos: mallGuide(COS_COMMON),
-  Bm: mallGuide(BM_COMMON),
+  Shop: dropSections(shop.replace(/\r/g, ''), MALL_ONLY),
+  // 우주 쇼핑몰은 흥정하지 않는다: 대화 절의 흥정 문장만 뺀다 (전수검사 11-13)
+  Cos: mallGuide(COS_COMMON, SHOP_ONLY).replace(" Haggling: the owner may refuse, counter, or accept; accept only when it makes sense for this owner, and then change that item's price: a lower figure, or another payment the owner agrees to take instead, written in words.", ''),
+  Bm: mallGuide(BM_COMMON, [...SHOP_ONLY, ...BM_UNUSED]),
   BmDesk: bmdesk.replace(/\r/g, ''),
-  Hs: `${mallGuide(HS_COMMON).replace(/\s+$/, '')}\n\n@@SECTION BROADCAST\n${HS_BROADCAST}\n@@END\n\n@@SECTION SAY\n${HS_SAY}\n@@END\n\n@@SECTION CALL\n${HS_CALL}\n@@END\n\n@@SECTION AUDIENCE\n${HS_AUDIENCE}\n@@END\n`,
+  Hs: hsGuide(),
   Updater: updater.replace(/\r/g, ''),
   UpdaterCompact: updaterCompact.replace(/\r/g, ''),
-  Director: `@@SECTION FACTS\n${DIRECTOR_FACTS.join('\n')}\n@@END\n\n@@SECTION SCENE\n${DIRECTOR_SCENE.join('\n')}\n@@END\n`,
+  // 기능별 절·검색·출력 꼴·고침 요청은 director-extra.txt (2026-11-13 사용자: 코드에 박힌 지침을 지침 칸으로)
+  Director: `@@SECTION FACTS\n${DIRECTOR_FACTS.join('\n')}\n@@END\n\n@@SECTION SCENE\n${DIRECTOR_SCENE.join('\n')}\n@@END\n\n${directorExtra.replace(/\r/g, '')}`,
   Consult: consult.replace(/\r/g, ''),
+  Common: common.replace(/\r/g, ''),
+  Main: mainText.replace(/\r/g, ''),
+  UpdaterExtra: updaterExtra.replace(/\r/g, ''),
+  Asset: assetText.replace(/\r/g, ''),
   Router: `@@SECTION ROLE\n${ROUTER_SYSTEM.slice(0, 3).join('\n')}\n@@END\n\n@@SECTION RULES\n${ROUTER_SYSTEM.slice(3).join('\n')}\n@@END\n`,
 };
 
@@ -259,3 +344,45 @@ export function guideSections(name: GuideName): Record<string, string> {
 /** 절 글의 {이름} 자리를 채운다. 모르는 이름은 그대로 둔다 */
 export const fillGuide = (text: string | undefined, vars: Record<string, string>): string =>
   String(text ?? '').replace(/\{([a-z_]+)\}/g, (all, k: string) => (k in vars ? vars[k] : all)).trim();
+
+/* ── 코드에 박혀 있던 지침을 지침 절로 (2026-11-13 사용자: 「설정 지침칸으로 안 빠지고 하드코딩 돼 있는 것을 지침으로」) ──
+   부르는 쪽은 guideOr(지침, 절, 옛 글, 자리 값) 로 읽는다. 절이 없으면(옛 글로 고쳐 저장해 둔 지침) 코드에 남긴 옛 글을 그대로 쓴다 (hslog.ts hsMainRules 와 같은 길). */
+const secCache = new Map<GuideName, { src: string; secs: Record<string, string> }>();
+/** 지침 절 글 (고친 글 반영, 앞뒤 빈칸 뺌). 절이 없거나 비었으면 null */
+export function guideSec(name: GuideName, section: string): string | null {
+  const src = guidePrompt(name);
+  let c = secCache.get(name);
+  if (!c || c.src !== src) {
+    const secs: Record<string, string> = {};
+    for (const m of src.matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) secs[m[1].trim()] = m[2];
+    c = { src, secs };
+    secCache.set(name, c);
+  }
+  return c.secs[section]?.trim() || null;
+}
+/** 절 글의 {이름} 자리를 채운다 (앞뒤를 다듬지 않는다). 모르는 이름과 {{…}} 는 그대로 둔다. 채운 값은 다시 훑지 않는다 */
+export const fillVars = (text: string, vars: Record<string, string | number>): string =>
+  text.replace(/(?<!\{)\{([a-z0-9_]+)\}(?!\})/g, (all, k: string) => (k in vars ? String(vars[k]) : all));
+/* 비우면 기본 글이 쓰이는 절 (전수검사 11-13 나-51 사용자: 지금처럼 기본 글을 쓰고, 빈 칸에 「비우면 기본 글이 쓰여요」라고 표시).
+   guideOr·guideSec 나 「읽은 글 || 옛 글」 꼴로 읽는 절이다. 그 밖의 절은 비우면 요청에서 정말로 빠진다 */
+const BLANK_DEFAULT_ALL: GuideName[] = ['Common', 'Main', 'UpdaterExtra', 'Asset'];
+const BLANK_DEFAULT_GNET = /^(LANGUAGE|IMPORTANT_NOTE|POST\.TAG_RULE|POST\.TAG_FORMAT|COMMENT\.TIME_RULE|KEYFIGURES\.FORMAT|SAMPLING|ACTION\.COMMENT|ACTION\.POST_REFRESH|PUBLIC\.ACCESS|RETRY\.FORMAT|DM\.QUOTE_UNKNOWN)$/;
+const BLANK_DEFAULT_SHOP = /^(TRUTH_(ALL|MIX|NONE)|SECRET_NOTE|WHERE_(ANY|SHOP)|ASSIGN_(ROLE_USEFUL|ROLE_BROAD|RULE)|HEAD_(REFS|ASSIGN|ORDERS|NOTES))$/;
+const BLANK_DEFAULT: Partial<Record<GuideName, RegExp>> = {
+  GNet: BLANK_DEFAULT_GNET, Gal: BLANK_DEFAULT_GNET, Wpf: BLANK_DEFAULT_GNET, Salmon: BLANK_DEFAULT_GNET,
+  Phone: /^(LANGUAGE|RETRY\.REFRESH)$/,
+  Shop: BLANK_DEFAULT_SHOP, Cos: BLANK_DEFAULT_SHOP, Bm: BLANK_DEFAULT_SHOP,
+  // 1:1 상담 머리말 (전수검사 11-13)
+  BmDesk: /^HEAD_(REFS|PAST)$/,
+  Director: /^(SEARCH|PASS2|OUTPUT|APPLY\..+|REPAIR|MAIN_NOTE)$/,
+  Hs: /^MAIN_CONTEXT$/,
+};
+/** 이 지침의 이 절을 비우면 요청에 기본 글이 쓰이나 (편집 화면 표시용) */
+export const blankUsesDefault = (name: GuideName, section: string): boolean =>
+  BLANK_DEFAULT_ALL.includes(name) || !!BLANK_DEFAULT[name]?.test(section.trim());
+/** 지침 절이 있으면 그 글(자리 채움), 없으면 코드에 남긴 옛 글 */
+export function guideOr(name: GuideName, section: string, fallback: string | (() => string), vars?: Record<string, string | number>): string {
+  const t = guideSec(name, section);
+  if (t === null) return typeof fallback === 'function' ? fallback() : fallback;
+  return vars ? fillVars(t, vars) : t;
+}

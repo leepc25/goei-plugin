@@ -17,7 +17,7 @@ import { ensureFlow } from './flow';
 import { flowPage, flowView } from './flowpage';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
-import { gnet } from '../gnet';
+import { boardFailures, clearBoardFailures } from '../gnet';
 import { phone } from '../phone';
 import { wiki } from '../wiki';
 
@@ -140,7 +140,8 @@ function diagBundle(ctx: ChatContext, canChat: boolean): string {
     wikiPack: !!storedWikiPack(),
     chat: canChat ? { messages: Array.isArray(ctx.chat.message) ? ctx.chat.message.length : 0, vars: chatSettingVars(ctx.chat.scriptstate) } : null,
     prefs: getPrefs(),
-    failures: { gnet: fail(gnet.failure), phone: fail(phone.failure), wiki: fail(wiki.failure) },
+    // 네 게시판 실패를 사이트와 함께 모두 적는다 (전수검사 11-13)
+    failures: { gnet: boardFailures().map((f) => ({ site: f.site, reason: f.reason, raw: f.raw })), phone: fail(phone.failure), wiki: fail(wiki.failure) },
     peopleRuns: runs,
   }, null, 2);
 }
@@ -175,7 +176,7 @@ function backupPage(ctx: ChatContext, canChat: boolean): string {
   const defaults = `<section class="ps-group"><h3>기본값</h3><div class="ps-rows">
       ${defRow('기본값으로 저장', '지금 설정을 기본값으로 저장해요. 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.', 'save', '기본값으로 저장')}
       ${defRow('기본값 불러오기', canChat ? '저장해 둔 기본값을 지금 채팅에 가져와요.' : '채팅을 시작한 뒤에 쓸 수 있어요. 새 채팅은 기본값으로 시작해요.', 'load', '불러오기', !canChat)}
-      ${defRow('초기화', '지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 플러그인 원래 값으로 되돌려요. 세계(카드 명부)는 그대로 둬요.', 'reset', '초기화', !canChat)}
+      ${defRow('초기화', '지금 채팅의 설정과 저장해 둔 기본값, 고친 지침, 고친 세계(카드 명부)를 플러그인 원래 값으로 되돌려요. 상황판 켜기·끄기와 추가 규칙은 그대로 둬요.', 'reset', '초기화', !canChat)}
     </div></section>${mainDefaultsConfirm(ctx)}`;
   return `<div class="gw-page gw-set">${head('', '저장·불러오기', '설정은 고치는 즉시 저장돼요. 여기서는 기본값을 저장·불러오기·초기화하고, 설정을 글(JSON)로 내보내고 가져와요.')}
     <div class="gx-settings gw-setbody">
@@ -207,7 +208,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
   const tok = tokenizerName();
   const rows = [
     row('카드', badge(goei, goei ? '괴이 카드' : '괴이 카드 아님'), goei ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`} · 명부·매니페스트 있음` : '설치 · 점검에서 심으면 괴이 카드가 돼요'),
-    row('플러그인', badge(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? `업데이트 주소 ${UPDATE_BASE}` : '업데이트 주소가 없는 빌드'),
+    row('플러그인', badge(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? '' : '업데이트를 받을 수 없는 빌드'), // 주소 글은 보여 주지 않는다 (2026-11-13 사용자)
     // 카드 판 ≠ 플러그인 판이면 빨간 줄 (2026-11-06 사용자, 전수점검 남은 것 4): 카드가 낡았으면 업데이트 페이지로, 카드가 더 새면 플러그인을 받으라고
     ...(goei && compareVersions(ver, PLUGIN_VERSION) !== 0 ? [row('판 맞춤', badge(false, compareVersions(ver, PLUGIN_VERSION) < 0 ? '카드가 낡음' : '플러그인이 낡음'), compareVersions(ver, PLUGIN_VERSION) < 0
       ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`}, 플러그인 v${PLUGIN_VERSION}. 새 기능·지침이 카드에 없을 수 있어요. 업데이트에서 카드를 플러그인 판으로 올리세요. <button class="gx-mini" data-action="ed-node" data-value="set:update">${ICONS.refresh}업데이트로</button>`
@@ -216,9 +217,10 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
     // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
     row('토크나이저', badge(!!tok, tok || '어림값') + getBtn('tok', '받기 (약 2MB)', !!tok), tok ? '토큰 수를 정확히 세요' : '안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요.'),
     row('위키 기본 문서', badge(!!storedWikiPack(), storedWikiPack() ? '있음' : '없음') + getBtn('wiki', '받기 (약 1MB)', !!storedWikiPack()), storedWikiPack() ? '카드에서 뺀 기본 문서 묶음 (이 기기 저장소)' : '안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요.'),
-    row('로어북 보내기', badge(null, mode === 'risu' ? 'Risu가 직접' : '플러그인이 고름'), '설정 → 고급 → 로어북 보내기'),
+    row('로어북 보내기', badge(null, mode === 'risu' ? 'Risu가 직접' : '플러그인이 고름'), '설정 → 호출 → 로어북 호출 → 로어북 보내기'),
   ].join('');
-  const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : '', phone.failure ? `괴담톡: ${phone.failure.reason}` : '', wiki.failure ? `위키: ${wiki.failure.reason}` : ''].filter(Boolean);
+  // 게시판 실패는 네 사이트 모두, 사이트 이름으로 (연어 마켓 실패가 「괴담넷」으로 나왔다, 전수검사 11-13)
+  const fails = [...boardFailures().map((f) => `${f.name}: ${f.reason}`), phone.failure ? `괴담톡: ${phone.failure.reason}` : '', wiki.failure ? `위키: ${wiki.failure.reason}` : ''].filter(Boolean);
   return `<div class="gw-page gw-set">${head('', '상태 점검', '플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.')}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows}${row('최근 실패', fails.length ? badge(false, `${fails.length}건`) : badge(true, '없음'), fails.length ? '「실패 기록」에서 원문을 볼 수 있어요' : '괴담넷·괴담톡·위키 요청이 실패한 적이 없어요')}</div></section>
@@ -228,7 +230,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
 function logPage(ctx: ChatContext, canChat: boolean): string {
   const fail = (name: string, f: { reason: string; raw: string } | null) =>
     f ? `<div class="ps-row"><div class="ps-label"><b>${esc(name)}</b><small>${esc(f.reason)}</small></div><textarea readonly rows="4">${esc(f.raw)}</textarea></div>` : '';
-  const fails = fail('괴담넷', gnet.failure) + fail('괴담톡', phone.failure) + fail('위키', wiki.failure);
+  const fails = boardFailures().map((f) => fail(f.name, f)).join('') + fail('괴담톡', phone.failure) + fail('위키', wiki.failure);
   const bundle = diagBundle(ctx, canChat);
   return `<div class="gw-page gw-set">${head('', '실패 기록', '괴담넷·괴담톡·위키 요청이 실패했을 때 모델이 보낸 원문이에요. 인물 기록 갱신의 결과는 「인물 기록 점검」에 있어요.')}
     <div class="gx-settings gw-setbody">
@@ -427,7 +429,7 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
       manUi.sizes = null;
       return true;
     case 'man-clear-fail':
-      gnet.failure = null;
+      clearBoardFailures(); // 보고 있지 않은 사이트 것도 (전수검사 11-13)
       phone.failure = null;
       wiki.failure = null;
       return true;

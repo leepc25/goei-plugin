@@ -1,11 +1,13 @@
 // 「고급 설정」 접는 칸 (v0.16.27, 사용자 설계): 각 기능 설정 맨 아래, 기본은 닫힘. 손대지 않아도 원본 기본값으로 돈다.
 // 바꾼 항목은 이름 앞 점과 되돌리기 버튼으로 보이고, 닫힌 칸 제목에 바꾼 개수가 뜬다.
-import { numSet, numWidth, setRow, setSeg } from './setrow';
+import { groupStep, numSet, setRow, setSeg, stepSize } from './setrow';
 import { ADV, advChanged, advItem, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
+import { ACTIVE_BOOKS_VAR, activeBooks, bookNames, toggleActiveBook, type RefSource } from '../core/refs';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { syncDecorators, type LoreMode } from '../core/lore';
+import { fnSet, type FnFeature } from '../core/reffn';
 import { keepOpen } from './panels';
 
 const esc = (s: unknown) =>
@@ -32,13 +34,11 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
   const zero = n === 0 && item.zero;
   const down = Math.max(min, n - step);
   const up = Math.min(max, n + step);
-  return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n <= min ? 'disabled' : ''} aria-label="${esc(item.label)} 줄이기">−</button>
-    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item.max ?? ''}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? '' : n}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''}${zeroWidth(item.zero, max)} aria-label="${esc(item.label)}">${item.unit ? `<span>${esc(item.unit)}</span>` : ''}
+  return `<div class="st-step adv-step${stepSize(max === Number.MAX_SAFE_INTEGER ? 9999999 : max, item.unit ?? '', item.zero ?? '')}"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n <= min ? 'disabled' : ''} aria-label="${esc(item.label)} 줄이기">−</button>
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item.max ?? ''}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? '' : n}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''} aria-label="${esc(item.label)}">${item.unit ? `<span>${esc(item.unit)}</span>` : ''}
     <button class="gx-step" data-action="adv-set" data-value="${id}=${up}" ${n >= max ? 'disabled' : ''} aria-label="${esc(item.label)} 늘리기">+</button></div>`;
 }
 
-/** 0일 때 보이는 말이 기본 칸(6.2em)보다 길면 칸을 그 말만큼 넓힌다 (모든 세부 값 줄 공통) */
-const zeroWidth = (z?: string, max = 0): string => (z && [...z].length > 5 ? ` style="width:${[...z].length + 1.2}em"` : ` style="width:${numWidth(max)}"`);
 
 function row(f: AdvFeature, item: AdvItem, state: State): string {
   const cur = advValue(state, f, item.key);
@@ -83,10 +83,51 @@ export function advChipsCtl(f: AdvFeature, keys: string[], state: State): string
   }).join('')}</div>`;
 }
 
-/** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다 */
-export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[], noTitle = false): string {
+// ── 「상시 로어북」 고르기 (설정 → 로어북 호출, 2026-11-12 사용자): 카드의 로어북 이름 목록에서 체크. 값은 $gen_active_books (core/refs.ts) ──
+/** 목록이 열려 있는지 · 검색어 · 열 때 골라져 있던 이름(목록 맨 위에 둔다. 체크할 때마다 줄이 옮겨 다니지 않게 열 때 한 번만 정한다) (화면 상태, 저장하지 않는다) */
+export const booksUi = { open: false, q: '', top: [] as string[] };
+const low = (s: string) => s.trim().toLowerCase();
+
+/** 목록 안쪽 (검색어를 칠 때 이 부분만 다시 그린다). 고른 이름이 카드에 없으면 맨 위에 「카드에 없음」으로 남겨 풀 수 있게 한다 */
+export function activeBooksList(src: RefSource, state: State): string {
+  const picked = activeBooks(state);
+  const on = new Set(picked.map(low));
+  const card = bookNames(src);
+  const inCard = new Set(card.map(low));
+  const gone = picked.filter((n) => !inCard.has(low(n)));
+  if (!card.length && !gone.length) return '<p class="gx-muted dir-empty">고를 수 있는 로어북이 없어요.</p>';
+  const q = low(booksUi.q);
+  const top = new Set(booksUi.top.map(low));
+  const list = [...gone, ...card.filter((n) => top.has(low(n))), ...card.filter((n) => !top.has(low(n)))].filter((n) => !q || n.toLowerCase().includes(q));
+  if (!list.length) return '<p class="gx-muted dir-empty">검색 결과가 없어요.</p>';
+  return list
+    .map((n) => `<button class="dir-ext-item" data-action="adv-book" data-value="${esc(n)}" aria-pressed="${on.has(low(n))}"><b>${esc(n)}</b>${inCard.has(low(n)) ? '' : '<small>카드에 없음</small>'}<span class="ck-m box${on.has(low(n)) ? ' on' : ''}"></span></button>`)
+    .join('');
+}
+
+/** 검색어를 칠 때: 목록만 다시 그린다 (입력 칸은 그대로). 이 입력이 아니면 false */
+export function booksInput(name: string, value: string, root: ParentNode | null | undefined, src: RefSource, state: State): boolean {
+  if (name !== 'adv-books-q') return false;
+  booksUi.q = value;
+  const box = root?.querySelector('.ps-ctl > .dir-ext > .dir-ext-list');
+  if (box) box.innerHTML = activeBooksList(src, state);
+  return true;
+}
+
+/** 「상시 로어북」 줄: 고른 개수 + 「로어북 선택」. 누르면 그 줄 아래에 검색 칸과 목록이 열린다 (명부의 사진 고르기와 같은 방식).
+ *  목록의 체크는 AI 상담이 누르지 않는다 (data-consult="no": 카드마다 이름이 다른 목록. 상담에는 설명만 간다) */
+export function activeBooksRow(src: RefSource, state: State): string {
+  const n = activeBooks(state).length;
+  const list = booksUi.open
+    ? `<div class="dir-ext" data-consult="no"><input class="gx-search" data-input="adv-books-q" value="${esc(booksUi.q)}" placeholder="검색" aria-label="검색" autocomplete="off"><div class="dir-ext-list">${activeBooksList(src, state)}</div></div>`
+    : '';
+  return setRow('상시 로어북', `<span class="ph-inline"><span>${n}개 선택</span><button class="gx-mini${booksUi.open ? ' on' : ''}" data-action="adv-books" aria-expanded="${booksUi.open}">로어북 선택</button></span>${list}`, '조건 없이 늘 넘기는 로어북이에요.', 'adv-row');
+}
+
+/** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다. rows[묶음 순서]는 그 묶음의 줄 맨 아래에 넣는다 */
+export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[], noTitle = false, rows: Record<number, string> = {}): string {
   return ADV[f]
-    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group">${noTitle ? '' : `<h3>${esc(g.title)}</h3>`}<div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}</div>${extra[gi] ?? ''}</section>`))
+    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group">${noTitle ? '' : `<h3>${esc(g.title)}</h3>`}<div class="ps-rows">${groupStep(`${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`)}${rows[gi] ?? ''}</div>${extra[gi] ?? ''}</section>`))
     .join('');
 }
 
@@ -95,7 +136,7 @@ export function advancedBox(f: AdvFeature, state: State): string {
   const n = advChanged(state, f).length;
   const groups = ADV[f]
     .map((g, gi) => {
-      const body = `${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`;
+      const body = groupStep(`${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}`);
       if (g.fold) {
         return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc(g.title)}</summary><div class="ps-rows">${body}</div></details>`;
       }
@@ -135,8 +176,34 @@ export async function handleAdvanced(action: string, value: string | undefined, 
   const v = value ?? '';
   let vars: Record<string, string> | null = null;
   if (action === 'adv-set') {
-    const hit = parse(v);
-    if (hit) vars = { [advVar(hit[0], hit[1])]: hit[2] };
+    // 기능별 넘길 내용·양 (core/reffn.ts): 「gn:fn_기능_칸=값」「ph:fn_기능_칸=값」
+    const fn = /^(gn|ph):(fn_[a-z_]+)=(.*)$/.exec(v);
+    const own = fn ? fnSet(fn[1] as FnFeature, fn[2], fn[3]) : null;
+    const hit = fn ? null : parse(v);
+    if (own) vars = { [own[0]]: own[1] };
+    else if (hit) vars = { [advVar(hit[0], hit[1])]: hit[2] };
+  } else if (action === 'adv-books') {
+    booksUi.open = !booksUi.open;
+    booksUi.q = '';
+    booksUi.top = booksUi.open ? activeBooks(scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate) : [];
+  } else if (action === 'adv-book') {
+    // 「상시 로어북」 체크: 누른 이름을 넣거나 뺀다 (기본값과 같아지면 비운다)
+    // 저장하는 그 순간의 값에서 고친다 (연달아 눌러도 앞 체크가 사라지지 않게)
+    if (!v.trim()) return true;
+    if (scope === 'defaults') {
+      await savePrefs((p) => {
+        const next = { ...(p.vars ?? {}) };
+        const x = toggleActiveBook(next, v);
+        if (x) next[ACTIVE_BOOKS_VAR] = x;
+        else delete next[ACTIVE_BOOKS_VAR];
+        return { ...p, vars: next };
+      });
+      env.render();
+      return true;
+    }
+    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [ACTIVE_BOOKS_VAR]: toggleActiveBook(chat.scriptstate, v) } }));
+    await env.refresh();
+    return true;
   } else return false;
   if (!vars) {
     env.render();

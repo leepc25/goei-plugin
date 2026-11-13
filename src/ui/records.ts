@@ -3,9 +3,9 @@
 // 일지·보고서는 core/journal 이 종료 순간 잘라 둔 스냅숏(채팅 변수 $goei_journal·$goei_reports)을 그대로 그린다 — 모델 호출 없음.
 // 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
 // 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 메인 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
-import { setRow } from './setrow';
+import { setRow, stepSizeText } from './setrow';
 import {
-  JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
+  JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_LIST_PAGE, JR_REPORT_CAP, journalClock, journalNewestFirst, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
   buildChronicle, CHRON_KIND_LABEL, type ChronEntry, type ChronKind,
 } from '../core/journal';
@@ -22,13 +22,14 @@ import { updateChat, type ChatContext } from '../host/risu';
 import { onOffSwitch } from './controls';
 import { drawerBox } from './drawer';
 import { walletPane, walletTools } from './wallet';
-import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
+import { defaultsAction, defaultsAsk, defaultsButtons, defaultsConfirm } from './defaults';
 import { ICONS } from './icons';
 import { avatar, stLabel } from './images';
 import { evArt } from './evpic';
 import { factionListView, factionView, peopleDocsView, peopleListView, personView, resetPeopleUi } from './people';
 import { toast } from './toast';
 import { isPhone } from './media';
+import { moreCut } from './more';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -240,8 +241,12 @@ export function journalList(ctx: ChatContext): string {
   const q = rec.q.trim().toLowerCase();
   const pass = (r: JournalRow) => (rec.filter === 'mine' ? r.mine : rec.filter === 'bg' ? !r.mine : true)
     && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(' ')} ${r.result}`.toLowerCase().includes(q));
-  const shown = rows.filter(pass).reverse();
+  // 저장 순서가 아니라 종료 시각 순 — 지난 시각 종료가 뒤에 저장돼도 같은 날이 한 묶음 (전수검사 11-13)
+  const shown = journalNewestFirst(rows.filter(pass));
   if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 줄이 없어요.' : '아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요.'}</p>`;
+  // 보고서 저장소는 한 번만 읽는다 — 줄마다 읽으면 찾기 칸이 버벅인다 (전수검사 11-13)
+  const reps = new Map<string, Report>();
+  for (const x of readReports(ctx.chat).items) if (!reps.has(x.id)) reps.set(x.id, x);
   const groups: { day: string; rows: JournalRow[] }[] = [];
   for (const r of shown) {
     const day = dayOf(r.at);
@@ -251,14 +256,16 @@ export function journalList(ctx: ChatContext): string {
   }
   groups.sort((a, b) => (a.day === '' ? 1 : b.day === '' ? -1 : 0));
   const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
-  return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map((r) => journalRow(ctx, r)).join('')}</ul></section>`).join('');
+  // 처음엔 최근 것부터 정한 줄 수만, 나머지는 「더 보기」 (ui/more.ts). 날짜 머리의 건수는 그날 전체 — 더 보기를 눌러도 숫자가 바뀌지 않게
+  const cut = moreCut('rec-journal', `${rec.filter}|${q}`, ctx.chat.scriptstate, groups);
+  return cut.groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.shown.map((r) => journalRow(ctx, r, reps)).join('')}</ul></section>`).join('') + cut.more;
 }
 
-function journalRow(ctx: ChatContext, r: JournalRow): string {
+function journalRow(ctx: ChatContext, r: JournalRow, reps: Map<string, Report>): string {
   const dur = r.at !== null && r.since !== null ? longDur(Math.max(0, r.at - r.since)) : '';
   const names = r.agents.map((a) => a.name).filter(Boolean);
   // 보고서 탭을 뺀 뒤(2026-11-05) 호감·지출 요약과 고정 표시만 일지 줄에. 「보고서 ›」「간이 보고서」 같은 단추 글자는 없음 (줄 어디를 눌러도 보고서가 뜬다)
-  const rep = r.rpt ? readReports(ctx.chat).items.find((x) => x.id === r.rpt) : undefined;
+  const rep = r.rpt ? reps.get(r.rpt) : undefined;
   const sum = rep ? `${peopleSum(rep)}${walletSum(rep)}` : '';
   const inner = `${shot(ctx, r.name, r.kind, r.loc, r.at)}
     <span class="gx-jr-main"><span class="gx-jr-l1">${gmark(r.kind, r.grade)}<b>${esc(r.name)}</b>${r.mine ? '<span class="gx-badge live">내 사건</span>' : ''}${rep?.pin ? `<i class="gx-jr-pin" title="고정">${ICONS.pin}</i>` : ''}</span>
@@ -297,16 +304,18 @@ function chroniclePane(ctx: ChatContext): string {
     if (g && g.day === e.day) g.rows.push(e);
     else groups.push({ day: e.day, rows: [e] });
   }
+  const repIds = new Set(readReports(ctx.chat).items.map((r) => r.id)); // 한 번만 읽기 (전수검사 11-13)
   const line = (e: ChronEntry) => {
-    const act = e.rpt && readReports(ctx.chat).items.some((r) => r.id === e.rpt) ? ` data-action="rec-chron-open" data-value="${esc(e.rpt)}"`
+    const act = e.rpt && repIds.has(e.rpt) ? ` data-action="rec-chron-open" data-value="${esc(e.rpt)}"`
       : e.person ? ` data-action="rec-person" data-value="${esc(e.person)}"`
       : e.faction ? ` data-action="rec-faction" data-value="${esc(e.faction)}"` : '';
     const mark = e.jk ? gmark(e.jk, e.grade) : `<i class="gx-cr-dot ${e.kind}" aria-hidden="true"></i>`;
     const inner = `${mark}<span class="gx-cr-main"><b>${esc(e.title)}</b><small>${esc(e.text)}</small></span><em class="gx-cr-kind">${esc(CHRON_KIND_LABEL[e.kind])}</em>`;
     return `<li>${act ? `<button class="gx-cr-row ${e.kind}"${act}>${inner}</button>` : `<div class="gx-cr-row ${e.kind}">${inner}</div>`}</li>`;
   };
+  const cut = moreCut('rec-chronicle', [...rec.chronOff].sort().join(','), ctx.chat.scriptstate, groups);
   return `${mon}${tools}
-    <div class="gx-jr-list gx-chron">${groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '날짜 없음')}</span><em>${g.rows.length}줄</em></h3><ul>${g.rows.map(line).join('')}</ul></section>`).join('')}</div>`;
+    <div class="gx-jr-list gx-chron">${cut.groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '날짜 없음')}</span><em>${g.rows.length}줄</em></h3><ul>${g.shown.map(line).join('')}</ul></section>`).join('')}${cut.more}</div>`;
 }
 
 // ── 보고서 요약 조각 (일지 줄에 붙는다) ──
@@ -504,8 +513,10 @@ export async function handleRecords(action: string, value: string | undefined, c
     case 'rec-back':
       if (rec.view === 'list') return false;
       rec.notice = '';
-      if (rec.view === 'report') Object.assign(rec, { sub: rec.sub === 'chronicle' ? 'chronicle' : 'journal', view: 'list', id: '' });
-      else if (rec.view === 'faction') Object.assign(rec, { sub: 'factions', view: 'list', id: '' });
+      if (rec.view === 'report') {
+        dropPng(); // 보고서가 닫히면 그 미리보기도 (전수검사 11-13)
+        Object.assign(rec, { sub: rec.sub === 'chronicle' ? 'chronicle' : 'journal', view: 'list', id: '' });
+      } else if (rec.view === 'faction') Object.assign(rec, { sub: 'factions', view: 'list', id: '' });
       else Object.assign(rec, { sub: 'people', view: 'list', id: '' });
       resetPeopleUi();
       break;
@@ -588,8 +599,9 @@ function seg(key: string, cur: string, items: [string, string][]): string {
   if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="jr-set" data-value="${esc(`${key}=${v}`)}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
 }
-function stepper(key: string, shown: string, canDown: boolean, canUp: boolean, label: string): string {
-  return `<div class="st-step"><button class="gx-step" data-action="jr-step" data-value="${key}:-" ${!canDown || rec.busy ? 'disabled' : ''} aria-label="${esc(label)} 줄이기">−</button>
+function stepper(key: string, shown: string, canDown: boolean, canUp: boolean, label: string, step: number, sizes: string[] = []): string {
+  // data-step: 한 번 누를 때 움직이는 양 (AI 상담 목록이 읽는다)
+  return `<div class="st-step${stepSizeText(shown, ...sizes)}" data-step="${step}"><button class="gx-step" data-action="jr-step" data-value="${key}:-" ${!canDown || rec.busy ? 'disabled' : ''} aria-label="${esc(label)} 줄이기">−</button>
     <b>${esc(shown)}</b><button class="gx-step" data-action="jr-step" data-value="${key}:+" ${!canUp || rec.busy ? 'disabled' : ''} aria-label="${esc(label)} 늘리기">+</button></div>`;
 }
 
@@ -597,8 +609,9 @@ export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
   const s = journalSettings(ctx.chat.scriptstate);
   const rows = [
     row('보고서 카드 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 끝난 응답 아래에 보고서 카드를 띄울지만 정해요. 보고서 자체는 이 설정과 상관없이 모두 만들어져 「기록」에 쌓여요. 카드는 보여 주기만 하고 본문·요청에는 들어가지 않아요. 안 띄움으로 바꾸면 이미 뜬 카드도 사라져요.'),
-    row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한'), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
-    row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < JR_REPORT_CAP.max, '보고서 상한'), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
+    row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한', JR_JOURNAL_CAP.step, [`${JR_JOURNAL_CAP.max.toLocaleString('en-US')}줄`]), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
+    row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < Math.min(JR_REPORT_CAP.max, s.journalCap), '보고서 상한', JR_REPORT_CAP.step, [`${JR_REPORT_CAP.max}건`]), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
+    row('한 번에 보일 줄 수', stepper('list_page', `${s.listPage}줄`, s.listPage > JR_LIST_PAGE.min, s.listPage < JR_LIST_PAGE.max, '한 번에 보일 줄 수', JR_LIST_PAGE.step, [`${JR_LIST_PAGE.max}줄`]), `일지·연대기·가계부·소지품 기록 목록에 처음 보일 줄 수예요 (${JR_LIST_PAGE.min}~${JR_LIST_PAGE.max}). 넘는 줄은 목록 아래 「더 보기」를 누르면 나와요.`),
   ].join('');
   return `<div class="ph-form jr-set">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>일지 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('jr')}</span></header>${defaultsConfirm('jr')}
@@ -624,10 +637,24 @@ async function setVars(ctx: ChatContext, env: RecordsEnv, vars: Record<string, s
   await env.refresh();
 }
 
+/** 채팅 카드는 display 처리기가 그린다: 열쇠 표를 다시 모으고, 이미 그려진 메시지도 다시 그리게 채팅을 그대로 한 번 저장한다 (끄면 카드가 사라진다) */
+async function redrawChatCards(ctx: ChatContext): Promise<void> {
+  try {
+    await refreshStatusContext(ctx.charIndex, ctx.chatIndex);
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+  } catch {
+    /* 다시 못 그려도 설정은 저장됐다 (다음 채팅 전환 때 반영) */
+  }
+}
+
 async function handleJournalSettings(action: string, v: string, ctx: ChatContext, env: RecordsEnv): Promise<boolean> {
+  // 불러오기인지는 defaultsAction 이 비우기 전에 읽어 둔다 (전수검사 11-13)
+  const isLoad = action === 'jr-def-yes' && defaultsAsk.pane === 'jr' && defaultsAsk.what === 'load';
   const def = await defaultsAction('jr', action, v, ctx, env.refresh);
   if (def !== null) {
     if (def) rec.info = def;
+    // 기본값 불러오기로 카드 표시가 바뀌어도 이미 뜬 카드에 반영 (전수검사 11-13)
+    if (isLoad) await redrawChatCards(ctx);
     env.render();
     return true;
   }
@@ -639,15 +666,7 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     if (key === 'chat_card') val = val === 'off' || val === 'all' ? val : 'mine';
     else return true;
     await setVars(ctx, env, { [JR(key)]: val });
-    if (key === 'chat_card') {
-      // 채팅 카드는 display 처리기가 그린다: 열쇠 표를 다시 모으고, 이미 그려진 메시지도 다시 그리게 채팅을 그대로 한 번 저장한다 (끄면 카드가 사라진다)
-      try {
-        await refreshStatusContext(ctx.charIndex, ctx.chatIndex);
-        await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
-      } catch {
-        /* 다시 못 그려도 설정은 저장됐다 (다음 채팅 전환 때 반영) */
-      }
-    }
+    if (key === 'chat_card') await redrawChatCards(ctx);
     return true;
   }
   if (action === 'jr-step') {
@@ -656,10 +675,12 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     const dir = op === '+' ? 1 : -1;
     let next: number;
     if (key === 'journal_cap') next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s.journalCap + dir * JR_JOURNAL_CAP.step));
-    else if (key === 'report_cap') next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s.reportCap + dir * JR_REPORT_CAP.step));
+    else if (key === 'report_cap') next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s.journalCap, s.reportCap + dir * JR_REPORT_CAP.step));
+    else if (key === 'list_page') next = Math.max(JR_LIST_PAGE.min, Math.min(JR_LIST_PAGE.max, s.listPage + dir * JR_LIST_PAGE.step));
     else return true;
     if (String(next) === jrValue(ctx.chat.scriptstate, key)) return true;
-    await setVars(ctx, env, { [JR(key)]: String(next) });
+    // 일지 상한을 보고서 상한 아래로 내리면 보고서 상한도 같이 내린다 (사용자 13-2 (다))
+    await setVars(ctx, env, { [JR(key)]: String(next), ...(key === 'journal_cap' && next < s.reportCap ? { [JR('report_cap')]: String(next) } : {}) });
     return true;
   }
   return false;

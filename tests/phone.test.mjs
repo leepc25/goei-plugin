@@ -99,7 +99,7 @@ test('reply prompt picks sections and carries the room packet', { skip: !realLor
   const sys = p.messages[0].content;
   assert.match(sys, /OUTPUT CONTRACT/);
   assert.match(sys, /send: reply to the owner's exact text/);
-  assert.match(sys, /### Direct rooms/);
+  assert.doesNotMatch(sys, /### Direct rooms/, '내 말에 답하는 요청엔 먼저 연락 규칙을 붙이지 않는다 (gphone#7)');
   assert.doesNotMatch(sys, /Obey announcementCheck|When invitationCheck.allowed/);
   const body = JSON.parse(p.messages[1].content);
   assert.equal(body.room.messages[0].content, '팀장님 지금 어디세요?');
@@ -108,15 +108,28 @@ test('reply prompt picks sections and carries the room packet', { skip: !realLor
   assert.equal(body.narratorOnly.universe.characterDescription, '세계관 설명');
   assert.equal(body.narratorOnly.recentStory.length, 2);
   assert.equal(p.contactMode, false);
-  // 직접 추가한 연락처는 관계 근거 섹션과 원문 목록이 붙는다
+  // 직접 추가한 연락처: 근거 뽑기 없이 MANUAL_CONTACT 규칙만, 메모가 있으면 앱이 관계를 못박지 않는다 (사용자 11-13 7번 (가))
   const m = { id: 'c_custom', name: '김씨', custom: true, note: '편의점 사장' };
   const r2 = dmRoom(m.id, { people: { [m.id]: m } });
   P.push(st, r2, 'me', '사장님', '');
   r2.pending = { status: 'error', action: { type: 'send' } };
   const p2 = PP.replyPrompt({ char: { globalLore: realLore }, chat }, st, r2, d, {});
-  assert.ok(p2.contactMode);
-  assert.match(p2.messages[0].content, /Return exactly \{"contacts":\[\.\.\.\],"result":\{"patch":\[\]\}\}/);
-  assert.ok(JSON.parse(p2.messages[1].content).recipientEvidenceSources.some((s) => s.kind === 'contact_memo'));
+  assert.equal(p2.contactMode, false);
+  assert.match(p2.messages[0].content, /manuallySavedContact/);
+  assert.match(p2.messages[0].content, /Return only <lb-minitalk-patch>/);
+  const b2 = JSON.parse(p2.messages[1].content);
+  assert.equal(b2.recipientEvidenceSources, undefined);
+  assert.equal(b2.participants[0].relationshipToOwner, undefined, '메모가 있으면 모델이 메모로 판단');
+  // 메모·로어북·이름 언급·지난 대화가 다 없으면 처음 연락하는 사이로 못박는다
+  const n = { id: 'c_new', name: '처음보는번호', custom: true, note: '' };
+  const r3 = dmRoom(n.id, { people: { [n.id]: n } });
+  P.push(st, r3, 'me', '안녕하세요', '');
+  r3.pending = { status: 'error', action: { type: 'send' } };
+  const b3 = JSON.parse(PP.replyPrompt({ char: { globalLore: realLore }, chat }, st, r3, d, {}).messages[1].content);
+  assert.match(b3.participants[0].relationshipToOwner, /^none/);
+  P.push(st, r3, n.id, '누구세요?', '');
+  const b4 = JSON.parse(PP.replyPrompt({ char: { globalLore: realLore }, chat }, st, r3, d, {}).messages[1].content);
+  assert.equal(b4.participants[0].relationshipToOwner, undefined, '말을 주고받은 뒤에는 못박지 않는다');
 });
 
 test('refresh covers directory, announcements and invitations, then commits', { skip: !realLore }, () => {

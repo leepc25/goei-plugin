@@ -1,18 +1,19 @@
 // 종료 → 일지 줄 + 보고서 스냅숏 (docs/설계안_기록_보고서.md 3-3·4장). 엔진 밖에서, 모델 호출 없이.
 // 입력은 종료를 반영한 채팅(메시지·scriptstate·인물 기록)과 엔진이 이번 응답에 적어 둔 closed[]. 자동(ttl)·모델 태그·수동 종료 세 길이 여기로 모인다.
 import { affinityOf, cueDelta, sumCues } from '../people/affinity';
+import { temperOf } from '../people/base';
 import { peopleSettings } from '../people/settings';
 import { anchorPositions, liveChanges, liveness, messageKey, peopleStore } from '../people/store';
 import { factionOfWho, stageOf, type Change } from '../people/types';
 import { getPrefs } from '../settings';
-import type { Chat, ChatMessage } from '../types';
+import type { Chat, ChatMessage, ScriptState } from '../types';
 import { aliveAnchors, liveWallet, readWallet, WALLET_START_DEFAULT } from '../wallet';
 import type { Catalog } from '../world/catalog';
 import { codesToNames, type AnEntry, type ClosedEvent, type InEntry, type MsEntry, type WorldState } from '../world/engine';
 import { findStatusTags } from '../world/status';
 import { isMine, periodOf } from './mine';
 import type { JournalSettings } from './settings';
-import { journalHash, readJournal, readReports, trimJournal, trimReports } from './store';
+import { journalHash, readJournal, readReports, reportVars, trimJournal, trimReports } from './store';
 import {
   PEOPLE_MAX, RESULT_REPORT_MAX, RESULT_ROW_MAX, TRADES_MAX, TRAIL_MAX,
   type JournalAgent, type JournalRow, type JournalStore, type Report, type ReportPerson, type ReportStore, type ReportTrade, type TrailStep,
@@ -77,13 +78,14 @@ function peopleDelta(chat: Chat, from: number, to: number): ReportPerson[] {
   const live = liveness(chat);
   const all = liveChanges(store, live);
   const ps = peopleSettings(chat.scriptstate);
-  const o = { speed: ps.speed, turnCap: ps.turnCap };
   const pos = (c: Change) => live.at.get(c.anchor) ?? -1;
   const span = all.filter((c) => c.kind === 'cue' && c.pin === undefined && !factionOfWho(c.who) && pos(c) >= from && pos(c) <= to);
   const byWho = new Map<string, Change[]>();
   for (const c of span) (byWho.get(c.who) ?? byWho.set(c.who, []).get(c.who)!).push(c);
   const out: ReportPerson[] = [];
   for (const [who, list] of byWho) {
+    // 성격 계수·감소 승수까지 인물 기록 화면과 같게 (전수검사 11-13)
+    const o = { temper: temperOf(who), speed: ps.speed, speedDown: ps.speedDown, turnCap: ps.turnCap };
     const delta = sumCues(who, 0, list, 0, -1e9, 1e9, o);
     if (!delta) continue;
     const top = [...list].sort((a, b) => Math.abs(cueDelta(b, o)) - Math.abs(cueDelta(a, o)))[0];
@@ -104,6 +106,14 @@ function walletSpan(chat: Chat, from: number, to: number, start?: number): { tra
     .map((e) => ({ memo: e.memo, amount: e.amount, ...(e.quote ? { quote: cut(e.quote, 60) } : {}) }));
   const balance = live.filter((e) => !e.anchor || pos(e.anchor) <= to).reduce((n, e) => n + e.amount, w.start);
   return { trades, balance };
+}
+
+/** 전체 보고서의 인물 변화·가계부·잔고 (from~to 메시지) */
+function fillSpan(report: Report, chat: Chat, from: number, to: number, walletStart?: number): void {
+  report.people = peopleDelta(chat, from, to);
+  const w = walletSpan(chat, from, to, walletStart);
+  report.wallet = w.trades;
+  report.balance = w.balance;
 }
 
 /** 종료 하나 → 일지 줄 + 보고서. 보고서 번호는 부르는 쪽이 매긴다 */
@@ -136,10 +146,9 @@ function snapshot(input: BuildInput, ev: ClosedEvent, anchor: string, now: strin
     idx: index, anchor, ...(last ? { statusKey: last.raw.trim() } : {}), savedAt: now,
   };
   if (mine) {
-    report.people = peopleDelta(chat, from, to);
-    const w = walletSpan(chat, from, to, input.walletStart);
-    report.wallet = w.trades;
-    report.balance = w.balance;
+    const list = Array.isArray(chat.message) ? chat.message : [];
+    report.fromKey = list[from] ? messageKey(list[from], from) : `#${from + 1}`;
+    fillSpan(report, chat, from, to, input.walletStart);
   }
   return { row, report };
 }
@@ -170,9 +179,35 @@ export function buildClosures(input: BuildInput): BuildResult {
     added.push(report);
   }
   if (!rows.length) return { journal, reports, rows, added };
-  journal = trimJournal({ v: 1, rows: [...journal.rows, ...rows] }, settings.journalCap);
+  journal = trimJournal({ v: 1, rows: [...journal.rows, ...rows] }, settings.journalCap, new Set(reports.items.filter((x) => x.pin).map((x) => x.id)));
   const t = trimReports({ v: 1, items: [...reports.items, ...added] }, journal, settings.reportCap);
   journal = t.journal;
   reports = t.reports;
   return { journal, reports, rows, added };
+}
+
+/**
+ * 종료 응답의 가계부 맞춤·인물 갱신이 끝난 뒤, 그 응답(index)에서 끝난 전체 보고서만 인물 변화·가계부·잔고를 다시 센다.
+ * 다른 메시지에서 끝난 옛 보고서는 종료 시점 그대로 둔다. 바뀐 것이 없으면 null (전수검사 11-13)
+ */
+export function refreshClosures(chat: Chat, index: number, walletStart?: number): ScriptState | null {
+  const list = Array.isArray(chat.message) ? chat.message : [];
+  const m = list[index];
+  if (!m) return null;
+  const key = messageKey(m, index);
+  const reports = readReports(chat);
+  const at = anchorPositions(chat);
+  let changed = false;
+  const items = reports.items.map((r) => {
+    if (!r.mine || !r.fromKey || r.idx !== index || r.anchor !== key) return r;
+    const from = at.get(r.fromKey);
+    if (from === undefined) return r;
+    const next: Report = { ...r };
+    fillSpan(next, chat, from, index, walletStart);
+    const same = JSON.stringify([r.people, r.wallet, r.balance]) === JSON.stringify([next.people, next.wallet, next.balance]);
+    if (same) return r;
+    changed = true;
+    return next;
+  });
+  return changed ? reportVars({ v: 1, items }) : null;
 }

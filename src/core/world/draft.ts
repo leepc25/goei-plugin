@@ -50,7 +50,8 @@ export function putRecord(over: WorldOverrides, kind: WorldKind, name: string, f
 export function removeRecord(over: WorldOverrides, kind: WorldKind, name: string): WorldOverrides {
   const next: WorldOverrides = { ...over, [kind]: { ...(over[kind] ?? {}) } };
   const bucket = next[kind] as Record<string, Partial<WorldRecord>>;
-  if (defaultRecord(kind, name)) bucket[name] = { deleted: true };
+  // 고친 내용은 지우기 표시 밑에 남겨 되살리기 때 돌려준다 (전수검사 11-13)
+  if (defaultRecord(kind, name)) bucket[name] = { ...(bucket[name] ?? {}), deleted: true };
   else delete bucket[name];
   if (!Object.keys(bucket).length) delete next[kind];
   return next;
@@ -133,9 +134,11 @@ const LINE_SYN: Record<string, [string, string[]][]> = {
   appearance: [['physique', ['physique', 'build', 'body', '체격', '체형']], ['appearance', ['appearance', 'looks', 'face', 'hair', '외모', '외형', '얼굴']], ['outfit', ['outfit', 'clothes', 'clothing', 'attire', 'dress', '복장', '옷']]],
 };
 
+// 영문 낱말은 낱말 머리에서만 맞춘다 (identity 의 entit, flaws 의 law 를 안 잡게). 한글은 붙여 쓰니 그대로 포함 검사 (전수검사 11-13)
+const synHit = (t: string, w: string): boolean => (/^[a-z ]+$/.test(w) ? new RegExp(`(^|[^a-z])${w}`).test(t) : t.includes(w));
 const matchSyn = (title: string, table: [string, string[]][]): string | undefined => {
   const t = title.toLowerCase();
-  return table.find(([, words]) => words.some((w) => t.includes(w)))?.[0];
+  return table.find(([, words]) => words.some((w) => synHit(t, w)))?.[0];
 };
 
 export interface ImportResult {
@@ -149,11 +152,39 @@ export interface ImportResult {
 export function parseImport(kind: WorldKind, text: string): ImportResult {
   const lines = text.replace(/\r/g, '').split('\n');
   const sections: { title: string; body: string[] }[] = [{ title: '', body: [] }];
-  for (const line of lines) {
+  // # 제목이 있으면 가장 얕은 깊이에서만 끊고, 더 깊은 제목·**굵게**·[…] 줄은 본문으로 둔다.
+  // 조립 글 맨 위 문서 제목(### 이름)과 [Affiliation code: …] 줄은 건너뛴다 (전수검사 11-13)
+  const HEAD = /^(#{1,6})\s+(.+?)\s*#*$/;
+  const skip = new Set<number>();
+  let cut = 0;
+  if (kind !== 'appendix') {
+    const heads = lines.flatMap((l, i) => {
+      const m = HEAD.exec(l);
+      return m ? [{ i, d: m[1].length }] : [];
+    });
+    if (heads.length) {
+      const min = Math.min(...heads.map((h) => h.d));
+      const [first, next] = heads;
+      const docTitle =
+        first.d === min && heads.filter((h) => h.d === min).length === 1 && heads.some((h) => h.d > min) &&
+        lines.slice(first.i + 1, next.i).every((l) => !l.trim() || /^\[Affiliation code:[^\]]*\]\s*$/i.test(l));
+      if (docTitle) for (let i = first.i; i < next.i; i++) skip.add(i);
+      const rest = docTitle ? heads.slice(1) : heads;
+      cut = Math.min(...rest.map((h) => h.d));
+    }
+  }
+  lines.forEach((line, i) => {
+    if (skip.has(i)) return;
+    if (cut) {
+      const m = HEAD.exec(line);
+      if (m && m[1].length === cut) sections.push({ title: m[2].trim(), body: [] });
+      else sections[sections.length - 1].body.push(line);
+      return;
+    }
     const h = /^#{1,6}\s+(.+?)\s*#*$/.exec(line) ?? /^\*\*([^*]{1,60})\*\*:?\s*$/.exec(line) ?? /^\[([^\]]{1,40})\]\s*$/.exec(line);
     if (h) sections.push({ title: h[1].trim(), body: [] });
     else sections[sections.length - 1].body.push(line);
-  }
+  });
   const fields: Record<string, string> = {};
   const extra: ExtraField[] = [];
   const map: [string, string][] = [];

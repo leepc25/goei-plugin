@@ -9,6 +9,7 @@ import { latestNote } from './updater';
 import { rhythmClock, rhythmClockLines } from './rhythm';
 import { factionNow, factionsBlock, sceneFactionCodes, userFactionOf } from './faction';
 import { messageText } from '../refs';
+import { fixedSections } from './seed';
 import type { PeopleSettings } from './settings';
 import type { PeopleStore, Temper } from './types';
 
@@ -49,12 +50,17 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
   const blocks: string[] = [];
-  const sheets: string[] = [];
+  /** 인물마다: 시트 원문(요청에서 뺄 것)과 상한 밖 길이(시트 고정 절) */
+  const own: { sheet: string | null; exempt: number }[] = [];
+  // 성적 프로필 정책 글(SEXUAL.POLICY)은 처음 프로필이 있는 인물 블록에만. 뒤에서부터 빼므로 첫 블록이 남는다 (전수검사 11-13)
+  let policyShown = false;
   for (const n of people) {
     const p = o.store.people[n];
     const sheet = o.sheetOf(n);
-    if (sheet) sheets.push(sheet);
+    const exempt = !sheet ? 0 : o.settings.inject === 'split' ? fixedSections(sheet).reduce((s, x) => s + x.name.length + x.body.length + 2, 0) : o.settings.inject === 'append' ? sheet.trim().length : 0;
+    own.push({ sheet: sheet || null, exempt });
     const note = o.settings.director === 'note' ? latestNote(o.store, n, live) : null;
+    const sx = sexualTexts(p, o.settings);
     blocks.push(
       personBlock(p, o.store, live, changes, {
         sheet,
@@ -73,10 +79,19 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         axes: o.settings.features.has('axes'),
         features: o.settings.features,
         qual: o.settings.qualitative,
-        sexual: sexualTexts(p, o.settings),
+        sexual: sx,
+        sexualPolicy: !policyShown,
       }),
     );
+    if (sx.desire || sx.paraphilia) policyShown = true;
   }
+  // 상한(본문 전체 글자 수)은 기록에만 건다 (고정 절 원문은 상한 밖). 넘치면 글 중간에서 자르지 않고 뒤 인물부터 통째로 뺀다 (모델이 고른 인물 → 글에 나온 인물, 항상 포함은 끝까지).
+  // 뺀 인물의 원래 시트는 요청에 남긴다 (전수검사 11-13: 4명부터 뒤 인물이 블록에서도 시트에서도 사라졌다)
+  let keep = blocks.length;
+  const sizeOf = (k: number) => blocks.slice(0, k).reduce((s, b) => s + b.length + 2, 0) - own.slice(0, k).reduce((s, x) => s + x.exempt, 0);
+  while (keep > 1 && sizeOf(keep) > o.settings.blockCap) keep--;
+  blocks.length = keep;
+  const sheets = own.slice(0, keep).map((x) => x.sheet).filter((x): x is string => !!x);
   // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
   if (o.settings.features.has('rhythm')) {
     const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
@@ -93,12 +108,12 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
     if (fb) blocks.push(fb);
   }
-  return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
+  return { text: peopleBlock(blocks), people, sheets };
 }
 
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
 
-/** 요청에서 시트 원문을 뺀다 (split·record 모드). 로어북 고르기가 넣은 글에 그대로 들어 있을 때만.
+/** 요청에서 시트 원문을 뺀다 (모든 모드: split 은 고정 절, append 는 시트 전체를 블록에 넣고, record 는 일부러 뺀다). 로어북 고르기가 넣은 글에 그대로 들어 있을 때만.
  *  공백·줄바꿈 차이는 무시한다 (낱말 사이를 `\s+` 로 맞춘 정규식. 예전 「첫 낱말 ~ 끝 낱말」 자르기는 첫 `###` 부터 엉뚱한 범위를 지웠다. QC 2026-10-28) */
 export function stripSheets<M extends PromptMessage>(messages: M[], sheets: string[]): M[] {
   if (!sheets.length) return messages;
@@ -128,10 +143,10 @@ export function insertBlock<M extends PromptMessage>(messages: M[], text: string
   return at < 0 ? [...messages, add] : [...messages.slice(0, at), add, ...messages.slice(at)];
 }
 
-/** 요청 가공 한 번에: 블록 만들기 → (split·record) 시트 빼기 → 끼우기 */
+/** 요청 가공 한 번에: 블록 만들기 → 시트 빼기 → 끼우기 */
 export function withPeopleBlock<M extends PromptMessage>(messages: M[], chat: Chat, o: RequestOpts): M[] {
   const r = peopleBlockFor(chat, o);
   if (!r.text) return messages;
-  const out = o.settings.inject === 'split' || o.settings.inject === 'record' ? stripSheets(messages, r.sheets) : messages;
+  const out = stripSheets(messages, r.sheets); // 덧붙임도 블록에 시트가 있으므로 원래 시트를 뺀다 (전수검사 11-13)
   return insertBlock(out, r.text);
 }

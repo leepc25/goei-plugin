@@ -566,9 +566,12 @@ export function phoneTabs(lore: LoreEntry[]): TabInfo[] {
 /** 기본 플레이 세력 코드 (요원 소속에 코드로 들어가는 세력) */
 export const FACTIONS = BUILTIN;
 
+/** 기본 세력의 기본 세계 이름 (세계 기록·관계의 열쇠) */
+const DEFAULT_FACTION_NAMES: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
+
 export function factionDisplayNames(lore: LoreEntry[]): Record<string, string> {
   const m = displaySection(lore).none ?? {};
-  const out: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
+  const out: Record<string, string> = { ...DEFAULT_FACTION_NAMES };
   for (const f of FACTIONS) if (s(m[f])) out[f] = s(m[f]);
   return { ...extraNames(lore), ...out };
 }
@@ -680,7 +683,10 @@ export function buildOrgs(lore: LoreEntry[], agents: AgentRow[], saved: Record<s
       phoneTabs: Array.isArray(d.phone_tabs) ? list(d.phone_tabs) : (mode(members.map((m) => m.phoneTabs)) ?? base.phoneTabs),
     });
   };
-  for (const f of FACTIONS) make(names[f], f);
+  // 기본 세력 조직은 「기본」 호칭이 아니라 저장 줄의 code 로 찾는다. 호칭을 바꿔도 기록·관계가 떨어지지 않게 (전수검사 11-13)
+  const keyOf = (f: string): string =>
+    Object.keys(saved).find((n) => s(obj(saved[n]).code) === f) ?? (names[f] in saved ? names[f] : (DEFAULT_FACTION_NAMES[f] ?? names[f]));
+  for (const f of FACTIONS) make(keyOf(f), f);
   for (const name of Object.keys(saved)) if (s(name) && !out.some((o) => o.name === name)) make(name, '');
   for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, '');
   // 세력 폴더에 넣은 로어북도 조직으로 (이름이 같거나 한쪽이 다른 쪽을 품으면 이미 있는 조직: 협회 ↔ 특수재난대응협회)
@@ -997,7 +1003,7 @@ function cleanSpec(spec: FactionSpec): FactionSpec {
 }
 
 const HELP =
-  '괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. ' +
+  '괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「세계」 탭에서 고치세요. ' +
   '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 📎부록 폴더 항목은 「본 항목 이름 · 설명」으로 지으면 본 항목에 붙고, 켜지는 조건은 부록 탭에서 정합니다. 모델에게는 보내지 않습니다.';
 
 export function directoryContent(data: DirectoryData): string {

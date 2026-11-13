@@ -3,11 +3,14 @@
 // 상점과 달리 본편 표식 없이 브라우저에서 언제든 연다. 우주몰은 운영자 문의 창이 있고, 포인트몰은 운영자가 없다(정가 구매만, 로그인해야 씀).
 import type { Chat } from './types';
 import { type TruthMode, emptyShop, readShop, reviveShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
-import type { GuideName } from './guides';
-import { lastBot, SHOP_SHARED_VARS } from './shop';
+import { guideOr, type GuideName } from './guides';
+import { lastBot, SHOP_CTX_VAR, SHOP_SHARED_VARS } from './shop';
 import { liveOrders, readyNotes } from './orders';
 import { readDesk } from './bmdesk';
 import { aliveAnchors } from './wallet';
+import { capLines, shopMain, shopMainLines } from './shopctx';
+import { hsBuyPasses } from './hslog';
+import { pointsOn } from './points';
 
 export type MallSite = 'cos' | 'bm';
 export const MALL_SITES: MallSite[] = ['cos', 'bm'];
@@ -28,12 +31,18 @@ export const mallAutoKey = (site: MallSite) => `$${site}_sh_auto`;
 type Vars = Record<string, unknown> | undefined;
 
 /** 상점 설정 함수에 넘길 변수: 그 사이트 값($cos_sh_*)을 상점 이름($sh_*)으로 비춘다. 사이트에 없는 값은 상점 값을 쓰지 않고 기본값.
- *  상점 넷이 같이 쓰는 값(SHOP_SHARED_VARS)은 기본 상점 자리의 값 그대로 */
+ *  같이 쓰는 값(SHOP_SHARED_VARS)은 기본 상점 자리의 값 그대로.
+ *  맥락 반영은 가게마다 따로 (2026-11-12 사용자: 가게 표): 사이트 값($cos_sh_ctx)이 있으면 그 값, 따로 정한 적이 없으면 기본 상점 값($sh_ctx) */
 export function mallVars(vars: Vars, site: MallSite): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith('$sh_') || SHOP_SHARED_VARS.includes(k)) out[k] = v;
   const pre = `$${site}_sh_`;
-  for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith(pre) && !SHOP_SHARED_VARS.includes(`$sh_${k.slice(pre.length)}`)) out[`$sh_${k.slice(pre.length)}`] = v;
+  for (const [k, v] of Object.entries(vars ?? {})) {
+    if (!k.startsWith(pre)) continue;
+    const sh = `$sh_${k.slice(pre.length)}`;
+    if (sh === SHOP_CTX_VAR ? v !== '1' && v !== '0' : SHOP_SHARED_VARS.includes(sh)) continue;
+    out[sh] = v;
+  }
   return out;
 }
 
@@ -183,11 +192,13 @@ export function cosAssignment(count: number, context: boolean, roll: CosRoll, rn
   if (!slots.length) return '';
   const want = slots.some((s) => s.useful);
   const G = site === 'bm' ? 'CATEGORY' : 'GENRE'; // 포인트몰은 장르가 아니라 상품 분류
+  // 글은 그 몰 지침의 ASSIGN_* 절. 절이 없으면 여기 남긴 글
+  const guide: GuideName = site === 'bm' ? 'Bm' : 'Cos';
   const lines = slots.map((s, i) => {
-    const role = s.useful ? " | ROLE: useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)" : want ? ' | ROLE: broad stock, unrelated to the current scene' : '';
+    const role = s.useful ? ` | ROLE: ${guideOr(guide, 'ASSIGN_ROLE_USEFUL', "useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)")}` : want ? ` | ROLE: ${guideOr(guide, 'ASSIGN_ROLE_BROAD', 'broad stock, unrelated to the current scene')}` : '';
     return `Item ${i + 1} — ${G}: ${s.genre} | VALUE TIER: ${s.tier.name} (${s.tier.desc}), price ${rollPrice(site, s.tier.lo, s.tier.hi)}${role}`;
   });
-  return `${lines.join('\n')}\nBuild each item to its assigned ${G} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. ${G === 'GENRE' ? 'Genres' : 'Categories'} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
+  return `${lines.join('\n')}\n${guideOr(guide, 'ASSIGN_RULE', () => `Build each item to its assigned ${G} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. ${G === 'GENRE' ? 'Genres' : 'Categories'} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`, { unit: G, units: G === 'GENRE' ? 'Genres' : 'Categories' })}`;
 }
 
 // ── 우주몰 시그니처 상품 (구버전 Lua: 「우리가 도움!」·「착한 친구」를 코드가 확률로 끼움, 모델 생성 아님) ──
@@ -250,17 +261,40 @@ export function mallEvents(chat: Chat): string[] {
   if (!key) return [];
   const vars = chat.scriptstate;
   const out: string[] = [];
+  // 설정 「메인 요청에 붙이는 것」(core/shopctx.ts): 문의 · 맞춤 주문 · 1:1 상담을 가게마다 따로 거른다. 대화는 「최대 양」 줄까지 (0 = 전부)
+  const cosMain = shopMain(vars, 'cos');
+  const lines = shopMainLines(vars);
   const cos = readMall(vars, 'cos').talk.filter((l) => l.k === key);
-  if (cos.some((l) => l.who === 'me')) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${cos.map((l) => `${l.who === 'me' ? 'protagonist' : 'operator'}: "${l.text}"`).join(' / ')}`);
-  for (const o of liveOrders(vars, aliveAnchors(chat))) {
-    if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString('en-US')} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
-  }
-  // 맞춤 주문이 바로 앞 응답에서 완성됐으면 한 번만 (그 뒤 턴에는 다시 넘기지 않는다)
-  if (cosReadyMode(vars) === 'both') {
-    const at = lastBot(chat)!.index;
-    for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
+  if (cosMain.has('ask') && cos.some((l) => l.who === 'me')) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${capLines(cos, lines).map((l) => `${l.who === 'me' ? 'protagonist' : 'operator'}: "${l.text}"`).join(' / ')}`);
+  if (cosMain.has('order')) {
+    for (const o of liveOrders(vars, aliveAnchors(chat))) {
+      if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString('en-US')} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
+    }
+    // 맞춤 주문이 바로 앞 응답에서 완성됐으면 한 번만 (그 뒤 턴에는 다시 넘기지 않는다). 「완성 알림」이 「카드 + 메인 요청」일 때만
+    if (cosReadyMode(vars) === 'both') {
+      const at = lastBot(chat)!.index;
+      for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
+    }
   }
   const desk = readDesk(vars);
-  if (desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${desk.talk.filter((l) => l.who !== 'sys').map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
+  // 상담 줄마다 적힌 응답 키로 거른다 (키 없는 옛 줄은 상담 키): 창을 열어 둔 채 다음 턴에 이어 한 말도 넘어가고, 지난 턴 줄은 다시 안 간다 (전수검사 11-13)
+  const dl = desk.talk.filter((l) => l.who !== 'sys' && ((l as { k?: string }).k ?? desk.anchor) === key);
+  if (shopMain(vars, 'bm').has('desk') && dl.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${capLines(dl, lines).map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
   return out;
 }
+
+/** 판 것(core/items.ts soldNow 의 「…에 팖」 자리 이름)을 메인 요청에 붙이나: 우주 쇼핑몰에 판 것은 문의 창에서 운영자와 흥정해 파는 것이라 「문의」를 따르고,
+ *  포인트몰에 판 것은 그 줄의 「컨텍스트 포함」만 따른다(팔기 칸이 없다). 그 밖의 이름은 기본 상점의 「팔기」. 「…에 팖」이 아닌 기록(망상홈쇼핑 맞교환 등)은 거르지 않는다 */
+export function soldPasses(vars: Vars, place: string, plain: boolean): boolean {
+  // 망상홈쇼핑 맞교환 줄도 망상홈쇼핑 「구매」 칸을 따른다 (전수검사 11-13)
+  if (!plain) return place.startsWith('망상홈쇼핑') ? hsBuyPasses(vars) : true;
+  if (place === MALL_NAME.cos) return shopMain(vars, 'cos').has('ask');
+  if (place === MALL_NAME.bm) return shopMain(vars, 'bm').on;
+  return shopMain(vars, 'shop').has('sell');
+}
+
+/** 이 쇼핑몰을 턴마다 부르나: 켜짐 · 「매 턴」 · 포인트몰은 백일몽 로그인과 포인트 칸이 있을 때만 (화면에 안 보이는 포인트몰을 부르지 않게, 전수검사 11-13) */
+export const mallAutoTurn = (chat: Chat, site: MallSite): boolean => {
+  const m = mallSettings(chat.scriptstate, site);
+  return m.on && m.auto === 'turn' && (site !== 'bm' || (String(chat.scriptstate?.['$br_login'] ?? '') === '1' && pointsOn(chat)));
+};

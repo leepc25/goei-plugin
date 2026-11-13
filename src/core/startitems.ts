@@ -1,6 +1,6 @@
 // 고유 인물 시작 소지품 (2026-11-07 사용자: 모델 호출 없이 미리 정해 둠).
 // 목록은 코드에 두지 않고 명부(Directory 로어북) 요원 줄의 `start_items` 칸에 둔다. 명부 편집 화면에서 보고 고친다.
-// 그 인물로 시작하면 소지품($st_items)에 넣고, 무기·장비는 빈 장착 칸에 차례로 끼운다 (무기 2 · 장비 4, 넘치면 소지품).
+// 그 인물로 시작하면 소지품($st_items)에 넣고, 무기·장비는 빈 장착 칸에 차례로 끼운다 (무기 2 · 장비 6, 넘치면 소지품).
 // 소지품에 넣기(startItemsVars)는 core/items.ts 에 — 명부(world/directory)가 이 파일을 읽으므로 소지품 전체를 끌어오지 않게
 import { itemEquip, itemUses, itemWeight, parseTraits, traitsText, type ItemEquip } from './itemtraits';
 

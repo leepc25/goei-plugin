@@ -17,10 +17,11 @@ import { previewGnetRefresh } from '../gnet';
 import { previewPhoneRefresh, previewPhoneView } from '../phone';
 import { previewWikiAuto } from '../wiki';
 import { previewShopShelf } from '../shop';
-import { shopJudgeBy, shopOn } from '../../core/shop';
+import { shopJudgeBy, shopOn, shopSettings } from '../../core/shop';
+import { hsSettings, HS_NAME } from '../../core/homeshop';
 import { previewMallShelf } from '../malls';
 import { boardView, BOARD_NAME, BOARD_SITES } from '../../core/boards';
-import { MALL_NAME, mallSettings, type MallSite } from '../../core/malls';
+import { MALL_NAME, mallAutoTurn, mallSettings, type MallSite } from '../../core/malls';
 import { autoTasks, JOINT_LABEL, jointGroups, jointMates, jointOn, type JointKind } from '../../core/netjoint';
 import { traceUi } from './trace';
 
@@ -45,31 +46,37 @@ function tokKey(ctx: ChatContext): string {
 }
 const count = (m: LlmMessage[] | null | undefined): number | null => (m ? promptTokens({ messages: m }) : null);
 
+/** 한 가지를 세고 나면 화면에 차례를 넘긴다 (2026-11-13 사용자: 호출 흐름을 열 때 렉이 걸린다 — 요청 열두 개를 한 번에 조립하고 세느라 화면이 그동안 멈췄다) */
+const breathe = () => new Promise<void>((r) => setTimeout(r, 0));
+
 async function computeTokens(ctx: ChatContext): Promise<TokMap> {
   const map: TokMap = {};
-  const safe = (name: string, f: () => number | null) => {
+  const safe = async (name: string, f: () => number | null) => {
+    await breathe();
     try {
       map[name] = f();
     } catch {
       map[name] = null;
     }
   };
+  // 화면을 먼저 그리고 나서 세기 시작한다
+  await breathe();
   const pp = await previewPeopleCalls(ctx).catch(() => ({ router: null, director: null, update: null }));
-  map['인물 Router'] = count(pp.router);
-  map['인물 Director'] = count(pp.director);
-  map['인물 갱신'] = count(pp.update);
-  safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
-  safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
-  for (const site of BOARD_SITES) safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
-  safe('관전', () => count(previewPhoneView(ctx)));
-  safe('위키 자동 작성', () => {
+  await safe('인물 Router', () => count(pp.router));
+  await safe('인물 Director', () => count(pp.director));
+  await safe('인물 갱신', () => count(pp.update));
+  await safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
+  await safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
+  for (const site of BOARD_SITES) await safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
+  await safe('관전', () => count(previewPhoneView(ctx)));
+  await safe('위키 자동 작성', () => {
     const w = previewWikiAuto(ctx);
     const a = count(w.article);
     const t = count(w.title);
     return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
   });
-  safe('상점', () => count(previewShopShelf(ctx)));
-  for (const site of ['cos', 'bm'] as MallSite[]) safe(`${MALL_NAME[site]} 진열`, () => count(previewMallShelf(ctx, site)));
+  await safe('상점', () => count(previewShopShelf(ctx)));
+  for (const site of ['cos', 'bm'] as MallSite[]) await safe(`${MALL_NAME[site]} 진열`, () => count(previewMallShelf(ctx, site)));
   return map;
 }
 
@@ -168,7 +175,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     })(),
     { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
     { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:모델', sure: assetOn ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? jointText('phone').calls : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? jointText('phone').sure : 0, maybe: 0 },
+    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? jointText('phone').calls : ph.autoOpen ? '괴담톡 열 때 1회' : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? jointText('phone').sure : 0, maybe: 0 },
     { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? jointText('gn').calls : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:net', to: 'r:자동 호출', sure: gn.auto ? jointText('gn').sure : 0, maybe: 0 },
     // 다른 게시판 셋·쇼핑몰 둘 (11-09 사용자: 괴담넷만 있고 통째로 빠져 있었다). 사이트마다 설정 변수가 따로라 그 사이트로 비춘 상태값으로 읽는다
     ...(['gal', 'wpf', 'sm'] as const).map((site): Node => {
@@ -182,15 +189,20 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     ...(['cos', 'bm'] as MallSite[]).map((site): Node => {
       const m = mallSettings(ss, site);
       const login = site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1';
-      const on = m.on && m.auto === 'turn' && login;
-      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (login ? '1회' : '로그인했을 때 1회 (지금 로그아웃)') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:shop', to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
+      const on = mallAutoTurn(ctx.chat, site);
+      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (!login ? '로그인했을 때 1회 (지금 로그아웃)' : on ? '1회' : '호출 없음') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:shop', to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
     }),
   ];
   const manual: Node[] = [
-    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:shop', to: 'r:사용', sure: 0, maybe: 0 },
+    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: mm(shopSettings(ss).model), calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:shop', to: 'r:사용', sure: 0, maybe: 0 },
     { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: '사이트별 설정', calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:net', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:shop', to: 'r:모델', sure: 0, maybe: 0 },
-    { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '상담사 연결 1회 + 보낼 때마다 1회', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
+    { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '보낼 때마다 1회 (상담사 연결 1회 더)', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
+    // 망상홈쇼핑: 빠져 있어 그 설정 페이지 호출 줄·AI 상담 [지금 상태]에 없었다. 글은 호출 흐름 화면(flowpage.ts) 줄과 같게 (전수검사 11-13)
+    ...((hs) => [
+      { name: `${HS_NAME} 편성`, sub: '방송 편성 받기', kind: 'aux', on: false, model: hs.on ? mm(hs.shop.model) : undefined, calls: hs.on ? (hs.auto === 'open' ? '창을 열 때 1회' : '수동 (새로고침 때만)') : '호출 없음', page: 'set:hs', to: 'r:사용', sure: 0, maybe: 0 },
+      { name: `${HS_NAME} 채팅 보내기`, sub: '방송 채팅', kind: 'aux', on: false, model: hs.on && hs.say ? mm(hs.shop.model) : undefined, calls: hs.on && hs.say ? '보낼 때마다 1회' : '호출 없음', page: 'set:hs', to: 'r:채팅 보내기', sure: 0, maybe: 0 },
+    ] as Node[])(hsSettings(ss)),
     { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
   ];

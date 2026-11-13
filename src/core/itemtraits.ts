@@ -1,8 +1,8 @@
 // 소지품 판정 칸 (장착 갈래·상태·소모 횟수·쓰임 글). 다른 데에 기대지 않는 순수 함수만 — 명부(world/directory)·시작 소지품이 소지품 전체를 끌어오지 않게 (core/items.ts 가 다시 내보냄)
 
-/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 무기·무기 아닌 것 둘만). 칸: 무기 2 · 장비 4 */
+/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 무기·무기 아닌 것 둘만). 칸: 무기 2 · 장비 6 (2026-11-12 사용자: 장비 칸 둘 더) */
 export type ItemEquip = 'weapon' | 'gear';
-export const EQUIP_SLOTS: Record<ItemEquip, number> = { weapon: 2, gear: 4 };
+export const EQUIP_SLOTS: Record<ItemEquip, number> = { weapon: 2, gear: 6 };
 export const EQUIP_LABEL: Record<ItemEquip, string> = { weapon: '무기', gear: '장비' };
 export const itemEquip = (v: unknown): ItemEquip | undefined => (v === 'weapon' || v === 'gear' ? v : undefined);
 
@@ -22,8 +22,8 @@ export const itemWeight = (v: unknown): number | undefined => {
   const n = typeof v === 'string' ? Number(v.trim().replace(/,/g, '.').replace(/\s*(kg|킬로그램|킬로)$/i, '')) : typeof v === 'number' ? v : NaN;
   return Number.isFinite(n) && n >= 0 ? Math.min(9999, Math.round(n * 1000) / 1000) : undefined;
 };
-/** 무게 글: 1kg 밑은 g, 그 위는 소수 한 자리 kg (「250g」「1.2kg」「12kg」) */
-export const weightText = (kg: number): string => (kg < 1 ? `${Math.max(1, Math.round(kg * 1000))}g` : `${Number(kg.toFixed(kg < 10 ? 1 : 0))}kg`);
+/** 무게 글: 1kg 밑은 g, 그 위는 10g 단위까지 kg (「250g」「1.24kg」「12.4kg」). 2026-11-13 사용자: 어림수로만 보여 현실감이 없다 */
+export const weightText = (kg: number): string => (kg < 1 ? `${Math.max(1, Math.round(kg * 1000))}g` : `${Number(kg.toFixed(2))}kg`);
 
 /** 판정 칸 (상점 줄·보조 모델·시작 소지품·직접 넣기가 같은 꼴로) */
 export interface ItemTraits {
@@ -41,7 +41,9 @@ export interface ItemTraits {
 /** 「쓰임」 칸 글 → 판정: 무기·장비·사용·소모N (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
 export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> {
   const out: Omit<ItemTraits, 'icon' | 'weight'> = { use: false };
-  for (const t0 of String(text ?? '').split(/[\s,，/·+]+/)) {
+  // 「소모 3」「소모3회」「소모(3)」「소모 x3」은 쪼개기 전에 「소모3」으로 붙인다: 띄우면 1회로, 글자가 붙으면 소모가 빠졌다 (전수검사 11-13)
+  const src = String(text ?? '').replace(/(소모|consumable|uses?)\s*[:：]?\s*[(（x×]?\s*(\d+)\s*[)）]?\s*(?:회|번|개)?/gi, '$1$2');
+  for (const t0 of src.split(/[\s,，/·+]+/)) {
     const t = t0.trim().toLowerCase();
     if (!t) continue;
     if (/^(무기|weapon)$/.test(t)) out.equip = 'weapon';

@@ -45,6 +45,8 @@ export interface GPost {
    * (2026-11-10 사용자: 댓글을 단 그 턴에만 컨텍에 들어가야 한다)
    */
   back?: number;
+  /** 내가 이 글을 쓰거나 댓글을 단 이야기 턴 수. 그 턴의 본편 요청에는 꼭 넣고, 본편 응답이 오면 지운다 (전수검사 11-13) */
+  touch?: number;
 }
 /** 쪽지 상대와 처음 이어진 공개 글 (원본 T 줄) */
 export interface GSource {
@@ -299,6 +301,7 @@ export function decode(raw: unknown): GState {
           ...(p[9] ? { tag: cut(p[9], 12) } : {}), ...(p[10] === '1' ? { scrap: true } : {}),
           ...(p[11] === '1' ? { voted: true } : {}), ...(p[12] === '1' ? { down: true } : {}),
           ...(p[0] === 'P' && /^\d+$/.test(p[13] ?? '') ? { back: Number(p[13]) } : {}),
+          ...(p[0] === 'P' && /^\d+$/.test(p[14] ?? '') ? { touch: Number(p[14]) } : {}),
         };
         (p[0] === 'A' ? st.archive : st.posts).push(post);
         map.set(id, post);
@@ -323,7 +326,7 @@ export function decode(raw: unknown): GState {
 export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
-    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0', ...(p.back !== undefined ? [p.back] : [])].join('|'));
+    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0', ...(p.touch !== undefined ? [p.back ?? '', p.touch] : p.back !== undefined ? [p.back] : [])].join('|'));
     for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const p of st.archive ?? []) {
@@ -337,6 +340,11 @@ export function encode(st: GState): string {
 
 export function readGnet(chat: Chat): GState {
   const st = decode(chat.scriptstate?.[GN_RAW]);
+  // 이번 턴에 쓴 글·단 댓글 표시도 본편 응답이 오면 지운다 (전수검사 11-13)
+  if (st.posts.some((p) => p.touch !== undefined)) {
+    const turn = storyTurns(chat);
+    for (const p of st.posts) if (p.touch !== undefined && turn > p.touch) delete p.touch;
+  }
   // 잠깐 되돌아온 글은 그 턴의 본편 응답이 온 뒤(턴 수가 늘면) 다시 보관함으로. 읽을 때마다 같은 결과라 따로 저장하지 않아도 되고, 다음 저장 때 같이 적힌다
   if (st.posts.some((p) => p.back !== undefined)) {
     const turn = storyTurns(chat);
@@ -350,9 +358,10 @@ export function readGnet(chat: Chat): GState {
   return st;
 }
 
-/** 생성 도중 게시판이 바뀌었는지 볼 때 쓰는 열쇠 (읽음 표시는 뺀다) */
+/** 생성 도중 게시판이 바뀌었는지 볼 때 쓰는 열쇠 (읽음 표시·조회·추천 수는 뺀다) */
 export function snapshotKey(st: GState): string {
-  return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
+  // 기다리는 동안 추천을 눌러도 새로고침 결과를 버리지 않게 조회·추천 수는 비교하지 않는다 (전수검사 11-13)
+  return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
 }
 const postHead = (p: GPost) => JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine]);
 const commentKey = (c: GComment) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
@@ -503,7 +512,8 @@ export function reconcileUnread(st: GState, previous: GState): void {
 
 export function acknowledge(st: GState, post?: number, nick?: string): boolean {
   let changed = false;
-  if (post !== undefined) for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
+  // 보관함 글도 읽음 처리한다 (전수검사 11-13)
+  if (post !== undefined) for (const c of findAnyPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
   if (nick !== undefined) for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
   return changed;
 }
@@ -526,20 +536,23 @@ export function writeGnet(chat: Chat, st: GState, opts: { reconcile?: boolean; a
 
 // ── 사용자 기록 (앱이 직접 씀) ──
 
-export function addUserPost(st: GState, nick: string, title: string, body: string, date: string): GPost {
+/** turn = 지금 이야기 턴 수: 주면 그 턴의 본편 요청에 이 글을 꼭 넣는다 (전수검사 11-13) */
+export function addUserPost(st: GState, nick: string, title: string, body: string, date: string, turn?: number): GPost {
   st.seq += 1;
   const p: GPost = {
     id: st.seq, date: validDate(date), nick: cut(nick, 80), title: trimTokens(title, LIMITS.title_tokens), body: trimTokens(body, LIMITS.post_tokens),
-    views: 0, votes: 0, mine: true, comments: [],
+    views: 0, votes: 0, mine: true, comments: [], ...(turn !== undefined ? { touch: turn } : {}),
   };
   st.posts.unshift(p);
   return p;
 }
 
-export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = '', turn = 0): number {
-  const p = revivePost(st, postIdValue, turn);
+export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = '', turn?: number): number {
+  const p = revivePost(st, postIdValue, turn ?? 0);
   if (!p) throw new GnetError('대상 글이 없어졌어요.');
   if (parent > 0 && !p.comments[parent - 1]) throw new GnetError('답글을 달 댓글이 없어졌어요.');
+  // 게시판에 있던 옛 글에 단 댓글도 그 턴의 본편 요청에 꼭 넣는다 (전수검사 11-13)
+  if (turn !== undefined) p.touch = turn;
   p.comments.push({ parent, nick, body: trimTokens(body, LIMITS.comment_tokens), mine: true, unread: false });
   stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ''], now);
   return p.comments.length;
@@ -559,7 +572,8 @@ export function deletePost(st: GState, id: number): boolean {
 
 /** 내 댓글 k 삭제: 자식은 k의 부모로 옮기고 뒤 번호는 하나씩 당긴다 */
 export function deleteComment(st: GState, id: number, k: number): boolean {
-  const p = findPost(st, id);
+  // 보관함 글의 내 댓글도 지울 수 있게 (전수검사 11-13)
+  const p = findAnyPost(st, id);
   const target = p?.comments[k - 1];
   if (!p || !target?.mine) return false;
   const up = target.parent;
@@ -715,6 +729,18 @@ export interface BoardOptions {
   date: string;
 }
 
+// 요청에서 첨부 기록은 [ATTACHMENT An]으로 바뀌어 간다. 돌아온 유지 댓글을 저장 댓글과 맞춰 볼 때 쓴다 (전수검사 11-13)
+const ATTACH_LABEL = /\[ATTACHMENT A\d+\]/g;
+function attachSwap(text: string, mark: string): string {
+  let s = String(text ?? '');
+  for (const r of attachmentRecords(s).reverse()) s = s.slice(0, r.start) + mark + s.slice(r.end);
+  return s.replace(ATTACH_LABEL, mark).split('[지원하지 않는 첨부]').join(mark).trim();
+}
+/** 첨부 자리를 모두 같은 표시 한 글자로 */
+const attachShape = (text: string) => attachSwap(text, '\u0001');
+/** 첨부를 모두 지운 함께 쓴 글만 */
+const attachText = (text: string) => attachSwap(text, '').trim();
+
 /** 새로고침 응답 반영 (원본 normalize + applyNode). before: 요청할 때의 게시판, current: 지금 게시판 */
 export function applyBoard(before: GState, current: GState, value: unknown, o: BoardOptions): BoardResult {
   if (snapshotKey(before) !== snapshotKey(current)) throw new GnetError('생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.');
@@ -756,6 +782,8 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
     };
     // 저장된 기록의 작성자·제목·본문·날짜가 이긴다. 모델은 NPC 댓글과 조회·추천만 보탠다
     const sigs = new Map<string, number>();
+    // 첨부 붙은 저장 댓글: 첨부가 라벨로 바뀌거나 빠져 돌아와도 같은 댓글로 본다 (전수검사 11-13)
+    const loose = new Map<string, number>();
     const remap = new Map<number, number | false>([[0, 0]]);
     if (prev) {
       Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
@@ -763,9 +791,15 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
       if (prev.scrap) q.scrap = true;
       if (prev.voted) q.voted = true;
       if (prev.down) q.down = true;
+      // 잠깐 되돌아온 글의 기한(back)·이번 턴 표시(touch)도 옮긴다. 빠지면 보관함으로 안 돌아간다 (전수검사 11-13)
+      if (prev.back !== undefined) q.back = prev.back;
+      if (prev.touch !== undefined) q.touch = prev.touch;
       for (const c of prev.comments) {
         q.comments.push(c);
         sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
+        if (!hasAttachment(c.body)) continue;
+        const keys = [`${c.nick}\0${attachShape(c.body)}`, ...(attachText(c.body) ? [`${c.nick}\0${attachText(c.body)}`] : [])];
+        for (const k of keys) if (!loose.has(k)) loose.set(k, q.comments.length);
       }
     }
     const raws: string[] = [];
@@ -773,11 +807,17 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
       const n = i + 1;
       if (!isObj(c)) return void remap.set(n, false);
       const cAuthor = str(c.author).trim();
-      const content = stripForged(str(c.content));
+      const got = stripForged(str(c.content));
       let parent = int(c.parent) ?? 0;
       if (parent < 0 || parent >= n) parent = 0;
+      const sig0 = `${cAuthor}\0${got}`;
+      if (sigs.has(sig0)) return void remap.set(n, sigs.get(sig0)!);
+      const hit = loose.get(`${cAuthor}\0${attachShape(got)}`) ?? loose.get(`${cAuthor}\0${got.trim()}`);
+      if (hit) return void remap.set(n, hit);
+      // 새 댓글에 남은 첨부 라벨 글자는 지운다 (전수검사 11-13)
+      const stripped = got.replace(ATTACH_LABEL, '');
+      const content = stripped === got ? got : stripped.trim();
       const sig = `${cAuthor}\0${content}`;
-      if (sigs.has(sig)) return void remap.set(n, sigs.get(sig)!);
       if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
         skippedComments++;
         return void remap.set(n, false);
@@ -1021,10 +1061,11 @@ export interface ActivitySnapshot {
   commentsAllowed: boolean;
 }
 
-export function activityContext(st: GState, targetId: number | null): { posts: ActivityPost[]; snapshots: Map<number, ActivitySnapshot> } {
+/** posts = 다른 글 활동으로 넘길 게시판 글 수 (글 쓰기는 기능 표의 「지난 기록」, 그 밖은 새로고침의 글 수) */
+export function activityContext(st: GState, targetId: number | null, posts_ = HISTORY.refresh): { posts: ActivityPost[]; snapshots: Map<number, ActivitySnapshot> } {
   const posts: ActivityPost[] = [];
   const snapshots = new Map<number, ActivitySnapshot>();
-  for (const p of st.posts.slice(0, HISTORY.refresh)) {
+  for (const p of st.posts.slice(0, posts_)) {
     const selected = new Set<number>();
     for (let n = Math.max(1, p.comments.length - HISTORY.comment + 1); n <= p.comments.length; n++) {
       let k = n;
@@ -1205,8 +1246,10 @@ export function parseDmBody(raw: string): string {
 
 // ── 본편 요청에 넣는 기록 (원본 RC.gnetContext + contextPack) ──
 
-export function mainContext(st: GState, nick: string, rules: string, focus?: Focus | null): string {
-  const posts: Pick<Record<string, unknown>>[] = [];
+/** site: 화면에 보이는 게시판 이름. 여러 게시판 덩어리를 모델이 가려 읽게 넣는다 (전수검사 11-13) */
+export function mainContext(st: GState, nick: string, rules: string, focus?: Focus | null, site?: string): string {
+  // pin: 보관함에서 잠깐 되살린 글(back)과 이번 턴에 쓴 글·댓글 단 글(touch)은 그 턴에 꼭 넣는다 (전수검사 11-13)
+  const posts: (Pick<Record<string, unknown>> & { pin?: boolean })[] = [];
   // 내가 쓴 것만: 내 글, 내 댓글이 달린 글(그 댓글과 위쪽 댓글만), 내가 주고받은 쪽지는 원래 모두 내 것 (원본 context_own_only)
   for (const p of CONTEXT.includePosts ? st.posts : []) {
     if (CONTEXT.ownOnly && !p.mine && !p.comments.some((c) => c.mine)) continue;
@@ -1225,6 +1268,7 @@ export function mainContext(st: GState, nick: string, rules: string, focus?: Foc
     const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: describe(c.body) })).filter((c) => wanted.has(c.id));
     posts.push({
       order: p.id,
+      pin: p.back !== undefined || p.touch !== undefined,
       related: related(focus, [p.nick, p.title, ...comments.map((c) => c.author)], `${p.title}\n${p.body}\n${comments.map((c) => c.content).join('\n')}`),
       data: { kind: 'public_post', title: p.title, date: p.date, author: p.nick, content: describe(p.body), comments, access: 'publicly accessible; reading by each character is not established' },
     });
@@ -1241,10 +1285,12 @@ export function mainContext(st: GState, nick: string, rules: string, focus?: Foc
       },
     });
   }
-  const payload = (records: unknown[]) => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'gnet', records })}\n[MODULE_CONTEXT_END]`;
+  const payload = (records: unknown[]) => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'gnet', ...(site ? { site } : {}), records })}\n[MODULE_CONTEXT_END]`;
   const fits = (records: unknown[]) => !(CONTEXT.tokens > 0 && tokens(payload(records)) > CONTEXT.tokens);
-  const keptPosts = pickRecords(posts, { focus: CONTEXT.focus, recent: CONTEXT.recentPosts, max: CONTEXT.posts, fits });
-  const keptDms = pickRecords(dms, { focus: CONTEXT.focus, recent: CONTEXT.recentDms, max: CONTEXT.dms, fits: (k) => fits([...keptPosts, ...k]) });
+  // 기록마다 한 번만 센다 (전수검사 11-13: 후보마다 묶음 전체를 다시 세서 기록이 많으면 몇 초씩 늦었다)
+  const cost = (d: unknown) => tokens(JSON.stringify(d)) + 1;
+  const keptPosts = pickRecords(posts, { focus: CONTEXT.focus, recent: CONTEXT.recentPosts, max: CONTEXT.posts, fits, cost, room: CONTEXT.tokens > 0 ? CONTEXT.tokens - tokens(payload([])) : Infinity });
+  const keptDms = pickRecords(dms, { focus: CONTEXT.focus, recent: CONTEXT.recentDms, max: CONTEXT.dms, fits: (k) => fits([...keptPosts, ...k]), cost, room: CONTEXT.tokens > 0 ? CONTEXT.tokens - tokens(payload(keptPosts)) : Infinity });
   const kept = [...keptPosts, ...keptDms];
   return kept.length ? payload(kept) : '';
 }

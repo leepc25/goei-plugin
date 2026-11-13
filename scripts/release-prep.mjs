@@ -6,16 +6,15 @@
 //   --version x.y.z            판을 이 값으로
 //   --no-card                  카드 빌드(③)를 건너뛴다
 //   --skip-tests               ⑤를 건너뛴다
-//   --browser                  ⑤ 뒤에 브라우저 시험 plugin 그룹도 돌린다 (약 30분)
 //   --dry                      무엇을 할지만 보이고 아무것도 바꾸지 않는다
 // 규칙: release/ 의 옛 조각·옛 pic 은 지우지 않는다(결과물 삭제 금지). 카드 빌드가 지운 pic 파일은 git 에서 되살린다.
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { bump: '', version: '', card: true, tests: true, browser: false, dry: false };
+const opt = { bump: '', version: '', card: true, tests: true, dry: false };
 {
   const a = process.argv.slice(2);
   for (let i = 0; i < a.length; i++) {
@@ -24,7 +23,6 @@ const opt = { bump: '', version: '', card: true, tests: true, browser: false, dr
     else if (k === '--version') opt.version = v();
     else if (k === '--no-card') opt.card = false;
     else if (k === '--skip-tests') opt.tests = false;
-    else if (k === '--browser') opt.browser = true;
     else if (k === '--dry') opt.dry = true;
     else if (k === '-h' || k === '--help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); process.exit(0); }
     else throw new Error(`모르는 옵션: ${k}`);
@@ -94,8 +92,23 @@ if (opt.card) {
   const fx = resolve(ROOT, '.scratch/fixture');
   if (existsSync(fx)) {
     const old = resolve(ROOT, `.scratch/fixture_old_${Date.now()}`);
-    log(`④-2 옛 시험 카드 치움 .scratch/fixture → ${old.replace(ROOT + '/', '')} (다음 브라우저 시험이 새 판으로 다시 만든다)`);
+    log(`④-2 옛 시험 카드 치움 .scratch/fixture → ${old.replace(ROOT + '/', '')} (④-3 에서 새 판으로 다시 만든다)`);
     if (!opt.dry) renameSync(fx, old);
+  }
+}
+
+// ④-3 시험 카드를 새 판으로 만든다 — 다시 만들던 브라우저 시험 실행기(test-browser.mjs)는 목록 폐기로 멈춰, 치우기만 하고 아무도 만들지 않았다 (전수검사 11-13)
+{
+  const dir = resolve(ROOT, '.scratch/fixture');
+  const target = resolve(dir, 'fixture.json');
+  if (!opt.dry) mkdirSync(dir, { recursive: true });
+  const charx = resolve(dir, 'lite.charx');
+  run('python3', ['tools/build_lite_card.py', 'card/원본_봇카드.jpeg', charx], '④-3 시험 카드: 경량 카드');
+  try {
+    run('python3', ['tests/make_fixture.py', charx, target], '④-3 시험 카드: fixture');
+  } finally {
+    // 중간 파일(93MB)만 지운다 — test-browser.mjs 와 같은 동작
+    if (!opt.dry && existsSync(charx)) unlinkSync(charx);
   }
 }
 
@@ -103,7 +116,6 @@ if (opt.card) {
 if (opt.tests) {
   run('npm', ['run', 'typecheck'], '⑤ 형 검사');
   run('npm', ['test'], '⑤ 단위 시험');
-  if (opt.browser) run('node', ['scripts/test-browser.mjs', '--group', 'plugin', '--no-build'], '⑤ 브라우저 시험 (plugin)');
 } else log('⑤ 시험 건너뜀 (--skip-tests)');
 
 // 남은 절차
@@ -111,7 +123,7 @@ const ver = opt.dry ? version : JSON.parse(readFileSync(resolve(ROOT, 'release/v
 console.log(`
 [release:prep] 끝. 판 ${version}${opt.dry ? ' (dry: 아무것도 바꾸지 않음)' : ` · release/version.json = ${JSON.stringify(ver)}`}
 남은 절차 (사람이 함):
-  ${opt.browser ? '✓' : '○'} 브라우저 시험 plugin 그룹: npm run test:browser -- --group plugin --no-build  (약 30분)
+  ○ 이번에 고친 화면의 화면 시험만 한 번: node tests/<화면>-browser.mjs  (고친 화면은 PC·폰 크기로 직접 열어 확인)
   ○ git status 로 release/ 변경 확인 (지워진 파일이 있으면 안 됨 — 결과물 삭제 금지)
   ○ 커밋 → push → 사용자가 「합쳐」면 PR, 「릴리스해」면 main 머지
   ○ main 에 release/version.json 이 올라가면 GitHub Actions(release.yml)가 Releases 를 만든다 → 끝나면 사용자에게 알림

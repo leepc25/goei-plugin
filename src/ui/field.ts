@@ -506,7 +506,8 @@ export function missionList(ctx: ChatContext, opening = false): string {
   const q = field.query.trim().toLowerCase();
     const row = (kind: MissionKind, r: { name: string; sub: string }) => {
     const sel = field.mname === r.name && field.mpick === kind;
-    const val = `${kind}:${esc(r.name)}`;
+    // 날값: aimMark가 한 번 이스케이프하므로 여기서는 하지 않는다 (전수검사 11-13)
+    const val = `${kind}:${r.name}`;
     // 괴이·특수·거점: 한 칸짜리 그림 띠. 누르면 같은 칸에서 정사각으로 펴지고 설명·선택·위키가 그림 안에 (2026-10-20 사용자)
     // 거점도 같은 띠 (2026-10-21 사용자: 거점 사진도 넣을 거라 한 줄로). 그림이 없으면 사건 공용 그림
     const open = field.mopen === `${kind}:${r.name}`;
@@ -522,13 +523,13 @@ export function missionList(ctx: ChatContext, opening = false): string {
     const wikiBtn = opening ? '' : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc(link?.doc ?? r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`;
     // 위키는 접힌 띠에서도 보이게 오른쪽 끝, 펴면 접기 오른쪽 옆 (2026-10-21 사용자)
     if (!open) {
-      return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
+      return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${esc(val)}" aria-expanded="false"${bg}>
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
     // 선택은 카드 가운데 큰 과녁 (2026-10-29 사용자, evcard aimMark). 펼친 카드에만
     const aim = sel ? aimMark(true, 'mission-unpick', val) : aimMark(false, 'mission-pick', val);
-    return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
-      ${aim}<span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+    return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${esc(val)}"${bg}>
+      ${aim}<span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${esc(val)}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
       <span class="gx-evart-cap">${capOpen('')}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
@@ -656,7 +657,16 @@ export function depart(ctx: ChatContext, env: FieldEnv): Promise<void> {
     }
     const names = partyNames(x, team);
     const body = sceneDirective(d, dest, names, support, false);
-    return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names, support) }, body), note) };
+    // 보내지 않은 임무 카드를 출동으로 바꾸면 그 임무 요청도 거둔다 (전수검사 11-13)
+    let chat = latest;
+    const last = (latest.message ?? []).at(-1);
+    const kinds = ['an', 'ms', 'in'] as EventKind[];
+    if (x.on && last?.role === 'user' && hasSceneCard(String(last.data ?? '')) && kinds.some((k) => x.world.pending[k])) {
+      const w = structuredClone(x.world);
+      for (const k of kinds) cancelMission(w, k);
+      chat = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction) } };
+    }
+    return { chat: placeRecord(chat, sceneRecord({ target: targetName(target), party: partyLabel(names, support) }, body), note) };
   });
 }
 

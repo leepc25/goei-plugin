@@ -12,6 +12,9 @@ let enc: Tiktoken | null = null;
 let label = '';
 const cache = new Map<string, number>();
 const CACHE_MAX = 400;
+// 기억하는 글자 수 합 상한. 개수만 막으면 11만 자 지침·요청 400개(수십 MB)가 남았다 (전수검사 11-13)
+const CACHE_CHARS = 4_000_000;
+let cacheChars = 0;
 
 /** 순위표(JSON 글)를 올린다. 틀리면 false (어림값 그대로) */
 export function setTokenizerRanks(json: unknown, name: string): boolean {
@@ -21,6 +24,7 @@ export function setTokenizerRanks(json: unknown, name: string): boolean {
     enc = new Tiktoken({ pat_str: r.pat_str, special_tokens: r.special_tokens ?? {}, bpe_ranks: r.bpe_ranks });
     label = name;
     cache.clear();
+    cacheChars = 0;
     return true;
   } catch {
     enc = null;
@@ -33,6 +37,7 @@ export function clearTokenizer(): void {
   enc = null;
   label = '';
   cache.clear();
+  cacheChars = 0;
 }
 
 /** 올라간 토크나이저 이름 (없으면 빈 문자열 = 어림값) */
@@ -50,7 +55,13 @@ export function exactTokens(text: string): number | null {
   } catch {
     return null;
   }
-  if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value as string);
+  if (s.length > CACHE_CHARS) return n;
+  while (cache.size && (cache.size >= CACHE_MAX || cacheChars + s.length > CACHE_CHARS)) {
+    const k = cache.keys().next().value as string;
+    cacheChars -= k.length;
+    cache.delete(k);
+  }
   cache.set(s, n);
+  cacheChars += s.length;
   return n;
 }

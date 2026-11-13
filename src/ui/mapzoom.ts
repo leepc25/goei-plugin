@@ -87,7 +87,13 @@ export function bindMapZoom(root: HTMLElement): void {
   let v = views.get(key) ?? { z: 1, x: 0, y: Number.NaN };
   const canPan = () => layer.offsetWidth * v.z > canvas.clientWidth + 1 || layer.offsetHeight * v.z > canvas.clientHeight + 1;
 
+  const img = canvas.querySelector<HTMLImageElement>('.gx-mapimg');
   const apply = () => {
+    // 그림이 불리기 전엔 크기가 0이라 가운데를 못 잰다. 저장하지 않고 load 뒤에 맞춘다 (전수검사 11-13)
+    if (Number.isNaN(v.y) && img && !img.complete) {
+      layer.style.transform = '';
+      return;
+    }
     if (Number.isNaN(v.y)) v = { ...v, y: (canvas.clientHeight - layer.offsetHeight) / 2 };
     v = clamp(v, canvas.clientWidth, canvas.clientHeight, layer.offsetWidth, layer.offsetHeight);
     views.set(key, v);
@@ -107,7 +113,6 @@ export function bindMapZoom(root: HTMLElement): void {
     const r = canvas.getBoundingClientRect();
     return [px - r.left - canvas.clientLeft, py - r.top - canvas.clientTop] as const;
   };
-  const img = canvas.querySelector<HTMLImageElement>('.gx-mapimg');
   if (img && !img.complete) img.addEventListener('load', apply, { once: true });
   apply();
 

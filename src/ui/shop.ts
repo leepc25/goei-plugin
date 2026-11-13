@@ -11,7 +11,9 @@ import { facePic } from '../host/assets';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { genSettings } from '../core/advanced';
-import { collectRefs, limitRefs, recentTurns, refText, storyText, type RefSource } from '../core/refs';
+import { collectRefs, limitRefs, recentTurns, refText, storyText, type RefRow, type RefSource } from '../core/refs';
+import { buildRegistry } from '../core/world/registry';
+import { matchedBooks, shopGive, type ShopGive } from '../core/shopfn';
 import { readDirectory } from '../core/world';
 import { findStatusTags } from '../core/world/status';
 import { rebuildStatusLine } from '../core/statusctx';
@@ -25,13 +27,18 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { getPrefs } from '../core/settings';
 import {
-  applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, sayToOwner, shelfItems, shelfPrompt, shopOn, shopSettings, shopVars, shortWon, startSell, talkPrompt,
+  applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, reviveShop, sayToOwner, shelfItems, shelfPrompt, shopOn, shopSettings, shopVars, shortWon, startSell, talkPrompt,
   type ShopItem, type ShopSource, type ShopState,
 } from '../core/shop';
 import { ICONS } from './icons';
 import { imageUrl } from './images';
-import { equipBox, equipParts, itemPic } from './items';
+import { equipBox, itemPic } from './items';
 
+/** 지금 방문 상태. 산 응답이 지워졌으면(다시 굴리기·삭제) 진열대의 「팔림」도 되살려 읽는다 (쇼핑몰 readMall 과 같게, 전수검사 11-13) */
+const liveShop = (chat: ChatContext['chat']): ShopState | null => {
+  const st = currentShop(chat);
+  return st ? reviveShop(st, aliveAnchors(chat)) : null;
+};
 /** 상품 그림: 소지품과 같은 PixelLab 그림 팩에서 그림 낱말·이름으로 (ui/items.ts itemPic, 표시 전용) */
 const pic = (name: string, icon?: string): string => itemPic({ name, icon });
 /** 판정 글: 「무기 · 소모 3」 · 「사용」 (상점 물건·팔 물건) */
@@ -100,7 +107,7 @@ const costText = (it: { price: number; pay?: string }) => (it.pay ? `${it.pay}${
 
 export function shopPopup(ctx: ChatContext): string {
   if (!shopUi.open) return '';
-  const st = currentShop(ctx.chat);
+  const st = liveShop(ctx.chat);
   pts = !!st?.identity.points;
   const phone = isPhone();
   if (!st) {
@@ -189,13 +196,9 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
   // 진열대와 같은 구획 상자 안에 (사용자 11-07: 배경에 늘어놓지 말고 상자 안에)
   const head = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small></header>`;
   const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : `<p class="gx-wt-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
-  if (isPhone()) return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
-  // PC (2026-11-08 사용자: 장착 띠를 따로 두면 소지품이 가려 안 보임): 상자 하나에 왼쪽 아바타(자르지 않음, 세로로 섬),
-  // 오른쪽 첫 줄 장착 6칸, 그 아래부터 소지품 격자. 소지품이 많으면 아바타 아래까지 전체 너비로 이어진다
-  const { av, slots } = equipParts(ctx, 'sell', st.sell?.itemId ?? '');
-  const cells = mine.map((it) => pickCell(it, st)).join('');
-  const empty = mine.length ? '' : `<p class="gx-wt-empty sh-sell-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
-  return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells}${empty}</div></section></div>`;
+  // 장착 띠와 소지품 구획은 서로 다른 상자 (2026-11-12 사용자: 장착 칸과 물건 칸이 한 격자처럼 붙어 구분이 안 됨).
+  // 소지품 창과 같은 규격: 위에 테두리 친 장착 띠 [아바타 | 장착 8칸], 그 아래 제목 줄을 가진 소지품 구획. 칸 크기·열 수는 style.css 가 PC·폰을 가른다
+  return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
 }
 
 function pickCell(it: Item, st: ShopState): string {
@@ -300,17 +303,27 @@ export interface ShopEnv {
 
 const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
 
-/** 상점·쇼핑몰 요청 자료. sh: 쓸 설정 (쇼핑몰은 사이트 설정) */
-export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ctx.chat.scriptstate)): ShopSource {
+/** 상점·쇼핑몰 요청 자료. sh: 쓸 설정 (쇼핑몰은 사이트 설정).
+ *  give: 가게 표·기능 표·양 표로 정한 「넘길 것」 (core/shopfn.ts shopGive, 기본 상점·쇼핑몰 둘). 안 주면 예전 고정 값 그대로 (망상홈쇼핑) */
+export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ctx.chat.scriptstate), give?: ShopGive): ShopSource {
   const src = playerSource({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() } as RefSource);
   const vars = ctx.chat.scriptstate ?? {};
-  const story = storyText(recentTurns(ctx.chat, sh.turns, genSettings(vars).userMessages));
-  // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
+  // 최근 챗로그는 맥락 반영이 꺼져 있어도 관련 로어북을 고를 때는 읽는다
+  const story = storyText(recentTurns(ctx.chat, give ? give.turns : sh.turns, genSettings(vars).userMessages));
   const doc = findDoc(ctx.chat, st.shop, ctx.char.globalLore);
-  const rows = limitRefs(
-    collectRefs(src, { scope: 'gnet', text: `${st.shop}\n${st.owner}\n${story}`, authors: false, persona: false, related: true, extra: doc ? [{ source: `위키: ${st.shop}`, content: innerBody(doc.body).slice(0, 3000) }] : [] }),
-    sh.refs,
-  );
+  const extra = doc ? [{ source: `위키: ${st.shop}`, content: innerBody(doc.body).slice(0, 3000) }] : [];
+  const text = `${st.shop}\n${st.owner}\n${story}`;
+  let rows: RefRow[];
+  if (give) {
+    // 「참조 로어북」 수: 관련 로어북·2차 참조를 실제로 이 수까지만. 가게 이름·주인 이름에 걸린 것을 끝까지 남긴다
+    const registry = buildRegistry(src.char.globalLore);
+    const named = matchedBooks(registry, `${st.shop}\n${st.owner}`);
+    // 가게 이름과 같은 위키 문서는 「관련 로어북」 칸을 켰을 때만 (전수검사 11-13)
+    rows = limitRefs(collectRefs(src, { scope: 'gnet', text, ...give.toggles, registry, extra: give.toggles.related ? extra : [] }), give.refs, { hard: true, first: (r) => r.sources.some((x) => named.has(x.trim().toLowerCase())) });
+  } else {
+    // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
+    rows = limitRefs(collectRefs(src, { scope: 'gnet', text, authors: false, persona: false, related: true, extra }), sh.refs);
+  }
   let status = '';
   const msgs = ctx.chat.message ?? [];
   for (let i = msgs.length - 1; i >= 0 && !status; i--) {
@@ -322,6 +335,8 @@ export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ct
   if (status) status = rebuildStatusLine(status, usedCols(colConfig(vars)).filter((c) => c !== 'wallet' && c !== 'points'));
   const situation = ['$an_report', '$in_report'].map((k) => String(vars[k] ?? '').trim()).filter(Boolean).join('\n').slice(0, 1500);
   const identity = peopleSettings(vars).on ? identityText(peopleStore(ctx.chat).identity) : '';
+  // 가게 표와 기능 표 가운데 하나라도 맥락 반영이 꺼져 있으면 신분·상태창·괴이·챗로그를 넘기지 않는다
+  if (give && !give.context) return { st, refs: refText(rows), story: '', status: '', situation: '', identity: '', language: genSettings(vars).language };
   return { st, refs: refText(rows), story, status, situation, identity, language: genSettings(vars).language };
 }
 
@@ -334,10 +349,11 @@ function saleDone<C extends ChatContext['chat']>(chat: C, shop: string, itemId: 
   if (!liveItemsOf(it0, chat).some((x) => x.id === itemId)) return null;
   const p = !!now.identity.points;
   const l0 = ledgerOf(chat.scriptstate, p);
-  const w = addWalletEntry(l0, { id: freshWalletId(l0, `sl_${itemId}_${now.sales.length}`, now.key), anchor: now.key, amount: o.price, memo: o.name, src: 'store' });
+  // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
+  const w = addWalletEntry(l0, { id: freshWalletId(l0, `sl_${itemId}_${now.sales.length}`, now.key), anchor: now.key, amount: o.price, memo: o.name, src: 'store' }, aliveAnchors(chat));
   // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
   const items = sellItem(it0, itemId, now.key, `${now.shop}에 팖`);
-  const nextShop = closeSale(now);
+  const nextShop = closeSale(now, now.key);
   if (!nextShop) return null;
   const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
   const use = q && q.some((u) => u.id === itemId) ? itemUseVars(dropUse(q, itemId)) : {};
@@ -355,7 +371,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
   if (kind === 'talk') await env.refresh();
   else env.render();
   try {
-    const src = shopSource(ctx, st0);
+    const src = shopSource(ctx, st0, s, shopGive(ctx.chat.scriptstate, 'shop', kind));
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: kind === 'shelf' ? '상점 진열' : '상점 대화' };
     let deal = '';
@@ -412,7 +428,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
 
 /** 상점 팝업의 data-action. 처리했으면 true. 'shop-say' 의 value 는 입력칸 글 */
 export async function shopAction(action: string, value: string | undefined, ctx: ChatContext, env: ShopEnv): Promise<boolean> {
-  const st = currentShop(ctx.chat);
+  const st = liveShop(ctx.chat);
   pts = !!st?.identity.points;
   switch (action) {
     case 'shop-open': {
@@ -578,22 +594,23 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       const start = getPrefs().walletStart ?? WALLET_START_DEFAULT;
       let bought = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readShop(chat.scriptstate);
+        const alive = aliveAnchors(chat);
+        const now0 = readShop(chat.scriptstate);
+        const now = now0 ? reviveShop(now0, alive) : null;
         const target = now?.items.find((x) => x.id === it.id && !x.sold);
         if (!now || !target) return null;
-        const alive = aliveAnchors(chat);
         // 포인트 상점은 포인트 장부에서 (원 가계부는 건드리지 않음)
         const p = !!now.identity.points;
         const w0 = p ? readPoints(chat.scriptstate) : readWallet(chat.scriptstate, start);
         if (walletBalance(w0, alive) < target.price) return null;
         // 원 몫이 있을 때만 가계부에. 원이 아닌 대가는 물건에 적어 다음 턴 본편에 「무엇으로 치르고 샀다」로 넘긴다 (core/items.ts boughtLine)
         const walletId = target.price > 0 ? freshWalletId(w0, `${p ? 'sp' : 'st'}_${target.id}`, now.key) : '';
-        const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
+        const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }, alive) : w0; // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
         // 포인트로 산 것은 원 값 없이 「N 포인트」 대가로 적는다 (본편에 「paid with N points」)
         const paid = p ? { paidWith: `${target.price.toLocaleString('en-US')} Baekilmong points${target.pay ? ` + ${target.pay}` : ''}` } : { price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) };
-        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, truth: target.truth, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', anchor: now.key, ...paid });
+        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, truth: target.truth, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', store: 'shop', anchor: now.key, ...paid });
         bought = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id, now.key)) } }; // 산 응답 키를 적어 다시 굴리면 되살게 (전수검사 11-13)
       });
       shopUi.detail = '';
       shopUi.info = bought ? `「${it.name}」을 샀어요. 소지품에 들어갔어요.` : pts ? '포인트가 모자라거나 이미 팔린 물건이에요.' : '잔고가 모자라거나 이미 팔린 물건이에요.';
@@ -622,7 +639,8 @@ export function shopInput(v: string): void {
 
 /** 호출 흐름 미리 계산: 지금 열 수 있는 상점의 진열대 요청 (없으면 null) */
 export function previewShopShelf(ctx: ChatContext): LlmMessage[] | null {
-  const st = currentShop(ctx.chat);
+  const st = liveShop(ctx.chat);
   if (!st) return null;
-  return shelfPrompt(shopSource(ctx, st), shopSettings(ctx.chat.scriptstate));
+  const s = shopSettings(ctx.chat.scriptstate);
+  return shelfPrompt(shopSource(ctx, st, s, shopGive(ctx.chat.scriptstate, 'shop', 'shelf')), s);
 }

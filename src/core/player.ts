@@ -26,6 +26,9 @@ export function playableAgents(lore: LoreEntry[] | undefined, faction: string): 
 
 export const PLAYER_HEAD = '## Player Character';
 
+/** 이름 뒤에 붙는 조사 (applyPlayer 이름 바꾸기). 긴 것부터 */
+const HANGUL_JOSA = ['에게서', '이에게', '이한테', '이랑', '이가', '이는', '이를', '이도', '이의', '에게', '한테', '하고', '이', '가', '은', '는', '을', '를', '의', '께', '와', '과', '랑', '도', '만', '님', '씨', '아', '야'].join('|');
+
 /** 요청에 넣을 주인공 글 = 그 요원 로어북 그대로 (CBS를 풀고 장식 줄을 뗀다).
  *  11-07 사용자: 페르소나 자리에 지침을 덧붙이지 말고 로어북만 넣을 것. 전에 붙였던 「대사·행동을 쓰지 마라, 서술만 하라」 네 줄이 인물 플레이 응답에서 대사를 없앴다. */
 export function playerBlock(lore: LoreEntry[] | undefined, agent: AgentRow, env: CbsEnv): string {
@@ -66,8 +69,14 @@ export function applyPlayer<M extends { role?: unknown; content?: unknown }>(mes
   if (n && agentName && n !== agentName && n.length >= 2 && !/^(?:user|나|유저)$/i.test(n)) {
     const esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // 영문 이름은 낱말 경계로만 (Kim → Kimchi 안 바꿈)
-    const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc}\\b` : esc, 'g');
-    out = out.map((m) => (typeof m?.content === 'string' && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m));
+    // 한글 이름도 앞이 한글이 아니고 뒤가 끝·비한글·조사일 때만 (「지원팀」「강지원」 안 바꿈). 넣은 주인공 글 안은 건드리지 않는다 (전수검사 11-13)
+    const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc}\\b` : `(?<![가-힣])${esc}(?=$|[^가-힣]|(?:${HANGUL_JOSA})(?![가-힣]))`, 'g');
+    const swap = (text: string) => text.split(block).map((part) => part.replace(re, () => agentName)).join(block);
+    out = out.map((m) => {
+      if (typeof m?.content !== 'string') return m;
+      const content = swap(m.content);
+      return content === m.content ? m : { ...m, content };
+    });
   }
   return out;
 }

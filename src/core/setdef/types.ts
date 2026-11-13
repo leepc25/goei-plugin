@@ -11,7 +11,8 @@ export type SetCtl =
   /** 수 한 칸 */
   | { t: 'num'; lo: number; hi: number; unit: string; act?: 'num' | 'shnum' }
   /** 글 한 줄 */
-  | { t: 'text'; ph: string; max?: number }
+  /** def = 기본값 글. 있으면 저장값이 없을 때 칸에 그 글이 진짜 값으로 들어 있다 (회색 안내 글 ph 는 「비우면 …」 같은 안내에만) */
+  | { t: 'text'; ph: string; max?: number; def?: string }
   /** 줄이기·늘리기 단추. 버튼 값은 「열쇠:-」「열쇠:+」 */
   | { t: 'step'; lo: number; hi: number; unit: string; action?: string; vkey?: string }
   /** 글 여러 줄. 이름 없이 줄 전체를 쓴다 */
@@ -41,7 +42,7 @@ export interface SetDef {
   /** 읽어 주기용 이름 (줄 이름과 다를 때) */
   aria?: string;
   /** 조작 옆에 붙는 수 칸 (켬·끔 + 확률, 켬·끔 + 상한). whenOn = 켜져 있을 때만 보인다 */
-  inline?: { key: string; lo: number; hi: number; unit: string; aria?: string; whenOn?: boolean };
+  inline?: { key: string; lo: number; hi: number; unit: string; aria?: string; whenOn?: boolean; step?: number };
   /** 다른 줄의 값이 이럴 때만 보이는 줄 (여럿이면 모두 맞아야) */
   show?: SetShow | SetShow[];
   /** 범위 배지: device = 이 기기 공통 값 (채팅·기본값 구분 없음) */
@@ -53,6 +54,8 @@ export interface SetGroup {
   rows: SetDef[];
   /** 묶음 머리 아래 안내 글 (HTML) */
   note?: string;
+  /** 줄 대신 격자를 그리는 자리 (페이지의 선 Wire.grid 가 이 이름으로 그린다). rows 는 비운다 */
+  grid?: string;
 }
 /** 한 기능(페이지 계열)의 설정 */
 export interface SetPage {

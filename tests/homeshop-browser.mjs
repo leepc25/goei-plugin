@@ -27,19 +27,20 @@ sells: 망상홈쇼핑
 상품|신남|오늘 첫 상품, 행운의 무전기입니다!|-
 바스트|속삭임|건전지가 없어도 누군가는 꼭 받아요.|-
 와이드|놀람|이 구성이 오늘 방송에서만, 무이자 여섯 번!|가격 공개
-바스트|다급|지금 전화가 밀려들고 있습니다, 서두르세요!|주문 폭주
+바스트|매진 임박|지금 전화가 밀려들고 있습니다, 서두르세요!|주문 폭주
 전화|말하기|네 고객님, 연결됐습니다. 거기 어디세요?|전화 연결
-바스트|차가움|…끊지 마세요.|응시
-와이드|카운트|남은 수량이 빠르게 줄고 있습니다!|남은 수량 -12
+바스트|차가워짐|…끊지 마세요.|응시
+와이드|할부 세기|남은 수량이 빠르게 줄고 있습니다!|남은 수량 -12
 바스트|웃음|매진 임박입니다, 고객님.|매진 임박
 #2
 와이드|말하기|다음 상품입니다.|-
 바스트|신남|잠들지 않는 베개!|가격 공개
 #3
 와이드|말하기|마지막 상품입니다.|-
-바스트|다급|한 번 더 울리는 자명종!|매진
+바스트|매진 임박|한 번 더 울리는 자명종!|매진
 </cue>
 <chat>
+#1
 ㅇㅇ|2번 재입고 되나요
 ???|여기 안에 있어요
 민지맘|저거 진짜 들려요?
@@ -48,6 +49,10 @@ sells: 망상홈쇼핑
 하루|6회면 몇 번 불려가요?
 rose|진행자 눈 왜저럼
 익명|방청 신청했는데 답이 없어요
+#2
+감자|이부전용 베개 줄
+#3
+abc92|삼부전용 자명종 줄
 </chat>
 <peek>
 수신 전용. 송신 버튼은 장식입니다.
@@ -61,7 +66,8 @@ rose|진행자 눈 왜저럼
 </operator>`;
 const browser = await launch();
 const REPLY = '첫 답.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]';
-for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['phone', 'phone']]) {
+const VPS = [['pc', { width: 1280, height: 800, touch: false }], ['pcbig', { width: 1920, height: 1080, touch: false }], ['phone', 'phone']].filter(([v]) => !process.env.VP || process.env.VP.split(',').includes(v));
+for (const [vp, size] of VPS) {
   const chat = { message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_wallet: JSON.stringify({ start: 140000, log: [] }) } };
   const { page, errors } = await boot(browser, fx, chat, size, { store: { 'p:goei:data-homeshop': distPack('goei-data-homeshop'), 'p:goei:data-items': distPack('goei-data-items') } });
   let n = 0;
@@ -72,7 +78,7 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   await page.waitForTimeout(300);
   await page.evaluate((r) => { window.__llm = [{ type: 'success', result: r }]; }, SHOW);
   const goHs = async () => {
-    if (vp === 'pc') { if (!(await page.locator('.br').count())) await click('[data-action="nav-tab"][data-value="net"]'); await click('.br-bm[data-value="hs"]'); }
+    if (vp !== 'phone') { if (!(await page.locator('.br').count())) await click('[data-action="nav-tab"][data-value="net"]'); await click('.br-bm[data-value="hs"]'); }
     else { await click('.gx-cgrip'); await click('[data-action="br-site"][data-value="hs"]'); }
   };
   await goHs();
@@ -80,19 +86,33 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   await shot('connecting');
   await page.waitForSelector('.hs-l3', { timeout: 15000 });
   const call = await page.evaluate(() => window.__calls.llm.at(-1).messages.map((m) => m.content).join('\n'));
-  assert.ok(call.includes('<cue>') && call.includes('와이드'), '방송 절이 요청문에 들어감');
+  assert.ok(call.includes('<cue>') && call.includes('wide'), '방송 절이 요청문에 들어감');
   if (process.env.GIF) {
     // 움직임 확인용: 방송 칸을 0.2초마다 찍는다 (GIF=장수)
-    const box = await page.locator(vp === 'pc' ? '.hs-bd' : '.hs-main').boundingBox();
+    const box = await page.locator(vp !== 'phone' ? '.hs-bd' : '.hs-main').boundingBox();
     mkdirSync(`${OUT}/gif-${vp}`, { recursive: true });
     for (let i = 0; i < Number(process.env.GIF); i++) { await page.screenshot({ path: `${OUT}/gif-${vp}/${String(i).padStart(3, '0')}.png`, clip: { x: box.x, y: box.y, width: Math.min(box.width, 1280 - box.x), height: Math.min(box.height, 800 - box.y) } }); await page.waitForTimeout(120); }
     await page.close();
     continue;
   }
+  if (process.env.TRACE) {
+    // 동작 흐름 기록: 0.1초마다 「컷:동작:큐」 → 바뀐 자리만
+    const seq = await page.evaluate(async () => { const out = []; for (let i = 0; i < 300; i++) { const v = document.querySelector('.hs-scr')?.dataset.clip ?? ''; if (out.at(-1)?.[1] !== v) out.push([i / 10, v]); await new Promise((r) => setTimeout(r, 100)); } return out; });
+    console.log(vp, seq.map(([t, v]) => `${t.toFixed(1)} ${v}`).join('\n'));
+  }
   for (let i = 0; i < 6; i++) { await page.waitForTimeout(2600); await shot(`t${i}`); }
   const ss = () => page.evaluate(() => window.__chat.scriptstate);
+  // 사이트 안 스크롤이 된다 · 방송 칸이 보이는 높이의 2/3 를 넘지 않는다 (11-11 사용자)
+  const geo = await page.evaluate(() => { const h = document.querySelector('.br-page > .hs'); const tv = document.querySelector('.hs-scr').getBoundingClientRect(); const before = h.scrollTop; h.scrollTop = 99999; const moved = h.scrollTop - before; h.scrollTop = before; return { moved, can: h.scrollHeight > h.clientHeight, tvH: tv.height, pageH: h.clientHeight, chat: document.querySelector('.hs-chat').getBoundingClientRect().width }; });
+  console.log(vp, JSON.stringify(geo));
+  assert.ok(!geo.can || geo.moved > 0, '스크롤 됨');
+  assert.ok(geo.tvH <= geo.pageH * 0.66, `방송 칸 높이 ${geo.tvH} / ${geo.pageH}`);
   await page.evaluate(() => document.querySelector('.hs-sec')?.scrollIntoView({ block: 'end' })); await page.waitForTimeout(300); await shot('lineup');
   await page.evaluate(() => document.querySelector('.hs-gnb')?.scrollIntoView({ block: 'start' }));
+  // 채팅은 지금 부의 것만 흐르고, 다 흘러도 되풀이하지 않는다 (11-12 사용자)
+  { const lines = await page.evaluate(() => [...document.querySelectorAll('.hs-chlog p')].map((p) => p.textContent));
+    assert.ok(!lines.some((t) => t.includes('이부전용') || t.includes('삼부전용')), `다른 부 채팅이 섞임: ${lines.join(' / ')}`);
+    assert.equal(new Set(lines).size, lines.length, `채팅 되풀이: ${lines.join(' / ')}`); }
   // 스티커 보기 → 들추기
   await click('[data-action="hs-pop"][data-value="peek"]'); await page.waitForTimeout(200);
   await click('[data-action="hs-lift"]'); await page.waitForTimeout(200); await shot('peek');

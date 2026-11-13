@@ -178,9 +178,10 @@ function articlePrompt(ctx: ChatContext, title: string, o: { inherited: string[]
     // 그림 (라이트보드 나무위키 W3): 본문까지면 괴이·특수·거점·조직 그림 후보, 인물 문서면 정보칸 표정 후보
     const subject = entryFor(ctx, title);
     const images = s.images === 'body'
-      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [subject] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject)]
-          .filter((e, i, arr) => arr.findIndex((x) => x.photo === e.photo) === i)
-          .map((e) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name }))
+      // 주제 그림만 subject: true, 나머지는 false 로 분명히 넘긴다 (전수검사 11-13)
+      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [{ e: subject, subject: true }] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject).map((e) => ({ e, subject: false }))]
+          .filter((x, i, arr) => arr.findIndex((y) => y.e.photo === x.e.photo) === i)
+          .map(({ e, subject }) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name, subject }))
       : [];
     const moods = s.images !== 'off' && subject?.cat === 'ag' ? portraitMoods(ctx, subject.photo) : [];
     return fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s, catalogNames, registry(ctx)));
@@ -188,7 +189,8 @@ function articlePrompt(ctx: ChatContext, title: string, o: { inherited: string[]
 
 // ── 생성 ──
 
-async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean, docRequest = '', usePrevious?: boolean): Promise<void> {
+// 새 문서의 물려받기(fresh)는 작성 화면만 넘긴다. 자동 작성은 빈 값 (전수검사 11-13)
+async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean, docRequest = '', usePrevious?: boolean, fresh: { inherited: string[]; previousTitle: string | null; direct: boolean } = { inherited: [], previousTitle: null, direct: false }): Promise<void> {
   const key = chatKey(ctx);
   if (jobs.has(key)) {
     wiki.notice = `「${jobs.get(key)!.title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
@@ -197,9 +199,9 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
   }
   const s: WikiSettings = wikiSettings(ctx.chat.scriptstate);
   const old = findDoc(ctx.chat, title, ctx.char.globalLore);
-  const inherited = regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : wiki.inherited;
-  const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-  const previousDoc = regenerate ? ((usePrevious ?? s.refreshPrevious) ? old : null) : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle, ctx.char.globalLore) : null;
+  const inherited = regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : fresh.inherited;
+  const direct = regenerate ? !!old?.meta?.direct : fresh.direct;
+  const previousDoc = regenerate ? ((usePrevious ?? s.refreshPrevious) ? old : null) : fresh.previousTitle ? findDoc(ctx.chat, fresh.previousTitle, ctx.char.globalLore) : null;
   const writingRequest = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   jobs.set(key, { title, started: Date.now() });
   wiki.failure = null;
@@ -807,7 +809,9 @@ export function bindFootnotes(root: HTMLElement): void {
     pop.style.width = `${w}px`;
     const left = Math.max(12, Math.min(r.left - box.left - w / 2 + r.width / 2, box.width - w - 12));
     let top = r.bottom - box.top + doc.scrollTop + 6;
-    if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
+    // 위·아래 판단은 보이는 영역(.wsc) 기준. 문서 칸은 스크롤 칸이 아니라 문서 전체 길이다 (전수검사 11-13)
+    const view = (doc.closest<HTMLElement>('.wsc') ?? doc).getBoundingClientRect();
+    if (r.bottom + pop.offsetHeight + 12 > view.bottom && r.top - pop.offsetHeight - 12 > view.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
     pop.style.left = `${left}px`;
     pop.style.top = `${top}px`;
   };
@@ -888,7 +892,8 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     if (k) {
       const box = panel.querySelector<HTMLElement>('.wls');
       const sec = box?.querySelector<HTMLElement>(`[data-ksec="${k}"]`);
-      if (box && sec) box.scrollTop = sec.offsetTop;
+      // offsetTop 은 서랍(.wdr) 기준이라 검색칸·탭 줄만큼 지나쳤다. 목록 칸 기준으로 맞춘다 (전수검사 11-13)
+      if (box && sec) box.scrollTop += sec.getBoundingClientRect().top - box.getBoundingClientRect().top;
       grid.hidden = true;
       return;
     }
@@ -1017,7 +1022,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.listOpen = false;
       break;
     case 'wiki-start':
-      if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false, wiki.docReq);
+      if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false, wiki.docReq, undefined, { inherited: wiki.inherited, previousTitle: wiki.previousTitle, direct: wiki.direct });
       break;
     case 'wiki-rewrite': {
       // 다시 쓰기 칸을 연다: 지난번 이 문서 지침을 채워 둔다

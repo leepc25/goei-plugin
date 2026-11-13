@@ -17,7 +17,7 @@ import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from '.
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { viewSettings } from './core/phoneView';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
-import { advNum, applyAdvanced } from './core/advanced';
+import { advNum, applyAdvanced, genSettings } from './core/advanced';
 import { fitTotal, type ContextPart } from './core/budget';
 import { makeFocus, sceneText } from './core/focus';
 import { buildRegistry } from './core/world/registry';
@@ -28,9 +28,10 @@ import { autoWriteWiki } from './ui/wiki';
 import { wikiSettings } from './core/wiki';
 import { autoRefreshGnet } from './ui/gnet';
 import { autoRefreshMall } from './ui/malls';
-import { MALL_SITES, mallSettings } from './core/malls';
+import { MALL_SITES, mallAutoTurn } from './core/malls';
 import { Joint } from './host/joint';
 import { autoTasks, jointGroups } from './core/netjoint';
+import { readReports, refreshClosures } from './core/journal';
 import { BOARD_NAME } from './core/boards';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
@@ -45,7 +46,7 @@ import { createFab, type Fab } from './host/overlay';
 import { createProgWin, progressOn, type ProgWin } from './host/progwin';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintTheme, setCurrentTheme, themeName } from './ui/theme';
-import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
+import { hasImgTag, IMG_RECENT, imgHidden, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { appShown, openApp, openInstall, openRecords, openShop, openWiki } from './ui/app';
@@ -66,11 +67,12 @@ import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
 import { withHomeshop } from './core/homeshop';
+import { hsMainContext, hsMainOn, hsMainRules, hsMainSettings } from './core/hslog';
 import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
 import { cosReadyMode } from './core/malls';
-import { hideUseBox, refreshUseBox, USE_SLOT } from './host/usebox';
+import { hideUseBox, markUseSent, refreshUseBox, USE_SLOT } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
@@ -81,7 +83,7 @@ import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
-import { traceBegin, traceMain, traceReply } from './host/trace';
+import { traceBegin, traceEnd, traceMain, traceReply, traceTurnId } from './host/trace';
 import { progressAbort, progressEnd, progressPlan, progressTurn, progressWatch } from './core/progress';
 import { turnPlan } from './core/progplan';
 import { bookText } from './core/refs';
@@ -110,10 +112,62 @@ const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
  * 맨 끝의 정리 단계(core/sanitize.ts stripMarkers)가 플러그인 표식을 한 번 더 지워 모델이 표식 글자를 보지 않게 한다.
  * 실패한 단계는 모아 한 줄 로그 `[goei] 요청 조립 실패: 단계 …` 로 남긴다. 이 함수는 던지지 않는다 (던지면 시작기 main.ts 가 sanitize 로 같은 처리)
  */
+/** 직전 조립이 새로 끼운 system 글들. Risu 는 요청이 실패하면 앞 회차 결과에 replacer 를 다시 돌린다 (자동 재시도) — 그때 다시 조립하지 않는다 */
+let lastAdded = new Set<string>();
+const sysTexts = (ms: PromptMessage[]): string[] => ms.filter((m) => m?.role === 'system' && typeof m.content === 'string').map((m) => m.content as string);
+/** 플러그인이 끼운 글: 끼우기 전(before)에 없던 메시지는 통째로, 고친 메시지는 앞뒤 같은 곳을 뺀 가운데. 호출 기록에 「플러그인이 더한 토큰」으로 (전수검사 11-13) */
+function addedTexts(before: PromptMessage[], after: PromptMessage[]): string[] {
+  const str = (m: PromptMessage) => (typeof m?.content === 'string' ? m.content : '');
+  const left = new Map<string, number>();
+  for (const m of before) left.set(str(m), (left.get(str(m)) ?? 0) + 1);
+  // 끼운 뒤에 없는 메시지 = 고친 메시지 (짝 후보)
+  const rest = before.filter((m) => !after.some((a) => str(a) === str(m)));
+  const used = new Set<number>();
+  const out: string[] = [];
+  for (const m of after) {
+    const t = str(m);
+    const n = left.get(t) ?? 0;
+    if (n > 0) {
+      left.set(t, n - 1);
+      continue;
+    }
+    if (!t) continue;
+    // 같은 역할의 고친 메시지 중 앞뒤가 가장 많이 같은 것과 짝짓는다
+    let best = -1;
+    let score = 0;
+    let cut: [number, number] = [0, 0];
+    rest.forEach((b, i) => {
+      if (used.has(i) || b?.role !== m?.role) return;
+      const o = str(b);
+      const lim = Math.min(o.length, t.length);
+      let p = 0;
+      while (p < lim && o[p] === t[p]) p++;
+      let q = 0;
+      while (q < lim - p && o[o.length - 1 - q] === t[t.length - 1 - q]) q++;
+      if (p + q > score) {
+        best = i;
+        score = p + q;
+        cut = [p, q];
+      }
+    });
+    if (best >= 0 && score >= 20) {
+      used.add(best);
+      const mid = t.slice(cut[0], t.length - cut[1]);
+      if (mid) out.push(mid);
+    } else out.push(t);
+  }
+  return out;
+}
+
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
   if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
+  // 자동 재시도: 이미 조립한 요청이 다시 들어왔다. 참고 기록·인물 기록이 두 번 끼고 호출 기록 턴이 새로 열리지 않게 그대로 보낸다 (전수검사 11-13)
+  if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
+  const input0 = new Set(sysTexts(messages));
   const failed: string[] = [];
+  /** 플러그인이 끼운 글 (호출 기록의 「플러그인이 더한 토큰」, 전수검사 11-13) */
+  let added: string[] | undefined;
   /** 한 단계: 던지면 이름·까닭을 모으고 fallback(= 그 단계 이전 모양) */
   const step = <T>(name: string, run: () => T, fallback: T): T => {
     try {
@@ -136,17 +190,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   try {
     setWaiting(true);
     setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
-    // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
-    messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages).messages).messages, messages);
-    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
-    if (messages.some((m) => marked(m?.content))) {
-      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripSceneMark(stripStartCard(stripUnsentMark(m.content))) } : m)), messages);
-    }
-    // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
-    if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) {
-      messages = step('옛 이미지 태그', () => stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def), messages);
-    }
     // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
+    // 지시문 풀기가 채팅의 마지막 메시지를 봐야 해서 그 앞에서 읽는다 (전수검사 11-13)
     let ctx: ChatContext | null = null;
     if (liteNow) {
       // 호출 흐름 기록: 새 턴 (host/trace.ts). 이 뒤의 라우터·디렉터 호출은 이 턴의 「본편 전」
@@ -154,11 +199,33 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
       // 진행 창 (core/progress.ts): 이 턴에 돌 단계를 설정으로 미리 깐다
       if (ctx) step('진행 계획', () => progressPlan(turnPlan(ctx!.char, ctx!.chat)), undefined);
+    }
+    // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
+    // 카드·전화가 채팅의 마지막 메시지면 요청에서 그 뒤의 user 글은 프리셋 글이라 합치지 않는다. 채팅을 못 읽으면 전처럼 (전수검사 11-13)
+    if (messages.some((m) => m?.role === 'user' && (hasSceneCard(m.content) || hasCall(m.content)))) {
+      const chat0 = ctx?.chat ?? (await stepAsync('지시문 채팅 읽기', async () => (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null, null));
+      const last = chat0?.message?.at(-1);
+      const lastData = last?.role === 'user' && typeof last.data === 'string' ? last.data : '';
+      const o = chat0 ? { cardIsLast: hasSceneCard(lastData), callIsLast: hasCall(lastData) } : {};
+      messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages, o).messages, o).messages, messages);
+    }
+    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
+    if (messages.some((m) => marked(m?.content))) {
+      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripSceneMark(stripStartCard(stripUnsentMark(m.content))) } : m)), messages);
+    }
+    // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
+    if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) {
+      // 이 채팅의 에셋 출력이 꺼져 있으면 최근 것까지 전부 뺀다. 남기면 모델이 따라 써 태그가 끝없이 이어졌다 (전수검사 11-13)
+      const assetOff = step('에셋 출력 읽기', () => (ctx ? !basicSettings(ctx.char.globalLore, ctx.chat.scriptstate).assetOn : imgHidden()), false);
+      messages = step('옛 이미지 태그', () => (assetOff ? stripAllImgTags(messages) : stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def)), messages);
+    }
+    if (liteNow) {
       // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
       await stepAsync('유저 이름', () => readUser(), undefined);
       messages = step('기록 태그 정리', () => stripHistoryTags(messages), messages);
       if (ctx) {
         const c = ctx;
+        const pre = messages;
         messages = step('로어', () => fixLore(messages, c), messages);
         messages = await stepAsync('주인공', () => withPlayer(messages, c), messages);
         messages = step('명부 다듬기', () => trimRoster(messages), messages);
@@ -174,12 +241,15 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
         // 소지품 [Inventory]: 지금 가진 것·한계·이번 턴 사건(사용·새로 산 것·넘침)을 마지막 유저 메시지 앞에 (core/items.ts, 설정 「소지품 → 본편에 넘기기」)
         messages = step('소지품', () => withInventory(messages, c.chat), messages);
+        // 「다음 메시지에 사용」 칩: 요청에 실려 나갔으니 바로 숨긴다 (host/usebox.ts markUseSent, 2026-11-12 사용자: 보냈는데 안 없어짐)
+        await stepAsync('사용 상자', () => markUseSent(c.charIndex, c.chatIndex, c.chat), undefined);
         // 망상홈쇼핑: 할부 호출 턴·방청 신청 턴에만 한 번 (core/homeshop.ts, 평소엔 아무것도 안 넣는다)
         messages = step('망상홈쇼핑', () => withHomeshop(messages, c.chat), messages);
         // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
         messages = await stepAsync('인물 기록', () => withPeople(messages, c), messages);
         // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
         messages = step('이미지 지침', () => withImgPrompt(messages, c), messages);
+        added = step('더한 글', () => addedTexts(pre, messages), undefined);
       }
     }
     // 시드 표식이 있는 요청만 (첫 전송·그 리롤): 수명대로 표식을 떼거나 블록을 지운다. 없으면 아무것도 읽지 않는다 (매 전송마다 드는 비용을 0에 가깝게)
@@ -196,8 +266,20 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (failed.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed.join(' · ')} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
   // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
   const out = sanitize(messages);
-  if (liteNow) step('호출 기록', () => traceMain(out, failed), undefined);
+  if (liteNow) step('호출 기록', () => traceMain(out, failed, added), undefined);
+  lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
   return out;
+}
+
+/** 요청의 이미지 태그를 전부 지운다 (시스템 글 제외). 에셋 출력을 끈 채팅용 (전수검사 11-13) */
+function stripAllImgTags<M extends PromptMessage>(messages: M[]): M[] {
+  let changed = false;
+  const out = messages.map((m) => {
+    if (!m || m.role === 'system' || typeof m.content !== 'string' || !m.content.includes('<img=')) return m;
+    changed = true;
+    return { ...m, content: m.content.replace(/<img=.*?>/g, '') };
+  });
+  return changed ? out : messages;
 }
 
 /** 플러그인 표식만 지운다 (core/sanitize.ts). 시작기도 본체 beforeRequest 가 던졌을 때 이것을 부른다. 던지지 않는다 */
@@ -376,7 +458,15 @@ async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }
   return out;
 }
 
-/** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
+/** 요청 맨 끝에 system 한 줄. 끝이 assistant(프리필·이어 쓰기)면 그 앞에 넣어 프리필이 마지막으로 남게 한다 (전수검사 11-13) */
+function appendImgPrompt<M extends PromptMessage>(messages: M[], text: string): M[] {
+  let end = messages.length;
+  while (end > 0 && messages[end - 1]?.role === 'assistant') end--;
+  const add = { role: 'system', content: text } as M;
+  return end === messages.length || end === 0 ? [...messages, add] : [...messages.slice(0, end), add, ...messages.slice(end)];
+}
+
+/** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에, 끝이 assistant 프리필이면 그 앞에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
 function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): M[] {
   const s = basicSettings(char.globalLore, chat.scriptstate);
   const out = stripImgLore(messages);
@@ -385,10 +475,11 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const names = imgCharacters(char.globalLore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: me?.english || undefined, userName: userInfo().name });
   if (!names.length) return out;
-  return [...out, { role: 'system', content: buildImgPrompt(cfg, names, s.assetPlayer) } as M];
+  // 지침 속 {{user}}는 Risu 가 다시 풀지 않으니 여기서 푼다 (전수검사 11-13)
+  return appendImgPrompt(out, evaluate(buildImgPrompt(cfg, names, s.assetPlayer), { vars: chat.scriptstate ?? {}, char: char.name, user: me?.name || userOrTag() }));
 }
 
-/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
+/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서, 망상홈쇼핑 시청 기록을 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
  *  지침·명부는 요청마다 다시 읽는다 (캐릭터 번호로 캐시하면 지침·명부를 고쳐도 옛것이 남았다. 명부 읽기는 10ms 안쪽. QC 2026-10-28) */
 function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const ss = chat.scriptstate;
@@ -397,17 +488,20 @@ function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const wantGnet = boardsOn.length > 0;
   const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
   const wantWiki = wikiContextOn(ss);
-  if (!wantGnet && !wantPhone && !wantWiki) return [];
+  // 망상홈쇼핑 시청 기록 (core/hslog.ts): 방송에서 실제로 본 것·친 채팅·주문. 기록이 있고 「본편에 넘기기」($hs_main)가 켜져 있을 때
+  const wantHs = hsMainOn(ss);
+  if (!wantGnet && !wantPhone && !wantWiki && !wantHs) return [];
   applyAdvanced(ss);
   const src = { char: { globalLore: char.globalLore }, chat };
   const rules = { phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
   const focus = makeFocus(scene, buildRegistry(char.globalLore));
   // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
   const parts: ContextPart[] = [];
-  for (const { view } of boardsOn) {
+  for (const { site, view } of boardsOn) {
     const rule = mainContextRules({ char: src.char, chat: view });
     const st = readGnet(view);
-    if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: GN_CONTEXT.tokens, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rule, focus)) });
+    // 어느 게시판 글인지 이름을 붙인다 (전수검사 11-13: 네 게시판이 모두 feature:'gnet' 으로만 갔다)
+    if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: GN_CONTEXT.tokens, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rule, focus, BOARD_NAME[site])) });
   }
   if (wantPhone && rules.phone) {
     try {
@@ -419,6 +513,7 @@ function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
     }
   }
   if (wantWiki && rules.wiki) parts.push({ cap: advNum(ss, 'nw', 'ctx_tokens'), build: (cap) => wikiMainContext(chat, rules.wiki!, focus, cap) });
+  if (wantHs) parts.push({ cap: hsMainSettings(ss).tokens, build: (cap) => hsMainContext(chat, hsMainRules(), focus, cap) });
   return fitTotal(parts, advNum(ss, 'gen', 'ctx_total')).filter(Boolean);
 }
 
@@ -461,6 +556,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 이 턴만 닫는다. 뒤 작업이 없으면 바로
   const after: Promise<unknown>[] = [];
   const pTurn = progressTurn();
+  const tTurn = traceTurnId();
   try {
     const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
@@ -569,7 +665,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
     {
-      const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+      const pp = requestPeopleUpdate('turn', { at: { charIndex: arg.characterIndex, chatIndex: arg.chatIndex } }).catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`))
+        // 이번 응답에서 끝난 내 사건 보고서에 그 응답의 가계부 맞춤·호감 계기까지 넣는다 (전수검사 11-13)
+        .then(() => (readReports(now).items.some((r) => r.mine && r.idx === arg.messageIndex)
+          ? updateChat(arg.characterIndex, arg.chatIndex, (cur) => { const v = refreshClosures(cur, arg.messageIndex, walletStart); return v ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...v } } : null; }).catch(() => null)
+          : null));
       after.push(pp);
       if (!peopleSettings(now.scriptstate).parallel) await pp;
     }
@@ -582,8 +682,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     const netTasks = autoTasks(now.scriptstate);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
-    // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했을 때만)
-    const malls = MALL_SITES.filter((site) => { const m = mallSettings(now!.scriptstate, site); return m.on && m.auto === 'turn' && (site !== 'bm' || String(now!.scriptstate?.['$br_login'] ?? '') === '1'); });
+    // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했고 백일몽 소속(포인트 켬)일 때만. 탭이 안 보이는 채팅에서 부르지 않게, 전수검사 11-13)
+    const malls = MALL_SITES.filter((site) => mallAutoTurn(now!, site));
     if (netTasks.length || viewAuto || wikiAuto || malls.length) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
@@ -599,7 +699,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         const gnetFail = (site: string) => (error: unknown) => console.log(`[goei] ${BOARD_NAME[site as keyof typeof BOARD_NAME] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
         // 덩어리마다: 둘 이상이면 Joint 로 한 요청(각 작업은 요청문을 만들어 맡기고, 다 모이면 한 번에 보냄), 하나면 그냥. 덩어리끼리는 차례로
         for (const group of jointGroups(now!.scriptstate)) {
-          const joint = group.length > 1 ? new Joint(group[0].model, group[0].fixed, group.map((t) => t.kind)) : undefined;
+          const joint = group.length > 1 ? new Joint(group[0].model, group[0].fixed, group.map((t) => t.kind), genSettings(now!.scriptstate).concurrent) : undefined;
           await Promise.all(group.map(async (t) => {
             try {
               if (t.kind === 'phone') await autoRefresh(await fresh(), arg.messageIndex, undefined, joint);
@@ -619,7 +719,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   } catch (error) {
     console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
-    void Promise.allSettled(after).then(() => progressEnd(pTurn));
+    void Promise.allSettled(after).then(() => { progressEnd(pTurn); traceEnd(tTurn); });
   }
 }
 
@@ -831,6 +931,7 @@ function startWatcher(fab: Fab | null): () => void {
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let shownChat = '';
+  let lastChar: number | undefined;
   const tick = async () => {
     try {
       const snap = await readSnapshot(fab);
@@ -838,6 +939,11 @@ function startWatcher(fab: Fab | null): () => void {
       if (stopped) return;
       const next = state.update(snap, lite);
       liteNow = state.lite;
+      // 캐릭터를 바꾸거나 봇 판정이 바뀌면 에셋 목록을 다시 읽는다 (안 읽으면 앞 캐릭터 목록으로 그림 태그를 골랐다. 첫 차례는 시작 때 읽음, 전수검사 11-13)
+      if (snap.charIndex >= 0) {
+        if (lastChar !== undefined && (snap.charIndex !== lastChar || (next.changed && next.fabVisible))) void loadModuleAssets().catch(() => false);
+        lastChar = snap.charIndex;
+      }
       // 같은 봇 안에서 채팅만 바꿔도(버튼은 그대로) 그 채팅의 배색·상태창 칸 구성·시작 안내로 (QC 2026-10-28: 앞 채팅 것이 남았다)
       const chatKey = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : '';
       if (next.fabVisible && (next.changed || chatKey !== shownChat)) {
@@ -864,6 +970,8 @@ function startWatcher(fab: Fab | null): () => void {
       if (prog && pKey !== progKey) { progKey = pKey; await prog.setVisible(pShow).catch(() => {}); }
       // 떠 있으면 매 초 폭(폰·PC 모양)·자리를 다시 맞춘다 (릴리스 점검 11-09: 창 크기를 바꿔도 그대로였다)
       else if (prog && pShow) await prog.setVisible(true).catch(() => {});
+      // 상황판이 떠 있으면 PC 카드를 저절로 펴지 않고, 폰 막대는 주소줄 아래로 (닫기 X·탭 수 단추를 가리지 않게, 전수검사 11-13)
+      if (prog) await prog.setPanel(appShown()).catch(() => {});
       // 턴에 채팅을 붙이고, 채팅을 옮겼으면 앞 채팅의 턴을 치우고, 본편을 너무 오래 기다리면 실패로 닫는다
       progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
     } catch (error) {

@@ -43,3 +43,13 @@ Output exactly one block and nothing else:
 1. What does the customer want?
 2. How would this counselor respond?
 @@END
+
+@@SECTION HEAD_REFS
+[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
+@@END
+
+@@SECTION HEAD_PAST
+[최근 상담사 — 겹치지 말 것]
+@@END
+
+<!-- HEAD_REFS·HEAD_PAST 는 상담 요청 자료의 머리말입니다. MAKE 절이 「[최근 상담사 — 겹치지 말 것]」을 글자 그대로 가리키므로 HEAD_PAST 를 고치면 MAKE 절도 같이 고치세요. -->

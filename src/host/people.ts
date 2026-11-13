@@ -6,10 +6,12 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, repairDirector, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun, foldLog } from '../core/people/store';
+import { sumCues } from '../core/people/affinity';
+import { genSettings } from '../core/advanced';
 import { hypaSummaries } from '../core/people/hypa';
-import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
-import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
+import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, shopKeyLine, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
+import { applyConsolidate, buildConsolidate, consolidateUserText, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
@@ -24,9 +26,10 @@ import { promptFor, UPDATER_COMPACT, UPDATER_DETAILED } from '../core/people/pro
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
-import { mentionsPoints, pointsOn, pointsVars, readPoints } from '../core/points';
+import { mentionsPoints, pointsOn, pointsVars, readPoints, syncPointsToStatus } from '../core/points';
 import { addWalletEntry, aliveAnchors, mentionsAmount, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
+import { applyItemChanges, ITEM_SCOPE_SKIP, itemScope, itemAutoOn, itemStateOn, itemsAwayOf, itemsNowOf, itemsVars, readItems, setItemRules, usedItemsAt } from '../core/items';
+import { ensureItemIcons, itemPictures } from './itemicons';
 import { getPrefs } from '../core/settings';
 import { settleShop, shopJudgeBy, shopJudgeGuide, shopOn, shopRule, stripShopTags } from '../core/shop';
 import { guideSections } from '../core/guides';
@@ -35,12 +38,19 @@ import { guideSections } from '../core/guides';
 /** Router 기본 지침: 지침 탭 「Router」의 ROLE·RULES 절 */
 const routerBase = () => { const g = guideSections('Router'); return [g.ROLE, g.RULES].filter((x) => x?.trim()).join('\n'); };
 const directorBase = () => { const g = guideSections('Director'); return { facts: g.FACTS, scene: g.SCENE }; };
-import { parseIdentity } from '../core/people/identity';
-import type { Identity, PeopleStore } from '../core/people/types';
+import { parseIdentity, rankLevel } from '../core/people/identity';
+import { AFF_MAX, AFF_MIN, type Identity, type PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
 
 // ── 진단 ──
+
+/** 장면 인물이 없는 갱신기 호출(소지품·가계부·상점만 읽음): 새 인물에게 쓸 수 없는 절은 뺀다 (전수검사 11-13, 약 3천 토큰).
+ *  호감·호칭·지각 절은 남긴다: 이 응답에서 새로 등록한 인물의 cues·address·knowledge 를 쓴다 */
+function dropNoPeople(sections: Set<string>, settings: PeopleSettings): void {
+  for (const k of ['axes', 'sexual']) sections.delete(k);
+  for (const f of ['affinity', 'suspicion', 'openness'] as const) if (settings.qualitative.has(f)) sections.delete(f);
+}
 
 export interface DiagRun {
   at: string;
@@ -176,7 +186,10 @@ export function statusIdentity(chat: Chat): ReturnType<typeof parseIdentity> {
     const tags = findStatusTags(String(list[i].data ?? ''));
     const t = tags.at(-1);
     if (!t) continue;
-    return t.identity ? parseIdentity(t.identity, messageKey(list[i], i)) : null;
+    const id = t.identity ? parseIdentity(t.identity, messageKey(list[i], i)) : null;
+    // 가짜 관리국(B00) 소속은 자기 조직을 「관리국」이라 부른다 (Faction 지침). 「가짜」 없이 적힌 관리국은 이 채팅의 소속으로 읽는다 (전수검사 11-13)
+    if (id && id.faction === 'A00' && userFaction(chat) === 'B00' && !/가짜|fake/i.test(t.identity)) return { ...id, faction: 'B00', level: rankLevel('B00', id.rank) };
+    return id;
   }
   return null;
 }
@@ -189,7 +202,7 @@ let running = 0;
 let chain: Promise<unknown> = Promise.resolve();
 export const peopleUpdating = () => running > 0;
 
-export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[] }
+export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[]; /** 다시 읽기: 첫 성공 저장 때 비운 기록 수 */ cleared?: number }
 
 /** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 이어서 (읽을 것이 없으면 바로 끝난다) */
 export interface RunScope {
@@ -197,9 +210,12 @@ export interface RunScope {
   indexes?: number[];
   /** 이 인물만 반영하고 읽음 표시는 그대로 (다시 읽기) */
   only?: string[];
+  /** 다시 읽기: 첫 성공 저장 때 이 인물의 이야기 기록을 비운다 (실패하면 그대로 둠, 전수검사 11-13) */
+  clear?: string;
 }
 
-export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
+/** at: 응답이 붙은 채팅 (본편 응답 뒤). 그 채팅이 지금 열려 있지 않으면 읽지 않고 다음 턴에 미룬다 (전수검사 11-13: 다른 채팅을 읽고 거기에 적었다) */
+export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope; at?: { charIndex: number; chatIndex: number } } = {}): Promise<RunResult> {
   running++;
   const run = chain.then(() => runOnce(reason, o)).finally(() => {
     running--;
@@ -220,10 +236,15 @@ async function waitNotBusy(): Promise<void> {
   });
 }
 
-async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }): Promise<RunResult> {
+async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope; at?: { charIndex: number; chatIndex: number } }): Promise<RunResult> {
   const result: RunResult = { ran: 0, applied: 0, skipped: [], errors: [] };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return result;
+  // 응답이 끝난 채팅과 지금 열린 채팅이 다르면 손대지 않는다. 그 응답은 안 읽은 채로 남아 다음 갱신이 읽는다 (전수검사 11-13)
+  if (o.at && (o.at.charIndex !== ctx.charIndex || o.at.chatIndex !== ctx.chatIndex)) {
+    result.skipped.push('다른 채팅이 열려 있어 다음 턴에 읽음');
+    return result;
+  }
   const settings = peopleSettings(ctx.chat.scriptstate);
   if (!settings.on || (settings.when === 'manual' && !o.manual)) return result;
   const store = peopleStore(ctx.chat);
@@ -254,6 +275,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
   }
   const batches = planBatches(ctx.chat, unread, settings.spanCap);
   const id = chatId(ctx);
+  // 다시 읽기의 비우기는 첫 성공 저장과 함께 한다. 그 전엔 자료용 사본에서만 비운다 (전수검사 11-13)
+  let pendingClear = o.scope?.clear;
+  let clearedNow = 0;
   for (let b = 0; b < batches.length; b++) {
     setStatus({ busy: true, label: batches.length > 1 ? `관계 갱신 중… (${b + 1}/${batches.length})` : '관계 갱신 중…' });
     const t0 = Date.now();
@@ -267,6 +291,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         break;
       }
       const curStore = peopleStore(fresh.chat);
+      if (pendingClear) clearStoryRecords(curStore, pendingClear);
       // 가계부: 상태창 잔고 칸을 쓰는 채팅이면 장부 잔고를 자료에 넣고 거래 절을 켠다 (core/wallet.ts)
       const walletOn = colConfig(fresh.chat.scriptstate).wallet !== 'off';
       const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
@@ -277,13 +302,15 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const batchKeys = batches[b].map((i) => (fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : '')).filter(Boolean);
       // 소지품 (core/items.ts): 설정 「보조 모델이 읽기」가 켜져 있으면 지금 목록을 자료에 넣고 소지품 절을 켠다
       const itemsOn = itemAutoOn(fresh.chat.scriptstate);
-      const itemsNow = itemsOn ? itemsNowOf(fresh.chat) : null;
+      const itemsNow = itemsOn ? itemsNowOf(fresh.chat, itemPictures) : null;
+      // 상태 그림 묶음(꿈결 수집기)의 그림 이름은 그림 팩에서 읽는다: 아직 안 받았으면 받기만 걸어 두고 이번 요청은 그림 이름 없이 간다
+      if (itemsOn) void ensureItemIcons();
       const usedNow = itemsOn ? usedItemsAt(readItems(fresh.chat.scriptstate), batchKeys, aliveAnchors(fresh.chat)) : [];
       // 상점 판단 (11-09, 설정 「상점 판단」): 갱신기가 맡으면 이 묶음에 든 가장 최근 응답 하나를 판단한다. 다시 읽기(only)는 하지 않는다
       const lastChar = fresh.chat.message.reduce((a, m, i) => (m.role === 'char' ? i : a), -1);
       const shopAt = !o.scope?.only && shopOn(fresh.chat.scriptstate) && shopJudgeBy(fresh.chat.scriptstate).by === 'updater' && batches[b].includes(lastChar) ? lastChar : -1;
       const shopSelf = shopAt >= 0 ? [...exclude, userInfo().name] : [];
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { shop: shopAt >= 0 ? { at: shopAt, self: shopSelf } : null,  settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { shop: shopAt >= 0 ? { at: shopAt, self: shopSelf } : null,  settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow, away: itemsOn ? itemsAwayOf(fresh.chat) : [] });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
@@ -291,6 +318,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (walletOn && walletLoose(fresh.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsUse) sections.add('points');
       if (itemsOn) sections.add('items');
+      if (!input.people.length) dropNoPeople(sections, settings);
       const system = updaterSystem(settings, sections, fresh.chat.scriptstate, !!input.shop);
       input.system = system;
       if (input.overBudget.length) {
@@ -331,7 +359,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         { role: 'system', content: system },
         { role: 'user', content: dataText },
       ];
-      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: 1, retryModel: 'same', state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined, label: '갱신기' });
+      // 형식 오류 재시도·재시도 모델은 「생성 공통」 설정을 따른다 (전수검사 11-13: 1회·같은 모델로 박혀 있었다). 동시 요청 수는 세지 않는다
+      const g = genSettings(fresh.chat.scriptstate);
+      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: g.retries, retryModel: g.retryModel, state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined, label: '갱신기' });
       diag.raw = raw;
       diag.outChars = raw.length;
       // 쓰기: 응답 대기 중이면 기다리고, 같은 채팅인지·메시지가 그대로인지 확인
@@ -341,6 +371,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         if (chatId({ ...fresh, chat: cur }) !== id) return null;
         for (const [i, k] of keys) if (!cur.message[i] || messageKey(cur.message[i], i) !== k) return null;
         const s = peopleStore(cur);
+        if (pendingClear) clearedNow = clearStoryRecords(s, pendingClear);
         const before = snapshotRun(s);
         const report = applyUpdate(s, cur, input, value, {
           settings,
@@ -356,16 +387,26 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         });
         diag.report = report;
         // 되돌리기용 (리수폿 J-4): 이 갱신이 새로 만든 것. 다시 읽기(only)는 적지 않는다
-        if (!o.scope?.only) recordRun(s, before, new Date().toISOString());
+        if (!o.scope?.only) {
+          recordRun(s, before, new Date().toISOString());
+          // 변경 기록 줄이기: 지워진 응답의 변경은 버리고, 상한을 넘으면 오래된 호감 계기를 값으로 접는다. 세력 평판은 시작값이 바뀔 수 있어 접지 않는다 (전수검사 11-13)
+          foldLog(s, cur, (who, cues, folded) => {
+            const p = s.people[who];
+            if (!p) return null;
+            return sumCues(who, p.affinity.base, cues, folded, AFF_MIN, AFF_MAX, { temper: temperOf(who), speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }) - p.affinity.base;
+          });
+        }
         let next = cur;
         if (report.wallet.length) {
           let w = readWallet(cur.scriptstate, walletStart);
-          for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: 'story' });
+          const alive = aliveAnchors(cur); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
+          for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: 'story' }, alive);
           next = { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } };
         }
         if (report.points.length) {
           let p = readPoints(next.scriptstate);
-          for (const e of report.points) p = addWalletEntry(p, { ...e, src: 'story' });
+          const alive = aliveAnchors(next); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
+          for (const e of report.points) p = addWalletEntry(p, { ...e, src: 'story' }, alive);
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...pointsVars(p) } };
         }
         // 거래를 적은 뒤 상태창 잔고 맞춤 줄을 다시 계산한다 (같은 거래를 두 번 세지 않게, core/wallet.ts syncWalletToStatus)
@@ -374,9 +415,16 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
           if (w) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...walletVars(w) } };
         }
+        // 포인트도 같다 (2026-11-13 사용자: 정산 5,000p 한 번이 「상태창 포인트 +5,000」「정산 지급 +5,000」「상태창 포인트 −5,000」 세 줄로 적혔다 — 포인트만 이 다시 맞춤이 빠져 있었다)
+        if (pointsUse && report.points.length && colConfig(next.scriptstate).points !== 'off' && walletSyncOn(next.scriptstate)) {
+          const p = syncPointsToStatus(readPoints(next.scriptstate), next);
+          if (p) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...pointsVars(p) } };
+        }
         // 소지품 변화를 목록($st_items)에 (core/items.ts applyItemChanges). 소모성 횟수는 「사용」 기록으로 이미 셈 — 여기선 본문이 말한 변화만
         if (report.items.length) {
-          const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate) });
+          // 판정 표·「두고 옴」 말은 이 채팅의 설정으로 (core/itemrules.ts). order = 메시지 차례 (사용자가 버린 물건은 버린 뒤의 메시지가 근거일 때만 되살린다)
+          setItemRules(next.scriptstate);
+          const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate), skipKinds: ITEM_SCOPE_SKIP[itemScope(next.scriptstate)], order: (next.message ?? []).map((m, i) => messageKey(m, i)) });
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
         }
         // 상점 판단 (11-09): 판단한 응답 끝의 표식을 갱신기 판단대로 바꾸고(있으면 붙이고 없으면 지움) 본편과 같은 정리(settleShop)를 돌린다.
@@ -397,6 +445,10 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         diag.error = '저장 직전에 채팅이 달라져 이번 결과를 버림';
         result.skipped.push(diag.error);
         continue;
+      }
+      if (pendingClear) {
+        result.cleared = clearedNow;
+        pendingClear = undefined;
       }
       diag.ok = true;
       result.ran++;
@@ -442,7 +494,7 @@ function updaterSystem(settings: PeopleSettings, sections: Set<string>, vars: Re
   let system = assemblePrompt(base, sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
   if (shop && !base.includes('<<SECTION:shop>>')) {
     const def = settings.prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
-    system += `\n\n${sectionBody(def, 'shop') ?? ''}\nAdd this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.`;
+    system += `\n\n${sectionBody(def, 'shop') ?? ''}\n${shopKeyLine()}`;
   }
   return system.replace('<<SHOP_RULE>>', () => (shop ? shopRule(vars) : '')).replace('<<SHOP_JUDGE>>', () => (shop ? shopJudgeGuide() : ''));
 }
@@ -469,15 +521,18 @@ export async function rereadPerson(name: string, turns: number): Promise<RunResu
   const p = store.people[name];
   if (!p) return { ran: 0, applied: 0, skipped: ['기록이 없는 인물'], errors: [], cleared: 0 };
   const indexes = mentionIndexes(ctx.chat, name, [...p.aliases, ...(allNames().find((n) => n.name === name)?.aliases ?? [])], turns);
-  let cleared = 0;
-  await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
-    const s = peopleStore(cur);
-    cleared = clearStoryRecords(s, name);
-    return withPeople(cur, s);
-  });
-  if (!indexes.length) return { ran: 0, applied: 0, skipped: ['최근 응답에 이 인물이 나오지 않아요 (기록만 비움)'], errors: [], cleared };
-  const r = await requestPeopleUpdate('reread', { manual: true, scope: { indexes, only: [name] } });
-  return { ...r, cleared };
+  if (!indexes.length) {
+    let cleared = 0;
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
+      const s = peopleStore(cur);
+      cleared = clearStoryRecords(s, name);
+      return withPeople(cur, s);
+    });
+    return { ran: 0, applied: 0, skipped: ['최근 응답에 이 인물이 나오지 않아요 (기록만 비움)'], errors: [], cleared };
+  }
+  // 비우기는 다시 읽기가 저장될 때 같이 한다 — 모델이 실패하면 기록이 그대로 남는다 (전수검사 11-13)
+  const r = await requestPeopleUpdate('reread', { manual: true, scope: { indexes, only: [name], clear: name } });
+  return { ...r, cleared: r.cleared ?? 0 };
 }
 
 /** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */
@@ -502,9 +557,10 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
     if (settings.keepRaw) (diag.system = input.system), (diag.data = dataText);
     const messages: LlmMessage[] = [
       { role: 'system', content: input.system },
-      { role: 'user', content: `Record to tidy:\n${dataText}\n\nReturn the JSON object.` },
+      { role: 'user', content: consolidateUserText(dataText) },
     ];
-    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined, label: '정리' });
+    const g = genSettings(ctx.chat.scriptstate);
+    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: g.retries, retryModel: g.retryModel, state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined, label: '정리' });
     diag.raw = raw;
     diag.outChars = raw.length;
     await waitNotBusy();
@@ -675,18 +731,19 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       const walletOn = colConfig(ctx.chat.scriptstate).wallet !== 'off';
       const balance = walletOn ? walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat)) : null;
       const itemsOn = itemAutoOn(ctx.chat.scriptstate);
-      const itemsNow = itemsOn ? itemsNowOf(ctx.chat) : null;
+      const itemsNow = itemsOn ? itemsNowOf(ctx.chat, itemPictures) : null;
       const usedNow = itemsOn && list[last] ? usedItemsAt(readItems(ctx.chat.scriptstate), [messageKey(list[last], last)], aliveAnchors(ctx.chat)) : [];
       const memory = await hypaMemory(ctx.chat, ctx.char, [messageText(String(list[last]?.data ?? '')), ...Object.keys(store.people)].join('\n'), settings).catch(() => [] as string[]);
       // 상점 판단 (실제 호출과 같게, 릴리스 점검 11-09)
       const shopOnNow = shopOn(ctx.chat.scriptstate) && shopJudgeBy(ctx.chat.scriptstate).by === 'updater';
-      const inp = buildUpdate(ctx.chat, store, [last], { shop: shopOnNow ? { at: last, self: [...exclude, userInfo().name] } : null, settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, points: pointsOn(ctx.chat) ? walletBalance(readPoints(ctx.chat.scriptstate), aliveAnchors(ctx.chat)) : null, items: itemsNow, used: usedNow });
+      const inp = buildUpdate(ctx.chat, store, [last], { shop: shopOnNow ? { at: last, self: [...exclude, userInfo().name] } : null, settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, points: pointsOn(ctx.chat) ? walletBalance(readPoints(ctx.chat.scriptstate), aliveAnchors(ctx.chat)) : null, items: itemsNow, used: usedNow, away: itemsOn ? itemsAwayOf(ctx.chat) : [] });
       const sections = enabledSections(settings);
       if (inp.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
       if (walletOn && walletLoose(ctx.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsOn(ctx.chat)) sections.add('points');
       if (itemsOn) sections.add('items');
+      if (!inp.people.length) dropNoPeople(sections, settings);
       const system = updaterSystem(settings, sections, ctx.chat.scriptstate, !!inp.shop);
       out.update = [{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(inp.data) }];
     }

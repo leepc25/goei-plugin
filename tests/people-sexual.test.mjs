@@ -57,7 +57,7 @@ test('지침: 켜진 칸·발정모드에 따라 절이 조립되고, 끄면 절
   const on = St.peopleSettings({});
   const sec = Sx.sexualWriterSection(on);
   assert.ok(/sexual_init/.test(sec) && /sexual_context_only/.test(sec) && /replace/.test(sec) && /six independent observations across four scenes/.test(sec));
-  assert.ok(/자지/.test(Sx.sexualPromptRules(true)) && !/자지/.test(Sx.sexualPromptRules(false)));
+  assert.ok(!/자지/.test(Sx.sexualPromptRules(true)) && !/자지/.test(Sx.sexualPromptRules(false)) && (sec.match(/자지/g) ?? []).length === 1, '어휘 규칙은 인물별 문장에 한 번만');
   assert.equal(Sx.sexualWriterSection(St.peopleSettings({ $pp_sexual_desire: '0', $pp_paraphilia: '0' })), '');
   assert.ok(!/`paraphilia`/.test(Sx.sexualWriterSection(St.peopleSettings({ $pp_paraphilia: '0' })).split('\n')[1]), '이상성욕만 끄면 그 칸은 지침에서 빠짐');
   for (const text of [PD.UPDATER_DETAILED, PC.UPDATER_COMPACT]) {

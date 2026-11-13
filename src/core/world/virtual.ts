@@ -5,9 +5,9 @@ import type { LoreEntry } from '../types';
 import { readDirectory, readDirectoryData, type Directory } from './directory';
 import { assembleAgent, assembleAnomaly, assembleAppendix, assembleOrg, assembleSite } from './assemble';
 import { assembleFaction, assembleRoster } from './faction';
-import { setActiveWorld, worldRecords, worldRelations, type WorldOverrides, type WorldRecord, worldAnomalyNote, excludedOrgs, filterRelations } from './records';
+import { setActiveWorld, worldDataGen, worldRecords, worldRelations, type WorldOverrides, type WorldRecord, worldAnomalyNote, excludedOrgs, filterRelations } from './records';
 import type { WorldKind } from './schema';
-import { guidePrompt } from '../guides';
+import { GUIDE_NAMES, getUserRules, guidePrompt, guideOverridden, guideText } from '../guides';
 import { FACTION_BOOK, TAG_BOOK } from '../factions';
 
 export const ROSTER_BOOK = '🙂Roster';
@@ -69,11 +69,13 @@ function entry(kind: WorldKind, name: string, key: string, content: string, fold
  */
 export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
   const base = stripVirtual(lore ?? []);
-  const hit = cache.get(base);
-  if (hit) return hit;
+  // 같은 내용이면 지난번 가상 항목을 그대로 쓴다. 카드 항목은 이번에 받은 것 그대로 (전수검사 11-13)
+  const print = fingerprint(base);
+  if (memo && memo.print === print) {
+    setActiveWorld(...memo.active);
+    return [...base, ...memo.virtual.map((e) => ({ ...e }))];
+  }
   const overrides = worldOverrides(base);
-  // 결과는 안 쓴다: 카드 로어북 기준 명부를 먼저 한 번 읽어 readDirectory 의 캐시를 데워 둔다(아래 folderKey 들이 같은 배열로 다시 읽음)
-  void readDirectory(base);
   const out = [...base];
   const existing = new Set(base.filter((e) => e.mode !== 'folder').map((e) => s(e.comment)));
   // 1) 가상 항목이 폴더에 있어야 명부가 요원·괴이·파밍으로 알아보므로, 먼저 빈 본문의 항목을 만들어 명부를 다시 읽는다
@@ -131,7 +133,8 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
     e.content = `@@dont_activate\n${content}\n\n---`;
   }
   // 인물 기록의 세력 시작값 등이 읽는 「지금 세계」: 관계 격자와 코드→조직 이름
-  setActiveWorld(filterRelations(worldRelations(overrides), excludedOrgs(recs.org)), Object.fromEntries(dir.orgs.flatMap((o) => (o.faction ? [[o.faction, o.name]] : []))), worldAnomalyNote(overrides));
+  const active: Parameters<typeof setActiveWorld> = [filterRelations(worldRelations(overrides), excludedOrgs(recs.org)), Object.fromEntries(dir.orgs.flatMap((o) => (o.faction ? [[o.faction, o.name]] : []))), worldAnomalyNote(overrides)];
+  setActiveWorld(...active);
   // 상시 지침(🏷️Tag·📜Faction·🙂Roster): 카드에 없으면 가상으로. 요청에는 플러그인이 직접 끼운다 (core/lore.ts insertLoreBlock)
   const missingAlways = ALWAYS_BOOKS.filter((b) => !existing.has(b.name));
   if (missingAlways.length) {
@@ -146,11 +149,45 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
   }
   // 조립하지 못한 가상 항목(명부에 안 들어온 이름)은 뺀다
   const result = out.filter((e) => !isVirtual(e) || e.mode === 'folder' || s(e.content) !== '@@dont_activate\n\n\n---');
-  cache.set(base, result);
+  const virtual = result.slice(base.length);
+  memo = { print, virtual: virtual.map((e) => ({ ...e })), active };
   return result;
 }
 
-const cache = new WeakMap<LoreEntry[], LoreEntry[]>();
+// 마지막 조립 하나만 기억한다. 열쇠는 내용 지문 (배열은 부를 때마다 새것이라 배열 열쇠로는 한 번도 안 맞았다) (전수검사 11-13)
+let memo: { print: string; virtual: LoreEntry[]; active: Parameters<typeof setActiveWorld> } | null = null;
+
+/** 카드 로어북 항목의 글·숫자 칸 + 고친 지침·내 규칙 + 세계 자료 교체 회수의 지문 (FNV 두 벌) */
+function fingerprint(base: LoreEntry[]): string {
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193 ^ base.length;
+  let n = 0;
+  const feed = (t: string) => {
+    for (let i = 0; i < t.length; i++) {
+      const c = t.charCodeAt(i);
+      h1 = Math.imul(h1 ^ c, 16777619);
+      h2 = Math.imul(h2 ^ c, 2246822519) ^ (h2 >>> 13);
+    }
+    h1 = Math.imul(h1 ^ 0xffff, 16777619);
+    h2 = Math.imul(h2 ^ 0xffff, 2246822519);
+    n += t.length + 1;
+  };
+  for (const e of base) {
+    const r = e as Record<string, unknown>;
+    for (const k in r) {
+      const v = r[k];
+      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+        feed(k);
+        feed(String(v));
+      }
+    }
+    feed('\u0000');
+  }
+  for (const g of GUIDE_NAMES) if (guideOverridden(g)) feed(`${g}\u0001${guideText(g)}`);
+  feed(JSON.stringify(getUserRules()));
+  feed(String(worldDataGen()));
+  return `${(h1 >>> 0).toString(36)}.${(h2 >>> 0).toString(36)}.${n}`;
+}
 
 /** 가상 항목이 하나라도 들어 있는지 */
 export const hasVirtual = (lore: LoreEntry[] | undefined): boolean => (lore ?? []).some(isVirtual);

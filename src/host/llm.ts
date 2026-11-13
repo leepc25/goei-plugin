@@ -4,8 +4,10 @@ import { clip, requestText, traceCall } from './trace';
 import { tokens } from '../core/gnet';
 import { photoData } from './photo';
 import { applyAdvanced } from '../core/advanced';
-import { RETRY_ANALYZE } from '../core/craft';
-import { progressCallChunk, progressCallEnd, progressCallStart } from '../core/progress';
+import { retryAnalyze } from '../core/craft';
+import { guideOr } from '../core/guides';
+import { imageMissingLine } from '../core/attach';
+import { progressCallChunk, progressCallEnd, progressCallStart, progressCallTokens } from '../core/progress';
 export type ModelChoice = 'main' | 'aux';
 
 export interface LlmMessage {
@@ -19,9 +21,17 @@ export class LlmError extends Error {
   }
 }
 
-/** 생각 블록 제거 (생각 단계 「적고 지움」의 <lb-process> 포함) */
-function stripThoughts(s: string): string {
-  return s.replace(/<(thoughts|think|lb-process)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '').replace(/<(?:thoughts|think|lb-process)\b[^>]*>[\s\S]*$/gi, '');
+/** 생각 블록 제거 (생각 단계 「적고 지움」의 <lb-process> 포함). <thinking> 도 (전수검사 11-13) */
+export function stripThoughts(s: string): string {
+  const t = s.replace(/<(thoughts|thinking|think|lb-process)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '');
+  // 맨 앞의 닫히지 않은 칸: 「{」「[」나 생각 칸이 아닌 태그로 시작하는 줄부터는 답으로 남긴다. 그런 줄이 없으면 전처럼 다 지운다 (전수검사 11-13)
+  const head = /^\s*<(?:thoughts|thinking|think|lb-process)\b[^>]*>/i.exec(t);
+  if (head) {
+    const rest = t.slice(head[0].length);
+    const ans = /^[ \t]*(?:[{[]|<(?!\/?(?:thoughts|thinking|think|lb-process)\b))/m.exec(rest);
+    return ans ? rest.slice(ans.index) : '';
+  }
+  return t.replace(/<(?:thoughts|thinking|think|lb-process)\b[^>]*>[\s\S]*$/gi, '');
 }
 
 async function readStream(stream: ReadableStream<unknown>, onChunk?: (chars: number) => void): Promise<string> {
@@ -51,11 +61,26 @@ async function withPhotos(messages: (LlmMessage & { images?: string[] })[]): Pro
       const missing = data.map((d, i) => (d ? 0 : i + 1)).filter(Boolean);
       return {
         ...rest,
-        content: missing.length ? `${rest.content}\nImage ${missing.join(', ')} could not be loaded; do not describe it.` : rest.content,
+        content: missing.length ? `${rest.content}\n${imageMissingLine(missing.join(', '))}` : rest.content,
         multimodals: data.filter((d): d is string => !!d).map((base64) => ({ type: 'image', base64 })),
       };
     }),
   );
+}
+
+/** 모델 호출 시간 제한 (전수검사 11-13 나-7, 사용자 결정 (2)): 응답이 이만큼 오지 않으면(받는 중이면 마지막 조각부터) 실패로 본다.
+ * 모델 연결이 멈춰도 응답 뒤 처리(갱신기·이미지 태그 보충)가 채팅을 영영 묶어 두지 않게. raw 'timeout' 이라 일시 오류로 다시 보낸다 */
+const MODEL_IDLE_MS = 300_000;
+function idleLimit<T>(run: (tick: () => void) => Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return new Promise<T>((resolve, reject) => {
+    const arm = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => reject(new LlmError(`모델이 ${MODEL_IDLE_MS / 1000}초 동안 응답하지 않아 멈췄어요. Risu의 모델 연결을 확인해 주세요.`, 'timeout')), MODEL_IDLE_MS);
+    };
+    arm();
+    run(arm).then(resolve, reject).finally(() => clearTimeout(timer));
+  });
 }
 
 /** staticModel: 기능별 전용 모델 ID (있으면 메인·보조 대신 그 모델) */
@@ -64,17 +89,30 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice, stati
   const at = new Date().toISOString();
   const t0 = Date.now();
   const req = requestText(messages);
-  const reqTokens = tokens(req);
-  // 진행 창 (core/progress.ts): 시작할 때 모델·요청 토큰을 알리고, 끝나면 응답 토큰·시간을
-  const pid = progressCallStart(label, staticModel || model, reqTokens);
+  // 진행 창 (core/progress.ts): 시작할 때 모델을 알리고, 끝나면 응답 토큰·시간을
+  const pid = progressCallStart(label, staticModel || model, 0);
+  // 기록용 요청 토큰은 요청을 보낸 뒤에 센다. 긴 요청은 세는 데 1초 가까이 걸려 호출이 늦게 나갔다 (전수검사 11-13)
+  let reqTokens: number | undefined;
+  const countReq = (): number => {
+    if (reqTokens === undefined) {
+      reqTokens = tokens(req);
+      progressCallTokens(pid, reqTokens);
+    }
+    return reqTokens;
+  };
+  setTimeout(countReq, 0);
   const done = (ok: boolean, response: string, error?: string) => {
     const ms = Date.now() - t0;
+    countReq();
     const responseTokens = tokens(response);
     progressCallEnd(pid, { ok, ms, respTokens: responseTokens, ...(error ? { error } : {}) });
-    void traceCall({ label, at, ms, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, requestTokens: reqTokens, response: clip(response), responseChars: response.length, responseTokens }).catch(() => {});
+    void traceCall({ label, at, ms, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, requestTokens: countReq(), response: clip(response), responseChars: response.length, responseTokens }).catch(() => {});
   };
   try {
-    const text = await runModelRaw(messages, model, staticModel, (n) => progressCallChunk(pid, n));
+    const text = await idleLimit((tick) => runModelRaw(messages, model, staticModel, (n) => {
+      tick();
+      progressCallChunk(pid, n);
+    }));
     done(true, text);
     return text;
   } catch (error) {
@@ -97,7 +135,7 @@ async function runModelRaw(messages: LlmMessage[], model: ModelChoice, staticMod
   else if (res && typeof res === 'object') {
     const r = res as { type?: string; result?: unknown };
     if (r.type === 'fail' && /Plugin calls are blocked/i.test(String(r.result ?? ''))) {
-      throw new LlmError('Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.', String(r.result));
+      throw new LlmError('Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 이 기능이 쓰는 모델(또는 Risu의 메인·보조 모델)을 플러그인 모델이 아닌 것으로 바꿔 보세요.', String(r.result));
     }
     if (r.type === 'fail') throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.\n${String(r.result ?? '').slice(0, 300)}`, String(r.result ?? ''));
     if (r.type === 'multiline' && Array.isArray(r.result)) text = (r.result as [string, string][]).filter(([role]) => role === 'char').map(([, t]) => t).join('\n');
@@ -132,7 +170,8 @@ export interface RetryOptions {
 // ── 동시 요청 수 (라이트보드 「동시요청수」, 2026-11-06). 괴담넷·괴담톡·위키 요청만 센다. 인물 기록은 세지 않는다 (리수폿 스레드 요청) ──
 let running = 0;
 const waiting: (() => void)[] = [];
-async function slot<T>(limit: number | undefined, run: () => Promise<T>): Promise<T> {
+/** 동시 요청 칸 하나를 잡고 run. 통합 요청(host/joint.ts)도 요청 한 건마다 이걸로 감싼다 (전수검사 11-13) */
+export async function limited<T>(limit: number | undefined, run: () => Promise<T>): Promise<T> {
   if (!limit || limit < 1) return run();
   while (running >= limit) await new Promise<void>((r) => waiting.push(r));
   running++;
@@ -145,11 +184,11 @@ async function slot<T>(limit: number | undefined, run: () => Promise<T>): Promis
 }
 
 /** 다시 보기 문장 (원본 그대로) */
-const reiterationText = (i: number, n: number) => `<system>
+export const reiterationText = (i: number, n: number): string => guideOr('Common', 'REITERATE', () => `<system>
 Reiteration phase (${i}/${n})
 Now, read the instruction and your previous output carefully. Is it format-adhering? Did it follow all the instructions without any omission?
 Carefully think, then if it is OK, output the required node without any changes. If it needs changes, apply the changes and output the node.
-</system>`;
+</system>`, { i, n });
 
 
 /** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
@@ -159,10 +198,10 @@ const TRANSIENT = /빈 응답|MALFORMED|finishReason|overloaded|UNAVAILABLE|RESO
 const transient = (error: unknown) => error instanceof LlmError && TRANSIENT.test(`${error.message}\n${error.raw}`);
 const TRANSIENT_RETRIES = 2;
 
-const defaultFix = (messages: LlmMessage[]) => (raw: string, reason: string): LlmMessage[] => [
+export const defaultFix = (messages: LlmMessage[]) => (raw: string, reason: string): LlmMessage[] => [
   ...messages,
   ...(raw ? [{ role: 'assistant' as const, content: raw }] : []),
-  { role: 'user', content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}\n${RETRY_ANALYZE}` },
+  { role: 'user', content: guideOr('Common', 'RETRY.DEFAULT', () => `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}\n${retryAnalyze()}`, { reason: reason.slice(0, 600), analyze: retryAnalyze() }) },
 ];
 
 /** 실패 화면에 원문을 보여 주도록 오류에 응답 원문을 붙인다 (이미 있으면 그대로) */
@@ -189,7 +228,7 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
     try {
       try {
         // 통합 요청(first = Joint.ask)은 동시 요청 칸 밖에서: 칸이 1이면 한쪽이 칸을 잡고 다른 쪽을 기다려 둘 다 멈췄다 (11-09 점검)
-        raw = attempt === 0 && o.first ? await o.first(ask) : await slot(o.concurrent, () => runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label));
+        raw = attempt === 0 && o.first ? await o.first(ask) : await limited(o.concurrent, () => runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label));
       } catch (error) {
         // 모델 쪽 일시 오류면 형식 재시도 횟수와 무관하게 같은 요청을 다시 (최대 2회)
         if (!transient(error) || transientLeft <= 0) throw error;
@@ -203,7 +242,7 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
       for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
         const again: LlmMessage[] = [...ask, { role: 'assistant', content: raw }, { role: 'user', content: reiterationText(i, o.reiterate ?? 0) }];
         try {
-          const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? '기타'} 다시 보기 ${i}`));
+          const next = await limited(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? '기타'} 다시 보기 ${i}`));
           if (next.trim()) raw = next;
         } catch {
           break;

@@ -1,6 +1,7 @@
 // 인물 기록 정리 (리수폿 「문서 정리」에 해당): 보조 모델이 한 인물의 살아 있는 항목들을 더 적은 수의 조밀한 항목으로 다시 쓴다.
 // 사용자가 인물 화면에서 「정리」를 눌렀을 때만. 합쳐진 원본은 folded 표시(되돌릴 수 없음), 하나에서 온 항목은 대체(replaces).
 import type { PeopleSettings } from './settings';
+import { guideOr } from '../guides';
 import { entryId, liveEntries, liveness, plain, type Liveness } from './store';
 import { CORE_SLOTS, SLOT_META, slotsFor, type Entry, type PeopleStore, type SlotId } from './types';
 import { recordChars } from './updater';
@@ -12,7 +13,8 @@ export interface ConsolidateInput {
   ids: Map<string, { slot: SlotId; entry: Entry }>;
 }
 
-export const CONSOLIDATE_PROMPT = (lang: 'ko' | 'en', slots: SlotId[] = [...CORE_SLOTS]) => [
+/** 글은 지침 「인물 기록 갱신기(덧붙임)」 CONSOLIDATE 절. 절이 없으면 아래에 남긴 글 */
+export const CONSOLIDATE_PROMPT = (lang: 'ko' | 'en', slots: SlotId[] = [...CORE_SLOTS]) => guideOr('UpdaterExtra', 'CONSOLIDATE', () => [
   'You tidy the per-chat record of one roleplay character. The record is a set of slots, each a list of short entries. Over time entries pile up, overlap, or go stale. Rewrite each slot into fewer, denser entries without losing any fact that is still true.',
   '',
   'Rules:',
@@ -25,7 +27,10 @@ export const CONSOLIDATE_PROMPT = (lang: 'ko' | 'en', slots: SlotId[] = [...CORE
   'Output exactly one JSON object, nothing else:',
   '{"slots":{"<slot>":[{"text":"<statement>","target":"<name|@user|null>","from":["<id>"]}]}}',
   'Slot hints: ' + slots.map((s) => `${s} = ${SLOT_META[s].hint}`).join('; '),
-].join('\n');
+].join('\n'), { lang_note: lang === 'en' ? ' in English' : ' in Korean', slot_hints: slots.map((s) => `${s} = ${SLOT_META[s].hint}`).join('; ') });
+
+/** 정리 요청의 user 글 (host/people.ts). 지침 「인물 기록 갱신기(덧붙임)」 CONSOLIDATE.USER 절, 없으면 여기 남긴 글 */
+export const consolidateUserText = (dataText: string): string => guideOr('UpdaterExtra', 'CONSOLIDATE.USER', () => `Record to tidy:\n${dataText}\n\nReturn the JSON object.`, { data: dataText });
 
 export function buildConsolidate(store: PeopleStore, chat: Parameters<typeof liveness>[0], who: string, settings: PeopleSettings): ConsolidateInput | null {
   const p = store.people[who];
@@ -102,11 +107,11 @@ export function applyConsolidate(store: PeopleStore, who: string, input: Consoli
       list.push({ id: entryId(who, slot, '#0', seq, n.text), text: n.text, src: 'story', anchor: '#0', seq, ...(n.target ? { target: n.target } : {}), ...(n.from.length === 1 ? { replaces: n.from[0] } : { from: n.from }) });
       for (const id of n.from) used.add(id);
     }
-    // 어디에도 안 쓰인 원본은 버린 것: 취소 표시한 빈 대체 항목으로 숨긴다 (정리 항목은 '#0' 기준이라 되살아나지 않는다)
+    // 어디에도 안 쓰인 원본은 버린 것: 원본에 folded 를 단다. 예전의 취소(void) 대체 항목은 살아 있지 않아 원본을 숨기지 못했다 (전수검사 11-13)
     for (const e of input.data.slots[slot]) {
       if (used.has(e.id)) continue;
-      seq++;
-      list.push({ id: entryId(who, slot, '#0', seq, `-${e.id}`), text: `(정리에서 제외) ${e.text}`.slice(0, 300), src: 'story', anchor: '#0', seq, replaces: e.id, void: true, ...(e.target ? { target: e.target } : {}) });
+      const orig = list.find((x) => x.id === e.id);
+      if (orig) orig.folded = true;
     }
     report.slots++;
     report.before += input.data.slots[slot].length;

@@ -118,12 +118,12 @@ test('반영: 항목 add/upsert/remove 보류, 계기 상한·중복, 호칭, �
     next_note: [{ who: '쟈알디', now: 'Guards the door.', must_not_reveal: ['유저의 전직'] }, { who: '잼트리', now: 'x' }],
   };
   const rep = U.applyUpdate(store, c, input, r, { settings: settings() });
-  assert.equal(rep.applied.entries, 4, 'upsert 1 + add 2(쟈알디 지식, 데쥬레 지식) + 부장→쟈알디 history 1');
+  assert.equal(rep.applied.entries, 5, 'upsert 1 + add 2(쟈알디 지식, 데쥬레 지식) + 부장→쟈알디 history 1 + remove 1(낱말 검사 없음, 사용자 11-13)');
   assert.ok(rep.dropped.some((d) => d.reason === '같은 뜻의 항목이 이미 있음'));
   assert.ok(rep.dropped.some((d) => d.reason === '인용이 원문에 없음'));
   assert.ok(rep.dropped.some((d) => d.reason === '명단에 없는 이름' && d.who === '아무개'));
   assert.ok(rep.dropped.some((d) => d.reason === '확정 구간 밖 메시지'));
-  assert.ok(rep.held.some((h) => h.reason === '삭제 근거가 분명하지 않음'));
+  assert.ok(!rep.held.some((h) => h.reason === '삭제 근거가 분명하지 않음'));
   const live = S.liveness(c);
   const state = S.liveEntries(store.people.쟈알디.slots.state, live);
   assert.deepEqual(state.map((e) => e.text), ['왼팔 부상 (유저를 감싸다)']);
@@ -179,7 +179,7 @@ test('새 인물: 2턴 규칙·역할 명사·별명 충돌·상한, 확인 모�
   assert.ok(rep.dropped.some((d) => d.reason === '턴당 2명 상한'));
 });
 
-test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 접는다', () => {
+test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 앞 항목을 남긴다', () => {
   const { c, store, input } = setup();
   const rep = U.applyUpdate(store, c, input, {
     docs: [
@@ -203,7 +203,7 @@ test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 접는다',
   assert.ok(rep.dropped.some((d) => d.reason === '없는 의심 종류'));
   const live = S.liveness(c);
   const su = S.liveEntries(store.people.데쥬레.slots.suspicion, live);
-  assert.deepEqual(su.map((e) => e.text), ['[시작] 유저가 명단을 봤다는 말을 의심', '[해소] 오해로 밝혀짐'], '해소는 마지막 단서를 대체');
+  assert.deepEqual(su.map((e) => e.text), ['[시작] 유저가 명단을 봤다는 말을 의심', '[단서] 비밀번호를 알고 있었다', '[해소] 오해로 밝혀짐'], '해소는 앞 항목을 대체하지 않는다 (점수 유지)');
   // 기능 끔
   const rep2 = U.applyUpdate(store, c, input, { suspicion: [{ who: '데쥬레', target: '@user', kind: '정체', op: 'open', text: 'q', m: 'm4', quote: '팔을' }] }, { settings: settings({ features: new Set(['affinity']) }) });
   assert.equal(rep2.applied.suspicion, 0);

@@ -2,7 +2,7 @@
 // 앵무새 막기 (사용자): 지침에 예시 대사·소재 목록을 넣지 않는다. 사람을 먼저 「진짜로」 만든다 — 코드가 주사위 칸을 굴리고(설정에서 고침),
 // 모델이 그 값으로 상담사 카드를 한 번 짓는다(저장). 대화는 매 턴 그 카드를 같이 보낸다. 최근 상담사 요약을 넘겨 겹치지 않게 한다.
 // 지침 글: 플러그인 내장 지침 「BmDesk」(src/data/guides/bmdesk.txt, 설정 → 지침 → 포인트몰 1:1 상담에서 고침).
-import { fillGuide, guideSections } from './guides';
+import { fillGuide, guideOr, guideSections } from './guides';
 import type { CraftMessage } from './craft';
 
 type Vars = Record<string, unknown> | undefined;
@@ -165,7 +165,8 @@ const G = () => guideSections('BmDesk');
 const diceText = (d: DeskDice) => d.map(([k, v]) => `${k}: ${v}`).join('\n');
 const cardText = (a: DeskAgent) => `손님에게 보이는 호칭: ${deskTag(a)}\n이름: ${a.name}\n직급: ${a.rank}\n부서: ${a.dept}\n소개: ${a.intro}\n말투: ${a.voice}\n${diceText(a.dice)}`;
 const material = (src: DeskSource) => [
-  src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]\n${src.refs}` : '',
+  // 머리말은 지침 절에서, 없으면 옛 글 (전수검사 11-13)
+  src.refs ? `${guideOr('BmDesk', 'HEAD_REFS', '[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]')}\n${src.refs}` : '',
   `[지금 진열된 상품]\n${src.shelf || '(없음)'}`,
   `[손님]\n사내 계정: ${src.nick || '-'}\n남은 포인트: ${Math.trunc(src.points).toLocaleString('en-US')}p`,
 ].filter(Boolean).join('\n\n');
@@ -175,7 +176,7 @@ export function makePrompt(src: DeskSource, dice: DeskDice, recent: DeskAgent[],
   const g = G();
   const system = [fillGuide(g.COMMON, {}), fillGuide(g.MAKE, {}), fillGuide(g.MANUAL, {}), fillGuide(g.MAKE_OUTPUT, {}), src.language ?? ''].filter(Boolean).join('\n\n');
   const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join('\n') : '(없음)';
-  return { messages: [{ role: 'system', content: system }, { role: 'user', content: `${material(src)}\n\n[손님에게 보이는 호칭]\n상담원 ${no}\n\n[이번 상담사 주사위]\n${diceText(dice)}\n\n[최근 상담사 — 겹치지 말 것]\n${past}\n\n[현재 작업]\n상담사 카드와 첫 메시지` }], thoughts: fillGuide(g.THOUGHTS_MAKE, {}) };
+  return { messages: [{ role: 'system', content: system }, { role: 'user', content: `${material(src)}\n\n[손님에게 보이는 호칭]\n상담원 ${no}\n\n[이번 상담사 주사위]\n${diceText(dice)}\n\n${guideOr('BmDesk', 'HEAD_PAST', '[최근 상담사 — 겹치지 말 것]')}\n${past}\n\n[현재 작업]\n상담사 카드와 첫 메시지` }], thoughts: fillGuide(g.THOUGHTS_MAKE, {}) };
 }
 
 /** 대화: 카드 + 이번 상담 대화 전부 */

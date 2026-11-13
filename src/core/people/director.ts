@@ -6,13 +6,15 @@ import { messageText } from '../refs';
 import { listDocs } from '../wiki';
 import { addressOf, affinityView } from './affinity';
 import { axesLinesEn } from './axes';
-import { KNOWLEDGE_RULE, personBlock, unknownTo } from './inject';
+import { temperOf } from './base';
+import { knowledgeRule, personBlock, unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
 import { rhythmClock, rhythmClockLines } from './rhythm';
 import { speechVarietyBlock } from './speech';
-import { SEXUAL_DIRECTOR_POLICY, SEXUAL_POLICY, sexualAnyOn, sexualTexts } from './sexual';
+import { SEXUAL_POLICY, sexualAnyOn, sexualDirectorPolicy, sexualTexts } from './sexual';
 import type { PeopleSettings } from './settings';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE } from './basetext';
+import { guideOr } from '../guides';
 import { SLOT_META, slotsFor, type PeopleStore, type SlotId } from './types';
 
 /** 2026-11-07 (전수검사 2 의 E): 메모 상한 120 → 400자, 모르는 것 ≤8, 불확실한 점(uncertain) 추가 (원본 note ≤12,000 + uncertainties) */
@@ -84,7 +86,8 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const persons = people.map((n) => {
     const p = store.people[n];
     const slot = (k: 'state' | 'threads' | 'knowledge' | 'suspicion') => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
-    const aff = affinityView(p, changes, store.folded[n] ?? 0, { speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap });
+    // 성격 계수(temper)도 본편·화면과 같이 넣는다 (전수검사 11-13)
+    const aff = affinityView(p, changes, store.folded[n] ?? 0, { temper: temperOf(n), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap });
     const slots: Record<string, { text: string; target?: string }[]> = {};
     for (const k of featureSlots) {
       const es = liveEntries(p.slots[k as SlotId], live).slice(-4).map((e) => ({ text: e.text, ...(e.target ? { target: e.target } : {}) }));
@@ -99,7 +102,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
       ...(s.directorFeatures && s.features.has('axes') ? { axes: axesLinesEn(p.axes), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
       // 성적 욕망·이상성욕 (원본 director people_profile: text + policy sexual_context_only)
       ...(() => { const t = sexualTexts(p, s); return { ...(t.desire ? { sexual_desire: { text: t.desire, policy: SEXUAL_POLICY } } : {}), ...(t.paraphilia ? { paraphilia: { text: t.paraphilia, policy: SEXUAL_POLICY } } : {}) }; })(),
-      record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
+      record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speechMarks: true, temper: temperOf(n), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
       state: slot('state'),
       threads: slot('threads'),
       knowledge: slot('knowledge'),
@@ -111,28 +114,30 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const rhythm = s.directorFeatures && s.features.has('rhythm')
     ? Object.values(store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })))
     : [];
-  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', ...FEATURE_GUIDE[f], ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [`\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${SEXUAL_DIRECTOR_POLICY}`] : [])]) : [];
+  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', guideOr('Director', `APPLY.${f.toUpperCase()}`, () => FEATURE_GUIDE[f].join('\n')), ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [guideOr('Director', 'APPLY.SEXUAL', () => `\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${sexualDirectorPolicy()}`, { policy: sexualDirectorPolicy() })] : [])]) : [];
   // 기본 지침은 지침 탭 「Director」에서 고친다 (리수폿 J-1). 기능별 절·검색·출력 계약은 그대로
   const facts = base.facts?.trim() || DIRECTOR_FACTS.join('\n');
   const scene = base.scene?.trim() || DIRECTOR_SCENE.join('\n');
-  const system = [facts, ...(s.director === 'scene' ? [scene] : []), ...guides, '', ...(s.directorSearch ? SYSTEM_SEARCH : []), OUTPUT, s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']
+  const system = [facts, ...(s.director === 'scene' ? [scene] : []), ...guides, '', ...(s.directorSearch ? [guideOr('Director', 'SEARCH', () => SYSTEM_SEARCH.join('\n'), { max: SEARCH_MAX })] : []), guideOr('Director', 'OUTPUT', OUTPUT), s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']
     .join('\n')
     .replace('{{LANG}}', s.directorLang === 'ko' ? 'Korean' : 'English')
     .replace('{{LINES}}', s.directorLen === 'normal' ? '3' : '1');
   const data = { people: persons, ...(rhythm.length ? { rhythm, rhythm_clock: rhythmClockLines(rhythmClock(store, chat, live)) } : {}), ...(memory.length ? { memory } : {}), recent, input: input.slice(0, 4000) };
-  const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, p.state, p.threads, p.unknown_to, p.slots]), input }));
+  // 최근 글도 열쇠에 넣는다: 같은 입력을 두 번 보내도 장면이 나아갔으면 다시 묻는다. 리롤은 최근 글이 같아 그대로 재사용 (전수검사 11-13)
+  const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, p.state, p.threads, p.unknown_to, p.slots]), input, recent: recent.map((r) => r.text.slice(0, 400)) }));
   return { system, data, key, people, search: s.directorSearch };
 }
 
 /** 출력 검증 실패 뒤 고침 요청 (원본 repairDirectorPrompt): 같은 지침 + 오류·이전 답을 붙여 1회 더 */
 export function repairDirector(built: DirectorInput, invalid: string, error: string): DirectorInput {
-  const fix = `## Output repair\nYour previous response failed validation: ${plain(error, 200)}. Return exactly one JSON object in the shape given above, with no code fence, explanation, preface or trailing text. Use only the names in \`people\`; never invent a field or a narrative fact.`;
+  // 글은 지침 「Director」 REPAIR 절. 절이 없으면 여기 남긴 글
+  const fix = guideOr('Director', 'REPAIR', () => `## Output repair\nYour previous response failed validation: ${plain(error, 200)}. Return exactly one JSON object in the shape given above, with no code fence, explanation, preface or trailing text. Use only the names in \`people\`; never invent a field or a narrative fact.`, { error: plain(error, 200) });
   return { ...built, system: `${built.system}\n\n${fix}`, data: { ...built.data, invalid_previous_response: invalid.slice(0, 6000) } };
 }
 
 /** 2차 호출 자료: 같은 지침 + 「2차」 안내 + found */
 export function buildDirectorPass2(built: DirectorInput, found: SearchResult[]): DirectorInput {
-  return { ...built, system: `${built.system}\n\n${SYSTEM_PASS2}`, data: { ...built.data, found }, search: false };
+  return { ...built, system: `${built.system}\n\n${guideOr('Director', 'PASS2', SYSTEM_PASS2)}`, data: { ...built.data, found }, search: false };
 }
 
 function jsonOf(raw: string): Record<string, unknown> {
@@ -149,7 +154,9 @@ const KINDS: SearchKind[] = ['chat', 'lore', 'wiki'];
 /** 응답 → 메모 또는 검색 요청. allowSearch=false 면 need 는 오류 */
 export function parseDirectorAny(raw: string, people: string[], scene: boolean, allowSearch: boolean): { notes: DirectorNote[] } | { need: DirectorSearch[] } {
   const v = jsonOf(raw);
-  if (Array.isArray(v.need)) {
+  // 빈 need 는 없는 것으로 친다. need 와 notes 가 같이 오면 2차·검색 요청이 비었을 때 notes 를 쓴다 (전수검사 11-13)
+  const hasNotes = Array.isArray(v.notes);
+  if (Array.isArray(v.need) && v.need.length && !(hasNotes && !allowSearch)) {
     if (!allowSearch) throw new Error('2차에서는 검색을 요청할 수 없어요');
     const need: DirectorSearch[] = [];
     for (const x of v.need as Record<string, unknown>[]) {
@@ -159,8 +166,8 @@ export function parseDirectorAny(raw: string, people: string[], scene: boolean, 
       need.push({ kind, query, reason: plain(x?.reason, 60) });
       if (need.length >= SEARCH_MAX) break;
     }
-    if (!need.length) throw new Error('검색 요청이 비어 있어요');
-    return { need };
+    if (need.length) return { need };
+    if (!hasNotes) throw new Error('검색 요청이 비어 있어요');
   }
   if (!Array.isArray(v.notes)) throw new Error('notes 목록이 없어요');
   const out: DirectorNote[] = [];
@@ -228,7 +235,9 @@ export const DIRECTOR_HEAD = '[Director note]';
 export function directorBlock(notes: DirectorNote[], user: string): string {
   if (!notes.length) return '';
   const lines = notes.map((n) => [`- ${n.who}: ${n.now}`, n.react ? `  Likely reaction this turn: ${n.react}` : '', ...n.mustNot.map((m) => `  Must not reveal: ${m}`), ...(n.uncertain ?? []).map((u) => `  Uncertain: ${u}`)].filter(Boolean).join('\n'));
-  return `${DIRECTOR_HEAD}\nReference for ${user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. ${KNOWLEDGE_RULE} Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim.\n${lines.join('\n')}`;
+  // 머리말은 지침 「Director」 MAIN_NOTE 절. 절이 없으면 여기 남긴 글
+  const head = guideOr('Director', 'MAIN_NOTE', () => `Reference for ${user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim.`, { user, knowledge_rule: knowledgeRule() });
+  return `${DIRECTOR_HEAD}\n${head}\n${lines.join('\n')}`;
 }
 
 /** 화면 「지침 편집」용 기본 지침 원문 (연출형 기준) */

@@ -107,6 +107,8 @@ export interface Report {
   pin?: boolean;
   idx: number;
   anchor: string;
+  /** 전체만: 사건 기간 시작 메시지의 열쇠 (종료 응답 뒤 인물·가계부 다시 셈, 전수검사 11-13) */
+  fromKey?: string;
   /** 종료 응답의 상태창 원문(trim) → 채팅 카드 자리표. 없으면 카드 없음 */
   statusKey?: string;
   /** ISO */
