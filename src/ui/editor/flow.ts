@@ -197,7 +197,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: mm(shopSettings(ss).model), calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:shop', to: 'r:사용', sure: 0, maybe: 0 },
     { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: '사이트별 설정', calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:net', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:shop', to: 'r:모델', sure: 0, maybe: 0 },
-    { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '상담사 연결 1회 + 보낼 때마다 1회', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
+    { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '보낼 때마다 1회 (상담사 연결 1회 더)', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
     // 망상홈쇼핑: 빠져 있어 그 설정 페이지 호출 줄·AI 상담 [지금 상태]에 없었다. 글은 호출 흐름 화면(flowpage.ts) 줄과 같게 (전수검사 11-13)
     ...((hs) => [
       { name: `${HS_NAME} 편성`, sub: '방송 편성 받기', kind: 'aux', on: false, model: hs.on ? mm(hs.shop.model) : undefined, calls: hs.on ? (hs.auto === 'open' ? '창을 열 때 1회' : '수동 (새로고침 때만)') : '호출 없음', page: 'set:hs', to: 'r:사용', sure: 0, maybe: 0 },

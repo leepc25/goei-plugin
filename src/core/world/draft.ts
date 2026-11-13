@@ -50,7 +50,8 @@ export function putRecord(over: WorldOverrides, kind: WorldKind, name: string, f
 export function removeRecord(over: WorldOverrides, kind: WorldKind, name: string): WorldOverrides {
   const next: WorldOverrides = { ...over, [kind]: { ...(over[kind] ?? {}) } };
   const bucket = next[kind] as Record<string, Partial<WorldRecord>>;
-  if (defaultRecord(kind, name)) bucket[name] = { deleted: true };
+  // 고친 내용은 지우기 표시 밑에 남겨 되살리기 때 돌려준다 (전수검사 11-13)
+  if (defaultRecord(kind, name)) bucket[name] = { ...(bucket[name] ?? {}), deleted: true };
   else delete bucket[name];
   if (!Object.keys(bucket).length) delete next[kind];
   return next;

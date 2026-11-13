@@ -32,7 +32,7 @@ import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
-import { BOARD_NAME, BOARD_REF_CFG, BOARD_SITE_VAR, boardView, boardWrite, isBoardSite, type BoardSite } from '../core/boards';
+import { BOARD_NAME, BOARD_REF_CFG, BOARD_SITE_VAR, BOARD_SITES, boardView, boardWrite, isBoardSite, type BoardSite } from '../core/boards';
 import { JOINT_VAR, jointOn } from '../core/netjoint';
 import { siteLogo } from './browser';
 import { isPhone } from './media';
@@ -118,6 +118,20 @@ export function useBoardSite(site: BoardSite): void {
   uiSite = site;
 }
 export const boardSiteNow = (): BoardSite => uiSite;
+/** 네 게시판의 최근 실패: 보고 있는 사이트는 gnet, 나머지는 저장해 둔 화면 상태에서 (uiFor는 빈 항목을 만들어 안 씀, 전수검사 11-13) */
+export function boardFailures(): { site: BoardSite; name: string; reason: string; raw: string }[] {
+  const out: { site: BoardSite; name: string; reason: string; raw: string }[] = [];
+  for (const s of BOARD_SITES) {
+    const u = s === uiSite ? gnet : uiSaved.get(s);
+    if (u?.failure) out.push({ site: s, name: BOARD_NAME[s], reason: u.failure.reason, raw: u.failure.raw });
+  }
+  return out;
+}
+/** 네 게시판의 실패를 모두 지운다 (전수검사 11-13) */
+export function clearBoardFailures(): void {
+  gnet.failure = null;
+  for (const u of uiSaved.values()) u.failure = null;
+}
 /** 사이트마다 다른 말: 연어 마켓은 쪽지가 아니라 채팅 (2026-11-10 사용자: 「채팅하기」인데 창은 쪽지함이었다) */
 const dmW = () => (uiSite === 'sm' ? '채팅' : '쪽지');
 const dmBox = () => (uiSite === 'sm' ? '내 채팅' : '쪽지함');

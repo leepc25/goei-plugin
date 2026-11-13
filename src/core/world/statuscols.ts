@@ -180,7 +180,7 @@ const RULE: Record<ColId, string> = {
   companions: 'Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.',
   deployed: 'Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.',
   identity: "Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).",
-  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted.",
+  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert. Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted.",
   wallet: "Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it.",
 };
 
@@ -198,7 +198,7 @@ export function statusSection(cols: ColId[]): string {
     '## Status',
     fmt,
     '',
-    guideOr('Main', 'STATUS.RULE.ONE_LINE', '- Output exactly one [▣] at the very end of every response, as the final line.'),
+    guideOr('Main', 'STATUS.RULE.ONE_LINE', '- Output exactly one [▣] at the very end of every response.'),
     guideOr('Main', 'STATUS.RULE.FIELDS', () => `- Fields in order: ${cols.map((id) => colDef(id).label).join(' | ')}. Never add, drop or reorder fields.`, { labels: cols.map((id) => colDef(id).label).join(' | ') }),
     ...rules,
     guideOr('Main', 'STATUS.RULE.PREVIOUS', '- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.'),

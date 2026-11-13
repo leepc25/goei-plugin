@@ -1,6 +1,6 @@
 folder: 📎부록
 name: 남해지사 · 시설
-key: Leisure Zone, 휴무 구역, 남해술집, 숙면관리점, 종교활동실, 광차, 작업 대기 구역, 관계자 외 출입금지, 옛 중앙시스템, 중앙제어실
+key: Leisure Zone, 휴무 구역, 남해술집, 숙면관리점, 종교활동실, 광차, 작업 대기 구역, 옛 중앙시스템
 appendix: {"keys": true, "with_parent": false, "need_parent": false, "target": false, "places": ["남해지사"]}
 ---
 ### Namhae Branch Appendix: Facilities and Registered Uh-doom

@@ -115,7 +115,7 @@ function saleDone<C extends ChatContext['chat']>(chat: C, site: MallSite, itemId
   if (!liveItemsOf(it0, chat).some((x) => x.id === itemId)) return null;
   const anchor = lastBot(chat)?.key ?? '';
   const w0 = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  const w = addWalletEntry(w0, { id: freshWalletId(w0, `${site}_sl_${itemId}_${now.sales.length}`, anchor), anchor, amount: o.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' });
+  const w = addWalletEntry(w0, { id: freshWalletId(w0, `${site}_sl_${itemId}_${now.sales.length}`, anchor), anchor, amount: o.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' }, aliveAnchors(chat)); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
   const items = sellItem(it0, itemId, anchor, `${MALL_NAME[site]}에 팖`);
   const nextShop = closeSale(now, anchor); // 판 응답 키 — 다시 굴리면 판 것 목록에서도 빠진다 (전수검사 11-13)
   if (!nextShop) return null;
@@ -285,7 +285,7 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
     let st = now;
     for (const it of list) {
       const walletId = it.price > 0 ? freshWalletId(w, `${site}_${it.id}`, anchor) : '';
-      if (walletId) w = addWalletEntry(w, { id: walletId, anchor, amount: -it.price, memo: `${it.name} (${MALL_NAME[site]})`, src: 'store' });
+      if (walletId) w = addWalletEntry(w, { id: walletId, anchor, amount: -it.price, memo: `${it.name} (${MALL_NAME[site]})`, src: 'store' }, alive); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
       // 흥정으로 붙은 다른 대가(it.pay)도 기록에 남긴다 (일반 상점 ui/shop.ts 와 같게, 릴리스 점검 11-09)
       const extra = it.pay ? ` + ${it.pay}` : '';
       const paid = p ? { paidWith: `${it.price.toLocaleString('en-US')} Baekilmong points at ${MALL_NAME[site]}${extra}` } : { price: it.price, ...(walletId ? { walletId } : {}), paidWith: `bank transfer to ${MALL_NAME[site]}${extra}` };
@@ -417,7 +417,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         if (walletBalance(w, alive) < n.price) { short = true; return null; }
         const anchor = lastBot(chat)?.key ?? '';
         const walletId = freshWalletId(w, `${site}_note_${n.id}`, anchor);
-        w = addWalletEntry(w, { id: walletId, anchor, amount: -n.price, memo: `쪽지: ${n.title} (${MALL_NAME[site]})`, src: 'store' });
+        w = addWalletEntry(w, { id: walletId, anchor, amount: -n.price, memo: `쪽지: ${n.title} (${MALL_NAME[site]})`, src: 'store' }, alive); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
         const items = addItem(readItems(chat.scriptstate), alive, { name: `쪽지: ${n.title}`, desc: `${MALL_NAME[site]} 운영자가 보낸 쪽지`, text: n.body, use: false, icon: 'note paper', weight: 0.01, from: 'store', store: site, anchor, price: n.price, walletId, paidWith: `bank transfer to ${MALL_NAME[site]}` });
         ok = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop) } };
@@ -441,7 +441,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         if (walletBalance(w, alive) < q.price) { short = true; return null; }
         const anchor = lastBot(chat)?.key ?? '';
         const walletId = freshWalletId(w, `${site}_ord_${q.id}`, anchor);
-        w = addWalletEntry(w, { id: walletId, anchor, amount: -q.price, memo: `맞춤 주문 선납: ${q.item.name} (${MALL_NAME[site]})`, src: 'store' });
+        w = addWalletEntry(w, { id: walletId, anchor, amount: -q.price, memo: `맞춤 주문 선납: ${q.item.name} (${MALL_NAME[site]})`, src: 'store' }, alive); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
         const { sold: _s, tag: _t, was: _w, orig: _o, pay: _p, ...item } = q.item;
         const order: CosOrder = { id: q.id, anchor, price: q.price, hours: q.hours, orderedAt: worldMinute(chat), orderedKey: anchor, walletId, item };
         ok = true;

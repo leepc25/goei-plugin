@@ -7,7 +7,7 @@ import { SCENARIOS } from '../../core/scenarios';
 import { agentScene, agentSceneSaved, factionScenes } from '../../core/scenes';
 import type { Directory } from '../../core/world/directory';
 import type { ChatContext } from '../../host/risu';
-import { directoryDraft, photoBlock, startSlots, type StartSlot } from '../directory';
+import { directoryDraft, dirUi, photoBlock, startSlots, type StartSlot } from '../directory';
 import { ICONS } from '../icons';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -30,11 +30,12 @@ const seg = (action: string, value: string, on: boolean, a: string, b: string) =
 function slotRow(s: StartSlot): string {
   const open = stUi.sel === s.code;
   const kind = s.kind === 'builtin' ? '기본 세력' : s.kind === 'group' ? '묶음' : '플레이 조직';
+  // 플레이 조직 줄은 숨길 수 없어 보임/숨김을 안 낸다. 펼치면 「시작 칸에서 빼기」 (전수검사 11-13)
   return `<div class="dir-row${open ? ' open' : ''}" data-slot-row="${esc(s.code)}">
     <div class="dir-head st-slot" data-action="dir-start-open" data-value="${esc(s.code)}" role="button" aria-expanded="${open}">
       <span class="gw-grip" data-drag-slot="${esc(s.code)}" title="끌어서 순서 바꾸기">${ICONS.grip}</span>
       <span class="dir-name"><b>${esc(s.name)}</b><small>${kind} · ${esc(s.code)}${s.count ? ` · ${s.count}명` : ''}</small></span>
-      ${seg('dir-start-show', s.code, !s.hidden, '보임', '숨김')}
+      ${s.kind === 'extra' ? '' : seg('dir-start-show', s.code, !s.hidden, '보임', '숨김')}
       <span class="st-caret">${open ? ICONS.up : ICONS.down}</span>
     </div>
   </div>`;
@@ -49,9 +50,10 @@ function scenesBlock(code: string, d: Directory): string {
       // 11-07 사용자: 공용 장면 일곱 편이 한 번에 다 펼쳐져 보여 과함 → 구성원별 첫 장면처럼 접어 두고 제목만 보인다
       // 펼침을 기억 (11-08 눌러 보기 점검: 펼친 장면에서 보임·숨김을 누르면 다시 그리며 접혔다)
       const keep = `st-scene:${code}|${r.fm}`;
+      // 새 장면 지우기는 「지울까요? 지우기/취소」를 거친다 (전수검사 11-13)
       return `<details class="st-scene${r.hidden ? ' off' : ''}" data-keep="${esc(keep)}"${keepOpen(keep)}><summary><b>${esc(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}${r.hidden ? ' · 숨김' : ''}</small></summary>
         <div class="dir-line"><span>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}</span>
-          <span class="gx-row-btns">${seg('dir-scene-show', `${code}|${r.fm}`, !r.hidden, '보임', '숨김')}${r.custom ? `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc(`${code}|${r.fm}`)}">지우기</button>` : ''}</span></div>
+          <span class="gx-row-btns">${seg('dir-scene-show', `${code}|${r.fm}`, !r.hidden, '보임', '숨김')}${r.custom ? (dirUi.confirmDel === `scene|${code}|${r.fm}` ? `<span class="gx-hint">이 장면을 지울까요? <button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc(`yes|${code}|${r.fm}`)}">지우기</button><button class="gx-mini" data-action="dir-scene-del" data-value="${esc(`no|${code}|${r.fm}`)}">취소</button></span>` : `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc(`ask|${code}|${r.fm}`)}">지우기</button>`) : ''}</span></div>
         ${input(k('label'), r.label, '이름')}
         ${area(k('ko'), r.ko, '한국어', 6, r.hasDefault ? '비우면 기본 글로 돌아가요' : '')}
         ${area(k('en'), r.en, 'English', 6, r.hasDefault ? '비우면 기본 글로 돌아가요' : '')}

@@ -127,7 +127,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     },
     {
       title: '컨텍스트 포함',
-      chips: [chip('ctx_focus', '장면 관련 먼저', 1), chip('ctx_messages', '메시지', 1, '$ph_context_messages'), chip('ctx_notices_on', '공지', 1, '$ph_context_announcements')],
+      chips: [chip('ctx_focus', '장면에 나온 것만', 1), chip('ctx_messages', '메시지', 1, '$ph_context_messages'), chip('ctx_notices_on', '공지', 1, '$ph_context_announcements')],
       items: [
         num('ctx_history', '넣을 말풍선', 200, 1, 1000, '개'),
         num('ctx_notices', '넣을 공지', 1, 0, 50, '개'),

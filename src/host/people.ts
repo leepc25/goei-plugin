@@ -399,12 +399,14 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope; 
         let next = cur;
         if (report.wallet.length) {
           let w = readWallet(cur.scriptstate, walletStart);
-          for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: 'story' });
+          const alive = aliveAnchors(cur); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
+          for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: 'story' }, alive);
           next = { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } };
         }
         if (report.points.length) {
           let p = readPoints(next.scriptstate);
-          for (const e of report.points) p = addWalletEntry(p, { ...e, src: 'story' });
+          const alive = aliveAnchors(next); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
+          for (const e of report.points) p = addWalletEntry(p, { ...e, src: 'story' }, alive);
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...pointsVars(p) } };
         }
         // 거래를 적은 뒤 상태창 잔고 맞춤 줄을 다시 계산한다 (같은 거래를 두 번 세지 않게, core/wallet.ts syncWalletToStatus)

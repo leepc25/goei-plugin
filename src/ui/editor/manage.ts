@@ -17,8 +17,7 @@ import { ensureFlow } from './flow';
 import { flowPage, flowView } from './flowpage';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
-import { boardSiteNow, gnet } from '../gnet';
-import { BOARD_NAME } from '../../core/boards';
+import { boardFailures, clearBoardFailures } from '../gnet';
 import { phone } from '../phone';
 import { wiki } from '../wiki';
 
@@ -141,8 +140,8 @@ function diagBundle(ctx: ChatContext, canChat: boolean): string {
     wikiPack: !!storedWikiPack(),
     chat: canChat ? { messages: Array.isArray(ctx.chat.message) ? ctx.chat.message.length : 0, vars: chatSettingVars(ctx.chat.scriptstate) } : null,
     prefs: getPrefs(),
-    // gnet 은 지금 보고 있는 게시판의 화면 상태라 사이트를 같이 적는다 (전수검사 11-13)
-    failures: { gnet: gnet.failure ? { site: boardSiteNow(), ...fail(gnet.failure) } : null, phone: fail(phone.failure), wiki: fail(wiki.failure) },
+    // 네 게시판 실패를 사이트와 함께 모두 적는다 (전수검사 11-13)
+    failures: { gnet: boardFailures().map((f) => ({ site: f.site, reason: f.reason, raw: f.raw })), phone: fail(phone.failure), wiki: fail(wiki.failure) },
     peopleRuns: runs,
   }, null, 2);
 }
@@ -220,8 +219,8 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
     row('위키 기본 문서', badge(!!storedWikiPack(), storedWikiPack() ? '있음' : '없음') + getBtn('wiki', '받기 (약 1MB)', !!storedWikiPack()), storedWikiPack() ? '카드에서 뺀 기본 문서 묶음 (이 기기 저장소)' : '안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요.'),
     row('로어북 보내기', badge(null, mode === 'risu' ? 'Risu가 직접' : '플러그인이 고름'), '설정 → 호출 → 로어북 호출 → 로어북 보내기'),
   ].join('');
-  // 게시판 실패는 보고 있는 사이트 이름으로 (연어 마켓 실패가 「괴담넷」으로 나왔다, 전수검사 11-13)
-  const fails = [gnet.failure ? `${BOARD_NAME[boardSiteNow()]}: ${gnet.failure.reason}` : '', phone.failure ? `괴담톡: ${phone.failure.reason}` : '', wiki.failure ? `위키: ${wiki.failure.reason}` : ''].filter(Boolean);
+  // 게시판 실패는 네 사이트 모두, 사이트 이름으로 (연어 마켓 실패가 「괴담넷」으로 나왔다, 전수검사 11-13)
+  const fails = [...boardFailures().map((f) => `${f.name}: ${f.reason}`), phone.failure ? `괴담톡: ${phone.failure.reason}` : '', wiki.failure ? `위키: ${wiki.failure.reason}` : ''].filter(Boolean);
   return `<div class="gw-page gw-set">${head('', '상태 점검', '플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.')}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows}${row('최근 실패', fails.length ? badge(false, `${fails.length}건`) : badge(true, '없음'), fails.length ? '「실패 기록」에서 원문을 볼 수 있어요' : '괴담넷·괴담톡·위키 요청이 실패한 적이 없어요')}</div></section>
@@ -231,7 +230,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
 function logPage(ctx: ChatContext, canChat: boolean): string {
   const fail = (name: string, f: { reason: string; raw: string } | null) =>
     f ? `<div class="ps-row"><div class="ps-label"><b>${esc(name)}</b><small>${esc(f.reason)}</small></div><textarea readonly rows="4">${esc(f.raw)}</textarea></div>` : '';
-  const fails = fail(BOARD_NAME[boardSiteNow()], gnet.failure) + fail('괴담톡', phone.failure) + fail('위키', wiki.failure);
+  const fails = boardFailures().map((f) => fail(f.name, f)).join('') + fail('괴담톡', phone.failure) + fail('위키', wiki.failure);
   const bundle = diagBundle(ctx, canChat);
   return `<div class="gw-page gw-set">${head('', '실패 기록', '괴담넷·괴담톡·위키 요청이 실패했을 때 모델이 보낸 원문이에요. 인물 기록 갱신의 결과는 「인물 기록 점검」에 있어요.')}
     <div class="gx-settings gw-setbody">
@@ -430,7 +429,7 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
       manUi.sizes = null;
       return true;
     case 'man-clear-fail':
-      gnet.failure = null;
+      clearBoardFailures(); // 보고 있지 않은 사이트 것도 (전수검사 11-13)
       phone.failure = null;
       wiki.failure = null;
       return true;

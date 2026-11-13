@@ -463,7 +463,6 @@ KEY_EDITS = {
     '한설인육공장': (['butcher shop', 'Human Meat Factory'], []),
     '광기로 점철된 성당': (['Corrupted cathedral', 'Beelzebub'], []),
     '기괴한 방탈출 카페': (['방탈출', 'Escape Room'], ['기괴한 방탈출 카페']),
-    '유쾌 테마파크': (['AMUSEMENT THEME PARK'], []),
     '헝그리 행맨': (['abandoned kindergarten', '버려진 유지원'], []),
     '반짝반짝 용궁': (['용궁', 'Dragon Palace'], ['반짝반짝 용궁']),
     '성 안티쿠스 기숙학교': (['기숙학교', 'Boarding School'], []),

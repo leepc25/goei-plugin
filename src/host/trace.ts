@@ -37,6 +37,8 @@ export interface TraceMain {
   failed: string[];
   totalChars: number;
   totalTokens?: number;
+  /** 플러그인이 끼운 글(로어·참고 기록·인물 기록·상태창 등)의 토큰. 리스 최대 컨텍스트 계산 밖이다 (전수검사 11-13) */
+  added?: number;
 }
 
 export interface TraceTurn {
@@ -199,7 +201,7 @@ export async function traceBegin(): Promise<void> {
 }
 
 /** 본편 요청 조립 끝: 최종 모양을 적는다 */
-export function traceMain(messages: { role?: string; content?: unknown }[], failed: string[]): void {
+export function traceMain(messages: { role?: string; content?: unknown }[], failed: string[], added?: string[]): void {
   if (!open) return;
   const rows = messages.map((m) => ({ role: String(m?.role ?? ''), content: typeof m?.content === 'string' ? m.content : '' }));
   open.main = {
@@ -217,6 +219,7 @@ export function traceMain(messages: { role?: string; content?: unknown }[], fail
   const pt = progressTurn();
   setTimeout(() => {
     main.totalTokens = rows.reduce((n, r) => n + tokens(r.content), 0);
+    if (added) main.added = added.reduce((n, t) => n + tokens(t), 0);
     if (pt) progressMainTokens(main.totalTokens, pt);
     save(t.id);
   }, 0);

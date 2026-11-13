@@ -187,7 +187,7 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
     '### POSITIVE (do this)',
     'Narrative:',
     `[1] ${first} walked into the room with a quiet smile.`,
-    '[2] She glanced at the figure standing by the desk, her expression hardening into something sharper.',
+    `[2] ${first} glanced at the figure standing by the desk, her expression hardening into something sharper.`,
     '',
     'Correct output:',
     `[{"line":1,"tag":"<img=\\"${first}_default\\">"},{"line":2,"tag":"<img=\\"${first}_serious\\">"}]`,

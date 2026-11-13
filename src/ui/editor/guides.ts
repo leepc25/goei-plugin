@@ -1,5 +1,5 @@
 // 지침 편집 (docs/설계안_세계편집.md 3장): 글칸 하나 + 자리표 안내 + 토큰. 고친 글은 이 기기 설정(prefs.guides)에 두고 core/guides.ts 가 요청에 쓴다.
-import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, isGuideName, joinGuide, setGuideOverride, splitGuide, type GuideName } from '../../core/guides';
+import { blankUsesDefault, guideDefault, guideOverridden, guideText, GUIDE_LABEL, isGuideName, joinGuide, setGuideOverride, splitGuide, type GuideName } from '../../core/guides';
 type GuidePart = ReturnType<typeof splitGuide>[number];
 import { tokenizerName } from '../../core/tokenizer';
 import { tokens } from '../../core/gnet';
@@ -62,7 +62,7 @@ export function guidePage(name: GuideName, crumb = ''): string {
       const head = md
         ? `<input class="gw-gtitle" data-input="ed-guide-title" data-key="${name}|${i}" value="${esc(p.title)}" spellcheck="false" aria-label="절 제목">`
         : `<b>${esc(p.title)}</b>${fixed ? '<button class="gw-fhint" type="button" data-action="ed-hint" data-hint="이 이름은 플러그인이 요청마다 절을 골라 쓸 때 쓰는 이름표예요. 그래서 바꿀 수 없고, 본문만 고칠 수 있어요.">?</button>' : ''}`;
-      return `<div class="gw-field gw-copyto${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span>${copyBtn()}</div>
+      return `<div class="gw-field gw-copyto${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : blankUsesDefault(name, p.title) ? '비우면 기본 글이 쓰여요' : ''}</span>${copyBtn()}</div>
       <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="${p.body.trim() ? 3 : 1}" spellcheck="false">\n${esc(p.body)}</textarea></div>`;
     })
     .join('');

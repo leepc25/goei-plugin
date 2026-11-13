@@ -115,6 +115,49 @@ const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
 /** 직전 조립이 새로 끼운 system 글들. Risu 는 요청이 실패하면 앞 회차 결과에 replacer 를 다시 돌린다 (자동 재시도) — 그때 다시 조립하지 않는다 */
 let lastAdded = new Set<string>();
 const sysTexts = (ms: PromptMessage[]): string[] => ms.filter((m) => m?.role === 'system' && typeof m.content === 'string').map((m) => m.content as string);
+/** 플러그인이 끼운 글: 끼우기 전(before)에 없던 메시지는 통째로, 고친 메시지는 앞뒤 같은 곳을 뺀 가운데. 호출 기록에 「플러그인이 더한 토큰」으로 (전수검사 11-13) */
+function addedTexts(before: PromptMessage[], after: PromptMessage[]): string[] {
+  const str = (m: PromptMessage) => (typeof m?.content === 'string' ? m.content : '');
+  const left = new Map<string, number>();
+  for (const m of before) left.set(str(m), (left.get(str(m)) ?? 0) + 1);
+  // 끼운 뒤에 없는 메시지 = 고친 메시지 (짝 후보)
+  const rest = before.filter((m) => !after.some((a) => str(a) === str(m)));
+  const used = new Set<number>();
+  const out: string[] = [];
+  for (const m of after) {
+    const t = str(m);
+    const n = left.get(t) ?? 0;
+    if (n > 0) {
+      left.set(t, n - 1);
+      continue;
+    }
+    if (!t) continue;
+    // 같은 역할의 고친 메시지 중 앞뒤가 가장 많이 같은 것과 짝짓는다
+    let best = -1;
+    let score = 0;
+    let cut: [number, number] = [0, 0];
+    rest.forEach((b, i) => {
+      if (used.has(i) || b?.role !== m?.role) return;
+      const o = str(b);
+      const lim = Math.min(o.length, t.length);
+      let p = 0;
+      while (p < lim && o[p] === t[p]) p++;
+      let q = 0;
+      while (q < lim - p && o[o.length - 1 - q] === t[t.length - 1 - q]) q++;
+      if (p + q > score) {
+        best = i;
+        score = p + q;
+        cut = [p, q];
+      }
+    });
+    if (best >= 0 && score >= 20) {
+      used.add(best);
+      const mid = t.slice(cut[0], t.length - cut[1]);
+      if (mid) out.push(mid);
+    } else out.push(t);
+  }
+  return out;
+}
 
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
@@ -123,6 +166,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
   const input0 = new Set(sysTexts(messages));
   const failed: string[] = [];
+  /** 플러그인이 끼운 글 (호출 기록의 「플러그인이 더한 토큰」, 전수검사 11-13) */
+  let added: string[] | undefined;
   /** 한 단계: 던지면 이름·까닭을 모으고 fallback(= 그 단계 이전 모양) */
   const step = <T>(name: string, run: () => T, fallback: T): T => {
     try {
@@ -180,6 +225,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       messages = step('기록 태그 정리', () => stripHistoryTags(messages), messages);
       if (ctx) {
         const c = ctx;
+        const pre = messages;
         messages = step('로어', () => fixLore(messages, c), messages);
         messages = await stepAsync('주인공', () => withPlayer(messages, c), messages);
         messages = step('명부 다듬기', () => trimRoster(messages), messages);
@@ -203,6 +249,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         messages = await stepAsync('인물 기록', () => withPeople(messages, c), messages);
         // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
         messages = step('이미지 지침', () => withImgPrompt(messages, c), messages);
+        added = step('더한 글', () => addedTexts(pre, messages), undefined);
       }
     }
     // 시드 표식이 있는 요청만 (첫 전송·그 리롤): 수명대로 표식을 떼거나 블록을 지운다. 없으면 아무것도 읽지 않는다 (매 전송마다 드는 비용을 0에 가깝게)
@@ -219,7 +266,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (failed.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed.join(' · ')} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
   // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
   const out = sanitize(messages);
-  if (liteNow) step('호출 기록', () => traceMain(out, failed), undefined);
+  if (liteNow) step('호출 기록', () => traceMain(out, failed, added), undefined);
   lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
   return out;
 }
@@ -923,6 +970,8 @@ function startWatcher(fab: Fab | null): () => void {
       if (prog && pKey !== progKey) { progKey = pKey; await prog.setVisible(pShow).catch(() => {}); }
       // 떠 있으면 매 초 폭(폰·PC 모양)·자리를 다시 맞춘다 (릴리스 점검 11-09: 창 크기를 바꿔도 그대로였다)
       else if (prog && pShow) await prog.setVisible(true).catch(() => {});
+      // 상황판이 떠 있으면 PC 카드를 저절로 펴지 않고, 폰 막대는 주소줄 아래로 (닫기 X·탭 수 단추를 가리지 않게, 전수검사 11-13)
+      if (prog) await prog.setPanel(appShown()).catch(() => {});
       // 턴에 채팅을 붙이고, 채팅을 옮겼으면 앞 채팅의 턴을 치우고, 본편을 너무 오래 기다리면 실패로 닫는다
       progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
     } catch (error) {

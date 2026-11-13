@@ -24,7 +24,7 @@ export const GNET_SET: SetPage = {
       rows: [
         { key: 'post', label: '게시글 수', ctl: { t: 'minmax', lo: COUNT_RANGE.post[0], hi: COUNT_RANGE.post[1], unit: '개' }, help: `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요` },
         { key: 'cmt', label: '새 글 댓글 수', ctl: { t: 'minmax', lo: COUNT_RANGE.cmt[0], hi: COUNT_RANGE.cmt[1], unit: '개' }, help: `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요` },
-        { key: 'act', label: '활동 댓글 수', ctl: { t: 'minmax', lo: COUNT_RANGE.act[0], hi: COUNT_RANGE.act[1], unit: '개' }, help: `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요` },
+        { key: 'act', label: '활동 댓글 수', ctl: { t: 'minmax', lo: COUNT_RANGE.act[0], hi: COUNT_RANGE.act[1], unit: '개' }, help: `새 글·댓글·답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요` },
         { key: 'privacy', label: '사생활', ctl: { t: 'seg', opts: [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']] },
           help: '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만' },
         { key: 'subject', label: '주제', ctl: { t: 'text', ph: '비우면 세계관에 맞는 다양한 주제' } },

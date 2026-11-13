@@ -5,7 +5,7 @@ import type { Chat } from '../core/types';
 import { dropPendingVars, worldOn } from '../core/world/output';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { getChar, updateChat } from './risu';
-import { isWaiting } from './waiting';
+import { passWaiting } from './waiting';
 import { openRepick } from './openinghint';
 
 /** 방금 놓은 마지막 유저 메시지(기록 카드·직접 입력)를 「아직 안 보냄」으로 */
@@ -35,7 +35,8 @@ onChatClick('unsent', async (_doc, x, y) => {
   if (!list.length) return 'idle';
   let on = false;
   for (const el of list) if (await hit(el, x, y)) on = true;
-  if (!on || isWaiting()) return false;
+  // 응답을 기다리는 중이면 5초 안에 두 번 눌러야 지운다 (실패한 요청이 3분 동안 취소를 막지 않게, 전수검사 11-13)
+  if (!on || !passWaiting()) return false;
   busy = true;
   try {
     const charIndex = await risuai.getCurrentCharacterIndex();

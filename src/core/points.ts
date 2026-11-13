@@ -101,7 +101,7 @@ export function syncPointsToStatus(w0: Wallet, chat: Chat): Wallet | null {
   // 그 응답에 묶인 상점 거래는 상태창 다음 일이라 맞춤 셈에서 뺀다 (가계부와 같음)
   const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor)) };
   const diff = target - walletBalance(before, alive);
-  const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: 'story' });
+  const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: 'story' }, alive); // 살아 있는 응답을 넘겨 장부가 400줄을 넘으면 줄인다 (전수검사 11-13)
   return JSON.stringify(next) === JSON.stringify(w0) ? null : next;
 }
 

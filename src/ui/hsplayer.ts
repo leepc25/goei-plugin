@@ -203,12 +203,24 @@ function fitScale(w: number, h: number): number {
   return fit >= 2 ? 2 : fit >= 1 ? 1 : fit;
 }
 
+/** 폭 맞춤(-1): 높이 제한·정수 맞춤 없이 칸 폭에 꼭 맞춘다 (전수검사 11-13) */
+function widthScale(w: number): number {
+  const wrap = stage?.closest<HTMLElement>('.hs-wrap');
+  const page = stage?.closest<HTMLElement>('.hs');
+  if (!wrap || !page) return 1;
+  const phone = page.classList.contains('hs-m');
+  const cs = getComputedStyle(wrap);
+  const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const roomW = (phone ? inner : inner - 274) - 2;
+  return Math.max(0.25, roomW / w);
+}
+
 function layout(): void {
   if (!stage || !canvas || !feed) return;
   const w = feed.art?.pack.w ?? 512;
   const h = feed.art?.pack.h ?? 384;
-  // 0 = 꽂힌 칸의 폭에 맞춤 (1배를 넘기지 않는다)
-  const k = feed.scale > 0 ? feed.scale : fitScale(w, h);
+  // 0 = 자동(보이는 자리에 맞춤), -1 = 폭 맞춤
+  const k = feed.scale > 0 ? feed.scale : feed.scale === -1 ? widthScale(w) : fitScale(w, h);
   if (canvas.width !== w) canvas.width = w;
   if (canvas.height !== h) canvas.height = h;
   stage.style.width = `${w * k}px`;

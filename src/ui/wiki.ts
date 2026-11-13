@@ -178,9 +178,10 @@ function articlePrompt(ctx: ChatContext, title: string, o: { inherited: string[]
     // 그림 (라이트보드 나무위키 W3): 본문까지면 괴이·특수·거점·조직 그림 후보, 인물 문서면 정보칸 표정 후보
     const subject = entryFor(ctx, title);
     const images = s.images === 'body'
-      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [subject] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject)]
-          .filter((e, i, arr) => arr.findIndex((x) => x.photo === e.photo) === i)
-          .map((e) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name }))
+      // 주제 그림만 subject: true, 나머지는 false 로 분명히 넘긴다 (전수검사 11-13)
+      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [{ e: subject, subject: true }] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject).map((e) => ({ e, subject: false }))]
+          .filter((x, i, arr) => arr.findIndex((y) => y.e.photo === x.e.photo) === i)
+          .map(({ e, subject }) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name, subject }))
       : [];
     const moods = s.images !== 'off' && subject?.cat === 'ag' ? portraitMoods(ctx, subject.photo) : [];
     return fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s, catalogNames, registry(ctx)));

@@ -4,7 +4,7 @@
 import { sitePicList } from './sitepics';
 import { hasAttachment } from './attach';
 import { viewSite, type BoardSite } from './boards';
-import { fillVars, GUIDE_LABEL, type GuideName } from './guides';
+import { fillVars, GUIDE_LABEL, guideOr, type GuideName } from './guides';
 import { evaluate } from './cbs';
 import {
   activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, countText, trimTokens, postLimit,
@@ -106,7 +106,8 @@ function pack(src: RefSource, b: GnetBooks, fn: GnetOp, thoughts: ThoughtsKey, g
     related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
     extra: [{ source: '현재 발생 상황', content: b.read('LB.EXTRA') }],
   });
-  const material = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${refText(rows)}\n[최근 본문]\n${story}\n[현재 작업]\n${extras}`;
+  // 참고 자료 머리말은 공통 지침 절에서, 없으면 옛 글 (전수검사 11-13)
+  const material = `${guideOr('Common', 'HEAD.REFS', '[참고 자료 — 작중 인물에게 자동 공개되지 않음]')}\n${refText(rows)}\n[최근 본문]\n${story}\n[현재 작업]\n${extras}`;
   const attachments = hasAttachment(material);
   const messages: CraftMessage[] = [
     { role: 'system', content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames) },
