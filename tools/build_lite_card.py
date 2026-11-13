@@ -285,6 +285,33 @@ def add_start_items(entries):
     return entries
 
 
+DIRECTORY_FIX_FILE = ROOT / 'card' / 'directory-fix.json'
+
+
+def add_directory_fix(entries):
+    """명부 칸 덮어쓰기 (card/directory-fix.json): 요원·거점은 칸만, 시작 로어북은 목록째. 없는 이름이면 빌드를 멈춘다 (전수검사 11-13)"""
+    if not DIRECTORY_FIX_FILE.exists():
+        return entries
+    want = json.loads(DIRECTORY_FIX_FILE.read_text(encoding='utf-8'))
+    d = next(e for e in entries if e.get('comment') == 'Directory')
+    data = json.loads(d['content'])
+    for group, rows in want.items():
+        if group.startswith('_'):
+            continue
+        have = data.get(group)
+        if not isinstance(have, dict):
+            raise SystemExit(f'directory-fix.json: 명부에 {group} 묶음이 없음')
+        for k, v in rows.items():
+            if k not in have:
+                raise SystemExit(f'directory-fix.json: 명부 {group}에 {k} 없음')
+            if isinstance(v, dict):
+                have[k].update(v)
+            else:
+                have[k] = v
+    d['content'] = json.dumps(data, ensure_ascii=False, indent=1)
+    return entries
+
+
 CARRY_FILE = ROOT / 'card' / 'carry.json'
 
 
@@ -950,7 +977,7 @@ def main(src, dst):
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
     # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 로어북은 ⚙️설정 폴더·Directory·매니페스트
-    lore = drop_plugin_lore(drop_wiki_lore(add_carry(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore)))))))))
+    lore = drop_plugin_lore(drop_wiki_lore(add_directory_fix(add_carry(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore))))))))))
     lore, _prints = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     # 폴더 key: 플러그인이 이름 대신 key 로 폴더를 찾고(이름을 바꿔도 됨), 점검이 없어진 것을 안다 (2026-10-27 설계안 9절)
