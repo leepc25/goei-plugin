@@ -259,6 +259,14 @@ export function unequipItem(it: Items, id: string): Items {
   const { slot: _s, held: _h, ...rest } = cur;
   return { ...it, list: it.list.map((x) => (x.id === id ? rest : x)) };
 }
+/** 장착을 바꾼 뒤 칸에서 밀려난 장비(gear)의 id: 앞에서는 칸에 놓여 있었고 뒤에서는 아닌 것.
+ *  장비는 장착해야 쓰니 부르는 쪽이 사용 예정에서 뺀다 (사용자 2026-11-14, 11-14 재검토 ①-2). 갈래 없는 물건·손 물건은 넣지 않는다 */
+export function gearUnseated(before: Item[], after: Item[]): string[] {
+  return before.filter((e) => e.equip === 'gear' && isEquipped(e, before)).map((e) => e.id).filter((id) => {
+    const now = after.find((x) => x.id === id);
+    return !!now && !isEquipped(now, after);
+  });
+}
 export const liveItemsOf = (it: Items, chat: Chat): Item[] => liveItems(it, aliveAnchors(chat));
 
 const hash = (text: string) => {

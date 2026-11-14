@@ -42,8 +42,9 @@ export const peopleUi = {
   notice: '',
   info: '',
   busy: false,
-  /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기) */
-  undoAsk: false,
+  /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기).
+   *  물은 갱신의 열쇠(undoKey: 채팅 + 그 갱신 시각). 빈 글 = 묻지 않는 중. 다른 채팅·다음 갱신에서는 열쇠가 달라 저절로 꺼진다 (재검토 11-14) */
+  undoAsk: '',
   /** 호감 숫자 보이기 (ⓘ) */
   showNum: false,
   /** 호감 직접 수정 칸 */
@@ -81,9 +82,12 @@ export const peopleUi = {
 };
 
 export function resetPeopleUi(): void {
-  Object.assign(peopleUi, { notice: '', info: '', affEdit: false, addrEdit: false, showNum: false, diagShow: '', logOpen: false });
+  Object.assign(peopleUi, { notice: '', info: '', undoAsk: '', affEdit: false, addrEdit: false, showNum: false, diagShow: '', logOpen: false });
   peopleUi.evOpen.clear();
 }
+
+/** 되돌리기 확인이 가리키는 갱신: 이 채팅의 이 마지막 갱신. 되돌릴 갱신이 없으면 빈 글 */
+const undoKey = (ctx: ChatContext, store: PeopleStore): string => (store.lastRun ? `${chatId(ctx)}|${store.lastRun.at}` : '');
 
 // ── 상태 알림: 갱신 중·끝남이면 다시 그린다 (입력 중이면 건너뛴다 — 한글 조합 보호) ──
 
@@ -579,7 +583,7 @@ export function peopleListView(ctx: ChatContext): string {
   const undoN = store.lastRun ? store.lastRun.entries.length + store.lastRun.docs.length + store.lastRun.changes.length + store.lastRun.observations.length + store.lastRun.newPeople.length : 0;
   const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목은 변경 기록에서 다시 살릴 수 있어요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? 'disabled' : ''}>↶</button>` : '';
   const newN = store.lastRun?.newPeople.length ?? 0;
-  const undoAsk = undoN && peopleUi.undoAsk
+  const undoAsk = undoN && peopleUi.undoAsk && peopleUi.undoAsk === undoKey(ctx, store)
     ? `<div class="gx-hint">마지막 갱신 ${undoN}개를 취소할까요?${newN ? ` 새 인물 ${newN}명은 지워져요.` : ''} <button class="gx-mini danger" data-action="pp-undo-run-yes" ${peopleUi.busy ? 'disabled' : ''}>취소하기</button><button class="gx-mini" data-action="pp-undo-run-no">그만</button></div>`
     : '';
   return `<div class="ph-room nw-pane pp-pane">${head('이 채팅의 인물', `${Object.keys(store.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
@@ -1018,17 +1022,19 @@ export async function handlePeople(action: string, value: string | undefined, ct
     }
     case 'pp-undo-run':
       // 바로 되돌리지 않고 한 번 더 묻는다 (전수검사 11-13, 사용자 승인)
-      peopleUi.undoAsk = true;
+      peopleUi.undoAsk = undoKey(ctx, peopleStore(ctx.chat));
       env.render();
       return true;
     case 'pp-undo-run-no':
-      peopleUi.undoAsk = false;
+      peopleUi.undoAsk = '';
       env.render();
       return true;
     case 'pp-undo-run-yes': {
-      peopleUi.undoAsk = false;
+      // 물었던 그 갱신일 때만 되돌린다 (그 사이 새 갱신이 왔으면 새 갱신을 지우지 않는다)
+      const asked = peopleUi.undoAsk;
+      peopleUi.undoAsk = '';
       let n = 0;
-      await mutate(ctx, env, (store) => (n = undoLastRun(store)) > 0);
+      await mutate(ctx, env, (store, chat) => (n = asked && undoKey({ ...ctx, chat }, store) === asked ? undoLastRun(store) : 0) > 0);
       peopleUi.info = n ? `마지막 갱신을 되돌렸어요 (${n}개 취소).` : '되돌릴 갱신이 없어요.';
       env.render();
       return true;

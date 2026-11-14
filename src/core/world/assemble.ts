@@ -60,6 +60,8 @@ export function assembleAgent(rec: WorldRecord, a: AgentRow, dir: Directory, fac
   return parts.join('\n\n');
 }
 
+const paragraphs = (t: string): string[] => t.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+
 /** 절 모양 기록(조직·괴이·파밍): 순서(order)대로 칸·추가 절 */
 function sections(rec: WorldRecord, defs: FieldDef[], faction?: string, skip: string[] = []): string[] {
   const out: string[] = [];
@@ -72,8 +74,39 @@ function sections(rec: WorldRecord, defs: FieldDef[], faction?: string, skip: st
     }
     if (skip.includes(id)) continue;
     const def = defs.find((f) => f.id === id);
-    const t = def ? fieldValue(rec, id, faction) : '';
-    if (def && t) out.push(`#### ${def.title}\n${t}`);
+    if (!def) continue;
+    const base = fieldValue(rec, id);
+    // 세력별 시점 글(variants). 조직 소개의 첫 문단은 📜Faction 요약 자리라, 한 문단짜리 시점 글은 그 첫 문단만 바꾸고 뒷글은 남긴다
+    const swapHead = kind === 'org' && id === 'intro' && !rec.noSummary && paragraphs(base).length > 1;
+    const split = (t: string, own: boolean): [string, string] => {
+      const ps = paragraphs(t);
+      if (swapHead && (!own || ps.length === 1)) return [ps[0] ?? '', paragraphs(base).slice(1).join('\n\n')];
+      return [t, ''];
+    };
+    const whole = ([h, r]: [string, string]) => (r ? `${h}\n\n${r}` : h);
+    const vs = Object.entries(rec.variants ?? {})
+      .filter(([c, f]) => typeof f[id] === 'string' && f[id].trim() && (faction === undefined || c === faction))
+      .map(([c, f]) => [c, split(f[id].trim(), true)] as const);
+    if (!vs.length) {
+      if (base) out.push(`#### ${def.title}\n${base}`);
+      continue;
+    }
+    if (faction !== undefined) {
+      out.push(`#### ${def.title}\n${whole(vs[0][1])}`);
+      continue;
+    }
+    // 세력을 안 정했으면 CBS 분기로 남긴다 (요청 때 플러그인이 푼다)
+    const on = (c: string, t: string) => `{{#if {{equal::${VAR}::${c}}}}}${t}{{/if}}`;
+    if (!base) {
+      out.push(vs.map(([c, v]) => on(c, `#### ${def.title}\n${whole(v)}`)).join(''));
+      continue;
+    }
+    const b = split(base, false);
+    const others = (t: string) => `${vs.map(([c]) => `{{#if {{not_equal::${VAR}::${c}}}}}`).join('')}${t}${'{{/if}}'.repeat(vs.length)}`;
+    const t = vs.every(([, v]) => v[1] === b[1])
+      ? `${others(b[0])}${vs.map(([c, v]) => on(c, v[0])).join('')}${b[1] ? `\n\n${b[1]}` : ''}`
+      : `${others(whole(b))}${vs.map(([c, v]) => on(c, whole(v))).join('')}`;
+    out.push(`#### ${def.title}\n${t}`);
   }
   return out;
 }
@@ -91,9 +124,22 @@ export function assembleSite(rec: WorldRecord, p: PlaceRow, faction?: string): s
   return [`### ${title}`, ...sections(rec, SITE_FIELDS, faction)].join('\n\n');
 }
 
+/** 조직의 한글 이름도 호칭 표대로 (가짜 관리국으로 플레이하면 제 조직이 「관리국」). 세력을 안 정했으면 CBS 분기 */
+function orgKoName(dir: Directory, org: OrgRow, faction?: string): string {
+  const shown = (viewer: string) => (org.faction && dir.display[viewer]?.[org.faction]) || '';
+  // 호칭 표에서 기본(none)과 다르게 부르는 세력만 바꾼다. 그 밖은 명부 이름 그대로
+  const ko = (viewer: string) => (shown(viewer) && shown(viewer) !== shown('none') ? shown(viewer) : org.name);
+  const def = org.name;
+  if (faction !== undefined) return ko(faction);
+  const swaps = Object.keys(dir.display).filter((v) => v !== 'none' && ko(v) !== def);
+  if (!swaps.length) return def;
+  const others = swaps.map((v) => `{{#if {{not_equal::${VAR}::${v}}}}}`).join('');
+  return `${others}${def}${'{{/if}}'.repeat(swaps.length)}${swaps.map((v) => `{{#if {{equal::${VAR}::${v}}}}}${ko(v)}{{/if}}`).join('')}`;
+}
+
 /** 조직(세력 상세) 로어 글: 제목(호칭 표 CBS) + 코드 + 절들 */
 export function assembleOrg(rec: WorldRecord, org: OrgRow, dir: Directory, faction?: string): string {
-  const title = rec.title || `${orgNameCbs(dir, org)} (${org.name})`;
+  const title = rec.title || `${orgNameCbs(dir, org)} (${orgKoName(dir, org, faction)})`;
   const head = org.faction ? `### ${title}\n\n[Affiliation code: ${org.faction}]` : `### ${title}`;
   return [head, ...sections(rec, ORG_FIELDS, faction)].join('\n\n');
 }

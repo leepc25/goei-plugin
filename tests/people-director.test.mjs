@@ -61,3 +61,63 @@ test('2차 검색: need → 코드 검색(채팅·로어북·위키) → found �
   assert.deepEqual(notes.notes, [{ who: '쟈알디', now: '서류를 넘김', react: '짧게 확인', mustNot: ['지하'] }]);
   assert.equal(D.parseDirector('{"notes":[]}', ['쟈알디'], true).length, 0);
 });
+
+test('요청 자료: 기록은 record 전문 한 번만, 꼬리 칸(state·threads·knowledge·suspicion)은 싣지 않는다. 재사용 열쇠는 그대로 꼬리를 본다 (gupdp#1)', () => {
+  const e = (id, text, extra = {}) => ({ id, text, src: 'story', anchor: 'c1', seq: 1, ...extra });
+  const mk = (state, threads) => {
+    const store = T.emptyStore();
+    store.people.쟈알디 = person('쟈알디');
+    store.people.쟈알디.slots.state = [e('s1', state)];
+    store.people.쟈알디.slots.threads = [e('t1', threads)];
+    store.people.쟈알디.slots.knowledge = [e('k1', '명일 아파트 지하의 소문을 들었다')];
+    store.people.쟈알디.slots.suspicion = [e('u1', '요원이 보고서를 고쳤다고 의심', { target: '@user' })];
+    return store;
+  };
+  const st = settings({ $pp_suspicion: '1' });
+  const b = D.buildDirector(c, mk('서류 더미에 파묻혀 있다', '아파트 건 보고를 기다린다'), ['쟈알디'], '서류를 받았다', st, {});
+  const p = b.data.people[0];
+  for (const k of ['state', 'threads', 'knowledge', 'suspicion']) assert.equal(p[k], undefined, `${k} 꼬리 칸 없음`);
+  for (const t of ['서류 더미에 파묻혀 있다', '아파트 건 보고를 기다린다', '명일 아파트 지하의 소문을 들었다']) {
+    assert.ok(p.record.includes(t), 'record 전문에는 있음');
+    assert.equal(JSON.stringify(b.data).split(t).length - 1, 1, `자료에 한 번만: ${t}`);
+  }
+  // 열쇠: 같은 기록이면 같고, 상태·미해결이 바뀌면 달라진다
+  assert.equal(D.buildDirector(c, mk('서류 더미에 파묻혀 있다', '아파트 건 보고를 기다린다'), ['쟈알디'], '서류를 받았다', st, {}).key, b.key);
+  assert.notEqual(D.buildDirector(c, mk('자리를 비웠다', '아파트 건 보고를 기다린다'), ['쟈알디'], '서류를 받았다', st, {}).key, b.key);
+  assert.notEqual(D.buildDirector(c, mk('서류 더미에 파묻혀 있다', '다른 건'), ['쟈알디'], '서류를 받았다', st, {}).key, b.key);
+});
+
+test('자료가 없는 기능 절(의심·리듬·성적)은 붙이지 않고, 자료가 실리면 붙인다 (11-14 재검토 gtoken#5)', () => {
+  const on = settings({ $pp_suspicion: '1', $pp_rhythm: '1', $pp_axes: '1', $pp_sexual_desire: '1', $pp_paraphilia: '1' });
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  const empty = D.buildDirector(c, store, ['쟈알디'], '서류를 받았다', on, { 쟈알디: '' });
+  assert.ok(!empty.system.includes('## Suspicion'), '의심 칸이 비면 의심 절 없음');
+  assert.ok(!empty.system.includes('## Narrative rhythm'), '리듬 기록이 없으면 리듬 절 없음');
+  assert.ok(!/sexual_context_only/.test(empty.system), '성적 글이 없으면 성적 절 없음');
+  assert.ok(empty.system.includes('## Personality axes') && empty.system.includes('## Affinity and taste'), '다른 절은 그대로');
+  assert.equal(empty.data.rhythm, undefined);
+  assert.equal(empty.data.people[0].slots, undefined);
+  // 자료가 실리면 그 절이 붙는다
+  // 의심은 기본이 정성 모드(suspicion.* 칸), 수치를 켜면 suspicion 칸. 그 모드에서 실리는 칸에 글이 있어야 한다
+  const num = settings({ $pp_suspicion: '1', $pp_num_suspicion: '1' });
+  store.people.쟈알디.slots.suspicion = [{ id: 'su1', text: '[시작] 서류 날짜가 맞지 않는다', src: 'story', anchor: 'c1', seq: 1, target: '@user', quote: '명일' }];
+  assert.ok(!D.buildDirector(c, store, ['쟈알디'], '서류를 받았다', on, { 쟈알디: '' }).system.includes('## Suspicion'), '정성 모드에서는 수치 칸이 실리지 않으니 절도 없음');
+  const sn = D.buildDirector(c, store, ['쟈알디'], '서류를 받았다', num, { 쟈알디: '' });
+  assert.ok(sn.data.people[0].slots.suspicion.length === 1 && sn.system.includes('## Suspicion'));
+  store.people.쟈알디.slots['suspicion.concern'] = [{ id: 'su3', text: '서류 날짜가 맞지 않는다', src: 'story', anchor: 'c1', seq: 2, target: '@user', quote: '명일' }];
+  const sus = D.buildDirector(c, store, ['쟈알디'], '서류를 받았다', on, { 쟈알디: '' });
+  assert.ok(sus.data.people[0].slots['suspicion.concern'].length === 1 && sus.system.includes('## Suspicion'));
+  assert.ok(!sus.system.includes('## Narrative rhythm') && !/sexual_context_only/.test(sus.system));
+  store.docs['rhythm:hook:서류'] = { type: 'rhythm', key: 'hook:서류', entries: [{ id: 'h1', text: '[stage:seeded] [tier:mid] 서류', src: 'story', anchor: 'c1', seq: 1 }] };
+  const rh = D.buildDirector(c, store, ['쟈알디'], '서류를 받았다', on, { 쟈알디: '' });
+  assert.ok(rh.data.rhythm.length === 1 && rh.system.includes('## Narrative rhythm'));
+  store.people.쟈알디.sexual = { desire: { text: '직설적이다', at: 'T' }, paraphilia: { text: '', at: '' }, desireOn: true, paraphiliaOn: true, explicit: null };
+  const sx = D.buildDirector(c, store, ['쟈알디'], '서류를 받았다', on, { 쟈알디: '' });
+  assert.ok(sx.data.people[0].sexual_desire && /sexual_context_only fields/.test(sx.system));
+  // 지워진 메시지에 닻을 둔 의심 기록은 자료가 아니다
+  const gone = T.emptyStore();
+  gone.people.쟈알디 = person('쟈알디');
+  gone.people.쟈알디.slots['suspicion.concern'] = [{ id: 'su2', text: 'x', src: 'story', anchor: 'zz', seq: 1, target: '@user', quote: 'x' }];
+  assert.ok(!D.buildDirector(c, gone, ['쟈알디'], '서류를 받았다', on, { 쟈알디: '' }).system.includes('## Suspicion'));
+});

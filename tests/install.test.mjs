@@ -1,7 +1,7 @@
 // 깡통봇 설치·점검 (설계안 9절): 괴이 카드 판정, 인사말 심기, 로어북 심기(없는 것만·key 로 폴더 찾기), 점검
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isGoeiLore, installLore, plantGreetings, installCheck, findFolder, installSummary, installData, readManifest, readDirectoryData, isLanding, installLoreSettings } from '../dist-test/core.mjs';
+import { isGoeiLore, installLore, plantGreetings, installCheck, findFolder, installSummary, installData, readManifest, readDirectoryData, isLanding, installLoreSettings, notePictures } from '../dist-test/core.mjs';
 
 // 설치 자료는 본체에 없고 자료 팩(goei-data-install)으로 받는다 (개선 나1). 시험은 dist-test/core.mjs 가 tests/data-init.mjs 로 파일에서 넣어 준다
 const INSTALL_GREETINGS = installData().greetings;
@@ -94,4 +94,38 @@ test('점검: 다 갖춘 카드는 빠진 것 없음', () => {
   const st = installCheck({ lore, firstMessage: INSTALL_GREETINGS.first, loreSettings: installLoreSettings(undefined), alternateGreetings: planted.greetings, assets, iconOurs: true, wikiPack: true, tokenizer: true });
   assert.deepEqual(installSummary(st), []);
   assert.equal(st.goei, true);
+});
+
+// loader#6: 깡통봇은 설치 때 적어 둔 사진 목록에 묶이지 않고 지금 설치 자료의 목록으로 점검한다
+test('깡통봇 점검: 새 릴리스에 추가·교체된 카드 사진을 알아채고, 받은 뒤 매니페스트에 적으면 다시 세지 않는다', () => {
+  const planted = plantGreetings([]);
+  const base = installLore([], planted.index);
+  const [first, second, ...rest] = INSTALL_PICTURES;
+  // 옛 릴리스에 설치한 깡통봇: 첫 사진은 옛 지문, 둘째 사진은 그때 없었음
+  const oldFirst = [first[0], 'oldoldoldold', first[2], first[3]];
+  const withPics = (lore, pictures, extra = {}) => lore.map((e) => (e.comment === 'Plugin manifest' ? { ...e, content: JSON.stringify({ ...JSON.parse(e.content), ...extra, pictures }) } : e));
+  const lore = withPics(base, [oldFirst, ...rest]);
+  const assets = [oldFirst, ...rest].map((p) => [p[0], `path/${p[1]}`, p[2]]);
+  const check = (l, a) => installCheck({ lore: l, firstMessage: INSTALL_GREETINGS.first, loreSettings: installLoreSettings(undefined), alternateGreetings: planted.greetings, assets: a, iconOurs: true, wikiPack: true, tokenizer: true });
+  const st = check(lore, assets);
+  assert.deepEqual(st.pictures.missing.map((p) => p[0]).sort(), [first[0], second[0]].sort(), '교체된 사진과 추가된 사진');
+  assert.equal(st.pictures.total, INSTALL_PICTURES.length);
+  // 받은 뒤: 에셋에 넣고 매니페스트에 적는다
+  const got = st.pictures.missing;
+  const noted = notePictures(lore, got);
+  assert.ok(noted, '매니페스트가 바뀜');
+  assert.equal(noted.length, lore.length);
+  const m = readManifest(noted);
+  assert.equal(m.pictures.find((p) => p[0] === first[0])[1], first[1]);
+  assert.ok(m.pictures.some((p) => p[0] === second[0]));
+  assert.equal(m.pictures.length, INSTALL_PICTURES.length);
+  assert.deepEqual(m.greetings, readManifest(lore).greetings, '다른 칸은 그대로');
+  const after = check(noted, [...assets, [second[0], 'path/new', second[2]]]);
+  assert.deepEqual(after.pictures.missing, []);
+  assert.equal(notePictures(noted, got), null, '바뀐 것이 없으면 null');
+  // 정식 카드(source 있음)는 매니페스트 목록 그대로 본다 (카드 업데이트가 맡는다)
+  const official = withPics(base, [oldFirst, ...rest], { source: { name: '괴이', version: '1' } });
+  assert.deepEqual(check(official, assets).pictures.missing, []);
+  assert.equal(notePictures(official, got), null);
+  assert.equal(notePictures([], got), null);
 });

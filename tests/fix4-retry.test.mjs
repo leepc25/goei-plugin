@@ -45,6 +45,14 @@ test('통째로 바뀐 글·이웃에 끼운 글: 없어진 수만큼만 고친 
   assert.deepEqual(insertedSystemTexts([], [sys('A')]), ['A']);
 });
 
+test('같은 머리로 시작하는 끼운 글(주인공 요원 글)이 고친 로어 글 앞에 있어도 고친 글은 기억하지 않는다', () => {
+  const before = [sys('프리셋'), sys('### Character - 가\n옛 인물 설명.'), bot('첫 장면'), user('행동')];
+  const after = [sys('프리셋'), sys('### Character - 다\n주인공 요원 글!'), sys('### Character - 나\n새 인물 설명?'), bot('첫 장면'), sys('[상태]'), user('행동')];
+  assert.deepEqual(insertedSystemTexts(before, after), ['### Character - 다\n주인공 요원 글!', '[상태]']);
+  // 닮은 데가 하나도 없는 글끼리는 전처럼 앞의 새 글이 고친 글
+  assert.deepEqual(insertedSystemTexts([sys('가나다'), user('u')], [sys('XYZ'), sys('[끼움]'), user('u')]), ['[끼움]']);
+});
+
 test('body.ts 연결: lastAdded 는 끼운 글만 (입력에 없던 system 글 전부가 아니다)', async () => {
   const body = await readFile(new URL('../src/body.ts', import.meta.url), 'utf8');
   assert.match(body, /lastAdded = new Set\(insertedSystemTexts\(input0, out\)\);/);

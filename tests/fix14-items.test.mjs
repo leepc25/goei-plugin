@@ -32,3 +32,41 @@ test('직접 버린 물건: 마지막 메시지가 사용자 글일 때 버려�
   assert.deepEqual(keysAfterLastBot(next), ['u2']);
   assert.ok(!inventoryText(next).includes('threw 코트 away'), '다음 턴에는 안 실린다');
 });
+
+// 11-14 재검토 ①-2: 찬 장비 칸에 다른 장비를 끌어 놓아 바꾸면, 밀려난 장비는 장착이 풀리니 「사용 예정」에서도 빠져야 한다
+// (화면 ui/items.ts items-dnd 가 gearUnseated 로 밀려난 장비를 찾아 dropUse 한다). 손 칸에서 밀려난 물건은 넣지 않는다
+test('칸으로 끌어다 바꾸기: 밀려난 장비(gear)만 찾아 사용 예정에서 뺀다', async () => {
+  const { equipItem, liveItems, gearUnseated, addUse, dropUse, isEquipped } = await import('../dist-test/core.mjs');
+  const alive = new Set();
+  let it = { list: [], log: [] };
+  for (const [name, equip] of [['방독면', 'gear'], ['코트', 'gear'], ['망치', 'weapon'], ['손전등', undefined], ['칼', 'weapon']]) {
+    it = addItem(it, alive, { name, use: true, ...(equip ? { equip } : {}), from: 'manual', anchor: '' });
+  }
+  const id = (name) => it.list.find((x) => x.name === name).id;
+  it = equipItem(it, alive, id('방독면'), 0, 'gear');
+  const before = liveItems(it, alive);
+  let queue = addUse([], before.find((x) => x.name === '방독면'), undefined);
+  assert.deepEqual(queue.map((u) => u.id), [id('방독면')]);
+
+  const swapped = equipItem(it, alive, id('코트'), 0, 'gear');
+  const after = liveItems(swapped, alive);
+  assert.ok(!isEquipped(after.find((x) => x.name === '방독면'), after), '방독면은 칸에서 밀려났다');
+  const bumped = gearUnseated(before, after);
+  assert.deepEqual(bumped, [id('방독면')]);
+  for (const b of bumped) queue = dropUse(queue, b);
+  assert.deepEqual(queue, [], '밀려난 장비의 사용 예정이 빠진다');
+
+  // 빈 칸에 장착 · 같은 물건을 다른 칸으로 옮기기: 밀려난 것 없음
+  assert.deepEqual(gearUnseated(before, liveItems(equipItem(it, alive, id('코트'), 1, 'gear'), alive)), []);
+  assert.deepEqual(gearUnseated(before, liveItems(equipItem(it, alive, id('방독면'), 3, 'gear'), alive)), []);
+  // 손 칸에서 밀려난 물건(손 물건·갈래 없는 물건)은 넣지 않는다
+  let hand = equipItem(it, alive, id('망치'), 0, 'weapon');
+  hand = equipItem(hand, alive, id('손전등'), 1, 'weapon');
+  const hb = liveItems(hand, alive);
+  let ha = liveItems(equipItem(hand, alive, id('칼'), 0, 'weapon'), alive);
+  assert.ok(!isEquipped(ha.find((x) => x.name === '망치'), ha));
+  assert.deepEqual(gearUnseated(hb, ha), []);
+  ha = liveItems(equipItem(hand, alive, id('칼'), 1, 'weapon'), alive);
+  assert.ok(!isEquipped(ha.find((x) => x.name === '손전등'), ha));
+  assert.deepEqual(gearUnseated(hb, ha), []);
+});

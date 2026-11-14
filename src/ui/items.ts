@@ -11,7 +11,7 @@ import { refreshUseBox } from '../host/usebox';
 import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
+  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gearUnseated, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
   purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, slotKind, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
@@ -627,7 +627,14 @@ export async function itemsAction(action: string, value: string | undefined, ctx
           env.render();
           return true;
         }
-        await write((x, alive) => equipItem(x, alive, id, Number(n), k === 'weapon' ? 'weapon' : 'gear'));
+        // 찬 장비 칸에 놓아 바꾸면 밀려난 장비의 사용 예정도 뺀다 (장착해야 쓴다, 사용자 2026-11-14 · 11-14 재검토 ①-2). 손 칸에서 밀려난 것은 그대로 둔다
+        let bumped: string[] = [];
+        await write((x, alive) => {
+          const next = equipItem(x, alive, id, Number(n), k === 'weapon' ? 'weapon' : 'gear');
+          bumped = k === 'weapon' || next === x ? [] : gearUnseated(liveItems(x, alive), liveItems(next, alive));
+          return next;
+        });
+        for (const b of bumped) await dropFromUse(ctx, b);
       } else if (to === 'grid') {
         if (!isEquipped(it, liveOf(ctx))) return true;
         await write((x) => unequipItem(x, id));

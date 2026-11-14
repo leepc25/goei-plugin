@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   worldRecords, worldRecord, mergeRecord, fieldOrder, worldRelations, withWorldLore, stripVirtual, isVirtual, hasVirtual, readDirectory, lore as L,
-  assembleAgent, orgNameCbs, FIELDS, WORLD_KINDS,
+  assembleAgent, assembleOrg, evaluate, orgNameCbs, FIELDS, WORLD_KINDS,
 } from '../dist-test/core.mjs';
 
 test('기본 세계: 카드 로어북에서 옮긴 기록 수와 칸', () => {
@@ -85,4 +85,41 @@ test('조립: 소속 표기는 호칭 표에서 세력별 분기 CBS 로', () =>
   assert.equal(orgNameCbs(dir, org), '{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}');
   const text = assembleAgent(worldRecord('agent', '쟈알디'), dir.agents.find((a) => a.lore === '쟈알디'), dir);
   assert.match(text, /- Organization: \{\{#if .*Management Bureau\{\{\/if\}\}\n- Department: Comprehensive Response Team\n- Role: /);
+});
+
+test('조직 상세: 세력별 시점 글(variants)과 한글 이름 바꾸기가 상세 로어에도 적용된다 (lorg#1·#2)', () => {
+  const out = withWorldLore([...slots, { comment: 'Directory', key: '', mode: 'normal', content: JSON.stringify({ schema: 1, 요원: {}, 조직: { 관리국: { code: 'A00', english: 'Management Bureau' }, '가짜 관리국': { code: 'B00', english: 'Fake Management Bureau' }, 교황청: { english: 'Vatican' } }, 괴이: {}, '미스틱 사이트': {}, 호칭: { none: { A00: '관리국', B00: '가짜 관리국' }, A00: { A00: '관리국', B00: '가짜 관리국' }, B00: { A00: '가짜 관리국', B00: '관리국' } } }) }]);
+  const dir = readDirectory(out);
+  const as = (name, code) => evaluate(out.find((e) => isVirtual(e) && e.comment === name).content.replace(/^@@dont_activate\n/, '').replace(/\n\n---$/, ''), { vars: { $st_faction: code } });
+  const fake = worldRecord('org', '가짜 관리국');
+  const [enemy, ...rest] = fake.fields.intro.trim().split(/\n\s*\n/);
+  const own = fake.variants.B00.intro.trim();
+  assert.match(enemy, /absolute enemy/);
+  // 가짜 관리국(B00)으로 플레이: 제 조직이 「Management Bureau (관리국)」, 첫 문단은 제 시점 글, 뒷글은 그대로
+  const b = as('가짜 관리국', 'B00');
+  assert.ok(b.startsWith('### Management Bureau (관리국)\n\n[Affiliation code: B00]\n\n'), b.slice(0, 80));
+  assert.ok(!b.includes('absolute enemy'), 'B00 에게 관리국 시점 첫 문단이 가지 않는다');
+  assert.ok(b.includes(`${own}\n\n${rest.join('\n\n')}`), '첫 문단만 시점 글로 바뀌고 뒷글은 남는다');
+  assert.ok(as('관리국', 'B00').startsWith('### Fake Management Bureau (가짜 관리국)\n'));
+  assert.ok(as('관리국', 'B00').includes(worldRecord('org', '관리국').variants.B00.intro.trim()));
+  assert.ok(!as('관리국', 'B00').includes(worldRecord('org', '관리국').fields.intro.trim()));
+  // 다른 세력·세력 없음: 지금까지와 같은 글
+  for (const code of ['A00', 'C00', '']) {
+    const a = as('가짜 관리국', code);
+    assert.ok(a.startsWith('### Fake Management Bureau (가짜 관리국)\n\n[Affiliation code: B00]\n\n'), a.slice(0, 80));
+    assert.ok(a.includes(fake.fields.intro.trim()) && !a.includes(`${own}\n\n`), `기본 글 그대로 (${code})`);
+    assert.ok(as('관리국', code).startsWith('### Management Bureau (관리국)\n'));
+    assert.ok(as('관리국', code).includes(worldRecord('org', '관리국').fields.intro.trim()));
+  }
+  // 시점 글이 없는 조직은 CBS 없이 그대로
+  assert.ok(!out.find((e) => isVirtual(e) && e.comment === '교황청').content.includes('{{#if'));
+  // 세력을 정해 조립해도 같은 결과
+  const org = dir.orgs.find((o) => o.name === '가짜 관리국');
+  assert.equal(evaluate(assembleOrg(fake, org, dir, 'B00'), { vars: { $st_faction: 'B00' } }), b);
+  assert.equal(evaluate(assembleOrg(fake, org, dir, 'A00'), { vars: { $st_faction: 'A00' } }), as('가짜 관리국', 'A00'));
+  // 여러 문단짜리 시점 글은 칸을 통째로 바꾼다
+  const multi = { ...fake, variants: { B00: { intro: 'one\n\ntwo' } } };
+  const m = evaluate(assembleOrg(multi, org, dir), { vars: { $st_faction: 'B00' } });
+  assert.ok(m.includes('#### ') && m.includes('one\n\ntwo') && !m.includes(rest[0]));
+  assert.ok(evaluate(assembleOrg(multi, org, dir), { vars: { $st_faction: 'A00' } }).includes(fake.fields.intro.trim()));
 });

@@ -89,3 +89,18 @@ test('메인 이미지 지침: 주인공 금지 문장은 Asset 절, 기본은 �
   G.setGuideOverride('Asset', G.guideDefault('Asset').replace(/@@SECTION MAIN_USER_(RULE|SKIP)\n[\s\S]*?\n@@END\n?/g, ''));
   try { assert.equal(P.buildImgPrompt(cfg, ['Aileen'], false), old); } finally { reset(); }
 });
+
+// 재검토 11-14 ①-8: 사진 목록 머리말 절은 비워도 코드의 기본 글이 나가므로 「비우면 기본 글」 표시 대상이다 (나-51)
+test('사진 목록 머리말 절(PICS_*): 비우면 기본 글이 쓰이는 절로 표시된다', () => {
+  const char = { globalLore: LORE };
+  for (const site of ['GNet', 'Gal', 'Wpf', 'Salmon']) {
+    for (const sec of ['PICS_NONE', 'PICS_PEOPLE', 'PICS_EXPR', 'PICS_THINGS']) assert.equal(G.blankUsesDefault(site, sec), true, `${site} ${sec}`);
+    assert.equal(G.blankUsesDefault(site, 'DM.QUOTE_UNKNOWN'), true);
+    // 표시 대상이 아닌 이름은 그대로 아니다
+    assert.equal(G.blankUsesDefault(site, 'PICS_OTHER'), false);
+    assert.equal(G.blankUsesDefault(site, 'XPICS_NONE'), false);
+  }
+  // 표시와 실제가 맞는다: 절을 비우면 기본 글이 나간다
+  assert.equal(S.sitePicList(char, () => ''), S.sitePicList(char));
+  assert.equal(S.sitePicList({ globalLore: lore([]) }, () => ''), 'Available pictures: none.');
+});

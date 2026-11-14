@@ -154,7 +154,9 @@ export function insertedSystemTexts(before: PromptMessage[], after: PromptMessag
         while (p < lim && o[p] === t[p]) p++;
         let q = 0;
         while (q < lim - p && o[o.length - 1 - q] === t[t.length - 1 - q]) q++;
-        if (p + q > score) {
+        // 점수가 같을 때: 닮은 데가 없으면(0) 앞의 새 글, 닮은 데가 있으면 뒤의 새 글.
+        // 같은 머리(`### Character - `)로 시작하는 끼운 글은 주인공 요원 글(applyPlayer)이고, 첫 system 글 바로 뒤 = 로어 글보다 앞에 끼워진다
+        if (p + q > score || (p + q === score && score > 0)) {
           best = i;
           score = p + q;
         }

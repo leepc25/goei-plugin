@@ -132,8 +132,12 @@ export function installCheck(i: CheckInput): InstallState {
     return want ? typeof greetings[n] !== 'string' || !(greetings[n] as string).trim() : false;
   });
   const have = new Set(((Array.isArray(i.assets) ? i.assets : []) as unknown[]).filter(isRow).map((r) => r[0]));
-  const want = manifestPictures(m).length ? manifestPictures(m) : inst.pictures;
-  const missingPics = want.filter((p) => !have.has(p[0]));
+  // 깡통봇(매니페스트에 source 없음)은 설치 때 적어 둔 목록이 아니라 지금 설치 자료의 목록으로 본다: 새 릴리스에 추가된 사진,
+  // 지문이 바뀐 사진(매니페스트에 적힌 지문과 다름)도 「없음」으로 세어 다시 받게 한다 (loader#6). 정식 카드는 카드 업데이트가 맡는다
+  const listed = manifestPictures(m);
+  const known = new Map(listed.map((p) => [p[0], p[1]]));
+  const want = listed.length && m?.source ? listed : inst.pictures;
+  const missingPics = want.filter((p) => !have.has(p[0]) || (known.has(p[0]) && known.get(p[0]) !== p[1]));
   let directory = false;
   let directoryGaps = 0;
   try {
@@ -199,6 +203,32 @@ export function buildManifest(o: { greetings: Record<string, number>; settingsKe
     pictures: manifestPictures(prev as Manifest).length ? manifestPictures(prev as Manifest) : installData().pictures,
     keys: { ...keys, settings: o.settingsKey },
   };
+}
+
+/**
+ * 받아 저장한 카드 사진을 깡통봇 매니페스트의 사진 목록에 적는다 (같은 이름은 새 지문으로, 새 이름은 뒤에): 점검이 다음에 다시 받으라고 하지 않게 (loader#6).
+ * 매니페스트가 없거나 정식 카드(source 있음)이거나 바뀐 것이 없으면 null
+ */
+export function notePictures(lore: LoreEntry[] | undefined, got: Picture[]): LoreEntry[] | null {
+  const old = lore ? manifestEntry(lore) : undefined;
+  const m = lore ? readManifest(lore) : null;
+  if (!lore || !old || !m || m.source || !got.length) return null;
+  const list = manifestPictures(m).map((p) => [...p] as Picture);
+  const at = new Map(list.map((p, n) => [p[0], n]));
+  let changed = false;
+  for (const p of got) {
+    const n = at.get(p[0]);
+    if (n === undefined) {
+      at.set(p[0], list.length);
+      list.push([...p] as Picture);
+      changed = true;
+    } else if (list[n][1] !== p[1] || list[n][2] !== p[2] || list[n][3] !== p[3]) {
+      list[n] = [...p] as Picture;
+      changed = true;
+    }
+  }
+  if (!changed) return null;
+  return lore.map((e) => (e === old ? { ...old, content: JSON.stringify({ ...m, pictures: list }) } : e));
 }
 
 const entry = (comment: string, content: string, folder: string, extra: Partial<LoreEntry> = {}): LoreEntry =>

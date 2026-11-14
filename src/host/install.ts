@@ -2,7 +2,7 @@
 // 로어북·인사말은 캐릭터에, 사진은 에셋 저장소(release/pic), 아이콘은 release/icon.png 를 받아 메인 아이콘으로,
 // 위키 기본 문서 묶음은 release/wiki-base.N.txt 를 받아 플러그인 저장소에 둔다.
 // 설치 자료(인사말·사진 목록·기본 명부·아이콘 정보)는 점검 전에 자료 팩(goei-data-install)으로 받는다 (host/datapack.ts ensureInstallData, QC 개선 나1).
-import { installCheck, installData, installLore, installLoreSettings, isLanding, plantGreetings, type InstallState } from '../core/install';
+import { installCheck, installData, installLore, installLoreSettings, isLanding, notePictures, plantGreetings, type InstallState } from '../core/install';
 import { UPDATE_BASE } from '../core/update';
 import { setStoredWikiPack, storedWikiPack, WIKI_PACK_HEAD } from '../core/wiki';
 import { clearTokenizer, setTokenizerRanks, tokenizerName } from '../core/tokenizer';
@@ -111,7 +111,9 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
     if (!list.length) return;
     assets = mergePictures(assets, list);
     const fresh = ((await risuai.getCharacterFromIndex(charIndex)) ?? char) as Record<string, unknown>;
-    await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: assets });
+    // 깡통봇: 받은 사진의 지문을 매니페스트에 적는다 (안 적으면 바뀐 사진을 점검이 계속 「없음」으로 센다, loader#6)
+    const lore = notePictures(fresh.globalLore as LoreEntry[] | undefined, list.map(([p]) => p));
+    await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: assets, ...(lore ? { globalLore: lore } : {}) });
     saved += list.length;
   };
   for (let i = 0; i < all.length; i += COMMIT) {

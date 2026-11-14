@@ -83,9 +83,10 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const featureSlots = s.directorFeatures ? slotsFor(s.features, s.qualitative).filter((x) => SLOT_META[x].feature) : [];
   // 기록 전문(본편이 받는 인물 블록과 같은 글)을 `record` 로 준다 (2026-11-07 E: 꼬리 6개만 주던 것 → 전문). 인물 수로 예산을 나눈다
   const recordCap = Math.max(1500, Math.floor(s.blockCap / Math.max(1, people.length)));
+  const tails: Record<string, { state: string[]; threads: string[] }> = {};
   const persons = people.map((n) => {
     const p = store.people[n];
-    const slot = (k: 'state' | 'threads' | 'knowledge' | 'suspicion') => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
+    const slot = (k: 'state' | 'threads') => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
     // 성격 계수(temper)도 본편·화면과 같이 넣는다 (전수검사 11-13)
     const aff = affinityView(p, changes, store.folded[n] ?? 0, { temper: temperOf(n), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap });
     const slots: Record<string, { text: string; target?: string }[]> = {};
@@ -93,6 +94,8 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
       const es = liveEntries(p.slots[k as SlotId], live).slice(-4).map((e) => ({ text: e.text, ...(e.target ? { target: e.target } : {}) }));
       if (es.length) slots[k] = es;
     }
+    // 꼬리(state·threads)는 재사용 열쇠 계산에만 쓴다. 자료(data)에는 `record` 전문이 같은 글을 싣고 있어 넣지 않는다 (11-14 재검토 gupdp#1)
+    tails[n] = { state: slot('state'), threads: slot('threads') };
     return {
       name: n,
       values: values[n] ?? '',
@@ -103,10 +106,6 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
       // 성적 욕망·이상성욕 (원본 director people_profile: text + policy sexual_context_only)
       ...(() => { const t = sexualTexts(p, s); return { ...(t.desire ? { sexual_desire: { text: t.desire, policy: SEXUAL_POLICY } } : {}), ...(t.paraphilia ? { paraphilia: { text: t.paraphilia, policy: SEXUAL_POLICY } } : {}) }; })(),
       record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speechMarks: true, temper: temperOf(n), speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
-      state: slot('state'),
-      threads: slot('threads'),
-      knowledge: slot('knowledge'),
-      ...(s.features.has('suspicion') && !s.qualitative.has('suspicion') ? { suspicion: slot('suspicion') } : {}),
       ...(Object.keys(slots).length ? { slots } : {}),
       unknown_to: unknownTo(p, store, live),
     };
@@ -114,7 +113,13 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const rhythm = s.directorFeatures && s.features.has('rhythm')
     ? Object.values(store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })))
     : [];
-  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', guideOr('Director', `APPLY.${f.toUpperCase()}`, () => FEATURE_GUIDE[f].join('\n')), ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [guideOr('Director', 'APPLY.SEXUAL', () => `\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${sexualDirectorPolicy()}`, { policy: sexualDirectorPolicy() })] : [])]) : [];
+  // 자료가 실린 기능 절만 붙인다 (11-14 재검토 gtoken#5): 의심 칸이 빈 장면·리듬 기록이 없는 채팅·성적 글이 없는 인물에게 그 절은 요청에 없는 자료를 설명한다
+  const hasData: Record<string, boolean> = {
+    suspicion: persons.some((p) => Object.keys(p.slots ?? {}).some((k) => SLOT_META[k as SlotId].feature === 'suspicion')),
+    rhythm: rhythm.length > 0,
+  };
+  const hasSexual = persons.some((p) => 'sexual_desire' in p || 'paraphilia' in p);
+  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f) && hasData[f] !== false).flatMap((f) => ['', guideOr('Director', `APPLY.${f.toUpperCase()}`, () => FEATURE_GUIDE[f].join('\n')), ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) && hasSexual ? [guideOr('Director', 'APPLY.SEXUAL', () => `\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${sexualDirectorPolicy()}`, { policy: sexualDirectorPolicy() })] : [])]) : [];
   // 기본 지침은 지침 탭 「Director」에서 고친다 (리수폿 J-1). 기능별 절·검색·출력 계약은 그대로
   const facts = base.facts?.trim() || DIRECTOR_FACTS.join('\n');
   const scene = base.scene?.trim() || DIRECTOR_SCENE.join('\n');
@@ -124,7 +129,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
     .replace('{{LINES}}', s.directorLen === 'normal' ? '3' : '1');
   const data = { people: persons, ...(rhythm.length ? { rhythm, rhythm_clock: rhythmClockLines(rhythmClock(store, chat, live)) } : {}), ...(memory.length ? { memory } : {}), recent, input: input.slice(0, 4000) };
   // 최근 글도 열쇠에 넣는다: 같은 입력을 두 번 보내도 장면이 나아갔으면 다시 묻는다. 리롤은 최근 글이 같아 그대로 재사용 (전수검사 11-13)
-  const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, p.state, p.threads, p.unknown_to, p.slots]), input, recent: recent.map((r) => r.text.slice(0, 400)) }));
+  const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, tails[p.name].state, tails[p.name].threads, p.unknown_to, p.slots]), input, recent: recent.map((r) => r.text.slice(0, 400)) }));
   return { system, data, key, people, search: s.directorSearch };
 }
 
