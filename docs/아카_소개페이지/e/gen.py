@@ -51,7 +51,7 @@ def cls(ko):
     return re.sub(r'✂️.*?✂️|❗','',t).split(',')[0].split('(')[0].strip()
 SUB='#8a8a8a'; LINE='rgba(128,128,128,0.35)'; ACC='#2f9e86'
 SANS="'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif"
-def h(t): return f'<div style="margin:56px 0 16px 0;font-size:22px;font-weight:800;letter-spacing:-0.3px;">{t}</div>'
+def h(t): return f'<div style="margin:72px 0 26px 0;padding:14px 18px;background:{ACC};border-radius:10px;"><span style="font-size:20px;font-weight:800;color:#ffffff;">{t}</span></div>'
 def img(src,alt='',st=''): return f'<img src="{src}" alt="{html.escape(alt)}" style="display:block;width:100%;height:auto;margin:0;{st}">'
 def people(rows):
     o='<div style="margin:22px 0 0 0;font-size:0;">'
@@ -69,6 +69,14 @@ def fold(title,sub,body,first=False):
             f'<span style="font-size:18px;font-weight:800;">{title}</span>'
             +(f'<div style="margin-top:4px;font-size:14px;color:{SUB};line-height:1.6;word-break:keep-all;">{sub}</div>' if sub else '')+'</summary>'
             f'<div style="padding:4px 2px 30px 2px;">{body}</div></details>')
+def mini(label,body):
+    return (f'<details style="margin:14px 0 0 0;"><summary style="list-style:none;"><span style="display:inline-block;padding:8px 16px;border:1px solid {LINE};border-radius:999px;font-size:13px;font-weight:700;">{label} <span style="color:{ACC};">펼치기</span></span></summary><div style="padding:4px 0 0 0;">{body}</div></details>')
+def faccard(nm,en,blurb,sc,rows,label):
+    o=(f'<div style="margin:0 0 28px 0;padding:0 0 28px 0;border-bottom:1px solid {LINE};font-size:0;"><div style="display:inline-block;vertical-align:top;width:240px;max-width:100%;margin:0 24px 12px 0;">{img(fac(en),nm,"border-radius:10px;")}</div>'
+       f'<div style="display:inline-block;vertical-align:top;width:560px;max-width:100%;"><div style="font-size:20px;font-weight:800;">{nm}</div>'
+       f'<div style="margin-top:6px;font-size:15px;line-height:1.7;word-break:keep-all;">{blurb}</div>{scenes(sc) if sc else ""}</div></div>')
+    if rows: o=o[:-6]+mini(label,people(rows))+'</div>'
+    return o
 def facbody(en,sc,rows=None):
     o=f'<div style="max-width:520px;">{img(fac(en),"","border-radius:10px;")}</div>'
     return o+(scenes(sc) if sc else '')+(people(rows) if rows else '')
@@ -86,10 +94,6 @@ B.append(f'<div style="padding:24px 0 0 0;"><div style="font-size:34px;font-weig
          f'<div style="margin-top:6px;font-size:16px;color:{SUB};line-height:1.6;">RisuAI용 괴담 세계관 시뮬레이션 봇</div></div>')
 
 B.append(f'<div style="margin:18px 0 0 0;font-size:16px;line-height:1.8;word-break:keep-all;">괴이가 실제로 나타나는 한국을 무대로 한 괴담 시뮬레이션 봇입니다. 전용 플러그인이 함께 들어 있습니다.</div>')
-st='<div style="margin:22px 0 0 0;font-size:0;">'
-for n,l in [('5','세력'),('55','인물'),('63','괴이'),('143','위키 문서')]:
-    st+=f'<div style="display:inline-block;width:25%;vertical-align:top;"><div style="font-size:26px;font-weight:900;color:{ACC};line-height:1.2;">{n}</div><div style="font-size:13px;color:{SUB};">{l}</div></div>'
-B.append(st+'</div>')
 B.append(h('스타트 패널'))
 sp=save(Image.open(K+'promo/pc-start-01-open.png').convert('RGB').crop((705,95,1857,1630)).resize((691,921),Image.LANCZOS),'start.jpg',86)
 def step(i,t,d): return f'<div style="display:table;margin:0 0 14px 0;"><div style="display:table-cell;width:28px;font-size:15px;font-weight:900;color:{ACC};">{i}</div><div style="display:table-cell;"><div style="font-size:16px;font-weight:800;line-height:1.4;">{t}</div><div style="font-size:13px;color:{SUB};line-height:1.5;">{d}</div></div></div>'
@@ -100,17 +104,17 @@ P={'관리국':[('쟈알디','종합대응팀 부장'),('스팡달','종합대�
  '백일몽 주식회사':[('청달래','개발본부 임원'),('호유원','이사'),('이병진','행정지원'),('백석주','정예 A조 조장'),('진나솔','정예 A조'),('이성해','정예 B조'),('이자헌','D조 조장'),('은하제','D조'),('박민성','D조'),('백사헌','F조'),('고영은','R조'),('강이학','I조'),('장허운','Y조'),('곽제강','연구1팀'),('이연화','연구1팀'),('제이','경비반장')]}
 EN={'관리국':'Management Bureau','가짜 관리국':'Fake Management Bureau','백일몽 주식회사':'Baekilmong','민간인':'Civilian','프리랜서':'Freelancer'}
 F=''
-for i,nm in enumerate(['관리국','가짜 관리국','백일몽 주식회사','민간인','프리랜서']):
-    F+=fold(nm,BL[nm],facbody(EN[nm],SN[nm],P.get(nm)),i==0)
-F+=fold('이면의 주민들','인물 열세 명의 첫 장면',facbody('Residents of the Hidden World',None,
- [('차여진','특별한 의뢰'),('서윤지','녹음기'),('고연지','선불입니다'),('윤지아','야간 접수'),('마덕희','도금이에요, 자기야'),('문혜란','사인 먼저, 밥은 나중에'),('신유리','십. 퍼센트. 매주.'),('블라렛','이교도와 수녀'),('살라딘','여기서 불타리라'),('아벤샤','마녀의 산책'),('세크리엠','갇힌 여자'),('탐미주의','넌 내 최고의 작품이야'),('브라우니','화요일의 즐거움, 화요일의 열기')]))
+for nm in ['관리국','가짜 관리국','백일몽 주식회사','민간인','프리랜서']:
+    F+=faccard(nm,EN[nm],BL[nm],SN[nm],P.get(nm),f'소속 인물 {len(P.get(nm,[]))}명')
+F+=faccard('이면의 주민들','Residents of the Hidden World','인물 열세 명이 각자의 첫 장면으로 시작한다.',None,
+ [('차여진','특별한 의뢰'),('서윤지','녹음기'),('고연지','선불입니다'),('윤지아','야간 접수'),('마덕희','도금이에요, 자기야'),('문혜란','사인 먼저, 밥은 나중에'),('신유리','십. 퍼센트. 매주.'),('블라렛','이교도와 수녀'),('살라딘','여기서 불타리라'),('아벤샤','마녀의 산책'),('세크리엠','갇힌 여자'),('탐미주의','넌 내 최고의 작품이야'),('브라우니','화요일의 즐거움, 화요일의 열기')],'인물 13명과 첫 장면')
 B.append(F)
 
 B.append(h('괴이'))
 top=['룩키마트','심연교통공사','한설인육공장','자정역','소라 랜드','화요퀴즈쇼']
 B.append('<div style="font-size:0;margin:0 -5px;">'+''.join(tile(k,600,'33.33%',150) for k in top)+'</div>')
 rest=[k for k in AN if k not in top]; G=''.join(tile(k,240,'16.66%',100) for k in rest); n=sum(1 for k in rest if anom(k,240))
-B.append(fold('괴이 더 보기',f'{n}곳','<div style="font-size:0;margin:0 -5px;">'+G+'</div>',True))
+B.append(mini(f'나머지 괴이 {n}곳','<div style="font-size:0;margin:14px -5px 0 -5px;">'+G+'</div>'))
 
 B.append(h('전용 플러그인'))
 def sub(label,items):
@@ -130,11 +134,23 @@ MENU=[('상황판','',screen('promo/pc-play-02-board','m_board.jpg'),''),
    sub('가계부',[(screen('s-chron/pc_가계부_달줄','i_led.jpg',C),'가계부')])),
  ('기록','',screen('promo/pc-play-07-records','m_rec.jpg'),
    sub('연대기',[(screen('s-chron/pc_연대기','r_chron.jpg',C),'연대기')]))]
-ov='<div style="font-size:0;margin:0 -5px 18px -5px;">'
-for nm,ds,src,_ in MENU:
-    ov+=f'<div style="display:inline-block;vertical-align:top;width:33.33%;min-width:150px;margin:0 0 14px 0;"><div style="padding:0 5px;">{img(src,nm,"border-radius:8px;")}<div style="margin-top:6px;font-size:14px;font-weight:800;">{nm}</div></div></div>'
-B.append(ov+'</div>')
-B.append(''.join(fold(nm,ds,img(src,nm,"border-radius:10px;")+extra,i==0) for i,(nm,ds,src,extra) in enumerate(MENU)))
+LBL={'인터넷':'게시판, 상점, 위키 화면','소지품':'가계부 화면','기록':'연대기 화면'}
+for nm,ds,src,extra in MENU:
+    B.append(f'<div style="margin:0 0 28px 0;padding:0 0 28px 0;border-bottom:1px solid {LINE};"><div style="font-size:18px;font-weight:800;margin:0 0 10px 0;">{nm}</div>{img(src,nm,"border-radius:10px;")}'+(mini(LBL[nm],extra) if extra else '')+'</div>')
+
+B.append(h('설정'))
+def sset(path,name):
+    im=Image.open(K+path+'.png').convert('RGB').crop((290,60,1630,1140))
+    return save(im,name,84)
+def tabblock(nm,src,extra=''):
+    return f'<div style="margin:0 0 28px 0;padding:0 0 28px 0;border-bottom:1px solid {LINE};"><div style="font-size:18px;font-weight:800;margin:0 0 10px 0;">{nm}</div>{img(src,nm,"border-radius:10px;")}{extra}</div>'
+g1=sub('호출',[(sset('s-set/pc_manage_flow','t_flow.jpg'),'호출 흐름'),(sset('s-set/pc_set_lore','t_lore.jpg'),'로어북 호출'),(sset('s-set/pc_set_adv','t_adv.jpg'),'생성 공통')])
+g2=sub('표시',[(sset('s-set/pc_set_screen','t_screen.jpg'),'화면'),(sset('s-set/pc_set_image','t_image.jpg'),'캐릭터 이미지'),(sset('s-set/pc_set_status','t_status.jpg'),'상태창')])
+g3=sub('기능',[(sset('s-set/pc_set_board','t_board.jpg'),'상황판'),(sset('s-set/pc_set_net','t_net.jpg'),'인터넷'),(sset('s-set/pc_set_phone','t_phone.jpg'),'괴담톡'),(sset('s-set/pc_set_wiki','t_wiki.jpg'),'위키'),(sset('s-set/pc_set_items','t_items.jpg'),'소지품'),(sset('s-set/pc_set_shop','t_shop.jpg'),'상점'),(sset('s-set/pc_set_journal','t_journal.jpg'),'일지'),(sset('s-set/pc_set_factions','t_fac.jpg'),'세력')])
+B.append(tabblock('기능',sset('s-set/pc_set_people','t_people.jpg'),mini('기능 탭의 다른 페이지',g1+g2+g3)))
+B.append(tabblock('세계',sset('s-set2/pc_agent','t_world.jpg')))
+B.append(tabblock('지침',sset('s-set2/pc_guide_RP','t_guide.jpg')))
+B.append(tabblock('점검',sset('s-set2/pc_manage_backup','t_check.jpg')))
 
 B.append(h('받기'))
 B.append(f'<div><a href="https://github.com/leepc25/goei-plugin/releases/latest" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><span style="display:inline-block;padding:14px 34px;background:{ACC};border-radius:10px;"><span style="color:#ffffff;font-size:15px;font-weight:800;">최신 판 받기</span></span></a></div>')
@@ -143,7 +159,7 @@ S=(li(1,'받는 곳에서 최신 zip을 받아 푼다.')+li(2,'Risu 설정의 �
    +li(3,'괴이_ANOMALY.charx를 캐릭터로 가져온다. 그림이 카드에 들어 있으므로 예전 에셋 모듈은 끈다.')
    +li(4,'카드를 처음 열면 플러그인 본체를 한 번 받는다. 받지 못하면 뜨는 창에 zip 안의 goei-body.js를 넣는다.')
    +li(5,'채팅 화면 구석의 유령 단추를 누르고 출발한다.'))
-B.append('<div style="margin:22px 0 0 0;">'+fold('설치 순서','',S,True)+'</div>')
+B.append('<div style="margin:30px 0 0 0;"><div style="font-size:18px;font-weight:800;margin:0 0 14px 0;">설치 순서</div>'+S+'</div>')
 
 page=f'<div style="max-width:860px;margin:0 auto;font-family:{SANS};">{"".join(B)}</div>'
 open('arca.html','w').write(page)
