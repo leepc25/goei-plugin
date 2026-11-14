@@ -41,7 +41,7 @@ const liveShop = (chat: ChatContext['chat']): ShopState | null => {
 };
 /** 상품 그림: 소지품과 같은 PixelLab 그림 팩에서 그림 낱말·이름으로 (ui/items.ts itemPic, 표시 전용) */
 const pic = (name: string, icon?: string): string => itemPic({ name, icon });
-/** 판정 글: 「무기 · 소모 3」 · 「사용」 (상점 물건·팔 물건) */
+/** 판정 글: 「손 · 소모 3」 · 「사용」 (상점 물건·팔 물건) */
 const traitsOf = (x: { use: boolean; uses?: number; equip?: 'weapon' | 'gear' }) => [x.equip ? EQUIP_LABEL[x.equip] : '', x.uses ? `소모 ${x.uses}` : x.use ? '사용' : ''].filter(Boolean).join(' · ');
 import { isPhone } from './media';
 import { toast } from './toast';

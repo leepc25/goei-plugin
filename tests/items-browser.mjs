@@ -28,7 +28,7 @@ for (const vp of ['pc', 'phone']) {
   if (vp === 'pc') {
     await page.hover('.it-c[data-value="i_소금 봉지"]');
     await shot('grid');
-    // 끌어다 놓기: 권총 → 무기 둘째 칸, 진통제 → 사용 두 번(×2), 손전등 → 사용, 끄는 동안 버리기 띠
+    // 끌어다 놓기: 권총 → 손 둘째 칸, 진통제 → 사용 두 번(×2), 손전등 → 사용, 끄는 동안 버리기 띠
     const drag = async (from, to) => { await page.dragAndDrop(from, to); await sleep(350); };
     await drag('.it-c[data-value="i_권총"]', '[data-drop="equip:weapon:1"]');
     await drag('.it-c[data-value="i_진통제"]', '[data-drop="use"]');

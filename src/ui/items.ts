@@ -1,7 +1,7 @@
 // 소지품 메뉴 (2026-11-07 사용자 설계, docs/인계/소지품_1107/초안/mock2.mjs 가 그림 초안):
 // 하위 탭 [가계부 | 소지품]. 가계부는 기록 메뉴에서 여기로 옮겨 왔다 (ui/wallet.ts 그대로).
 // 소지품: 도구 줄(칸 수 알약 · 넘침 배지 · 물건|기록 토글 · PC는 직접 넣기·합치기 · 찾기) + 세 상자 (2026-11-07 밤 사용자, memory goei-equip-design):
-//   「장착」(왼쪽 아바타 + 무기 2 · 장비 4) → 소지품 격자(8열) → 「사용」(놓는 만큼 늘어남). 버리기는 끄는 동안만 붉은 띠로.
+//   「장착」(왼쪽 아바타 + 손 2 · 장비 6, 사용자 2026-11-14) → 소지품 격자(8열) → 「사용」(놓는 만큼 늘어남). 버리기는 끄는 동안만 붉은 띠로.
 // 끌어다 놓기(PC): 격자 → 장착 칸(장착) · 사용 상자(×n) · 버리기(한 번 확인), 장착 칸 → 격자(풀기). 팝업 단추(사용·장착·버리기)는 폰용으로 남김.
 // 칸을 올리면 설명 말풍선(PC), 누르면 팝업. 폰은 직접 넣기·합치기가 아래 도구 줄에.
 // 플러그인은 막지도 경고하지도 않는다: 칸이 넘치면 넘친 칸을 붉은 테두리로 보여 줄 뿐, 푸는 건 본편 응답 (core/items.ts).
@@ -78,7 +78,7 @@ export function itemPic(it: { name: string; icon?: string; id?: string; desc?: s
   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
 }
 
-/** 판정 글: 「무기 · 사용 · 남은 3 · 1.2kg · 손상」 */
+/** 판정 글: 「손 · 사용 · 남은 3 · 1.2kg · 손상」 */
 export function traitsLine(it: Item, left: number | undefined): string {
   return [it.equip ? EQUIP_LABEL[it.equip] : '', left !== undefined ? `남은 ${left}` : it.use ? '사용' : '', it.weight !== undefined ? (it.uses !== undefined ? `${weightText(lineWeight(it, left)!)} (1개 ${weightText(it.weight)})` : weightText(it.weight)) : '', it.state !== 'ok' ? STATE_LABEL[it.state] : ''].filter(Boolean).join(' · ');
 }
@@ -198,8 +198,9 @@ export function setAvatarHtml(fn: (ctx: ChatContext) => string): void {
 }
 
 /**
- * 「장착」 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 | 장착 칸 | 사용칸].
- * 장착 칸 차례는 무기 2 → 장비 6 (2026-11-12 사용자) — PC 4열(무기·무기·장비·장비 / 장비 4), 폰 2열 4줄(무기·무기 / 장비·장비 ×3). 무기 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
+ * 「장착」 띠 (2026-11-08 사용자): 제목·「손/장비」 글자 없이 [아바타 전신 | 장착 칸 | 사용칸].
+ * 장착 칸 차례는 손 2 → 장비 6 (2026-11-12 사용자) — PC 4열(손·손·장비·장비 / 장비 4), 폰 2열 4줄(손·손 / 장비·장비 ×3). 손 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
+ * 손 칸 = 손에 드는 것 전부(무기·도구·불빛·우산…), 장비 칸 = 몸에 걸치거나 매는 것. 안쪽 값은 옛 채팅 때문에 'weapon' 그대로 (사용자 2026-11-14)
  * PC: 아바타 자리와 장착 칸 묶음은 data-drop="auto" — 물건을 놓으면 장착 물건은 맞는 갈래 빈 칸으로, 쓰는 물건은 사용 예정으로 (itemsAction items-dnd). 칸에 직접 놓기는 그대로.
  * 폰: 사용칸을 그리지 않는다 (끌기가 없다). 물건 팝업의 「사용」「사용 취소」와 칸의 「사용 예정」 딱지로 한다.
  * where = 'items'(끌어다 놓기·누르면 팝업, 오른쪽에 사용칸) · 'sell'(상점 팔기: 아바타·사용칸 없이 칸만, 누르면 그 물건을 팔 물건으로)
@@ -212,7 +213,7 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
   return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av" data-drop="auto">${av}</div>` : ''}<div class="it-eqcol" data-drop="auto">${statsRow(ctx, liveOf(ctx))}${slots}</div>${isPhone() ? '' : useBox(ctx)}</div></section>`;
 }
 
-/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 6) */
+/** 장착 띠 조각: 아바타 · 장착 칸(손 2 → 장비 6) */
 export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''): { av: string; slots: string } {
   // 소지품·살아 있는 메시지·RP 때는 한 번만 구한다 (전수검사 11-13: 장착 칸마다 다시 구했다)
   const items = itemsOf(ctx);
@@ -222,7 +223,7 @@ export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''):
   let when: When | undefined;
   const slot = (k: ItemEquip, i: number) => {
     const it = eq[k][i];
-    if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
+    if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${k === 'weapon' ? ICONS.hand : ICONS.gear}</span></div>`; // 손 칸은 손 기호 (사용자 2026-11-14)
     const act = where === 'sell' ? 'shop-sell-pick' : 'items-open';
     const left = itemLeft(items, it, alive);
     when ??= whenOf(ctx);
@@ -359,7 +360,7 @@ function popup(ctx: ChatContext): string {
       ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
       ${queued ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
       ${boxButton(ctx, it.id)}
-      ${it.equip ? `<button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}">${equipped ? '장착 풀기' : '장착'}</button>` : ''}
+      ${it.equip ? `<button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}">${it.equip === 'weapon' ? (equipped ? '내려놓기' : '들기') : equipped ? '장착 풀기' : '장착'}</button>` : ''}
       ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
       ${it.uses !== undefined ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx, it).length ? '' : 'disabled'} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ''}
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc(it.id)}">버리기</button>
@@ -382,7 +383,7 @@ function form(it: Item | null, left?: number): string {
     <label><span>이름</span><input name="name" maxlength="30" required value="${esc(it?.name ?? '')}" placeholder="예: 소금 봉지"></label>
     <label><span>설명</span><input name="desc" maxlength="80" value="${esc(it?.desc ?? '')}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
     <label><span>효과</span><input name="effect" maxlength="60" value="${esc(it?.effect ?? '')}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
-    <label><span>장착</span><select name="equip">${opt('', '없음')}${opt('weapon', '무기')}${opt('gear', '장비')}</select></label>
+    <label><span>장착</span><select name="equip">${opt('', '없음')}${opt('weapon', '손')}${opt('gear', '장비')}</select></label>
     <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? ' checked' : ''}> 쓸 수 있음</span></label>
     <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ''}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
     <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ''}" placeholder="kg"></label>

@@ -144,7 +144,7 @@ function rulesBlock(stored: unknown, busy: boolean): string {
     const key = normIcon(r.a).replace(/ /g, '');
     const kindKey = Object.entries(ICON_KIND_LABEL).find(([, v]) => v === r.a.trim())?.[0];
     const ok = kindKey ? used.kinds.has(kindKey) : used.words.has(key);
-    const bad = (r.a || r.b) && !ok ? (!r.a ? '종류·물건말이 비어 있어 이 줄은 안 쓰여요.' : !r.b ? '판정이 비어 있어 이 줄은 안 쓰여요.' : '판정은 무기·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요.') : '';
+    const bad = (r.a || r.b) && !ok ? (!r.a ? '종류·물건말이 비어 있어 이 줄은 안 쓰여요.' : !r.b ? '판정이 비어 있어 이 줄은 안 쓰여요.' : '판정은 손·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요.') : '';
     return `<div class="ms-tb-r${bad ? ' bad' : ''}">
       <label class="ms-tb-c n"><span>종류·물건말</span><input class="gx-search" data-change="set-items-rules-cell" data-key="${i}:a" value="${esc(r.a)}" maxlength="${ALIAS_WORD_MAX}" aria-label="종류·물건말"${dis}></label>
       <i class="ms-arrow" aria-hidden="true">→</i>

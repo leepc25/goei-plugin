@@ -3273,7 +3273,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-slot .it-ic { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-slot .it-ic svg { width: 56%; height: 56%; }
 .it-slot .it-ic img { width: min(85px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; }
-/* 무기 칸만 색이 다름 (호박색), 빈 칸은 기호(칼·방패)로 갈래 */
+/* 손 칸만 색이 다름 (호박색), 빈 칸은 기호(손·방패)로 갈래 (사용자 2026-11-14: 무기 칸 → 손 칸) */
 .it-slot.it-s-weapon { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 7%, var(--panel)); }
 .it-slot.it-s-weapon .it-ic { background: color-mix(in srgb, var(--amber) 6%, color-mix(in srgb, var(--void) 60%, var(--panel))); }
 .it-slot.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }

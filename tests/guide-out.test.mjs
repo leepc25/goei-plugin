@@ -96,6 +96,8 @@ test('기본 지침으로 만든 요청문 = 옮기기 전 코드가 만들던 �
     ['\\nPrices should feel like real Korean prices for that kind of shop.', ''],
     ['not story readers or game players.\\n\\n### Tone and manner\\n\\nDefault to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', 'not story readers or game players.\\n\\n### Tone and manner\\n\\n'],
     ['\nFactions: 1 Management Bureau · 2 Fake Management Bureau · 3 Baekilmong · 4 Civilian · 5 Freelancer\n', '\n'],
+    // 사용자 2026-11-14: 「무기」 칸 → 「손」 칸 (손에 드는 것 전부)
+    ['무기 (held and fought with)', '손 (held in the hand to be used or fought with: weapons, tools, lights, umbrellas and anything else the protagonist holds rather than wears; the protagonist has two hands)'],
   ];
   const later = (t) => LATER.reduce((x, [a, b]) => x.split(a).join(b), t);
   for (const k of names) assert.equal(BASE[k], later(OLD.calls[k]), k);
