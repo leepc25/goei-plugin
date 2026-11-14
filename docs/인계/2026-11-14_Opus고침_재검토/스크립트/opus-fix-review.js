@@ -68,6 +68,8 @@ const list = UNITS.map((u, i) => ({ ...u, i })).filter((u) =>
   (!args?.only || args.only.includes(u.patch)) && (args?.from === undefined || u.i >= args.from) && (args?.to === undefined || u.i < args.to))
 log(`검토 단위 ${list.length}개 (전체 ${UNITS.length})`)
 const opt = (o) => (MODEL ? { ...o, model: MODEL } : o)
+// 여러 워크플로를 동시에 띄울 때 결과 파일이 서로 덮이지 않게 범위를 파일 이름에 붙인다.
+const SUF = args?.from !== undefined || args?.to !== undefined ? `_${args?.from ?? 0}-${args?.to ?? UNITS.length}` : args?.only ? '_일부' : ''
 
 const results = await pipeline(list,
   (u) => agent(reviewPrompt(u, u.i), opt({ label: `review:${u.patch}:${u.i}`, phase: 'Review', schema: FINDINGS })),
@@ -87,11 +89,11 @@ phase('Report')
 const report = await agent(`${COMMON}
 
 아래는 Opus 고침 재검토에서 셋 중 둘 이상이 참으로 확인한 문제 목록(JSON)과 단위별 확인 메모다.
-${DIR}/결과/재검토_결과.md 를 새로 써라 (이 파일 하나만 쓴다. 다른 파일은 고치지 않는다).
+${DIR}/결과/재검토_결과${SUF}.md 를 새로 써라 (이 파일 하나만 쓴다. 다른 파일은 고치지 않는다).
 - 맨 위에 저장소 CLAUDE.md 맨 위의 「⚠ Claude 반성」 칸을 그대로 넣는다(새 md 문서 규칙).
 - 한국어, 짧은 문장, 쉬운 말. 사용자가 읽고 고를 수 있게.
 - 나눔: ① 바로 고쳐도 되는 기능 버그(needs_user=false, kind code/test/build) ② 사용자에게 물어야 하는 것(글·화면 말·디자인, needs_user=true) ③ 반박돼 버린 것 수.
 - 항목마다: 번호, 제목, 파일:줄, 무엇이 잘못인지, 증거 한 줄, 고칠 안, 어느 패치에서 왔는지.
-그리고 같은 목록을 ${DIR}/결과/재검토_결과.json 으로도 저장한다(입력 JSON 그대로).
+그리고 같은 목록을 ${DIR}/결과/재검토_결과${SUF}.json 으로도 저장한다(입력 JSON 그대로).
 입력: ${JSON.stringify({ confirmed, units: all.map((r) => ({ patch: r.unit.patch, i: r.unit.i, checked: r.checked, dropped: r.dropped })) })}`, opt({ label: 'report', phase: 'Report' }))
 return { confirmed: confirmed.length, report }
