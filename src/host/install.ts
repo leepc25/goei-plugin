@@ -67,8 +67,10 @@ export async function checkInstall(charIndex: number, progress?: Progress): Prom
     wikiPack: packInLore || (!!storedWikiPack() && !(await wikiPackStale())),
     tokenizer: !!tokenizerName(),
   });
-  // 되돌린 봇은 이미 이전 아이콘이므로 「이전 아이콘으로」를 내지 않는다
-  return { state, iconPrev: note && !note.declined ? (note.prev ?? '') : '', iconDeclined: !!note?.declined, wikiOld: !packInLore && wikiPackOld() };
+  // 되돌린 봇은 이미 이전 아이콘이므로 「이전 아이콘으로」를 내지 않는다.
+  // 다만 되돌린 뒤 Risu 아이콘 목록에서 플러그인 아이콘을 직접 메인으로 골랐으면 지금은 우리 것이므로 다시 낸다
+  const ours = !!note && note.ours === String(char.image ?? '');
+  return { state, iconPrev: note && (!note.declined || ours) ? (note.prev ?? '') : '', iconDeclined: !!note?.declined && !ours, wikiOld: !packInLore && wikiPackOld() };
 }
 
 export type InstallStep = 'lore' | 'pictures' | 'icon' | 'wiki';

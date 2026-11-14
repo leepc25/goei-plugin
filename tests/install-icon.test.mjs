@@ -74,6 +74,33 @@ test('host: 「이전 아이콘으로」는 기록을 지우지 않고 되돌렸
   assert.equal(r.iconPrev, 'assets/mine.png');
 });
 
+test('host·화면: 되돌린 뒤 Risu 에서 플러그인 아이콘을 직접 메인으로 고르면 「이전 아이콘으로」가 다시 나온다', async () => {
+  const box = fakeRisu({ chaId: 'c3', name: '내 봇', image: 'assets/mine.png' });
+  const ctx = () => ({ charIndex: 0, chatIndex: 0, char: box.char, chat: {} });
+  M.instUi.forChar = -1;
+  await M.installIcon(0, () => {});
+  const ours = box.char.image;
+  assert.equal(await M.restoreIcon(0), true);
+  // Risu 아이콘 목록에서 직접 고름: 기록(declined)은 그대로, 메인만 우리 것
+  box.char = { ...box.char, image: ours };
+  assert.equal(note(box)?.declined, true);
+  let r = await M.checkInstall(0);
+  assert.equal(r.state.icon, true);
+  assert.equal(r.iconPrev, 'assets/mine.png', '지금 플러그인 아이콘이므로 되돌릴 길을 낸다');
+  assert.equal(r.iconDeclined, false);
+  await M.refreshInstall(ctx());
+  const html = M.installPage(ctx());
+  assert.match(html, /data-action="ed-inst-icon-back"/);
+  assert.doesNotMatch(html, /data-action="ed-inst-icon"[ >]/);
+
+  // 다시 되돌리면 전과 같다
+  assert.equal(await M.restoreIcon(0), true);
+  assert.equal(box.char.image, 'assets/mine.png');
+  r = await M.checkInstall(0);
+  assert.equal(r.iconDeclined, true);
+  assert.equal(r.iconPrev, '');
+});
+
 test('화면: 되돌린 봇은 전체 단추가 아이콘을 건드리지 않고 강조가 풀린다. 「플러그인 아이콘으로」로만 다시 바뀐다', async () => {
   // 로어북·인사말·첫 메시지·로어북 설정이 갖춰진 설치된 봇 (사진은 다 받지 못한 상태: 이어 받으려고 전체 단추를 누르는 경우)
   const lore = M.installLore([]).lore;

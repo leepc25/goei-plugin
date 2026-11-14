@@ -208,7 +208,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
   const mode = String(advValue(ctx.chat.scriptstate, 'gen', 'lore_mode') ?? 'plugin');
   const msgs = Array.isArray(ctx.chat.message) ? ctx.chat.message.length : 0;
   const tok = tokenizerName();
-  // 받아 둔 위키 기본 문서가 옛 판이면 설치·점검과 같은 말 「새 판 있음」 + 받기 단추 (사용자 11-14 C-5). 확인은 뒤에서 한 번만, 끝나면 다시 그린다
+  // 받아 둔 위키 기본 문서가 옛 판이면 「없음」 + 받기 단추 (사용자 11-14 C-5 (가): 새 글 없음). 확인은 뒤에서 한 번만, 끝나면 다시 그린다
   const wikiOld = wikiPackOld();
   if (!wikiOld) void checkWikiPackOld().then((old) => old && wikiPackOld() && diagOpen && rerender?.());
   const rows = [
@@ -221,7 +221,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
     row('채팅', badge(canChat, canChat ? '진행 중' : '시작 전'), canChat ? `메시지 ${msgs}개 · 이 채팅 값으로 동작해요` : '시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요'),
     // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
     row('토크나이저', badge(!!tok, tok || '어림값') + getBtn('tok', '받기 (약 2MB)', !!tok), tok ? '토큰 수를 정확히 세요' : '안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요.'),
-    row('위키 기본 문서', badge(!!storedWikiPack() && !wikiOld, wikiOld ? '새 판 있음' : storedWikiPack() ? '있음' : '없음') + getBtn('wiki', '받기 (약 1MB)', !!storedWikiPack() && !wikiOld), storedWikiPack() ? '카드에서 뺀 기본 문서 묶음 (이 기기 저장소)' : '안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요.'),
+    row('위키 기본 문서', badge(!!storedWikiPack() && !wikiOld, wikiOld ? '없음' : storedWikiPack() ? '있음' : '없음') + getBtn('wiki', '받기 (약 1MB)', !!storedWikiPack() && !wikiOld), storedWikiPack() ? '카드에서 뺀 기본 문서 묶음 (이 기기 저장소)' : '안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요.'),
     row('로어북 보내기', badge(null, mode === 'risu' ? 'Risu가 직접' : '플러그인이 고름'), '설정 → 호출 → 로어북 호출 → 로어북 보내기'),
   ].join('');
   // 게시판 실패는 네 사이트 모두, 사이트 이름으로 (연어 마켓 실패가 「괴담넷」으로 나왔다, 전수검사 11-13)
