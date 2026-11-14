@@ -1,0 +1,353 @@
+{
+ "group": "MISS",
+ "coverage": [
+  {
+   "key": "loader",
+   "covered": "끝까지 읽은 파일: src/main.ts, src/body-entry.ts, src/loader/body.ts, src/loader/card.ts, src/loader/panel.ts, src/core/fetchparts.ts, src/core/texthash.ts, src/core/update.ts, src/core/datapack.ts, src/host/datapack.ts, src/host/datapanel.ts, src/host/install.ts, src/core/install.ts, src/ui/update.ts, src/ui/editor/install.ts, scripts/build.mjs, scripts/data-pack.mjs, scripts/release-prep.mjs, tools/build_lite_card.py, .github/workflows/release.yml. 부분만 읽음: src/body.ts start(), src/host/picpack.ts, src/core/pictures.ts, src/core/lorebooks.ts, src/core/world/directory.ts(readDirectoryData·저장 부분), src/ui/directory.ts(지우기·소속), src/ui/app.ts(openInstall·업데이트 연결), src/ui/editor/index.ts(설치 페이지), tests/qc-loader-build.test.mjs. 782dca17c..HEAD 차이: release-prep, host/install, ui/update, build_lite_card, data-pack 확인.\n끝까지 따라간 흐름: 시작기 → 저장된 본체 판 확인 → 조각 받기(길이·sha256/FNV) → 실행 → 본체 start → 세계 자료(저장소/받기/파일 넣기 창, 다시 띄우기 고리); 받기 창 두 종류의 닫기·겹침; 카드 업데이트(version.json → card-update 조각 → planUpdate → 사진 → 저장); 깡통봇 설치(로어북·인사말·사진·아이콘·위키·토크나이저)와 점검표; 빌드 → 팩 지문 → release 복사 → GitHub 릴리스 zip.\n실제로 돌려 본 것(/tmp/audit_1113/loader/): release 폴더 자체 대조(본체 19조각·팩 5개의 길이·FNV·sha256, 본체에 박힌 지문, goei-data-world.txt, 아이콘 지문, pic 2,522장 존재, 현재 src 로 다시 만든 world·install 지문 = release) — 모두 맞음. dist-test/core.mjs 로 planUpdate 를 release/card-update 에 실제 적용(깡통봇, 명부에서 지운 거점·비운 칸).\n확인 못 한 것: 실제 RisuAI 안에서의 동작(pluginStorage 용량·동기화 방식, raw.githubusercontent 캐시가 ?t= 로 비켜지는지), CI 빌드 결과가 로컬 빌드와 바이트까지 같은지(빌드 금지라 돌리지 않음).",
+   "dropped": "약한 후보 7개 제외: ① 본체를 처음 받는 동안(판 올린 직후 최대 1분) 괴이 메시지 표시가 본체 받기를 기다림 — 의도된 설계로 보임 ② 릴리스 직후 CDN 캐시로 목록·조각 판이 섞이면 「깨져 있어요」 한두 번(지문 검사로 걸러지고 다시 받기로 풀림) ③ card-update 조각에는 길이만 있고 지문 없음(JSON 파싱이 대부분 잡음) ④ 받기 창이 이미 떠 있으면 새 실패 까닭으로 안 바뀜 ⑤ pluginStorage 에 본체·그림 팩 등 약 20MB 글을 두는 부담(Risu 내부를 확인 못 함) ⑥ installIcon 이 받기 전에 읽은 캐릭터로 저장(창이 몇 초) ⑦ build_lite_card.py 의 creator_notes() 문구 「괴이봇 명부」는 옛 이름이지만 지금은 제작 노트를 비워 화면에 안 나옴."
+  }
+ ],
+ "counts": {
+  "total": 10,
+  "confirmed": 10,
+  "disputed": 0,
+  "rejected": 0,
+  "unverified": 0
+ },
+ "confirmed": [
+  {
+   "key": "loader",
+   "n": 1,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "깡통봇(아무 봇에 설치한 봇)에서 「카드 업데이트」를 누르면 명부가 두 개가 되어 읽을 수 없게 되고, 봇 설명·인사말·트리거가 지워진다",
+    "kind": "bug",
+    "severity": "high",
+    "file": "src/core/update.ts",
+    "line": 108,
+    "other_files": [
+     "src/core/install.ts",
+     "src/ui/update.ts"
+    ],
+    "evidence": "loreName = `${comment}\\u0001${folder}` (108) 로 짝을 짓는데, 깡통봇의 ⚙️설정 폴더 key 는 installLore 가 만든 무작위 `folder:<uuid>` (core/install.ts:266) 이고 카드 쪽은 원본 카드의 고정 key 다. 그래서 planUpdate(185) 에서 폴더 항목만 이름으로 바뀌고(key 가 카드 것으로 바뀜), Directory·Plugin manifest 는 폴더가 달라 「새로 추가」+「지금 것 유지」가 된다. 또 CARD_FIELDS 반복(203-207)이 desc·alternateGreetings([\"\"])·triggerscript([])·firstMessage 등을 카드 값으로 덮는다. /tmp/audit_1113/loader/sim.mjs 로 release/card-update 를 실제로 적용해 확인: 결과 로어북 = [⚙️설정, Directory(카드 기본), Plugin manifest, 내 로어, Directory(사용자 것), Plugin manifest], readDirectoryData = null (두 JSON 을 이어 붙여 파싱 실패), desc \"\" / alternateGreetings [\"\"] / triggerscript []. 한 번 더 적용하면 renamed() 의 중복 제거(133)가 첫 Directory(카드 기본)만 남겨 사용자 명부가 사라진다. 깡통봇 매니페스트 version 은 설치 때 판에서 안 올라가므로(core/install.ts:198 `prev.version ?? PLUGIN_VERSION`) 릴리스마다 「새 버전이 있어요 · 카드 vX」 안내가 계속 뜬다.",
+    "scenario": "v0.21.11 때 자기 봇에 「괴이: ANOMALY 설치」를 한 사용자가 명부를 고쳐 씀 → 이번 릴리스 뒤 창 위 「새 버전이 있어요 카드 v0.21.x [업데이트]」→ 카드 업데이트 준비 → 카드에 적용. 결과: 명부를 읽을 수 없어 요원·거점이 비고(점검에 「명부(Directory)를 읽을 수 없음」), 「빠진 것 전부 채우기」를 누르면 고친 명부는 「(읽을 수 없어 보관)」으로 밀리고 기본 명부로 바뀜. 봇 원래 설명·추가 인사말·트리거 스크립트도 빈 값으로 덮임.",
+    "fix_sketch": "planUpdate 에서 합치기 전에 지금 카드의 ⚙️설정 폴더 key(findFolder)를 찾아, 들어오는 항목의 folder(카드 설정 폴더 key)를 지금 key 로 바꾸고 폴더 항목 자체는 지금 것을 유지한다(또는 Directory·Plugin manifest 는 폴더를 빼고 이름만으로 짝짓는다). 합친 뒤 Directory 가 둘 이상이면 보호 대상(지금 것)만 남긴다. 깡통봇(매니페스트에 source 가 없음)에서는 CARD_FIELDS 덮어쓰기를 건너뛸지(사진·명부 칸만 갱신) 사용자 결정 필요.",
+    "needs_user_decision": true,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "high",
+     "reasoning": "반박 근거를 찾지 못했고, 보고자의 시뮬레이션(/tmp/audit_1113/loader/sim.mjs)을 다시 돌려 같은 결과를 확인했다.\n\n1) 깡통봇에도 카드 업데이트가 열린다. src/ui/update.ts newVersions()/updateGroup() 은 `lite = !!readManifest(ctx.char.globalLore)` 만 보는데, installLore 가 깡통봇에도 plugin:'goei-plugin' 매니페스트를 심는다. 깡통봇을 가르는 조건(매니페스트 source 유무 등)은 planUpdate·handleUpdate 어디에도 없다.\n\n2) 버전이 안 올라가 릴리스마다 안내가 뜬다. buildManifest 는 `version: prev.version ?? PLUGIN_VERSION` 이라 설치 때 판에 머문다.\n\n3) 폴더 key 불일치로 짝이 안 맞는다. loreName 은 comment+folder 인데, 깡통봇 폴더 key 는 무작위 `folder:<uuid>`, 카드 쪽은 고정 `folder:f3b3863b-…`. 실행 결과 counts = {replaced:1, added:2, kept:3, protected:0}. 폴더 항목만 카드 것으로 바뀌고, 카드 Directory·Plugin manifest 가 새로 들어가며, 사용자 것은 「직접 넣은 항목」으로 뒤에 남는다. protected 0 이라 명부 보호가 작동하지 않았다.\n\n4) Directory 가 둘이 되어 읽기 실패. readDirectoryData 는 Directory 항목 내용을 전부 '\\n' 으로 이어 파싱한다. 실행 결과 `directory readable after update: false`. addDirectoryDefaults 도 cur 가 null 이라 그냥 지나간다.\n\n5) 한 번 더 적용하면 renamed() 의 중복 제거가 첫 Directory(카드 기본)만 남긴다. 실행 결과 둘째 결과 = [⚙️설정, Directory, Plugin manifest, 내 로어, Plugin manifest]. 사용자가 고친 명부가 사라진다. 그 전에 설치 점검의 「빠진 것 채우기」를 눌러도 installLore 가 둘 다 「(읽을 수 없어 보관)」으로 바꾸고 기본 명부를 새로 둔다.\n\n6) CARD_FIELDS 반복이 조건 없이 덮는다. 실행 결과 desc \"\" / alternateGreetings [\"\"] / triggerscript []. 사용자 봇의 설명·인사말(심어 둔 첫 장면 포함)·트리거가 없어진다. ui/update.ts 는 plan.next 를 그대로 setCharacterToIndex 한다.\n\n반박 후보는 모두 성립하지 않았다. tests/update.test.mjs, qc-loader-update.test.mjs, install.test.mjs 에 깡통봇+업데이트를 의도로 고정한 시험이 없다. 소유자 결정에도 해당 사항이 없고, 오히려 「결과물 삭제 금지」와 update.ts 머리말 「사용자가 고친 명부는 지킨다」에 어긋난다. 살아 있는 코드이며 v0.21.11 이전부터 있던 문제다. 심각도 high 유지: 평범한 깡통봇 사용자가 안내대로 누르면 데이터가 망가진다.",
+     "proof": "src/core/update.ts:108  const loreName = (e) => `${e.comment ?? ''}\\u0001${e.folder ?? ''}`;\nsrc/core/update.ts:185  mergeByName(current, payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));  // 짝이 맞을 때만 보호\nsrc/core/update.ts:133  .filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);  // 2회차에 첫 Directory(카드 기본)만 남김\nsrc/core/update.ts:203-207  for (const f of CARD_FIELDS) { if (!(f in payload.data)) continue; ... next[f] = payload.data[f]; }  // 조건 없음\nsrc/core/install.ts:266  settings = folderEntry(SETTINGS_FOLDER_NAME, `${FOLDER_PREFIX}${uuid()}`);\nsrc/core/install.ts:198  version: prev.version ?? PLUGIN_VERSION,\nsrc/ui/update.ts newVersions: const lite = !!readManifest(ctx.char.globalLore); card: lite && compareVersions(L.card, cardVersion(...)) > 0\nsrc/core/world/directory.ts:295-296  parts = directoryEntries(lore)...; parse(parts.map((e) => e.content).join('\\n'))\n카드 매니페스트 keys.settings = \"folder:f3b3863b-6743-4bf1-8968-4d79a5b12d77\", 키 목록에 source 있음. 설치 매니페스트(buildManifest)에는 source 없음.\n재실행 출력: counts { replaced: 1, added: 2, kept: 3, protected: 0 }; after = [⚙️설정(key f3b3…), Directory(folder f3b3…), Plugin manifest(f3b3…), 내 로어, Directory(folder 6848…), Plugin manifest(6848…)]; directory readable after update: false; desc after \"\" alt [\"\"] trig []; second = [⚙️설정, Directory, Plugin manifest, 내 로어, Plugin manifest]",
+     "fix_plan": "고칠 곳은 src/core/update.ts 의 planUpdate 하나다. ui/update.ts 는 plan 을 그대로 쓰므로 표시 외에는 손대지 않는다.\n\nA. 폴더 key 맞추기 (모든 카드 공통, 결정 불필요)\n1. planUpdate 맨 앞에서 `curFolder = findFolder(char.globalLore ?? [])`, `inFolder = findFolder(payload.data.globalLore)` 를 구한다 (findFolder 는 core/install.ts 에서 import. update.ts 는 이미 install.ts 의 fillDirectory 를 쓴다).\n2. 둘 다 있고 key 가 다르면 payload.data.globalLore 의 사본 incoming 을 만든다 (payload 원본은 바꾸지 않는다. upd-apply 때 다시 쓴다).\n   - mode==='folder' 이고 key===inKey 인 항목은 key 를 curKey 로.\n   - folder===inKey 인 항목은 folder 를 curKey 로.\n   - Plugin manifest 내용 JSON 의 keys.settings 를 curKey 로.\n3. 이후 renamed / mergeByName / keepUserKeys / shippedKeys / addDirectoryDefaults 에는 모두 이 incoming 을 넘긴다. 이렇게 하면 Directory 가 짝이 맞아 PROTECTED_LORE 로 지켜지고, 매니페스트는 한 개로 교체되며, addDirectoryDefaults 가 새 칸을 채운다.\n4. 안전망: 합친 뒤 Directory(isDirectory) 항목이 둘 이상이면 current 에 있던 것(사용자 것)만 남긴다. renamed() 의 133행 중복 제거는 「첫 번째」가 아니라 이 기준과 어긋나지 않게 두되, 옛 이름 명부를 옮기는 동작은 바꾸지 않는다.\n\nB. 깡통봇 판정 (결정 필요한 부분 포함)\n5. `bare = !!readManifest(char.globalLore) && !('source' in 지금 매니페스트)` (카드가 낸 매니페스트에는 source 가 있고 buildManifest 가 만든 것에는 없다).\n6. bare 이면 매니페스트를 통째로 바꾸지 않고 합친다: 지금 것의 greetings(심은 인사말 번호)·keys 는 유지, version·pictures·assets 만 카드 것으로. source 는 넣지 않는다 (다음 번에도 깡통봇으로 판정되게). 이렇게 해야 버전이 올라가 안내가 멈추고, planPictures 로 사진 갱신도 된다.\n7. bare 이면 CARD_FIELDS 반복을 건너뛰고(fields 는 빈 목록), customscript 합치기도 건너뛴다 → 이 부분이 사용자 결정 사항.\n\n바꾸면 안 되는 것: 진짜 Lite 카드(폴더 key 가 같고 source 있음)의 결과는 지금과 완전히 같아야 한다. PROTECTED_LORE, keepUserKeys, migrateLore, dropOldOutsidePlaces, dropDefaultAliases 순서 유지. 아무것도 지우지 않는다(사용자 Directory·직접 넣은 로어 유지).\n\n부가: ui/update.ts updateGroup 의 요약 줄은 bare 일 때 「바뀌는 카드 칸 0개」로 자연히 나온다. 문구 변경은 필요 없다.",
+     "test_idea": "tests/update.test.mjs 에 추가: 깡통봇 = { desc:'내 설명', alternateGreetings:['인사1'], triggerscript:[{x:1}], globalLore: installLore([{comment:'내 로어'}], plantGreetings(['인사1']).index) } 를 만들고, Directory 의 요원 한 명에 표시 값(__mine)을 넣고 매니페스트 version 을 '0.21.11' 로 낮춘다. 카드 payload 는 폴더 key 가 다른 ⚙️설정 + Directory + Plugin manifest(source 있음, version 높음). planUpdate 뒤 다음을 단언한다.\n(1) next.globalLore 에서 comment==='Directory' 항목이 정확히 1개.\n(2) readDirectoryData(next.globalLore) 가 null 이 아니고 표시 값이 남아 있음.\n(3) Plugin manifest 항목 1개, cardVersion(next.globalLore) === payload.version.\n(4) plan.lore.protected === 1.\n(5) planUpdate(plan.next, payload) 를 한 번 더 해도 (1)(2) 유지.\n(6) (결정대로면) next.desc === '내 설명', next.alternateGreetings 와 triggerscript 가 그대로.\n지금 코드는 (1)~(6) 모두 실패한다. 기존 Lite 카드 시험(같은 폴더 key)은 그대로 통과해야 한다.",
+     "needs_user_decision": true,
+     "decision_question_ko": "깡통봇(내 봇에 괴이를 설치한 봇)에서 「카드 업데이트」를 누르면 어디까지 바꿀까요? 지금은 봇 설명·인사말·트리거가 빈 값으로 덮이고 명부가 두 개가 되어 못 읽게 됩니다.\n1) 명부 빈 칸 채우기 + 카드 사진 + 버전만 올리고, 봇 설명·인사말·트리거·정규식은 그대로 둔다 (권장).\n2) 깡통봇에서는 카드 업데이트를 아예 띄우지 않고, 설치 점검의 「빠진 것 채우기」만 쓰게 한다.\n3) 지금처럼 카드 칸도 전부 덮되 명부만 지킨다.\n명부가 두 개 되는 문제는 어느 쪽이든 고칩니다."
+    },
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "high",
+     "reasoning": "Reproduced with the real release payload (card v0.21.14). The self-install path is live: src/ui/editor/install.ts:154 -> src/host/install.ts:75-79 -> core/install.ts installLore, which creates the ⚙️설정 folder with a random key `folder:<uuid>` (install.ts:266) and puts Directory / Plugin manifest in that folder. The card payload's same entries carry the card's fixed folder key (folder:f3b3863b-...). planUpdate (update.ts:185) pairs entries by loreName = comment + folder (update.ts:108): the folder entry itself has no `folder` so it pairs and is REPLACED by the card's (its key changes to the card's key), while Directory and Plugin manifest have different `folder` values, so the card's copies are 'added' and the user's are 'kept' at the end. PROTECTED_LORE never fires (count.protected = 0). readDirectoryData (world/directory.ts:295-296) joins the content of ALL Directory entries with '\\n' and parses -> two JSON objects -> null. manifestEntry now returns the card's manifest first, so the user's planted greeting index is orphaned. CARD_FIELDS loop (update.ts:203-207) then overwrites desc/personality/scenario/systemPrompt/... with the card's empty strings, alternateGreetings with [\"\"], triggerscript with [] - the user's own bot content is lost on setCharacterToIndex (ui/update.ts:284). A second update: renamed() line 133 keeps only the first Directory (the card default), silently dropping the user's edited roster. The gate does not prevent this: ui/update.ts newVersions/updateGroup only check readManifest != null (true for self-installed bots), and buildManifest keeps `prev.version ?? PLUGIN_VERSION` (install.ts:197), so the 'new card version' banner appears on every release for these users. Not dead code, not taste, no owner decision contradicted (header comment of update.ts itself promises 사용자가 고친 명부는 지킨다). Severity high is right: roster unreadable (agents/bases empty) plus irreversible loss of the user's bot description/greetings/triggers, on a path the banner actively invites. Reporter's fix sketch is right in direction; I add that the manifest must not be blindly replaced by the card's on a self-installed bot (greeting indexes differ) and that the distinguishing marker exists: the card manifest has `source`, the self-installed one does not.",
+     "proof": "Ran the reporter's probe myself from /tmp/audit_1113/verify (node /tmp/audit_1113/loader/sim.mjs; imports dist-test/core.mjs, real release/card-update.* parts): char {desc:'내 봇 설명', alternateGreetings:['인사1','인사2'], triggerscript:[{x:1}], globalLore:[내 로어]} -> plantGreetings + installLore -> edit one agent in Directory -> planUpdate(installed, payload). Output: counts { replaced: 1, added: 2, kept: 3, protected: 0 }; resulting lore = [⚙️설정 (key folder:f3b3863b…), Directory (folder f3b3863b…, card default), Plugin manifest (f3b3863b…), 내 로어, Directory (folder a9bcfdfd…, user's), Plugin manifest (a9bcfdfd…)]; 'directory readable after update: false'; desc after \"\" alt [\"\"] trig []; all 14 CARD_FIELDS listed as changed. Second planUpdate on the result: lore comments = [⚙️설정, Directory, Plugin manifest, 내 로어, Plugin manifest], readable again but only the card-default Directory remains (user's edit gone). My own probe /tmp/audit_1113/verify/m.mjs confirmed payload manifest keys = [schema, plugin, version, source, greetings, pictures, assets, keys, wiki], keys.settings = folder:f3b3863b-6743-4bf1-8968-4d79a5b12d77, alternateGreetings = [\"\"], version 0.21.14.",
+     "fix_plan": "File src/core/update.ts, function planUpdate (plus a small helper). Do NOT change mergeByName, keyed, PROTECTED_LORE, guide text, or the behaviour for real Lite cards whose settings-folder key equals the payload's.\n\n1) Folder-key alignment (always, no decision needed): before `mergeByName`, compute `inKey` = key of the payload entry with mode==='folder' and comment '⚙️설정' (or payload manifest keys.settings) and `curKey` = findFolder(current)?.key (import findFolder from './install'). If both exist and differ, build `incoming = payload.data.globalLore.map(...)` where: the folder entry gets key=curKey; every entry with folder===inKey gets folder=curKey; the Plugin manifest entry's JSON content gets keys.settings=curKey. Use this `incoming` everywhere planUpdate currently uses payload.data.globalLore (renamed, mergeByName, shippedKeys, addDirectoryDefaults). Result: Directory pairs and is protected (user's kept, new defaults filled by addDirectoryDefaults), manifest pairs, no duplicates.\n\n2) Safety net: after the merge, if more than one entry has comment DIRECTORY_COMMENT, keep only the one that came from `current` (the protected one) - never the incoming default. Likewise keep a single Plugin manifest.\n\n3) Self-installed bot (current manifest parses and has no `source` field; card manifest has `source`): (a) skip the CARD_FIELDS loop entirely (fields=[]), so desc/alternateGreetings/triggerscript/firstMessage etc. stay the user's; (b) do not replace the manifest with the card's: write `{...currentManifest, version: payload.version, pictures: cardManifest.pictures, assets: cardManifest.assets}` keeping the current `greetings` index and `keys.settings` and NOT adding `source` (so the version advances and the banner stops, and planPictures compares correctly next time); (c) customscript: keep current behaviour (merge by name) unless the owner says otherwise. Part 3 changes what 'card update' does on a self-installed bot -> owner decision (see question). Minimum without decision: parts 1+2 plus 3(a)/(b).\n\nui/update.ts needs no change if 3 is applied (plan.fields.length shows 0).",
+     "test_idea": "tests/core.test.mjs (or new unit test): build char = {desc:'내 설명', alternateGreetings:['a'], triggerscript:[{x:1}], globalLore:[]}; lore = installLore(char.globalLore, plantGreetings(char.alternateGreetings).index); edit one agent field in the Directory entry; payload = {schema:1, version:'9.9.9', minPlugin:'0', data:{globalLore:[folder '⚙️설정' key 'folder:CARD', Directory(folder 'folder:CARD', default JSON), Plugin manifest(folder 'folder:CARD', with source)], customscript:[], desc:'', alternateGreetings:[''], triggerscript:[]}}. Assert after planUpdate: next.globalLore.filter(e=>e.comment==='Directory').length === 1; readDirectoryData(next.globalLore) !== null and still contains the user's edit; exactly one 'Plugin manifest'; cardVersion(next.globalLore) === '9.9.9'; next.desc === '내 설명', next.alternateGreetings and next.triggerscript unchanged. Run planUpdate a second time on the result and assert the same. Before the fix: 2 Directory entries, readDirectoryData null, desc ''.",
+     "needs_user_decision": true,
+     "decision_question_ko": "아무 봇에 설치한 봇(깡통봇)에서 「카드 업데이트」를 누르면 무엇을 바꿀까요? (1) 명부의 빠진 칸·카드 사진·버전만 갱신하고, 봇 설명·인사말·트리거·첫 메시지 등 봇 원래 내용은 건드리지 않는다 [추천] (2) 깡통봇에서는 카드 업데이트 버튼과 「새 버전」 안내를 아예 띄우지 않고 설치 점검(빠진 것 채우기)만 쓴다 (3) 지금처럼 카드 칸을 전부 원본 카드 값으로 덮는다(봇 원래 설명·인사말이 지워짐). 어느 쪽이든 명부가 두 개로 겹쳐 못 읽게 되는 문제는 같이 고칩니다."
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 2,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "명부에서 지운 거점·조직과 일부러 비운 칸(소속 미정·직급·목록에서 숨김)이 카드 업데이트·「빠진 것 전부 채우기」 때마다 되살아난다",
+    "kind": "bug",
+    "severity": "medium",
+    "file": "src/core/install.ts",
+    "line": 235,
+    "other_files": [
+     "src/core/update.ts",
+     "src/ui/directory.ts"
+    ],
+    "evidence": "fillDirectory: `if (ce === undefined) { sec[name] = de; gaps++; }` (235-237) 와 `if (empty(row[f]) && !empty(fv)) row[f] = fv` (240). 이 함수는 카드 업데이트(core/update.ts:174-179 addDirectoryDefaults)와 설치·점검(installLore 282)에서 불린다. 명부 편집기는 거점 지우기(ui/directory.ts:1169 dir-base-del, 11-13 에 확인 단추까지 추가)·조직 지우기(1085)·소속 「미정」(1026, affiliation='')·세력 목록 토글(roster_for=[])을 제공하고 그대로 저장한다(core/world/directory.ts:932). /tmp/audit_1113/loader/sim2.mjs 로 확인: 「관리국 본부」 거점을 지우고 쟈알디 affiliation·rank 를 비운 명부에 release/card-update 를 적용 → 거점이 다시 생기고 affiliation 'A00'·rank '팀장' 으로 돌아옴. 점검도 이를 「명부에 빠진 칸 N개」로 세어(directoryGapCount 255) 단추가 계속 「빠진 것 전부 채우기」로 남는다.",
+    "scenario": "사용자가 설정 → 카드 명부에서 기본 거점 하나를 지우고, 요원 한 명을 모든 세력 목록에서 빼 둠 → 다음 카드 업데이트 적용(또는 설치·점검의 「빠진 것 전부 채우기」) → 지운 거점이 지도에 다시 나오고 그 요원이 목록에 다시 나타남. 업데이트 요약에는 「카드 명부 보존」이라고 나온다.",
+    "fix_sketch": "명부에 「사용자가 지운 기본 항목」 목록(예: _removed: {거점:[…], 조직:[…]})을 dir-*-del 때 적고 fillDirectory 가 그 이름은 건너뛴다. 칸 채우기(240)는 「칸이 아예 없을 때(undefined)」만 채우고 빈 문자열·빈 배열(사용자가 비운 값)은 그대로 둔다.",
+    "needs_user_decision": false,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "medium",
+     "reasoning": "반박하려 했으나 확인됨. fillDirectory(src/core/install.ts:216-247)는 기본 명부에 있는 항목이 사용자 명부에 없으면(ce === undefined) 그대로 다시 넣고, 항목 안의 칸은 empty()('' · [] · {} · undefined 모두)이면 기본값으로 덮는다. 「사용자가 일부러 지움/비움」을 구분하는 표시(tombstone)나 가드는 코드 어디에도 없다(grep: _removed 류 없음). 편집기 저장 경로도 실제로 따라가 봤다: directoryData()(src/core/world/directory.ts:978-982)는 요원의 affiliation·rank·department·roster_for·phone_tabs 를 항상 키째로(빈 문자열·빈 배열 포함) 쓰고, 거점은 dir.bases 에 남은 것만 쓴다(945-955). 즉 편집기에서 거점 지우기(ui/directory.ts:1177)·조직 지우기(1088)·소속 미정(assignOrg/984)·목록 토글(987)로 저장하면 「키 없음」 또는 「빈 값」이 되고, 둘 다 fillDirectory 가 되살린다. 실제 저장 경로로 재현(/tmp/audit_1113/v_loader_dir/p.mjs: readDirectory → 거점 1개 삭제·쟈알디 소속/직급/목록 비움·소속원 없는 기본 조직 삭제 → withDirectory(directoryData) → planUpdate(release/card-update)): 저장 직후 affiliation:'' rank:'' roster_for:[] · 거점 없음 → 업데이트 뒤 affiliation 'A00'·rank '팀장'·roster_for ['A00']·거점 복귀·조직 복귀. 부르는 곳: 카드 업데이트(core/update.ts:190 addDirectoryDefaults, 매 업데이트), 설치·점검(installLore 282, host/install.ts:79), 점검 숫자(directoryGapCount 255 → 304-305 「명부에 빠진 칸 N개」가 영영 0이 안 됨). tests/update.test.mjs:93 의 단위 시험은 「없는 칸(start_items)·없는 새 요원은 채우고 고친 값은 그대로」만 고정하며, 지운 항목·비운 칸을 되살리는 것을 의도로 고정한 시험은 없다. 오너 결정과도 충돌하지 않는다(코드 주석 스스로 「고친 값은 그대로」라 하고, 거점 지우기에 11-13 사용자 승인으로 확인 단추까지 붙였다). 옛 저장 호환 문제도 아니다(현재 편집기가 지금 쓰는 값이 깨짐). 심각도는 medium 유지: 데이터가 사라지는 게 아니라 사용자가 고친 것이 되돌아가는 것이고, 기본 명부를 지우거나 비운 사용자에게만 해당하지만 그 경우 업데이트마다 반복된다. 보고자의 고침안 중 「undefined 일 때만 채운다」는 그대로 쓰면 부족/위험하다: (a) start_items 는 directoryData 가 비었을 때 키를 아예 안 쓰므로(988) 사용자가 시작 소지품을 다 지운 경우는 여전히 되살아나고, (b) 2026-10-29 사용자 요청(깡통봇 명부의 빈 소속·잘린 영문명 채우기)을 깨뜨릴 수 있다. 그래서 명시적 표시 방식으로 고침안을 바로잡았다. 덧붙여 최상위 칸이 통째로 빈 경우(거점을 전부 지움 → 222-223 에서 기본 거점 전부 복귀)는 10-29 사용자 요청(「거점 0」 고침)과 같은 동작이라 건드리지 않는다.",
+     "proof": "src/core/install.ts:210 `const empty = (v) => v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length) || ...`\nsrc/core/install.ts:235-237 `if (ce === undefined) { sec[name] = de; gaps++; }`\nsrc/core/install.ts:240 `for (const [f, fv] of Object.entries(de)) if (empty(row[f]) && !empty(fv)) (row[f] = fv), gaps++;`\nsrc/core/update.ts:178-179 `const filled = fillDirectory(cur, add); return filled.gaps ? withDirectory(list, filled.data as never) : list;` (planUpdate 190 에서 매번)\nsrc/core/world/directory.ts:980-981 `affiliation: a.affiliation, rank: a.rank, department: a.department, roster_for: a.rosterFor, phone_tabs: a.phoneTabs` (빈 값도 키째 저장) / 946 `for (const b of dir.bases) ... out.거점[b.name] = d` (지운 거점은 키 없음)\nsrc/ui/directory.ts:1177 `d.bases = d.bases.filter((b) => b.name !== name);` / 1088 `d.orgs = d.orgs.filter((x) => x !== o);` / 987 `row[field] = cur.includes(arg) ? cur.filter(...) : [...cur, arg];`\n재현 출력: saved agent {\"affiliation\":\"\",\"rank\":\"\",\"roster_for\":[],\"phone_tabs\":[]} base in saved false → after update: base back true, agent {\"affiliation\":\"A00\",\"rank\":\"팀장\",\"roster_for\":[\"A00\"],\"phone_tabs\":[\"T01\"]}, org back true",
+     "fix_plan": "표시(tombstone) 방식. 화면·문구·가이드는 바꾸지 않는다.\n1) src/core/world/directory.ts: DirectoryData 에 선택 칸 `_removed?: Record<string, string[]>`(큰 칸 이름 → 지운 항목 이름)와, 항목(요원 AgentData 등)에 선택 칸 `_cleared?: string[]`(사용자가 비운 칸 이름)을 더한다. Directory(메모리 모양)에 `removed: Record<string,string[]>` 를, AgentRow 에 `cleared: string[]` 를 두고 readDirectory 에서 data._removed / 요원 줄의 _cleared 를 읽어 채우며, directoryData() 에서 비어 있지 않을 때만 다시 쓴다.\n2) src/ui/directory.ts: 'dir-base-del'(yes 분기, 1177)에서 removed['거점'] 에 name 추가, 'dir-org-del'(1088)에서 removed['조직'] 에 o.name 추가. 같은 이름을 다시 만들면(거점·조직 추가/이름 바꾸기 핸들러) 그 이름을 removed 에서 뺀다. 요원 칸: 'dir-set'/'dir-toggle'(984-988)·'dir-org-pick'(1030, assignOrg)·직급/부서 입력 핸들러에서, 고친 뒤 값이 빈 문자열/빈 배열이면 row.cleared 에 저장 칸 이름(affiliation·rank·department·roster_for·phone_tabs·start_items)을 넣고, 값이 다시 차면 뺀다. 시작 소지품을 다 지운 경우도 같은 방식으로 'start_items' 를 넣는다(directoryData 가 빈 start_items 키를 안 쓰기 때문).\n3) src/core/install.ts fillDirectory: (a) 루프 첫머리에서 `k === '_removed'` 도 '_help' 처럼 건너뛴다. (b) 235 줄 앞에 `const gone = isObj(cur._removed) && Array.isArray(cur._removed[k]) ? cur._removed[k] : []; if (gone.includes(name)) continue;` (c) 240 줄 칸 채우기에서 `f === '_cleared'` 는 건너뛰고, `Array.isArray(ce._cleared) && ce._cleared.includes(f)` 인 칸은 채우지 않는다. gaps 도 세지 않는다(그래야 directoryGapCount 가 0 이 되어 점검 단추가 정상으로 돌아온다).\n바꾸면 안 되는 것: 표시가 없는 빈 칸·없는 항목·없는 큰 칸은 지금처럼 채운다(10-29 깡통봇 명부 채우기, 11-08 start_items 채우기, tests/update.test.mjs:93 그대로 통과해야 함). 최상위 칸이 통째로 빈 경우(222-223)와 '괴담톡 탭' 통째 채우기(227-229)는 그대로. 「undefined 일 때만 채우기」로 단순화하지 않는다.",
+     "test_idea": "tests/update.test.mjs 에 추가: mine = { schema:1, _removed:{ 거점:['본부'] }, 거점:{ 지사:{sido:'서울'} }, 요원:{ 살라딘:{ affiliation:'', rank:'', roster_for:[], _cleared:['affiliation','rank','roster_for'] } } }, def = { schema:1, 거점:{ 본부:{sido:'서울'}, 지사:{sido:'서울'}, 새거점:{sido:'부산'} }, 요원:{ 살라딘:{ affiliation:'A00', rank:'팀장', roster_for:['A00'], start_items:[{name:'단검'}] } } } 로 planUpdate → assert.ok(!('본부' in got.거점)); assert.ok(got.거점.새거점); assert.equal(got.요원.살라딘.affiliation, ''); assert.equal(got.요원.살라딘.rank, ''); assert.deepEqual(got.요원.살라딘.roster_for, []); assert.deepEqual(got.요원.살라딘.start_items, [{name:'단검'}]); 그리고 fillDirectory(got, def).gaps === 0. 고치기 전에는 본부가 되살아나고 affiliation 이 'A00' 이 되어 실패한다. tests/directory.test.mjs 에는 readDirectory → 거점 삭제 → directoryData 결과에 _removed.거점 이 들어가는지 확인을 더한다.",
+     "needs_user_decision": false
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 3,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "카드 업데이트 「카드에 적용」이 사진을 받는 동안 생긴 채팅 변화를 옛 내용으로 덮어쓸 수 있다",
+    "kind": "bug",
+    "severity": "medium",
+    "file": "src/ui/update.ts",
+    "line": 284,
+    "evidence": "handleUpdate 가 246 에서 char 를 한 번 읽고 planUpdate(char, payload) 로 next = {...char, …}(채팅 전체 포함)를 만든 뒤, 270 의 fetchPictures(수십~수백 장, 몇 분 걸릴 수 있음)를 기다리고 나서 284 `setCharacterToIndex(ctx.charIndex, plan.next)` 로 통째로 쓴다. 다시 읽지 않는다. 같은 일을 하는 설치 쪽은 쓰기 직전에 다시 읽는다(host/install.ts:113 `fresh`).",
+    "scenario": "메시지를 보내 응답이 오는 중(또는 응답 뒤 갱신기·기록 저장이 도는 중)에 설정 → 업데이트 → 카드에 적용을 누름. 사진 받는 1~2분 사이에 도착한 응답·저장된 채팅 상태가, 적용 시점에 「사진 받기 전 캐릭터」로 덮여 사라진다.",
+    "fix_sketch": "사진을 다 받은 뒤 getCharacterFromIndex 로 다시 읽어 planUpdate(fresh, payload) 를 다시 만들고(받은 additionalAssets 만 얹어) 저장한다.",
+    "needs_user_decision": false,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "medium",
+     "severity": "medium",
+     "reasoning": "Tried to refute; found no guard. In src/ui/update.ts handleUpdate the character is read once (line 246), planUpdate builds next = { ...char, ... } (src/core/update.ts:200), i.e. a full copy of the character snapshot, then the code awaits fetchPictures (4 download workers + 4 saveAsset workers, src/host/picpack.ts:55-97) and finally writes that stale whole object back at line 284 without re-reading. The comment at line 261 (\"준비한 뒤 카드가 바뀌었을 수 있으니 저장 직전에 다시 합친다\") only covers the prepare->apply gap, not the download gap. updateUi.busy only blocks other upd-* actions; nothing stops the host from finishing a streaming reply or the plugin's own queued setChatToIndex saves (src/host/risu.ts:48-68) during the download. The rest of the code base treats this exact pattern as a hazard and re-reads right before writing: src/host/install.ts:113 (`fresh`) and src/host/risu.ts:83-87 (updateCharacterLore). No unit test pins the stale write as intended and no owner decision covers it.\n\nCaveats: (1) the loss of chat content depends on the host's getCharacterFromIndex returning the character including its chats, which is how RisuAI's character object is shaped and how every test mock models it, but it is not provable from this repo alone, hence confidence medium. (2) The window is only as long as the picture download (zero when pics.get is empty), and the user has to press 「카드에 적용」 while a reply or a background save is still in flight, so it is a specific-but-plausible case: medium is right, not high. Not an unreleased change (the code path predates 782dca17c in substance).",
+     "proof": "src/ui/update.ts:246 `const char = (await risuai.getCharacterFromIndex(ctx.charIndex))` ... :262 `const plan = planUpdate(char, updateUi.payload);` ... :270 `plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, ...)` ... :284 `await risuai.setCharacterToIndex(ctx.charIndex, plan.next);` (no re-read between 246 and 284).\nsrc/core/update.ts:200 `const next: Record<string, unknown> = { ...char, globalLore: lore.list, customscript: scripts.list };` (everything else, chats included, is the stale snapshot).\nContrast src/host/install.ts:113-114 `const fresh = ((await risuai.getCharacterFromIndex(charIndex)) ?? char) ...; await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: assets });` and src/host/risu.ts:81-87 (re-read before write, with the comment that this avoids overwriting other changes).",
+     "fix_plan": "File /home/user/goei-plugin/src/ui/update.ts, function handleUpdate, branch `action === 'upd-apply'` (lines 260-298).\n1. Keep lines 262-281 as they are for computing `pics` and downloading (still fetch with the first-read `char.additionalAssets`), but store the fetchPictures result in a local `let assets: unknown[] | undefined` instead of assigning to plan.next.\n2. After the download block (before line 283), re-read: `const fresh = ((await risuai.getCharacterFromIndex(ctx.charIndex)) ?? char) as Record<string, unknown>;` and rebuild `const plan = planUpdate(fresh, updateUi.payload);` (rename the earlier plan or drop it; it is only needed for the write).\n3. Set `if (assets) plan.next.additionalAssets = assets;` then apply the existing drop line using `plan.next.additionalAssets ?? fresh.additionalAssets`.\n4. Write `setCharacterToIndex(ctx.charIndex, plan.next)` as now. Everything after (forgetImages, loadModuleAssets, done text, env.refresh) unchanged.\nDo NOT change: planUpdate / mergeByName in src/core/update.ts, fetchPictures' all-or-nothing behaviour (a failed download must still leave the card untouched and show the same message), planPictures, the visible strings.\nOptional tidy (same effect, testable): move steps 1-4 into a host helper, e.g. `applyCardUpdate(charIndex, payload, progress)` in src/host/picpack.ts or a new src/host/update.ts, so it can be unit-tested with a fake risuai.",
+     "test_idea": "With a fake risuai whose getCharacterFromIndex returns clones of a stored character and whose saveAsset, when first called, appends a message to stored.chats[0].message (simulating a reply arriving during the download): run the apply path with a payload that has one picture to fetch. Assert that after apply the stored character's chats[0].message still contains the appended message AND characterVersion/globalLore are the payload's AND additionalAssets has the new picture row. Fails before (message gone), passes after.",
+     "needs_user_decision": false
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 4,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "카드 사진 받기에는 시간 제한이 없어, 응답이 멈춘 요청 하나로 설치·업데이트가 「사진 받는 중」에서 영영 멈춘다",
+    "kind": "bug",
+    "severity": "medium",
+    "file": "src/host/picpack.ts",
+    "line": 26,
+    "other_files": [
+     "src/host/install.ts",
+     "src/ui/editor/install.ts",
+     "src/ui/update.ts"
+    ],
+    "evidence": "fetchPicture(26-49)는 risuFetch·nativeFetch·arrayBuffer 를 timeout 없이 기다린다. 본체·자료 팩·업데이트 글 받기는 모두 40초 제한이 있다(loader/body.ts:47, host/datapack.ts:27, ui/update.ts:41 — 「응답이 영영 안 오면(프록시 멈춤)」 QC 2026-10-28). installPictures(host/install.ts:122-137)의 일꾼과 fetchPictures 가 이것을 그대로 await 하고, 그동안 instUi.busy / updateUi.busy 가 켜져 모든 단추가 disabled 다(ui/editor/install.ts:114, ui/update.ts:226).",
+    "scenario": "폰(웹 Risu 프록시)에서 깡통봇 설치로 사진 2,522장을 받는 중 요청 하나가 응답 없이 걸림 → 진행 글이 「사진 받는 중 1230/2522」에서 멈추고 설치·업데이트 단추가 전부 눌리지 않음. Risu 를 새로 고쳐야 풀린다.",
+    "fix_sketch": "fetchPicture 의 두 받기와 arrayBuffer 를 host/datapack.ts 의 timeout(40초)으로 감싼다. 시간 초과는 PicError 로 던져 기존 「n장까지 받았어요 … 다시 누르면 이어서」 경로를 탄다.",
+    "needs_user_decision": false,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "medium",
+     "reasoning": "반박하려 했으나 실제 문제로 확인했다. fetchPicture(src/host/picpack.ts:26-49)는 risuFetch, nativeFetch, res.arrayBuffer() 세 곳을 시간 제한 없이 await 한다. try/catch 는 거부(reject)만 잡으므로 응답이 영영 안 오는 경우는 못 푼다.\n\n호출자 쪽에도 보호 장치가 없다.\n- installPictures(src/host/install.ts:122-137): 일꾼 8개가 fetchPicture 를 그대로 await 하고 Promise.all 로 기다린다. 한 장만 멈춰도 그 묶음의 Promise.all 이 끝나지 않아 commit(done) 도 안 불린다. 그 묶음에서 이미 저장한 최대 299장은 캐릭터에 적히지 않는다.\n- fetchPictures(picpack.ts:64-76): 일꾼 4개, 같은 구조.\n- instUi.busy / updateUi.busy 는 이 await 가 끝난 뒤에만 풀린다(ui/editor/install.ts 의 `instUi.busy = ''`, ui/update.ts:295·303). 그동안 installAction 은 `if (instUi.busy) return true`, updateAction 은 `if (updateUi.busy) return true`(update.ts:226)로 모든 동작을 무시하고 단추도 disabled 다.\n\n같은 저장소의 다른 받기 세 곳(host/datapack.ts:27-31, loader/body.ts:48, ui/update.ts)은 정확히 이 증상 때문에 40초 제한을 넣었고(「응답이 영영 안 오면 화면이 받는 중으로 굳지 않게」 QC 2026-10-28), 사진 받기만 빠져 있다. 이를 의도로 고정한 단위 시험이나 소유자 결정은 없다.\n\n심각도는 medium 유지: 프록시가 응답 없이 걸리는 특정 상황에서만 나지만, 2,500장 규모 받기에서는 충분히 있을 법하고 새로 고침 말고는 풀 방법이 없다. 보고자의 고침 방향도 맞다. 다만 timeout 은 실제 요청을 끊지는 못하고 기다림만 푼다는 점은 알아 둘 것(다른 세 곳도 같다).",
+     "proof": "src/host/picpack.ts:32 `const r = await legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, ... });`\nsrc/host/picpack.ts:40 `const res = await risuai.nativeFetch(url, { method: 'GET' });`\nsrc/host/picpack.ts:42 `const b = new Uint8Array(await res.arrayBuffer());`\n(세 곳 모두 timeout 없음)\n\n대조 — src/host/datapack.ts:26-31\n`/** 받기 하나에 기다리는 시간. 응답이 영영 안 오면 화면이 「받는 중」으로 굳지 않게 (QC 2026-10-28; ui/update.ts·loader/body.ts 와 같은 값) */`\n`const TIMEOUT_MS = 40_000;`\ndatapack.ts:56/63/65 는 같은 세 호출을 모두 `timeout(...)` 으로 감싼다.\n\nsrc/host/install.ts:126 `const path = await risuai.saveAsset(await fetchPicture(p));`\nsrc/host/install.ts:137 `await Promise.all(Array.from({ length: WORKERS }, worker));` → 그 뒤에야 `await commit(done)`\nsrc/ui/editor/install.ts `if (instUi.busy) return true;` / src/ui/update.ts:226 `if (updateUi.busy) return true;`",
+     "fix_plan": "파일: src/host/picpack.ts 만 고친다.\n\n1. picpack.ts 에 datapack.ts:27-31 과 같은 도우미를 둔다(40초, Promise.race + finally clearTimeout). 시험할 수 있게 제한 시간을 바꿀 수 있도록 한다. 예: `export const picTimeout = { ms: 40_000 }` 와 `function timeout<T>(p: Promise<T>): Promise<T>` — 초과 시 `new PicError('…초 안에 받지 못했어요')` 로 거부. (datapack.ts 의 timeout 을 export 해 가져다 써도 되지만, 그 함수는 PicError 가 아닌 Error 를 던지고 제한 시간이 상수라 시험이 40초 걸린다. 로컬 정의가 낫다.)\n2. fetchPicture 안 세 곳을 감싼다: `await timeout(legacy(url, {...}))`, `await timeout(risuai.nativeFetch(url, { method: 'GET' }))`, `await timeout(res.arrayBuffer())`.\n3. 기존 try/catch 구조는 그대로 둔다. risuFetch 가 시간 초과면 catch 로 떨어져 nativeFetch 를 한 번 더 시도하고, 그것도 초과면 맨 끝의 `throw new PicError('사진 「이름」을 받지 못했어요.')` 로 간다. 한 장당 최악 약 80~120초 뒤 실패가 드러난다.\n\n바꾸지 말 것:\n- 지문 확인(ok), URL, 맨 끝 오류 문구.\n- installPictures 의 「실패해도 저장한 만큼 commit 후 n/전체장까지 받았어요」 경로와 fetchPictures 의 「하나라도 못 받으면 카드 안 바꿈」 경로. 둘 다 fetchPicture 가 거부하기만 하면 지금 코드로 올바르게 동작한다.\n- 호출자(install.ts, ui/update.ts, ui/editor/install.ts)는 손대지 않는다.\n\n참고(이번 범위 밖): risuai.saveAsset 도 시간 제한이 없다. 같은 방식으로 굳을 수 있으나 로컬 저장이라 가능성이 낮아 이번 고침에 넣지 않았다.",
+     "test_idea": "tests/picpack.test.mjs (esbuild 로 src/host/picpack.ts 를 묶어 불러옴): globalThis.risuai = { nativeFetch: () => new Promise(() => {}) } (risuFetch 없음), picTimeout.ms = 50 으로 낮춘 뒤 `await assert.rejects(Promise.race([fetchPicture(['a.png','abcdef123456','png']), new Promise((_, r) => setTimeout(() => r(new Error('HANG')), 1000))]), (e) => e instanceof PicError)`. 고치기 전에는 fetchPicture 가 끝나지 않아 'HANG' 으로 거부되어 실패하고, 고친 뒤에는 PicError 로 통과한다. 두 번째 단언: nativeFetch 는 바로 ok 를 주되 arrayBuffer 가 영영 안 끝나는 경우도 같은 결과.",
+     "needs_user_decision": false
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 5,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "「이전 아이콘으로」 되돌린 뒤 설치 단추를 누르면 아이콘이 다시 플러그인 것으로 바뀌고, 점검 글도 서로 어긋난다",
+    "kind": "bug",
+    "severity": "medium",
+    "file": "src/ui/editor/install.ts",
+    "line": 162,
+    "other_files": [
+     "src/host/install.ts"
+    ],
+    "evidence": "`if (!s?.icon) await run('아이콘', … installIcon …)` (162). restoreIcon 은 기록을 지우므로(host/install.ts:195) 되돌린 뒤 s.icon=false 가 된다. allDone = `s.goei && !missing.length && s.icon && s.tokenizer` (81) 이라 아이콘만 다르면 머리글은 「모두 갖춰져 있어요」(installSummary 는 아이콘을 안 셈)인데 단추는 강조된 「빠진 것 전부 채우기」가 된다. 정식 카드를 가져온 사용자도 기록이 없어(host/install.ts:63 iconOurs) 늘 「아이콘 ✗ 없음 · 다른 아이콘」으로 나온다.",
+    "scenario": "깡통봇 설치 뒤 「이전 아이콘으로」를 눌러 원래 봇 아이콘으로 되돌림 → 나중에 사진을 이어 받거나 위키 문서를 다시 받으려고 「빠진 것 전부 채우기」를 누름 → 아이콘이 말없이 다시 유령 아이콘으로 바뀜.",
+    "fix_sketch": "되돌릴 때 기록을 지우지 말고 `declined: true` 로 남겨, 그 캐릭터는 전체 단추가 아이콘을 다시 넣지 않게 한다(아이콘은 점검표 줄의 따로 단추로만). allDone 에서 s.icon 을 빼거나 installSummary 에 아이콘 줄을 넣어 글과 단추를 맞춘다.",
+    "needs_user_decision": true,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "low",
+     "reasoning": "The finding is half real. Severity should be low, not medium.\n\n**Real part — the icon comes back after the user reverted it.**\n- `restoreIcon` deletes the icon record for the character (`src/host/install.ts:195`).\n- `checkInstall` then computes `iconOurs` as false because there is no record (`:63`), so `s.icon` is false.\n- The 'all' step in `installAction` reinstalls the icon whenever `s.icon` is false (`src/ui/editor/install.ts:162`). Nothing remembers that the user chose the old icon.\n- Because `allDone` requires `s.icon` (`:81`), the button stays the highlighted 「빠진 것 전부 채우기」 after a revert, which invites the press.\n- The same press is what the page tells users to do to resume pictures (`:94`), so the scenario is plausible.\n\n**Why only low.**\n- Nothing is lost: `installIcon` records the previous icon again (`:168`), so 「이전 아이콘으로」 works again.\n- It is not silent: the result line lists 「아이콘」 among the things done.\n\n**Rejected part — the wording mismatch is intended.**\n- `installSummary` leaving the icon out of the missing count is deliberate. `tests/qc-loader-browser.mjs:626` says 「아이콘은 점검 항목이지만 빠진 것 수에는 안 셈」 and `:662` expects 「모두 갖춰져 있어요 … (아이콘만 다름)」.\n- The all-button installing the icon on an already-installed card with no record is also pinned (`:630`).\n- So the reporter's proposals to add an icon line to `installSummary`, or to change the official-card behaviour, contradict pinned behaviour and should not be applied.\n\nI read the code and the browser test file only; I ran nothing. No unit test covers `host/install.ts` icon functions today.",
+     "proof": "src/host/install.ts:193-196\n`if (!note?.prev) return false; await risuai.setCharacterToIndex(charIndex, { ...char, image: note.prev }); delete notes[charId(char)]; await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));`\n\nsrc/host/install.ts:63\n`iconOurs: !!note && note.ours === String(char.image ?? ''),`\n\nsrc/ui/editor/install.ts:162\n`if (!s?.icon) await run('아이콘', async () => (await installIcon(ctx.charIndex, progress), '아이콘'));`\n\nsrc/ui/editor/install.ts:81\n`const allDone = s.goei && !missing.length && s.icon && s.tokenizer;`\n\nsrc/core/install.ts:301-314 — `installSummary` has no icon line.\n\nPinned as intended: tests/qc-loader-browser.mjs:626 ('아이콘은 점검 항목이지만 빠진 것 수에는 안 셈'), :630 (all-button installs 아이콘 on an installed card), :662 ('모두 갖춰져 있어요 … 아이콘만 다름').",
+     "fix_plan": "Apply only after the owner answers the decision question, because it adds one visible button.\n\n1. `src/host/install.ts`\n   - `IconNote`: add `declined?: boolean`.\n   - `restoreIcon`: stop deleting the record. Replace `delete notes[charId(char)]` with `notes[id] = { ...note, declined: true }` and save. Keep setting `image: note.prev`.\n   - `checkInstall`: return `{ state, iconPrev: note && !note.declined ? note.prev : '', iconDeclined: !!note?.declined }`. Leave `iconOurs` as is; it is already false after a restore because `image !== ours`.\n   - `installIcon`: no logic change needed. It overwrites `notes[id]` with `{ ours, prev }`, which clears `declined`, and the existing `notes[id]?.ours === prev` check still works.\n\n2. `src/ui/editor/install.ts`\n   - `instUi`: add `iconDeclined: false`, set in `refreshInstall` from `r.iconDeclined`.\n   - Line 162: change to `if (!s?.icon && !instUi.iconDeclined) …`.\n   - Line 81: change to `const allDone = s.goei && !missing.length && (s.icon || instUi.iconDeclined) && s.tokenizer;` so the button is no longer highlighted after a revert.\n   - Add a way back: when `iconDeclined`, show a row in 「세부 선택」 with a button (new action `ed-inst-icon`, new `Step` value `'icon'`) that calls `installIcon`. Extend the step guard on line 129 to accept it.\n\n3. Must NOT change\n   - `installSummary` and the head text (pinned by `qc-loader-browser.mjs:626` and `:662`).\n   - The all-button installing the icon when there is no record at all (pinned by `:630`).\n   - The stored record shape before a restore, `{ ours, prev }` (pinned by `:545`).",
+     "test_idea": "New unit test (e.g. `tests/install-icon.test.mjs`) that bundles `src/host/install.ts` with a fake `globalThis.risuai` (`pluginStorage` get/set, `getCharacterFromIndex`, `setCharacterToIndex`, `saveAsset`) and preloaded install data.\n\nSteps: run `installIcon(0)`, then `restoreIcon(0)`, then `checkInstall(0)`.\n\nAssert `iconDeclined === true`, `iconPrev === ''`, and the stored `goei:icon` record still exists with `declined: true`. Before the fix the record is deleted and `iconDeclined` is undefined, so this fails.\n\nThen run `installIcon(0)` again and assert the record is `{ ours, prev }` with no `declined`.\n\nFor the UI half, extract the condition as a pure helper such as `shouldInstallIcon(state, declined)` and assert it returns false for `{ icon: false }` with `declined = true`.",
+     "needs_user_decision": true,
+     "decision_question_ko": "「이전 아이콘으로」 되돌린 뒤 「빠진 것 전부 채우기」를 누르면 아이콘이 다시 플러그인 것으로 바뀝니다. 어떻게 할까요?\n(1) 되돌린 봇은 전체 단추가 아이콘을 건드리지 않게 하고, 세부 선택에 「플러그인 아이콘으로」 단추를 따로 둔다 (추천).\n(2) 지금대로 둔다 — 다시 「이전 아이콘으로」를 누르면 되돌아가니 잃는 것은 없음."
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 6,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "깡통봇은 새 릴리스에 추가·교체된 카드 사진을 점검이 알아채지 못한다 (설치 때 사진 목록에 묶여 있음)",
+    "kind": "bug",
+    "severity": "low",
+    "file": "src/core/install.ts",
+    "line": 135,
+    "evidence": "installCheck: `const want = manifestPictures(m).length ? manifestPictures(m) : inst.pictures` (135) — 매니페스트에 사진 목록이 있으면 새 설치 자료(inst.pictures)는 보지 않는다. buildManifest 도 `pictures: manifestPictures(prev).length ? manifestPictures(prev) : installData().pictures` (199) 로 옛 목록을 그대로 둔다. 이름만 견주므로(136) 지문이 바뀐 사진도 「있음」.",
+    "scenario": "v0.21.11 에 깡통봇 설치(사진 2,5xx장) → 이후 릴리스에서 표정 그림이 추가됨 → 설치·점검은 「카드 사진 ✓」, 채팅의 새 표정 태그는 그림이 안 나옴. 받을 길은 카드 업데이트뿐인데 깡통봇에서는 그게 명부를 깨뜨린다(첫 항목).",
+    "fix_sketch": "매니페스트에 source(정식 카드 표시)가 없는 깡통봇은 want = inst.pictures 로 보고, 받은 뒤 매니페스트 pictures 를 inst.pictures 로 갱신한다. 지문이 다른 것도 missing 에 넣는다.",
+    "needs_user_decision": false,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "low",
+     "reasoning": "반박하려 했으나 코드로 확인됨. 깡통봇의 매니페스트는 첫 설치 때 buildManifest 가 installData().pictures 를 그대로 적는다. 그 뒤로는 installCheck(135)가 매니페스트 목록이 비어 있지 않으면 새 설치 자료(inst.pictures)를 전혀 보지 않고, buildManifest(199)도 prev 목록을 유지한다. 따라서 다음 릴리스의 goei-data-install 팩에 사진이 추가돼도 want 는 옛 목록이고 점검은 「카드 사진 N장 ✓」, installPictures 는 state.pictures.missing 이 비어 0장으로 끝난다. 136행은 이름만 견주므로 같은 이름·다른 지문(교체된 그림)도 못 잡는다. 이를 뒤집는 가드·정규화·후속 덮어쓰기는 host/install.ts, ui/editor/install.ts 어디에도 없다. tests/install.test.mjs 는 첫 설치 때 m.pictures.length === INSTALL_PICTURES.length 만 고정하며, 「매니페스트 목록 우선」을 의도로 못박은 시험은 없다(매니페스트 우선은 source 가 있는 정식 Lite 카드에는 타당: 그 카드 버전의 사진 목록이므로). 완화 요소: 깡통봇도 매니페스트가 있어 ui/update.ts 에서 lite=true 이고 version=설치 당시 PLUGIN_VERSION 이므로 「카드 업데이트」가 제안되고, planPictures 가 새 사진을 받아 준다. 하지만 그 길은 CARD_FIELDS 를 정식 카드 값으로 덮어써 사용자 봇 내용을 바꾸므로 깡통봇의 정상 경로가 아니다. 결과는 새/교체 그림이 안 나오는 것뿐(자료 손실 없음)이라 심각도 low 유지. 정식 카드 구분은 가능: tools/build_lite_card.py:967 이 매니페스트에 source 를 넣고, buildManifest 는 넣지 않는다. 보고자 수정안의 결함: 로어북 단계(사진 단계보다 먼저 실행)에서 매니페스트 pictures 를 inst.pictures 로 갱신하면 옛 지문 정보가 사라져 교체된 그림을 못 잡으므로, 매니페스트 갱신은 사진을 실제로 저장한 뒤에 해야 한다.",
+     "proof": "src/core/install.ts:135-136\n  const want = manifestPictures(m).length ? manifestPictures(m) : inst.pictures;\n  const missingPics = want.filter((p) => !have.has(p[0]));\nsrc/core/install.ts:199 (buildManifest)\n  pictures: manifestPictures(prev as Manifest).length ? manifestPictures(prev as Manifest) : installData().pictures,\nsrc/host/install.ts:101-103 (installPictures)\n  const { state } = await checkInstall(charIndex);\n  const all = state.pictures.missing;\n  if (!all.length) return 0;\ntools/build_lite_card.py:967  'source': {'name': ..., 'version': ...}  (정식 카드만 source 가 있음; buildManifest 는 source 를 쓰지 않음)\nsrc/ui/update.ts:178  const lite = !!readManifest(ctx.char.globalLore);  (깡통봇도 카드 업데이트가 유일한 사진 갱신 경로)",
+     "fix_plan": "1) src/core/install.ts installCheck: 매니페스트에 source 가 없으면(플러그인이 심은 깡통봇, `!m?.source`) want = inst.pictures 로 한다. source 가 있는 정식 카드는 지금처럼 매니페스트 목록 우선(바꾸지 않는다: 정식 카드는 카드 업데이트가 사진을 옮긴다). 깡통봇의 missing 조건은 `!have.has(p[0]) || (known.has(p[0]) && known.get(p[0]) !== p[1])` 로, known = new Map(manifestPictures(m).map(p => [p[0], p[1]])). 즉 이름이 없거나, 매니페스트에 적힌 지문과 새 자료의 지문이 다르면 받는다. 매니페스트에 그 이름이 없고 에셋에 이름이 있으면(사용자가 직접 넣은 사진) 건드리지 않는다.\n2) buildManifest(199)는 그대로 둔다(로어북 단계가 사진 단계보다 먼저 돌므로 여기서 목록을 새로 쓰면 옛 지문이 사라져 교체 그림을 못 잡는다).\n3) src/host/install.ts installPictures 의 commit(): 저장한 사진 list 를 캐릭터에 적을 때, 매니페스트에 source 가 없으면 globalLore 의 Plugin manifest 항목 pictures 에서 같은 이름 줄을 새 Picture 로 바꾸고 없는 이름은 붙여 함께 setCharacterToIndex 한다(순수 함수 예: core/install.ts `notePictures(lore, saved: Picture[]): LoreEntry[]` 를 새로 두고 manifestEntry/readManifest 사용). 받다 끊겨도 저장한 만큼만 기록되어 다시 누르면 이어 받는다. mergePictures 는 같은 이름 줄의 경로를 새 것으로 바꾸므로 그대로 쓴다.\n바꾸지 말 것: 새 자료에서 빠진 사진을 지우는 동작은 넣지 않는다(삭제 금지 규칙), 정식 카드(source 있음) 경로, planPictures, 사진 화면 문구.",
+     "test_idea": "tests/install.test.mjs: lore = installLore([], plantGreetings([]).index) 로 깡통봇 매니페스트를 만든 뒤 매니페스트 content 의 pictures 를 INSTALL_PICTURES.slice(1) 로 줄이고 첫 남은 줄의 지문을 'x' 로 바꾼다. assets 는 그 줄어든 목록의 이름 전부. installCheck({lore, assets, ...}).pictures.missing 의 이름이 [INSTALL_PICTURES[0][0], INSTALL_PICTURES[1][0]] (새로 추가된 것 + 지문 바뀐 것)이고 total === INSTALL_PICTURES.length 인지 단언 (지금은 missing.length === 0 으로 실패). 추가로 같은 매니페스트에 source:{name:'x'} 를 넣으면 missing.length === 0 (정식 카드는 그대로) 단언.",
+     "needs_user_decision": false
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 7,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "(미출시) 위키 묶음 「새 판 확인」 때문에 설치·점검 화면이 열릴 때마다 네트워크를 기다리고, 받아 둔 문서가 「없음」으로 나온다",
+    "kind": "bug",
+    "severity": "low",
+    "file": "src/host/install.ts",
+    "line": 65,
+    "other_files": [
+     "src/ui/app.ts",
+     "src/ui/editor/install.ts"
+    ],
+    "evidence": "checkInstall 이 `!(await wikiPackStale())` (65) 로 매번 wiki-base.json 을 받는다(228-239, getText = risuFetch 40초 + nativeFetch 40초). openInstall 은 창을 열기 전에 `await refreshInstall(installCtx)` (ui/app.ts:804) 를 기다리고, 「전부 채우기」 한 번에 checkInstall 이 세 번 돈다(installPictures host/install.ts:101, 끝의 refreshInstall). 저장된 지문이 없거나 다르면 wikiPack=false → 점검표에 「위키 기본 문서 ✗ 없음 (약 1MB)」(ui/editor/install.ts:66) — 실제로는 저장소에 있고 쓰이고 있다.",
+    "scenario": "응답이 멈추는 프록시 환경에서 햄버거 「설치·점검」을 누르면 최대 80초 동안 아무 창도 안 뜬다. 정상 환경에서도 이번 릴리스로 올린 모든 사용자의 점검표가 「위키 기본 문서 없음」으로 바뀐다(옛 판이 있다는 뜻인데 글은 없음).",
+    "fix_sketch": "릴리스 지문은 세션에 한 번만 받아 기억하고(실패하면 false), 화면은 먼저 그린 뒤 뒤에서 확인한다. 상태 글은 「없음」과 「새 판 있음(다시 받기)」을 구분한다.",
+    "needs_user_decision": true,
+    "unreleased_change": true
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "low",
+     "reasoning": "반박 시도는 실패했다. 다만 범위는 제보보다 좁다.\n\n확인된 것:\n- checkInstall(src/host/install.ts:65)은 저장소에 위키 묶음이 있고 카드 로어북에 묶음이 없으면 매번 wikiPackStale()을 기다린다. wikiPackStale(228-239)에는 세션 기억이 없고, 부를 때마다 getText('wiki-base.json')로 네트워크를 탄다.\n- getText(src/host/datapack.ts:34-48)는 risuFetch 40초 + nativeFetch 40초다. 응답이 멈춘 환경에서는 최악 80초가 걸린다.\n- openInstall(src/ui/app.ts:804)은 `await refreshInstall(installCtx)` 뒤에야 openEditor를 부른다. 그동안 설치 창이 뜨지 않는다. ensureInstallData는 저장된 자료가 있으면 네트워크 없이 끝나므로, 이 대기는 v0.21.11 이후 새로 생긴 것이다.\n- 「전부 채우기」 한 번에 checkInstall이 두 번 돈다(installPictures 101행, 끝의 refreshInstall 174행). 처음 창을 열 때까지 합치면 세 번이다.\n- 지문 저장(WIKI_DIGEST_KEY)은 이번 미출시 변경에서 처음 생겼다. 올린 사용자는 saved=null 이라 `saved !== want`가 참이 되고, 점검표에 「위키 기본 문서 ✗ 없음 (약 1MB)」(src/ui/editor/install.ts:66)과 요약 「위키 기본 문서 없음」(src/core/install.ts:311)이 나온다. release/wiki-base.json에 digest가 실제로 있다.\n\n제보에서 깎이는 것:\n- 「없음」으로 보아 다시 받게 하는 것은 65행 주석대로 11-13 전수검사에서 일부러 넣은 동작이다. 「전부 채우기」를 한 번 누르면 받고 지문이 적혀 해소된다. 기능이 깨지는 것이 아니라 글이 사실과 다른 것이다.\n- 80초 대기는 응답이 멈추는 환경에서만 생긴다. 보통 환경에서는 작은 JSON 한 번이다.\n- src/ui/editor/manage.ts:140은 storedWikiPack()만 보므로 영향이 없다.\n\n그래서 심각도는 low 그대로다.",
+     "proof": "src/host/install.ts:65  `wikiPack: packInLore || (!!storedWikiPack() && !(await wikiPackStale())),`\nsrc/host/install.ts:228-239  `async function wikiPackStale() { if (!storedWikiPack() || !UPDATE_BASE) return false; try { const idx = JSON.parse((await getText('wiki-base.json'))...); ... const saved = await risuai.pluginStorage.getItem(WIKI_DIGEST_KEY); return saved !== want; } catch { return false; } }` (세션 기억 없음, saved 가 null 이면 true)\nsrc/host/datapack.ts:27,34-48  `TIMEOUT_MS = 40_000`; getText = timeout(risuFetch) 실패 뒤 timeout(nativeFetch)\nsrc/ui/app.ts:804-805  `await refreshInstall(installCtx); openEditor(host, 'install');`\nsrc/host/install.ts:101  `const { state } = await checkInstall(charIndex);` (installPictures)\nsrc/ui/editor/install.ts:174  `await refreshInstall(ctx);`\nsrc/ui/editor/install.ts:66  `li(s.wikiPack, '위키 기본 문서', s.wikiPack ? '저장소에 있음 (이 기기 공통)' : '없음 (약 1MB)')`\nsrc/host/install.ts:222  지문은 installWikiPack 에서만 적힌다 (v0.21.11 이전 설치에는 없음)\nrelease/wiki-base.json  `\"digest\": \"b9c3289ea0a1\"`",
+     "fix_plan": "1) src/host/install.ts — 릴리스 지문을 세션에 한 번만 받는다.\n- 모듈 변수 `let wikiWant: Promise<string | null> | null = null;` 를 둔다.\n- 새 함수 `releaseWikiDigest()`가 `wikiWant ??= (async () => { try { getText('wiki-base.json') → digest 가 문자열이면 그 값, 아니면 null } catch { return null } })()` 를 돌려준다.\n- 실패(null)면 `wikiWant = null` 로 되돌려 다음 점검 때 다시 시도하게 한다.\n- wikiPackStale 은 이 값을 쓴다: `want === null` 이면 false, 아니면 `saved !== want`.\n- installWikiPack 이 성공해 index.digest 를 적을 때 `wikiWant = Promise.resolve(index.digest)` 로 맞춘다.\n- dropWikiPack 은 그대로 둔다.\n\n2) 창이 네트워크를 기다리지 않게 한다 (택1, 가가 더 작다).\n가. checkInstall 에서 릴리스 지문 대기에 짧은 한도를 건다. 예: `Promise.race([releaseWikiDigest(), 3초 뒤 null])`. 한도를 넘으면 stale=false 로 본다. 받기는 뒤에서 계속되고 다음 점검에 쓰인다.\n나. src/ui/app.ts:804 의 `await refreshInstall(installCtx)` 를 빼고 openEditor 를 먼저 부른다. 점검은 src/ui/editor/index.ts:767-773 의 기존 경로(「점검하는 중…」)에 맡긴다. 이 경우 instUi.forChar 가 이미 같은 캐릭터면 재점검이 안 되므로, openInstall 에서 `instUi.forChar = -1` 로 돌려야 한다.\n\n3) (사용자 결정 필요) 글 구분.\n- InstallState 에 `wikiPackOld: boolean` 을 더한다 (src/core/install.ts 의 타입·installCheck 통과, checkInstall 에서 `!packInLore && !!storedWikiPack() && stale`).\n- src/ui/editor/install.ts:66 의 설명과 src/core/install.ts:311 의 요약을 「새 판 있음 (다시 받기, 약 1MB)」 같은 글로 가른다.\n\n바꾸면 안 되는 것:\n- 판이 다르면 「전부 채우기」가 다시 받는 동작 (src/ui/editor/install.ts:163 의 `!s?.wikiPack`).\n- 오프라인이거나 지문을 못 받으면 false 로 보는 것.\n- packInLore 우선.\n- src/ui/editor/manage.ts:140.",
+     "test_idea": "tests 에 host/install 을 esbuild 로 묶는 단위 시험을 둔다. risuai 는 가짜로 둔다: pluginStorage 에 위키 묶음은 있고 지문은 없음, nativeFetch 는 호출 횟수를 세며 wiki-base.json 에 digest 를 돌려줌.\n- checkInstall 을 연달아 3번 부른 뒤 wiki-base.json 요청 횟수가 1인지 본다 (지금은 3).\n- nativeFetch 가 영영 끝나지 않는 가짜에서 checkInstall 이 한도(예: 5초) 안에 끝나고 state.wikiPack===true 인지 본다 (지금은 40~80초 대기).\n- 3)을 넣는다면: 지문이 다를 때 state.wikiPack===false 이고 state.wikiPackOld===true 인지, installSummary 에 「위키 기본 문서 없음」이 없는지 본다.",
+     "needs_user_decision": true,
+     "decision_question_ko": "받아 둔 위키 기본 문서가 옛 판일 때 점검표에 지금은 「✗ 없음 (약 1MB)」으로 나옵니다. (1) 「새 판 있음 (다시 받기)」로 글을 따로 둘까요, (2) 지금처럼 「없음」으로 둘까요? 추천은 (1)입니다. 네트워크를 기다리지 않게 하는 고침(세션에 한 번만 확인, 짧은 한도)은 화면 글과 무관해서 어느 쪽이든 그대로 넣을 수 있습니다."
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 8,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "플러그인이 옛 판일 때도 「아직 이 판의 …가 올라오지 않았어요. 잠시 뒤 다시」라고 나와, 기다려도 영영 안 받아진다",
+    "kind": "wording",
+    "severity": "low",
+    "file": "src/loader/body.ts",
+    "line": 81,
+    "other_files": [
+     "src/host/datapack.ts"
+    ],
+    "evidence": "fetchBody: `if (index?.version !== version) throw new BodyError('아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.')` (81), fetchPack: `if (index.hash !== pack.expect.hash) … '아직 이 판의 ${label}가 올라오지 않았어요…'` (host/datapack.ts:83). release 폴더에는 최신 판만 있으므로, 사용자의 플러그인이 release 보다 옛 판이면 이 조건은 영구히 참이다. 판이 앞선 것(아직 안 올라옴)과 뒤진 것(플러그인을 올려야 함)을 구분하지 않는다.",
+    "scenario": "이번 릴리스 뒤에도 플러그인을 v0.21.11 로 둔 사용자가 처음으로 소지품·홈쇼핑 화면을 열거나(그림 팩을 아직 안 받음), 저장소 사용량에서 본체를 지웠다 → 「잠시 뒤 다시 받아 주세요」가 계속 나오고 몇 번을 다시 눌러도 실패. 실제 해결책(플러그인 업데이트)은 안내되지 않는다.",
+    "fix_sketch": "목록의 version 을 compareVersions 로 견줘, release 가 더 새 판이면 「플러그인이 옛 판이에요. Risu 설정 → 플러그인에서 업데이트해 주세요」로 바꾼다(자료 팩 목록에도 version 이 있다).",
+    "needs_user_decision": true,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "low",
+     "reasoning": "Confirmed by reading the code; I found no guard that refutes it.\n\n- Both checks are plain inequality. `fetchBody` uses `index?.version !== version`; `fetchPack` uses `index.hash !== pack.expect.hash`. Neither looks at which side is newer, and both end with 「아직 이 판의 …가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.」\n- The release folder holds only one version. `release/goei-body.json` and `release/goei-data-world.json` each carry a single `version` (0.21.14 now). Once the release moves past the installed plugin, the condition is true forever and 「다시 받기」 can never succeed.\n- No nearby text points to the real remedy. The loader panel (`src/loader/panel.ts`) and the world-data panel (`src/host/datapanel.ts`) only say to retry or insert a file from the release zip. Following the zip advice with the latest zip then fails with 「이 플러그인(…)과 맞는 goei-body.js가 아니에요」.\n- The lazily fetched packs make this reachable for ordinary users. Besides world and install data, `fetchPack` serves `ITEMS_PACK` (`src/host/itemicons.ts:59`), `LOOKS_PACK` (`src/host/looks.ts:47`) and `HOMESHOP_PACK` (`src/host/homeshop.ts:78`). These are fetched on first use, so a user who stays on an old plugin and opens that screen for the first time after a newer release hits it. The body and world data are normally already in pluginStorage, so those two only fail after storage is cleared.\n\nMitigations exist, which keeps severity low: the build writes `//@update-url` (`scripts/build.mjs:17`), and `src/ui/update.ts:152,183` shows a new-plugin notice once the body is running. The user can still decline or miss those, and the message itself stays misleading.\n\nNo unit test pins the current behaviour as intended. `tests/qc-loader-browser.mjs:938` pins the 「올라오지 않았어요」 text only for a changed hash with the same version, which a fix must preserve.\n\nTwo corrections to the reporter's fix sketch:\n- `src/loader/body.ts` is the small loader bundle. Importing `compareVersions` from `src/core/update.ts` would drag in lorebooks, directory and install modules, so it needs a dependency-free module instead.\n- The pack check must compare the index `version` only after the hash mismatch, and keep the old message when the version is absent, equal or older.",
+     "proof": "src/loader/body.ts:81\n`if (index?.version !== version) throw new BodyError('아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.');`\n\nsrc/host/datapack.ts:83\n`if (index.hash !== pack.expect.hash) throw new DataPackError(`아직 이 판의 ${pack.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);`\n\nsrc/host/datapack.ts:76 — the index type omits `version`, so it is never read:\n`let index: { parts?: unknown; length?: unknown; hash?: unknown } | null = null;`\n\nrelease/goei-data-world.json — the version is available in the index:\n`{\"name\":\"goei-data-world\",\"version\":\"0.21.14\",\"parts\":[...],\"hash\":\"25a67469\",...}`\n\nsrc/loader/panel.ts:68 — retry repeats the same call, so the result cannot change:\n`if (act === 'get') void run(() => fetchBody(version));`\n\nLazy callers of fetchPack: src/host/itemicons.ts:59 (ITEMS_PACK), src/host/looks.ts:47 (LOOKS_PACK), src/host/homeshop.ts:78 (HOMESHOP_PACK), src/host/datapack.ts:125 and :198 (world, install).",
+     "fix_plan": "1. Add a dependency-free module `src/core/version.ts` and move `compareVersions` into it (currently `src/core/update.ts:34-42`). Re-export it from `src/core/update.ts` (`export { compareVersions } from './version'`) so existing imports keep working. `src/loader/body.ts` must NOT import `core/update.ts`, which would pull lorebooks, directory and install code into the loader bundle.\n\n2. `src/loader/body.ts`, `fetchBody`, line 81: split the check.\n   - If `typeof index?.version === 'string' && compareVersions(index.version, version) > 0`, throw a `BodyError` with the outdated-plugin text (for example 「플러그인이 옛 판(v${version})이에요. 새 판 v${index.version}이 나왔어요. Risu 설정 → 플러그인에서 업데이트해 주세요.」).\n   - Otherwise, if `index?.version !== version`, keep the existing 「아직 이 판의 본체가 올라오지 않았어요…」 text unchanged.\n\n3. `src/host/datapack.ts`, `fetchPack`:\n   - Add `version?: unknown` to the index type at line 76.\n   - At line 83, inside the `index.hash !== pack.expect.hash` branch only: if `typeof index.version === 'string' && compareVersions(index.version, PLUGIN_VERSION) > 0`, throw a `DataPackError` with the outdated-plugin text. `PLUGIN_VERSION` is already exported from `core/update`, which this file imports.\n   - Otherwise keep the existing 「아직 이 판의 ${label}가 올라오지 않았어요…」 text.\n\n4. Must NOT change:\n   - The same-version hash-mismatch message, pinned by `tests/qc-loader-browser.mjs:938`.\n   - The order of checks: format check, then hash, then parts.\n   - The hash comparison itself; a pack whose hash matches must still be accepted even when the index version is newer (unchanged pack across releases).\n   - The panel layouts and buttons.\n   - `tests/fixtures/old-loader-0.17.8.js`.",
+     "test_idea": "Add to a loader unit test (for example alongside `tests/qc-loader-build.test.mjs`, or a new `tests/loader-outdated.test.mjs`) that bundles `src/host/datapack.ts` with esbuild, defining `__PLUGIN_VERSION__ = \"0.21.11\"`, and stubs `risuai.nativeFetch`.\n\n- Serve `goei-data-world.json` as `{version:\"0.21.14\", parts:[\"goei-data-world.1.txt\"], length:1, hash:\"deadbeef\"}`. Assert `fetchPack(WORLD_PACK)` rejects with a message matching /업데이트/ and not matching /올라오지 않았어요/. This fails before the fix and passes after.\n- Serve the same index with `version:\"0.21.11\"`. Assert the rejection still matches /아직 이 판의 세계 자료가 올라오지 않았어요/. This passes before and after.\n- Same pair for `fetchBody(\"0.21.11\")` against `goei-body.json` with version \"0.21.14\" (expects /업데이트/) and \"0.21.10\" (expects /올라오지 않았어요/).",
+     "needs_user_decision": true,
+     "decision_question_ko": "플러그인이 옛 판이라 자료를 받을 수 없을 때, 지금은 「아직 이 판의 …가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요」라고 나와서 기다려도 해결되지 않습니다. 이 경우에만 다른 문구를 보여 줄까요?\n(1) 「플러그인이 옛 판(v0.21.11)이에요. 새 판 v0.21.14가 나왔어요. Risu 설정 → 플러그인에서 업데이트해 주세요.」로 바꾼다 (추천)\n(2) 지금 문구 그대로 둔다\n(1)을 고르시면 문구는 원하시는 대로 정해 주세요."
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 9,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "본체 받기 창의 「다시 받기·파일로 넣기」와 뒤에서 도는 자동 재시도가 겹치면 본체가 두 번 켜질 수 있다",
+    "kind": "bug",
+    "severity": "low",
+    "file": "src/main.ts",
+    "line": 107,
+    "evidence": "install()(105-122)은 `loading` 이 이미 돌고 있는지, body 가 이미 있는지 보지 않고 `loading = start(code, true)` 로 덮어쓴다. 한편 실패 60초 뒤 메시지 표시·요청이 ensure() → load(false) 를 다시 돌리고(127-131), load 는 fetchBody 뒤 body 가 이미 켜졌는지 보지 않고 61 에서 start(code) 를 부른다. 둘 다 성공하면 runBody 가 본체를 두 번 실행해 api.start() 가 두 번 돌고, 먼저 켜진 쪽의 감시기(startWatcher)·진행 창은 unload 되지 않은 채 남는다.",
+    "scenario": "첫 받기가 실패해 받기 창이 뜸 → 1분쯤 뒤 채팅 메시지가 그려지며 조용한 재시도가 본체 19조각을 받는 중 → 사용자가 「다시 받기」를 누름 → 두 받기가 모두 성공 → 본체 인스턴스 2개(감시 타이머 2벌, 요청 처리기는 나중 것만).",
+    "fix_sketch": "install() 과 load() 에서 start 직전에 `if (body) return body` 를 보고, install() 은 돌고 있는 loading 이 있으면 그것을 기다린 뒤 body 가 없을 때만 start 한다.",
+    "needs_user_decision": false,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "medium",
+     "severity": "low",
+     "reasoning": "반박 근거를 찾았으나 없었다. 겹침을 막는 장치가 어디에도 없다.\n\n- src/main.ts install()(105-122)은 body·loading 을 보지 않고 `loading = start(code, true)` 로 덮어쓴다. 받기 창(src/loader/panel.ts 44-55 run)은 단추만 잠그고 시작기의 loading 은 모른다.\n- ensure()(125-133)는 `loading ??= load(prompt)` 로 한 번만 돌지만, 받기 실패 뒤에는 load 의 then 이 loading 을 null 로 되돌린다(129). 60초가 지나면 onDisplay(168)·onBeforeRequest(139)의 ensure() 가 조용한 load(false) 를 새로 시작한다.\n- load()는 fetchBody 뒤 body 가 이미 있는지 보지 않고 61행에서 start(code, prompt) 를 부른다.\n- start()(82-101)·runBody(src/loader/body.ts 28-42)·본체 start(src/body.ts 1008-1074) 어디에도 한 번만 실행하는 가드가 없다. runBody 는 매번 스크립트를 새로 넣고, 본체 start 는 매번 createFab·createProgWin·startWatcher 를 한다.\n- 둘 다 성공하면 `body = await api.start(...)` 가 나중 것으로 덮이고, 먼저 켜진 본체의 unload 는 불리지 않는다. 유령 단추·진행 창·감시 타이머가 한 벌 더 남는다. 종료 때도 `body?.unload()` 는 나중 것만 거둔다.\n\n반대 경로는 안전하다. 세계 자료 창의 __goeiRelaunch 는 ensure(true) 의 `??=` 를 타므로 겹치지 않는다. 겹치는 것은 install() 뿐이다.\n\n심각도는 low 그대로다. 조건이 좁다: 받기 창이 전체 화면으로 뜬 채 60초 넘게 있고, 그 사이 Risu 가 괴이 표식이 든 메시지를 다시 그려야 하며(실제로 그 상황에서 다시 그리는지는 코드로 확인 못 함), 실패했던 받기가 두 번 다 성공해야 한다. 파일을 찾느라 1분 넘게 걸리는 폰 사용자나 「아직 이 판의 본체가 올라오지 않았어요」 뒤의 재시도에서 가능하다. 저장 자료 손실은 없고, 결과는 단추·감시가 두 벌 생기는 것이다. v0.21.11 이전부터 있던 코드다. 직접 재현 실행은 하지 않았고 코드 추적만 했다.\n\n리포터의 고침안은 부족하다. 본체 start 는 세계 자료 읽기 때문에 몇 초가 걸리므로, start 직전 `if (body) return body` 만으로는 두 start 가 동시에 도는 창이 남는다. start 자체를 한 번에 하나만 돌게 해야 한다.",
+     "proof": "src/main.ts:107 `loading = start(code, true).then((b) => {` (install: body·loading 확인 없음)\nsrc/main.ts:127-128 `if (!prompt && !loading && Date.now() - failedAt < 60_000) return Promise.resolve(null); loading ??= load(prompt).then(...)` (60초 뒤 조용한 재시도)\nsrc/main.ts:61 `const b = await start(code, prompt);` (fetchBody 뒤 body 재확인 없음)\nsrc/main.ts:86,94 `api = runBody(code, VERSION);` / `body = await api.start({ prompt });` (가드 없음, body 덮어씀)\nsrc/loader/body.ts:30-36 `delete g.__goeiBody; ... document.head.append(s);` (매번 본체 재실행)\nsrc/body.ts:1034,1039,1047 `fab = await createFab(...)` / `prog = await createProgWin()` / `stopWatcher = startWatcher(fab)` (매 start 마다 새로 만들고, 먼저 것의 unload 는 호출되지 않음)\nsrc/loader/panel.ts:68 `if (act === 'get') void run(() => fetchBody(version));` (창의 받기는 시작기 loading 과 무관)",
+     "fix_plan": "src/main.ts 만 고친다. 본체(src/body.ts)·src/loader/*.ts 는 건드리지 않는다.\n\n1. 모듈 변수 추가: `let starting: Promise<Body | null> | null = null;`\n2. 지금의 start(code, prompt) 몸통을 그대로 `startOnce(code, prompt)` 로 이름만 바꾼다. codeBroken·startError 처리는 그대로 둔다.\n3. 새 start(code, prompt):\n   - `if (body) return body;`\n   - `if (starting) { const b = await starting; if (b) return b; }` — 앞선 시작이 성공하면 그 본체를 쓰고, 실패했으면 내 코드로 이어서 시도한다.\n   - `const p = startOnce(code, prompt); starting = p; try { return await p; } finally { if (starting === p) starting = null; }`\n4. load() 61행 직전에 `if (body) return body;` 를 넣는다. 받는 동안 install 이 이미 켰으면 runBody 를 하지 않게 한다.\n5. install() 은 `loading = start(code, true)...` 를 그대로 둔다. start 가 한 번에 하나만 돌므로 덮어써도 본체는 한 번만 켜진다. `await save(code)` 와 실패 때 BodyError·closePanel 흐름도 그대로 둔다.\n\n바꾸면 안 되는 것:\n- ensure() 의 60초 규칙과 `??=`.\n- 실패 때 `loading = null` 로 되돌리는 동작.\n- `fromStore && codeBroken` 일 때만 저장 본체를 지우는 조건. 뒤따라온 쪽이 앞선 실패의 codeBroken 을 자기 것으로 읽지 않게, 3번처럼 앞선 것이 실패하면 반드시 자기 startOnce 를 다시 돌린다.\n- __goeiRelaunch, 받기 창 문구.",
+     "test_idea": "새 단위 시험(예: tests/main-single-start.test.mjs)을 만든다. esbuild 로 src/main.ts 를 묶고(__PLUGIN_VERSION__='t', __UPDATE_BASE__='x' 정의) 가짜 risuai·document 를 준다.\n\n- 가짜 준비: pluginStorage 는 비어 있음. nativeFetch 는 첫 회 실패, 이후 성공하되 수동으로 풀어 주는 지연을 둔다. document.head.append 는 `globalThis.__goeiBody = { version: 't', start: async () => { starts++; await gate; return handlers; } }` 를 심는다.\n- 순서: 카드 감시로 첫 load 실패(받기 창 뜸) → Date.now 를 61초 뒤로 → 표식 든 글로 display 처리기 호출(조용한 load 시작, 받기 지연 중) → 받기 창의 「다시 받기」 클릭 → 지연을 모두 풂.\n- 단언: `assert.equal(starts, 1)` 과 runBody 횟수(head.append 호출 수) 1. 고치기 전에는 2 로 실패하고, 고친 뒤 1 로 통과한다.",
+     "needs_user_decision": false
+    }
+   ]
+  },
+  {
+   "key": "loader",
+   "n": 10,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "릴리스 준비 스크립트가 카드 빌드보다 먼저 플러그인을 빌드해, 카드 쪽 자료가 바뀐 릴리스에서는 옛 자료로 만든 본체·팩이 release 에 복사된다",
+    "kind": "other",
+    "severity": "low",
+    "file": "scripts/release-prep.mjs",
+    "line": 67,
+    "other_files": [
+     "tools/build_lite_card.py",
+     "scripts/data-pack.mjs"
+    ],
+    "evidence": "② `npm run build` (67) → ③ build_lite_card.py (73) → ④ dist→release 복사 (85-87). 그런데 카드 빌드는 팩의 원료를 다시 쓴다: src/data/install/*.json (build_lite_card.py:402-411, 1046) 과 src/data/world/greetings.json (1047) — 이것이 installPackText·worldPackText(scenesData) 의 입력이고 그 지문이 본체에 박힌다(scripts/build.mjs:26,36-44). 순서상 ④ 가 복사하는 dist 는 ③ 이전 자료로 만든 것이다. ⑤ 의 tests/qc-loader-build.test.mjs:51-64 가 dist 팩 ≠ 현재 src 자료를 잡아 주지만, 그때는 이미 release/ 가 옛 팩으로 덮인 뒤이고 --skip-tests 면 그대로 나간다. (지금 release/ 는 맞는 상태임을 확인: world 25a67469, install 15ed9bb9 가 현재 src 로 다시 만든 지문과 같음.)",
+    "scenario": "card/directory-fix.json·start-items.json·새 표정 그림·첫 장면 철자 고침을 넣은 릴리스에서 release:prep 을 한 번만 돌림 → ⑤ 에서 실패하고 멈춤(다시 돌려야 함), --skip-tests 였다면 설치 자료 팩·첫 장면 글이 한 판 뒤진 채 릴리스된다(카드 업데이트의 명부와 깡통봇 설치 명부가 서로 다름).",
+    "fix_sketch": "③ 뒤에 src/data/install·src/data/world/greetings.json 이 바뀌었는지(git status 또는 packOf 지문 비교) 보고 바뀌었으면 ② 를 한 번 더 돌린 뒤 ④ 로 간다. --bump 와 --no-card 를 같이 주면 version.json·card-update 가 옛 판으로 남는다는 경고도 낸다.",
+    "needs_user_decision": false,
+    "unreleased_change": false
+   },
+   "verdicts": [
+    {
+     "real": true,
+     "confidence": "high",
+     "severity": "low",
+     "reasoning": "The finding is real: I looked for a guard or re-build and found none. release-prep.mjs runs the plugin build (② at line 67) before the card build (③ at line 73), then copies dist to release (④ at lines 85-87). The card build rewrites the pack inputs: src/data/install/*.json (build_lite_card.py:395-407, 1046) and src/data/world/greetings.json (1047). scripts/data-pack.mjs reads exactly those files (lines 38, 55-58), and scripts/build.mjs:26, 39-40 bakes their fingerprints into the body. So when card-side sources have changed since the last card build, ④ copies packs and a body made from the old data.\n\nThe only protection is step ⑤: tests/qc-loader-build.test.mjs compares the dist packs with the current src data. It runs after release/ is already overwritten, and --skip-tests bypasses it. In the normal path the run stops with a failure and a second run fixes it, so stale data ships only with --skip-tests. Step ④-3 runs the card build again but does not re-run the plugin build either.\n\nThis is release tooling, not live plugin code, and it only bites when card inputs changed without the regenerated src/data being built in. Low severity is right.\n\nThe reporter's fix (detect a change, then build again) works but is more than needed. build_lite_card.py does not read dist/ at all (grep finds no reference); it reads package.json for the version, which step ① has already written. Swapping the order is enough.",
+     "proof": "scripts/release-prep.mjs:67 `run('npm', ['run', 'build'], '② 빌드');` comes before :73 `run('python3', ['tools/build_lite_card.py', src, 'release/괴이_ANOMALY.charx'], '③ 카드 빌드');`, and :87 then does `copyFileSync(resolve(dist, f), resolve(ROOT, 'release', f))`.\ntools/build_lite_card.py:1046 `write_install_data(greetings, greeting_index, LANDING, pictures, lore, icon, icon_name)` and :1047 `(ROOT / 'src' / 'data' / 'world' / 'greetings.json').write_text(...)`.\nscripts/data-pack.mjs:38 `const g = readJson('src/data/world/greetings.json');` and :55-58 `greetings: readJson('src/data/install/greetings.json'), pictures: ..., directory: ..., icon: ...`.\nscripts/build.mjs:26 `packOf(WORLD_PACK_NAME, worldPackText(), pkg.version), packOf(INSTALL_PACK_NAME, installPackText(), pkg.version)` and :39-40 `__WORLD_PACK__` / `__INSTALL_PACK__` defines.\nNo second `npm run build` exists anywhere after ③ in release-prep.mjs.",
+     "fix_plan": "Change only scripts/release-prep.mjs.\n\n1. Move the whole `if (opt.card) { ... } else log('③ 카드 빌드 건너뜀 (--no-card)')` block (lines 69-80) above the `run('npm', ['run', 'build'], '② 빌드')` line (67), so the card build writes src/data/install/*.json and src/data/world/greetings.json before the plugin build packs them. This is safe because build_lite_card.py does not read dist/ and takes the version from package.json, which step ① has already written.\n2. Update the step labels and the header comment on lines 1-2 to match the new order (card first, then build).\n3. Optionally, when `!opt.card` and the version changed, log a warning that release/version.json and card-update stay at the old version.\n\nDo NOT change:\n- the pic restore via `git checkout` inside the card block;\n- the ④ copy regex or the rule that old pieces in release/ are never deleted;\n- steps ④-2, ④-3 and ⑤;\n- build_lite_card.py, build.mjs and data-pack.mjs.",
+     "test_idea": "Add a unit test (for example in tests/qc-loader-build.test.mjs) that reads scripts/release-prep.mjs as text and asserts `src.indexOf(\"'tools/build_lite_card.py', src,\") < src.indexOf(\"['run', 'build']\")`. It fails now because the build comes first, and passes after the swap.\n\nThe existing dist-pack-equals-src-pack assertion in qc-loader-build.test.mjs stays as the after-the-fact check.",
+     "needs_user_decision": false
+    }
+   ]
+  }
+ ],
+ "disputed": [],
+ "rejected": []
+}
