@@ -679,6 +679,13 @@ export function movedNow(it: Items, lastAnchor: string): string[] {
   });
 }
 
+/** 마지막 응답 뒤에 소지품 창에서 직접 버린 것 → 「This turn」 사건 (사용자 2026-11-14, 전수검사 mainreach#6·items#9).
+ *  버리기 기록은 anchor 가 빈 글이라 물건의 outKey(버린 때의 마지막 메시지)로 찾는다 */
+export function droppedNow(it: Items, lastAnchor: string): string[] {
+  if (!lastAnchor) return [];
+  return it.list.filter((x) => x.outHow === 'drop' && x.outKey === lastAnchor).map((x) => `threw ${x.name} away — the protagonist discarded it on purpose and no longer has it`);
+}
+
 /** 이번 턴에 인터넷 쇼핑몰 등에 판 것 (2026-11-10 사용자: 우주 쇼핑몰에 입던 옷을 팔았는데 본편은 그 옷을 계속 입고 나왔다 — 판 일이 본편에 안 넘어가고 있었다).
  *  마지막 응답 뒤의 판매 기록(what=sell). 지금 열린 상점(skipPlace)에 판 것은 shopEvents 가 따로 넘기므로 뺀다 */
 export function soldNow(it: Items, lastAnchor: string, skipPlace = '', passes?: (place: string, plain: boolean) => boolean): string[] {
@@ -866,7 +873,7 @@ export function inventoryText(chat: Chat): string {
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).filter((e) => (e.store === 'hs' ? hsBuyPasses(vars) : boughtPasses(vars, e.store))).map(boughtLine),
-    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
+    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...droppedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars), vars),

@@ -69,13 +69,12 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
   };
   if (members.length > 1 && members.some((a) => members.some((b) => a !== b && stageOf(a, b) !== 'neutral'))) {
     const no = new Map(members.map((n, i) => [n, i + 1]));
-    const legend = members.map((n) => `${no.get(n)} ${named(n)}`).join(' · ');
     const head = `| viewer \\ target | ${members.map((n) => no.get(n)).join(' | ')} |`;
     const sep = `|---|${members.map(() => '---').join('|')}|`;
     const rows = members.map((a) => `| ${no.get(a)} ${named(a)} | ${members.map((b) => (a === b ? '-' : STAGE_MARK[stageOf(a, b)])).join(' | ')} |`);
     // 메모는 기본값이 비어 있고(사용자 2026-10-27), 사용자가 쓴 칸만 표 아래에 한 줄씩
     const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`]!.memo!.trim().replace(/\n+/g, ' '), dir)}`));
-    parts.push(`## Faction Relations\n${guideOr('Main', 'FACTION.RELATIONS_LEGEND', 'How the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.')}\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
+    parts.push(`## Faction Relations\n${guideOr('Main', 'FACTION.RELATIONS_LEGEND', 'How the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.')}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
   }
   if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations\n${fillCodes(rel.common.trim(), dir)}`);
   return parts.join('\n\n') + '\n\n---';
