@@ -8,7 +8,7 @@
 //    Risu 는 글이 그대로면 메시지를 다시 그리지 않으니(Chats.svelte 글 해시), 이름은 글이 아니라 CSS(::before content)로 넣는다.
 //  · 마지막 메시지 = .chat-message-container:first-child (Risu 는 새 메시지를 맨 앞에 넣고 flex-col-reverse 로 뒤집어 보인다).
 import { aliveAnchors } from '../core/wallet';
-import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, lastUserKey, liveItems, readItemUse, readItems, usesToSend } from '../core/items';
+import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, lastUserKey, liveItems, readItemUse, readItems, useRerolling, usesToSend } from '../core/items';
 import type { Chat } from '../core/types';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { body } from './overlay';
@@ -91,14 +91,24 @@ let lockAt: { charIndex: number; chatIndex: number } | null = null;
 /** 본편 요청이 어느 채팅에서 나갔는지 적는다 (body.ts onBeforeRequest: 시작할 때 null, 채팅을 읽은 뒤 그 자리). 다른 채팅의 「사용」은 막지 않는다 */
 export function setUseLockAt(at: { charIndex: number; chatIndex: number } | null): void {
   lockAt = at ? { charIndex: at.charIndex, chatIndex: at.chatIndex } : null;
-  if (!at) out = null; // 새 요청: 지난 요청에 실린 것은 잊는다
+  if (!at) { out = null; blind = false; } // 새 요청: 지난 요청에 실린 것은 잊는다
 }
+/** 마지막 본편 요청을 손대지 못하고 보냈나 (이 봇 판정이 늦었거나 채팅을 못 읽음). [Inventory] 가 안 실렸으니 그 답에는 사용을 적지 않는다:
+ *  그사이 넣었거나 넣어 둔 것이 모델 모르게 쓴 것으로 적히고 깎였다. 자리는 그대로 두어 다음 요청에 실린다 */
+let blind = false;
+/** body.ts onBeforeRequest: setUseLockAt(null) 뒤에 적는다 (다음 요청에서 꺼진다) */
+export function setUseBlind(): void { blind = true; }
+export function useBlind(): boolean { return blind; }
 /** 마지막 본편 요청에 실제로 실려 나간 사용 (다시 굴리기 포함). sent 와 달리 기다림이 늦게 꺼져도 남는다: 답이 붙을 때 정리(settleItemUse)가 본다 */
-let out: { charIndex: number; chatIndex: number; userKey: string; ids: Set<string> } | null = null;
+let out: { charIndex: number; chatIndex: number; userKey: string; ids: Set<string>; reroll: boolean } | null = null;
 /** 이 채팅·이 유저 턴의 요청에 실려 나간 물건 id. 모르면 null (요청을 못 봤거나 다른 턴) */
 export function sentOut(charIndex: number, chatIndex: number, chat: Chat | null | undefined): Set<string> | null {
   if (!out || !chat || out.charIndex !== charIndex || out.chatIndex !== chatIndex || out.userKey !== lastUserKey(chat)) return null;
   return out.ids;
+}
+/** 그 요청이 자리 사본을 다시 보낸 다시 굴리기였나. 모르면 null. 정리(settleItemUse)가 요청과 같은 판정을 쓰게 넘긴다 (이어 쓰기는 같은 응답에 덧붙는다) */
+export function sentReroll(charIndex: number, chatIndex: number, chat: Chat | null | undefined): boolean | null {
+  return sentOut(charIndex, chatIndex, chat) ? out!.reroll : null;
 }
 /** 지금은 「사용」을 바꿀 수 없나(넣기·빼기): 이 채팅의 본편 답을 기다리는 중이거나 답 정리 중 (다시 굴리기 포함).
  *  그사이 넣은 것은 요청에 없었는데도 답이 붙을 때 쓴 것으로 적히고 횟수가 깎였다 (11-14 사용자: 전부 막기).
@@ -138,7 +148,7 @@ export async function markUseSent(charIndex: number, chatIndex: number, chat: Ch
   const userKey = lastUserKey(chat);
   // 요청에 실제로 실린 것만 (core/items.ts usesToSend: [Inventory] 의 「uses」 줄과 같은 셈)
   const ids = usesToSend(chat).map((u) => u.id);
-  out = { charIndex, chatIndex, userKey, ids: new Set(ids) };
+  out = { charIndex, chatIndex, userKey, ids: new Set(ids), reroll: useRerolling(chat) };
   if (!ids.length || chat.scriptstate?.[ITEM_USE_AT_VAR]) return;
   sent = { charIndex, chatIndex, userKey, ids: new Set(ids) };
   await refreshUseBox(charIndex, chatIndex, chat);

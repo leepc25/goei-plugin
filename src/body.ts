@@ -72,7 +72,7 @@ import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
 import { cosReadyMode } from './core/malls';
-import { hideUseBox, holdUseSettle, markUseSent, refreshUseBox, sentOut, setUseLockAt, USE_SLOT } from './host/usebox';
+import { hideUseBox, holdUseSettle, markUseSent, refreshUseBox, sentOut, sentReroll, setUseBlind, setUseLockAt, useBlind, USE_SLOT } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
@@ -193,6 +193,10 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   try {
     setWaiting(true);
     setUseLockAt(null); // 「사용」 잠금: 어느 채팅인지 읽기 전에는 전부 (host/usebox.ts)
+    // 다른 봇의 요청: 이 봇 채팅의 「사용」은 잠그지 않는다 (없는 자리를 적어 둔다)
+    if (!liteNow) setUseLockAt({ charIndex: -1, chatIndex: -1 });
+    // 판정이 늦어 이 봇의 요청이었을 수도 있다: 손대지 못한 요청의 답에는 사용을 적지 않는다 (onOutput)
+    if (!liteNow) setUseBlind();
     setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
     // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
     // 지시문 풀기가 채팅의 마지막 메시지를 봐야 해서 그 앞에서 읽는다 (전수검사 11-13)
@@ -202,6 +206,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       await stepAsync('호출 기록', () => traceBegin(), undefined);
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
       if (ctx) setUseLockAt(ctx); // 「사용」 잠금은 요청을 보낸 이 채팅에만
+      else setUseBlind(); // 채팅을 못 읽음: [Inventory] 도 못 넣는다
       // 진행 창 (core/progress.ts): 이 턴에 돌 단계를 설정으로 미리 깐다
       if (ctx) step('진행 계획', () => progressPlan(turnPlan(ctx!.char, ctx!.chat)), undefined);
     }
@@ -627,9 +632,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 소지품 「사용」 상자: 보낸 것은 사용 기록으로 이 응답에 묶고, 다음 턴이면 비운다 (core/items.ts settleItemUse)
     // 요청에 실려 나간 것(sentOut)을 같이 넘긴다: 보낸 뒤 버리거나 판 물건도 쓴 것으로 적고, 요청에 없던 것은 적지 않는다
     const useSent = sentOut(arg.characterIndex, arg.chatIndex, latest ?? chat);
-    if (settleItemUse(latest ?? chat, arg.messageIndex, useSent)) {
+    const useAsked = sentReroll(arg.characterIndex, arg.chatIndex, latest ?? chat);
+    // 손대지 못하고 보낸 요청의 답(useBlind): 모델이 사용을 못 받았으니 적지 않고 자리를 그대로 둔다
+    if (!useBlind() && settleItemUse(latest ?? chat, arg.messageIndex, useSent, useAsked)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-        const vars = settleItemUse(cur, arg.messageIndex, useSent);
+        const vars = settleItemUse(cur, arg.messageIndex, useSent, useAsked);
         return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
       }).catch(() => null)) ?? latest;
     }

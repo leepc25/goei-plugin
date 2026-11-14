@@ -11,7 +11,7 @@ mkdirSync(dir, { recursive: true });
 await build({
   stdin: {
     contents: `
-      export { useBoxCss, markUseSent, sentUseIds, sentOut, dropUseUnlessSent, useLocked, holdUseSettle, setUseLockAt, freeUseLock } from './src/host/usebox';
+      export { useBoxCss, markUseSent, sentUseIds, sentOut, sentReroll, dropUseUnlessSent, useLocked, holdUseSettle, setUseLockAt, setUseBlind, useBlind, freeUseLock } from './src/host/usebox';
       export { setWaiting, isWaiting, setWaitingProbe, WAIT_MS, WAIT_AGAIN_MS } from './src/host/waiting';
       export { readItemUse, ITEM_USE_VAR, ITEM_USE_AT_VAR, ITEM_USE_PREV_VAR, readUsePrev, mergeUse, addItem, itemsVars, readItems, liveItems, lastUserKey, settleItemUse, itemLeft, usesToSend, inventoryText } from './src/core/items';
       export { dropFromUse, itemsAction, itemsTab, itemsUi } from './src/ui/items';
@@ -193,8 +193,21 @@ function reply(t, chatId) {
   U.setWaiting(false);
   t.store.chat.message.push({ role: 'char', data: '감았다', ...(chatId ? { chatId } : {}) });
   // body.ts 처럼 요청에 실려 나간 것(sentOut)을 같이 넘긴다
-  const vars = U.settleItemUse(t.store.chat, t.store.chat.message.length - 1, U.sentOut(0, t.ctx().chatIndex, t.store.chat));
+  // 손대지 못하고 보낸 요청의 답이면 정리를 건너뛴다 (useBlind)
+  const vars = U.useBlind() ? null : U.settleItemUse(t.store.chat, t.store.chat.message.length - 1, U.sentOut(0, t.ctx().chatIndex, t.store.chat), U.sentReroll(0, t.ctx().chatIndex, t.store.chat));
   if (vars) t.store.chat.scriptstate = { ...t.store.chat.scriptstate, ...vars };
+  done();
+}
+/** 이어 쓰기가 끝났다: 새 메시지 없이 마지막 응답에 덧붙고, 같은 자리로 정리가 온다 (body.ts onOutput 처럼 두 번 불러도 같아야 한다) */
+function continued(t) {
+  const done = U.holdUseSettle();
+  U.setWaiting(false);
+  const at = t.store.chat.message.length - 1;
+  t.store.chat.message[at].data += ' 이어서';
+  for (let k = 0; k < 2; k++) {
+    const vars = U.settleItemUse(t.store.chat, at, U.sentOut(0, t.ctx().chatIndex, t.store.chat), U.sentReroll(0, t.ctx().chatIndex, t.store.chat));
+    if (vars) t.store.chat.scriptstate = { ...t.store.chat.scriptstate, ...vars };
+  }
   done();
 }
 /** 본편 요청이 나갔다 (body.ts onBeforeRequest 처럼): 기다림을 켜고 이 채팅을 잠그고 실린 사용을 적는다 */
@@ -613,4 +626,119 @@ test('답이 3분보다 늦어도 리수가 아직 만드는 중이면 기다림
     U.setWaiting(false);
     U.setWaitingProbe(null);
   }
+});
+
+// ── 11-14 재검토 (v0.21.16 전): 이어 쓰기 · 다른 봇의 요청 ──
+test('답이 온 뒤 다른 물건을 넣고 이어 쓰기: 새 물건이 그 응답에 적히고 깎인다. 다음 메시지에 또 나가지 않고, 다시 굴리면 둘 다 다시 나간다', async () => {
+  const t = withIds(seed(60));
+  const other = addOther(t);
+  await send(t);
+  reply(t, 'r1');
+  await U.itemsAction('items-use', other, t.ctx(), t.env);
+  // 이어 쓰기 요청: 새 물건만 나간다
+  const inv = U.inventoryText(t.store.chat);
+  assert.match(inv, /This turn: uses 진통제 \(1 left after this\)/);
+  assert.doesNotMatch(inv, /uses[^\n]*붕대/);
+  await send(t);
+  assert.equal(U.sentReroll(0, 60, t.store.chat), false);
+  continued(t);
+  assert.deepEqual(usedLog(t), ['붕대×1', '진통제×1']);
+  assert.equal(leftNow(t, other), 1);
+  assert.equal(leftNow(t), 2);
+  assert.equal(t.store.chat.scriptstate[U.ITEM_USE_AT_VAR], 'm1', '보낸 자리로 적힌다 (칩이 남지 않는다)');
+  assert.equal(U.readUsePrev(t.store.chat.scriptstate), null);
+  // 또 이어 쓰거나 유저 메시지 없이 다음 응답을 받아도 다시 안 나간다
+  assert.doesNotMatch(U.inventoryText(t.store.chat), /This turn: uses/);
+  await send(t);
+  continued(t);
+  assert.deepEqual(usedLog(t), ['붕대×1', '진통제×1']);
+  // 다시 굴리기: 그 응답이 쓴 둘 다 다시 나가고 새 응답에 적힌다
+  t.store.chat.message.pop();
+  assert.match(U.inventoryText(t.store.chat), /This turn: uses 붕대[^\n]*진통제/);
+  await send(t);
+  reply(t, 'r1b');
+  assert.equal(leftNow(t), 2);
+  assert.equal(leftNow(t, other), 1);
+  // 다음 유저 메시지에는 안 나가고 자리가 비워진다
+  t.store.chat.message.push({ role: 'user', data: '다음', chatId: 'u2' });
+  assert.doesNotMatch(U.inventoryText(t.store.chat), /This turn: uses/);
+  await send(t);
+  reply(t, 'r2');
+  assert.deepEqual(t.queue(), []);
+  assert.equal(leftNow(t, other), 1);
+});
+
+test('답이 온 뒤 같은 물건을 다시 넣고 이어 쓰기: 그 응답의 기록에 횟수가 더해진다 (보낸 만큼 깎인다)', async () => {
+  const t = withIds(seed(61));
+  await send(t);
+  reply(t, 'r1');
+  await U.itemsAction('items-use', t.id, t.ctx(), t.env);
+  assert.match(U.inventoryText(t.store.chat), /This turn: uses 붕대 \(1 left after this\)/);
+  await send(t);
+  continued(t);
+  assert.deepEqual(usedLog(t), ['붕대×2']);
+  assert.equal(leftNow(t), 1);
+  assert.doesNotMatch(U.inventoryText(t.store.chat), /This turn: uses/);
+  // 다시 굴리면 두 번 쓴 것으로 다시 나간다
+  t.store.chat.message.pop();
+  assert.match(U.inventoryText(t.store.chat), /This turn: uses 붕대 ×2 \(1 left after this\)/);
+  await send(t);
+  reply(t, 'r1b');
+  assert.equal(leftNow(t), 1);
+});
+
+test('다른 봇의 요청을 기다리는 동안: 이 봇 채팅의 「사용」은 잠기지 않는다', async () => {
+  const t = seed(62);
+  // body.ts onBeforeRequest: 이 봇이 아니면(liteNow 꺼짐) 없는 자리를 적는다
+  const src = (await import('node:fs')).readFileSync('src/body.ts', 'utf8');
+  assert.match(src, /setUseLockAt\(null\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(!liteNow\) setUseLockAt\(\{ charIndex: -1, chatIndex: -1 \}\);/);
+  U.setWaiting(true);
+  U.setUseLockAt(null);
+  assert.equal(U.useLocked(0, 62), true, '어느 채팅인지 모르면 전부');
+  U.setUseLockAt({ charIndex: -1, chatIndex: -1 });
+  try {
+    assert.equal(U.useLocked(0, 62), false);
+    assert.equal(U.sentOut(0, 62, t.store.chat), null, '지난 요청에 실린 것은 잊은 채다');
+    U.itemsUi.info = '';
+    await U.itemsAction('items-use', t.id, t.ctx(), t.env);
+    assert.equal(nOf(t), 2);
+    assert.notEqual(U.itemsUi.info, WAIT);
+    assert.equal(await U.dropFromUse({ charIndex: 0, chatIndex: 62 }, t.id), true);
+    assert.deepEqual(t.queue(), []);
+  } finally {
+    U.setWaiting(false);
+  }
+});
+
+test('이 봇 판정이 늦어 손대지 못하고 보낸 요청: 기다리는 동안 넣은 것은 그 답에 적히지 않고 다음 메시지에 나간다', async () => {
+  const t = seed(63);
+  // body.ts: 손대지 못한 요청이면 적어 두고(onBeforeRequest), 그 답에서는 사용 정리를 건너뛴다(onOutput)
+  const src = (await import('node:fs')).readFileSync('src/body.ts', 'utf8');
+  assert.match(src, /if \(!liteNow\) setUseBlind\(\);/);
+  assert.match(src, /if \(ctx\) setUseLockAt\(ctx\);[^\n]*\n\s*else setUseBlind\(\);/);
+  assert.match(src, /if \(!useBlind\(\) && settleItemUse\(/);
+  // 요청: liteNow 가 꺼져 있어 [Inventory] 도 보낸 표시도 없다
+  U.setWaiting(true);
+  U.setUseLockAt(null);
+  U.setUseLockAt({ charIndex: -1, chatIndex: -1 });
+  U.setUseBlind();
+  assert.equal(U.useBlind(), true);
+  // 답을 기다리는 동안 넣는다 (잠기지 않는다)
+  await U.itemsAction('items-use', t.id, t.ctx(), t.env);
+  const n = nOf(t);
+  assert.equal(n, 2, '넣어 둔 하나에 하나 더');
+  const left = leftOf(t);
+  reply(t, 'r1');
+  assert.deepEqual(usedLog(t), [], '모델이 못 받은 사용은 적지 않는다');
+  assert.equal(leftOf(t), left);
+  assert.equal(nOf(t), n);
+  assert.ok(!t.store.chat.scriptstate[U.ITEM_USE_AT_VAR], '자리는 아직 안 보낸 채');
+  // 다음 요청은 제대로 나간다: 실리고, 그 답에 적힌다
+  t.store.chat.message.push({ role: 'user', data: '다음', chatId: 'u2' });
+  await send(t);
+  assert.equal(U.useBlind(), false, '새 요청에서 꺼진다');
+  assert.ok(U.sentOut(0, 63, t.store.chat)?.has(t.id));
+  reply(t, 'r2');
+  assert.deepEqual(usedLog(t), ['붕대×2']);
+  assert.equal(leftOf(t), left - n);
 });
