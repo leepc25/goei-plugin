@@ -5,7 +5,7 @@
 // 팔기(11-07): 도구 줄 「팔기」 → 진열대 자리에 내 소지품 → 하나 고르면 입력창에 「팔기: 이름」 칩(값을 부르거나 그냥 보냄) → 주인이 값을 부르면 상세 창(잔고 / +값 / 잔액) [팔기][흥정][그만].
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
-import { refreshUseBox } from '../host/usebox';
+import { refreshUseBox, useLocked } from '../host/usebox';
 import { generate, type LlmMessage } from '../host/llm';
 import { facePic } from '../host/assets';
 import { personaText } from '../host/user';
@@ -355,7 +355,8 @@ function saleDone<C extends ChatContext['chat']>(chat: C, shop: string, itemId: 
   const items = sellItem(it0, itemId, now.key, `${now.shop}에 팖`);
   const nextShop = closeSale(now, now.key);
   if (!nextShop) return null;
-  const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+  // 답을 기다리는 중·정리 중에는 「사용」 자리를 건드리지 않는다 (요청에 실린 사용이 기록 없이 빠지지 않게, host/usebox.ts useLocked)
+  const q = chat.scriptstate?.[ITEM_USE_AT_VAR] || useLocked() ? null : readItemUse(chat.scriptstate);
   const use = q && q.some((u) => u.id === itemId) ? itemUseVars(dropUse(q, itemId)) : {};
   return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...ledgerVars(w, p), ...itemsVars(items), ...shopVars(nextShop), ...use } };
 }

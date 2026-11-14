@@ -33,7 +33,7 @@ for (const vp of ['pc', 'phone']) {
   const click = async (sel) => { await page.evaluate((q) => document.querySelector(q)?.click(), sel); await sleep(250); };
 
   /** 소지품 창에서 물건을 「사용」에 놓는다 (창이 새 채팅을 다 읽을 때까지 기다리고, 놓였는지 변수로 확인) */
-  const queue = async (names = ['소형 손전등', '딸기맛 막대사탕']) => {
+  const openItems = async () => {
     await openWin(page); await sleep(300);
     if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
     // 소지품 탭: 보이는 단추를 누른다 (PC 는 숨은 폰 탭이 먼저 잡힌다)
@@ -41,6 +41,9 @@ for (const vp of ['pc', 'phone']) {
       await page.evaluate(() => { const t = [...document.querySelectorAll('[data-action="tab"][data-value="items"], [data-action="nav-tab"][data-value="items"]')]; (t.find((x) => x.offsetParent !== null) ?? t[0])?.click(); });
       await sleep(400);
     }
+  };
+  const queue = async (names = ['소형 손전등', '딸기맛 막대사탕']) => {
+    await openItems();
     for (const n of names) {
       const id = `i_${n}`;
       for (let i = 0; i < 8; i++) {
@@ -140,6 +143,12 @@ for (const vp of ['pc', 'phone']) {
   v = await vars(); s = await bar();
   console.log(vp, '2 continue', JSON.stringify(v));
   if (s.shown || v.log.length !== 2) bad(`빈 입력 이어 쓰기 응답 뒤: ${JSON.stringify(v)} ${JSON.stringify(s)}`);
+  // 응답이 살아 있는 채로 유저 메시지 없이 또 보내면(두 번째 응답) 지난 사용을 다시 넘기지 않고, 기록도 그대로다 (11-14 재검토)
+  r = await send(null);
+  if (r.uses.length) bad(`유저 메시지 없이 이어 받는 요청에 사용이 또 실렸다: ${JSON.stringify(r.uses)}`);
+  await respond();
+  v = await vars();
+  if (v.log.length !== 2) bad(`이어 받은 응답 뒤에도 사용 기록은 2줄이어야 한다: ${JSON.stringify(v)}`);
 
   // ── 3. 다시 굴리기: 응답을 지우고 같은 유저 턴으로 다시 요청 ──
   await reset(); await queue();
@@ -153,14 +162,31 @@ for (const vp of ['pc', 'phone']) {
   console.log(vp, '3 reroll', JSON.stringify(v));
   if (v.log.length !== 2) bad(`다시 굴린 응답에 사용 기록이 2줄이어야 한다(옛 응답 것은 죽음): ${JSON.stringify(v)}`);
 
-  // ── 4. 보낸 뒤 응답 전에 물건을 더 놓으면 그것만 보인다 ──
+  // ── 4. 보낸 뒤 응답 전에는 물건을 더 놓을 수 없다 (11-14 사용자: 기다리는 중에는 전부 막기). 단추는 켜져 있고 누르면 안내가 뜬다 ──
   await reset();
   await queue(['소형 손전등']);
   await send('켠다');
+  const before4 = (await vars()).use;
+  await openItems();
+  await page.waitForSelector('.it-c[data-value="i_딸기맛 막대사탕"]', { timeout: 5000 });
+  await click('.it-c[data-value="i_딸기맛 막대사탕"]');
+  const dead4 = await page.evaluate(() => document.querySelector('[data-action="items-use"]')?.disabled);
+  await click('[data-action="items-use"]');
+  const note4 = await page.evaluate(() => /답을 기다리는 중이라 지금은 사용에 넣을 수 없어요/.test(document.body.innerText));
+  await click('[data-action="items-close"]');
+  await closeWin(page); await sleep(300);
+  s = await bar();
+  v = await vars();
+  console.log(vp, '4 refused while waiting', JSON.stringify(s), JSON.stringify({ dead4, note4 }));
+  if (dead4 !== false) bad(`기다리는 중에도 사용 단추는 켜져 있어야 한다: ${dead4}`);
+  if (!note4) bad('기다리는 중에 사용을 누르면 안내가 떠야 한다');
+  if (v.use !== before4) bad(`기다리는 중에는 사용 목록이 그대로여야 한다: ${JSON.stringify(v)}`);
+  if (s.shown !== 1 || s.label !== '보내는 중' || s.names.length !== 1 || !/손전등/.test(s.names[0])) bad(`보낸 손전등만 「보내는 중」으로 보여야 한다: ${JSON.stringify(s)}`);
+  // 답이 온 뒤에는 창을 다시 열어 넣을 수 있다
+  await respond();
   await queue(['딸기맛 막대사탕']);
   s = await bar();
-  console.log(vp, '4 added while waiting', JSON.stringify(s));
-  if (s.shown !== 1 || s.names.length !== 1 || !/막대사탕/.test(s.names[0])) bad(`보낸 뒤 더 놓은 것만 보여야 한다: ${JSON.stringify(s)}`);
+  if (s.shown !== 1 || s.names.length !== 1 || !/막대사탕/.test(s.names[0])) bad(`답이 온 뒤 놓은 것만 보여야 한다: ${JSON.stringify(s)}`);
 
   // ── 5. 요청 실패: 응답 알림 없이 기다림이 끝나면(180초) 다시 보인다 ──
   await reset();

@@ -1,4 +1,91 @@
- `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ""}</div></section>
+ray(ctx2.chat.message) ? ctx2.chat.message.length : 0, vars: chatSettingVars(ctx2.chat.scriptstate) } : null,
+      prefs: getPrefs(),
+      // 네 게시판 실패를 사이트와 함께 모두 적는다 (전수검사 11-13)
+      failures: { gnet: boardFailures().map((f) => ({ site: f.site, reason: f.reason, raw: f.raw })), phone: fail4(phone.failure), wiki: fail4(wiki.failure) },
+      peopleRuns: runs
+    }, null, 2);
+  }
+  function downloadJson(name, json) {
+    const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2e3);
+  }
+  function backupPage(ctx2, canChat) {
+    const withChat = canChat && manUi.withChat;
+    const json = exportJson(ctx2, withChat);
+    const chatN = canChat ? Object.keys(chatSettingVars(ctx2.chat.scriptstate)).length : 0;
+    const sizes = manUi.sizes;
+    const store3 = STORE.map(([key, label2, help, drop]) => {
+      const n3 = sizes?.[key] ?? 0;
+      const ctl = `<span class="gw-tokens">${sizes ? n3 ? kb(n3) : "없음" : "…"}</span>${drop && n3 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
+      return row6(label2, ctl, help);
+    }).join("");
+    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
+      <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc39(manUi.importName)}</span>` : ""}</div>
+      <textarea data-input="man-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc39(manUi.importText)}</textarea></div>
+    <div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? "" : "disabled"}>적용</button></div>`;
+    const defRow2 = (label2, help, what, btn, off = false) => row6(label2, `<button class="gx-mini${what === "reset" ? " danger" : ""}" data-action="set-bar" data-value="${what}" ${off ? "disabled" : ""}>${btn}</button>`, help);
+    const defaults = `<section class="ps-group"><h3>기본값</h3><div class="ps-rows">
+      ${defRow2("기본값으로 저장", "지금 설정을 기본값으로 저장해요. 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.", "save", "기본값으로 저장")}
+      ${defRow2("기본값 불러오기", canChat ? "저장해 둔 기본값을 지금 채팅에 가져와요." : "채팅을 시작한 뒤에 쓸 수 있어요. 새 채팅은 기본값으로 시작해요.", "load", "불러오기", !canChat)}
+      ${defRow2("초기화", "지금 채팅의 설정과 저장해 둔 기본값, 고친 지침, 고친 세계(카드 명부)를 플러그인 원래 값으로 되돌려요. 상황판 켜기·끄기와 추가 규칙은 그대로 둬요.", "reset", "초기화", !canChat)}
+    </div></section>${mainDefaultsConfirm(ctx2)}`;
+    return `<div class="gw-page gw-set">${head2("", "저장·불러오기", "설정은 고치는 즉시 저장돼요. 여기서는 기본값을 저장·불러오기·초기화하고, 설정을 글(JSON)로 내보내고 가져와요.")}
+    <div class="gx-settings gw-setbody">
+    ${defaults}
+    <section class="ps-group"><h3>내보내기·가져오기</h3><p class="ps-note">들어가는 것: 화면·이미지 설정, 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 바꾸지 않아 원래 값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.</p><div class="ps-rows">
+      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
+        <div class="ps-ctl"><span class="gw-tokens">${kb(json.length)}</span><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div></div>
+      ${canChat ? `<div class="ps-row"><div class="ps-label"><b>지금 채팅 값도 넣기</b><small>이 채팅에서 바꾼 설정 값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·생성 공통) ${chatN}개를 「chat」으로 같이 넣어요. 가져올 때 채팅이 열려 있으면 그 채팅에 적혀요. 기록(상황판 내용·인물 기록·일지)은 안 들어가요.</small></div>
+        <div class="ps-ctl"><label class="pp-check"><input type="checkbox" data-change="man-with-chat" ${withChat ? "checked" : ""}> 넣기</label></div></div>` : ""}
+      ${importRows}
+    </div></section>
+    <section class="ps-group"><h3>저장소 사용량 <small>이 기기 플러그인 저장소에 있는 것</small></h3><div class="ps-rows">${store3}</div></section>
+    </div></div>`;
+  }
+  function getBtn(what, label2, has3) {
+    if (has3) return "";
+    if (manUi.getting === what) return `<span class="gx-muted gw-getting">${esc39(manUi.progress || "받는 중…")}</span>`;
+    return `<button class="gx-mini" data-action="man-get-${what}" ${manUi.getting ? "disabled" : ""}>${ICONS.refresh}${esc39(label2)}</button>`;
+  }
+  function diagPage(ctx2, canChat) {
+    const lore = ctx2.char.globalLore;
+    const goei = isGoeiLore(lore);
+    const ver = cardVersion(lore);
+    const mode2 = String(advValue(ctx2.chat.scriptstate, "gen", "lore_mode") ?? "plugin");
+    const msgs4 = Array.isArray(ctx2.chat.message) ? ctx2.chat.message.length : 0;
+    const tok3 = tokenizerName();
+    const wikiOld = wikiPackOld();
+    if (!wikiOld) void checkWikiPackOld().then((old) => old && wikiPackOld() && diagOpen && rerender3?.());
+    const rows3 = [
+      row6("카드", badge2(goei, goei ? "괴이 카드" : "괴이 카드 아님"), goei ? `카드 ${ver === "0" ? "이전 판" : `v${ver}`} · 명부·매니페스트 있음` : "설치 · 점검에서 심으면 괴이 카드가 돼요"),
+      row6("플러그인", badge2(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? "" : "업데이트를 받을 수 없는 빌드"),
+      // 주소 글은 보여 주지 않는다 (2026-11-13 사용자)
+      // 카드 판 ≠ 플러그인 판이면 빨간 줄 (2026-11-06 사용자, 전수점검 남은 것 4): 카드가 낡았으면 업데이트 페이지로, 카드가 더 새면 플러그인을 받으라고
+      ...goei && compareVersions(ver, PLUGIN_VERSION) !== 0 ? [row6("판 맞춤", badge2(false, compareVersions(ver, PLUGIN_VERSION) < 0 ? "카드가 낡음" : "플러그인이 낡음"), compareVersions(ver, PLUGIN_VERSION) < 0 ? `카드 ${ver === "0" ? "이전 판" : `v${ver}`}, 플러그인 v${PLUGIN_VERSION}. 새 기능·지침이 카드에 없을 수 있어요. 업데이트에서 카드를 플러그인 판으로 올리세요. <button class="gx-mini" data-action="ed-node" data-value="set:update">${ICONS.refresh}업데이트로</button>` : `카드 v${ver}, 플러그인 v${PLUGIN_VERSION}. 플러그인을 새 판으로 받으세요.`)] : [],
+      row6("채팅", badge2(canChat, canChat ? "진행 중" : "시작 전"), canChat ? `메시지 ${msgs4}개 · 이 채팅 값으로 동작해요` : "시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요"),
+      // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
+      row6("토크나이저", badge2(!!tok3, tok3 || "어림값") + getBtn("tok", "받기 (약 2MB)", !!tok3), tok3 ? "토큰 수를 정확히 세요" : "안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요."),
+      row6("위키 기본 문서", badge2(!!storedWikiPack() && !wikiOld, wikiOld ? "새 판 있음" : storedWikiPack() ? "있음" : "없음") + getBtn("wiki", "받기 (약 1MB)", !!storedWikiPack() && !wikiOld), storedWikiPack() ? "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)" : "안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요."),
+      row6("로어북 보내기", badge2(null, mode2 === "risu" ? "Risu가 직접" : "플러그인이 고름"), "설정 → 호출 → 로어북 호출 → 로어북 보내기")
+    ].join("");
+    const fails = [...boardFailures().map((f) => `${f.name}: ${f.reason}`), phone.failure ? `괴담톡: ${phone.failure.reason}` : "", wiki.failure ? `위키: ${wiki.failure.reason}` : ""].filter(Boolean);
+    return `<div class="gw-page gw-set">${head2("", "상태 점검", "플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.")}
+    <div class="gx-settings gw-setbody">
+    <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows3}${row6("최근 실패", fails.length ? badge2(false, `${fails.length}건`) : badge2(true, "없음"), fails.length ? "「실패 기록」에서 원문을 볼 수 있어요" : "괴담넷·괴담톡·위키 요청이 실패한 적이 없어요")}</div></section>
+    </div></div>`;
+  }
+  function logPage(ctx2, canChat) {
+    const fail4 = (name, f) => f ? `<div class="ps-row"><div class="ps-label"><b>${esc39(name)}</b><small>${esc39(f.reason)}</small></div><textarea readonly rows="4">${esc39(f.raw)}</textarea></div>` : "";
+    const fails = boardFailures().map((f) => fail4(f.name, f)).join("") + fail4("괴담톡", phone.failure) + fail4("위키", wiki.failure);
+    const bundle = diagBundle(ctx2, canChat);
+    return `<div class="gw-page gw-set">${head2("", "실패 기록", "괴담넷·괴담톡·위키 요청이 실패했을 때 모델이 보낸 원문이에요. 인물 기록 갱신의 결과는 「인물 기록 점검」에 있어요.")}
+    <div class="gx-settings gw-setbody">
+    <section class="ps-group"><h3>진단 묶음</h3><div class="ps-rows">${row6("내려받기", `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, "판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.")}</div></section>
+    <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ""}</div></section>
     </div></div>`;
   }
   function manageConfirmPopup() {
@@ -357,7 +444,7 @@ ${talk}` }
   }
   function pageRows(html, page, menu) {
     const doc2 = new DOMParser().parseFromString(html, "text/html");
-    const out = [];
+    const out2 = [];
     const seen4 = /* @__PURE__ */ new Set();
     let infoN = 0;
     const cols = /* @__PURE__ */ new Map();
@@ -469,19 +556,19 @@ ${talk}` }
         push3({ id: `${action}${key ? `.${key}` : ""}`, name: isGrid ? cg2 : "", kind: "pick", cur: curEl?.dataset.value ?? "", opts, locked: mates.every((x) => x.hasAttribute("disabled")), colGroup: cg2 || void 0, ctl: { t: "pick", action, send: Object.fromEntries(opts.map(([v]) => [v, v])) } });
       }
       if (!made.length) {
-        out.push({ id: `row.${page}.${++infoN}`, page, menu, group: group4, name: label2, kind: "info", cur: "", help, go: spot(), keys: [label2] });
+        out2.push({ id: `row.${page}.${++infoN}`, page, menu, group: group4, name: label2, kind: "info", cur: "", help, go: spot(), keys: [label2] });
         return;
       }
       for (const r of made) {
         r.name = r.name && (made.length > 1 || !isPs) ? `${label2} · ${r.name}` : label2;
-        out.push(r);
+        out2.push(r);
       }
     });
     doc2.querySelectorAll(".ps-group > .mx-foot").forEach((foot) => {
       if (foot.closest(TWIN)) return;
       const title2 = txt(foot.parentElement?.querySelector("h3"));
       const help = txt(foot);
-      if (title2 && help) out.push({ id: `row.${page}.${++infoN}`, page, menu, group: title2, name: title2, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [title2] });
+      if (title2 && help) out2.push({ id: `row.${page}.${++infoN}`, page, menu, group: title2, name: title2, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [title2] });
     });
     doc2.querySelectorAll("details.ps-adv").forEach((d) => {
       if (d.closest(TWIN) || !d.querySelector(".ms-tb") || d.querySelector(ROW)) return;
@@ -489,9 +576,9 @@ ${talk}` }
       if (!name) return;
       const count2 = txt(d.querySelector(":scope > summary > .adv-count"));
       const help = `${count2 ? `지금 ${count2}. ` : ""}${txt(d.querySelector(".ps-note"))} 상담에서는 바꾸지 못해요. 설정 화면에서 펼쳐 칸으로 고쳐요.`.trim();
-      out.push({ id: `row.${page}.${++infoN}`, page, menu, group: txt(d.closest(".ps-group")?.querySelector("h3")), name, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [name] });
+      out2.push({ id: `row.${page}.${++infoN}`, page, menu, group: txt(d.closest(".ps-group")?.querySelector("h3")), name, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [name] });
     });
-    return out;
+    return out2;
   }
   var host2 = null;
   var setCatalogHost = (h) => {
@@ -641,17 +728,17 @@ ${talk}` }
     return [.../* @__PURE__ */ new Set([...byName, ...byRow])];
   }
   function openMenus(menus, want, base, budget2) {
-    const out = [];
+    const out2 = [];
     let used = base;
     for (const page of [...new Set(want)]) {
       const m = menus.find((x) => x.page === page);
       if (!m || !m.rows.length) continue;
       const cost = budget2 > 0 ? tokens(m.rows.map(itemLine2).join("\n")) : 0;
-      if (budget2 > 0 && out.length > 0 && used + cost > budget2) continue;
+      if (budget2 > 0 && out2.length > 0 && used + cost > budget2) continue;
       used += cost;
-      out.push(m);
+      out2.push(m);
     }
-    return out;
+    return out2;
   }
   var modelOf = () => getPrefs().consultModel === "main" ? "main" : "aux";
   var consultButton = () => `<button class="gx-mini ai-open${consultUi.open ? " on" : ""}" data-action="ai-toggle" aria-pressed="${consultUi.open}">AI 상담</button>`;
@@ -1453,10 +1540,10 @@ ${talk}` }
   function treeCounts(ctx2) {
     if (!ctx2) return {};
     const over = overridesOf(ctx2);
-    const out = {};
-    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) out[k] = recordCount(ctx2, k, over);
-    out.base = directoryDraft(ctx2).bases.length;
-    return out;
+    const out2 = {};
+    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) out2[k] = recordCount(ctx2, k, over);
+    out2.base = directoryDraft(ctx2).bases.length;
+    return out2;
   }
   var GRID_HEADS = ".ck-pc .ck-h1 > b, .mx-grid:not(.ck-ph) .mx-head label";
   var gridOf = (scope, label2) => [...scope?.querySelectorAll(GRID_HEADS) ?? []].find((b) => b.textContent?.trim() === label2)?.closest(".ps-group") ?? null;
@@ -1464,7 +1551,7 @@ ${talk}` }
   var FIND_PAGES = ["screen", "image", "board", "status", "net", "cos", "bm", "hs", "phone", "wiki", "journal", "items", "shop", "people", "factions", "lore", "adv"];
   var findNorm = (s8) => s8.toLowerCase().replace(/\s+/g, "");
   function buildFindIndex(ctx2) {
-    const out = [];
+    const out2 = [];
     const keepPage = settingsUi.page;
     for (const page of FIND_PAGES) {
       let html = "";
@@ -1482,15 +1569,15 @@ ${talk}` }
         if (!label2) return;
         const group4 = row8.closest(".ps-group, .ps-card, details")?.querySelector("h3, h4, summary")?.textContent?.trim() ?? "";
         const help = row8.querySelector(".ps-label > small")?.textContent?.trim() ?? "";
-        out.push({ page, label: label2, group: group4, help });
+        out2.push({ page, label: label2, group: group4, help });
       });
       doc2.querySelectorAll(GRID_HEADS).forEach((b) => {
         const label2 = b.textContent?.trim() ?? "";
-        if (label2) out.push({ page, label: label2, group: b.closest(".ps-group")?.querySelector("h3")?.textContent?.trim() ?? "", help: "" });
+        if (label2) out2.push({ page, label: label2, group: b.closest(".ps-group")?.querySelector("h3")?.textContent?.trim() ?? "", help: "" });
       });
     }
     settingsUi.page = keepPage;
-    return out;
+    return out2;
   }
   setCatalogHost({
     pages: () => treeOf("set").flatMap((g2) => g2.items).filter((i) => i[0].startsWith("set:")).map((i) => {
@@ -2065,14 +2152,14 @@ ${talk}` }
     return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc42(text5)}</em>` : "";
   }
   function chipItems(html = "") {
-    const out = [];
+    const out2 = [];
     const re = /<span class="gx-(?:pchip|badge[^"]*)">/g;
     const starts = [];
     for (let m = re.exec(html); m; m = re.exec(html)) {
       starts.push(m.index);
     }
-    starts.forEach((st, i) => out.push(html.slice(st, starts[i + 1] ?? html.length)));
-    return out;
+    starts.forEach((st, i) => out2.push(html.slice(st, starts[i + 1] ?? html.length)));
+    return out2;
   }
   function depMark(c) {
     if (!c.key) return "";
@@ -3095,115 +3182,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .dir-kinds .long { display: none; }
   /* 탭 6개: 모바일은 세 개씩 두 줄 */
   .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
-  .dir-kinds .gx-seg { font-size: 13px; }
-  .dir-line > span { min-width: 0; flex-basis: 100%; }
-}
-.dir-group.warn { color: var(--amber); }
-.dir-alert { width: 100%; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); background: var(--amber-bg); color: var(--amber); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
-.dir-add, .dir-rename { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
-.dir-add input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 15px; }
-.dir-add .gx-mini, .dir-rename .gx-mini { min-height: 42px; padding: 0 14px; }
-.dir-rename .dir-in { flex: 1; min-width: 12em; }
-.dir-map { position: relative; width: 100%; max-width: 420px; margin: 4px 0 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); cursor: crosshair; user-select: none; -webkit-user-select: none; }
-.dir-map img { display: block; width: 100%; height: auto; pointer-events: none; }
-.dir-map.ph { aspect-ratio: 4 / 5; display: grid; place-items: center; color: var(--dim); font-size: 14px; cursor: default; }
-.dir-mappin { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--signal); border: 2px solid var(--void); box-shadow: 0 0 0 2px var(--signal); transform: translate(-50%, -50%); pointer-events: none; }
-.dir-panel select.gx-select { width: 100%; }
-/* 실제 사진 (v0.11.0) */
-.at-add-image { border-style: solid; border-color: var(--accent-line); color: var(--signal); }
-.at-item-image { align-items: center; }
-.at-thumb { width: 52px; height: 52px; flex: none; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--sunk); }
-.at-card-image { display: block; padding: 0; overflow: hidden; width: fit-content; max-width: min(100%, 320px); background: var(--sunk); }
-.at-photo { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; }
-.at-photo img { display: block; max-width: 100%; max-height: 320px; min-width: 120px; min-height: 80px; object-fit: contain; }
-.at-card-image figcaption { padding: 6px 10px 8px; font-size: 13px; color: var(--sub); }
-.at-broken { display: none; gap: 6px; align-items: center; padding: 10px 12px; color: var(--dim); }
-.at-card-image.broken .at-photo { display: none; }
-.at-card-image.broken .at-broken { display: flex; }
-.at-files .at-card-image { padding: 0; }
-.at-zoom { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 24px; background: rgba(0, 0, 0, .86); cursor: zoom-out; }
-.at-zoom img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
-.at-zoom-x { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); color: #fff; font-size: 18px; }
-
-/* 요원 카드 (상황판·편성 공통, v0.11.0): 요원마다 칸을 나누고 사진은 둥근 네모 */
-.gx-acards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
-.gx-acards.pick { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 8px; }
-.gx-acard { position: relative; display: flex; align-items: flex-start; gap: 12px; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); text-align: left; font: inherit; }
-.gx-acard.op { border-color: var(--accent-line); }
-.gx-acard .gx-ava { width: 56px; height: 56px; font-size: 20px; }
-.gx-acard.pick { padding: 10px; background: var(--void); }
-.gx-acard.pick .gx-ava { width: 48px; height: 48px; border-radius: 12px; }
-.gx-acard-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-.gx-acard-top { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
-.gx-acard-top b { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.gx-st { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 999px; font-style: normal; font-size: 12px; font-weight: 700; white-space: nowrap; color: var(--st); background: color-mix(in srgb, var(--st) 14%, transparent); }
-.gx-st::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.gx-acard-txt small { font-size: 13px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gx-acard-sit { font-size: 13px; line-height: 1.45; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.gx-acard.pick .gx-acard-sit { -webkit-line-clamp: 1; }
-.gx-acard.pick:hover:not(:disabled) { border-color: var(--line2); }
-.gx-acard.pick.on { border-color: var(--signal); }
-.gx-acard.pick.on .gx-acard-top b { color: var(--signal); }
-.gx-acard.pick:disabled { opacity: .45; }
-.gx-acard-check { display: none; position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--signal); color: var(--on-signal); font-size: 13px; font-weight: 800; place-items: center; }
-.gx-acard.pick.on .gx-acard-check { display: grid; }
-
-/* ── 괴담톡 (v0.12.0): 메신저 화면. PC는 목록|대화 두 칸, 모바일은 한 칸씩. 고정 높이 상자 없이 창 높이를 나눠 쓰고, 입력창은 늘 아래 ── */
-.gx-body.ph-app { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; min-height: 0; }
-.gx-body .ph-side { display: flex; flex-direction: column; gap: 10px; min-height: 0; padding: 14px 14px 0; border-right: 1px solid var(--panel2); overflow: hidden; }
-.ph-side-head { display: flex; flex-direction: column; gap: 8px; }
-/* 연락처·대화·공지 탭 (v0.16.22): 상자 대신 글자 + 아래 밑줄 */
-.ph-subs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
-.ph-sub { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 42px; padding: 0 12px; border: 0; background: none; color: var(--dim); font: inherit; font-size: 15px; font-weight: 600; white-space: nowrap; }
-.ph-sub::after { content: ''; position: absolute; left: 22%; right: 22%; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: transparent; }
-.ph-sub:hover { color: var(--text); }
-.ph-sub.on { color: var(--text); font-weight: 700; }
-.ph-sub.on::after { background: var(--signal); }
-/* 도구 다섯 개: 한 줄에 아이콘 + 이름, 상자 없이 (PC·모바일 같음) */
-/* 단추 수에 맞춰 균등하게 (2026-10-29: 설정 단추를 빼서 넷이 된 괴담넷·괴담톡이 왼쪽으로 몰렸다) */
-.ph-tools { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; }
-.ph-tools .ph-tool { width: auto; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 12px; }
-.ph-tools .ph-tool svg { width: 23px; height: 23px; }
-.ph-tool-l { font-size: 11.5px; font-weight: 600; line-height: 1; white-space: nowrap; }
-.ph-tool { display: inline-grid; place-items: center; width: var(--ctl-h); height: var(--ctl-h); flex: none; padding: 0; border: 0; border-radius: var(--ctl-r); background: none; color: var(--sub); }
-.ph-tool svg { width: 20px; height: 20px; }
-.ph-tool:hover:not(:disabled) { background: var(--panel); color: var(--text); }
-.ph-tool[aria-pressed="true"], .ph-tool.on { background: var(--accent-bg); color: var(--signal); }
-.ph-tool:disabled { opacity: .4; }
-.ph-tool.sm { width: var(--ctl-sm); height: var(--ctl-sm); }
-.ph-tool.sm svg { width: 18px; height: 18px; }
-.ph-search { width: 100%; flex: none; }
-.ph-content { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -14px; padding: 0 6px 14px; }
-.ph-tabs { flex: none; display: flex; gap: 6px; padding: 0 8px 8px; overflow-x: auto; scrollbar-width: none; }
-.ph-tab { flex: none; min-height: var(--ctl-sm); padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; }
-.ph-tab.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
-.ph-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.ph-row { display: flex; align-items: center; gap: 4px; border-radius: 14px; padding-right: 6px; }
-.ph-row:hover { background: var(--panel); }
-.ph-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 8px; border: 0; border-radius: 14px; background: none; text-align: left; color: var(--text); font: inherit; }
-.ph-main.on { background: var(--accent-bg); }
-.ph-row:has(> .ph-main.on), .ph-row:has(> .ph-main.on):hover { background: var(--accent-bg); }
-.ph-row:has(> .ph-rdel) .ph-main.on { background: none; }
-.ph-avatar { position: relative; overflow: hidden; flex: none; width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--panel2); color: var(--mint); font-weight: 700; font-size: 16px; }
-.ph-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ph-avatar.group { color: var(--amber); background: var(--amber-bg); }
-.ph-avatar.group svg { width: 22px; height: 22px; }
-.ph-avatar.group i { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 11px; font-weight: 800; }
-.ph-contacts .ph-avatar { width: 58px; height: 58px; border-radius: 17px; font-size: 19px; }
-.ph-who-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.ph-who-name b { min-width: 0; }
-.ph-who-name .gx-st { flex: none; }
-.ph-sec { display: flex; align-items: center; gap: 6px; margin: 10px 8px 4px; font-size: 13px; font-weight: 700; color: var(--sub); }
-.ph-sec:first-child { margin-top: 2px; }
-.ph-sec b { color: var(--dim); font-weight: 600; }
-.ph-avatar.sm { width: 40px; height: 40px; border-radius: 13px; font-size: 14px; }
-.ph-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.ph-who b { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ph-who small { color: var(--dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-who-top, .ph-who-bot { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ph-who-top b, .ph-who-bot small { flex: 1; min-width: 0; }
-.ph-time { flex: none !important; font-size: 12px !important; }
-.ph-wait { color: var(--amber) !important; }
-.ph-badge { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; }
-.ph-act { display: flex; align-items: center; gap: 2px; flex: none; }
-.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place
+  .dir-kinds .gx

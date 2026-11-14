@@ -1,4 +1,347 @@
-nc function checkInstall(charIndex, progress4) {
+gain);
+      })().finally(() => {
+        painting = null;
+      });
+      await painting;
+    };
+    const onChange = () => {
+      const t = progressTurn();
+      if (t && t !== seen4) {
+        seen4 = t;
+        clearHide();
+        if (!phone2 && visible2 && !panelOpen) void setOpen(true);
+      }
+      if (t?.endAt && open3 && hideTimer === void 0) {
+        hideTimer = setTimeout(() => {
+          hideTimer = void 0;
+          void setOpen(false);
+        }, turnSummary(t).failed ? HIDE_AFTER_FAIL : HIDE_AFTER_OK);
+      }
+      void schedule2();
+    };
+    const offProgress = onProgress(onChange);
+    const rectOf = async (el) => el ? await el.getBoundingClientRect() : null;
+    let drag = null;
+    let moved = false;
+    let pending2 = null;
+    let loop = null;
+    const runDrag = async () => {
+      try {
+        while (pending2 && drag) {
+          const d = drag;
+          const p2 = pending2;
+          pending2 = null;
+          if (!await d.hit) {
+            drag = null;
+            break;
+          }
+          if (drag !== d) continue;
+          const dx = p2.x - d.x;
+          const dy = p2.y - d.y;
+          if (!moved && Math.hypot(dx, dy) < 6) continue;
+          if (!moved) {
+            moved = true;
+            await host4.setAttribute("x-goei-drag", "true");
+          }
+          pos = { right: d.start.right - dx, top: d.start.top + dy };
+          await applyPos();
+        }
+      } catch {
+        drag = null;
+      } finally {
+        loop = null;
+      }
+    };
+    const onDown = (ev) => {
+      drag = null;
+      pending2 = null;
+      moved = false;
+      if (!visible2 || phone2 || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
+      if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
+      const x = ev.clientX;
+      const y = ev.clientY;
+      const grab = open3;
+      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card3.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
+    };
+    const onMove = (ev) => {
+      if (!drag || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
+      if (ev.buttons !== void 0 && ev.buttons !== 1) {
+        drag = null;
+        return;
+      }
+      pending2 = { x: ev.clientX, y: ev.clientY };
+      loop ??= runDrag();
+    };
+    const onUp = () => {
+      const d = drag;
+      void (loop ?? Promise.resolve()).then(async () => {
+        if (drag === d) drag = null;
+        if (moved) {
+          await host4.setAttribute("x-goei-drag", "false");
+          try {
+            await risuai.safeLocalStorage.setItem(POS_KEY2, JSON.stringify(pos));
+          } catch {
+          }
+        }
+      });
+    };
+    const onClick = async (ev) => {
+      if (!visible2) return;
+      await loop;
+      if (moved) return;
+      if (!open3) {
+        if (inside(await rectOf(dot2), ev.clientX, ev.clientY)) {
+          clearHide();
+          await setOpen(true);
+        }
+        return;
+      }
+      if (inside(await rectOf(await card3.querySelector("[data-grip]")), ev.clientX, ev.clientY)) {
+        clearHide();
+        await setOpen(false);
+        return;
+      }
+      if (inside(await rectOf(card3), ev.clientX, ev.clientY)) return;
+      const t = progressTurn();
+      if (!t || t.endAt || Date.now() - t.at >= WATCHDOG) {
+        clearHide();
+        await setOpen(false);
+      }
+    };
+    let ids = [];
+    const unbind = async () => {
+      const old = ids;
+      ids = [];
+      for (const { target, type, id: id2 } of old) await target.removeEventListener(type, id2).catch(() => {
+      });
+    };
+    const docTarget = typeof doc2?.addEventListener === "function" ? doc2 : host4;
+    let binding = Promise.resolve();
+    const bind = () => binding = binding.catch(() => {
+    }).then(async () => {
+      await unbind();
+      for (const [target, type, fn2] of [
+        [host4, "pointerdown", onDown],
+        [docTarget, "pointermove", onMove],
+        [docTarget, "pointerup", onUp],
+        [docTarget, "pointercancel", onUp],
+        [docTarget, "click", onClick]
+      ]) {
+        ids.push({ target, type, id: await target.addEventListener(type, fn2, { passive: true }) });
+      }
+    });
+    await bind();
+    await schedule2();
+    return {
+      async setVisible(next) {
+        const { vw } = await viewport().catch(() => ({ vw: 1024 }));
+        const ph = vw <= PHONE_MAX;
+        if (ph !== phone2) {
+          phone2 = ph;
+          await host4.setAttribute("x-goei-phone", ph ? "true" : "false");
+          if (ph) await setOpen(false);
+        }
+        if (next === visible2 && next) {
+          await applyPos();
+          return;
+        }
+        if (next && !visible2) await bind().catch(() => {
+        });
+        visible2 = next;
+        if (!next) {
+          drag = null;
+          pending2 = null;
+          clearHide();
+          await setOpen(false);
+        } else await applyPos();
+        await host4.setAttribute("x-goei-show", next ? "true" : "false");
+      },
+      async setPanel(next) {
+        if (next === panelOpen) return;
+        panelOpen = next;
+        await host4.setAttribute("x-goei-panel", next ? "true" : "false");
+      },
+      async setTheme(theme) {
+        await host4.setAttribute("x-goei-theme", theme);
+      },
+      async remove() {
+        offProgress();
+        clearHide();
+        if (tick4 !== void 0) clearInterval(tick4);
+        visible2 = false;
+        await host4.remove();
+        await unbind();
+      }
+    };
+  }
+  var progressOn = () => getPrefs().progress !== false;
+
+  // src/host/container.ts
+  var BELOW_ALERTS = "49";
+  var doc;
+  async function showWindow() {
+    if (doc === void 0) doc = await risuai.getRootDocument().catch(() => null);
+    await risuai.showContainer("fullscreen");
+    if (!doc) return;
+    try {
+      const frames = await doc.querySelectorAll("body > iframe");
+      const n3 = await frames.length();
+      for (let i = 0; i < n3; i++) {
+        const f = await frames.at(i);
+        if (!f) continue;
+        if (await f.getStyle("zIndex") === "1000" && await f.getStyle("display") !== "none") await f.setStyle("zIndex", BELOW_ALERTS);
+      }
+    } catch {
+    }
+  }
+
+  // src/core/navhist.ts
+  var LIMIT = 60;
+  var NavHistory = class {
+    list = [];
+    at = -1;
+    /** 지금 화면 상태를 적는다 (방금 적은 것과 같으면 그대로) */
+    record(state2) {
+      const key = JSON.stringify(state2);
+      if (this.list[this.at] === key) return;
+      this.list = this.list.slice(0, this.at + 1);
+      this.list.push(key);
+      if (this.list.length > LIMIT) this.list.shift();
+      this.at = this.list.length - 1;
+    }
+    can(dir2) {
+      const i = this.at + dir2;
+      return i >= 0 && i < this.list.length;
+    }
+    /** 한 칸 옮기고 그 화면 상태를 돌려준다. 갈 곳이 없으면 null */
+    go(dir2) {
+      if (!this.can(dir2)) return null;
+      this.at += dir2;
+      return JSON.parse(this.list[this.at]);
+    }
+    clear() {
+      this.list = [];
+      this.at = -1;
+    }
+  };
+
+  // src/host/picpack.ts
+  var isRow5 = (r) => Array.isArray(r) && typeof r[0] === "string" && typeof r[1] === "string";
+  var PicError = class extends Error {
+  };
+  async function digest(b) {
+    try {
+      const h = new Uint8Array(await crypto.subtle.digest("SHA-1", b));
+      return [...h].map((x) => x.toString(16).padStart(2, "0")).join("").slice(0, 12);
+    } catch {
+      return null;
+    }
+  }
+  var PIC_TIMEOUT_MS = 4e4;
+  function timeout2(p2) {
+    let t;
+    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error("timeout")), PIC_TIMEOUT_MS))]).finally(() => clearTimeout(t));
+  }
+  async function fetchPicture(p2) {
+    const url = `${UPDATE_BASE}/pic/${p2[1]}.${p2[2]}`;
+    const ok = async (b) => !!b?.length && (await digest(b) ?? p2[1]) === p2[1];
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await timeout2(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }));
+        const b = r?.ok ? toBytes3(r.data) : null;
+        if (await ok(b)) return b;
+      } catch {
+      }
+    }
+    try {
+      const res = await timeout2(risuai.nativeFetch(url, { method: "GET" }));
+      if (res.ok) {
+        const b = new Uint8Array(await timeout2(res.arrayBuffer()));
+        if (await ok(b)) return b;
+      }
+    } catch {
+    }
+    throw new PicError(`사진 「${p2[0]}」을 받지 못했어요.`);
+  }
+  async function fetchPictures(assets, plan, progress4) {
+    const got = [];
+    let i = 0;
+    let failed4 = false;
+    const worker = async () => {
+      while (i < plan.get.length && !failed4) {
+        const p2 = plan.get[i++];
+        try {
+          got.push([p2, await fetchPicture(p2)]);
+        } catch (error) {
+          failed4 = true;
+          throw error;
+        }
+        progress4(got.length, "get");
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    const paths = new Array(got.length);
+    let j = 0;
+    let saved = 0;
+    progress4(0, "save");
+    const saver = async () => {
+      while (j < got.length) {
+        const k = j++;
+        let path;
+        try {
+          path = await risuai.saveAsset(got[k][1]);
+        } catch (error) {
+          throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+        }
+        if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
+        paths[k] = path;
+        progress4(++saved, "save");
+      }
+    };
+    await Promise.all([saver(), saver(), saver(), saver()]);
+    return mergePictures(assets, got.map(([p2], k) => [p2, paths[k]]));
+  }
+  function mergePictures(assets, saved) {
+    const rows3 = (Array.isArray(assets) ? assets : []).map((r) => isRow5(r) ? [...r] : r);
+    const at = /* @__PURE__ */ new Map();
+    for (const r of rows3) if (isRow5(r) && !at.has(r[0])) at.set(r[0], r);
+    for (const [p2, path] of saved) {
+      const row8 = at.get(p2[0]);
+      if (row8) row8[1] = path, row8[2] = p2[2];
+      else {
+        const fresh3 = [p2[0], path, p2[2]];
+        rows3.push(fresh3);
+        at.set(p2[0], fresh3);
+      }
+    }
+    return rows3;
+  }
+
+  // src/host/install.ts
+  var WIKI_KEY = "goei:wikibase";
+  var WIKI_DIGEST_KEY = "goei:wikibase-digest";
+  var TOK_KEY = "goei:tok-o200k";
+  var ICON_KEY = "goei:icon";
+  async function loadStoredWikiPack() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(WIKI_KEY);
+      setStoredWikiPack(typeof raw === "string" && raw.startsWith(WIKI_PACK_HEAD) ? raw : null);
+    } catch {
+      setStoredWikiPack(null);
+    }
+  }
+  async function iconNotes() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(ICON_KEY);
+      const o = typeof raw === "string" ? JSON.parse(raw) : raw;
+      return o && typeof o === "object" ? o : {};
+    } catch {
+      return {};
+    }
+  }
+  var charId = (char) => String(char.chaId ?? char.name ?? "");
+  async function checkInstall(charIndex, progress4) {
     await ensureInstallData(progress4);
     const char = await risuai.getCharacterFromIndex(charIndex) ?? {};
     const notes = await iconNotes();
@@ -679,15 +1022,15 @@ nc function checkInstall(charIndex, progress4) {
       throw new Error("인물 모습 팩이 JSON 이 아니에요.");
     }
     if (!obj7(j) || j.schema !== 1 || j.kind !== "looks" || !Array.isArray(j.looks)) throw new Error("인물 모습 팩 형식이 달라요.");
-    const out = [];
+    const out2 = [];
     for (const r of j.looks) {
       if (!obj7(r) || typeof r.id !== "string" || typeof r.img !== "string" || !r.img) continue;
       const n3 = num7(r.n), cw = num7(r.cw), ch = num7(r.ch);
       if (!(n3 >= 1 && cw > 0 && ch > 0)) continue;
       const g2 = r.g === "남" || r.g === "여" ? r.g : "";
-      out.push({ id: r.id, name: String(r.name ?? ""), g: g2, unique: r.unique === true, n: n3, w: num7(r.w) || 128, h: num7(r.h) || 256, cw, ch, ox: num7(r.ox) || 0, oy: num7(r.oy) || 0, sec: num7(r.sec) > 0 ? num7(r.sec) : LOOK_FRAME_SEC, img: r.img });
+      out2.push({ id: r.id, name: String(r.name ?? ""), g: g2, unique: r.unique === true, n: n3, w: num7(r.w) || 128, h: num7(r.h) || 256, cw, ch, ox: num7(r.ox) || 0, oy: num7(r.oy) || 0, sec: num7(r.sec) > 0 ? num7(r.sec) : LOOK_FRAME_SEC, img: r.img });
     }
-    return out;
+    return out2;
   }
   var lookId = (state2) => {
     const v = String(state2?.[LOOK_KEY] ?? "").trim();
@@ -1132,27 +1475,27 @@ nc function checkInstall(charIndex, progress4) {
   var draftExtras = (d) => d.orgs.filter((o) => !o.faction && o.spec.playable && o.spec.code);
   var codesOf = (d) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code)];
   function namesOf(d, lore) {
-    const out = factionDisplayNames(lore ?? []);
-    for (const f of BUILTIN) if (d.display.none?.[f]) out[f] = d.display.none[f];
-    for (const o of draftExtras(d)) out[o.spec.code] = o.name;
-    return out;
+    const out2 = factionDisplayNames(lore ?? []);
+    for (const f of BUILTIN) if (d.display.none?.[f]) out2[f] = d.display.none[f];
+    for (const o of draftExtras(d)) out2[o.spec.code] = o.name;
+    return out2;
   }
   var tabName = (o) => o.spec.tab || Array.from(o.name).slice(0, 2).join("");
   function startSlots(d) {
-    const out = [];
+    const out2 = [];
     const count2 = (code2) => d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name && a.rosterFor.includes(code2)).length;
     for (const code2 of BUILTIN) {
       const o = d.orgs.find((x) => x.faction === code2);
       const base = SCENARIOS.factions.find((f) => f.code === code2);
-      out.push({ code: code2, name: o?.spec.title || base?.name || code2, kind: "builtin", hidden: !!o?.spec.hidden, count: count2(code2), ...o ? { org: o } : {} });
+      out2.push({ code: code2, name: o?.spec.title || base?.name || code2, kind: "builtin", hidden: !!o?.spec.hidden, count: count2(code2), ...o ? { org: o } : {} });
     }
-    for (const o of draftExtras(d)) out.push({ code: o.spec.code, name: o.spec.title || o.name, kind: "extra", hidden: false, count: count2(o.spec.code), org: o });
-    for (const g2 of d.startGroups) if (!out.some((x) => x.code === g2.code)) out.push({ code: g2.code, name: g2.name, kind: "group", hidden: g2.hidden, count: count2(g2.code) });
+    for (const o of draftExtras(d)) out2.push({ code: o.spec.code, name: o.spec.title || o.name, kind: "extra", hidden: false, count: count2(o.spec.code), org: o });
+    for (const g2 of d.startGroups) if (!out2.some((x) => x.code === g2.code)) out2.push({ code: g2.code, name: g2.name, kind: "group", hidden: g2.hidden, count: count2(g2.code) });
     const at = (c) => {
       const i = d.startOrder.indexOf(c);
       return i < 0 ? Number.MAX_SAFE_INTEGER : i;
     };
-    return out.map((x, i) => [x, i]).sort((a, b) => at(a[0].code) - at(b[0].code) || a[1] - b[1]).map(([x]) => x);
+    return out2.map((x, i) => [x, i]).sort((a, b) => at(a[0].code) - at(b[0].code) || a[1] - b[1]).map(([x]) => x);
   }
   function tabsOf(d, lore) {
     const tabs2 = d.phoneTabs.tabs.length ? d.phoneTabs.tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] })) : phoneTabs(lore ?? []).filter((t) => !/^T1\d\d$/.test(t.id));
@@ -1167,7 +1510,7 @@ nc function checkInstall(charIndex, progress4) {
     const hit4 = sourceCache.get(books);
     if (hit4) return hit4;
     const folders = new Map(books.filter((e) => e.mode === "folder" && typeof e.key === "string").map((e) => [e.key, String(e.comment ?? "")]));
-    const out = /* @__PURE__ */ new Map();
+    const out2 = /* @__PURE__ */ new Map();
     const divider = /* @__PURE__ */ new Map();
     for (const e of books) {
       if (e.mode === "folder") continue;
@@ -1178,10 +1521,10 @@ nc function checkInstall(charIndex, progress4) {
         divider.set(folder, sep[1]);
         continue;
       }
-      if (name) out.set(name, [folder, divider.get(folder)].filter(Boolean).join(" · "));
+      if (name) out2.set(name, [folder, divider.get(folder)].filter(Boolean).join(" · "));
     }
-    sourceCache.set(books, out);
-    return out;
+    sourceCache.set(books, out2);
+    return out2;
   }
   var loreSourceOf = (ctx2, name) => loreSources(ctx2.char.globalLore).get(name) ?? "";
   function directoryExtList(ctx2) {
@@ -2973,125 +3316,4 @@ nc function checkInstall(charIndex, progress4) {
 /* 설정 찾기 칸 (2026-11-06 사용자 승인, 전수점검 8-10): 기능 탭 왼쪽 목록 위. 찾은 줄은 목록 자리에, 고른 줄은 페이지에서 잠깐 비춘다 */
 .gw-find { display: block; width: 100%; height: var(--h); margin: 4px 0 2px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); color: var(--text); font: inherit; font-size: 14px; box-sizing: border-box; }
 .gw-find::placeholder { color: var(--dim); }
-.gw-find:focus { outline: none; border-color: var(--accent-line); }
-.gw-tree-item.gw-find-hit { height: auto; min-height: var(--h); padding-top: 6px; padding-bottom: 6px; }
-.gw-find-hit > span { display: flex; flex-direction: column; gap: 1px; white-space: normal; }
-.gw-find-hit b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gw-find-hit small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gw-find-none { margin: 14px 12px; font-size: 13px; color: var(--dim); }
-.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
-@keyframes gw-find-flash { 0%, 40% { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--signal); } 100% { background: transparent; box-shadow: inset 3px 0 0 transparent; } }
-@media (prefers-reduced-motion: reduce) { .gw-find-flash { animation: none; background: var(--accent-bg); } }
-/* 인물 설정 전용 모델 ID 줄: 입력칸과 저장이 한 줄 (2026-11-07 사용자: 폰에서 저장이 아래로 떨어졌다) */
-.gw .ps-row > .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
-.gw .pp-mid-ctl > input { width: auto; flex: 1 1 auto; min-width: 0; }
-
-/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 상자 안 위·아래 여백 같게 */
-.gw .pp-flow-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap) 14px; padding: 12px var(--pad); }
-.gw .pp-flow-head > p { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
-.gw .pp-flow-head b { color: var(--text); }
-/* 기능 설정 우하단 「맨 위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
-.gw-totop { grid-area: body; align-self: end; justify-self: end; z-index: 5; width: 42px; height: 42px; margin: 0 22px 18px 0; display: grid; place-items: center; padding: 0; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s, transform .18s; }
-.gw-totop.show { opacity: 1; pointer-events: auto; transform: none; }
-.gw-totop:hover { background: var(--accent-bg); }
-.gw-totop svg { width: 20px; height: 20px; }
-/* 조작 없이 설명만 있는 줄 (2026-11-08 사용자: 소지품 「넘기는 것·남는 것」 글 위 쓸데없는 여백) — 빈 조작 칸(높이 34)을 접고 설명을 이름 옆 첫 줄부터 */
-.gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label hint'; }
-.gw .ps-row:has(> .ps-ctl:empty) > .ps-ctl { display: none; }
-.gw .ps-row:has(> .ps-ctl:empty) > .ps-label > b { min-height: 0; }
-@container (max-width: 600px) {
-  .gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label' 'hint'; }
-}
-/* 글 복사 단추 (2026-11-08 사용자): 머리 줄에서는 토큰 수와 ▲▼ 사이, 글 상자에서는 안쪽 오른쪽 위(스크롤 막대 왼쪽) */
-.gw .gw-copy.done { color: var(--signal); border-color: var(--signal); }
-.gw .gw-copybox { position: relative; }
-.gw .gw-copybox > .gw-copy { position: absolute; top: 8px; right: 18px; z-index: 1; background: var(--panel); }
-.gw .gw-copybox > .gw-preview, .gw .gw-copybox > pre, .gw .gw-copybox > textarea { padding-right: 56px; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  /* 복사 단추가 늘어 폰에서 ▲▼가 다음 줄로 밀리지 않게 머리 줄 간격만 줄인다 */
-  .gw .gw-field-head { column-gap: 6px; }
-  .gw .gw-fmove .gx-mini.icon { width: 36px; }
-}
-/* 맨 위로 단추가 맨 아래 줄(예: 인물 설정 전용 모델 ID 「저장」)을 덮지 않게 끝에 단추 높이만큼 여백 (11-08 눌러 보기 점검) */
-.gw-body:has(~ .gw-totop)::after { content: ''; display: block; height: 72px; }
-/* 뒤로 단추는 어디서나 36 (11-09 점검 17: 설정 창 안만 34였다) */
-.gw .ph-room-head .ph-tool.ph-back { width: 36px; height: 36px; min-height: 36px; max-height: 36px; }
-/* 세력 관계 줄: 상세 칸이 좁아 5단계 고르기가 오른쪽 밖으로 넘쳤다 (11-09 점검 21) → 이름·설명 아래에 고르기·메모 */
-.gw .gw-rel-rows .ps-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'hint' 'ctl'; }
-.gw .gw-rel-rows .ps-row > .ps-ctl { margin-top: 4px; }
-
-/* 추가 규칙: 규칙마다 접는 칸 한 페이지 (11-09) */
-.gw-rule { margin-bottom: 8px; }
-.gw-rule > summary.ps-adv-sum .gw-state { margin-left: 8px; }
-
-/* ── 표: [이름][사이트 칸 × N] 격자, 설명은 칸들 아래 (줄 규격 [이름][조작] 을 칸 여럿으로 늘린 것. 설정 개편 4단계) ── */
-.gw .mx { display: block; }
-.gw .mx-head, .gw .mx-row { display: grid; grid-template-columns: var(--label) repeat(var(--mx-n), minmax(0, 1fr)); column-gap: 16px; }
-.gw .mx-head { position: sticky; top: 0; z-index: 3; align-items: center; margin: 0 0 12px; padding: 8px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
-.gw .mx-head label { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
-.gw .mx-head label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gw .mx-head label svg, .gw .mx-head label img { width: 18px; height: 18px; flex: 0 0 auto; }
-.gw .mx-row { row-gap: 4px; align-items: start; padding: 10px var(--pad); border-top: 1px solid var(--gline); }
-.gw .ps-rows > .mx-row:first-child { border-top: 0; }
-.gw .mx-label { grid-column: 1; display: flex; align-items: center; min-width: 0; min-height: var(--h); font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); }
-.gw .mx-cell { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--gap); min-width: 0; min-height: var(--h); }
-.gw .mx-cell + .mx-cell { box-shadow: -9px 0 0 -8px var(--gline); }
-.gw .mx-cell .gx-chips { margin: 0; gap: 4px; }
-.gw .mx-cell .ps-text, .gw .mx-cell > input.gx-search:not(.ph-pct) { width: 100%; }
-.gw .mx-cell .ph-pct { width: 56px; }
-.gw .mx-cell .adv-val { max-width: 100%; }
-.gw .mx-site, .gw .mx-r { display: none; }
-.gw .mx-none { color: var(--dim); font-size: 13px; opacity: .65; }
-.gw .mx-all { grid-column: 2 / -1; }
-.gw .mx-shared, .gw .mx-cap { color: var(--dim); font-size: 12.5px; white-space: nowrap; }
-.gw .mx-help { grid-column: 2 / -1; display: block; margin: 0; font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--dim); }
-.gw .mx-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 20px; padding: 10px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--dim); font-size: 13px; }
-.gw .mx-note { margin: 0; padding: 10px var(--pad); border-bottom: 1px solid var(--hair); font-size: 13px; line-height: 1.5; color: var(--dim); }
-.gw .ck { margin-bottom: 20px; }
-.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) var(--ck-cols, repeat(var(--ck-n), minmax(0, 1fr))); align-items: center; padding: 0 10px; }
-.gw .ck-h1 { padding-top: 8px; font-size: 13px; color: var(--text); }
-.gw .ck-h1 b { padding: 2px 4px; font-weight: 700; text-align: center; word-break: keep-all; }
-.gw .ck-h2 { padding-bottom: 6px; border-bottom: 1px solid var(--gline); font-size: 12.5px; color: var(--dim); }
-.gw .ck-h2 > span { text-align: center; line-height: 1.25; word-break: keep-all; }
-.gw .ck-row { min-height: 38px; border-top: 1px solid var(--gline); }
-.gw .ck-h2 + .ck-row { border-top: 0; }
-.gw .ck-name { min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); }
-.gw .ck-cell { display: flex; align-items: center; justify-content: center; align-self: stretch; }
-.gw .ck-first { box-shadow: inset 1px 0 0 var(--gline); }
-.gw .ck-m { width: 22px; height: 22px; padding: 0; border: 1.5px solid var(--line); background: var(--void); cursor: pointer; }
-.gw .ck-m.round { border-radius: 50%; }
-.gw .ck-m.box { border-radius: 6px; }
-.gw .ck-m.on { border-color: var(--signal); background: var(--signal); box-shadow: inset 0 0 0 4px var(--panel); }
-.gw .ck-m.box.on { box-shadow: none; background: var(--signal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%230b1f1c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
-.gw .ck-x { color: var(--dim); opacity: .5; }
-.gw .ck > h3 { margin-bottom: 8px; }
-.gw .ck-ph { display: none; }
-.gw .ck-band { box-shadow: inset 2px 0 0 var(--line); }
-.gw .mx-foot:has(.ck-foot1) { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 12px 28px; }
-.gw .ck-foot1 { display: block; min-width: 0; }
-.gw .ck-foot1 > b { display: block; margin-bottom: 4px; color: var(--text); font-size: 13px; font-weight: 700; }
-.gw .hl { display: block; }
-.gw .hl-h { display: block; margin-top: 6px; color: var(--text); font-size: 12.5px; font-weight: 600; opacity: .8; }
-.gw .hl-h:first-child { margin-top: 0; }
-.gw .hl-i { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); column-gap: 10px; padding: 2px 0; line-height: 1.5; }
-.gw .hl-i > b { color: var(--dim); font-weight: 700; word-break: keep-all; }
-.gw .hl-i > span:only-child { grid-column: 1 / -1; }
-.gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 12.5px; }
-.gw .ck-h2.solo { padding-top: 8px; }
-.gw .ck-h2 > span { padding: 0 3px; }
-.gw .ck-n { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--void); overflow: hidden; }
-.gw .ck-n b { min-width: 32px; padding: 0 4px; font-size: 13px; font-weight: 600; text-align: center; color: var(--text); }
-.gw .ck-s { width: 22px; height: 26px; padding: 0; border: 0; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1; cursor: pointer; }
-.gw .mx-grid { margin-bottom: 20px; --label: var(--gname, 96px); }
-/* 격자의 이름 칸은 한 페이지 안에서 모두 같은 폭 (--gname). 이름이 긴 페이지(상점)는 페이지째 넓힌다 */
-.gw .fam-wide { --gname: 136px; }
-.gw .mx-grid .mx-row, .gw .mx-grid .mx-head { padding-left: 10px; padding-right: 10px; }
-.gw .mx-grid .mx-head { position: static; margin: 0; border: 0; border-bottom: 1px solid var(--gline); border-radius: 0; background: none; }
-.gw .mx-grid .mx-head label { font-size: 12.5px; font-weight: 600; color: var(--dim); cursor: default; }
-.gw .mx-grid .mx-row { align-items: center; }
-.gw .mx-grid .ps-rows > .mx-row:nth-child(2) { border-top: 0; }
-.gw .mx-name { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
-.gw .mx-name svg, .gw .mx-name img { width: 18px; height: 18px; flex: 0 0 auto; }
-.gw .mx-cell .mx-sel { width: auto; min-width: 7.5em; }
-.gw .mx-foot { display: block; padding: 10px var(--pad) 12px; border-top: 1px solid var(--hair); font-size: 13px; line-height: 1.55; color: var(--dim); }
-@media (max-width:
+.gw-fin

@@ -240,10 +240,18 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.deepEqual(after.log.filter((l) => l.what !== 'get').map((l) => [l.what, l.anchor, l.item, l.n]), [['use', 'b2', id, 2]]);
   assert.deepEqual(liveItems(after, new Set(['u1', 'b1', 'u2', 'b2'])), []);
   Object.assign(chat.scriptstate, vars);
-  // 같은 턴 리롤: 다시 넘기고(옛 응답 기록은 셈에서 빼고 본다), 새 응답에 다시 묶는다
+  // 유저 메시지 없이 이어 받는 응답(옛 응답이 살아 있다): 그 사용은 이미 쓴 것이라 다시 넘기지 않고, 다 쓴 물건이 목록에 돌아오지도 않는다 (11-14 재검토)
   assert.deepEqual(pendingItemUse(chat.scriptstate, 'u2'), [{ id, n: 2 }]);
-  assert.match(withInventory(msgs(chat), chat).find((m) => m.role === 'system').content, /uses 소금 봉지 ×2/);
-  chat.message[3] = { role: 'char', data: '다시 뿌렸다', chatId: 'b3' };
+  const cont = withInventory(msgs(chat), chat).find((m) => m.role === 'system')?.content ?? '';
+  assert.doesNotMatch(cont, /uses 소금 봉지/);
+  assert.doesNotMatch(cont, /^- 소금 봉지/m);
+  chat.message.push({ role: 'char', data: '이어서', chatId: 'b2b' });
+  assert.equal(settleItemUse(chat, 4), null, '이어 받은 응답에 또 적지 않는다');
+  chat.message.pop();
+  // 같은 턴 리롤: 리수가 옛 응답을 먼저 지우고 요청한다 → 횟수가 돌아온 채로 다시 넘기고, 새 응답에 다시 묶는다
+  chat.message.pop();
+  assert.match(withInventory(msgs(chat), chat).find((m) => m.role === 'system').content, /\[2 uses left\]\n[^]*uses 소금 봉지 ×2 \(used up after this\)/);
+  chat.message.push({ role: 'char', data: '다시 뿌렸다', chatId: 'b3' });
   const again = settleItemUse(chat, 3);
   assert.deepEqual(readItems(again).log.filter((l) => l.what !== 'get').map((l) => l.anchor), ['b2', 'b3']);
   Object.assign(chat.scriptstate, again);
@@ -252,6 +260,96 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   chat.message.push({ role: 'user', data: '다음', chatId: 'u3' }, { role: 'char', data: '응', chatId: 'b4' });
   assert.deepEqual(pendingItemUse(chat.scriptstate, 'u3'), []);
   assert.deepEqual(settleItemUse(chat, 5), { $st_item_use: '', [ITEM_USE_AT_VAR]: '' });
+});
+
+// 11-14 재검토 (v0.21.16 전): 유저 메시지가 없는 채팅에서는 보낸 자리 표식이 비어 응답마다 또 쓰이고 또 깎였다
+test('사용: 유저 메시지가 없는 채팅(시작 직후 빈 전송)에서도 한 번만 쓰인다. 다시 굴리면 다시 나가고, 첫 유저 메시지에는 안 나간다', async () => {
+  const { settleItemUse, ITEM_USE_AT_VAR, usesToSend, queueUseVars, readItemUse, itemLeft: left } = await import('../dist-test/core.mjs');
+  let it = addItem(empty, new Set(), { name: '붕대', desc: '', use: true, uses: 3, from: 'manual', anchor: '' });
+  it = addItem(it, new Set(), { name: '소금', desc: '', use: true, uses: 3, from: 'manual', anchor: '' });
+  const [id, salt] = it.list.map((x) => x.id);
+  const chat = { message: [{ role: 'char', data: '시작', chatId: 'b0' }], scriptstate: { ...itemsVars(it), ...itemUseVars([{ id, n: 1 }]) } };
+  const aliveNow = () => new Set(chat.message.map((m) => m.chatId));
+  const leftNow = (x = id) => { const cur = readItems(chat.scriptstate); return left(cur, cur.list.find((e) => e.id === x), aliveNow()); };
+  /** 요청에 실린 것으로 응답을 받고 정리한다 → 실린 이름 */
+  const turn = (chatId) => {
+    const sent = usesToSend(chat);
+    chat.message.push({ role: 'char', data: '응', chatId });
+    Object.assign(chat.scriptstate, settleItemUse(chat, chat.message.length - 1, new Set(sent.map((u) => u.id))) ?? {});
+    return sent.map((u) => u.name);
+  };
+  assert.deepEqual(turn('b1'), ['붕대']);
+  assert.equal(leftNow(), 2);
+  assert.ok(chat.scriptstate[ITEM_USE_AT_VAR], '보낸 자리로 적힌다 (칩이 남지 않는다)');
+  // 빈 전송을 또 해도 다시 안 나간다
+  assert.deepEqual(turn('b2'), []);
+  assert.equal(leftNow(), 2);
+  chat.message.pop();
+  // 그 응답을 다시 굴리면 다시 나간다
+  chat.message.pop();
+  assert.equal(leftNow(), 3);
+  assert.deepEqual(turn('b1b'), ['붕대']);
+  assert.equal(leftNow(), 2);
+  // 응답을 지운 채 다른 물건을 넣으면 이어 넣는다 (둘 다 나간다)
+  chat.message.pop();
+  Object.assign(chat.scriptstate, queueUseVars(chat, (q) => [...q, { id: salt, n: 1 }]));
+  assert.deepEqual(readItemUse(chat.scriptstate).map((u) => u.id), [id, salt]);
+  assert.deepEqual(turn('b1c'), ['붕대', '소금']);
+  // 답이 온 뒤 새로 넣으면 지난 자리는 비우고 새로 시작한다
+  Object.assign(chat.scriptstate, queueUseVars(chat, (q) => [...q, { id: salt, n: 1 }]));
+  assert.deepEqual(readItemUse(chat.scriptstate), [{ id: salt, n: 1 }]);
+  assert.deepEqual(turn('b3'), ['소금']);
+  assert.equal(leftNow(salt), 1);
+  // 첫 유저 메시지: 지난 자리는 안 나가고 비워진다
+  chat.message.push({ role: 'user', data: '간다', chatId: 'u1' });
+  assert.deepEqual(turn('b4'), []);
+  assert.deepEqual(readItemUse(chat.scriptstate), []);
+  assert.equal(chat.scriptstate[ITEM_USE_AT_VAR], '');
+  assert.equal(leftNow(), 2);
+  assert.equal(leftNow(salt), 1);
+});
+
+// 11-14 재검토: 답이 온 뒤 같은 물건을 다시 「사용」에 넣고 유저 메시지 없이 다음 응답을 받아도, 새로 넣은 사용은 보내고 적는다
+test('사용: 답이 온 뒤 같은 물건을 새로 넣으면 이어 받는 응답에도 보내고 적는다. 넘어온 자리는 또 보내지 않는다', async () => {
+  const { withInventory, settleItemUse, ITEM_USE_AT_VAR, usesToSend, removeItem, itemLeft: left } = await import('../dist-test/core.mjs');
+  const msgs = (chat) => chat.message.map((m) => ({ role: m.role === 'char' ? 'assistant' : 'user', content: m.data }));
+  const inv = (chat) => withInventory(msgs(chat), chat).find((m) => m.role === 'system')?.content ?? '';
+  const live = (chat) => new Set(chat.message.map((m) => m.chatId));
+  const it = addItem(empty, new Set(['u1', 'b1']), { name: '소금 봉지', desc: '', uses: 3, from: 'story', anchor: 'b1' });
+  const id = it.list[0].id;
+  const chat = { message: [{ role: 'user', data: '간다', chatId: 'u1' }, { role: 'char', data: '갔다', chatId: 'b1' }, { role: 'user', data: '뿌린다', chatId: 'u2' }, { role: 'char', data: '뿌렸다', chatId: 'b2' }], scriptstate: { ...itemsVars(it), ...itemUseVars([{ id, n: 1 }]) } };
+  Object.assign(chat.scriptstate, settleItemUse(chat, 3));
+  assert.equal(chat.scriptstate[ITEM_USE_AT_VAR], 'u2');
+  // 넘어온 자리(at = u2): 이어 받는 응답에는 또 보내지 않는다
+  assert.deepEqual(usesToSend(chat), []);
+  assert.doesNotMatch(inv(chat), /uses 소금 봉지/);
+  // 답이 온 뒤 새로 넣었다 (ui/items.ts queueUse: 자리를 비우고 at 을 '' 로)
+  Object.assign(chat.scriptstate, itemUseVars([{ id, n: 1 }]), { [ITEM_USE_AT_VAR]: '' });
+  assert.deepEqual(usesToSend(chat).map((u) => [u.id, u.n, u.after]), [[id, 1, 1]]);
+  assert.match(inv(chat), /\[2 uses left\][^]*uses 소금 봉지 \(1 left after this\)/);
+  chat.message.push({ role: 'char', data: '또 뿌렸다', chatId: 'b3' });
+  const vars = settleItemUse(chat, 4, new Set([id]));
+  assert.equal(vars[ITEM_USE_AT_VAR], 'u2');
+  const after = readItems(vars);
+  assert.deepEqual(after.log.filter((l) => l.what === 'use').map((l) => [l.anchor, l.n]), [['b2', 1], ['b3', 1]]);
+  assert.equal(left(after, after.list[0], live(chat)), 1);
+  Object.assign(chat.scriptstate, vars);
+  assert.equal(settleItemUse(chat, 4, new Set([id])), null, '같은 응답에 두 번 적지 않는다');
+
+  // 요청에 실린 것을 알면: 요청에 없던 물건은 적지 않고, 보낸 뒤 버린 물건은 적는다 (다시 주우면 횟수가 맞게)
+  let two = addItem(empty, new Set(['b1']), { name: '소금 봉지', desc: '', uses: 3, from: 'story', anchor: 'b1' });
+  two = addItem(two, new Set(['b1']), { name: '진통제', desc: '', uses: 2, from: 'story', anchor: 'b1' });
+  const [salt, pill] = two.list.map((e) => e.id);
+  const c2 = (items, use) => ({ message: [{ role: 'user', data: '간다', chatId: 'u1' }, { role: 'char', data: '갔다', chatId: 'b1' }, { role: 'user', data: '뿌린다', chatId: 'u2' }, { role: 'char', data: '뿌렸다', chatId: 'b2' }], scriptstate: { ...itemsVars(items), ...itemUseVars(use) } });
+  const used = (vars) => readItems(vars).log.filter((l) => l.what === 'use').map((l) => l.name);
+  assert.deepEqual(used(settleItemUse(c2(two, [{ id: salt, n: 1 }, { id: pill, n: 1 }]), 3, new Set([salt]))), ['소금 봉지'], '요청에 없던 진통제는 안 적는다');
+  assert.deepEqual(used(settleItemUse(c2(two, [{ id: salt, n: 1 }, { id: pill, n: 1 }]), 3)), ['소금 봉지', '진통제'], '모르면 전처럼 전부');
+  const dropped = removeItem(two, salt, 'drop', 'manual', '', { key: 'u2' });
+  const v = settleItemUse(c2(dropped, [{ id: salt, n: 1 }]), 3, new Set([salt]));
+  assert.deepEqual(used(v), ['소금 봉지'], '보낸 뒤 버린 물건도 쓴 것으로 적는다');
+  const row = readItems(v).list.find((e) => e.id === salt);
+  assert.equal(left(readItems(v), row, new Set(['u1', 'b1', 'u2', 'b2'])), 2);
+  assert.deepEqual(used(settleItemUse(c2(dropped, [{ id: salt, n: 1 }]), 3) ?? {}), [], '보낸 것을 모르면 버린 물건은 안 적는다');
 });
 
 // 11-08 전수점검: 상점에 판 물건은 판 응답에 묶여 숨고, 그 응답이 사라지면 돌아온다

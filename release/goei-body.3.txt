@@ -46,21 +46,21 @@
     }
   }
   function pickStyle(s8, style) {
-    let out = "";
+    let out2 = "";
     let i = 0;
     for (; ; ) {
       const a = s8.indexOf("{{#when", i);
-      if (a < 0) return out + s8.slice(i);
+      if (a < 0) return out2 + s8.slice(i);
       const e = openEnd(s8, a);
       const m = STYLE_WHEN.exec(s8.slice(a, e));
       if (!m) {
-        out += s8.slice(i, e);
+        out2 += s8.slice(i, e);
         i = e;
         continue;
       }
       const c = closeAt(s8, e);
       const keep2 = m[1] === "equal" ? style === m[2] : style !== m[2];
-      out += s8.slice(i, a) + (keep2 ? pickStyle(s8.slice(e, c), style) : "");
+      out2 += s8.slice(i, a) + (keep2 ? pickStyle(s8.slice(e, c), style) : "");
       i = c + 9;
     }
   }
@@ -237,35 +237,35 @@ ${ROUTER_SYSTEM.slice(3).join("\n")}
   function splitBy(text5, re, headOf2) {
     const hits2 = [...text5.matchAll(re)];
     if (!hits2.length) return [{ title: "전체", head: "", body: text5.replace(/\s+$/, ""), tail: text5.match(/\s+$/)?.[0] ?? "" }];
-    const out = [];
+    const out2 = [];
     const pre2 = text5.slice(0, hits2[0].index);
-    if (pre2.trim()) out.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
-    else if (pre2) out.push({ title: "머리", head: pre2, body: "", tail: "" });
+    if (pre2.trim()) out2.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
+    else if (pre2) out2.push({ title: "머리", head: pre2, body: "", tail: "" });
     hits2.forEach((m, i) => {
       const start3 = m.index + m[0].length;
       const end = i + 1 < hits2.length ? hits2[i + 1].index : text5.length;
       const raw = text5.slice(start3, end);
       const tail2 = raw.match(/\s+$/)?.[0] ?? "";
-      out.push({ ...headOf2(m), body: raw.slice(0, raw.length - tail2.length), tail: tail2 });
+      out2.push({ ...headOf2(m), body: raw.slice(0, raw.length - tail2.length), tail: tail2 });
     });
-    return out;
+    return out2;
   }
   function splitGuide(text5) {
     if (text5.includes("@@SECTION")) {
       const re = /@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g;
       const hits2 = [...text5.matchAll(re)];
-      const out = [];
+      const out2 = [];
       const pre2 = text5.slice(0, hits2[0]?.index ?? 0);
-      if (pre2.trim()) out.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
-      else if (pre2) out.push({ title: "머리", head: pre2, body: "", tail: "" });
+      if (pre2.trim()) out2.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
+      else if (pre2) out2.push({ title: "머리", head: pre2, body: "", tail: "" });
       hits2.forEach((m, i) => {
         const end = m.index + m[0].length;
         const gap = text5.slice(end, i + 1 < hits2.length ? hits2[i + 1].index : text5.length);
-        out.push({ title: m[1].trim(), head: `@@SECTION ${m[1]}
+        out2.push({ title: m[1].trim(), head: `@@SECTION ${m[1]}
 `, body: m[2], tail: `
 @@END${gap}` });
       });
-      return out;
+      return out2;
     }
     if (/^===[^=\n]+===$/m.test(text5)) return splitBy(text5, /^===([^=\n]+)===\n/gm, (m) => ({ title: m[1].trim(), head: m[0] }));
     if (/^#{2,3} /m.test(text5)) return splitBy(text5, /^#{2,3} ([^\n]*)\n/gm, (m) => ({ title: m[1].trim(), head: m[0] }));
@@ -306,9 +306,9 @@ ${rules3}` };
     return joinGuide(parts);
   }
   function guideSections(name) {
-    const out = {};
-    for (const m of guidePrompt(name).matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out[m[1].trim()] = m[2];
-    return out;
+    const out2 = {};
+    for (const m of guidePrompt(name).matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out2[m[1].trim()] = m[2];
+    return out2;
   }
   var fillGuide = (text5, vars) => String(text5 ?? "").replace(/\{([a-z_]+)\}/g, (all, k) => k in vars ? vars[k] : all).trim();
   var secCache = /* @__PURE__ */ new Map();
@@ -661,7 +661,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
   // src/core/cbs.ts
   var truthy = (v) => v === "1" || v.toLowerCase() === "true";
   function splitTop(s8) {
-    const out = [];
+    const out2 = [];
     let depth = 0;
     let cur = "";
     for (let i = 0; i < s8.length; i++) {
@@ -674,13 +674,13 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
         cur += "}}";
         i++;
       } else if (depth === 0 && s8[i] === ":" && s8[i + 1] === ":") {
-        out.push(cur);
+        out2.push(cur);
         cur = "";
         i++;
       } else cur += s8[i];
     }
-    out.push(cur);
-    return out;
+    out2.push(cur);
+    return out2;
   }
   function closeOf(s8, i) {
     let depth = 0;
@@ -875,18 +875,18 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
   }
   function evaluate(text5, env3) {
     if (!text5.includes("{{")) return text5;
-    let out = "";
+    let out2 = "";
     let i = 0;
     while (i < text5.length) {
       const j = text5.indexOf("{{", i);
       if (j < 0) {
-        out += text5.slice(i);
+        out2 += text5.slice(i);
         break;
       }
-      out += text5.slice(i, j);
+      out2 += text5.slice(i, j);
       const k = closeOf(text5, j);
       if (k < 0) {
-        out += text5.slice(j);
+        out2 += text5.slice(j);
         break;
       }
       const raw = text5.slice(j + 2, k - 2);
@@ -894,22 +894,22 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
       if (head3.startsWith("#if") || head3.startsWith("#when")) {
         const b = blockEnd(text5, k);
         if (!b) {
-          out += text5.slice(j, k);
+          out2 += text5.slice(j, k);
           i = k;
           continue;
         }
         const yes = head3.startsWith("#if") ? truthy(evaluate(head3.replace(/^#if(::)?/, ""), env3).trim()) : whenCond(head3, env3);
         const body5 = yes ? text5.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text5.slice(b.elseEnd, b.close) : "";
-        out += evaluate(body5, env3);
+        out2 += evaluate(body5, env3);
         i = b.end;
         continue;
       }
       const inner = evaluate(raw, env3);
       const v = fn(inner, env3);
-      out += v === null ? `{{${inner}}}` : v;
+      out2 += v === null ? `{{${inner}}}` : v;
       i = k;
     }
-    return out;
+    return out2;
   }
 
   // src/core/lorebooks.ts
@@ -1253,42 +1253,42 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
       for (const [k, v] of Object.entries(obj(vf))) if (typeof v === "string") m[k] = v;
       if (Object.keys(m).length) variants[code2] = m;
     }
-    const out = {
+    const out2 = {
       fields: fields3,
       extra: over?.extra !== void 0 ? cleanExtra(over.extra) : base?.extra ?? []
     };
     const keys = over?.keys ?? base?.keys;
-    if (keys) out.keys = keys;
+    if (keys) out2.keys = keys;
     const title2 = over?.title ?? base?.title;
-    if (title2) out.title = title2;
-    if (over?.titleRaw ?? base?.titleRaw) out.titleRaw = true;
+    if (title2) out2.title = title2;
+    if (over?.titleRaw ?? base?.titleRaw) out2.titleRaw = true;
     const order2 = over?.order ?? base?.order;
-    if (Array.isArray(order2) && order2.length) out.order = order2.map(String);
-    if (Object.keys(variants).length) out.variants = variants;
+    if (Array.isArray(order2) && order2.length) out2.order = order2.map(String);
+    if (Object.keys(variants).length) out2.variants = variants;
     const departments = over?.departments ?? base?.departments;
-    if (departments && Object.keys(departments).length) out.departments = { ...departments };
-    if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
-    if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
-    if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
-    if (over?.relOff ?? base?.relOff) out.relOff = true;
+    if (departments && Object.keys(departments).length) out2.departments = { ...departments };
+    if (over?.summaryOnly ?? base?.summaryOnly) out2.summaryOnly = true;
+    if (over?.noSummary ?? base?.noSummary) out2.noSummary = true;
+    if (over?.rosterOff ?? base?.rosterOff) out2.rosterOff = true;
+    if (over?.relOff ?? base?.relOff) out2.relOff = true;
     const notes = over?.roster_notes ?? base?.roster_notes;
-    if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n3) => ({ department: String(n3.department ?? ""), label: String(n3.label ?? "") }));
-    return out;
+    if (Array.isArray(notes) && notes.length) out2.roster_notes = notes.map((n3) => ({ department: String(n3.department ?? ""), label: String(n3.label ?? "") }));
+    return out2;
   }
   function worldRecords(kind, overrides2) {
     const base = DEFAULTS2(kind);
     const over = overrides2?.[kind] ?? {};
-    const out = /* @__PURE__ */ new Map();
+    const out2 = /* @__PURE__ */ new Map();
     for (const [name, rec3] of Object.entries(base)) {
       const m = mergeRecord(rec3, over[name]);
-      if (m) out.set(name, m);
+      if (m) out2.set(name, m);
     }
     for (const [name, rec3] of Object.entries(over)) {
-      if (out.has(name) || base[name]) continue;
+      if (out2.has(name) || base[name]) continue;
       const m = mergeRecord(void 0, rec3);
-      if (m) out.set(name, m);
+      if (m) out2.set(name, m);
     }
-    return out;
+    return out2;
   }
   var worldRecord = (kind, name, overrides2) => worldRecords(kind, overrides2).get(name) ?? null;
   function worldRelations(overrides2) {
@@ -1330,10 +1330,10 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
     const all = [...base, ...extras2];
     if (!rec3.order) return all;
     const seen4 = /* @__PURE__ */ new Set();
-    const out = [];
-    for (const id2 of rec3.order) if (all.includes(id2) && !seen4.has(id2)) seen4.add(id2), out.push(id2);
-    for (const id2 of all) if (!seen4.has(id2)) out.push(id2);
-    return out;
+    const out2 = [];
+    for (const id2 of rec3.order) if (all.includes(id2) && !seen4.has(id2)) seen4.add(id2), out2.push(id2);
+    for (const id2 of all) if (!seen4.has(id2)) out2.push(id2);
+    return out2;
   }
   function fieldValue(rec3, id2, faction) {
     const v = faction ? rec3.variants?.[faction]?.[id2] : void 0;
@@ -1346,7 +1346,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
   var obj2 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
   function pickScenes(raw) {
     const d = obj2(raw);
-    const out = {};
+    const out2 = {};
     const one2 = (v) => {
       const o = obj2(v);
       const row8 = {};
@@ -1362,14 +1362,14 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
       for (const [fm, v] of Object.entries(obj2(rows3))) {
         if (!/^\d+$/.test(fm)) continue;
         const row8 = one2(v);
-        if (row8) ((out.세력 ??= {})[code2] ??= {})[fm] = row8;
+        if (row8) ((out2.세력 ??= {})[code2] ??= {})[fm] = row8;
       }
     }
     for (const [id2, v] of Object.entries(obj2(d.인물))) {
       const row8 = one2(v);
-      if (row8) (out.인물 ??= {})[id2] = row8;
+      if (row8) (out2.인물 ??= {})[id2] = row8;
     }
-    return out;
+    return out2;
   }
   function safeDefaults() {
     try {
@@ -1435,14 +1435,14 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
   var obj3 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
   function pickSpec(raw) {
     const d = obj3(raw);
-    const out = {};
-    if (isFactionCode(d.code)) out.code = d.code;
-    if (d.playable === true) out.playable = true;
-    if (d.hidden === true) out.hidden = true;
-    if (FACTION_TYPES.some((t) => t.id === d.type)) out.type = d.type;
-    for (const k of ["title", "blurb", "photo", "face", "crop", "english", "gm_name", "gm_desc", "tab"]) if (s3(d[k])) out[k] = s3(d[k]);
-    if (Array.isArray(d.seed)) out.seed = list(d.seed);
-    return out;
+    const out2 = {};
+    if (isFactionCode(d.code)) out2.code = d.code;
+    if (d.playable === true) out2.playable = true;
+    if (d.hidden === true) out2.hidden = true;
+    if (FACTION_TYPES.some((t) => t.id === d.type)) out2.type = d.type;
+    for (const k of ["title", "blurb", "photo", "face", "crop", "english", "gm_name", "gm_desc", "tab"]) if (s3(d[k])) out2[k] = s3(d[k]);
+    if (Array.isArray(d.seed)) out2.seed = list(d.seed);
+    return out2;
   }
   function loreText(lore, comment) {
     return lore.filter((e) => e.comment === comment && typeof e.content === "string").map((e) => e.content).join("\n");
@@ -1468,13 +1468,13 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
     return Object.entries(obj3(directoryRaw(lore).조직)).map(([name, v]) => [name.trim(), pickSpec(v)]).filter(([name]) => name);
   }
   function startGroups(lore) {
-    const out = [];
+    const out2 = [];
     for (const [name, raw] of Object.entries(obj3(directoryRaw(lore ?? [])["시작 묶음"]))) {
       const d = obj3(raw);
-      if (!s3(name) || !isFactionCode(d.code) || BUILTIN.includes(d.code) || out.some((g2) => g2.code === d.code)) continue;
-      out.push({ name: s3(name), code: d.code, blurb: s3(d.blurb), english: s3(d.english), photo: s3(d.photo), hidden: d.hidden === true });
+      if (!s3(name) || !isFactionCode(d.code) || BUILTIN.includes(d.code) || out2.some((g2) => g2.code === d.code)) continue;
+      out2.push({ name: s3(name), code: d.code, blurb: s3(d.blurb), english: s3(d.english), photo: s3(d.photo), hidden: d.hidden === true });
     }
-    return out;
+    return out2;
   }
   function startOrder(lore) {
     return list(obj3(directoryRaw(lore ?? [])["시작 화면"]).order);
@@ -1499,7 +1499,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
     if (hit4) return hit4;
     const specs = orgSpecs(books);
     const scenes = scenesOf(books);
-    const out = SCENARIOS.factions.map((f, i) => {
+    const out2 = SCENARIOS.factions.map((f, i) => {
       const spec = specs.find(([, v]) => v.code === f.code)?.[1] ?? {};
       return {
         ...f,
@@ -1535,13 +1535,13 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
           org: name
         });
       }
-      out.push(...extras2.sort((a, b) => a.code.localeCompare(b.code)));
+      out2.push(...extras2.sort((a, b) => a.code.localeCompare(b.code)));
     }
     for (const g2 of startGroups(books)) {
-      if (out.some((f) => f.code === g2.code)) continue;
-      out.push({ code: g2.code, name: g2.name, affiliation: g2.name, blurb: g2.blurb, scenarios: scenarioList(g2.code, scenes, EXTRA_SCENARIOS), photo: g2.photo, english: g2.english, type: "org", builtin: false, hidden: g2.hidden, group: true });
+      if (out2.some((f) => f.code === g2.code)) continue;
+      out2.push({ code: g2.code, name: g2.name, affiliation: g2.name, blurb: g2.blurb, scenarios: scenarioList(g2.code, scenes, EXTRA_SCENARIOS), photo: g2.photo, english: g2.english, type: "org", builtin: false, hidden: g2.hidden, group: true });
     }
-    const sorted = sortByStart(startOrder(books), out);
+    const sorted = sortByStart(startOrder(books), out2);
     cache.set(books, sorted);
     return sorted;
   }
@@ -1551,9 +1551,9 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra2)}`;
     return factionList(lore).find((f) => f.code === code2)?.type ?? "org";
   }
   function extraNames(lore) {
-    const out = {};
-    for (const f of extraFactions(lore)) out[f.code] = f.org ?? f.name;
-    return out;
+    const out2 = {};
+    for (const f of extraFactions(lore)) out2[f.code] = f.org ?? f.name;
+    return out2;
   }
   function extraTabs(lore) {
     return extraFactions(lore).map((f) => ({ id: extraTabId(f.code), name: f.tab ?? f.code, visibleFor: [f.code] }));
@@ -1770,10 +1770,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (!k) return [];
     const table2 = kind === "an" ? PLACES_AN : kind === "in" ? PLACES_IN : KINDS_MS;
     const keys = rank(table2, name, kind === "ms" ? "" : text5, name);
-    const out = kind === "an" ? [...new Set(keys.flatMap((key) => [key, ...FALLBACK[key] ? [FALLBACK[key]] : []]).flatMap((key) => two(`Situation ${k} ${key}`, name)))] : keys.map((key) => `Situation ${k} ${key}`);
-    if (kind === "ms") out.push("Situation Mystic Door");
-    out.push(`Situation ${k}`);
-    return out;
+    const out2 = kind === "an" ? [...new Set(keys.flatMap((key) => [key, ...FALLBACK[key] ? [FALLBACK[key]] : []]).flatMap((key) => two(`Situation ${k} ${key}`, name)))] : keys.map((key) => `Situation ${k} ${key}`);
+    if (kind === "ms") out2.push("Situation Mystic Door");
+    out2.push(`Situation ${k}`);
+    return out2;
   }
   function baseShared(name, label2 = "") {
     const hay = clean(`${name} ${label2}`);
@@ -1815,23 +1815,23 @@ ${body5.slice(at).replace(/^\s+/, "")}
   };
   var weightText = (kg) => kg < 1 ? `${Math.max(1, Math.round(kg * 1e3))}g` : `${Number(kg.toFixed(2))}kg`;
   function parseTraits(text5) {
-    const out = { use: false };
+    const out2 = { use: false };
     const src = String(text5 ?? "").replace(/(소모|consumable|uses?)\s*[:：]?\s*[(（x×]?\s*(\d+)\s*[)）]?\s*(?:회|번|개)?/gi, "$1$2 ");
     for (const t0 of src.split(/[\s,，/·+]+/)) {
       const t = t0.trim().toLowerCase();
       if (!t) continue;
-      if (/^(손|hand|held|무기|weapon)$/.test(t)) out.equip = "weapon";
-      else if (/^(장비|gear|wear)$/.test(t)) out.equip = out.equip ?? "gear";
-      else if (/^(사용|use|usable)$/.test(t)) out.use = true;
+      if (/^(손|hand|held|무기|weapon)$/.test(t)) out2.equip = "weapon";
+      else if (/^(장비|gear|wear)$/.test(t)) out2.equip = out2.equip ?? "gear";
+      else if (/^(사용|use|usable)$/.test(t)) out2.use = true;
       else {
         const m = /^(?:소모|consumable|uses?)[:：]?(\d+)?$/.exec(t);
         if (m) {
-          out.use = true;
-          out.uses = itemUses(m[1] ?? 1);
+          out2.use = true;
+          out2.uses = itemUses(m[1] ?? 1);
         }
       }
     }
-    return out;
+    return out2;
   }
   var traitsText = (t) => [t.equip ? EQUIP_LABEL[t.equip] : "", t.uses ? `소모${t.uses}` : t.use ? "사용" : ""].filter(Boolean).join("·") || "-";
   var cleanIcon = (v) => String(v ?? "").toLowerCase().replace(/[／|｜]/g, "/").replace(/[^a-z0-9가-힣 /\-]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40) || void 0;
@@ -1840,7 +1840,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var s4 = (v) => typeof v === "string" ? v.trim() : "";
   function readStartItems(v) {
     if (!Array.isArray(v)) return [];
-    const out = [];
+    const out2 = [];
     for (const x of v) {
       if (!x || typeof x !== "object") continue;
       const o = x;
@@ -1849,7 +1849,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const uses = itemUses(o.uses);
       const equip = itemEquip(o.equip);
       const weight = itemWeight(o.weight);
-      out.push({
+      out2.push({
         name,
         ...o.use === true || uses ? { use: true } : {},
         ...uses ? { uses } : {},
@@ -1861,19 +1861,19 @@ ${body5.slice(at).replace(/^\s+/, "")}
         ...weight !== void 0 ? { weight } : {}
       });
     }
-    return out;
+    return out2;
   }
   var START_ITEM_COLUMNS = "이름 | 쓰임 | 시작 자리 | 설명 | 효과 | 그림 낱말 | 무게(kg)";
   var place = (e) => !e.equip || e.wear === false ? "소지품" : e.equip === "weapon" ? "손 칸" : "장비 칸";
   var startItemsText = (list4) => list4.map((e) => [e.name, traitsText(e), place(e), e.desc || "-", e.effect || "-", e.icon || "-", e.weight !== void 0 ? String(e.weight) : "-"].join(" | ")).join("\n");
   function parseStartItems(text5) {
-    const out = [];
+    const out2 = [];
     for (const line2 of text5.split("\n")) {
       const c = line2.split("|").map((x) => x.trim()).map((x) => x === "-" ? "" : x);
       const name = c[0] ?? "";
       if (!name) continue;
       const t = parseTraits((c[1] ?? "").replace(/(소모|consumable|uses?)\s+(\d)/gi, "$1$2"));
-      out.push({
+      out2.push({
         name,
         ...t.use ? { use: true } : {},
         ...t.uses ? { uses: t.uses } : {},
@@ -1885,20 +1885,20 @@ ${body5.slice(at).replace(/^\s+/, "")}
         .../* @__PURE__ */ ((w) => w !== void 0 ? { weight: w } : {})(c[6] ? itemWeight(c[6]) : void 0)
       });
     }
-    return out;
+    return out2;
   }
 
   // src/core/world/directory.ts
   var DIRECTORY_SCHEMA = 1;
   function groupRows(saved) {
-    const out = [];
+    const out2 = [];
     for (const [name, raw] of Object.entries(obj4(saved))) {
       const d = obj4(raw);
       const code2 = s5(d.code);
-      if (!s5(name) || !/^[A-Z]00$/.test(code2) || out.some((g2) => g2.code === code2)) continue;
-      out.push({ name: s5(name), code: code2, blurb: s5(d.blurb), english: s5(d.english), hidden: d.hidden === true, ...s5(d.photo) ? { photo: s5(d.photo) } : {}, ...s5(d.face) ? { face: s5(d.face) } : {}, ...s5(d.crop) ? { crop: s5(d.crop) } : {} });
+      if (!s5(name) || !/^[A-Z]00$/.test(code2) || out2.some((g2) => g2.code === code2)) continue;
+      out2.push({ name: s5(name), code: code2, blurb: s5(d.blurb), english: s5(d.english), hidden: d.hidden === true, ...s5(d.photo) ? { photo: s5(d.photo) } : {}, ...s5(d.face) ? { face: s5(d.face) } : {}, ...s5(d.crop) ? { crop: s5(d.crop) } : {} });
     }
-    return out;
+    return out2;
   }
   var s5 = (v) => typeof v === "string" ? v.trim() : "";
   var list2 = (v) => Array.isArray(v) ? v.map(s5).filter(Boolean) : [];
@@ -1922,17 +1922,17 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (dataCache.has(lore)) return dataCache.get(lore);
     const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
     const d = obj4(parts.length ? parse(parts.map((e) => e.content).join("\n")) : null);
-    const out = d.schema === DIRECTORY_SCHEMA ? migrateRoster(d) : null;
-    dataCache.set(lore, out);
-    return out;
+    const out2 = d.schema === DIRECTORY_SCHEMA ? migrateRoster(d) : null;
+    dataCache.set(lore, out2);
+    return out2;
   }
   var strMap = (v) => Object.fromEntries(Object.entries(obj4(v)).map(([k, x]) => [k, s5(x)]).filter(([, x]) => x));
   function displaySection(lore) {
     const d = readDirectoryData(lore)?.호칭;
     const raw = d && typeof d === "object" ? d : obj4(book(lore, "Faction display"));
-    const out = {};
-    for (const [viewer, m] of Object.entries(obj4(raw))) if (Object.keys(strMap(m)).length) out[viewer] = strMap(m);
-    return out;
+    const out2 = {};
+    for (const [viewer, m] of Object.entries(obj4(raw))) if (Object.keys(strMap(m)).length) out2[viewer] = strMap(m);
+    return out2;
   }
   var DEFAULT_PHONE_TABS = {
     order_by_faction: { B00: ["T02", "T01"] },
@@ -2006,7 +2006,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const names4 = new Set(lore.filter((e) => !isFolder(e) && !mine3.has(e)).map((e) => s5(e.comment)).filter(Boolean));
     const saved = obj4(data3?.부록);
     const seen4 = /* @__PURE__ */ new Set();
-    const out = [];
+    const out2 = [];
     for (const e of members) {
       const lore2 = s5(e.comment);
       if (seen4.has(lore2)) continue;
@@ -2015,7 +2015,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const guess = guessParent(lore2, names4);
       const flag2 = (v, def) => typeof v === "boolean" ? v : def;
       const parent = typeof d.parent === "string" ? s5(d.parent) : guess;
-      out.push({
+      out2.push({
         lore: lore2,
         guess,
         parent,
@@ -2028,7 +2028,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         unlock: s5(d.unlock)
       });
     }
-    return out;
+    return out2;
   }
   function appendixData(r) {
     const d = { keys: r.keys, with_parent: r.withParent, need_parent: r.needParent, target: r.target };
@@ -2048,22 +2048,22 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function legacyPlaces(lore, group4) {
     const world2 = obj4(book(lore, "World catalog"));
     const rows3 = Array.isArray(world2[group4]) ? world2[group4] : [];
-    const out = [];
+    const out2 = [];
     for (const r of rows3) {
       if (!Array.isArray(r) || r.length !== 5) continue;
       const label2 = s5(r[1]);
       if (!label2) continue;
-      out.push({ lore: s5(r[2]) || label2, label: label2, english: s5(r[3]), aliases: list2(r[4]), preset: r[0] === true, inFolder: false });
+      out2.push({ lore: s5(r[2]) || label2, label: label2, english: s5(r[3]), aliases: list2(r[4]), preset: r[0] === true, inFolder: false });
     }
-    return out;
+    return out2;
   }
   function legacyBases(lore) {
     const world2 = obj4(book(lore, "World catalog"));
     const rows3 = Array.isArray(world2["랜드마크"]) ? world2["랜드마크"] : [];
-    const out = [];
+    const out2 = [];
     for (const r of rows3) {
       if (!Array.isArray(r) || r.length !== 10 || !s5(r[1])) continue;
-      out.push({
+      out2.push({
         name: s5(r[1]),
         label: s5(r[2]),
         lore: s5(r[3]),
@@ -2078,7 +2078,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         hint: [s5(r[3]), s5(r[2]), s5(r[1])].filter(Boolean)
       });
     }
-    return out;
+    return out2;
   }
   var num = (v, d = 50) => typeof v === "number" && Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : d;
   function buildBases(lore, data3, orgs) {
@@ -2152,20 +2152,20 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return void 0;
   }
   function phoneTabs(lore) {
-    const out = phoneTabsSection(lore).tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] }));
+    const out2 = phoneTabsSection(lore).tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] }));
     const extra2 = extraFactions(lore).map((f) => f.code);
-    if (!extra2.length) return out;
-    for (const t of out) if (BUILTIN.every((f) => t.visibleFor.includes(f))) t.visibleFor.push(...extra2.filter((f) => !t.visibleFor.includes(f)));
-    for (const t of extraTabs(lore)) if (!out.some((x) => x.id === t.id)) out.push(t);
-    return out;
+    if (!extra2.length) return out2;
+    for (const t of out2) if (BUILTIN.every((f) => t.visibleFor.includes(f))) t.visibleFor.push(...extra2.filter((f) => !t.visibleFor.includes(f)));
+    for (const t of extraTabs(lore)) if (!out2.some((x) => x.id === t.id)) out2.push(t);
+    return out2;
   }
   var FACTIONS = BUILTIN;
   var DEFAULT_FACTION_NAMES = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
   function factionDisplayNames(lore) {
     const m = displaySection(lore).none ?? {};
-    const out = { ...DEFAULT_FACTION_NAMES };
-    for (const f of FACTIONS) if (s5(m[f])) out[f] = s5(m[f]);
-    return { ...extraNames(lore), ...out };
+    const out2 = { ...DEFAULT_FACTION_NAMES };
+    for (const f of FACTIONS) if (s5(m[f])) out2[f] = s5(m[f]);
+    return { ...extraNames(lore), ...out2 };
   }
   function groupFaction(group4, names4) {
     let best = "";
@@ -2227,7 +2227,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function buildOrgs(lore, agents, saved) {
     const names4 = factionDisplayNames(lore);
     const tabs2 = phoneTabs(lore);
-    const out = [];
+    const out2 = [];
     const make = (name, faction) => {
       const members = agents.filter((a) => a.affiliation === (faction || name));
       const d = obj4(saved[name]);
@@ -2238,7 +2238,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       }
       if (!spec.english && ORG_ENGLISH[faction || name]) spec.english = ORG_ENGLISH[faction || name];
       const base = !faction && spec.playable && spec.code ? { rosterFor: [spec.code], phoneTabs: [extraTabId(spec.code)] } : orgDefaults(faction, tabs2);
-      out.push({
+      out2.push({
         name,
         faction,
         spec,
@@ -2248,20 +2248,20 @@ ${body5.slice(at).replace(/^\s+/, "")}
     };
     const keyOf4 = (f) => Object.keys(saved).find((n3) => s5(obj4(saved[n3]).code) === f) ?? (names4[f] in saved ? names4[f] : DEFAULT_FACTION_NAMES[f] ?? names4[f]);
     for (const f of FACTIONS) make(keyOf4(f), f);
-    for (const name of Object.keys(saved)) if (s5(name) && !out.some((o) => o.name === name)) make(name, "");
-    for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
+    for (const name of Object.keys(saved)) if (s5(name) && !out2.some((o) => o.name === name)) make(name, "");
+    for (const a of agents) if (a.affiliation && !orgOf(out2, a.affiliation)) make(a.affiliation, "");
     for (const e of orgFolder(lore)) {
       const name = s5(e.comment);
       const same4 = (o2) => o2.name === name || Math.min(o2.name.length, name.length) >= 2 && (o2.name.includes(name) || name.includes(o2.name));
-      if (out.some(same4)) continue;
+      if (out2.some(same4)) continue;
       make(name, "");
-      const o = out[out.length - 1];
+      const o = out2[out2.length - 1];
       if (!o.spec.english) {
         const en2 = guessEnglish(e);
         if (en2) o.spec.english = en2;
       }
     }
-    return out;
+    return out2;
   }
   function orgHint(group4, orgs, lore) {
     if (!group4) return void 0;
@@ -2316,7 +2316,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const folder = members?.[kind] ?? [];
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
-      const out = [];
+      const out2 = [];
       const seen4 = /* @__PURE__ */ new Set();
       const merge = (base, d) => ({
         ...base,
@@ -2338,17 +2338,17 @@ ${body5.slice(at).replace(/^\s+/, "")}
           legacyLore.set(name, old.lore);
         }
         const base = old ? { ...old, lore: name, inFolder: true } : { lore: name, label: name, english: guessEnglish(e), aliases: [], preset: true, inFolder: true };
-        out.push(merge(base, obj4(saved[name])));
+        out2.push(merge(base, obj4(saved[name])));
       }
       for (const [name, d] of Object.entries(saved)) {
         if (seen4.has(name) || !exists.has(name)) continue;
         seen4.add(name);
         const old = legacy.find((r) => !used.has(r) && r.lore === name);
         if (old) used.add(old);
-        out.push(merge(old ?? { lore: name, label: name, english: guessEnglish(byLore.get(name)), aliases: [], preset: false, inFolder: false }, obj4(d)));
+        out2.push(merge(old ?? { lore: name, label: name, english: guessEnglish(byLore.get(name)), aliases: [], preset: false, inFolder: false }, obj4(d)));
       }
-      for (const r of legacy) if (!used.has(r) && !seen4.has(r.lore) && !(members?.[kind].length && data3)) out.push(r);
-      return ordered(out, Object.keys(saved), legacy.map((r) => r.lore), legacyLore);
+      for (const r of legacy) if (!used.has(r) && !seen4.has(r.lore) && !(members?.[kind].length && data3)) out2.push(r);
+      return ordered(out2, Object.keys(saved), legacy.map((r) => r.lore), legacyLore);
     };
     const agents = () => {
       const legacy = legacyAgents(books);
@@ -2356,7 +2356,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
       const fresh3 = /* @__PURE__ */ new Set();
-      const out = [];
+      const out2 = [];
       const groups = [];
       const seen4 = /* @__PURE__ */ new Set();
       const merge = (base, d) => ({
@@ -2399,30 +2399,30 @@ ${body5.slice(at).replace(/^\s+/, "")}
         else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group4, inFolder: true };
         const row8 = merge(base, obj4(saved[name]));
         if (!old && !saved[name]) fresh3.add(row8);
-        out.push(row8);
+        out2.push(row8);
       }
       for (const [name, d] of Object.entries(saved)) {
         if (seen4.has(name) || !exists.has(name)) continue;
         seen4.add(name);
         const old = legacy.rows.find((r) => !used.has(r) && r.lore === name);
         if (old) used.add(old);
-        out.push(merge(old ?? { lore: name, id: "", name, english: "", aliases: [], legacyEnglish: [], affiliation: "미분류", rosterFor: [], phoneTabs: [], rank: "", department: "", group: "", inFolder: false }, obj4(d)));
+        out2.push(merge(old ?? { lore: name, id: "", name, english: "", aliases: [], legacyEnglish: [], affiliation: "미분류", rosterFor: [], phoneTabs: [], rank: "", department: "", group: "", inFolder: false }, obj4(d)));
       }
-      for (const r of legacy.rows) if (!used.has(r) && !seen4.has(r.lore) && !(members?.agent.length && data3)) out.push(r);
-      const sorted = ordered(out, Object.keys(saved), legacy.rows.map((r) => r.lore), legacyLore);
-      out.splice(0, out.length, ...sorted);
+      for (const r of legacy.rows) if (!used.has(r) && !seen4.has(r.lore) && !(members?.agent.length && data3)) out2.push(r);
+      const sorted = ordered(out2, Object.keys(saved), legacy.rows.map((r) => r.lore), legacyLore);
+      out2.splice(0, out2.length, ...sorted);
       const taken = /* @__PURE__ */ new Set();
-      for (const r of out) {
+      for (const r of out2) {
         if (!/^P\d{3,}$/.test(r.id) || taken.has(r.id)) r.id = "";
         else taken.add(r.id);
       }
-      for (const r of out) if (!r.id) taken.add(r.id = stableAgentId(r.lore, taken));
-      const orgs = buildOrgs(books, out.filter((r) => !fresh3.has(r)), obj4(data3?.조직));
+      for (const r of out2) if (!r.id) taken.add(r.id = stableAgentId(r.lore, taken));
+      const orgs = buildOrgs(books, out2.filter((r) => !fresh3.has(r)), obj4(data3?.조직));
       for (const r of fresh3) {
         const o = orgHint(r.group, orgs, books);
         if (o) assignOrg(r, o);
       }
-      return { rows: out, groups, refill: legacy.refill, orgs };
+      return { rows: out2, groups, refill: legacy.refill, orgs };
     };
     const ag = agents();
     for (const o of ag.orgs) o.shared = orgShared(o.name, o.spec.type, o.spec.title ?? "");
@@ -2471,11 +2471,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function directoryData(dir2) {
     const place3 = (p2) => ({ preset: p2.preset, label: p2.label, english: p2.english, aliases: p2.aliases, ...p2.photo ? { photo: p2.photo } : {}, ...p2.face ? { face: p2.face } : {}, ...p2.crop ? { crop: p2.crop } : {} });
-    const out = { schema: DIRECTORY_SCHEMA, roster_v: ROSTER_V, refill: dir2.refill, 괴이: {}, "미스틱 사이트": {}, 요원: {}, 조직: {} };
-    for (const o of dir2.orgs) out.조직[o.name] = { roster_for: o.rosterFor, phone_tabs: o.phoneTabs, ...cleanSpec(o.spec) };
+    const out2 = { schema: DIRECTORY_SCHEMA, roster_v: ROSTER_V, refill: dir2.refill, 괴이: {}, "미스틱 사이트": {}, 요원: {}, 조직: {} };
+    for (const o of dir2.orgs) out2.조직[o.name] = { roster_for: o.rosterFor, phone_tabs: o.phoneTabs, ...cleanSpec(o.spec) };
     const used = [.../* @__PURE__ */ new Set([...dir2.usedCodes, ...dir2.orgs.map((o) => o.faction ? "" : o.spec.code ?? ""), ...dir2.startGroups.map((g2) => g2.code)])].filter((c) => c && !BUILTIN.includes(c)).sort();
-    if (used.length) out.codes_used = used;
-    out.거점 = {};
+    if (used.length) out2.codes_used = used;
+    out2.거점 = {};
     for (const b of dir2.bases) {
       const d = { sido: b.sido, gu: b.gu, x: Math.round(b.x * 10) / 10, y: Math.round(b.y * 10) / 10 };
       if (b.label && b.label !== b.name) d.label = b.label;
@@ -2484,14 +2484,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (b.aliases.length) d.aliases = b.aliases;
       if (b.org) d.org = b.org;
       if (!b.show) d.show = false;
-      out.거점[b.name] = d;
+      out2.거점[b.name] = d;
     }
-    if (Object.keys(dir2.display).length) out.호칭 = dir2.display;
-    if (dir2.phoneTabs.tabs.length) out["괴담톡 탭"] = dir2.phoneTabs;
-    if (Object.keys(dir2.seeds).length) out["시작 로어북"] = dir2.seeds;
-    if (dir2.appendices.length) out.부록 = Object.fromEntries(dir2.appendices.map((r) => [r.lore, appendixData(r)]));
+    if (Object.keys(dir2.display).length) out2.호칭 = dir2.display;
+    if (dir2.phoneTabs.tabs.length) out2["괴담톡 탭"] = dir2.phoneTabs;
+    if (Object.keys(dir2.seeds).length) out2["시작 로어북"] = dir2.seeds;
+    if (dir2.appendices.length) out2.부록 = Object.fromEntries(dir2.appendices.map((r) => [r.lore, appendixData(r)]));
     if (dir2.startGroups.length) {
-      out["시작 묶음"] = {};
+      out2["시작 묶음"] = {};
       for (const g2 of dir2.startGroups) {
         const gd = { code: g2.code };
         if (g2.blurb) gd.blurb = g2.blurb;
@@ -2500,14 +2500,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
         if (g2.face) gd.face = g2.face;
         if (g2.crop) gd.crop = g2.crop;
         if (g2.hidden) gd.hidden = true;
-        out["시작 묶음"][g2.name] = gd;
+        out2["시작 묶음"][g2.name] = gd;
       }
     }
-    if (dir2.startOrder.length) out["시작 화면"] = { order: [...dir2.startOrder] };
+    if (dir2.startOrder.length) out2["시작 화면"] = { order: [...dir2.startOrder] };
     const scenes = pickScenes(dir2.scenes);
-    if (Object.keys(scenes).length) out["첫 장면"] = scenes;
-    for (const p2 of dir2.anomalies) out.괴이[p2.lore] = place3(p2);
-    for (const p2 of dir2.sites) out["미스틱 사이트"][p2.lore] = place3(p2);
+    if (Object.keys(scenes).length) out2["첫 장면"] = scenes;
+    for (const p2 of dir2.anomalies) out2.괴이[p2.lore] = place3(p2);
+    for (const p2 of dir2.sites) out2["미스틱 사이트"][p2.lore] = place3(p2);
     for (const a of dir2.agents) {
       const d = {
         id: a.id,
@@ -2527,17 +2527,17 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (a.gender) d.gender = a.gender;
       if (a.startItems?.length) d.start_items = a.startItems;
       if (a.carry) d.carry = a.carry;
-      out.요원[a.lore] = d;
+      out2.요원[a.lore] = d;
     }
-    return out;
+    return out2;
   }
   function cleanSpec(spec) {
-    const out = {};
+    const out2 = {};
     for (const [k, v] of Object.entries(spec)) {
       if (v === void 0 || v === false || v === "" || Array.isArray(v) && !v.length && k !== "seed") continue;
-      out[k] = v;
+      out2[k] = v;
     }
-    return out;
+    return out2;
   }
   var HELP = "괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「세계」 탭에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 📎부록 폴더 항목은 「본 항목 이름 · 설명」으로 지으면 본 항목에 붙고, 켜지는 조건은 부록 탭에서 정합니다. 모델에게는 보내지 않습니다.";
   function directoryContent(data3) {
@@ -2547,15 +2547,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function trackRemoved(old, data3) {
     const was = obj4(old?._removed);
     const own2 = obj4(data3._removed);
-    const out = {};
+    const out2 = {};
     for (const k of ["거점", "조직"]) {
       const now2 = data3[k];
       const names4 = [.../* @__PURE__ */ new Set([...list2(was[k]), ...list2(own2[k]), ...now2 && typeof now2 === "object" ? Object.keys(obj4(old?.[k])) : []])];
       const gone = now2 && typeof now2 === "object" ? names4.filter((n3) => n3 && !(n3 in now2)) : names4;
-      if (gone.length) out[k] = gone;
+      if (gone.length) out2[k] = gone;
     }
-    if (!Object.keys(out).length && data3._removed === void 0) return data3;
-    return { ...data3, _removed: out };
+    if (!Object.keys(out2).length && data3._removed === void 0) return data3;
+    return { ...data3, _removed: out2 };
   }
   function withDirectory(lore, data3) {
     if (data3.세계 === void 0) {
@@ -2675,29 +2675,29 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function boardState(state2, site) {
     const src = state2 ?? {};
     if (site === "gn") return { ...src, [BOARD_SITE_VAR]: "gn" };
-    const out = {};
-    for (const [k, v] of Object.entries(src)) if (siteKey(k, site) === null && gnKey(k, site) === null) out[k] = v;
+    const out2 = {};
+    for (const [k, v] of Object.entries(src)) if (siteKey(k, site) === null && gnKey(k, site) === null) out2[k] = v;
     for (const [k, v] of Object.entries(src)) {
       const g2 = gnKey(k, site);
-      if (g2) out[g2] = v;
+      if (g2) out2[g2] = v;
     }
-    out[BOARD_SITE_VAR] = site;
-    return out;
+    out2[BOARD_SITE_VAR] = site;
+    return out2;
   }
   var boardView = (chat, site) => ({ ...chat, scriptstate: boardState(chat.scriptstate, site) });
   function boardWrite(base, view2, site) {
-    const out = { ...base.scriptstate ?? {} };
+    const out2 = { ...base.scriptstate ?? {} };
     const vs = view2.scriptstate ?? {};
     if (site !== "gn") {
-      for (const k of Object.keys(out)) if (gnKey(k, site) && !(gnKey(k, site) in vs)) delete out[k];
+      for (const k of Object.keys(out2)) if (gnKey(k, site) && !(gnKey(k, site) in vs)) delete out2[k];
     }
     for (const [k, v] of Object.entries(vs)) {
       if (k === BOARD_SITE_VAR || site !== "gn" && gnKey(k, site)) continue;
       const s8 = siteKey(k, site);
-      out[s8 ?? k] = v;
+      out2[s8 ?? k] = v;
     }
-    if (site === "gn") delete out[BOARD_SITE_VAR];
-    return { ...base, ...view2, scriptstate: out };
+    if (site === "gn") delete out2[BOARD_SITE_VAR];
+    return { ...base, ...view2, scriptstate: out2 };
   }
   var viewSite = (state2) => {
     const v = state2?.[BOARD_SITE_VAR];
@@ -2973,19 +2973,19 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function bodyParts(body5) {
     const text5 = String(body5 ?? "");
-    const out = [];
+    const out2 = [];
     let last2 = 0;
     for (const m of text5.matchAll(ANY())) {
-      if (m.index > last2) out.push({ kind: "text", text: text5.slice(last2, m.index) });
-      if (m[3] !== void 0) out.push(decodeLegacy(m[3]) ?? { kind: "text", text: "[첨부 기록 오류]" });
+      if (m.index > last2) out2.push({ kind: "text", text: text5.slice(last2, m.index) });
+      if (m[3] !== void 0) out2.push(decodeLegacy(m[3]) ?? { kind: "text", text: "[첨부 기록 오류]" });
       else {
         const kind = m[1].toLowerCase();
-        out.push(isKind(kind) && m[2].trim() ? { kind, text: m[2].trim() } : { kind: "text", text: "[지원하지 않는 첨부]" });
+        out2.push(isKind(kind) && m[2].trim() ? { kind, text: m[2].trim() } : { kind: "text", text: "[지원하지 않는 첨부]" });
       }
       last2 = m.index + m[0].length;
     }
-    if (last2 < text5.length) out.push({ kind: "text", text: text5.slice(last2) });
-    return out.filter((p2) => p2.kind !== "text" || p2.text.trim());
+    if (last2 < text5.length) out2.push({ kind: "text", text: text5.slice(last2) });
+    return out2.filter((p2) => p2.kind !== "text" || p2.text.trim());
   }
   function describe(body5, brief = false) {
     return bodyParts(body5).map((p2) => p2.kind === "text" ? p2.text : `[${ATTACH_LABELS[p2.kind]}${brief ? "" : p2.kind === "image" ? ` 첨부: 실제 이미지${p2.text ? ` (설명: ${p2.text})` : ""}` : ` 첨부 내용: ${p2.text}`}]`).join("");
@@ -3850,7 +3850,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   var en = (s8) => String(s8 ?? "").replace(/\\/g, "\\\\").replace(/\|/g, "\\p").replace(/\r/g, "").replace(/\n/g, "\\n");
   function fields(line2) {
-    const out = [];
+    const out2 = [];
     let cur = "";
     let esc47 = false;
     for (const c of line2) {
@@ -3859,13 +3859,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
         esc47 = false;
       } else if (c === "\\") esc47 = true;
       else if (c === "|") {
-        out.push(cur);
+        out2.push(cur);
         cur = "";
       } else cur += c;
     }
     if (esc47) cur += "\\";
-    out.push(cur);
-    return out;
+    out2.push(cur);
+    return out2;
   }
   var blank = () => ({ posts: [], archive: [], dms: [], sources: {}, seq: 0 });
   function decode(raw) {
@@ -3915,18 +3915,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return st;
   }
   function encode(st) {
-    const out = ["GN1", `Q|${st.seq || G_POST_BASE}`];
+    const out2 = ["GN1", `Q|${st.seq || G_POST_BASE}`];
     for (const p2 of st.posts) {
-      out.push(["P", p2.id, en(p2.date), en(p2.nick), en(p2.title), p2.views, p2.votes, en(p2.body), p2.mine ? "1" : "0", en(p2.tag ?? ""), p2.scrap ? "1" : "0", p2.voted ? "1" : "0", p2.down ? "1" : "0", ...p2.touch !== void 0 ? [p2.back ?? "", p2.touch] : p2.back !== void 0 ? [p2.back] : []].join("|"));
-      for (const c of p2.comments) out.push(["C", p2.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
+      out2.push(["P", p2.id, en(p2.date), en(p2.nick), en(p2.title), p2.views, p2.votes, en(p2.body), p2.mine ? "1" : "0", en(p2.tag ?? ""), p2.scrap ? "1" : "0", p2.voted ? "1" : "0", p2.down ? "1" : "0", ...p2.touch !== void 0 ? [p2.back ?? "", p2.touch] : p2.back !== void 0 ? [p2.back] : []].join("|"));
+      for (const c of p2.comments) out2.push(["C", p2.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
     }
     for (const p2 of st.archive ?? []) {
-      out.push(["A", p2.id, en(p2.date), en(p2.nick), en(p2.title), p2.views, p2.votes, en(p2.body), p2.mine ? "1" : "0", en(p2.tag ?? ""), p2.scrap ? "1" : "0", p2.voted ? "1" : "0", p2.down ? "1" : "0"].join("|"));
-      for (const c of p2.comments) out.push(["AC", p2.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
+      out2.push(["A", p2.id, en(p2.date), en(p2.nick), en(p2.title), p2.views, p2.votes, en(p2.body), p2.mine ? "1" : "0", en(p2.tag ?? ""), p2.scrap ? "1" : "0", p2.voted ? "1" : "0", p2.down ? "1" : "0"].join("|"));
+      for (const c of p2.comments) out2.push(["AC", p2.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
     }
-    for (const [nick, s8] of Object.entries(st.sources)) out.push(["T", en(nick), s8.postid || 0, en(s8.title), en(s8.body), en(s8.author), en(s8.quote), en(s8.quoteAuthor)].join("|"));
-    for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
-    return out.join("\n");
+    for (const [nick, s8] of Object.entries(st.sources)) out2.push(["T", en(nick), s8.postid || 0, en(s8.title), en(s8.body), en(s8.author), en(s8.quote), en(s8.quoteAuthor)].join("|"));
+    for (const d of st.dms) out2.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
+    return out2.join("\n");
   }
   function readGnet(chat) {
     const st = decode(chat.scriptstate?.[GN_RAW]);
@@ -4236,8 +4236,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
       throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
     }
   }
-  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  var str2 = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
-  var int = (v) => {
-    const n3 = typeof v === "string" && v.trim() ? Number(v) : v;
-    return typeof 
+  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray

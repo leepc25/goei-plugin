@@ -8,12 +8,12 @@
 //    Risu 는 글이 그대로면 메시지를 다시 그리지 않으니(Chats.svelte 글 해시), 이름은 글이 아니라 CSS(::before content)로 넣는다.
 //  · 마지막 메시지 = .chat-message-container:first-child (Risu 는 새 메시지를 맨 앞에 넣고 flex-col-reverse 로 뒤집어 보인다).
 import { aliveAnchors } from '../core/wallet';
-import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, lastUserKey, liveItems, pendingItemUse, readItemUse, readItems } from '../core/items';
+import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, lastUserKey, liveItems, readItemUse, readItems, useRerolling, usesToSend } from '../core/items';
 import type { Chat } from '../core/types';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { body } from './overlay';
 import { updateChat } from './risu';
-import { onWaiting } from './waiting';
+import { isWaiting, onWaiting, setWaiting, setWaitingProbe } from './waiting';
 
 /** 한 번에 보이는 칩 수. 넘으면 마지막 칸이 「외 n개」 */
 const SLOTS = 12;
@@ -69,10 +69,86 @@ export function useSending(chat: Chat | null | undefined, charIndex: number, cha
   return !chat.scriptstate?.[ITEM_USE_AT_VAR] && lastUserKey(chat) === sent.userKey && sent.ids.has(id);
 }
 
+/** 답이 붙은 뒤 사용 정리(body.ts onOutput → settleItemUse)가 끝날 때까지도 잠근다: 기다림이 꺼진 뒤 정리 전에 넣은 것이 쓴 것으로 적히지 않게 (11-14 사용자) */
+let settling = 0;
+/** 정리 시작. 돌려준 함수를 부르면 풀린다 (여러 번 불러도 한 번만. 못 불러도 30초 뒤 풀린다) */
+export function holdUseSettle(): () => void {
+  let done = false;
+  const release = () => {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    settling = Math.max(0, settling - 1);
+    // 답이 붙어 정리가 끝났다: 「보내는 중」 표시도 끝 (자리 사본을 다시 보낸 턴은 at 이 비어 있어 표시가 남았다)
+    if (!settling) sent = null;
+  };
+  settling++;
+  const timer = setTimeout(release, 30_000);
+  return release;
+}
+/** 요청을 보낸 채팅. 모르면(null) 모든 채팅을 잠근다 */
+let lockAt: { charIndex: number; chatIndex: number } | null = null;
+/** 본편 요청이 어느 채팅에서 나갔는지 적는다 (body.ts onBeforeRequest: 시작할 때 null, 채팅을 읽은 뒤 그 자리). 다른 채팅의 「사용」은 막지 않는다 */
+export function setUseLockAt(at: { charIndex: number; chatIndex: number } | null): void {
+  lockAt = at ? { charIndex: at.charIndex, chatIndex: at.chatIndex } : null;
+  if (!at) { out = null; blind = false; } // 새 요청: 지난 요청에 실린 것은 잊는다
+}
+/** 마지막 본편 요청을 손대지 못하고 보냈나 (이 봇 판정이 늦었거나 채팅을 못 읽음). [Inventory] 가 안 실렸으니 그 답에는 사용을 적지 않는다:
+ *  그사이 넣었거나 넣어 둔 것이 모델 모르게 쓴 것으로 적히고 깎였다. 자리는 그대로 두어 다음 요청에 실린다 */
+let blind = false;
+/** body.ts onBeforeRequest: setUseLockAt(null) 뒤에 적는다 (다음 요청에서 꺼진다) */
+export function setUseBlind(): void { blind = true; }
+export function useBlind(): boolean { return blind; }
+/** 마지막 본편 요청에 실제로 실려 나간 사용 (다시 굴리기 포함). sent 와 달리 기다림이 늦게 꺼져도 남는다: 답이 붙을 때 정리(settleItemUse)가 본다 */
+let out: { charIndex: number; chatIndex: number; userKey: string; ids: Set<string>; reroll: boolean } | null = null;
+/** 이 채팅·이 유저 턴의 요청에 실려 나간 물건 id. 모르면 null (요청을 못 봤거나 다른 턴) */
+export function sentOut(charIndex: number, chatIndex: number, chat: Chat | null | undefined): Set<string> | null {
+  if (!out || !chat || out.charIndex !== charIndex || out.chatIndex !== chatIndex || out.userKey !== lastUserKey(chat)) return null;
+  return out.ids;
+}
+/** 그 요청이 자리 사본을 다시 보낸 다시 굴리기였나. 모르면 null. 정리(settleItemUse)가 요청과 같은 판정을 쓰게 넘긴다 (이어 쓰기는 같은 응답에 덧붙는다) */
+export function sentReroll(charIndex: number, chatIndex: number, chat: Chat | null | undefined): boolean | null {
+  return sentOut(charIndex, chatIndex, chat) ? out!.reroll : null;
+}
+/** 지금은 「사용」을 바꿀 수 없나(넣기·빼기): 이 채팅의 본편 답을 기다리는 중이거나 답 정리 중 (다시 굴리기 포함).
+ *  그사이 넣은 것은 요청에 없었는데도 답이 붙을 때 쓴 것으로 적히고 횟수가 깎였다 (11-14 사용자: 전부 막기).
+ *  빼기도 막는다: 요청을 조립하는 사이(보낸 표시 전)에 빼면 모델은 쓴 것으로 받았는데 기록이 안 남았다 (11-14 재검토).
+ *  채팅 자리를 안 주면 어느 채팅이든 잠긴 것으로 본다 */
+export function useLocked(charIndex?: number, chatIndex?: number): boolean {
+  if (settling > 0) return true;
+  if (!isWaiting()) return false;
+  return !lockAt || charIndex === undefined || chatIndex === undefined || (lockAt.charIndex === charIndex && lockAt.chatIndex === chatIndex);
+}
+
+/** 리수가 지금 답을 만드는 중인가: 입력창에 멈춤 단추(.loadmove)가 있으면 busy, 보내기 단추가 돌아와 있으면 idle. 화면을 못 읽거나 단추를 못 찾으면 unknown */
+async function risuBusy(): Promise<'busy' | 'idle' | 'unknown'> {
+  try {
+    const screen = await (await body())?.doc.querySelector('.default-chat-screen');
+    if (!screen) return 'unknown';
+    if (await screen.querySelector('.loadmove')) return 'busy';
+    return (await screen.querySelector('.button-icon-send')) ? 'idle' : 'unknown';
+  } catch {
+    return 'unknown'; // 못 읽으면 모른다
+  }
+}
+
+/** 리수는 중지·실패·프롬프트 미리 보기를 알려 주지 않아, 답이 안 오는데도 기다림이 3분까지 켜져 있었다 (11-14 재검토).
+ *  리수 입력창에 보내기 단추가 돌아와 있으면(만드는 중에는 그 자리에 멈춤 단추 .loadmove 가 있다) 요청이 끝난 것이니 기다림을 끈다.
+ *  「사용」을 막기 직전에만 본다. 화면을 못 읽거나 단추를 못 찾으면 그대로 둔다 */
+export async function freeUseLock(): Promise<void> {
+  if (!isWaiting()) return;
+  if ((await risuBusy()) === 'idle') setWaiting(false, true);
+}
+
+// 답이 3분보다 늦어도 리수가 아직 만드는 중이면 기다림을 끄지 않는다: 꺼지면 「사용」 잠금이 풀려, 그사이 넣거나 뺀 것이 답이 붙을 때 어긋났다 (11-14 재검토)
+setWaitingProbe(async () => (await risuBusy()) === 'busy');
+
 /** 본편 요청에 「사용」이 실려 나갔다 (body.ts onBeforeRequest, [Inventory] 를 넣은 바로 뒤). 칩 이름표를 바로 「보내는 중」으로 */
 export async function markUseSent(charIndex: number, chatIndex: number, chat: Chat): Promise<void> {
   const userKey = lastUserKey(chat);
-  const ids = pendingItemUse(chat.scriptstate, userKey).map((u) => u.id);
+  // 요청에 실제로 실린 것만 (core/items.ts usesToSend: [Inventory] 의 「uses」 줄과 같은 셈)
+  const ids = usesToSend(chat).map((u) => u.id);
+  out = { charIndex, chatIndex, userKey, ids: new Set(ids), reroll: useRerolling(chat) };
   if (!ids.length || chat.scriptstate?.[ITEM_USE_AT_VAR]) return;
   sent = { charIndex, chatIndex, userKey, ids: new Set(ids) };
   await refreshUseBox(charIndex, chatIndex, chat);
@@ -80,6 +156,7 @@ export async function markUseSent(charIndex: number, chatIndex: number, chat: Ch
 
 // 응답 알림 없이 기다림이 끝났다 = 요청이 실패했거나 멈췄다: 아직 안 쓰인 것이니 칩을 다시 보인다 (다음 전송에 다시 실린다)
 onWaiting((w, late) => {
+  if (!w) lockAt = null;
   if (w || !late || !sent) return;
   const { charIndex, chatIndex } = sent;
   sent = null;
@@ -116,9 +193,10 @@ async function ensure(): Promise<{ doc: Root['doc']; style: El } | null> {
   return { doc, style };
 }
 
-/** × 로 뺀 뒤의 채팅. 「보내는 중」인 물건이면 null (그대로 둔다): 모델은 이미 쓴 것으로 받았으니 빼면 횟수·기록이 어긋난다 (재검토 11-14 B-9) */
+/** × 로 뺀 뒤의 채팅. 「보내는 중」인 물건이면 null (그대로 둔다): 모델은 이미 쓴 것으로 받았으니 빼면 횟수·기록이 어긋난다 (재검토 11-14 B-9).
+ *  이 채팅의 답을 기다리는 중·정리 중에도 null: 보낸 표시가 붙기 전(요청 조립 중)에 빼는 틈을 막는다 */
 export function dropUseUnlessSent(chat: Chat, charIndex: number, chatIndex: number, id: string): Chat | null {
-  if (sentUseIds(chat, charIndex, chatIndex)?.has(id)) return null;
+  if (useLocked(charIndex, chatIndex) || sentUseIds(chat, charIndex, chatIndex)?.has(id)) return null;
   const next = dropUse(readItemUse(chat.scriptstate), id);
   return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next) } };
 }
@@ -135,6 +213,7 @@ onChatClick('use', async (doc, x, y) => {
     busy = true;
     try {
       const { charIndex, chatIndex } = where;
+      await freeUseLock(); // 중지·실패로 끝난 요청이 × 를 막지 않게
       await updateChat(charIndex, chatIndex, (chat) => dropUseUnlessSent(chat, charIndex, chatIndex, id));
       await refreshUseBox(charIndex, chatIndex);
     } catch (error) {

@@ -139,3 +139,66 @@ test('옛 명부(부록 줄 없음): 플러그인 기본 명부의 같은 이름
   // 기본 명부에 없는 부록은 코드 기본값 그대로
   assert.equal(readDirectory(base).appendices.find((r) => r.lore === '이름 모를 부록').target, true);
 });
+
+test('망상홈쇼핑 · 상품: 오후역이 켜지는 모든 길에서 같이 켜진다 (오후역 본문에서 뺀 상품 4개가 여기 있다)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { withWorldLore } = await import('../dist-test/core.mjs');
+  const read = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
+  const fresh = JSON.parse(read('../src/data/install/directory.json'));
+  const APP = '망상홈쇼핑 · 상품';
+  const split = (t) => t.split(',').map((k) => k.trim()).filter(Boolean);
+  // 자료 세 곳이 같다: 부록 키 ⊇ 오후역 키, 카드 글 머리 = 세계 자료·기본 명부
+  const station = JSON.parse(read('../src/data/world/anomalies.json')).records.오후역;
+  const app = JSON.parse(read('../src/data/world/appendices.json')).records[APP];
+  for (const k of [...split(station.keys), '오후역', fresh.괴이.오후역.english, ...fresh.괴이.오후역.aliases]) assert.ok(split(app.keys).includes(k), `부록 키에 ${k}`);
+  for (const w of ['Into the Vacuum', 'Happy-Maker', 'Gold-Edition Blood Bathtub', 'Aesthetic-Caterpillar Egg-Sac Diet Aid']) {
+    assert.ok(app.fields.body.includes(w), `부록 본문에 ${w}`);
+    assert.ok(!JSON.stringify(station).includes(w), `오후역 본문에는 없다: ${w}`);
+  }
+  const head = Object.fromEntries(read('../card/extra-lore/부록_망상홈쇼핑_상품.txt').split('\n---\n')[0].split('\n').map((l) => l.split(': ')).map(([k, ...v]) => [k, v.join(': ')]));
+  assert.equal(head.key, app.keys, '카드 글 키 = 세계 자료 키');
+  assert.deepEqual(JSON.parse(head.appendix), fresh.부록[APP], '카드 글 조건 = 기본 명부');
+
+  const books = (d) => withWorldLore([{ comment: 'Directory', key: '', mode: 'normal', content: JSON.stringify(d) }]);
+  const picked = (bs, text, state = {}) =>
+    lore.pickLore(lore.managedEntries(bs), [{ role: 'user', data: text }], { target: '', board: [], deployed: [], ...state }, { depth: 10, budget: 0 }).map((p) => p.entry.name);
+  const both = (got, why) => assert.ok(got.includes('오후역') && got.includes(APP), `${why}: ${got.join(', ')}`);
+  const now = books(fresh);
+  // 글에 이름만
+  for (const t of ['오후역에 내렸다.', '혈액 방송국 로비에 들어섰다.', '혈액방송국이 보인다.', 'We got off at Afternoon Station.', 'the Blood Broadcasting Station lobby']) both(picked(now, t), t);
+  // 상태창 목표 (이름·키·영문명), 위치만 다른 곳이어도
+  for (const target of ['오후역', '혈액 방송국', '혈액방송국', 'Afternoon Station', 'Blood Broadcasting Station']) both(picked(now, '조용한 밤', { target, place: '대기실' }), `목표 ${target}`);
+  both(picked(now, '조용한 밤', { target: '오후역', place: '혈액 방송국 메인 스튜디오' }), '목표 오후역 + 위치');
+  assert.ok(picked(now, '조용한 밤', { place: '혈액 방송국 메인 스튜디오' }).includes(APP), '위치만으로도');
+  // Risu 방식
+  const risu = lore.pickLoreRisu(lore.managedEntries(now), [{ role: 'user', data: '오후역에 내렸다.' }], 10).map((p) => p.entry.name);
+  both(risu, 'Risu 방식');
+  // 옛 카드 명부 (위치에 혈액 방송국이 없는 줄이 저장돼 있음)도 목표 칸으로 켜진다
+  const old = structuredClone(fresh);
+  old.부록[APP] = { keys: true, with_parent: false, need_parent: false, target: true, places: ['망상홈쇼핑', '망상 홈쇼핑', '오후역'] };
+  both(picked(books(old), '조용한 밤', { target: '혈액 방송국' }), '옛 명부 + 목표 혈액 방송국');
+  // 세계 탭에서 오후역에 넣은 별칭·바꾼 영문명으로 오후역이 켜져도 같이 켜진다 (글·목표 칸 둘 다, 11-14 재검토)
+  const mine = structuredClone(fresh);
+  mine.괴이.오후역.aliases = [...mine.괴이.오후역.aliases, '혈흉 방송국'];
+  mine.괴이.오후역.english = 'Noon Terminal';
+  both(picked(books(mine), '혈흉 방송국에 도착했다.'), '넣은 별칭 (글)');
+  both(picked(books(mine), '조용한 밤', { target: '혈흉 방송국', place: '대기실' }), '넣은 별칭 (목표)');
+  both(picked(books(mine), 'We reached Noon Terminal.'), '바꾼 영문명 (글)');
+  both(picked(books(mine), '조용한 밤', { target: 'Noon Terminal' }), '바꾼 영문명 (목표)');
+  // 「목표」 스위치를 끄면 목표 칸만으로는 안 켜진다 (오후역은 켜져도 부록은 안 따라간다). 글에 부르는 말이 나오면 켜진다
+  const off = structuredClone(fresh);
+  off.부록[APP] = { ...off.부록[APP], target: false };
+  for (const target of ['오후역', '혈액 방송국', 'Afternoon Station']) {
+    const got = picked(books(off), '조용한 밤', { target, place: '대기실' });
+    assert.ok(got.includes('오후역') && !got.includes(APP), `목표 끔 + 목표 ${target}: ${got.join(', ')}`);
+  }
+  both(picked(books(off), '오후역에 내렸다.', { target: '오후역', place: '대기실' }), '목표 끔 + 글에 이름');
+  const offMine = structuredClone(mine);
+  offMine.부록[APP] = { ...offMine.부록[APP], target: false };
+  both(picked(books(offMine), '혈흉 방송국에 도착했다.'), '목표 끔 + 넣은 별칭 (글)');
+  assert.ok(!picked(books(offMine), '조용한 밤', { target: '혈흉 방송국', place: '대기실' }).includes(APP), '목표 끔 + 넣은 별칭 (목표)');
+  // 상관없는 글·목표에서는 꺼져 있다
+  for (const got of [picked(now, '조용한 밤'), picked(now, '오후에 역 앞 방송국에서 만나자. 혈액 검사는 내일.'), picked(now, '조용한 밤', { target: '화요퀴즈쇼', place: '서울역' })]) assert.ok(!got.includes(APP) && !got.includes('오후역'), got.join(', '));
+  // 새로 넣은 키가 다른 부록·항목을 켜지 않는다
+  assert.deepEqual(picked(now, '오후역에 내렸다.').filter((n) => n.includes('·')), [APP]);
+});

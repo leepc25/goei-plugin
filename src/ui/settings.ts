@@ -29,7 +29,7 @@ import { defStored } from '../core/deftext';
 import { ITEM_LEFT_WORDS_DEFAULT, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_DEFAULT, ITEM_OFF_WORDS_VAR, ITEM_RULES_DEFAULT, ITEM_RULES_VAR, ITEM_WORDS_MAX, parseItemRules } from '../core/itemrules';
 import { ICON_KIND_LABEL, normIcon } from '../core/iconmatch';
 import { keepOpen } from './panels';
-import { invOn, ITEM_SCOPE_VAR, ITEM_SKIP_MAX, ITEM_SKIP_VAR, itemScope, itemSkip, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
+import { invOn, ITEM_SCOPE_VAR, ITEM_SKIP_MAX, ITEM_SKIP_VAR, itemScope, itemSkip, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_PREV_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_AMOUNTS, isGiveKey, isGiveShop, isShopAmount, isShopFn, shopFnNone, shopFnVar, shopGiveVar } from '../core/shopfn';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
@@ -559,7 +559,7 @@ function bulkSideVars(chat: Chat, prev: ScriptState | undefined, next: ScriptSta
   const before = usedCols(colConfig(prev));
   const after = usedCols(colConfig(next));
   if (before.join() !== after.join()) vars[COL_LOG_VAR] = withColLog(prev, n, after);
-  if (invOn(prev) && !invOn(next)) Object.assign(vars, { [ITEM_USE_VAR]: '', [ITEM_USE_AT_VAR]: '', [ITEM_RESUMED_VAR]: '' });
+  if (invOn(prev) && !invOn(next)) Object.assign(vars, { [ITEM_USE_VAR]: '', [ITEM_USE_AT_VAR]: '', [ITEM_USE_PREV_VAR]: '', [ITEM_RESUMED_VAR]: '' });
   else if (!invOn(prev) && invOn(next)) vars[ITEM_RESUMED_VAR] = n ? String(n) : '';
   const shopOff = shopSettings(prev).on && !shopSettings(next).on;
   if (shopOff) vars[SHOP_VAR] = '';
@@ -1240,7 +1240,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       await save(ctx, env, (chat): ScriptState | null => {
         if (invOn(chat.scriptstate) === (v === '1')) return null;
         return v === '0'
-          ? { [ITEM_ON_VAR]: '0', [ITEM_USE_VAR]: '', [ITEM_USE_AT_VAR]: '', [SHOP_VAR]: '', [ITEM_RESUMED_VAR]: '' }
+          ? { [ITEM_ON_VAR]: '0', [ITEM_USE_VAR]: '', [ITEM_USE_AT_VAR]: '', [ITEM_USE_PREV_VAR]: '', [SHOP_VAR]: '', [ITEM_RESUMED_VAR]: '' }
           : { [ITEM_ON_VAR]: '1', [ITEM_RESUMED_VAR]: (chat.message ?? []).length ? String((chat.message ?? []).length) : '' };
       });
       if (v === '0') {

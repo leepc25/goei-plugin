@@ -12,7 +12,7 @@ import { genSettings } from '../core/advanced';
 import { addWalletEntry, aliveAnchors, freshWalletId, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { pointsOn, pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
-import { refreshUseBox } from '../host/usebox';
+import { refreshUseBox, useLocked } from '../host/usebox';
 import { getPrefs } from '../core/settings';
 import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, settleReady, worldMinute, type CosOrder } from '../core/orders';
 import { turnKey, acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
@@ -119,7 +119,8 @@ function saleDone<C extends ChatContext['chat']>(chat: C, site: MallSite, itemId
   const items = sellItem(it0, itemId, anchor, `${MALL_NAME[site]}에 팖`);
   const nextShop = closeSale(now, anchor); // 판 응답 키 — 다시 굴리면 판 것 목록에서도 빠진다 (전수검사 11-13)
   if (!nextShop) return null;
-  const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+  // 답을 기다리는 중·정리 중에는 「사용」 자리를 건드리지 않는다 (요청에 실린 사용이 기록 없이 빠지지 않게, host/usebox.ts useLocked)
+  const q = chat.scriptstate?.[ITEM_USE_AT_VAR] || useLocked() ? null : readItemUse(chat.scriptstate);
   const use = q && q.some((u) => u.id === itemId) ? itemUseVars(dropUse(q, itemId)) : {};
   return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop), ...use } };
 }

@@ -1,4 +1,119 @@
- ?? "")}"`;
+ height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 4 8 4a2 2 0 0 0 0 4h4Zm0 0s1.5-4 4-4a2 2 0 0 1 0 4h-4Z"/>')
+  };
+  function attachEditor(prefix, items, kinds, disabled = false, giftNote = "", showMenu = true) {
+    const rows3 = items.map(
+      (a, i) => `<div class="at-item${a.kind === "image" ? " at-item-image" : ""}">${a.kind === "image" ? `<img class="at-thumb" src="${esc6(a.preview ?? "")}" data-asset="${a.preview ? "" : esc6(a.asset ?? "")}" alt="보낼 사진">` : `<span class="at-kind">${ICON[a.kind]}${ATTACH_LABELS[a.kind]}</span>`}
+      <input class="gx-search" data-input="${prefix}-att" data-key="${i}" value="${esc6(a.content)}" placeholder="${esc6(ATTACH_HINTS[a.kind])}" maxlength="2000" aria-label="${ATTACH_LABELS[a.kind]} 내용" ${disabled ? "disabled" : ""}>
+      <button class="gx-mini" data-action="${prefix}-att-del" data-value="${i}" aria-label="${ATTACH_LABELS[a.kind]} 첨부 빼기" ${disabled ? "disabled" : ""}>✕</button></div>`
+    ).join("");
+    const full = items.length >= ATTACH_MAX;
+    const all = giftNote && !kinds.includes("gift") ? [...kinds, "gift"] : kinds;
+    const menu = all.map((k) => {
+      const blocked2 = !kinds.includes(k);
+      if (k === "image") return `<button class="at-add at-add-image" data-pick-photo="${prefix}" ${disabled || full ? "disabled" : ""} title="붙여넣기(Ctrl+V)나 끌어놓기로도 올릴 수 있어요">${ICON.image}<span>사진 올리기</span></button>`;
+      const label2 = k === "photo" && kinds.includes("image") ? "사진 묘사" : ATTACH_LABELS[k];
+      return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc6(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
+    }).join("");
+    if (!rows3 && !showMenu) return "";
+    return `<div class="at-editor" data-drop-photo="${prefix}">${rows3}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
+  }
+  function attachInput(items, key, value) {
+    const row8 = items[Number(key)];
+    if (!row8) return false;
+    row8.content = value;
+    return true;
+  }
+  function attachAction(items, op, value, kinds) {
+    if (op === "add") {
+      if (items.length >= ATTACH_MAX || value === "image" || !kinds.includes(value)) return false;
+      items.push({ kind: value, content: "" });
+      return true;
+    }
+    const i = Number(value);
+    if (!Number.isInteger(i) || !items[i]) return false;
+    const [gone] = items.splice(i, 1);
+    if (gone.preview?.startsWith("blob:")) URL.revokeObjectURL(gone.preview);
+    return true;
+  }
+  function addPhoto(items, asset, preview) {
+    if (items.length >= ATTACH_MAX) return false;
+    items.push({ kind: "image", content: "", asset, preview });
+    if (preview.startsWith("blob:")) photos.set(asset, preview);
+    return true;
+  }
+  var emptyAttachment = (items) => items.find((a) => a.kind !== "image" && !a.content.trim());
+  var photos = /* @__PURE__ */ new Map();
+  var loading = /* @__PURE__ */ new Map();
+  function loadPhoto(asset) {
+    let p2 = loading.get(asset);
+    if (!p2) {
+      p2 = photoUrl(asset).then((url) => {
+        photos.set(asset, url);
+        return url;
+      });
+      loading.set(asset, p2);
+    }
+    return p2;
+  }
+  function hydratePhotos(scope) {
+    scope.querySelectorAll("img[data-asset]").forEach((img) => {
+      const asset = img.dataset.asset;
+      if (!asset || img.getAttribute("src")) return;
+      const fill3 = (url) => {
+        if (url) img.src = url;
+        else img.closest(".at-card-image")?.classList.add("broken");
+      };
+      if (photos.has(asset)) fill3(photos.get(asset));
+      else void loadPhoto(asset).then(fill3);
+    });
+  }
+  function zoomPhoto(src, alt) {
+    const box3 = document.createElement("div");
+    box3.className = "gx at-zoom";
+    box3.setAttribute("role", "dialog");
+    box3.setAttribute("aria-label", "사진 크게 보기");
+    box3.innerHTML = `<img src="${esc6(src)}" alt="${esc6(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
+    const close3 = () => {
+      box3.remove();
+      document.removeEventListener("keydown", key, true);
+    };
+    const key = (ev) => {
+      if (ev.key !== "Escape") return;
+      ev.stopPropagation();
+      close3();
+    };
+    box3.addEventListener("click", close3);
+    document.addEventListener("keydown", key, true);
+    document.body.appendChild(box3);
+  }
+  function card(kind, text5, asset) {
+    const label2 = ATTACH_LABELS[kind];
+    if (kind === "image") {
+      const src = asset ? photos.get(asset) : null;
+      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}" data-asset="${esc6(asset ?? "")}" alt="${esc6(text5 || label2)}" loading="lazy"></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
+    }
+    if (kind === "file") {
+      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc6(text5)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
+    }
+    if (kind === "link") {
+      const url = attachUrl(text5);
+      const go3 = url ? `<a class="at-go" href="${esc6(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
+      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc6(text5)}</b>${go3}</div></div>`;
+    }
+    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc6(text5)}</b><small>선물이 도착했습니다</small></div></div>`;
+    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc6(text5).replace(/\n/g, "<br>")}</span></div></div>`;
+  }
+  var sitePic = null;
+  function setSitePicSource(fn2) {
+    sitePic = fn2;
+  }
+  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
+  var camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+  function boardCard(kind, text5, asset, url) {
+    if (kind === "image" || url) {
+      const src = url ?? (asset ? photos.get(asset) : null);
+      const data3 = url ? "" : ` data-asset="${esc6(asset ?? "")}"`;
       return `<figure class="ax ax-img at-card-image${!url && asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}"${data3} alt="${esc6(text5)}" loading="lazy"><span class="zm" aria-hidden="true">⤢</span></button>
       <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${kind === "image" && text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
     }
@@ -7,17 +122,17 @@
     return card(kind, text5, asset);
   }
   function textWithPics(text5, board2) {
-    const out = [];
+    const out2 = [];
     let last2 = 0;
-    const para = (t) => t.trim() ? out.push(`<p>${esc6(t.trim()).replace(/\n/g, "<br>")}</p>`) : 0;
+    const para = (t) => t.trim() ? out2.push(`<p>${esc6(t.trim()).replace(/\n/g, "<br>")}</p>`) : 0;
     for (const m of text5.matchAll(SITE_PIC)) {
       para(text5.slice(last2, m.index));
       const url = sitePic?.(m[1]) ?? null;
-      out.push(url ? board2 ? boardCard("image", "", void 0, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(url)}" alt="" loading="lazy"></button></figure>` : board2 ? boardCard("photo", m[1].replace(/_[a-z ]+$/i, "")) : card("photo", m[1].replace(/_[a-z ]+$/i, "")));
+      out2.push(url ? board2 ? boardCard("image", "", void 0, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(url)}" alt="" loading="lazy"></button></figure>` : board2 ? boardCard("photo", m[1].replace(/_[a-z ]+$/i, "")) : card("photo", m[1].replace(/_[a-z ]+$/i, "")));
       last2 = m.index + m[0].length;
     }
     para(text5.slice(last2));
-    return out;
+    return out2;
   }
   function boardFiles(text5) {
     return bodyParts(text5).filter((p2) => p2.kind === "file" || p2.kind === "link").map((p2) => ({ kind: p2.kind, text: p2.text, url: p2.kind === "link" ? attachUrl(p2.text) : null }));
@@ -38,18 +153,18 @@
     return desc ? { url: null } : null;
   }
   function attachBody(text5, board2 = false, noFiles = false) {
-    const out = [];
+    const out2 = [];
     const files = [];
     for (const p2 of bodyParts(text5)) {
-      if (p2.kind === "text") out.push(...textWithPics(p2.text, board2));
+      if (p2.kind === "text") out2.push(...textWithPics(p2.text, board2));
       else if (board2 && (p2.kind === "file" || p2.kind === "link")) {
         if (noFiles) continue;
         const url = p2.kind === "link" ? attachUrl(p2.text) : null;
         files.push(`<div class="r"><span class="ic" aria-hidden="true">${p2.kind === "file" ? "📎" : "🔗"}</span>${url ? `<a href="${esc6(url)}" target="_blank" rel="noopener noreferrer">${esc6(p2.text)}</a>` : `<span>${esc6(p2.text)}</span>`}</div>`);
-      } else out.push(board2 ? boardCard(p2.kind, p2.text, p2.asset) : card(p2.kind, p2.text, p2.asset));
+      } else out2.push(board2 ? boardCard(p2.kind, p2.text, p2.asset) : card(p2.kind, p2.text, p2.asset));
     }
-    if (files.length) out.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join("")}</div>`);
-    return out.join("");
+    if (files.length) out2.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join("")}</div>`);
+    return out2.join("");
   }
 
   // src/host/assets.ts
@@ -1066,15 +1181,15 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
   var JOINT_KEY = { phone: "phone", gn: "gnet", gal: "gal", wpf: "wpf", sm: "sm" };
   var jointOn = (state2) => String(state2?.[JOINT_VAR] ?? "1") !== "0";
   function autoTasks(state2) {
-    const out = [];
+    const out2 = [];
     const ph = phoneSettings(state2);
-    if (ph.auto) out.push({ kind: "phone", model: ph.model, fixed: featureModel(state2, "ph") });
+    if (ph.auto) out2.push({ kind: "phone", model: ph.model, fixed: featureModel(state2, "ph") });
     for (const site of BOARD_SITES) {
       const sv = boardState(state2, site);
       const g2 = gnetSettings(sv);
-      if (g2.enabled && g2.auto) out.push({ kind: site, model: g2.model, fixed: featureModel(sv, "gn") });
+      if (g2.enabled && g2.auto) out2.push({ kind: site, model: g2.model, fixed: featureModel(sv, "gn") });
     }
-    return out;
+    return out2;
   }
   function jointGroups(state2) {
     const tasks = autoTasks(state2);
@@ -3020,9 +3135,9 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
       list4.push({ cat: "org", name, title: title2, sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, { ...o.spec, shared: o.shared }), face: facePic(ctx2.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc2, o.spec.english ?? ""] });
     }
     const seen4 = /* @__PURE__ */ new Set();
-    const out = list4.filter((e) => seen4.has(`${e.cat}|${e.title}`) ? false : (seen4.add(`${e.cat}|${e.title}`), true));
-    entryCache = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, list: out };
-    return out;
+    const out2 = list4.filter((e) => seen4.has(`${e.cat}|${e.title}`) ? false : (seen4.add(`${e.cat}|${e.title}`), true));
+    entryCache = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, list: out2 };
+    return out2;
   }
   var entryFor = (ctx2, title2) => {
     const all = entries(ctx2).filter((e) => e.title === title2);
@@ -3457,8 +3572,8 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
       const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
       t0 = null;
       const fromLeft = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "left";
-      const out = fromLeft ? dx < -36 : dx > 36;
-      if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act2("close");
+      const out2 = fromLeft ? dx < -36 : dx > 36;
+      if (out2 && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act2("close");
     }, { passive: true });
     const edge = root3.querySelector(".wk .wgrab");
     let e0 = null;
@@ -3681,126 +3796,4 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
             ctl: { t: "seg", opts: [["1", "메인 모델"], ["2", "보조 모델"]], fb: "2" },
             help: "게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 메인 응답과 같은 모델"
           },
-          { key: "context", label: "컨텍스트 포함", common: "ctx", ctl: onOff("0", "0"), help: "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요" },
-          {
-            key: "sampling",
-            label: "다양성 강화",
-            common: "sampling",
-            ctl: { t: "seg", opts: [["0", "OFF"], ["1", "ON"]], fb: "0" },
-            help: "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요"
-          }
-        ]
-      },
-      {
-        title: "게시판",
-        rows: [
-          { key: "post", label: "게시글 수", ctl: { t: "minmax", lo: COUNT_RANGE.post[0], hi: COUNT_RANGE.post[1], unit: "개" }, help: `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요` },
-          { key: "cmt", label: "새 글 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.cmt[0], hi: COUNT_RANGE.cmt[1], unit: "개" }, help: `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요` },
-          { key: "act", label: "활동 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.act[0], hi: COUNT_RANGE.act[1], unit: "개" }, help: `새 글·댓글·답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요` },
-          {
-            key: "privacy",
-            label: "사생활",
-            ctl: { t: "seg", opts: [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]] },
-            help: "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"
-          },
-          { key: "subject", label: "주제", ctl: { t: "text", ph: "비우면 세계관에 맞는 다양한 주제" } },
-          { key: "mood", label: "분위기·말투", ctl: { t: "text", ph: "비우면 익명 커뮤니티 말투" } },
-          { key: "protagonist", label: "보호 대상", ctl: { t: "text", ph: "비우면 주인공" }, help: "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공" },
-          { key: "keyfigures", label: "주요 인물 닉네임", ctl: { t: "seg", opts: [["1", "보존"], ["0", "안 함"]], fb: "1" }, help: "주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요" },
-          { key: "keepown", label: "새로고침 시 내 글", ctl: { t: "seg", opts: [["1", "유지"], ["0", "교체"]] }, help: "새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요" },
-          { key: "keepreplied", label: "내 댓글 있는 글", ctl: { t: "seg", opts: [["1", "유지"], ["0", "교체"]] }, help: "내가 댓글을 단 남의 글도 새로고침 때 남길지예요" }
-        ]
-      },
-      {
-        title: "쪽지",
-        rows: [
-          { key: "incoming", label: "선쪽지 받기", ctl: { t: "seg", opts: [["1", "받기"], ["0", "안 받기"]], fb: "1" }, help: "게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요" },
-          { key: "storage", label: "쪽지 자동 정리", ctl: { t: "custom" } }
-        ]
-      }
-    ]
-  };
-
-  // src/core/fetchparts.ts
-  var PART_CONCURRENCY = 4;
-  async function fetchParts(names4, get, onDone, limit = PART_CONCURRENCY) {
-    const out = new Array(names4.length);
-    let next = 0;
-    let done3 = 0;
-    let failed4 = false;
-    const worker = async () => {
-      while (next < names4.length && !failed4) {
-        const i = next++;
-        try {
-          out[i] = await get(names4[i]);
-        } catch (error) {
-          failed4 = true;
-          throw error;
-        }
-        onDone?.(++done3);
-      }
-    };
-    await Promise.all(Array.from({ length: Math.min(limit, names4.length) }, worker));
-    return out.join("");
-  }
-
-  // src/core/stalever.ts
-  var VERSION = /^\d+(\.\d+)*$/;
-  function oldPluginMessage(mine3, up) {
-    if (typeof up !== "string" || !VERSION.test(up) || !VERSION.test(mine3)) return null;
-    const a = mine3.split(".").map(Number);
-    const b = up.split(".").map(Number);
-    for (let i = 0; i < Math.max(a.length, b.length); i++) {
-      const d = (b[i] ?? 0) - (a[i] ?? 0);
-      if (d < 0) return null;
-      if (d > 0) return `플러그인이 옛 판(v${mine3})이에요. 새 판 v${up}가 나왔어요. Risu 설정 → 플러그인에서 업데이트해 주세요.`;
-    }
-    return null;
-  }
-
-  // src/host/datapack.ts
-  var WORLD_KEY2 = "goei:data-world";
-  var INSTALL_KEY = "goei:data-install";
-  var DataPackError = class extends Error {
-  };
-  var TIMEOUT_MS = 4e4;
-  function timeout(p2, name) {
-    let t;
-    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${name}을 ${TIMEOUT_MS / 1e3}초 안에 받지 못했어요.`)), TIMEOUT_MS))]).finally(() => clearTimeout(t));
-  }
-  async function getText(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
-        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-      } catch {
-      }
-    }
-    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
-    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
-    return String(await timeout(res.text(), name) ?? "");
-  }
-  async function getBytes(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
-        const b = r?.ok ? toBytes3(r.data) : null;
-        if (b?.length) return b;
-      } catch {
-      }
-    }
-    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
-    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
-    return new Uint8Array(await timeout(res.arrayBuffer(), name));
-  }
-  async function fetchPack(pack4, progress4) {
-    if (!UPDATE_BASE) throw new DataPackError("받을 곳이 정해지지 않은 빌드예요.");
-    if (!pack4.expect.hash) throw new DataPackError(`이 빌드에는 ${pack4.label} 지문이 없어요.`);
-    progress4?.(`${pack4.label} 목록 받는 중…`);
-    let index = null;
-    try {
-      index = JSON.parse((await getText(`${pack4.name}.json`)).replac
+          { key: "context", label: "컨텍스트 포함", common: "ctx", ctl: onOff("0", "0"), help: "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요" 
