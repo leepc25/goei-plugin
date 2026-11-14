@@ -28,3 +28,24 @@ test('같은 정산을 두 번 셌다가 되돌린 맞춤 줄 짝은 지운다 (
   const healed = syncPointsToStatus({ ...dup, log: [...dup.log, { id: 'ps_later', anchor: 'zz', amount: -5000, memo: '상태창 포인트', src: 'story', at: '' }] }, c2);
   assert.deepEqual(healed.log.map((e) => e.memo), ['정산 지급']);
 });
+
+test('포인트 칸이 그대로인 응답에서 갱신기가 적은 지출은 되돌리지 않는다 (가계부와 같음, 재검토 11-14)', () => {
+  const w1 = syncPointsToStatus(readPoints({}), chat('900'));
+  const c2 = chat('900', '900');
+  // 턴1: 상태창 포인트 칸은 900 그대로인데 갱신기가 본문에서 「매점 −300」을 읽어 적음
+  const spent = { ...w1, log: [...w1.log, { id: 'u1', anchor: 'c1', amount: -300, memo: '매점', src: 'story', at: '' }] };
+  const w2 = syncPointsToStatus(spent, c2) ?? spent;
+  assert.deepEqual(w2.log.map((e) => [e.memo, e.amount]), [['상태창 포인트', 900], ['매점', -300]]);
+  // 이미 되돌림 줄이 적힌 장부(옛 버그 흔적)는 그 줄을 뺀다
+  const bad = { ...spent, log: [...spent.log, { id: 'ps_c1', anchor: 'c1', amount: 300, memo: '상태창 포인트', src: 'story', at: '' }] };
+  const w3 = syncPointsToStatus(bad, c2);
+  assert.deepEqual(w3.log.map((e) => [e.memo, e.amount]), [['상태창 포인트', 900], ['매점', -300]]);
+});
+test('포인트 칸이 바뀐 응답은 지금처럼 맞춘다 (갱신기가 같은 거래를 적으면 맞춤 줄이 빠진다)', () => {
+  const w1 = syncPointsToStatus(readPoints({}), chat('900'));
+  const c2 = chat('900', '600');
+  const w2 = syncPointsToStatus(w1, c2);
+  assert.deepEqual(w2.log.map((e) => e.amount), [900, -300]);
+  const w3 = syncPointsToStatus({ ...w2, log: [...w2.log, { id: 'u1', anchor: 'c1', amount: -300, memo: '매점', src: 'story', at: '' }] }, c2);
+  assert.deepEqual(w3.log.map((e) => [e.memo, e.amount]), [['상태창 포인트', 900], ['매점', -300]]);
+});

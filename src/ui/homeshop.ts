@@ -117,7 +117,6 @@ async function ask(ctx: ChatContext, env: HsEnv): Promise<void> {
   const job = chatKey(ctx);
   if (jobs.has(job)) return;
   jobs.add(job);
-  const s = hsSettings(ctx.chat.scriptstate);
   ui.loading = true;
   ui.notice = '';
   ui.failRaw = '';
@@ -125,7 +124,14 @@ async function ask(ctx: ChatContext, env: HsEnv): Promise<void> {
   let failed = false;
   try {
     // 그림 팩을 아직 안 받았으면 기다린다: 없으면 표정 목록이 talk 하나로 나간다 (전수검사 11-13)
-    if (!homeshopArt() && !homeshopStatus().failed) await ensureHomeshop();
+    if (!homeshopArt() && !homeshopStatus().failed) {
+      await ensureHomeshop();
+      // 기다리는 사이 채팅을 옮겼으면 그만둔다. 요청문은 기다린 뒤의 채팅 값으로 만든다 (재검토 11-14)
+      const now = env.current();
+      if (!now || chatKey(now) !== job) return;
+      ctx = now;
+    }
+    const s = hsSettings(ctx.chat.scriptstate);
     const show = readShow(ctx.chat.scriptstate);
     const g = genSettings(ctx.chat.scriptstate);
     const moods = moodMap(homeshopArt()?.pack ?? null);

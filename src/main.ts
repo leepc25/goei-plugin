@@ -16,6 +16,8 @@ const ours = (t: unknown) => typeof t === 'string' && MARKS.some((m) => t.includ
 
 let body: Body | null = null;
 let loading: Promise<Body | null> | null = null;
+/** 지금 돌고 있는 본체 시작 (start 가 한 번에 하나만 돌게) */
+let starting: Promise<Body | null> | null = null;
 let stopped = false;
 /** 받기에 실패한 때. 메시지마다 다시 받으려 하지 않게, 카드를 다시 열거나 1분이 지나야 다시 시도한다 */
 let failedAt = 0;
@@ -55,6 +57,8 @@ async function load(prompt: boolean): Promise<Body | null> {
       return null;
     }
     lap('본체 받음');
+    // 받는 동안 받기 창(install)이 이미 본체를 켰으면 그것을 쓴다
+    if (body) return body;
     await save(code);
     lap('본체 저장');
   }
@@ -78,8 +82,25 @@ async function save(code: string): Promise<void> {
   }
 }
 
-/** prompt: 카드 열기·단추처럼 사용자가 시킨 시작인지 — 본체는 세계 자료 받기 창을 이때만 다시 띄운다 (닫은 창이 표시·요청마다 되살아나지 않게) */
+/** 본체 시작은 한 번에 하나만: 받기 창의 install 과 조용한 재시도(load)가 겹쳐도 본체가 두 번 켜지지 않게 (loader#9).
+ *  이미 켜졌으면 그 본체를, 앞선 시작이 돌고 있으면 그것을 기다려 성공하면 그 본체를 쓰고, 실패했으면 내 코드로 이어서 시도한다 */
 async function start(code: string, prompt: boolean): Promise<Body | null> {
+  while (starting) {
+    const b = await starting;
+    if (b) return b;
+  }
+  if (body) return body;
+  const p = startOnce(code, prompt);
+  starting = p;
+  try {
+    return await p;
+  } finally {
+    if (starting === p) starting = null;
+  }
+}
+
+/** prompt: 카드 열기·단추처럼 사용자가 시킨 시작인지 — 본체는 세계 자료 받기 창을 이때만 다시 띄운다 (닫은 창이 표시·요청마다 되살아나지 않게) */
+async function startOnce(code: string, prompt: boolean): Promise<Body | null> {
   codeBroken = false;
   let api: ReturnType<typeof runBody>;
   try {

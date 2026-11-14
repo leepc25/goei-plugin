@@ -56,3 +56,65 @@ test('미리 만든 자료: 52명, 조직 시작값, 별명 표', () => {
   assert.ok(j.aliases.includes('Jyaldi') && j.titles.includes('부장'));
   assert.ok(Base.valuesOf('쟈알디').length > 10);
 });
+
+// 11-14 재검토 ①-1: 몫은 칸 글자만 세고 머리말·관계 줄은 안 세어, 기록이 찬 인물이 둘만 있어도 합이 상한을 넘어 마지막 인물이 통째로 빠졌다
+test('상한: 기록이 가득한 2~4명 → 지난 일부터 줄여 전원이 들어가고 합이 상한 이하', () => {
+  for (const [count, each] of [[2, 80], [3, 50], [4, 30], [4, 80]]) {
+    const store = T.emptyStore();
+    const names = ['가람', '나루', '다솜', '라온'].slice(0, count);
+    for (const n of names) {
+      const p = Seed.seedPerson(n, null, { address: { toUser: '요원', register: '반말' } });
+      p.slots.state = [{ id: `${n}-s`, text: `${n} 현재 상태 기록`, anchor: 'c1' }];
+      p.slots.history = Array.from({ length: each }, (_, i) => ({ id: `${n}-h${i}`, text: `${n} 지난 일 ${i} ` + '가'.repeat(200), anchor: 'c1' }));
+      store.people[n] = p;
+    }
+    const chat = { message: [{ role: 'user', data: '안녕', chatId: 'u1' }, { role: 'char', data: `${names.join(', ')}가 모였다.`, chatId: 'c1' }], scriptstate: {} };
+    const settings = St.peopleSettings({});
+    const r = R.peopleBlockFor(chat, { settings, store, sheetOf: () => null, user: '주인공' });
+    assert.deepEqual(r.people, names);
+    const body = r.text.slice(r.text.indexOf('## '));
+    for (const n of names) {
+      assert.match(body, new RegExp(`## ${n} `), `${count}명·${each}개: ${n} 블록이 들어감`);
+      assert.match(body, new RegExp(`- ${n} 현재 상태 기록`), `${n} 현재 상태가 남음`);
+      assert.match(body, new RegExp(`- ${n} 지난 일 ${each - 1} `), `${n} 가장 새 지난 일이 남음`);
+    }
+    assert.ok(body.length <= settings.blockCap, `${count}명·${each}개: 합 ${body.length} ≤ 상한 ${settings.blockCap}`);
+    assert.ok(body.length > settings.blockCap * 0.85, `${count}명·${each}개: 상한을 거의 다 씀 (${body.length})`);
+  }
+});
+
+// 11-14 재검토 ①-1 검증: 넘친 글자가 항목 하나보다 작으면 몫을 그만큼만 깎아 블록이 그대로였고, 뒤 인물이 통째로 빠졌다
+const capPeople = (spec) => {
+  const store = T.emptyStore();
+  const names = ['가람', '나루', '다솜', '라온', '마루', '바다'].slice(0, spec.length);
+  names.forEach((n, k) => {
+    const p = Seed.seedPerson(n, null, { address: { toUser: '요원', register: '반말' } });
+    p.slots.state = [{ id: `${n}-s`, text: `${n} 현재 상태 기록`, anchor: 'c1' }];
+    p.slots.history = Array.from({ length: spec[k][0] }, (_, i) => ({ id: `${n}-h${i}`, text: `${n} 지난 일 ${i} ` + '가'.repeat(spec[k][1]), anchor: 'c1' }));
+    store.people[n] = p;
+  });
+  const chat = { message: [{ role: 'user', data: '안녕', chatId: 'u1' }, { role: 'char', data: `${names.join(', ')}가 모였다.`, chatId: 'c1' }], scriptstate: {} };
+  const settings = St.peopleSettings({});
+  const r = R.peopleBlockFor(chat, { settings, store, sheetOf: () => null, user: '주인공' });
+  return { names, r, body: r.text.slice(r.text.indexOf('## ')), cap: settings.blockCap };
+};
+
+test('상한: 2자만 넘쳐도(60×180 과 34×192) 뒤 인물이 통째로 빠지지 않는다', () => {
+  const { names, r, body, cap } = capPeople([[60, 180], [34, 192]]);
+  assert.deepEqual(r.people, names);
+  for (const n of names) assert.match(body, new RegExp(`## ${n} `), `${n} 블록이 들어감`);
+  assert.match(body, /- 나루 지난 일 33 /, '나루 가장 새 지난 일이 남음');
+  assert.ok(body.length <= cap, `합 ${body.length} ≤ 상한 ${cap}`);
+  assert.ok(body.length > cap * 0.95, `한 항목쯤만 줄임 (${body.length})`);
+});
+
+test('상한: 무작위 2~6명 — 줄일 지난 일이 남아 있으면 아무도 통째로 빠지지 않는다', () => {
+  let seed = 20261114;
+  const rnd = (n) => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff), seed % n);
+  for (let t = 0; t < 400; t++) {
+    const spec = Array.from({ length: 2 + rnd(5) }, () => [1 + rnd(80), 20 + rnd(220)]);
+    const { names, body, cap } = capPeople(spec);
+    for (const n of names) assert.match(body, new RegExp(`## ${n} `), `${JSON.stringify(spec)}: ${n} 블록이 들어감`);
+    assert.ok(body.length <= cap, `${JSON.stringify(spec)}: 합 ${body.length} ≤ 상한 ${cap}`);
+  }
+});

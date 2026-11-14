@@ -1,4 +1,191 @@
-i.open = value ?? "";
+e() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${it.equip ?? ""}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc17(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when3)}</button>`;
+    };
+    const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join("")}</div>`;
+    return { av: avatarHtml(ctx2), slots };
+  }
+  var sendingUse = (ctx2, id2) => useSending(ctx2.chat, ctx2.charIndex, ctx2.chatIndex, id2);
+  function useBox(ctx2) {
+    const live = liveOf(ctx2);
+    const q = useQueue(ctx2).flatMap((u) => {
+      const it = live.find((x) => x.id === u.id);
+      return it ? [{ it, n: u.n }] : [];
+    });
+    const chips3 = q.map(({ it, n: n3 }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc17(it.name)}</b>${n3 > 1 ? `<em>×${n3}</em>` : ""}${sendingUse(ctx2, it.id) ? "" : `<button class="it-ux" data-action="items-unuse" data-value="${esc17(it.id)}" aria-label="${esc17(it.name)} 사용 취소">${ICONS.close}</button>`}</span>`).join("");
+    return `<div class="it-usebox${q.length ? "" : " empty"}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips3 || '<p class="it-uhint">쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.</p>'}</div></div>`;
+  }
+  var wtMark = (it, left) => {
+    const w = lineWeight(it, left);
+    return w !== void 0 ? `<span class="it-wt" title="무게">${weightText(w)}</span>` : "";
+  };
+  var stateCls = (it) => it.state === "broken" ? " broken" : it.state === "damaged" ? " damaged" : "";
+  function marks(it, left) {
+    return `${left !== void 0 ? `<span class="it-left" title="남은 횟수">${left}</span>` : ""}${it.state === "damaged" ? '<span class="it-crack" title="손상" aria-hidden="true"></span>' : it.state === "broken" ? '<span class="it-brk" title="고장">고장</span>' : ""}`;
+  }
+  function tipOf(it, left, w) {
+    const tr = traitsLine(it, left);
+    return `<span class="it-tip" aria-hidden="true"><b>${esc17(it.name)}</b><small>${esc17([tr, sourceLine(it, w)].filter(Boolean).join(" · "))}</small>${it.desc ? `<p>${esc17(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc17(it.effect)}</p>` : ""}</span>`;
+  }
+  function gridHtml(ctx2) {
+    const slots = itemSlots(ctx2.chat.scriptstate);
+    const q = itemsUi.q.trim();
+    const items = itemsOf(ctx2);
+    const alive = aliveAnchors(ctx2.chat);
+    const list4 = q ? searchItems(items, alive, q).items : gridItems(liveItems(items, alive));
+    if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
+    const w = whenOf(ctx2);
+    const queued2 = new Map(useQueue(ctx2).map((u) => [u.id, u.n]));
+    const live = liveItems(items, alive);
+    const cells2 = list4.map((it, i) => cell(it, itemLeft(items, it, alive), !q && i >= slots, w, queued2.get(it.id) ?? 0, canUse(it) && (it.equip !== "gear" || isEquipped(it, live))));
+    if (!q) for (let i = list4.length; i < slots; i++) cells2.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
+    return `<div class="it-grid" data-drop="grid">${cells2.join("")}</div>`;
+  }
+  function cell(it, left, over, w, queued2, usable) {
+    const all = queued2 > 0 && (left === void 0 || queued2 >= left);
+    const drag = !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${usable ? ' data-usable="1"' : ""}` : "";
+    return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}${all ? " queued" : ""}${stateCls(it)}" data-action="items-open" data-value="${esc17(it.id)}"${drag} aria-label="${esc17(it.name)}${over ? " (넘침)" : ""}${queued2 ? " (사용 예정)" : ""}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued2 ? `<span class="it-q8">사용 예정${queued2 > 1 ? ` ×${queued2}` : ""}</span>` : ""}<b>${esc17(it.name)}</b>${tipOf(it, left, w)}</button>`;
+  }
+  var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖", left: "없어짐", off: "해제" };
+  var logWhatLabel = (l) => l.what === "off" && l.hand ? "넣기" : WHAT[l.what] ?? l.what;
+  var BY = { story: "본문", manual: "직접", use: "사용 단추", store: "상점" };
+  var WEEK4 = "일월화수목금토";
+  function dayOf3(when3) {
+    const m = /(\d{4})\.(\d{2})\.(\d{2})/.exec(when3);
+    if (!m) return when3.split(" ")[0] || "날짜 없음";
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return `${m[1]}.${m[2]}.${m[3]} (${WEEK4[d.getUTCDay()]})`;
+  }
+  function logList(ctx2) {
+    const q = itemsUi.q.trim();
+    const items = itemsOf(ctx2);
+    const alive = aliveAnchors(ctx2.chat);
+    const all = (q ? searchItems(items, alive, q).log : items.log.slice().reverse()).filter((l) => !l.anchor || alive.has(l.anchor));
+    const rows3 = all.filter((l) => itemsUi.logFilter === "get" ? l.what === "get" : itemsUi.logFilter === "out" ? l.what !== "get" : true);
+    const chip3 = (v, label2, n3) => `<button class="gx-chip${itemsUi.logFilter === v ? " on" : ""}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label2}${n3 ? ` <small>${n3}</small>` : ""}</button>`;
+    const got = all.filter((l) => l.what === "get").length;
+    const chips3 = `<div class="gx-rec-tools it-logchips">${chip3("all", "전체", all.length)}${chip3("get", "획득", got)}${chip3("out", "사용", all.length - got)}</div>`;
+    if (!rows3.length) return `${chips3}<p class="gx-wt-empty">${q ? "맞는 기록이 없어요." : itemsUi.logFilter === "get" ? "아직 획득한 물건이 없어요." : itemsUi.logFilter === "out" ? "아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요." : "아직 기록이 없어요. 물건을 얻거나 쓰면 여기에 쌓여요."}</p>`;
+    const w = whenOf(ctx2);
+    const pic3 = (l) => itemPic(l);
+    const row8 = (l) => {
+      const when3 = whenLabel(w, l.anchor, l.at);
+      const sub = [BY[l.by] ?? l.by, l.what === "use" && (l.n ?? 1) > 1 ? `×${l.n}` : "", l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · ");
+      return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic3(l)}</span><span class="gx-wt-memo"><b>${esc17(l.name)} <em class="it-what ${l.what === "get" ? "get" : "out"}">${logWhatLabel(l)}</em></b><small>${esc17(sub)}</small></span><span class="gx-wt-amt"><small>${esc17(when3.split(" ")[1] ?? when3)}</small></span></div></li>`;
+    };
+    const groups = [];
+    for (const l of rows3) {
+      const day = dayOf3(whenLabel(w, l.anchor, l.at));
+      const g2 = groups[groups.length - 1];
+      if (g2 && g2.day === day) g2.rows.push(l);
+      else groups.push({ day, rows: [l] });
+    }
+    const cut3 = moreCut("items-log", `${itemsUi.logFilter}|${q}`, ctx2.chat.scriptstate, groups);
+    return `${chips3}<div class="gx-wallettab it-log">${cut3.groups.map((g2) => {
+      const gi = g2.rows.filter((l) => l.what === "get").length;
+      const go3 = g2.rows.length - gi;
+      return `<section class="gx-wt-day"><h3><span>${esc17(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go3 ? `사용 ${go3}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.shown.map(row8).join("")}</ul></section>`;
+    }).join("")}${cut3.more}</div>`;
+  }
+  function popup(ctx2) {
+    if (itemsUi.mode === "add") return shell2("직접 넣기", form(null));
+    if (!itemsUi.open) return "";
+    const it = liveOf(ctx2).find((x) => x.id === itemsUi.open);
+    if (!it) return "";
+    if (itemsUi.mode === "edit" && itemEditOn(ctx2.chat.scriptstate)) return shell2("고치기", form(it, leftOf(ctx2, it)));
+    if (itemsUi.mode === "merge") return shell2("합치기", mergePick(ctx2, it));
+    const head3 = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc17(it.name)}</b><small>${esc17([traitsLine(it, leftOf(ctx2, it)), sourceLine(it, whenOf(ctx2))].filter(Boolean).join(" · "))}</small></div></div>`;
+    if (itemsUi.mode === "drop") {
+      return shell2("버리기", `${head3}<p>버릴까요? 목록에서 빠지고 기록에 남아요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-drop" data-value="${esc17(it.id)}">버리기</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
+    }
+    if (itemsUi.mode === "purge") {
+      return shell2("삭제", `${head3}<p>삭제할까요? 목록과 기록에서 지워지고 되돌릴 수 없어요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-purge" data-value="${esc17(it.id)}">삭제</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
+    }
+    const queued2 = useQueue(ctx2).find((u) => u.id === it.id)?.n ?? 0;
+    const left = leftOf(ctx2, it);
+    const sending = sendingUse(ctx2, it.id);
+    const more = !sending && usableNow(ctx2, it) && (left === void 0 ? !queued2 : queued2 < left);
+    const equipped = isEquipped(it, liveOf(ctx2));
+    const body5 = `${head3}
+    ${it.desc ? `<p>${esc17(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
+    ${it.effect ? `<p class="ef">효과: ${esc17(it.effect)}</p>` : ""}
+    ${it.state === "broken" ? '<p class="bad">고장 나서 쓸 수 없어요.</p>' : ""}
+    ${it.text ? `<div class="it-note">${esc17(it.text)}</div>` : ""}
+    ${it.quote ? `<p class="qt">근거 「${esc17(it.quote)}」</p>` : ""}
+    <div class="it-btns">
+      ${it.use ? `<button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc17(it.id)}" ${more || queued2 && !sending ? "" : "disabled"}${needsEquip(ctx2, it) ? ' title="장착해야 쓸 수 있어요"' : ""}>${queued2 ? more ? `한 번 더 (×${queued2 + 1})` : `사용 ×${queued2}` : "사용"}</button>` : ""}
+      ${queued2 && !sending ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc17(it.id)}">사용 취소</button>` : ""}
+      ${boxButton(ctx2, it.id)}
+      <button class="gx-chip" data-action="${equipped ? "items-unequip" : "items-equip"}" data-value="${esc17(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ""}>${equipLabel(it, equipped)}</button>
+      ${itemEditOn(ctx2.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ""}
+      ${it.uses !== void 0 ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx2, it).length ? "" : "disabled"} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ""}
+      <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc17(it.id)}">버리기</button>
+    </div>
+    ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 메인 요청에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
+    return shell2(it.name, body5, it.id);
+  }
+  var shell2 = (label2, inner, del = "") => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc17(label2)}"><div class="gx-agpop-card it-card" data-action="items-keep">${del ? `<button class="gx-agpop-x it-del" data-action="items-purge-ask" data-value="${esc17(del)}" aria-label="삭제" title="삭제">${ICONS.trash}</button>` : ""}<button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
+  function form(it, left) {
+    const eq = it?.equip ?? "";
+    const opt = (v, l) => `<option value="${v}"${eq === v ? " selected" : ""}>${l}</option>`;
+    const pics2 = it ? itemPictures(it.name, it.icon) : null;
+    const picNow = it ? splitIconWord(it.icon).word : "";
+    return `<div class="it-form" data-it-form="1">
+    <label><span>이름</span><input name="name" maxlength="30" required value="${esc17(it?.name ?? "")}" placeholder="예: 소금 봉지"></label>
+    <label><span>설명</span><input name="desc" maxlength="80" value="${esc17(it?.desc ?? "")}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
+    <label><span>효과</span><input name="effect" maxlength="60" value="${esc17(it?.effect ?? "")}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
+    <label><span>장착</span><select name="equip">${opt("", "없음")}${opt("weapon", "손")}${opt("gear", "장비")}</select></label>
+    <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? " checked" : ""}> 쓸 수 있음</span></label>
+    <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ""}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
+    <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ""}" placeholder="kg"></label>
+${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 === picNow) ? "" : '<option value="" selected>그대로</option>'}${pics2.map((n3) => `<option value="${esc17(n3)}"${n3 === picNow ? " selected" : ""}>${esc17(n3)}</option>`).join("")}</select></label>` : ""}
+    <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc17(it?.id ?? "")}">${it ? "저장" : "넣기"}</button><button type="button" class="gx-chip" data-action="${it ? "items-back" : "items-close"}">취소</button></div>
+  </div>`;
+  }
+  function mergePick(ctx2, keep2) {
+    const others = mergeMates(ctx2, keep2);
+    const w = whenOf(ctx2);
+    return `<div class="it-ph"><span class="it-ic">${itemPic(keep2)}</span><div><b>${esc17(keep2.name)}</b><small>합칠 상대를 고르세요. 이름·설명은 이 물건 그대로, 남은 횟수와 무게만 더해져요.</small></div></div>
+    <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc17(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc17(o.name)}</b><small>${esc17(o.desc || sourceLine(o, w))}</small></span></button></li>`).join("")}</ul>
+    <div class="it-btns"><button class="gx-chip" data-action="items-back">취소</button></div>`;
+  }
+  async function itemsAction(action, value, ctx2, env3, formEl) {
+    const write = (fn2) => updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const cur = readItems(chat.scriptstate);
+      const next = fn2(cur, aliveAnchors(chat));
+      if (next === cur) return null;
+      return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemsVars(next) } };
+    });
+    const full = (k) => {
+      itemsUi.info = fullText(k);
+      env3.render();
+    };
+    const holdFirst = async (it) => {
+      if (it.equip !== "weapon" || !canUse(it) || isEquipped(it, liveOf(ctx2))) return true;
+      if (!equippedOf(liveOf(ctx2)).weapon.some((x) => !x)) {
+        full("weapon");
+        return false;
+      }
+      await write((x, alive) => equipItem(x, alive, it.id));
+      return true;
+    };
+    switch (action) {
+      case "items-sub":
+        itemsUi.sub = value === "wallet" || value === "points" ? value : "items";
+        Object.assign(walletUi, { open: null, edit: false, notice: "" });
+        itemsUi.open = "";
+        itemsUi.mode = "view";
+        itemsUi.notice = "";
+        env3.render();
+        return true;
+      case "items-log-filter":
+        itemsUi.logFilter = value === "get" ? "get" : value === "out" ? "out" : "all";
+        env3.render();
+        return true;
+      case "items-view":
+        itemsUi.view = value === "log" ? "log" : "grid";
+        env3.render();
+        return true;
+      case "items-open":
+        itemsUi.open = value ?? "";
         itemsUi.mode = "view";
         env3.render();
         return true;
@@ -127,14 +314,18 @@ i.open = value ?? "";
           return true;
         }
         if (!await holdFirst(it)) return true;
-        await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
+        if (!await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id)) {
+          itemsUi.info = `「${it.name}」은 지금 보내는 중이라 답이 온 뒤에 더 쓸 수 있어요.`;
+          env3.render();
+          return true;
+        }
         itemsUi.info = canUse(it) ? `「${it.name}」을 다음 메시지에 같이 보내요.` : `「${it.name}」은 지금 쓸 수 없어요.`;
         await env3.refresh();
         return true;
       }
       case "items-unuse": {
         if (!value) return true;
-        await dropFromUse(ctx2, value);
+        if (!await dropFromUse(ctx2, value)) return true;
         itemsUi.info = "사용을 취소했어요.";
         await env3.refresh();
         return true;
@@ -142,8 +333,9 @@ i.open = value ?? "";
       case "items-equip":
       case "items-unequip": {
         if (!value) return true;
+        const was = liveOf(ctx2).find((x) => x.id === value);
         await write((it2, alive) => action === "items-equip" ? equipItem(it2, alive, value) : unequipItem(it2, value));
-        if (action === "items-unequip") await dropFromUse(ctx2, value);
+        if (action === "items-unequip" && (!was || useNeedsSeat(was))) await dropFromUse(ctx2, value);
         const it = liveOf(ctx2).find((x) => x.id === value);
         if (action === "items-equip" && it && !isEquipped(it, liveOf(ctx2))) itemsUi.info = fullText(it.equip ?? "weapon");
         await env3.refresh();
@@ -160,14 +352,20 @@ i.open = value ?? "";
             env3.render();
             return true;
           }
-          await write((x, alive) => equipItem(x, alive, id2, Number(n3), k === "weapon" ? "weapon" : "gear"));
+          let bumped = [];
+          await write((x, alive) => {
+            const next = equipItem(x, alive, id2, Number(n3), k === "weapon" ? "weapon" : "gear");
+            bumped = next === x ? [] : seatLost(liveItems(x, alive), liveItems(next, alive));
+            return next;
+          });
+          for (const b of bumped) await dropFromUse(ctx2, b);
         } else if (to === "grid") {
           if (!isEquipped(it, liveOf(ctx2))) return true;
           await write((x) => unequipItem(x, id2));
-          await dropFromUse(ctx2, id2);
+          if (useNeedsSeat(it)) await dropFromUse(ctx2, id2);
         } else if (to === "auto") {
           if (isEquipped(it, liveOf(ctx2))) return true;
-          if (!it.equip && canUse(it)) await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
+          if (!it.equip && canUse(it)) await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
           else {
             const k = it.equip ?? "weapon";
             if (!equippedOf(liveOf(ctx2))[k].some((x) => !x)) {
@@ -183,7 +381,7 @@ i.open = value ?? "";
             return true;
           }
           if (!await holdFirst(it)) return true;
-          await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
+          await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
         } else if (to === "drop") {
           itemsUi.open = id2;
           itemsUi.mode = "drop";
@@ -198,24 +396,37 @@ i.open = value ?? "";
         return false;
     }
   }
-  async function queueUse(ctx2, fn2) {
+  async function queueUse(ctx2, fn2, id2) {
+    let held = false;
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      if (useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2)) {
+        held = true;
+        return null;
+      }
       const sent2 = !!chat.scriptstate?.[ITEM_USE_AT_VAR];
       const cur = sent2 ? [] : readItemUse(chat.scriptstate);
       const next = fn2(cur);
       if (!sent2 && JSON.stringify(next) === JSON.stringify(cur)) return null;
       return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemUseVars(next), [ITEM_USE_AT_VAR]: "" } };
     });
+    if (held) return false;
     void refreshUseBox(ctx2.charIndex, ctx2.chatIndex);
+    return true;
   }
   async function dropFromUse(ctx2, id2) {
+    let held = false;
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       if (chat.scriptstate?.[ITEM_USE_AT_VAR]) return null;
+      if (useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2)) {
+        held = true;
+        return null;
+      }
       const cur = readItemUse(chat.scriptstate);
       const next = dropUse(cur, id2);
       return next.length === cur.length ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemUseVars(next) } };
     });
     void refreshUseBox(ctx2.charIndex, ctx2.chatIndex);
+    return !held;
   }
   function itemsInput(root3, ctx2, v) {
     itemsUi.q = v;
@@ -815,6 +1026,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     const sell = st0.sell && !now2.sell ? null : next.sell;
     return { ...next, items, sell };
   }
+  var lateNow = (chat, site) => readMall(chat.scriptstate, site, aliveAnchors(chat));
   async function ask3(ctx2, env3, site, kind, st0) {
     const job = `${chatKey6(ctx2)}:${site}`;
     if (jobs5.has(job)) return;
@@ -867,7 +1079,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       let sold = false;
       let merged = next;
       await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
-        const now2 = readMall(chat.scriptstate, site);
+        const now2 = lateNow(chat, site);
         merged = mergeLate(now2, next, st0);
         if (st0.sell && !now2.sell) deal = "";
         const saved = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, { ...merged, key }), ...note2 !== null ? { [mallNoteKey(site)]: note2, [atKey(site)]: turnKey(chat) } : {} } };
@@ -2103,20 +2315,18 @@ ${v.failRaw.slice(0, 1500)}`;
     return content.replace(/\n\s*\n\s*<img\s*=[^>]*>\s*\n\s*\n/g, "\n\n").replace(/<img\s*=[^>]*>\s*/g, "");
   }
   function splitNarrative(content) {
-    const head3 = /^\s*(?:<Thoughts>[\s\S]*?<\/Thoughts>\s*)+/.exec(content);
-    const leading = head3 ? head3[0] : "";
-    const rest = content.slice(leading.length);
+    const { head: leading, body: rest } = splitThoughts(content);
     const cut3 = ["[▣|", "[◎|"].map((p2) => rest.indexOf(p2)).filter((i) => i >= 0);
     const at = cut3.length ? Math.min(...cut3) : -1;
     const narrative = at >= 0 ? rest.slice(0, at) : rest;
     const trailing = at >= 0 ? rest.slice(at) : "";
     return {
       leading,
-      narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/gi, "").replace(/<!--[\s\S]*?-->/g, "")).trim(),
+      narrative: stripImageTags(stripThoughts(narrative).replace(/<!--[\s\S]*?-->/g, "")).trim(),
       trailing
     };
   }
-  function paragraphs(text5) {
+  function paragraphs2(text5) {
     const out = [];
     let cur = [];
     for (const line2 of `${text5}
@@ -2275,7 +2485,7 @@ ${aliasLines.join("\n")}
     if (!narrative) return null;
     const active3 = activeCharacters(narrative, d).filter((name) => !exclude.includes(name));
     if (!active3.length) return null;
-    const paras = paragraphs(narrative);
+    const paras = paragraphs2(narrative);
     if (!paras.length) return null;
     return { original: content, paras, leading, trailing, messages: assetPrompt(active3, paras, d, limit) };
   }
@@ -2992,22 +3202,27 @@ ${themeVars("[x-goei-prog]")}
       return null;
     }
   }
+  var PIC_TIMEOUT_MS = 4e4;
+  function timeout2(p2) {
+    let t;
+    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error("timeout")), PIC_TIMEOUT_MS))]).finally(() => clearTimeout(t));
+  }
   async function fetchPicture(p2) {
     const url = `${UPDATE_BASE}/pic/${p2[1]}.${p2[2]}`;
     const ok = async (b) => !!b?.length && (await digest(b) ?? p2[1]) === p2[1];
     const legacy = risuai.risuFetch;
     if (legacy) {
       try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
+        const r = await timeout2(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }));
         const b = r?.ok ? toBytes3(r.data) : null;
         if (await ok(b)) return b;
       } catch {
       }
     }
     try {
-      const res = await risuai.nativeFetch(url, { method: "GET" });
+      const res = await timeout2(risuai.nativeFetch(url, { method: "GET" }));
       if (res.ok) {
-        const b = new Uint8Array(await res.arrayBuffer());
+        const b = new Uint8Array(await timeout2(res.arrayBuffer()));
         if (await ok(b)) return b;
       }
     } catch {
@@ -3091,358 +3306,4 @@ ${themeVars("[x-goei-prog]")}
     }
   }
   var charId = (char) => String(char.chaId ?? char.name ?? "");
-  async function checkInstall(charIndex, progress4) {
-    await ensureInstallData(progress4);
-    const char = await risuai.getCharacterFromIndex(charIndex) ?? {};
-    const notes = await iconNotes();
-    const note2 = notes[charId(char)];
-    const lore = char.globalLore;
-    const packInLore = (lore ?? []).some((e) => typeof e.content === "string" && e.content.startsWith(WIKI_PACK_HEAD));
-    const state2 = installCheck({
-      lore,
-      firstMessage: char.firstMessage,
-      loreSettings: char.loreSettings,
-      alternateGreetings: char.alternateGreetings,
-      assets: char.additionalAssets,
-      iconOurs: !!note2 && note2.ours === String(char.image ?? ""),
-      // 받아 둔 묶음이 릴리스 판과 다르면 「없음」으로 보아 설치·점검이 다시 받게 한다 (전수검사 11-13)
-      wikiPack: packInLore || !!storedWikiPack() && !await wikiPackStale(),
-      tokenizer: !!tokenizerName()
-    });
-    return { state: state2, iconPrev: note2?.prev ?? "" };
-  }
-  async function installLoreAndGreetings(charIndex, o = {}) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    const planted = plantGreetings(char.alternateGreetings);
-    const lore = installLore(char.globalLore, planted.index);
-    const first = char.firstMessage;
-    const landing = isLanding(first) ? {} : { firstMessage: installData().greetings.first };
-    if (!isLanding(first) && typeof first === "string" && first.trim() && !planted.greetings.includes(first)) planted.greetings.push(first);
-    const ls = installLoreSettings(char.loreSettings);
-    await risuai.setCharacterToIndex(charIndex, {
-      ...char,
-      ...o.name ? { name: o.name } : {},
-      ...landing,
-      ...ls ? { loreSettings: ls } : {},
-      globalLore: lore,
-      alternateGreetings: planted.greetings
-    });
-  }
-  async function installPictures(charIndex, progress4) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    const { state: state2 } = await checkInstall(charIndex);
-    const all = state2.pictures.missing;
-    if (!all.length) return 0;
-    const WORKERS = 8;
-    const COMMIT = 300;
-    let saved = 0;
-    let assets = char.additionalAssets;
-    const commit = async (list4) => {
-      if (!list4.length) return;
-      assets = mergePictures(assets, list4);
-      const fresh3 = await risuai.getCharacterFromIndex(charIndex) ?? char;
-      await risuai.setCharacterToIndex(charIndex, { ...fresh3, additionalAssets: assets });
-      saved += list4.length;
-    };
-    for (let i = 0; i < all.length; i += COMMIT) {
-      const get = all.slice(i, i + COMMIT);
-      const done3 = [];
-      let next = 0;
-      let failure = null;
-      const worker = async () => {
-        while (next < get.length && !failure) {
-          const p2 = get[next++];
-          try {
-            const path = await risuai.saveAsset(await fetchPicture(p2));
-            if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
-            done3.push([p2, path]);
-          } catch (error) {
-            failure ??= error;
-            return;
-          }
-          const n3 = saved + done3.length;
-          if (n3 % 10 === 0 || n3 === all.length) progress4(`사진 받는 중 ${n3}/${all.length}`);
-        }
-      };
-      await Promise.all(Array.from({ length: WORKERS }, worker));
-      await commit(done3);
-      if (failure) {
-        const why = failure instanceof Error ? failure.message : String(failure);
-        throw new Error(saved ? `${saved}/${all.length}장까지 받았어요. ${why}` : why);
-      }
-    }
-    forgetImages();
-    void loadModuleAssets().catch(() => false);
-    return saved;
-  }
-  async function installIcon(charIndex, progress4) {
-    const icon = installData().icon;
-    if (!icon.file) throw new Error("이 판에는 아이콘 정보가 없어요.");
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    progress4("아이콘 받는 중…");
-    const bytes = await getBytes(icon.file);
-    if (icon.bytes && bytes.length !== icon.bytes) throw new Error("아이콘을 끝까지 받지 못했어요.");
-    const d = icon.digest ? await digest(bytes) : null;
-    if (d && d !== icon.digest) throw new Error("받은 아이콘이 이 판의 아이콘과 달라요.");
-    const path = await risuai.saveAsset(bytes);
-    if (typeof path !== "string" || !path) throw new Error("아이콘을 저장하지 못했어요.");
-    const notes = await iconNotes();
-    const id2 = charId(char);
-    const prev = String(char.image ?? "");
-    notes[id2] = { ours: path, prev: notes[id2]?.ours === prev ? notes[id2].prev : prev };
-    await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
-    const cc = (Array.isArray(char.ccAssets) ? char.ccAssets : []).filter((a) => a && typeof a === "object");
-    const hasIcon = (uri) => cc.some((a) => a.type === "icon" && a.uri === uri);
-    if (prev && !hasIcon(prev)) cc.push({ type: "icon", uri: prev, name: cc.some((a) => a.type === "icon" && a.name === "main") ? "previous" : "main", ext: extOf(prev) });
-    if (!hasIcon(path)) cc.push({ type: "icon", uri: path, name: "goei", ext: extOf(icon.file) });
-    await risuai.setCharacterToIndex(charIndex, { ...char, image: path, ccAssets: cc });
-  }
-  var extOf = (path) => /\.(png|jpe?g|webp|avif|gif)$/i.exec(path)?.[1]?.toLowerCase() ?? "png";
-  async function restoreIcon(charIndex) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) return false;
-    const notes = await iconNotes();
-    const note2 = notes[charId(char)];
-    if (!note2?.prev) return false;
-    await risuai.setCharacterToIndex(charIndex, { ...char, image: note2.prev });
-    delete notes[charId(char)];
-    await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
-    return true;
-  }
-  async function installWikiPack(progress4) {
-    if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
-    progress4("위키 기본 문서 목록 받는 중…");
-    let index = null;
-    try {
-      index = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
-    } catch {
-      throw new Error("위키 기본 문서 목록을 받지 못했어요.");
-    }
-    if (!index || !Array.isArray(index.parts)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
-    let text5 = "";
-    let n3 = 0;
-    for (const name of index.parts) {
-      if (typeof name !== "string" || !/^wiki-base\.\d+\.txt$/.test(name)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
-      text5 += await getText(name);
-      progress4(`위키 기본 문서 받는 중 ${++n3}/${index.parts.length}`);
-    }
-    if (typeof index.length === "number" && text5.length !== index.length) throw new Error(`위키 기본 문서를 끝까지 받지 못했어요. (${text5.length}/${index.length}자)`);
-    if (!text5.startsWith(WIKI_PACK_HEAD)) throw new Error("위키 기본 문서 묶음 형식이 달라요.");
-    await risuai.pluginStorage.setItem(WIKI_KEY, text5);
-    if (typeof index.digest === "string") await risuai.pluginStorage.setItem(WIKI_DIGEST_KEY, index.digest);
-    setStoredWikiPack(text5);
-    return text5.length;
-  }
-  async function wikiPackStale() {
-    if (!storedWikiPack() || !UPDATE_BASE) return false;
-    try {
-      const idx = JSON.parse((await getText("wiki-base.json")).replace(/^\uFEFF/, ""));
-      const want = idx && typeof idx === "object" ? idx.digest : void 0;
-      if (typeof want !== "string") return false;
-      const saved = await risuai.pluginStorage.getItem(WIKI_DIGEST_KEY);
-      return saved !== want;
-    } catch {
-      return false;
-    }
-  }
-  async function loadStoredTokenizer() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(TOK_KEY);
-      if (typeof raw === "string" && raw.length > 1e3) setTimeout(() => setTokenizerRanks(raw, "o200k_base"), 0);
-    } catch {
-    }
-  }
-  async function installTokenizer(progress4) {
-    if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
-    progress4("토크나이저 목록 받는 중…");
-    let index = null;
-    try {
-      index = JSON.parse((await getText("tok-o200k.json")).replace(/^\uFEFF/, ""));
-    } catch {
-      throw new Error("토크나이저 목록을 받지 못했어요.");
-    }
-    if (!index || !Array.isArray(index.parts)) throw new Error("토크나이저 목록 형식이 달라요.");
-    let text5 = "";
-    let n3 = 0;
-    for (const name of index.parts) {
-      if (typeof name !== "string" || !/^tok-o200k\.\d+\.txt$/.test(name)) throw new Error("토크나이저 목록 형식이 달라요.");
-      text5 += await getText(name);
-      progress4(`토크나이저 받는 중 ${++n3}/${index.parts.length}`);
-    }
-    if (typeof index.length === "number" && text5.length !== index.length) throw new Error(`토크나이저를 끝까지 받지 못했어요. (${text5.length}/${index.length}자)`);
-    if (!setTokenizerRanks(text5, "o200k_base")) throw new Error("토크나이저 순위표 형식이 달라요.");
-    await risuai.pluginStorage.setItem(TOK_KEY, text5);
-  }
-  async function dropTokenizer() {
-    await risuai.pluginStorage.removeItem(TOK_KEY).catch(() => {
-    });
-    clearTokenizer();
-  }
-  async function dropWikiPack() {
-    await risuai.pluginStorage.removeItem(WIKI_KEY).catch(() => {
-    });
-    await risuai.pluginStorage.removeItem(WIKI_DIGEST_KEY).catch(() => {
-    });
-    setStoredWikiPack(null);
-  }
-  async function dropOldGame() {
-    let n3 = 0;
-    try {
-      const keys = await risuai.pluginStorage.keys();
-      for (const k of Array.isArray(keys) ? keys : []) {
-        if (typeof k === "string" && (k === "goei:game:code" || k.startsWith("goei:game:pack:"))) {
-          await risuai.pluginStorage.removeItem(k).catch(() => {
-          });
-          n3++;
-        }
-      }
-    } catch {
-      await risuai.pluginStorage.removeItem("goei:game:code").catch(() => {
-      });
-    }
-    return n3;
-  }
-
-  // src/host/hooks.ts
-  var onInstalled = null;
-  function setInstalledHook(f) {
-    onInstalled = f;
-  }
-  function notifyInstalled() {
-    try {
-      onInstalled?.();
-    } catch {
-    }
-  }
-
-  // src/ui/update.ts
-  var esc21 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: null, pics: null, progress: "", done: "" };
-  var checked = false;
-  var skipped = "";
-  var SKIP_KEY = "goei:update-skip";
-  function withTimeout(p2, ms, what) {
-    return new Promise((resolve, reject) => {
-      const t = setTimeout(() => reject(new Error(`${what}을(를) ${Math.round(ms / 1e3)}초 안에 받지 못했어요.`)), ms);
-      p2.then((v) => (clearTimeout(t), resolve(v)), (e) => (clearTimeout(t), reject(e)));
-    });
-  }
-  async function getText2(name) {
-    try {
-      return await withTimeout(getTextOnce(name), 4e4, name);
-    } catch {
-      return await withTimeout(getTextOnce(name), 6e4, name);
-    }
-  }
-  async function getTextOnce(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    lastDirect = legacy ? "" : "risuFetch 없음";
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-        lastDirect = `직접 받기 ${r?.status}: ${String(typeof r?.data === "string" ? r.data : Object.prototype.toString.call(r?.data)).slice(0, 80)}`;
-      } catch (error) {
-        lastDirect = `직접 받기 오류: ${String(error).slice(0, 80)}`;
-      }
-    }
-    const res = await risuai.nativeFetch(url, { method: "GET" }).catch((e) => {
-      throw new Error(`업데이트 정보를 받지 못했어요. (${String(e)}; ${lastDirect})`);
-    });
-    if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}; ${lastDirect}).`);
-    return String(await res.text() ?? "");
-  }
-  var lastDirect = "";
-  async function getJson(name) {
-    const text5 = await getText2(name);
-    let body5 = text5;
-    try {
-      for (let i = 0; i < 2 && typeof body5 === "string"; i++) body5 = JSON.parse(body5.replace(/^\uFEFF/, ""));
-    } catch {
-      throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text5 ?? "").length}자)`);
-    }
-    return body5;
-  }
-  async function loadPayload(onPart) {
-    const index = await getJson("card-update.json");
-    if (index && "card" in index) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
-    if (!Array.isArray(index?.parts)) return index;
-    let text5 = "";
-    let n3 = 0;
-    onPart?.(0, index.parts.length);
-    for (const name of index.parts) {
-      if (typeof name !== "string" || !/^card-update\.\d+\.txt$/.test(name)) throw new Error("카드 업데이트 목록 형식이 달라요.");
-      text5 += await getText2(name);
-      onPart?.(++n3, index.parts.length);
-    }
-    if (typeof index.length === "number" && text5.length !== index.length) {
-      throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text5.length}/${index.length}자)`);
-    }
-    try {
-      return JSON.parse(text5);
-    } catch {
-      throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text5.length}자)`);
-    }
-  }
-  function describe2(x) {
-    if (x === null || typeof x !== "object") return `${typeof x}`;
-    const o = x;
-    const d = o.data;
-    return `keys=${Object.keys(o).slice(0, 6).join("/") || "없음"}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscript=${Array.isArray(d?.customscript) ? "list" : typeof d?.customscript}`;
-  }
-  async function checkLatest(env3, force = false) {
-    if (!UPDATE_BASE || updateUi.busy || checked && !force) return;
-    checked = true;
-    updateUi.busy = force;
-    if (force) updateUi.notice = "", env3.render();
-    try {
-      if (!force) skipped = String(await risuai.pluginStorage.getItem(SKIP_KEY).catch(() => "") ?? "");
-      const v = await getJson("version.json");
-      if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
-      updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
-    } catch (error) {
-      if (force) updateUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    updateUi.busy = false;
-    env3.render();
-  }
-  function newVersions(ctx2) {
-    const L = updateUi.latest;
-    if (!L) return {};
-    const lite = !!readManifest(ctx2.char.globalLore);
-    return {
-      card: lite && compareVersions(L.card, cardVersion(ctx2.char.globalLore)) > 0 ? L.card : void 0,
-      plugin: compareVersions(L.plugin, PLUGIN_VERSION) > 0 ? L.plugin : void 0
-    };
-  }
-  var skipKey = (n3) => `${n3.card ?? ""}|${n3.plugin ?? ""}`;
-  function hasUpdate(ctx2) {
-    const n3 = newVersions(ctx2);
-    return !!(n3.card || n3.plugin);
-  }
-  function updateBanner(ctx2) {
-    const n3 = newVersions(ctx2);
-    if (!(n3.card || n3.plugin) || skipKey(n3) === skipped) return "";
-    const what = [n3.plugin ? `플러그인 v${esc21(n3.plugin)}` : "", n3.card ? `카드 v${esc21(n3.card)}` : ""].filter(Boolean).join(" · ");
-    return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
-    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
-  }
-  function updateGroup(ctx2) {
-    const busy6 = updateUi.busy;
-    const rows3 = [];
-    const cur = cardVersion(ctx2.char.globalLore);
-    const lite = !!readManifest(ctx2.char.globalLore);
-    const L = updateUi.latest;
-    const row8 = (label2, value, help = "") => setRow(label2, value, help);
-    if (!UPDATE_BASE) {
-      return section2(row8("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
-    }
-    const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
-    rows3.push(row8(
-      "플러그인",
-      `<span class="upd-ver">v${esc21(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc21(L.plugin)}</b>` : ""}</span>`,
-      pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플
+  asy

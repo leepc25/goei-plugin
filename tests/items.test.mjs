@@ -115,6 +115,28 @@ test('장착: 빈 칸 첫 번째로, 칸을 주면 그 칸(있던 것은 격자�
   assert.equal(updateItem(it, vest.id, { equip: 'weapon' }).list[2].slot, undefined);
 });
 
+test('손에 든 물건은 갈래를 고쳐도 손에 남는다 (손 갈래가 아니게 되면 held), 장비 칸 물건은 내린다 (재검토 11-14 ①-4)', () => {
+  let it = addItem(empty, alive, { name: '권총', equip: 'weapon', use: true, from: 'manual', anchor: '', wear: true });
+  it = addItem(it, alive, { name: '조끼', equip: 'gear', from: 'manual', anchor: '', wear: true });
+  it = addItem(it, alive, { name: '열쇠', from: 'manual', anchor: '' });
+  it = equipItem(it, alive, it.list[2].id);
+  const [gun, vest, key] = it.list;
+  assert.deepEqual([gun.slot, vest.slot, key.slot, key.held], [0, 0, 1, true]);
+  const at = (s, id) => s.list.find((e) => e.id === id);
+  const shape = (s, id) => { const e = at(s, id); return [e.equip, e.slot, e.held, isEquipped(e, liveItems(s, alive))]; };
+  // 손 갈래 → 없음·장비: 손 칸 그대로, held 가 붙는다
+  assert.deepEqual(shape(updateItem(it, gun.id, { equip: '' }), gun.id), [undefined, 0, true, true], '권총 갈래 없음');
+  assert.deepEqual(shape(updateItem(it, gun.id, { equip: 'gear' }), gun.id), ['gear', 0, true, true], '권총 갈래 장비');
+  // 갈래 없이 든 것 → 장비: 손에 그대로. → 손 갈래: held 는 빠지고 손에 그대로
+  assert.deepEqual(shape(updateItem(it, key.id, { equip: 'gear' }), key.id), ['gear', 1, true, true], '열쇠 갈래 장비');
+  assert.deepEqual(shape(updateItem(it, key.id, { equip: 'weapon' }), key.id), ['weapon', 1, undefined, true], '열쇠 갈래 손');
+  // 장비 칸 물건은 갈래가 바뀌거나 없어지면 내린다
+  assert.deepEqual(shape(updateItem(it, vest.id, { equip: '' }), vest.id), [undefined, undefined, undefined, false], '조끼 갈래 없음');
+  assert.deepEqual(shape(updateItem(it, vest.id, { equip: 'weapon' }), vest.id), ['weapon', undefined, undefined, false], '조끼 갈래 손');
+  // 갈래가 안 바뀌면 그대로
+  assert.deepEqual(shape(updateItem(it, gun.id, { equip: 'weapon' }), gun.id), ['weapon', 0, undefined, true]);
+});
+
 test('버리기·합치기·파괴는 기록 한 줄. 합치기는 둘 다 소모성이고 이름에 같은 낱말이 있을 때만, 이름·설명은 남는 쪽 그대로 횟수만 더한다, 무게는 1개당이라 그대로 (11-08)', () => {
   let it = addItem(empty, alive, { name: '소금', desc: '한 줌', uses: 2, weight: 0.1, from: 'story', anchor: 'c1' });
   it = addItem(it, alive, { name: '소금 봉지', desc: '새 봉지', effect: '괴이를 늦춤', uses: 3, weight: '0.5', from: 'manual', anchor: '' });

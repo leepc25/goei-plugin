@@ -69,6 +69,8 @@
 .gw-head h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; font-size: 19px; font-weight: 700; line-height: 1.3; }
 .gw-head h2 small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
 .gw-head h2 .gw-pre { margin-left: 4px; }
+/* 요원 기록 이름 옆 순서 ▲▼: 넓은 창에서는 목록 줄에 있으므로 숨기고, 목록이 드롭다운으로 바뀌는 폰·좁은 창에서만 보인다 (11-14 사용자 B-11) */
+.gw-head h2 .gw-hmove { display: none; align-items: center; gap: 6px; }
 .gw-head-act { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--gap); margin-left: auto; }
 .gw-head .gx-muted, .gw-head > p { flex-basis: 100%; margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--dim); }
 .gw-eg { color: var(--sub); }
@@ -357,6 +359,7 @@
   .gw-list-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: none; }
   .gw-list-pane .gw-list, .gw-list-pane .dir-search, .gw-list-pane .gw-list-title { display: none; }
   .gw-list-pane .gw-list-pick { display: block; flex: 1; min-width: 0; }
+  .gw-head h2 .gw-hmove { display: inline-flex; }
 }
 
 /* ── 좁은 화면 ── */
@@ -393,6 +396,7 @@
   .gw-list-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: none; }
   .gw-list-pane .gw-list, .gw-list-pane .dir-search, .gw-list-pane .gw-list-title { display: none; }
   .gw-list-pane .gw-list-pick { display: block; flex: 1; min-width: 0; }
+  .gw-head h2 .gw-hmove { display: inline-flex; }
   .gw-list-tools { padding: 10px 14px; }
   .gw-list-pane .gw-add { padding: 0 14px 10px; }
   .gw-list-pane > .gw-anote { margin: 0 14px 10px; }

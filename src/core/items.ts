@@ -127,6 +127,8 @@ export interface ItemLog {
   n?: number;
   /** 그림 찾기용 낱말 */
   icon?: string;
+  /** off 줄: 손 칸에서 넣은 것 (없으면 장비 칸에서 해제). 본편 말·기록 탭 말을 나눈다 (사용자 2026-11-14 C-10·C-11) */
+  hand?: boolean;
   at: string;
 }
 
@@ -259,6 +261,24 @@ export function unequipItem(it: Items, id: string): Items {
   const { slot: _s, held: _h, ...rest } = cur;
   return { ...it, list: it.list.map((x) => (x.id === id ? rest : x)) };
 }
+/** 장착을 바꾼 뒤 칸에서 밀려난 장비(gear)의 id: 앞에서는 칸에 놓여 있었고 뒤에서는 아닌 것.
+ *  장비는 장착해야 쓰니 부르는 쪽이 사용 예정에서 뺀다 (사용자 2026-11-14, 11-14 재검토 ①-2). 갈래 없는 물건·손 물건은 넣지 않는다 */
+export function gearUnseated(before: Item[], after: Item[]): string[] {
+  return before.filter((e) => e.equip === 'gear' && isEquipped(e, before)).map((e) => e.id).filter((id) => {
+    const now = after.find((x) => x.id === id);
+    return !!now && !isEquipped(now, after);
+  });
+}
+/** 칸에서 빠지면 「사용 예정」도 빠지는 물건인가 (사용자 2026-11-14 여쭐 것 C-12 (나)): 원래 손에 드는 물건(무기·도구)과 장비는 빠지고,
+ *  들지 않아도 쓸 수 있는 물건(갈래 없음)은 손에서 빠져도 사용 예정이 남는다. 넣기·격자로 끌기·밀려남 모두 같게 */
+export const useNeedsSeat = (e: Item): boolean => !!e.equip;
+/** 장착을 바꾼 뒤 칸(손·장비)에서 밀려나 사용 예정에서도 빼야 하는 물건의 id: 앞에서는 칸에 놓여 있었고 뒤에서는 아닌 것 가운데 useNeedsSeat 인 것 */
+export function seatLost(before: Item[], after: Item[]): string[] {
+  return before.filter((e) => useNeedsSeat(e) && isEquipped(e, before)).map((e) => e.id).filter((id) => {
+    const now = after.find((x) => x.id === id);
+    return !!now && !isEquipped(now, after);
+  });
+}
 export const liveItemsOf = (it: Items, chat: Chat): Item[] => liveItems(it, aliveAnchors(chat));
 
 const hash = (text: string) => {
@@ -315,7 +335,13 @@ function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unkno
   if (next.uses) next.use = true;
   if (p.equip !== undefined) {
     const eq = itemEquip(p.equip);
-    if (eq !== next.equip && !next.held) delete next.slot;
+    if (eq !== next.equip) {
+      // 손 칸에는 아무 물건이나 (사용자 2026-11-14): 손 칸에 있던 것은 갈래가 바뀌어도 손에 남긴다 (손 갈래가 아니면 held). 장비 칸 것은 내린다
+      const inHand = next.slot !== undefined && (next.held || next.equip === 'weapon');
+      if (!inHand) delete next.slot;
+      else if (eq === 'weapon') delete next.held;
+      else next.held = true;
+    }
     if (eq) next.equip = eq;
     else delete next.equip;
   }
@@ -691,7 +717,7 @@ export function mergedNow(it: Items, lastAnchor: string): string[] {
 export function movedNow(it: Items, lastAnchor: string): string[] {
   if (!lastAnchor) return [];
   return it.log.filter((l) => l.by === 'story' && l.anchor === lastAnchor).flatMap((l) => {
-    if (l.what === 'off') return [`took off ${l.name} (still carrying it)`];
+    if (l.what === 'off') return [l.hand ? `put ${l.name} away (still carrying it)` : `took off ${l.name} (still carrying it)`];
     if (l.what === 'left') { const place = /^두고 옴: ([^·]+)/.exec(String(l.note ?? ''))?.[1]?.trim(); return [`left ${l.name}${place ? ` at ${place}` : ' behind'} — no longer carrying or wearing it`]; }
     if (l.what === 'gone' || l.what === 'destroy') return l.note === '다 씀' ? [] : [`no longer has ${l.name}`];
     return [];
@@ -700,9 +726,11 @@ export function movedNow(it: Items, lastAnchor: string): string[] {
 
 /** 마지막 응답 뒤에 소지품 창에서 직접 버린 것 → 「This turn」 사건 (사용자 2026-11-14, 전수검사 mainreach#6·items#9).
  *  버리기 기록은 anchor 가 빈 글이라 물건의 outKey(버린 때의 마지막 메시지)로 찾는다 */
-export function droppedNow(it: Items, lastAnchor: string): string[] {
-  if (!lastAnchor) return [];
-  return it.list.filter((x) => x.outHow === 'drop' && x.outKey === lastAnchor).map((x) => `threw ${x.name} away — the protagonist discarded it on purpose and no longer has it`);
+export function droppedNow(it: Items, lastAnchor: string, after: string[] = []): string[] {
+  // outKey 는 버린 때의 마지막 메시지(누구 글이든)라, 마지막 응답 뒤의 메시지(사용자 글) 키도 받는다 (11-14 재검토 ①-1)
+  const keys = new Set([lastAnchor, ...after].filter(Boolean));
+  if (!keys.size) return [];
+  return it.list.filter((x) => x.outHow === 'drop' && !!x.outKey && keys.has(x.outKey)).map((x) => `threw ${x.name} away — the protagonist discarded it on purpose and no longer has it`);
 }
 
 /** 이번 턴에 인터넷 쇼핑몰 등에 판 것 (2026-11-10 사용자: 우주 쇼핑몰에 입던 옷을 팔았는데 본편은 그 옷을 계속 입고 나왔다 — 판 일이 본편에 안 넘어가고 있었다).
@@ -824,7 +852,7 @@ export function recentItemLog(chat: Chat, it: Items, n: number, vars?: Record<st
       return !e || (e.store === 'hs' ? hsBuyPasses(vars) : boughtPasses(vars, e.store));
     }
     return true;
-  }).map((l) => `${l.what === 'gone' && l.note === '다 씀' ? 'used up' : LOG_VERB[l.what]} ${l.name}${(l.n ?? 1) > 1 ? ` ×${l.n}` : ''}`);
+  }).map((l) => (l.what === 'off' && l.hand ? `put ${l.name} away` : `${l.what === 'gone' && l.note === '다 씀' ? 'used up' : LOG_VERB[l.what]} ${l.name}${(l.n ?? 1) > 1 ? ` ×${l.n}` : ''}`)); // 손 칸에서 넣은 것은 「put X away」 (사용자 2026-11-14 C-10)
 }
 
 /** 채팅의 마지막 봇 응답 키 (없으면 '') */
@@ -832,6 +860,13 @@ export function lastBotKey(chat: Chat): string {
   const list = chat.message ?? [];
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') return messageKey(list[i], i);
   return '';
+}
+/** 마지막 봇 응답 뒤에 온 메시지들의 키 (봇 응답이 없으면 전부) */
+export function keysAfterLastBot(chat: Chat): string[] {
+  const list = chat.message ?? [];
+  const out: string[] = [];
+  for (let i = list.length - 1; i >= 0 && list[i].role !== 'char'; i--) out.push(messageKey(list[i], i));
+  return out;
 }
 
 export interface UsedNow {
@@ -892,7 +927,7 @@ export function inventoryText(chat: Chat): string {
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).filter((e) => (e.store === 'hs' ? hsBuyPasses(vars) : boughtPasses(vars, e.store))).map(boughtLine),
-    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...droppedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
+    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...droppedNow(it, lastBotKey(chat), keysAfterLastBot(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars), vars),
@@ -1061,7 +1096,8 @@ export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemCh
 }
 /** 본문에서 장착을 풂: 칸만 비우고(갈래는 그대로 — 다시 장착할 수 있다) 기록 한 줄 */
 function offItem(it: Items, cur: Item, c: ItemChange): Items {
-  return addItemLog(unequipItem(it, cur.id), { name: cur.name, item: cur.id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'off', by: 'story', anchor: c.anchor, ...(c.quote ? { quote: c.quote } : {}) });
+  // 손 칸에 있던 것이면 hand 를 적는다 (풀고 나면 held 가 지워져 나중에는 알 수 없다)
+  return addItemLog(unequipItem(it, cur.id), { name: cur.name, item: cur.id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'off', by: 'story', anchor: c.anchor, ...(slotKind(cur) === 'weapon' ? { hand: true } : {}), ...(c.quote ? { quote: c.quote } : {}) });
 }
 
 // ── 고유 인물 시작 소지품 (core/startitems.ts 의 줄) ──

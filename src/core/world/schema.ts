@@ -37,9 +37,9 @@ export const AGENT_FIELDS: FieldDef[] = [
   { id: 'intro', label: '소개', title: 'Roster', type: 'line', hint: 'Roster 지침의 한 줄. 「(나이/성별, 직급): 외모; 성격; 능력」 꼴' },
 ];
 
-/** 조직: 소개는 Faction 요약(첫 문단)과 세력 상세(전체) 양쪽에 쓰인다 */
+/** 조직: 소개의 첫 문단은 Faction 요약에, 나머지는 세력 상세에 쓰인다 (한 문단뿐이면 양쪽에) */
 export const ORG_FIELDS: FieldDef[] = [
-  { id: 'intro', label: '소개', title: 'Identity', type: 'text', hint: '첫 문단은 Faction 지침 요약에, 전체는 세력 상세 로어에' },
+  { id: 'intro', label: '소개', title: 'Identity', type: 'text', hint: '첫 문단은 Faction 지침 요약에, 나머지는 세력 상세 로어에' },
   { id: 'doctrine', label: '교리·방침', title: 'Doctrine', type: 'text' },
   { id: 'hq', label: '본부·거점', title: 'Headquarters and Sites', type: 'text' },
   { id: 'structure', label: '조직 구조', title: 'Structure', type: 'text' },

@@ -62,15 +62,47 @@ test('괴담톡 요청문: 사진 목록·표식 안내가 없고, 방 기록의
   }
 });
 
-test('괴담넷 요청문에는 사진 목록이 그대로 들어간다', { skip: !realLore }, () => {
-  const list = core.sitePicList ? core.sitePicList({ globalLore: realLore }) : null;
-  const b = core.gnetBooks({ char: { globalLore: realLore }, chat: chatOf() });
+test('괴담넷 요청문에는 사진 안내가 그대로 들어가고, 목록은 이번 요청 자료에 이름이 나온 것만이다 (11-14 E-14)', { skip: !realLore }, () => {
+  const src = (message) => ({ char: { globalLore: realLore }, chat: chatOf({}, message) });
+  const b = core.gnetBooks(src([]));
   const sec = gnetTxt.slice(0, gnetTxt.indexOf('Real photos: when the subject')).match(/@@SECTION (\S+)[^@]*$/)[1];
-  const all = b.read(sec);
-  assert.doesNotMatch(all, /__SITE_PICS__/);
-  assert.match(all, /Real photos: when the subject/);
-  assert.match(all, /People \(may add _expression\)|Available pictures: none\./);
-  if (list) assert.ok(all.includes(list.split('\n')[0]));
+  const raw = b.read(sec);
+  assert.match(raw, /Real photos: when the subject/);
+  assert.match(b.pics(raw, ''), /Available pictures: none\.$/, '자료에 아무도 없으면 지침의 「없음」 줄');
+  // 실제 요청문: 자리가 남지 않고, 본문에 나온 이름만 목록에 있다
+  const st = { seq: 100001, posts: [], dms: [], sources: {} };
+  const sysOf = (message) => {
+    const s = src(message);
+    return core.refreshPrompt(s, st, core.incomingPlan(s.chat, st, core.gnetSettings(s.chat.scriptstate), '나', () => 0.99), '나', {}).messages[0].content;
+  };
+  const things = (sys) => /^Anomalies, people and places \(no expression\): (.*)$/m.exec(sys)?.[1].split(', ') ?? [];
+  const everything = things(b.pics(raw, JSON.stringify(realLore)));
+  assert.ok(everything.length > 20, '명부에 그림 있는 괴이·장소가 여럿');
+  const quiet = sysOf([{ role: 'user', data: 'a' }, { role: 'char', data: 'b' }]);
+  assert.doesNotMatch(quiet, /__SITE_PICS__/);
+  assert.match(quiet, /Real photos: when the subject/);
+  assert.ok(things(quiet).length < everything.length / 2, '전체 목록이 통째로 붙지 않는다');
+  const name = everything.find((n) => !things(quiet).includes(n));
+  const hit = sysOf([{ role: 'user', data: `${name} 얘기를 들었다` }, { role: 'char', data: '조용했다.' }]);
+  assert.ok(things(hit).includes(name), '본문에 나온 대상은 목록에 있다');
+  assert.equal(things(hit).length, things(quiet).length + 1, '그것만 더해진다');
+  // 인물 줄: 늘 붙는 참고 기록(🙂Roster)의 이름은 세지 않는다 (사용자 2026-11-14 E-14 물음 2)
+  const people = (sys) => /^People \(may add _expression\): (.*)$/m.exec(sys)?.[1].split(', ') ?? [];
+  const everyone = people(b.pics(raw, JSON.stringify(realLore)));
+  assert.ok(everyone.length > 20, '명부에 그림 있는 인물이 여럿');
+  assert.match(core.refreshPrompt(src([{ role: 'user', data: 'a' }, { role: 'char', data: 'b' }]), st, core.incomingPlan(chatOf(), st, core.gnetSettings({}), '나', () => 0.99), '나', {}).messages[1].content, /\[활성 로어북: 🙂Roster\]/, '참고 자료에는 명부가 그대로 간다');
+  assert.equal(people(quiet).length, 0, `조용한 새로고침의 인물 줄: ${everyone.length} → ${people(quiet).length}`);
+  assert.doesNotMatch(quiet, /^Expressions: /m, '인물이 없으면 표정 줄도 없다');
+  const who = sysOf([{ role: 'user', data: `${everyone[3]} 얘기를 들었다` }, { role: 'char', data: '조용했다.' }]);
+  assert.deepEqual(people(who), [everyone[3]], '본문에 나온 인물만');
+  const board = { ...st, posts: [{ id: 100000, nick: 'ㅇㅇ', title: `${everyone[5]} 봤다`, body: '진짜임', date: '', views: 1, votes: 0, mine: false, comments: [] }] };
+  const s2 = src([{ role: 'user', data: 'a' }, { role: 'char', data: 'b' }]);
+  const onBoard = core.refreshPrompt(s2, board, core.incomingPlan(s2.chat, board, core.gnetSettings(s2.chat.scriptstate), '나', () => 0.99), '나', {}).messages[0].content;
+  assert.deepEqual(people(onBoard), [everyone[5]], '게시판 글에 나온 인물만');
+  console.log(`E-14 조용한 새로고침: 인물 ${everyone.length} → ${people(quiet).length}, 괴이·장소 ${everything.length} → ${things(quiet).length}`);
+  const dm = core.dmPrompt(src([]), { ...st, dms: [{ nick: 'x', side: 'me', body: '안녕', unread: false, date: '' }] }, 'x', '안녕', '나', {}).messages[0].content;
+  assert.doesNotMatch(dm, /__SITE_PICS__/);
+  assert.ok(things(dm).length < everything.length / 2, '쪽지 요청도 같다');
 });
 
 test('본편 참고로 가는 괴담톡 기록에도 옛 표식이 그대로 가지 않는다', () => {

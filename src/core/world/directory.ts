@@ -11,6 +11,7 @@ import { freeGroupCode, migrateRoster, NEUTRAL_BLURB, NEUTRAL_ENGLISH, NEUTRAL_G
 import type { LoreEntry } from '../types';
 import { readStartItems, type StartItem } from '../startitems';
 import { itemWeight } from '../itemtraits';
+import { defaultAppendixWhen } from './records';
 
 export { DIRECTORY_COMMENT } from '../lorebooks';
 export const DIRECTORY_SCHEMA = 1;
@@ -266,6 +267,8 @@ export interface DirectoryData {
   codes_used?: string[];
   /** 세계 데이터 덧쓰기 (core/world/records.ts WorldOverrides): 기본 세계 기록을 칸 단위로 덮거나 지우거나 더한 것 */
   세계?: Record<string, unknown>;
+  /** 사용자가 지우거나 이름을 바꿔 없어진 거점·조직 이름. 기본 명부 채우기(core/install.ts fillDirectory)가 되살리지 않게 withDirectory 가 적는다 (loader#2) */
+  _removed?: Record<string, string[]>;
 }
 
 const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
@@ -299,7 +302,7 @@ export function readDirectoryData(lore: LoreEntry[]): DirectoryData | null {
   return out;
 }
 
-export { ROSTER_V, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB, NEUTRAL_ENGLISH } from './roster-v';
+export { ROSTER_V, migrateRoster, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB, NEUTRAL_ENGLISH } from './roster-v';
 
 // ── 세력 호칭·괴담톡 탭·첫 턴 로어북 (명부, 없으면 옛 로어북) ──
 
@@ -414,7 +417,8 @@ function buildAppendices(lore: LoreEntry[], data: DirectoryData | null): Appendi
     const lore = s(e.comment);
     if (seen.has(lore)) continue;
     seen.add(lore);
-    const d = obj(saved[lore]);
+    // 명부에 줄이 없는 부록은 플러그인 기본 명부의 같은 이름 줄을 먼저 본다 (옛 카드 명부에는 새 부록 줄이 없다: 화요퀴즈쇼 · 합창단 퍼레이드 「목표 끔」)
+    const d = obj(saved[lore] ?? defaultAppendixWhen(lore));
     const guess = guessParent(lore, names);
     const flag = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
     const parent = typeof d.parent === 'string' ? s(d.parent) : guess;
@@ -1008,7 +1012,25 @@ const HELP =
 
 export function directoryContent(data: DirectoryData): string {
   const world = data.세계 && typeof data.세계 === 'object' && Object.keys(data.세계).length ? { 세계: data.세계 } : {};
-  return JSON.stringify({ schema: data.schema, roster_v: data.roster_v ?? ROSTER_V, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data['시작 묶음'] && Object.keys(data['시작 묶음']).length ? { '시작 묶음': data['시작 묶음'] } : {}), ...(data['시작 화면']?.order?.length ? { '시작 화면': data['시작 화면'] } : {}), ...(data['첫 장면'] && Object.keys(data['첫 장면']).length ? { '첫 장면': data['첫 장면'] } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}), ...world }, null, 1);
+  return JSON.stringify({ schema: data.schema, roster_v: data.roster_v ?? ROSTER_V, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data['시작 묶음'] && Object.keys(data['시작 묶음']).length ? { '시작 묶음': data['시작 묶음'] } : {}), ...(data['시작 화면']?.order?.length ? { '시작 화면': data['시작 화면'] } : {}), ...(data['첫 장면'] && Object.keys(data['첫 장면']).length ? { '첫 장면': data['첫 장면'] } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}), ...(data._removed && Object.keys(data._removed).length ? { _removed: data._removed } : {}), ...world }, null, 1);
+}
+
+/**
+ * 지운 거점·조직 기록: 카드에 있던 이름이 새 값에 없으면(지움·이름 바꿈) `_removed` 에 적고, 다시 생긴 이름은 뺀다.
+ * 카드 업데이트·「빠진 것 전부 채우기」가 기본 명부로 그 이름을 되살리지 않게 한다 (loader#2). 새 값에 그 칸이 아예 없으면(모르는 저장) 건드리지 않는다
+ */
+function trackRemoved(old: DirectoryData | null, data: DirectoryData): DirectoryData {
+  const was = obj(old?._removed);
+  const own = obj(data._removed);
+  const out: Record<string, string[]> = {};
+  for (const k of ['거점', '조직'] as const) {
+    const now = data[k];
+    const names = [...new Set([...list(was[k]), ...list(own[k]), ...(now && typeof now === 'object' ? Object.keys(obj(old?.[k])) : [])])];
+    const gone = now && typeof now === 'object' ? names.filter((n) => n && !(n in now)) : names;
+    if (gone.length) out[k] = gone;
+  }
+  if (!Object.keys(out).length && data._removed === undefined) return data;
+  return { ...data, _removed: out };
 }
 
 /** 로어북 목록에 명부를 넣거나 바꾼 새 목록 (원래 목록은 그대로). 설정 폴더가 있으면 그 안에 둔다 */
@@ -1018,6 +1040,7 @@ export function withDirectory(lore: LoreEntry[], data: DirectoryData): LoreEntry
     const cur = readDirectoryData(lore)?.세계;
     if (cur && typeof cur === 'object' && Object.keys(cur).length) data = { ...data, 세계: cur };
   }
+  data = trackRemoved(readDirectoryData(lore), data);
   const content = directoryContent(data);
   // 새 이름 항목을 먼저 쓰고, 없으면 옛 이름 항목을 새 이름으로 바꿔 쓴다. 남는 명부 항목은 지운다
   const own = lore.findIndex((e) => e.comment === DIRECTORY_COMMENT);

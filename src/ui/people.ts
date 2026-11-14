@@ -42,8 +42,9 @@ export const peopleUi = {
   notice: '',
   info: '',
   busy: false,
-  /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기) */
-  undoAsk: false,
+  /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기).
+   *  물은 갱신의 열쇠(undoKey: 채팅 + 그 갱신 시각). 빈 글 = 묻지 않는 중. 다른 채팅·다음 갱신에서는 열쇠가 달라 저절로 꺼진다 (재검토 11-14) */
+  undoAsk: '',
   /** 호감 숫자 보이기 (ⓘ) */
   showNum: false,
   /** 호감 직접 수정 칸 */
@@ -81,9 +82,12 @@ export const peopleUi = {
 };
 
 export function resetPeopleUi(): void {
-  Object.assign(peopleUi, { notice: '', info: '', affEdit: false, addrEdit: false, showNum: false, diagShow: '', logOpen: false });
+  Object.assign(peopleUi, { notice: '', info: '', undoAsk: '', affEdit: false, addrEdit: false, showNum: false, diagShow: '', logOpen: false });
   peopleUi.evOpen.clear();
 }
+
+/** 되돌리기 확인이 가리키는 갱신: 이 채팅의 이 마지막 갱신. 되돌릴 갱신이 없으면 빈 글 */
+const undoKey = (ctx: ChatContext, store: PeopleStore): string => (store.lastRun ? `${chatId(ctx)}|${store.lastRun.at}` : '');
 
 // ── 상태 알림: 갱신 중·끝남이면 다시 그린다 (입력 중이면 건너뛴다 — 한글 조합 보호) ──
 
@@ -233,7 +237,7 @@ async function setVars(ctx: ChatContext, env: PeopleEnv, vars: Record<string, st
 
 const FEATURE_HELP: Record<Feature, [string, string]> = {
   affinity: ['호감', '계기(작은친절·도움·배신…)를 기록하고 8단계로 계산해요'],
-  axes: ['성격 6축', '인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 기록 › 인물 상세에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요. 리수폿 People'],
+  axes: ['성격 6축', '인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 기록 › 인물 상세에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요.'],
   register: ['호칭·말투', '이 인물이 주인공을 부르는 말과 존댓말·반말 변화'],
   perception: ['인식', '이 인물이 아는 것·모르는 것(비밀 누설 방지)'],
   perception_ext: ['인식 확장', '감각 경로·관찰 성향까지 기록해요'],
@@ -577,9 +581,9 @@ export function peopleListView(ctx: ChatContext): string {
   const docsN = Object.values(store.docs).reduce((a, d) => a + liveEntries(d.entries, live).length, 0);
   const empty = !Object.keys(store.people).length && !pending.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>메인 응답에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : '';
   const undoN = store.lastRun ? store.lastRun.entries.length + store.lastRun.docs.length + store.lastRun.changes.length + store.lastRun.observations.length + store.lastRun.newPeople.length : 0;
-  const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목은 변경 기록에서 다시 살릴 수 있어요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? 'disabled' : ''}>↶</button>` : '';
+  const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목·계기는 인물 상세에서, 문서는 기록 문서에서 다시 살릴 수 있어요. 관찰은 되살릴 수 없고 새 인물은 지워져요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? 'disabled' : ''}>↶</button>` : '';
   const newN = store.lastRun?.newPeople.length ?? 0;
-  const undoAsk = undoN && peopleUi.undoAsk
+  const undoAsk = undoN && peopleUi.undoAsk && peopleUi.undoAsk === undoKey(ctx, store)
     ? `<div class="gx-hint">마지막 갱신 ${undoN}개를 취소할까요?${newN ? ` 새 인물 ${newN}명은 지워져요.` : ''} <button class="gx-mini danger" data-action="pp-undo-run-yes" ${peopleUi.busy ? 'disabled' : ''}>취소하기</button><button class="gx-mini" data-action="pp-undo-run-no">그만</button></div>`
     : '';
   return `<div class="ph-room nw-pane pp-pane">${head('이 채팅의 인물', `${Object.keys(store.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
@@ -1018,17 +1022,19 @@ export async function handlePeople(action: string, value: string | undefined, ct
     }
     case 'pp-undo-run':
       // 바로 되돌리지 않고 한 번 더 묻는다 (전수검사 11-13, 사용자 승인)
-      peopleUi.undoAsk = true;
+      peopleUi.undoAsk = undoKey(ctx, peopleStore(ctx.chat));
       env.render();
       return true;
     case 'pp-undo-run-no':
-      peopleUi.undoAsk = false;
+      peopleUi.undoAsk = '';
       env.render();
       return true;
     case 'pp-undo-run-yes': {
-      peopleUi.undoAsk = false;
+      // 물었던 그 갱신일 때만 되돌린다 (그 사이 새 갱신이 왔으면 새 갱신을 지우지 않는다)
+      const asked = peopleUi.undoAsk;
+      peopleUi.undoAsk = '';
       let n = 0;
-      await mutate(ctx, env, (store) => (n = undoLastRun(store)) > 0);
+      await mutate(ctx, env, (store, chat) => (n = asked && undoKey({ ...ctx, chat }, store) === asked ? undoLastRun(store) : 0) > 0);
       peopleUi.info = n ? `마지막 갱신을 되돌렸어요 (${n}개 취소).` : '되돌릴 갱신이 없어요.';
       env.render();
       return true;

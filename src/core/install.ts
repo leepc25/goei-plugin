@@ -132,8 +132,12 @@ export function installCheck(i: CheckInput): InstallState {
     return want ? typeof greetings[n] !== 'string' || !(greetings[n] as string).trim() : false;
   });
   const have = new Set(((Array.isArray(i.assets) ? i.assets : []) as unknown[]).filter(isRow).map((r) => r[0]));
-  const want = manifestPictures(m).length ? manifestPictures(m) : inst.pictures;
-  const missingPics = want.filter((p) => !have.has(p[0]));
+  // 깡통봇(매니페스트에 source 없음)은 설치 때 적어 둔 목록이 아니라 지금 설치 자료의 목록으로 본다: 새 릴리스에 추가된 사진,
+  // 지문이 바뀐 사진(매니페스트에 적힌 지문과 다름)도 「없음」으로 세어 다시 받게 한다 (loader#6). 정식 카드는 카드 업데이트가 맡는다
+  const listed = manifestPictures(m);
+  const known = new Map(listed.map((p) => [p[0], p[1]]));
+  const want = listed.length && m?.source ? listed : inst.pictures;
+  const missingPics = want.filter((p) => !have.has(p[0]) || (known.has(p[0]) && known.get(p[0]) !== p[1]));
   let directory = false;
   let directoryGaps = 0;
   try {
@@ -201,6 +205,32 @@ export function buildManifest(o: { greetings: Record<string, number>; settingsKe
   };
 }
 
+/**
+ * 받아 저장한 카드 사진을 깡통봇 매니페스트의 사진 목록에 적는다 (같은 이름은 새 지문으로, 새 이름은 뒤에): 점검이 다음에 다시 받으라고 하지 않게 (loader#6).
+ * 매니페스트가 없거나 정식 카드(source 있음)이거나 바뀐 것이 없으면 null
+ */
+export function notePictures(lore: LoreEntry[] | undefined, got: Picture[]): LoreEntry[] | null {
+  const old = lore ? manifestEntry(lore) : undefined;
+  const m = lore ? readManifest(lore) : null;
+  if (!lore || !old || !m || m.source || !got.length) return null;
+  const list = manifestPictures(m).map((p) => [...p] as Picture);
+  const at = new Map(list.map((p, n) => [p[0], n]));
+  let changed = false;
+  for (const p of got) {
+    const n = at.get(p[0]);
+    if (n === undefined) {
+      at.set(p[0], list.length);
+      list.push([...p] as Picture);
+      changed = true;
+    } else if (list[n][1] !== p[1] || list[n][2] !== p[2] || list[n][3] !== p[3]) {
+      list[n] = [...p] as Picture;
+      changed = true;
+    }
+  }
+  if (!changed) return null;
+  return lore.map((e) => (e === old ? { ...old, content: JSON.stringify({ ...m, pictures: list }) } : e));
+}
+
 const entry = (comment: string, content: string, folder: string, extra: Partial<LoreEntry> = {}): LoreEntry =>
   ({ key: '', secondkey: '', insertorder: 0, comment, content, mode: 'normal', alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra }) as LoreEntry;
 const folderEntry = (comment: string, key: string): LoreEntry =>
@@ -211,16 +241,28 @@ const empty = (v: unknown) => v === undefined || v === null || v === '' || (Arra
 
 /**
  * 있는 명부에 기본 명부의 빠진 칸만 채운다 (2026-10-29 사용자: 깡통봇 명부가 비어 거점 0·소속 없음·영문명 잘림·괴담톡 탭 없음).
- * 고친 값은 그대로 두고, 없는 큰 칸·없는 항목·항목 안의 빈 칸만 기본 값으로. 바뀐 칸 수와 결과를 돌려준다
+ * 고친 값은 그대로 두고, 없는 큰 칸·없는 항목·항목 안의 없는 칸만 기본 값으로. 바뀐 칸 수와 결과를 돌려준다.
+ * 사용자가 지운 것·일부러 비운 것은 되살리지 않는다 (loader#2):
+ * - 명부의 `_removed`(지우거나 이름을 바꾼 거점·조직 이름, core/world/directory.ts withDirectory 가 적는다)에 있는 항목은 건너뛴다
+ * - 항목 안의 칸은 아예 없을 때(undefined)만 채운다. 빈 글·빈 목록(소속 미정·직급 없음·목록에서 숨김)은 사용자가 비운 값이라 그대로 둔다.
+ *   다만 기본 명부를 한 번도 받은 적 없는 명부(거점이 비어 있고 지운 기록도 없음 — 10-29 의 깡통봇 명부)는 빈 칸도 채운다
  */
 export function fillDirectory(cur: Record<string, unknown>, def: Record<string, unknown>): { data: Record<string, unknown>; gaps: number } {
   const out: Record<string, unknown> = { ...cur };
   let gaps = 0;
+  const removedOf = (k: string): Set<string> => {
+    const r = isObj(cur._removed) ? cur._removed[k] : undefined;
+    return new Set(Array.isArray(r) ? r.filter((n): n is string => typeof n === 'string') : []);
+  };
+  const bare = empty(cur.거점) && !removedOf('거점').size;
   for (const [k, dv] of Object.entries(def)) {
-    if (k === '_help') continue;
+    if (k === '_help' || k === '_removed') continue;
     const cv = out[k];
+    const removed = removedOf(k);
     if (empty(cv)) {
-      if (!empty(dv)) (out[k] = dv), gaps++;
+      // 사용자가 지운 항목은 빼고 채운다 (전부 지웠으면 빈 채로 둔다)
+      const fill = removed.size && isObj(dv) ? Object.fromEntries(Object.entries(dv).filter(([name]) => !removed.has(name))) : dv;
+      if (!empty(fill)) (out[k] = fill), gaps++;
       continue;
     }
     // 괴담톡 탭은 통째로 (탭 줄이 비면 괴담톡이 안 나온다)
@@ -233,11 +275,12 @@ export function fillDirectory(cur: Record<string, unknown>, def: Record<string, 
     for (const [name, de] of Object.entries(dv)) {
       const ce = sec[name];
       if (ce === undefined) {
+        if (removed.has(name)) continue;
         sec[name] = de;
         gaps++;
       } else if (isObj(ce) && isObj(de)) {
         const row: Record<string, unknown> = { ...ce };
-        for (const [f, fv] of Object.entries(de)) if (empty(row[f]) && !empty(fv)) (row[f] = fv), gaps++;
+        for (const [f, fv] of Object.entries(de)) if ((bare ? empty(row[f]) : row[f] === undefined) && !empty(fv)) (row[f] = fv), gaps++;
         sec[name] = row;
       }
     }

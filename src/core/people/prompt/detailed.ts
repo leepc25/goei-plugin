@@ -8,7 +8,7 @@
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 import text from '../../../data/guides/updater-detailed.txt';
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "faction_rep_num", "faction_rep_qual", "axes", "sexual", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules", "next_note"] as const;
+export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "faction_rep_num", "faction_rep_qual", "axes", "sexual", "affinity", "affinity_num", "affinity_qual", "cue_table", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules", "next_note"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 // 글은 src/data/guides/updater-detailed.txt (2026-11-07 사용자: 지침은 전부 설정 → 지침 메뉴에서 보고 고친다). 고친 글은 core/guides.ts 가 덮는다

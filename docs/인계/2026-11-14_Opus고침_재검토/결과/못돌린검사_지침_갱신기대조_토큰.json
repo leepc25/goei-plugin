@@ -1,0 +1,722 @@
+{
+ "group": "MISS1",
+ "coverage": [
+  {
+   "key": "gupdp",
+   "covered": "끝까지 읽은 것: src/data/guides/updater-compact.txt(416줄), updater-detailed.txt(585줄), updater-extra.txt(103줄), director-extra.txt(72줄), directive.txt(30줄); src/core/people/director.ts, router.ts, consolidate.ts, basetext.ts(DIRECTOR_FACTS·SCENE·ROUTER_SYSTEM), prompt/*.ts, updater.ts 전체(자료 만들기·지침 조립·parseUpdate·applyUpdate), speech.ts 지침부, sexual.ts, request.ts, types.ts(SLOT_META·단계·상수), settings.ts 기본값, inject.ts personBlock, rhythm.ts 시계, faction.ts, dispatch.ts(Directive 조립), guides.ts DEFAULTS, host/people.ts updaterSystem.\n스크립트(/tmp/audit_1113/gupdp/tok.mjs, t2.mjs — js-tiktoken o200k_base): 두 갱신기 판을 assemblePrompt 와 같은 규칙으로 조립해 실측. 기본 설정 갱신기 지침 = 간결 13,273토큰(가계부·소지품·포인트 켜면 14,623, 상점 판단 포함 14,745; 성적 절 약 900 별도), 자세히 18,327/20,134/20,263. 절별 토큰(예: 간결 affinity 3,060, suspicion 공통 1,882, register 1,374, items 884), updater-extra·director-extra 절별 토큰, directive 343토큰. 두 판의 출력 계약(## 15 이하)은 diff 로 대조해 문장 표현 3줄 외 동일함을 확인. 백틱 식별자 집합 차이 대조.\n코드와 대조해 맞음을 확인한 것: 호감 계기 값·단계 경계(−71…300), 의심 무게 ±2/5/10·닫기 80/0·단계 19/39/59/79, 음란도 시작값·변화량·단계, 취향 띠, 세력 단계 id 5개, 리듬 표식·창·상한·연장, 관찰 승격 조건(4·3·55 / 6·4·75), 항목 상한(8·tidy 24·merge 300자), 새 인물 2명, 소지품 action·equip(hand/gear/none)·4개 상한, next_note 길이, Director 메모 길이·검색 need 꼴·REPAIR/PASS2/MAIN_NOTE 자리 채움, Router 출력 꼴, 정리(CONSOLIDATE) 출력 꼴·from 규칙, Directive 치환 항목([[DEST]] 등)과 절 이름, 말투 다변화 SIGN 꼴·표지 글. 소지품 규칙(사용·소모 횟수·장비·그램 무게·등급은 그림만)은 11-13 결정과 두 판 모두 일치.",
+   "dropped": "약한 후보 13개를 뺐다: (1) 의심 공통 절 10.4·10.5 의 `op: close/respond`·점수 문구가 글 모드(기본)에도 나감 — 글 모드 절이 「10.2–10.4 still apply, weights are only a guide」 로 풀어 주어 큰 재구성이 필요해 보류(간결 공통 절 1,882토큰). (2) 절 번호 중복(12·13·14 가 두 번씩, 11·10 이 15e 뒤) — 번호로 가리키는 곳이 없어 실해 없음. (3) 간결 7.2 「the one entry」 대 자세히 「a few compact entries」. (4) 자세히판만 `perception.reading` 을 knowledge 에도 적으라 함(한 사실 한 칸 규칙과 살짝 어긋남). (5) 자세히판 가계부 「or was charged」(청구만으로 거래 기록 가능). (6) 자세히판 tidy 문장 「Leave … affinity.appraisal unless they repeat (never merged)」 자기모순. (7) `known_names`·`doc_types`·`want`·`speech_variety` 가 자료에 오지만 지침에 설명 없음. (8) signals[].note(SIGNAL_STATE 15토큰)가 지침 1절과 같은 말. (9) Director MAIN_NOTE 의 「this English reference」 — director_lang=ko 면 틀림. (10) FACTS 의 「at most {{LINES}} line(s)」 가 JSON 칸 3개와 안 맞아 모호. (11) 출력 꼴 observations 줄에 성적 축(sexual_desire|paraphilia, replace, ≤700)이 성적 기능을 꺼도 남음. (12) PLAIN_STYLE/WRITER 의 「0.10.7 / 0.10.9」 는 다른 플러그인 판 번호라 모델에 뜻이 없음(코드가 그 문구로 「When false」 를 끼워 넣어 고치려면 코드도 봐야 함). (13) LANG_EN 의 [시작]/[단서] 표식·하게체/하오체 언급(갱신기가 직접 쓰지 않는 것), 음란도 글 모드에서 「the number never stands alone」, 간결 8.1b 의 「Apply an address…」(기록기가 아니라 작가용 문장). directive.txt 와 Router 규칙 본문, 상점 절(SHOP_RULE 공용), 포인트 절에서는 문제를 찾지 못했다."
+  },
+  {
+   "key": "gtoken",
+   "covered": "Probes (all under /tmp/audit_1113/gtoken/, rendered output in out/): build.mjs + build2.mjs (esbuild bundles of the request builders and src/core/index.ts), sections.mjs (tokens per section of all 23 guides), upd.mjs/upd2.mjs/upd3.mjs (updater compact vs detailed, per-section marginal cost), render1.mjs (boards x4, 괴담톡), render2.mjs (shop, malls, 망상홈쇼핑, 상담, AI 상담, Director, Router, image, main additions), pics.mjs (boards with real world data), wiki.mjs, meas.mjs, t2.mjs. Tokenizer js-tiktoken o200k_base. Default settings; 'guide part' = system message with empty lore unless noted.\n\nTOKEN TABLE (system prompt tokens)\nPer turn:\n- 갱신기 간결(기본, 가계부·소지품·상점 판단 포함) 15,947 (포인트 포함 16,116); 자세히 21,465 (21,634); 간결/자세히 = 74%. 선택 절 전부 끔: 4,098 / 5,719.\n- Director 사실형(기본) 1,621; 연출형 1,683; 기능 절 끔 587; 검색 끔 1,435. Router 418 (기본 꺼짐).\n- 메인 요청에 붙는 글: RP 1,387; Tag 1,379 (CBS 풀기 전); 상태창 절(칸 전부) 680; 상점 표식(판단=메인) 312; 인물 규칙 114; 홈쇼핑 기록 머리말 144.\n- 이미지: 보조 모델 태그 넣기 705; 메인용 이미지 지침 332.\n게시판 (빈 로어 / 실제 세계 자료): 괴담넷 새로고침 2,710 / 3,449, 글쓰기 2,227, 댓글 1,945 / 2,684, 글 하나 새로고침 1,945, 쪽지 996 / 1,735. 괴담갤 2,706 / 2,219 / 1,937 / 쪽지 1,060. 세정게 2,866 / 2,349 / 2,067 / 1,093. 연어 마켓 2,677 / 2,146 / 1,864 / 911. 사진 목록만 838.\n괴담톡: 답장(방 새로고침 동작) 2,606; 새 메시지 확인 2,980; 보기 전용 방 526.\n위키: 문서 작성(확장·자세히, 그림·표정 포함) 1,981; 자동 제목 90.\n상점: 첫 진열 1,210; 새 진열 1,113; 문의 1,284; 팔기 1,643. 우주 쇼핑몰: 진열 2,101 / 2,002 + 배정 347; 문의 2,767. 포인트몰: 진열 1,464 / 1,365 + 배정 311. 포인트몰 상담: 상담사 만들기 264, 대화 283 (+주사위 72). 망상홈쇼핑: 편성 1,939; 채팅 반응 945. AI 상담 1,172. 기록 정리 512. 한 번에 요청 봉투 305.\nNot sent by default (measured but off): MEMO.* 비망록 약 2,400 per guide, THOUGHTS.* 생각 단계.\n\nREAD IN FULL: src/core/guides.ts, gnetPrompt.ts, craft.ts, people/prompt/*, people/request.ts, people/basetext.ts, tests/guide-out-calls.mjs, tests/reffn-prompts.mjs, tests/guide-out.test.mjs, rp.txt, tag.txt, updater-extra.txt, consult.txt; the assembled default compact updater prompt (all 340 lines), and the rendered requests for board refresh, 괴담톡 확인/답장, 우주몰 문의, Director, wiki, status section, mall assignment. READ IN PART (builder and section-selection code only): phonePrompt.ts, shop.ts (prompt half), malls.ts, bmdesk.ts, consult.ts, wiki.ts, director.ts, sitepics.ts, host/people.ts (updater assembly), updater.ts (assemblePrompt/enabledSections), settings.ts defaults. NOT read line by line: updater-detailed.txt (compared by section size only), phone.txt/gnet.txt/shop.txt/wiki.txt/main.txt/common.txt/director-extra.txt/asset.txt outside the passages that appeared in rendered requests, body.ts, homeshop.ts, imgprompt.ts. Lore records were not audited (other lens). No unit test was run; nothing in the repository was changed.",
+   "dropped": "7 weaker candidates left out: (1) 우주몰 COMMON carries the 58-token 'when the customer offers to SELL ...' sentence in shelf requests that cannot use it (fix would move it into the Cos SELL section in guides.ts; not verified against the SELL text). (2) Mall assignment repeats 'ROLE: broad stock, unrelated to the current scene' and the tier description on every item line (about 10-25 tokens per item; a one-line legend in malls.ts cosAssignment would do). (3) 'Every listing is new / never relist' is said three times in a 우주몰 shelf request (COMMON, VARIETY, ASSIGN_RULE; ~25 tok). (4) 괴담톡 확인: 'A00/B00 are distinct despite the label 관리국' appears in both COMMON and ANNOUNCEMENTS (~12 tok). (5) Updater 8.6 repeats perception rules of section 9 and the knowledge slot when both features are on (~75 tok, but they are needed when perception is off). (6) Updater sexual section (1,046 tok) is sent every turn even when no scene person still needs a first text; only the 'First text once' bullet (~130 tok) could be gated in code. (7) Wiki SELECTED LENGTH text names both EXPAND and FAITHFUL behaviour although only one mode is active (~40 tok per article). Also noted but not counted as findings: 괴담톡 답장 already drops DIRECT_ROOMS for a sent message, and thoughts/memo are off by default, so the earlier audit's cuts there hold."
+  }
+ ],
+ "counts": {
+  "total": 24,
+  "confirmed": 23,
+  "rejected": 1,
+  "unverified": 0
+ },
+ "confirmed": [
+  {
+   "key": "gupdp",
+   "n": 1,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "Director 요청 자료에 같은 기록이 두 번 실린다 (전문 record + 꼬리 state·threads·knowledge)",
+    "kind": "over-token",
+    "severity": "high",
+    "file": "src/core/people/director.ts",
+    "line": 106,
+    "old_text": "      state: slot('state'),\n      threads: slot('threads'),\n      knowledge: slot('knowledge'),",
+    "new_text": "",
+    "evidence": "director.ts:105 가 `record: personBlock(... mode:'record')` 로 인물 기록 전문을 싣는데 (inject.ts:109-156 이 Current state / Knows / Open threads / Suspicion / 기능 칸을 모두 출력), 106-109행이 같은 항목의 마지막 6개씩을 `state`·`threads`·`knowledge`·`suspicion` 으로 또 싣는다. 지침도 basetext.ts:7 에서 「Each person's full record is in `record`; read it whole rather than the summary fields」 라고 꼬리 칸을 쓰지 말라고 한다. 11-07 E 에서 꼬리 → 전문으로 바꾸며 꼬리를 남긴 것. Director 는 기본 설정(director='facts')에서 매 턴 호출. 추정: 인물당 상태 3·지식 6·미해결 3 항목(각 50자 안팎)이면 인물당 약 400토큰, 장면 인물 3명이면 턴당 약 1,200토큰 중복 (추정치, 실측 아님).",
+    "needs_user_decision": false,
+    "also_change": "109행 `suspicion: slot('suspicion')` 도 같은 중복이라 함께 뺀다. 127행 재사용 열쇠(key)는 p.state·p.threads 를 쓰므로, 꼬리 값은 열쇠 계산용 지역 변수로만 남기고 data 에는 넣지 않는다. basetext.ts:7 의 ` rather than the summary fields` 는 지운다. `slots`(기능 칸, 칸 id 로 찾는 용도)는 APPLY 절이 id 로 가리키므로 그대로 둔다.",
+    "token_saving": 600,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "Confirmed in the files. director.ts:105 puts the full person block in `record` (personBlock mode 'record'), and inject.ts:109-112, 149-152 print \"Current state\", \"Knows\", \"Open threads\" and (when suspicion is numeric) \"Suspicion\" from the same slots. director.ts:106-109 then sends the last 6 entries of the same slots again as `state` / `threads` / `knowledge` / `suspicion`. The comment at director.ts:84 says the 11-07 change replaced the tails by the full record, but the tails were left in. basetext.ts:7 tells the model to read `record` whole \"rather than the summary fields\", so the tails are declared unused by the guide itself. No guide section (basetext.ts, director.ts FEATURE_GUIDE, director-extra.txt) refers to these four fields by name; the only code use is the reuse key at director.ts:127 (p.state, p.threads).\n\nDirector default is 'facts' (settings.ts:21), so this goes out every turn where a scene person exists.\n\nSeverity lowered to medium: the saving is the finder's estimate, not measured, and depends on how full the records are. Each tail is at most 6 entries of up to 300 chars per slot; early in a chat it is tens of tokens, in a long chat with 2-3 people it can pass 300 tokens per call.\n\nOne point against: the record is trimmed to recordCap (>= 1500 chars per person, inject.ts:85-96, order history -> knowledge -> behavior -> scene -> threads, oldest first), while the tails are untrimmed. Only when a record is so over budget that knowledge or threads are cut below 6 entries do the tails carry something the record lacks. State is never trimmed. With blockCap minimum 4000 this is a rare edge case and does not justify sending the duplicate every turn.\n\nThe finder's new_text (delete 3 lines) alone would not compile: line 127 reads p.state / p.threads, and noUnusedLocals is on (tsconfig.json:7) so the `slot` helper at line 88 must go too. The final edit below removes all four tail lines; the companion edits are in side_effects.",
+    "old_text_found_exactly": true,
+    "final_old_text": "      state: slot('state'),\n      threads: slot('threads'),\n      knowledge: slot('knowledge'),\n      ...(s.features.has('suspicion') && !s.qualitative.has('suspicion') ? { suspicion: slot('suspicion') } : {}),\n",
+    "final_new_text": "",
+    "side_effects": "Must change together in /home/user/goei-plugin/src/core/people/director.ts:\n1. Line 127 reuse key: replace `p.state, p.threads,` with `p.record,` (record contains state and threads; the key then also reacts to knowledge changes, which is more correct since the record is what is sent). Without this the file does not typecheck.\n2. Line 88 `const slot = (k: 'state' | 'threads' | 'knowledge' | 'suspicion') => ...` becomes unused; delete it (noUnusedLocals is on).\n3. /home/user/goei-plugin/src/core/people/basetext.ts:7: delete ` rather than the summary fields` (keep `read it whole.`), since no summary fields remain. This changes the Director FACTS guide text, so tests/guide-out.test.mjs fails on the pinned entries director.system, director.repair, director.pass2 in tests/fixtures/guide-out-old.json until the fixture is refreshed. This third edit is optional; leaving the phrase is harmless.\n\n`affinity`, `address`, `slots`, `unknown_to` stay: guides refer to `slots` and `unknown_to` by name. tests/people-director.test.mjs does not read the removed fields. Not run: no test was executed, checked by reading only. Edge case: when a record is trimmed by the per-person budget so that knowledge or threads fall below 6 entries, the Director loses the untrimmed tail it gets today.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 2,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "사실형 Director(기본값)에서 출력 꼴이 react 를 쓰라고 보여 주지만 프로그램은 버린다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/data/guides/director-extra.txt",
+    "line": 12,
+    "old_text": "\"react\":\"<≤400 chars or omit>\"",
+    "new_text": "\"react\":\"<≤400 chars, only when `react` is defined above; else omit>\"",
+    "evidence": "OUTPUT 절은 사실형·연출형 공용이다 (director.ts:121). `react` 설명(DIRECTOR_SCENE)은 연출형일 때만 붙고(director.ts:121 `s.director === 'scene' ? [scene] : []`), 읽을 때도 `const react = scene ? plain(n.react, NOTE_CHARS) : ''` (director.ts:178, host/people.ts:671 scene = director==='scene') 라 사실형에서는 react 를 통째로 버린다. now·must_not_reveal 없이 react 만 쓴 메모는 메모 자체가 사라진다(director.ts:181). 기본 설정이 director='facts' (settings.ts:21) 이고 APPLY 절들이 「이번 턴 방향」을 요구하므로 모델이 react 에 써서 잃기 쉽다. 출력 토큰도 인물당 최대 400자 낭비.",
+    "needs_user_decision": false,
+    "also_change": "director.ts:34 의 내장 OUTPUT 글(절이 없을 때 쓰는 사본)도 같은 문장으로.",
+    "token_saving": 0,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "Confirmed from the files. src/data/guides/director-extra.txt:12 (OUTPUT section) holds the quoted text verbatim, and the same string is the built-in copy at src/core/people/director.ts:34. The OUTPUT section is appended in both modes (director.ts:121), while the only definition of `react` (DIRECTOR_SCENE, src/core/people/basetext.ts:14) is added only when s.director === 'scene'. The parser drops react in facts mode: `const react = scene ? plain(n.react, NOTE_CHARS) : ''` (director.ts:178), called with scene = settings.director === 'scene' (src/host/people.ts:671). A note carrying only react is discarded entirely (director.ts:181). The default is director: 'facts' (src/core/people/settings.ts:21).\n\nSo in the default mode the output shape offers a field that is never defined and is always thrown away. The APPLY.* sections (e.g. SUSPICION \"Give a concrete direction for this turn\", AFFINITY \"say concretely how affinity alters conduct\") push the model toward direction text, and react is the obvious place to put it.\n\nI rate it low rather than medium. The shape already says \"or omit\", and the facts text says \"Facts, not direction\" and \"Never propose ... next actions\", so a capable model mostly leaves react out. The realistic cost is occasional wasted output (up to 400 chars per person) and, rarely, a note lost because the direction went only into react. I did not run the model to measure how often this happens.\n\nThe proposed edit is minimal, stays in English, adds no new rule (it only scopes an existing field), breaks no marker or placeholder, and conflicts with no owner decision. I stand behind it as proposed.\n\nNot fixed by this edit (separate finding): DIRECTOR_SCENE says react is ≤120 chars while OUTPUT and the parser (NOTE_CHARS) say 400.",
+    "old_text_found_exactly": true,
+    "final_old_text": "\"react\":\"<≤400 chars or omit>\"",
+    "final_new_text": "\"react\":\"<≤400 chars, only when `react` is defined above; else omit>\"",
+    "side_effects": "1) Make the same replacement in the built-in copy at src/core/people/director.ts:34 (const OUTPUT), which is used when the section is missing.\n2) tests/guide-out.test.mjs will fail until tests/fixtures/guide-out-old.json is updated: line 175 (the Director OUTPUT section text) and the pinned director.system / director.repair / director.pass2 entries (lines 431-433) all contain the old string.\n3) No parser change is needed; scene mode still reads react.\n4) An alternative that touches code instead of text: build OUTPUT without the react field when s.director !== 'scene'. It is cleaner but not required.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 3,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "사실형 Director: 「방향을 제안하지 말라」와 기능 절의 「이번 턴 방향을 구체적으로 말하라」가 부딪친다",
+    "kind": "contradiction",
+    "severity": "high",
+    "file": "src/core/people/basetext.ts",
+    "line": 10,
+    "old_text": "Never propose dialogue, emotion, next actions, plot or outcomes.",
+    "new_text": "Never propose dialogue, emotion, next actions, plot or outcomes, except the conduct tendency or single proposal a feature section below explicitly asks for.",
+    "evidence": "기본 설정(director='facts', director_features='1', settings.ts:21·28)에서 한 요청에 같이 들어간다. FACTS: basetext.ts:7 「Facts, not direction」, :10 「Never propose dialogue, emotion, next actions, plot or outcomes」. 반면 director-extra.txt:22 APPLY.AFFINITY 「then say concretely how affinity alters conduct in this scene: more attention, asking first…」, :42 APPLY.SUSPICION 「Give a concrete direction for this turn … test a detail, or confront」, :52 APPLY.RHYTHM 「If a hook action is allowed, propose at most one … saying what would enter the scene」, :32 APPLY.PERCEPTION 「note a disclosure that could genuinely occur as a future option」. 사실형에는 방향을 담을 칸(react)도 없다. 둘 다 따를 수 없다. 고치는 길은 둘: (가) 위 문장처럼 FACTS 에 예외를 한 구절 넣기, (나) 사실형에서는 APPLY 절의 방향 문장을 빼기(코드). 어느 쪽이 뜻에 맞는지 사용자 결정 필요.",
+    "needs_user_decision": true,
+    "also_change": "",
+    "token_saving": 0,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "The contradiction is real and both passages go to the same model in the same request under default settings.\n\n- Defaults: director='facts', director_features='1', and affinity, perception, suspicion and rhythm are all '1' (src/core/people/settings.ts:21,28,53,55,62).\n- Assembly: buildDirector (src/core/people/director.ts:117-121) builds system = FACTS + (SCENE only when director==='scene') + APPLY.* for every enabled feature + SEARCH + OUTPUT.\n- FACTS (src/core/people/basetext.ts:7,10): \"Facts, not direction\" and \"Never propose dialogue, emotion, next actions, plot or outcomes.\"\n- APPLY sections (src/data/guides/director-extra.txt): line 22 AFFINITY \"say concretely how affinity alters conduct in this scene\"; line 42 SUSPICION \"Give a concrete direction for this turn ... test a detail, or confront\"; line 52 RHYTHM \"propose at most one ... saying what would enter the scene\"; line 32 PERCEPTION \"note a disclosure that could genuinely occur as a future option\".\n- In facts mode the parser discards `react` (director.ts:178, `scene ? plain(n.react) : ''`), so the only place a direction can land is `now`, which FACTS defines as \"Facts, not direction\".\n\nI rate it medium, not high: the model is not told anything false, and a capable model usually lets the specific section win over the general ban. The cost is uneven notes from turn to turn.\n\nThe finder's edit works, but its wording (\"the conduct tendency or single proposal\") enumerates cases. I would stand behind a shorter clause with the same effect. This is still a meaning choice, because the file header (director.ts:1) says facts mode is \"facts and knowledge limits only\" while the APPLY sections were written for direction. The alternative is code: strip or skip the direction sentences in facts mode. That needs the owner's decision.\n\nThe similar sentence in updater-compact.txt:350 and updater-detailed.txt:520 belongs to the updater's next_note (note mode), which gets no APPLY sections, so it needs no change.",
+    "old_text_found_exactly": true,
+    "final_old_text": "Never propose dialogue, emotion, next actions, plot or outcomes.",
+    "final_new_text": "Never propose dialogue, emotion, next actions, plot or outcomes beyond what a feature section below asks for.",
+    "side_effects": "- tests/fixtures/guide-out-old.json pins this sentence in three entries (director.system, director.repair, director.pass2), so tests/guide-out.test.mjs will fail until the fixture is refreshed.\n- src/core/guides.ts:223 builds the Director default guide (FACTS section) from DIRECTOR_FACTS, so the guide tab default changes with it. A user's saved custom FACTS text is not affected.\n- Scene mode sends the same FACTS text; the added clause is harmless there because SCENE already allows `react`.\n- No twin text needs changing: the similar updater next_note sentence (updater-compact.txt:350, updater-detailed.txt:520) is a different call.\n- If the owner picks the code route instead, the change is in src/core/people/director.ts:117 (omit or trim the direction sentences of APPLY.AFFINITY, SUSPICION, RHYTHM and PERCEPTION when s.director==='facts'), and basetext.ts stays as it is.",
+    "needs_user_decision": true,
+    "decision_question_ko": "사실형 Director(기본값)에 「방향·다음 행동을 제안하지 말라」와 기능 절의 「이번 턴 방향을 구체적으로 말하라」(호감·의심·리듬·인지)가 함께 들어갑니다. 어느 쪽으로 맞출까요?\n(가) 사실형에서도 기능 절이 요구하는 방향은 허용한다. 금지 문장에 「기능 절이 요구하는 것은 예외」 한 구절만 붙입니다. 글만 고치면 됩니다.\n(나) 사실형은 사실만 쓴다. 사실형일 때는 기능 절의 방향 문장을 보내지 않도록 코드를 고칩니다. 방향은 연출형에서만 나옵니다.\n추천: (가). 고침이 가장 작고, 지금 기본 설정에서 호감·의심·리듬 기능이 실제로 메모에 반영됩니다."
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 4,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "연출형 Director: react 길이가 한 요청 안에서 120자와 400자로 다르게 적혀 있다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/core/people/basetext.ts",
+    "line": 14,
+    "old_text": "the user\\'s latest input (≤120 chars)",
+    "new_text": "the user\\'s latest input (≤400 chars)",
+    "evidence": "DIRECTOR_SCENE(basetext.ts:14)는 `react` 를 「≤120 chars」 라고 하고, 같은 요청 끝의 OUTPUT(director-extra.txt:12)은 `\"react\":\"<≤400 chars or omit>\"`, 프로그램도 400자까지 받는다 (director.ts:22 NOTE_CHARS = 400, :178). director.ts:20 주석 「2026-11-07 (전수검사 2 의 E): 메모 상한 120 → 400자」 — 그때 SCENE 문장만 안 고쳐진 것.",
+    "needs_user_decision": false,
+    "also_change": "",
+    "token_saving": 0,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed from the files. /home/user/goei-plugin/src/core/people/basetext.ts:14 (DIRECTOR_SCENE) tells the model `react` is \"≤120 chars\". The same scene-mode Director system prompt also carries: (a) basetext.ts:6 \"at most {{LINES}} line(s) (each ≤400 chars)\", (b) the OUTPUT line (src/data/guides/director-extra.txt:12, twin constant in src/core/people/director.ts:34) with \"react\":\"<≤400 chars or omit>\". The parser accepts 400: director.ts:22 NOTE_CHARS = 400, and director.ts:178 `plain(n.react, NOTE_CHARS)`. The comment at director.ts:20 records the 11-07 change \"메모 상한 120 → 400자\"; only the SCENE sentence was left behind. Both passages go to the same model in the same request (guides.ts:223 assembles FACTS + SCENE + director-extra; director.ts:119-120 uses them as the system text). So it is a real in-request contradiction (120 vs 400 for the same field). The fix is a one-number change, adds no rule, and conflicts with no owner decision. I lowered severity to low: the practical effect is only that the model may write a shorter `react` than allowed; nothing is rejected or false in play, and scene mode is an optional setting. The updater's separate `next_note.now` ≤120 (updater-compact.txt:407, updater-detailed.txt:518/576) is a different field in a different request and is not affected.",
+    "old_text_found_exactly": true,
+    "final_old_text": "the user\\'s latest input (≤120 chars)",
+    "final_new_text": "the user\\'s latest input (≤400 chars)",
+    "side_effects": "The file is a TS string literal, so the apostrophe is written as \\' (single backslash) in basetext.ts line 14; the match must use that form. tests/fixtures/guide-out-old.json contains the old \"(≤120 chars)\" sentence (3 occurrences), so tests/guide-out.test.mjs may report a difference for the Director guide and the fixture / expected-diff list must be updated with it. No code change needed (NOTE_CHARS is already 400). No twin text: director-extra.txt:12 and director.ts:34 already say 400. Users who saved a custom Director guide keep their own text (compatibility is of no concern).",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 5,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "자세히판 갱신기: 호감 단계를 「항목에 태도를 적을 때 쓰라」와 「단계에서 나온 글을 항목에 쓰지 말라」가 같이 있다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/data/guides/updater-detailed.txt",
+    "line": 242,
+    "old_text": "- Stages, for reading `affinity_now` and for describing attitude in entries (the program assigns them;",
+    "new_text": "- Stages, for reading `affinity_now` (the program assigns them;",
+    "evidence": "같은 절 223행 「you never predict the result and never write stage-derived prose into entries」, 255행 「never write a relationship label, consent, or address change because the stage would allow it」, 305행(8.4) 「never import the affinity stage as the relationship label」 과 부딪친다. 간결판(updater-compact.txt:187)은 「for reading `affinity_now`」 뿐이다 — 두 판이 다르다.",
+    "needs_user_decision": false,
+    "also_change": "",
+    "token_saving": 8,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed in /home/user/goei-plugin/src/data/guides/updater-detailed.txt. Line 242 and line 223 are in the same section (<<SECTION:affinity_num>>, 7.8), so they always reach the same model in the same request. Line 242 says the stages are \"for reading `affinity_now` and for describing attitude in entries\"; line 223 says \"you never predict the result and never write stage-derived prose into entries\". These cannot both be followed. The paragraph under the table (line 255: \"never write a relationship label, consent, or address change because the stage would allow it\") and 8.4 (line 305: \"never import the affinity stage as the relationship label\") side with line 223. The compact twin (updater-compact.txt:187) says only \"for reading `affinity_now`\", so the two versions also disagree. The edit is a pure deletion of the conflicting clause: it adds no rule, keeps the table and markers, and brings the detailed version in line with the compact one. I rate it low rather than medium: the detailed updater is not the default, and the surrounding text already leans strongly toward \"do not write it\", so real confusion is limited. The saving is about 8 tokens.",
+    "old_text_found_exactly": true,
+    "final_old_text": "- Stages, for reading `affinity_now` and for describing attitude in entries (the program assigns them;",
+    "final_new_text": "- Stages, for reading `affinity_now` (the program assigns them;",
+    "side_effects": "The string occurs once in updater-detailed.txt and nowhere else in src or tests. tests/fixtures/guide-out-old.json does not contain it, so I expect tests/guide-out.test.mjs to be unaffected; I did not run it. The compact twin (updater-compact.txt:187) already has the target wording and needs no change. No section marker or placeholder is touched. The table's third column, \"Direction of behavior and speech\", stays as reading help for `affinity_now`.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 6,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "자세히판 갱신기: 의심 점수 단계 풀이가 공통 절에 있어, 점수가 없는 글 모드(기본값)에도 나간다",
+    "kind": "mismatch",
+    "severity": "medium",
+    "file": "src/data/guides/updater-detailed.txt",
+    "line": 497,
+    "old_text": " Stages the program associates with the score, for reading `suspicion_now`: 0 baseline, to 19 slight unease, to 39 noticing, to 59 suspicion and questions, to 79 distrust and verification, to 100 strong conviction.",
+    "new_text": "",
+    "evidence": "의심은 기본이 글 모드다 (settings.ts num_suspicion: '0'). 이때 `suspicion_now` 는 자료에 없고 (updater.ts:327), suspicion_qual 절(504-505행)은 「there is no `suspicion_now`, no `suspicion` array, no weight and no stage」 라고 한다. 그런데 이 문장은 공통 절 10.5 에 있어 글 모드에도 나간다. 간결판은 같은 문장을 수치 절 안(updater-compact.txt:333 「Program stages for reading `suspicion_now`: …」)에 두었다. 실측 53토큰.",
+    "needs_user_decision": false,
+    "also_change": "지운 문장을 501행(### 10.6 Recording, suspicion_num 절) 끝에 붙인다: ` Program stages for reading `suspicion_now`: 0 baseline; to 19 slight unease; to 39 noticing; to 59 suspicion and questions; to 79 distrust and verification; to 100 strong conviction.` (간결판 333행과 같은 글)",
+    "token_saving": 53,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "The problem is real, but small. In /home/user/goei-plugin/src/data/guides/updater-detailed.txt line 497, the sentence explaining the score stages for `suspicion_now` sits in the common section 10.5, outside both the suspicion_num and suspicion_qual sections, so it is sent in both modes.\n\n- **Default is text mode:** settings.ts:59 has num_suspicion '0', and settings.ts:209 puts suspicion into the qualitative set in that case.\n- **No `suspicion_now` in text mode:** updater.ts:327 sets it to undefined when suspicion is qualitative.\n- **The guide then contradicts itself mildly:** the suspicion_qual section (line 505) says \"there is no `suspicion_now`, no `suspicion` array, no weight and no stage\", while line 497 explains how to read `suspicion_now`.\n- **The compact twin already does it right:** updater-compact.txt:333 has the same sentence inside its suspicion_num section.\n\nI rate it low rather than medium: the saving is about 53 tokens per text-mode call (the finder's figure, which I did not re-measure), and line 505 already tells the model the field does not exist, so real confusion is unlikely.\n\nThe quoted old_text is present verbatim. The edit moves the sentence without adding a rule, matches the compact guide, and conflicts with no owner decision.\n\nSo that it can be applied as one contiguous replacement, my final edit places the moved sentence at the start of the 10.6 Recording body rather than at the end of line 501. It uses the compact guide's wording.\n\nNot covered by this finding: the same common section 10.5 also carries other score-only wording (`op: respond` with `stage`, \"Never force a stage on a person because the score is high\").",
+    "old_text_found_exactly": true,
+    "final_old_text": " Stages the program associates with the score, for reading `suspicion_now`: 0 baseline, to 19 slight unease, to 39 noticing, to 59 suspicion and questions, to 79 distrust and verification, to 100 strong conviction. At any score, the person may express confirmed knowledge grounded in evidence, and at any score, while the case is open, they never state the matter as confirmed.\n\n<<SECTION:suspicion_num>>\n### 10.6 Recording\nItems in `suspicion`: `op: open` starts a case",
+    "final_new_text": " At any score, the person may express confirmed knowledge grounded in evidence, and at any score, while the case is open, they never state the matter as confirmed.\n\n<<SECTION:suspicion_num>>\n### 10.6 Recording\nProgram stages for reading `suspicion_now`: 0 baseline; to 19 slight unease; to 39 noticing; to 59 suspicion and questions; to 79 distrust and verification; to 100 strong conviction. Items in `suspicion`: `op: open` starts a case",
+    "side_effects": "- **Score mode:** the content is unchanged; the sentence only moves from 10.5 to the start of 10.6.\n- **Text mode (default):** the detailed updater guide gets about 53 tokens shorter.\n- **Compact guide:** updater-compact.txt needs no change; it already has this layout at line 333.\n- **Code:** no code change is needed. The section markers are untouched.\n- **Tests:** the sentence does not appear literally in tests/fixtures/*.json or tests/*.mjs. If tests/guide-out.test.mjs pins the detailed updater output by hash or length, it will need refreshing; I did not run it.\n- **Release bundle:** release/goei-body.2.txt contains the old sentence and will change on the next build.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 7,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "갱신기 두 판 모두: `cues` 에 뜻풀이가 같이 온다고 적혀 있지만 실제로는 이름만 온다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/guides/updater-compact.txt",
+    "line": 9,
+    "old_text": "`cues` (allowed cue names with meanings)",
+    "new_text": "`cues` (allowed cue names)",
+    "evidence": "updater.ts:314 `cues: … ? CUES : []` — 이름 배열만 싣는다. updater.ts:99 주석 「계기 뜻풀이는 지침 표에만 둔다 — 자료에 같은 뜻을 두 번 싣지 않음 (전수검사 11-13)」. 뜻은 7.8 표에 있다. 덧붙여: 호감이 글 모드이고 세력 평판만 수치일 때는 `cues` 가 오는데 affinity_qual 절은 「no `cues`」 라 하고, faction_rep_num 의 「(as for person affinity)」 가 가리키는 표(7.8, affinity_num 절)는 잘려 나가 뜻풀이가 어디에도 없다 (기본 설정에서는 생기지 않는 조합).",
+    "needs_user_decision": false,
+    "also_change": "updater-detailed.txt:12 `- `cues`: the cue names you may use for affinity, each with its meaning.` → `- `cues`: the cue names you may use for affinity.`",
+    "token_saving": 3,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. The data sends cue names only: /home/user/goei-plugin/src/core/people/updater.ts:314 sets `cues` to `CUES` or `[]`, and CUES is `Object.keys(CUE_VALUE)` (src/core/people/types.ts:93). The comment at updater.ts:99 says the meanings were deliberately moved to the guide table only (11-13 audit). So \"with meanings\" in updater-compact.txt:9 and \"each with its meaning\" in updater-detailed.txt:12 are leftovers and state something false about the input. The meanings are in the guide table (compact lines 172-182; detailed line 224 already says \"cue names are in `cues`\"), so the edit loses no instruction. It deletes words, adds no rule, and conflicts with no owner decision. Harm is small because the model still finds the meanings in the table in the default configuration, so low severity is right. The finder's side remark about affinity-qualitative plus faction-numeric is a separate non-default edge case; the code condition at updater.ts:314 does send `cues` in that case, but I did not check which guide sections are assembled then, and this edit does not address it.",
+    "old_text_found_exactly": true,
+    "final_old_text": "`cues` (allowed cue names with meanings)",
+    "final_new_text": "`cues` (allowed cue names)",
+    "side_effects": "The twin text must change at the same time: /home/user/goei-plugin/src/data/guides/updater-detailed.txt:12 \"  - `cues`: the cue names you may use for affinity, each with its meaning.\" -> \"  - `cues`: the cue names you may use for affinity.\" (found exactly once). No code or parser depends on either phrase; a grep of src and tests finds them only in the two guide files. tests/guide-out.test.mjs pins assembled guide output, so it may fail on the updater text and need its fixture (tests/fixtures/guide-out-old.json) refreshed; I did not run it. Saving is about 3 tokens per updater call.",
+    "needs_user_decision": false,
+    "decision_question_ko": ""
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 8,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "성적 프로필 절: 같은 판단 순서·추정·미확인 규칙이 한 요청에 두 번 들어간다",
+    "kind": "over-token",
+    "severity": "medium",
+    "file": "src/data/guides/updater-extra.txt",
+    "line": 76,
+    "old_text": "Consider explicit facts, sexual history or reactions, the supplied openness lewdness value and stage (`openness_now` when present), then personality. A weak but plausible inference is prefixed with exact text \"<추정>\" and names its basis. Use exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or no usable basis at all. ",
+    "new_text": "",
+    "evidence": "SEXUAL.WRITER 절 끝에 {prompt_rules}(= SEXUAL.PROMPT_RULES, updater-extra.txt:62)가 늘 붙는데 (sexual.ts:67-87), 거기에 같은 내용이 있다: 「Judge in order: explicit statements, sexual history or reactions, the supplied openness lewdness value and stage, then personality traits…」, 「Use exact prefix \"<추정>\" for a plausible inference…」, 「Return exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or when the data truly offers no basis at all」. 성적 욕망·이상성욕 기록은 기본 켬(settings.ts sexual_desire:'1', paraphilia:'1')이라 매 갱신 호출에 나간다. 지울 부분 실측 80토큰. (같은 줄의 {init_desire}{init_paraphilia} 40토큰과 77행 끝 「In both modes avoid clinical…」 15토큰도 PROMPT_RULES·문체 절과 겹치지만, 자리 채움 구조라 이번에는 건드리지 않음.) 원본(리수폿) 이식 글이라 줄여도 되는지 확인 필요.",
+    "needs_user_decision": true,
+    "also_change": "sexual.ts:82 의 내장 사본(절이 없을 때 쓰는 글)에서도 같은 세 문장을 뺀다.",
+    "token_saving": 80,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "확인함. /home/user/goei-plugin/src/data/guides/updater-extra.txt 76행(SEXUAL.WRITER 절)에 인용문이 글자 그대로 있고, 같은 절 끝 {prompt_rules} 자리에 SEXUAL.PROMPT_RULES(62행)가 늘 붙는다(src/core/people/sexual.ts:67-87, sexualWriterSection이 prompt_rules: sexualPromptRules(...)로 채움). 두 글은 같은 갱신기 요청의 같은 system 글에 들어간다(src/host/people.ts:494).\n\nPROMPT_RULES에 세 문장이 모두 있다: 판단 순서(explicit statements → sexual history or reactions → openness lewdness value and stage → personality traits), \"<추정>\" 접두와 근거 명시(\"every inferred inclination must use that inference prefix and name its basis\"), \"미확인\"을 쓰는 세 경우. 지워서 잃는 것은 「(`openness_now` when present)」라는 칸 이름 하나뿐인데, 이 칸은 갱신기 본문의 개방도 절(updater-compact.txt:255, updater-detailed.txt:20·378)에서 이미 정의되고 PROMPT_RULES의 \"the supplied openness lewdness value and stage\"가 같은 것을 가리키므로 지시 손실은 없다.\n\n코드가 이 문장을 찾아 쓰는 곳은 없다(grep: 사본은 sexual.ts:82 내장 글과 시험 고정 파일뿐). 지운 뒤에도 {init_desire}{init_paraphilia}가 끝에 빈칸을 달고 있어 뒤 문장 \"Cite `m`...\"과 자연히 이어진다. 규칙 추가도 문체 손질도 아닌 순수 중복 제거이고 소유자 결정과 충돌하지 않는다. 절감은 약 80토큰/갱신 호출(성적 칸 기본 켬)로 medium 하한이다.\n\n이 글은 roster/faction 원작자 글이 아니라 리수폿 이식 지침이며 뜻이 바뀌지 않으므로 사용자 결정은 필요 없다고 본다.",
+    "old_text_found_exactly": true,
+    "final_old_text": "Consider explicit facts, sexual history or reactions, the supplied openness lewdness value and stage (`openness_now` when present), then personality. A weak but plausible inference is prefixed with exact text \"<추정>\" and names its basis. Use exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or no usable basis at all. ",
+    "final_new_text": "",
+    "side_effects": "1) /home/user/goei-plugin/src/core/people/sexual.ts:82 의 내장 사본(절이 없을 때 쓰는 글)에서도 같은 세 문장을 함께 빼야 지침 파일과 어긋나지 않는다. 2) /home/user/goei-plugin/tests/fixtures/guide-out-old.json 에 이 문장이 4번 고정돼 있어 tests/guide-out.test.mjs 가 깨진다(고정 파일 갱신 필요). 3) 사용자가 설정에서 SEXUAL.PROMPT_RULES 절을 직접 지우거나 고쳐 이 규칙을 빼면 판단 순서·추정·미확인 규칙이 요청에서 사라진다(기본값에서는 문제 없음). 4) 「`openness_now`」 칸 이름 언급이 이 절에서 빠지지만 개방도 절에 정의가 남는다.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 9,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "간결판 갱신기: `perception.channels` 칸의 뜻이 자세히판·칸 설명·Director 와 다르다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/guides/updater-compact.txt",
+    "line": 241,
+    "old_text": "which channels reached this person in the scene in `perception.channels` (upsert per scene)",
+    "new_text": "the scene's sensory conditions in `perception.channels` (upsert; the moment, not the past)",
+    "evidence": "자세히판 updater-detailed.txt:334 「the scene's sensory conditions in `perception.channels` (upsert; the moment, not the past)」, 칸 정의 types.ts SLOT_META['perception.channels'].hint 「the scene's sensory conditions (distance, light, noise, call connection)」, Director director-extra.txt:37 「Read the scene's light, distance, obstruction, noise, gaze and contact (`perception.channels`)」. 간결판(기본)만 「이 인물에게 닿은 채널」 이라고 적어, 기록되는 내용이 Director 가 읽으려는 것(장면의 빛·거리·소음)과 달라진다.",
+    "needs_user_decision": false,
+    "also_change": "",
+    "token_saving": 0,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "Confirmed in the files. /home/user/goei-plugin/src/data/guides/updater-compact.txt:241 tells the updater to record \"which channels reached this person in the scene\" in `perception.channels`. Every other definition of the slot says it holds the scene's conditions: updater-detailed.txt:334 (\"the scene's sensory conditions in `perception.channels` (upsert; the moment, not the past)\"), src/core/people/types.ts:62 (label 장면 조건, hint \"the scene's sensory conditions (distance, light, noise, call connection)\"), src/core/people/inject.ts:77 (rendered as \"Scene conditions\"), and the Director at director-extra.txt:37 / director.ts:56, which reads \"the scene's light, distance, obstruction, noise, gaze and contact (`perception.channels`)\". SLOT_META hints are only sent in consolidate.ts, not in the ordinary updater request, so in the default compact guide this sentence is the only definition the updater sees. A model following it would plausibly write \"sight, hearing\" rather than light/distance/noise, which is then shown under \"Scene conditions\" and read by the Director as conditions. The effect is small because the two meanings are close, so low severity stands. The edit copies the detailed twin's wording, adds no rule, costs no tokens, and conflicts with no owner decision.",
+    "old_text_found_exactly": true,
+    "final_old_text": "which channels reached this person in the scene in `perception.channels` (upsert per scene)",
+    "final_new_text": "the scene's sensory conditions in `perception.channels` (upsert; the moment, not the past)",
+    "side_effects": "The quoted string does not appear literally in tests/fixtures/*.json or tests/*.mjs. I did not run tests/guide-out.test.mjs; if it pins the compact updater's perception_ext section by hash or by text assembled another way, that pin needs regenerating. No code change is needed, and the detailed twin and director-extra.txt already use the target wording.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 10,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "자세히판 갱신기만 상품권을 「돈」으로 쳐서 물건으로 안 받는다 (간결판·포인트몰과 다름)",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/guides/updater-detailed.txt",
+    "line": 447,
+    "old_text": "cash, bills, coins, cheques, gift certificates with a face value, and account balances",
+    "new_text": "cash, bills, coins, cheques and account balances",
+    "evidence": "간결판 updater-compact.txt:293 「Cash, bills, coins, cheques and account money are never items」 — 상품권 없음. 포인트몰 지침(src/core/guides.ts:95 BM_COMMON)은 `서류/상품권/voucher` 를 파는 물건의 그림 예로 든다. 자세히판을 쓰면 몰에서 산 상품권이 소지품에도 장부에도 안 잡힐 수 있다(액면가가 글에 없으면 거래로도 못 적음). 상품권을 돈으로 볼지 물건으로 볼지는 사용자 결정.",
+    "needs_user_decision": true,
+    "also_change": "",
+    "token_saving": 8,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "Confirmed the mismatch. src/data/guides/updater-detailed.txt:447 reads \"Money is never an item: cash, bills, coins, cheques, gift certificates with a face value, and account balances belong to the ledger (`transactions`), not to `items`.\" The twin rule in src/data/guides/updater-compact.txt:293 reads \"Cash, bills, coins, cheques and account money are never items — the ledger (`transactions`) handles money.\" with no gift certificates. The two files are alternative versions of the same updater guide (src/core/guides.ts:13-14), so the same story text is treated differently depending on which version is selected; compact is the default.\n\nThe detailed wording also creates a gap. Its `transactions` rule (line 423) only allows an entry when the text states an explicit amount. A voucher is therefore excluded from `items` and usually cannot be written to the ledger either, so it is recorded nowhere. The point-mall guide (src/core/guides.ts:95, BM_COMMON) uses `서류/상품권/voucher` as a picture-column example for goods on sale, so vouchers are expected to exist as things the player buys and holds.\n\nThe proposed edit removes one clause, adds no rule, conflicts with no owner decision, and aligns the detailed version with the default compact one. The practical effect is small because it only applies when the detailed updater is selected and a voucher appears. Whether a voucher counts as money or as an item is a meaning choice, so it needs the owner's decision.",
+    "old_text_found_exactly": true,
+    "final_old_text": "cash, bills, coins, cheques, gift certificates with a face value, and account balances",
+    "final_new_text": "cash, bills, coins, cheques and account balances",
+    "side_effects": "No pinned test text is affected: the phrase appears nowhere under tests/, and tests/fixtures/guide-out-old.json does not contain it. The only other copies are in built bundles (dist-test/core.bundle.mjs, joint.mjs, llm.mjs, goei-body.js), which pick up the change on the next build. updater-compact.txt needs no change because it already omits gift certificates. No code depends on the phrase. Saving is about 8 tokens, on the detailed updater only.",
+    "needs_user_decision": true,
+    "decision_question_ko": "자세히판 갱신기만 상품권을 「돈」으로 쳐서 소지품에 넣지 않습니다. 간결판(기본)과 포인트몰은 상품권을 물건으로 봅니다. (1) 자세히판에서 그 구절을 빼서 상품권을 물건으로 통일한다. (2) 지금대로 둔다. 추천은 (1)입니다. 지금은 액면가가 글에 없으면 상품권이 소지품에도 장부에도 안 잡힙니다."
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 11,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "인물 기록 「정리」가 수치 모드 의심 칸을 합치면 의심 종류와 점수가 깨진다",
+    "kind": "other",
+    "severity": "low",
+    "file": "src/core/people/consolidate.ts",
+    "line": 43,
+    "old_text": "    if (SLOT_META[slot].once) continue;",
+    "new_text": "    if (SLOT_META[slot].once || slot === 'suspicion') continue;",
+    "evidence": "의심 수치 모드에서는 `suspicion` 칸이 정리 대상에 든다 (slotsFor, types.ts gate:'num'). 정리 지침(updater-extra.txt:87)은 「Merge entries that describe the same thing」 라고만 한다. 그런데 반영 코드(consolidate.ts:107)는 새 항목에 `kind` 를 넣지 않고, 점수 계산(updater.ts:199 `${e.target}|${e.kind}`, :207 `/^\\[(시작|단서|반응|해소)…/`)은 항목마다 맨 앞 표식 하나만 읽는다. [시작]+[단서·중] 을 한 줄로 합치면 단서 점수가 빠지고 종류가 undefined 인 사례가 된다. 갱신기 쪽 merge 는 suspicion 칸을 막고 있다(updater.ts:683). 의심 수치 모드는 기본값이 아니고 「정리」는 직접 눌러야 하므로 낮음.",
+    "needs_user_decision": false,
+    "also_change": "",
+    "token_saving": 0,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed from the code. This is a code bug, not a guide-text problem.\n\n- src/core/people/consolidate.ts:41-43: buildConsolidate takes every slot from slotsFor() and skips only `once` slots. In numeric suspicion mode `suspicion` (types.ts:45, gate 'num') is included, so its entries are sent to the tidy model.\n- consolidate.ts:107: the rewritten entry is pushed with only id/text/src/anchor/seq/target/replaces|from. `kind` is not carried over.\n- src/core/people/updater.ts:199: suspicionCases groups by `${e.target}|${e.kind}`, so a consolidated entry lands in a separate case with kind \"undefined\".\n- updater.ts:207: the score reads one leading prefix per entry (`^\\[(시작|단서|반응|해소)…`). A merged line keeps at most one prefix, so the points of the others are lost (e.g. [시작]+[단서·중] → 10 instead of 15), or all of them if the model drops the prefix.\n- The CONSOLIDATE guide (src/data/guides/updater-extra.txt:87-89) says to merge same-thing entries and has no carve-out for `suspicion`; the slot hint \"prefixes stay\" cannot save several prefixes in one merged line.\n- The updater path already refuses generic entry writes to this slot (updater.ts:683-684), so excluding it from tidy is consistent.\n\nNot verified by running: I did not execute a probe or the unit test; the conclusion is from reading the code. Severity stays low: numeric suspicion is not the default (settings.ts:59 num_suspicion '0') and tidy runs only when the user presses 「정리」.\n\nThe one-line edit is minimal, adds no guide text, and conflicts with no owner decision. The qualitative slots (suspicion.concern/speech/behavior) are unaffected and still tidy normally.",
+    "old_text_found_exactly": true,
+    "final_old_text": "    if (SLOT_META[slot].once) continue;",
+    "final_new_text": "    if (SLOT_META[slot].once || slot === 'suspicion') continue;",
+    "side_effects": "No guide text changes, so tests/guide-out.test.mjs is unaffected. The `Slot hints` line in the CONSOLIDATE prompt will still list `suspicion` (built from `enabled`, consolidate.ts:52) although the slot is no longer sent; that is harmless, since applyConsolidate drops any returned slot that was not in the input (consolidate.ts:80). recordChars still counts suspicion entries toward `chars`, so the target may be slightly harder to reach in numeric mode. tests/people-consolidate.test.mjs should be re-run after the edit; I did not run it.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 12,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "정리 지침이 모델에게 보내지도 않는 「첫인상」 칸을 설명한다",
+    "kind": "over-token",
+    "severity": "low",
+    "file": "src/data/guides/updater-extra.txt",
+    "line": 89,
+    "old_text": " `affinity.appraisal` (first impression) is never rewritten: return it unchanged or leave the slot out.",
+    "new_text": "",
+    "evidence": "consolidate.ts:43 `if (SLOT_META[slot].once) continue;` — 한 번만 쓰는 칸(첫인상 `affinity.appraisal`, types.ts once:true)은 정리 자료에 아예 넣지 않는다. 모델이 「그대로 돌려주면」 입력에 없는 칸이라 버려진다 (consolidate.ts:80 「없는 칸이거나 목록이 아님」). 실측 23토큰.",
+    "needs_user_decision": false,
+    "also_change": "consolidate.ts:23 의 내장 사본에서도 같은 문장을 뺀다.",
+    "token_saving": 23,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "The finding holds. The quoted sentence is at /home/user/goei-plugin/src/data/guides/updater-extra.txt:89, verbatim, as the last sentence of that bullet.\n\n- **Slot never sent:** /home/user/goei-plugin/src/core/people/consolidate.ts:43 has `if (SLOT_META[slot].once) continue;`, and `affinity.appraisal` is the only slot marked `once: true` (types.ts:48). So the consolidate input never contains that slot.\n- **\"Return it unchanged\" cannot work:** the model has no ids for that slot. If it returned the slot anyway, applyConsolidate (consolidate.ts:80) drops it as 「없는 칸이거나 목록이 아님」 because `input.data.slots[slot]` is undefined.\n- **Nothing is lost by the cut:** the sentence contains no marker or placeholder, and the code already protects the first impression.\n- **Owner rules:** the edit only removes text, adds no rule, and fits the \"guides stay minimal\" decision.\n\nThe saving is about 23 tokens per consolidate call, and that call runs only when the user presses 「정리」, so severity is low.\n\nOne related leftover is outside this edit: `slot_hints` is built from all enabled slots, so the hint line still lists `affinity.appraisal = first impression only…`. That is harmless but is the same kind of dead text.",
+    "old_text_found_exactly": true,
+    "final_old_text": " `affinity.appraisal` (first impression) is never rewritten: return it unchanged or leave the slot out.",
+    "final_new_text": "",
+    "side_effects": "- **Twin text:** the built-in fallback copy at /home/user/goei-plugin/src/core/people/consolidate.ts:23 carries the same sentence and should be cut at the same time.\n- **Pinned text:** /home/user/goei-plugin/tests/fixtures/guide-out-old.json:285 holds the assembled CONSOLIDATE text, so tests/guide-out.test.mjs will probably need its fixture or allowed-difference list updated. I did not run the test.\n- **Behaviour:** no code behaviour changes.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 13,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "Router 출력의 reason 은 프로그램이 읽지 않는다",
+    "kind": "over-token",
+    "severity": "low",
+    "file": "src/core/people/basetext.ts",
+    "line": 24,
+    "old_text": "{\"selected\":[{\"name\":\"<canonical>\",\"reason\":\"<≤40 chars>\"}],",
+    "new_text": "{\"selected\":[{\"name\":\"<canonical>\"}],",
+    "evidence": "router.ts:67-71 parseRouter 는 selected 항목에서 `name` 만 읽는다 (`String(x?.name ?? '')`); `reason` 은 어디서도 쓰지 않는다 (RouterResult = { selected: string[]; newCharacters }). 고른 인물 최대 6명 × 40자 = 출력 약 90토큰. 다만 이유를 쓰게 하는 것이 고르기 품질에 도움이 된다고 볼 수도 있어 사용자 결정. Router 는 기본 꺼짐(router='code').",
+    "needs_user_decision": true,
+    "also_change": "",
+    "token_saving": 90,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. /home/user/goei-plugin/src/core/people/basetext.ts:24 asks the Router for {\"name\",\"reason\":\"<≤40 chars>\"} per selected person. parseRouter in /home/user/goei-plugin/src/core/people/router.ts (the `for (const x of v.selected ...)` loop) reads only `name` (or a bare string); RouterResult is { selected: string[]; newCharacters }, and no code in src/ reads the router's `reason`. The only other `reason` hits in src/host/people.ts are the DiagRun label ('router'), not the model's field. So the field is pure output cost: up to 6 names x ~40 chars, roughly 60-90 output tokens per Router call, plus latency. The Router is an optional stage and, per the finder, off by default (router='code'); I did not verify that default myself, but it only affects how often the saving applies, hence low severity. Two caveats make this a matter of taste rather than an error: (1) a short reason written AFTER the name does not really improve the choice (it is a post-hoc justification, not prior reasoning), but (2) the raw answer may be kept in the diagnostics record (diag.raw), where the reason is the only clue to why a person was picked. The edit removes text and adds no rule, so it does not conflict with any owner decision.",
+    "old_text_found_exactly": true,
+    "final_old_text": "{\"selected\":[{\"name\":\"<canonical>\",\"reason\":\"<≤40 chars>\"}],",
+    "final_new_text": "{\"selected\":[{\"name\":\"<canonical>\"}],",
+    "side_effects": "No code change needed: parseRouter already accepts items without `reason` (and bare strings). The Router default guide in /home/user/goei-plugin/src/core/guides.ts:229 is built from ROUTER_SYSTEM, so it changes automatically. tests/people-router.test.mjs:37 feeds a sample answer that still contains \"reason\" and keeps passing (the parser ignores it). No tests/fixtures file contains the string \"≤40 chars\"; I did not run tests/guide-out.test.mjs, so if it pins the Router guide text it would need a re-pin. A user who saved an edited Router guide keeps the old wording. Loss: the diagnostics raw answer no longer shows why each person was picked.",
+    "needs_user_decision": true,
+    "decision_question_ko": "인물 고르기(Router)가 고른 사람마다 「이유」를 40자 이내로 적게 되어 있는데, 프로그램은 이 이유를 읽지 않습니다. (1) 이유를 빼서 호출당 출력 약 60~90토큰을 줄인다 (2) 진단 기록에서 왜 골랐는지 보려고 그대로 둔다. 추천: (1) 빼기. Router는 켰을 때만 도는 단계라 효과는 작습니다."
+   }
+  },
+  {
+   "key": "gupdp",
+   "n": 14,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "갱신기 두 판 모두: `unknown_to` 가 「메모가 켜졌을 때」만 온다고 적혀 있지만 지각 기능만 켜져도 온다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/guides/updater-compact.txt",
+    "line": 9,
+    "old_text": "and `unknown_to` when the memo is on",
+    "new_text": "and `unknown_to` when perception or the memo is on",
+    "evidence": "updater.ts:319 `wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined` — 기본 설정(director='facts' 라 메모 꺼짐, perception 켬)에서 `unknown_to` 가 실린다. 9절 perception(간결판 234행)도 `unknown_to` 를 쓰라고 한다.",
+    "needs_user_decision": false,
+    "also_change": "updater-detailed.txt:15 `and, when the Director memo is on, `unknown_to`` → `and, when perception or the Director memo is on, `unknown_to``",
+    "token_saving": 0,
+    "record": ""
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. /home/user/goei-plugin/src/core/people/updater.ts:292 sets wantNote = (settings.director === 'note'), and line 319 passes `wantNote || features.has('perception') ? unknownTo(...) : undefined` into personPayload, which emits `unknown_to` whenever the list is non-empty (line 156). The default is director: 'facts' (settings.ts:21), so in default play the memo is off and `unknown_to` arrives because of perception alone. Both guides state the condition as the memo only: updater-compact.txt:9 and updater-detailed.txt:15. The same guides rely on `unknown_to` in the perception section (compact 234 and 349, detailed 327 and 519), so the data-part description is inaccurate against both the code and its own later sections. Practical harm is small: the model still sees the field and the perception section explains it. The edit is a factual correction of a condition, adds no rule, and conflicts with no owner decision (the updater guides may be detailed). The twin text in updater-detailed.txt must change in the same commit: old `and, when the Director memo is on, `unknown_to`` -> new `and, when perception or the Director memo is on, `unknown_to``.",
+    "old_text_found_exactly": true,
+    "final_old_text": "and `unknown_to` when the memo is on",
+    "final_new_text": "and `unknown_to` when perception or the memo is on",
+    "side_effects": "Twin edit needed in /home/user/goei-plugin/src/data/guides/updater-detailed.txt:15 (`and, when the Director memo is on, `unknown_to`` -> `and, when perception or the Director memo is on, `unknown_to``); each old string occurs exactly once in its file. No code change. Neither phrase appears as a literal anywhere under tests/ (grep), but tests/guide-out.test.mjs with tests/fixtures/guide-out-old.json may pin the assembled updater guide by hash or in encoded form; I did not run it, so expect a possible fixture refresh. About +2 tokens per updater call.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 1,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "게시판 요청마다 사진 이름 목록 840토큰이 통째로 붙는다",
+    "kind": "over-token",
+    "severity": "high",
+    "file": "src/data/guides/gnet.txt",
+    "line": 218,
+    "old_text": "__SITE_PICS__",
+    "new_text": "__SITE_PICS__",
+    "evidence": "Measured with the real world data (probe /tmp/audit_1113/gtoken/pics.mjs): the ATTACHMENTS section grows from ~135 to 974 tokens because src/core/sitepics.ts sitePicList() lists every pictured record: People line 239 tok (54 names), Expressions line 99 tok (42 words), 'Anomalies, people and places' line 405 tok (~60 names), plus the 95-token 'Real photos' paragraph. gnetPrompt.ts reads b.read('ATTACHMENTS') in refreshPrompt, postPrompt, commentPrompt AND dmPrompt, for all four boards, so every board call carries it: refresh 2,710 -> 3,449 system tokens, comment 1,945 -> 2,684, DM 996 -> 1,735 (the list is 43% of a DM request's guide part). Most names can never be the subject of the post/comment being written. The guide text itself needs no change; the cut is in code.",
+    "also_change": "Code fix (no guide text change): in src/core/gnetPrompt.ts gnetBooks().read / src/core/sitepics.ts sitePicList, pass only the pictures whose name or alias occurs in this request's material (reference rows + recent story + supplied board/DM JSON; Pic.terms already holds the match words), drop the Expressions line when no person is listed, and when nothing matches send neither the 'Real photos' paragraph nor PICS_NONE. Owner decision that board photos stay is kept; only the candidate list shrinks.",
+    "needs_user_decision": true,
+    "token_saving": 700
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "high",
+    "reasoning": "Confirmed from the files and by re-running the finder's probe (/tmp/audit_1113/gtoken/pics.mjs).\n\n- /home/user/goei-plugin/src/data/guides/gnet.txt:214-219: the ATTACHMENTS section ends with the line `__SITE_PICS__` (line 218), found verbatim.\n- /home/user/goei-plugin/src/core/gnetPrompt.ts:52 replaces it with sitePicList(src.char, ...). /home/user/goei-plugin/src/core/sitepics.ts:59-72 lists every pictured record unconditionally: all people, all 42 expressions, all anomalies/places.\n- b.read('ATTACHMENTS') is used in refreshPrompt (line 181), postPrompt (213), commentPrompt (258) and dmPrompt (323), so every board call carries it. All four boards (gn/gal/wpf/sm) read the same gnet.txt sections.\n- Measured: ATTACHMENTS is 974 tokens on all four boards. System part: refresh 3,416-3,605, comment 2,603-2,806, DM 1,650-1,832. The fixed guide text (attachment rules plus the \"Real photos\" paragraph) is about 135+95 tokens, so the three list lines are about 740 tokens (People 54 names, Expressions 42 words, Anomalies/places about 60 names). This matches the finder's numbers.\n- The probe runs without the host, where the asset check defaults to \"everything exists\". In the real app /home/user/goei-plugin/src/host/assets.ts:207 installs hasAsset, so the list is at most this size and smaller if the card lacks some pictures. The 974 is an upper bound, not a guarantee.\n\nThe over-token claim is real and above the 300-token \"high\" threshold. The proposed edit is a no-op on the guide text (old_text equals new_text); the saving comes only from a code change in sitepics.ts / gnetPrompt.ts. That code change is not meaning-neutral: an NPC could then only send a real picture of a subject named in the request material (reference rows, recent story, supplied board/DM JSON). A post about an unmentioned anomaly would fall back to a described photo. It keeps the owner's decision that board photos stay, but narrows them, so the owner should choose.\n\nTwo parts of the finder's also_change I would not adopt as stated:\n- Dropping the \"Real photos\" paragraph and PICS_NONE when nothing matches is fine, since the paragraph is useless without a list.\n- Dropping the Expressions line \"when no person is listed\" already happens in code (sitepics.ts:69, `people.length ? ...`), so no change is needed there.",
+    "old_text_found_exactly": true,
+    "final_old_text": "__SITE_PICS__",
+    "final_new_text": "__SITE_PICS__",
+    "side_effects": "No guide text changes; the fix is code only.\n\n- Code: /home/user/goei-plugin/src/core/sitepics.ts sitePicList() gets an optional filter (the request material text, matched against Pic.terms). /home/user/goei-plugin/src/core/gnetPrompt.ts gnetBooks().read() at line 52 must be given that material, but read() currently has no access to the task/reference text, so the four callers (refreshPrompt, postPrompt, commentPrompt, dmPrompt) or pack() must pass it in. When nothing matches, the \"Real photos\" paragraph (gnet.txt line 217) must be removed in code together with the list.\n- Other users of the list: fillSitePics (sitepics.ts:95) and dropSitePicGuide in /home/user/goei-plugin/src/core/phonePrompt.ts:134 must keep working. 괴담톡 already strips the list.\n- Tests that pin this text or function: tests/fixtures/guide-out-old.json (with tests/guide-out.test.mjs), tests/fix3-images.test.mjs, tests/phonepic.test.mjs. Any of them that render a board request with the full list will need updating.\n- Behaviour: NPCs can no longer attach a real picture of a subject absent from the request material. Short aliases in Pic.terms could cause false matches, which is harmless (the name is merely listed).\n- Caching: the system message becomes request-dependent in that section, which slightly reduces provider prompt-cache hits on the system prefix.\n- Resolution is unaffected: resolveSitePic still accepts any pictured name the model writes.",
+    "needs_user_decision": true,
+    "decision_question_ko": "게시판(괴담넷·괴담갤·세정게·연어 마켓) 요청마다 「보낼 수 있는 사진 이름 목록」 전체(인물 54명·표정 42개·괴이/장소 약 60개, 약 740토큰)가 붙습니다. 어떻게 할까요?\n(1) 이번 요청 자료(참고 기록·최근 본문·게시판/쪽지 내용)에 이름이 나온 것만 목록에 넣는다. 요청마다 약 700토큰이 줄지만, 자료에 안 나온 괴이·인물의 실제 사진은 NPC가 못 올리고 글로 된 사진 설명으로 대신합니다.\n(2) 지금처럼 전부 넣는다. 토큰은 그대로이고 어떤 사진이든 올릴 수 있습니다.\n(3) 쪽지 요청에서만 줄인다. 쪽지는 지침의 40% 이상이 이 목록입니다.\n추천: (1). 지침 글은 안 바꾸고 코드만 고칩니다."
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 2,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "간결 갱신기가 자세히판의 74%라 매 턴 약 1만6천 토큰이 나간다",
+    "kind": "over-token",
+    "severity": "high",
+    "file": "src/data/guides/updater-compact.txt",
+    "line": 1,
+    "old_text": "# People Record Updater (goei v1 · compact)",
+    "new_text": "# People Record Updater (goei v1 · compact)",
+    "evidence": "Measured (probe upd3.mjs, default settings + wallet + items + shop judge): compact system prompt 15,947 tok (16,116 with points) vs detailed 21,465 (21,634) = 74%. Core with every optional section off: 4,098 vs 5,719. Marginal cost per section, compact/detailed: affinity 2,790/4,045 (+affinity_num 608/983), suspicion 1,619/2,151, register 1,416/1,885, sexual 1,046/1,046 (identical), items 1,015/1,391, perception_ext 805/1,139, perception 597/776, shop 530/537, axes 514/652, rhythm 501/723. Sections that are (almost) not compacted at all: '15. Output' 1,543 vs 1,571 tok (98%), sexual 100%, 15c points 131/131, 15e shop 99%, 10.6 Recording 241/253, 7.7 192/219, 7.5 intents 501/613, 8.6 304/366. No single sentence cut closes this; it needs a decision whether 'compact' should really be a short guide (e.g. target about half) or stay a lightly trimmed copy. The concrete safe cuts I verified are reported as separate findings (sexual duplicate 80 tok, suspicion numeric lines 45 tok).",
+    "also_change": "If the owner wants a real compact guide: rewrite sections 7.2-7.7, 8.2-8.6, 9.1 and 10.1-10.5 of updater-compact.txt (they hold ~6,500 of the 16,000 tokens) and keep updater-detailed.txt as the full version.",
+    "needs_user_decision": true,
+    "token_saving": 0
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "medium",
+    "reasoning": "The size claim holds, but the finding proposes no edit (old_text equals new_text), so there is nothing to apply; it is a decision for the owner.\n\nMy own count (o200k_base, whole files): /home/user/goei-plugin/src/data/guides/updater-compact.txt is 17,856 tokens and updater-detailed.txt is 24,372 tokens, a ratio of 73%. That matches the finder's 74%. I did not re-run the assembled-request probe, so the 15,947 / 21,465 figures and the per-section costs are the finder's, unreproduced; they are consistent with the whole-file ratio.\n\nWhy I lowered severity from high to medium: no sentence here is false or contradictory, and the owner has said the updater guides may be detailed and that the compact one is the default. The size of the compact guide is therefore a design choice, not an error. Shrinking it to about half means rewriting sections 7–10, which changes meaning and risks updater quality; that cannot be done as a minimal, meaning-preserving edit. The concrete safe cuts (sexual-section duplicate, suspicion numeric lines) are separate findings and should be judged there.",
+    "old_text_found_exactly": true,
+    "final_old_text": "# People Record Updater (goei v1 · compact)",
+    "final_new_text": "# People Record Updater (goei v1 · compact)",
+    "side_effects": "No change as proposed, so nothing breaks. If the owner later orders a real rewrite of updater-compact.txt: tests/guide-out.test.mjs and tests/fixtures/guide-out-old.json pin the assembled text and would need updating, as would any people/updater prompt tests that check compact section text. src/core/people/prompt/compact.ts and src/core/guides.ts import the file, so section markers and placeholders must be kept. updater-detailed.txt would stay as the full version.",
+    "needs_user_decision": true,
+    "decision_question_ko": "간결 갱신기 지침이 자세히판의 약 74% 길이(파일 전체 약 1만8천 토큰, 자세히판 약 2만4천)입니다. (1) 지금대로 둔다 — 따로 보고된 안전한 중복 삭제만 적용. (2) 절반쯤으로 다시 쓴다 — 7~10장을 새로 써야 하고 갱신 품질이 달라질 수 있어 시험이 필요. 추천: (1). 틀린 내용은 아니고, 줄이려면 뜻이 바뀌는 큰 재작성이 필요합니다."
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 3,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "Director 사실형이 「지시 금지」라면서 기능 절은 「지시를 써라」고 한다",
+    "kind": "contradiction",
+    "severity": "high",
+    "file": "src/core/people/basetext.ts",
+    "line": 10,
+    "old_text": "Never propose dialogue, emotion, next actions, plot or outcomes.",
+    "new_text": "Never propose dialogue, plot or outcomes; give direction only where a feature section below asks for it.",
+    "evidence": "Default Director is 'facts' with director_features on (settings.ts PP_DEFAULTS director:'facts', director_features:'1'); rendered request = 1,621 tok (out/director.default(facts).txt). FACTS (basetext.ts:6,10) says '`now`: ... Facts, not direction' and 'Never propose dialogue, emotion, next actions, plot or outcomes'. The APPLY sections sent in the same system prompt (src/data/guides/director-extra.txt) say the opposite: APPLY.AFFINITY 'say concretely how affinity alters conduct in this scene: more attention, asking first ...', APPLY.SUSPICION 'Give a concrete direction for this turn instead of \"is suspicious\": ... test a detail, or confront', APPLY.RHYTHM 'If a hook action is allowed, propose at most one ... saying what would enter the scene', APPLY.PERCEPTION 'note a disclosure that could genuinely occur as a future option'. Both cannot be followed every turn in the default mode.",
+    "also_change": "Alternative if the owner wants 사실형 to stay pure facts: in src/core/people/director.ts buildDirector, send the APPLY.* sections only when s.director === 'scene' (saves ~1,030 tokens per turn in the default mode). Either way the Director guide's FACTS section (built from DIRECTOR_FACTS in guides.ts) and tests/fixtures/guide-out-old.json change with it.",
+    "needs_user_decision": true,
+    "token_saving": 0
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "Confirmed from the files. Defaults are director:'facts' and director_features:'1' (src/core/people/settings.ts:21,28). buildDirector (src/core/people/director.ts:117,121) puts FACTS and every enabled APPLY.* section into the same system prompt; SCENE is added only when director === 'scene'.\n\nFACTS (src/core/people/basetext.ts:7,10) says `now` is \"Facts, not direction\" and \"Never propose dialogue, emotion, next actions, plot or outcomes.\" The APPLY sections in the same prompt (src/data/guides/director-extra.txt) ask for the opposite:\n- line 22 AFFINITY: \"say concretely how affinity alters conduct in this scene\"\n- line 42 SUSPICION: \"Give a concrete direction for this turn instead of \\\"is suspicious\\\" ... test a detail, or confront\"\n- line 52 RHYTHM: \"propose at most one ... saying what would enter the scene\"\n- line 32 PERCEPTION: \"note a disclosure that could genuinely occur as a future option\"\n\nIn facts mode the direction also has nowhere to go: parseDirectorAny (director.ts:178) drops `react` unless scene mode, so only `now` is left, and `now` is the field declared \"Facts, not direction\". The contradiction is real and is sent every Director turn in the default setup.\n\nSeverity lowered to medium: the model simply picks one side, giving either direction-flavoured `now` lines or ignored APPLY directions. No false world fact or parser failure results.\n\nThe finder's edit is not one I would stand behind as written. It silently removes \"emotion, next actions\" from the ban, which changes meaning beyond the stated problem. My edit keeps the whole ban and only adds the exception clause. The `now` line still says \"Facts, not direction\"; the exception clause is the minimal reconciliation, so I left that line alone rather than add more text.\n\nThe finder's alternative (send APPLY.* only in scene mode) would also drop the slot-reading guidance that FACTS line 11 refers to (\"When a feature section below is present, its slots appear in each person's `slots`\"). It would also make the `director_features` setting do nothing in the default mode. I do not recommend it without the owner choosing it.\n\nI did not render the request or run any test; the 1,621-token and ~1,030-token figures are the finder's and are unverified.",
+    "old_text_found_exactly": true,
+    "final_old_text": "Never propose dialogue, emotion, next actions, plot or outcomes.",
+    "final_new_text": "Except where a feature section below asks for it, never propose dialogue, emotion, next actions, plot or outcomes.",
+    "side_effects": "- DEFAULTS.Director in src/core/guides.ts:223 is built from DIRECTOR_FACTS, so the FACTS section shown in the guide tab changes automatically. No twin text needs editing.\n- tests/fixtures/guide-out-old.json pins this sentence at lines 431-433 (three rendered Director requests). tests/guide-out.test.mjs will fail until the fixture is regenerated.\n- No test .mjs file greps the sentence directly.\n- release/goei-body.2.txt and docs copies contain the old sentence; they are build output and records and need no hand edit.\n- The same phrase in updater-compact.txt and updater-detailed.txt is a different guide and is not touched.\n- A user who saved a custom FACTS section in the guide tab keeps their own text.\n- If the owner picks option B instead, this text stays unchanged. The change is then in director.ts:117 (build `guides` only when s.director === 'scene'), the `director_features` help text in src/core/setdef/people.ts:74 must be reworded, and the same fixture changes.",
+    "needs_user_decision": true,
+    "decision_question_ko": "Director 사실형(기본값)은 「사실만, 지시 금지」라고 하는데, 같이 보내는 기능별 절(호감·의심·리듬·인식)은 「이번 턴 방향을 구체적으로 써라」고 해서 서로 어긋납니다. 어느 쪽으로 맞출까요?\n(A) 사실형에서도 기능별 절이 요구하는 방향은 쓰게 한다. 금지 문장 앞에 「기능 절이 요구할 때는 빼고」 한 구절만 넣습니다.\n(B) 사실형은 순수 사실만 쓴다. 기능별 절은 연출형에서만 보냅니다. 코드 수정이 필요하고, 사실형에서는 「기능별 지침」 설정이 아무 효과가 없어지며, 보고자 추정으로 턴당 약 1,000토큰이 줄어듭니다.\n(C) 그대로 둔다.\n권장: A. 문장 하나만 바꾸면 되고 지금 동작과 설정 설명이 그대로 유지됩니다."
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 4,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "Director 출력 꼴에 사실형에서는 버려지는 react 칸이 들어 있다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/data/guides/director-extra.txt",
+    "line": 12,
+    "old_text": "\"react\":\"<≤400 chars or omit>\"",
+    "new_text": "\"react\":\"<≤120 chars, only if defined above; otherwise omit>\"",
+    "evidence": "OUTPUT is sent in every Director call, but `react` is only defined in the SCENE section (basetext.ts DIRECTOR_SCENE: 'You may add `react` ... (≤120 chars)'), which buildDirector adds only when s.director === 'scene'. The default is 'facts'. The parser throws it away outside scene mode: director.ts parseDirectorAny `const react = scene ? plain(n.react, NOTE_CHARS) : ''`. So in the default mode the model is offered a 400-character field per person that has no definition and is discarded (wasted output tokens and latency before the main request), and the length disagrees with SCENE (120 vs 400).",
+    "also_change": "Cleaner code alternative: in director.ts buildDirector strip the react key from the OUTPUT text when s.director !== 'scene'. tests/fixtures/guide-out-old.json (director.system) pins this text.",
+    "needs_user_decision": false,
+    "token_saving": 10
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed from the files. The quoted text is at /home/user/goei-plugin/src/data/guides/director-extra.txt:12 (section OUTPUT) and occurs once in that file.\n\n- OUTPUT is sent in every Director call: director.ts:121 builds the system text as `[facts, ...(s.director === 'scene' ? [scene] : []), ..., guideOr('Director','OUTPUT', OUTPUT), ...]`.\n- `react` is defined only in the SCENE section: /home/user/goei-plugin/src/core/people/basetext.ts:14 says \"You may add `react` ... (≤120 chars)\".\n- The default mode is facts: /home/user/goei-plugin/src/core/people/settings.ts:21 has `director: 'facts'`.\n- The parser discards it outside scene mode: director.ts:178 is `const react = scene ? plain(n.react, NOTE_CHARS) : ''`.\n- In facts mode the field also runs against FACTS itself: basetext.ts:10 says \"Never propose dialogue, emotion, next actions, plot or outcomes. Never decide the user's reaction.\"\n- The lengths disagree: SCENE says ≤120, OUTPUT says ≤400. The parser clips at NOTE_CHARS = 400, so the tighter 120 is safe.\n\nThe proposed edit adds no rule; it only makes the field conditional on its definition and aligns the length. I rate it low rather than medium: the input-token change is nil, and the cost is occasional wasted output plus a mild contradiction in the default mode. I did not render a real request or run tests/guide-out.test.mjs.",
+    "old_text_found_exactly": true,
+    "final_old_text": "\"react\":\"<≤400 chars or omit>\"",
+    "final_new_text": "\"react\":\"<≤120 chars, only if defined above; otherwise omit>\"",
+    "side_effects": "- Twin text: the fallback constant OUTPUT at /home/user/goei-plugin/src/core/people/director.ts:34 holds the identical string and must get the same edit.\n- Pinned text: /home/user/goei-plugin/tests/fixtures/guide-out-old.json contains this string (4 lines match \"or omit\"), so tests/guide-out.test.mjs will need the fixture refreshed.\n- Parser: no change needed. It still accepts up to 400 chars in scene mode and ignores react in facts mode.\n- Alternative not required: stripping the react key from OUTPUT in buildDirector when s.director !== 'scene' would be cleaner, but it is a code change.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 5,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "Director에 자료가 없는 기능 절(성적·리듬·의심)도 매 턴 붙는다",
+    "kind": "over-token",
+    "severity": "medium",
+    "file": "src/data/guides/director-extra.txt",
+    "line": 55,
+    "old_text": "@@SECTION APPLY.SEXUAL",
+    "new_text": "@@SECTION APPLY.SEXUAL",
+    "evidence": "director.ts buildDirector adds an APPLY section whenever the feature flag is on, not when its data exists. Measured: APPLY.SEXUAL line with {policy} filled = 88 tok, added whenever axes + sexual settings are on, although the data keys are only present when a person has text (`t.desire ? { sexual_desire: ... } : {}`); APPLY.RHYTHM 137 tok although `rhythm`/`rhythm_clock` are only sent when rhythm docs exist (`rhythm.length ? {...} : {}`); APPLY.SUSPICION 154 tok although suspicion slots are only sent when a person has entries (`if (es.length) slots[k] = es`). In a chat with no sexual text, no rhythm record or no suspicion case (the usual state for many turns) these 380 tokens describe data that is not in the request.",
+    "also_change": "Code fix in src/core/people/director.ts buildDirector: add APPLY.SEXUAL only if some person in `persons` has sexual_desire/paraphilia, APPLY.RHYTHM only if rhythm.length, APPLY.SUSPICION only if some person has a live entry in a suspicion slot. No guide text change.",
+    "needs_user_decision": false,
+    "token_saving": 380
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "medium",
+    "reasoning": "Confirmed in /home/user/goei-plugin/src/core/people/director.ts line 117: the APPLY.* sections are chosen only by feature flag (`GUIDE_ORDER.filter((f) => s.features.has(f))`), and APPLY.SEXUAL by `f === 'axes' && sexualAnyOn(s)`. The data is conditional: `sexual_desire`/`paraphilia` only when the person has text (line 104), `rhythm`/`rhythm_clock` only when `rhythm.length` (line 125), and feature slots only when `es.length` (line 94). All three features are on by default (settings.ts: suspicion '1', rhythm '1', sexual_desire/paraphilia '1', director 'facts', director_features on), so this is ordinary play.\n\nMeasured with js-tiktoken o200k_base: APPLY.SUSPICION 154 tokens, APPLY.RHYTHM 137, APPLY.SEXUAL 23 before {policy} is filled (the finder's 88 with policy is plausible; I did not re-measure the filled line).\n\nTwo corrections to the finder's claim:\n1. The 380-token saving is an upper bound. Rhythm documents and sexual texts are written by the updater early on (the updater has `sexual_init` and a rhythm note), so after the first turns usually only the suspicion section (154) is still pointing at absent data. Realistic recurring saving is about 150-290 tokens per Director call, which is still medium.\n2. The suspicion condition must cover both modes. In numeric mode the slot is `suspicion`; in the default qualitative mode the slots are `suspicion.concern`/`.speech`/`.behavior` (types.ts lines 45, 68-70). The edit below checks any slot whose name starts with `suspicion`. Line 109 also sends `suspicion: []` in numeric mode when there are no cases; that is harmless and left alone.\n\nNothing the model needs is lost: all three sections only describe how to read data that is absent in those turns. The one general sentence in RHYTHM (\"Never add an event because the input is short\") disappears only until the first rhythm record exists. No guide text changes, so this does not touch any owner decision; it is a code-only change. I did not compile the proposed line (read-only task), so the cast on the slot key may need adjusting at typecheck.",
+    "old_text_found_exactly": true,
+    "final_old_text": "  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', guideOr('Director', `APPLY.${f.toUpperCase()}`, () => FEATURE_GUIDE[f].join('\\n')), ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [guideOr(",
+    "final_new_text": "  // 자료가 없는 기능 절은 붙이지 않는다 (의심 기록·리듬 기록·성적 글이 요청에 없을 때)\n  const hasData: Record<string, boolean> = {\n    suspicion: people.some((n) => (Object.keys(store.people[n].slots) as SlotId[]).some((k) => k.startsWith('suspicion') && liveEntries(store.people[n].slots[k], live).length > 0)),\n    rhythm: rhythm.length > 0,\n  };\n  const hasSexual = persons.some((p) => 'sexual_desire' in p || 'paraphilia' in p);\n  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f) && hasData[f] !== false).flatMap((f) => ['', guideOr('Director', `APPLY.${f.toUpperCase()}`, () => FEATURE_GUIDE[f].join('\\n')), ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) && hasSexual ? [guideOr(",
+    "side_effects": "File to change: /home/user/goei-plugin/src/core/people/director.ts line 117 only. No change to src/data/guides/director-extra.txt (the finder's old_text `@@SECTION APPLY.SEXUAL` is at line 55 verbatim, but it is not what gets edited).\n\nTests that may need their stores or expectations updated:\n- tests/guide-out.test.mjs with tests/fixtures/guide-out-old.json: the `director.*` entries are built by tests/guide-out-calls.mjs line 122-127 with every feature on. If its `dstore()` has no suspicion entry, rhythm doc or sexual text, the pinned output loses those sections (\"Narrative rhythm\" appears 4 times in the fixture).\n- tests/people-sexual.test.mjs line 143-147: checks the Director system text for the sexual policy; it passes only if the test person has sexual text.\n- tests/people-director.test.mjs line 29-31 and tests/people-extra.test.mjs line 36/133: these assert absence when the feature is off, or presence in the updater prompt, so they should be unaffected, but run them.\n\nOther effect: the Director system prompt now changes the first time a suspicion entry, rhythm record or sexual text appears, so a provider-side prompt cache prefix is invalidated once at each of those moments.\n\nThe built-in fallback text FEATURE_GUIDE in director.ts needs no change. Run `npm run typecheck` after the edit because the slot-key cast was not compiled.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 7,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "갱신기 성적 프로필 절에 판단 순서·추정·미확인 규칙이 두 번 적혀 있다",
+    "kind": "over-token",
+    "severity": "medium",
+    "file": "src/data/guides/updater-extra.txt",
+    "line": 76,
+    "old_text": "Consider explicit facts, sexual history or reactions, the supplied openness lewdness value and stage (`openness_now` when present), then personality. A weak but plausible inference is prefixed with exact text \"<추정>\" and names its basis. Use exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or no usable basis at all. ",
+    "new_text": "",
+    "evidence": "Section 7b of the updater (SEXUAL.WRITER, 1,046 tok, sent every turn by default because sexual_desire/paraphilia default '1') ends with {prompt_rules} = SEXUAL.PROMPT_RULES (updater-extra.txt:62), which states the same three rules again in the same request: 'Judge in order: explicit statements, sexual history or reactions, the supplied openness lewdness value and stage, then personality traits ...', 'Use exact prefix \"<추정>\" for a plausible inference ...', 'Return exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or when the data truly offers no basis at all ... every inferred inclination must use that inference prefix and name its basis.' The cut passage is 80 tokens (measured) and adds nothing the later paragraph does not say.",
+    "also_change": "Same sentence in the code fallback src/core/people/sexual.ts (sexualWriterSection, ~line 82) and the pinned output in tests/fixtures/guide-out-old.json (sexual.writer.*).",
+    "needs_user_decision": false,
+    "token_saving": 80
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "Confirmed. src/data/guides/updater-extra.txt:76 (SEXUAL.WRITER, the `sexual_init` bullet) contains the three sentences verbatim, and the same section ends at line 80 with {prompt_rules}, which sexualWriterSection (src/core/people/sexual.ts:86-87) always fills with SEXUAL.PROMPT_RULES (updater-extra.txt:62). That paragraph repeats all three rules in the same system prompt: judging order (explicit statements, sexual history or reactions, openness lewdness value and stage, personality traits), the exact \"<추정>\" prefix for weak inference with its basis named, and \"미확인\" only for a minor or ambiguous age, non-consent, or no basis at all. The section is appended to the updater system prompt in src/host/people.ts:494, so both copies always travel together. Nothing is lost by the cut except the parenthetical field name `openness_now`; that field is already defined in the openness section of the updater guide whenever it is supplied (updater-compact.txt:255, updater-detailed.txt:20/378), and updater.ts:142 only sends it when openness is on. No code parses any string from the passage (grep finds it only in the guide, the sexual.ts fallback and the fixture). The following sentence \"Cite `m` and `quote` ...\" stays and still reads correctly after {init_desire}{init_paraphilia}. The edit removes text only, adds no rule, and conflicts with no owner decision (updater guides may be detailed, but a same-request duplicate is plain waste). The finder's saving of about 80 tokens per updater call is plausible for this length; I did not re-measure it.",
+    "old_text_found_exactly": true,
+    "final_old_text": "Consider explicit facts, sexual history or reactions, the supplied openness lewdness value and stage (`openness_now` when present), then personality. A weak but plausible inference is prefixed with exact text \"<추정>\" and names its basis. Use exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or no usable basis at all. ",
+    "final_new_text": "",
+    "side_effects": "1) The code fallback in src/core/people/sexual.ts:82 (sexualWriterSection) holds the same three sentences and must be cut identically, otherwise the guide file and the fallback diverge. 2) tests/fixtures/guide-out-old.json pins this text in 4 places (sexual.writer.* outputs), so tests/guide-out.test.mjs will fail until the fixture is regenerated. No other test or source file contains the passage. The section marker and the placeholders {init_desire}, {init_paraphilia} and {prompt_rules} are untouched. The compact and detailed updater guides have no twin of this text; it lives only in updater-extra.txt.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 8,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "게시판 새로고침에 「댓글을 다 비우지 말라」가 네 군데 겹친다",
+    "kind": "over-token",
+    "severity": "low",
+    "file": "src/data/guides/gnet.txt",
+    "line": 113,
+    "old_text": "Vary reception by topic across each candidate: active discussions have multiple relevant comments and nested replies; individual quiet threads may have none. Preserve discussion when shortening output; do not default the entire board to empty comments arrays. On retained posts",
+    "new_text": "On retained posts",
+    "evidence": "A refresh request (rendered: out/board.refresh.gn.txt, 2,710 system tok) joins LB + BOARD.GUIDELINE + AUTO.GUIDELINE + AUTO.FORMAT. The same rule is in BOARD.GUIDELINE '### New-post reception' (gnet.txt:210: 'Hot, controversial ... attract several distinct reactions ... Zero comments is valid for an individual quiet post, not a default for every topic ... Use concise, natural comments rather than dropping discussions to save space'), in AUTO.FORMAT (gnet.txt:119 'Empty comments is [] only for a quiet thread', :121 'Vary reception across posts as shown; do not ... treat every topic as a silent thread') and here. The cut sentence pair is 44 tokens. The comment count '__GN_CMT_RANGE__ comments per new NPC post including nested replies' is likewise in both line 112 and line 210 (14 tok).",
+    "also_change": "Optional second cut in the same section (line 112): ', with __GN_CMT_RANGE__ comments per new NPC post including nested replies' (already stated at gnet.txt:210, which is always sent together with AUTO.GUIDELINE in refreshPrompt). Applies to all four board guides because they are built from gnet.txt.",
+    "needs_user_decision": true,
+    "token_saving": 58
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "The overlap is confirmed, but the saving is small and the text is the original author's, so this is a taste call for the owner rather than an error.\n\n- **Quote:** old_text is verbatim at /home/user/goei-plugin/src/data/guides/gnet.txt:113 (section AUTO.GUIDELINE).\n- **Same request:** AUTO.GUIDELINE is read only in refreshPrompt (src/core/gnetPrompt.ts:180), which also always sends BOARD.GUIDELINE (:179) and AUTO.FORMAT (:185). All three reach the same model together.\n- **Same rule elsewhere:** gnet.txt:210 says hot posts attract several reactions, zero comments is valid for an individual quiet post but not a default, and to use concise comments rather than dropping discussions. gnet.txt:119 and :121 say empty comments is [] only for a quiet thread and not to treat every topic as a silent thread.\n- **Code dependency:** none. The two sentences carry no placeholder or marker, and grep finds the string only in gnet.txt and tests/fixtures/guide-out-old.json.\n- **Token count:** I measured the two cut sentences at 44 tokens (o200k_base), matching the finder. That is about 1.6% of the 2,710-token refresh system prompt the finder reports.\n\nTwo things weigh against applying it automatically:\n\n- **Original author's text:** all three passages are verbatim in the original card (dist-test/real-module.json, lorebook entry \"GNet\"). The repetition looks like the author's deliberate emphasis against a known failure, where the model empties every comments array to shorten output.\n- **One nuance is lost:** \"across each candidate\" is the only wording that ties varied reception to each of the two sampling candidates. The rule itself still stands through lines 119, 121 and 210.\n\nI do not endorse the optional second cut (the __GN_CMT_RANGE__ clause on line 112). It saves only about 14 tokens, and the next line's \"initial new-post comment range\" refers back to it.",
+    "old_text_found_exactly": true,
+    "final_old_text": "Vary reception by topic across each candidate: active discussions have multiple relevant comments and nested replies; individual quiet threads may have none. Preserve discussion when shortening output; do not default the entire board to empty comments arrays. On retained posts",
+    "final_new_text": "On retained posts",
+    "side_effects": "- tests/guide-out.test.mjs will fail until tests/fixtures/guide-out-old.json is updated: it pins the AUTO.GUIDELINE section body, and the string appears 4 times in the fixture (sections and rendered calls).\n- The cut applies to all four board guides at once (GNet, Gal, Wpf, Salmon), because they are all built from gnet.txt. There is no separate twin text to change.\n- No code change is needed.\n- Behaviour risk: with less emphasis, refreshes may come back with empty comment arrays more often, especially in sampling mode with two candidates.",
+    "needs_user_decision": true,
+    "decision_question_ko": "게시판 새로고침 지침에 「댓글을 전부 비우지 말라」는 말이 세 절에 걸쳐 네 번 나옵니다(원작자 글 그대로). 그중 AUTO.GUIDELINE의 두 문장(44토큰, 요청의 약 1.6%)을 지울까요? (1) 그대로 둔다 — 원작자가 댓글이 텅 비는 것을 막으려고 일부러 강조한 것으로 보임. (2) 두 문장을 지운다 — 같은 뜻이 다른 두 절에 남음. 추천: (1) 그대로 둔다. 아끼는 양이 작고, 지우면 댓글 없는 글이 늘 수 있습니다."
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 9,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "의심 정성 모드(기본)에 없는 점수·op 설명이 같이 간다",
+    "kind": "contradiction",
+    "severity": "low",
+    "file": "src/data/guides/updater-compact.txt",
+    "line": 326,
+    "old_text": " A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence.",
+    "new_text": "<<SECTION:suspicion_num>> A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence.<<END:suspicion_num>>",
+    "evidence": "Default is qualitative suspicion (settings.ts num_suspicion:'0'), so section 10.6 'Qualitative mode' is sent: 'no `suspicion_now`, no `suspicion` array, no weight or stage'. Sections 10.4/10.5, sent in the same prompt, still give array mechanics that do not exist in this mode: '`op: open` on it', 'the old score is kept', 'Use close instead of a clue', and 10.5 '(`op: respond`, `stage`)'. Verified with assemblePrompt (probe t2.mjs): wrapping the sentence in the existing suspicion_num marker removes it in qualitative mode (13,267 -> 13,222 tok, no marker left over) and leaves numeric mode byte-identical. Nested markers of this kind are already used (affinity / affinity_num).",
+    "also_change": "Same sentence in src/data/guides/updater-detailed.txt line 494 (10.4). The section 1 data list ('`suspicion_now` (cases: ... `score` 0–100 program-computed ...)') and 10.5 '(`op: respond`, `stage`)' have the same issue and could be wrapped the same way.",
+    "needs_user_decision": true,
+    "token_saving": 45
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "Confirmed from files. (1) old_text is verbatim on src/data/guides/updater-compact.txt:326 (section 10.4). (2) Default is qualitative suspicion (src/core/people/settings.ts:59 num_suspicion:'0'; tests/people-qual.test.mjs:31 pins this as the 11-07 owner decision), so suspicion_qual (line 335-338: \"no `suspicion_now`, no `suspicion` array, no weight or stage\") is sent together with 10.4, whose sentence speaks of `op: open`, \"the old score is kept\" and \"Use close instead of a clue\" - array operations and a score that do not exist in this mode (tests/people-qual.test.mjs:84-96 shows the suspicion array is rejected in qualitative mode). (3) The marker mechanics work: assemblePrompt (src/core/people/updater.ts:393-399) uses /<<SECTION:([a-z_]+)>>([\\s\\S]*?)<<END:\\1>>/g in a loop with no newline requirement, so an inline nested suspicion_num block inside suspicion is dropped when off and only the markers are removed when on (numeric output byte-identical). suspicion_num is already a registered section name (prompt/detailed.ts:11). (4) Nothing needed is lost in qualitative mode: \"reopens only on new evidence\" is restated by the qual section (\"Without new evidence, do not raise it again or repeat an answered question\"; \"a dispelled case says so rather than vanishing\"); the close-vs-clue rule is purely an array rule. It adds no rule and undoes no owner decision. Caveats that keep it low: the qual section already reconciles the conflict explicitly (\"10.2-10.4 still apply; weights are only a guide\"), so this is a small over-token/stale-wording cut (~45 tokens per updater call) rather than a hard contradiction; and the fix is partial - the same paragraph keeps \"Closing (`op: close`, `result`) ... program sets score >=80 / score 0 / score kept\" and 10.5 keeps \"(`op: respond`, `stage`)\", which cannot be wrapped as simply because they carry the 확인/해소/묻음 and response-type meanings that qualitative mode still uses. I did not re-run the finder's token probe; the 45-token figure is plausible for a 40-word sentence.",
+    "old_text_found_exactly": true,
+    "final_old_text": " A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence.",
+    "final_new_text": "<<SECTION:suspicion_num>> A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence.<<END:suspicion_num>>",
+    "side_effects": "Twin text: src/data/guides/updater-detailed.txt:494 has the same sentence with different wording (\" A closed case reopens (`op: open` on an existing case) only on new relevant evidence; the program keeps the old score. Use a close instead of a clue in the same turn; never add a clue for the same evidence that closes the ...\" - read the full sentence before wrapping) and should be wrapped the same way. Numeric mode output is unchanged; qualitative (default) updater prompt loses about 45 tokens. No pinned test text found: the sentence is not in tests/fixtures/*.json and tests/people-qual.test.mjs only checks for other strings; dist-test bundles (core.bundle.mjs, joint.mjs, llm.mjs, goei-body.js) embed the guide and refresh on the next build. sectionBody() (updater.ts:381) takes the first `<<SECTION:suspicion_num>>\\n` match - the new inline marker has no newline after it, so it does not become the first match and that helper keeps returning the 10.6 Recording block. No code change needed.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "gtoken",
+   "n": 10,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "갱신기 지침에 다른 플러그인의 판 번호(0.10.9, 0.10.7)가 남아 있다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/guides/updater-extra.txt",
+    "line": 75,
+    "old_text": "(true = 0.10.9 explicit vocabulary, false = 0.10.7 blunt style)",
+    "new_text": "(true = explicit vocabulary, false = blunt style)",
+    "evidence": "'0.10.9' and '0.10.7' are version numbers of the Risupot plugin this section was ported from; the model is given no definition of them. The same request then says (updater-extra.txt:58, SEXUAL.PLAIN_STYLE) 'Use the 0.10.7 style: blunt everyday sex words ...', i.e. the label is immediately re-explained, so the numbers carry no information. About 12 tokens per turn; mainly a leftover-fragment issue.",
+    "also_change": "updater-extra.txt:58 'Use the 0.10.7 style: blunt everyday sex words and slang' -> 'Use blunt everyday sex words and slang'; same strings in src/core/people/sexual.ts fallbacks and tests/fixtures/guide-out-old.json.",
+    "needs_user_decision": false,
+    "token_saving": 12
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. /home/user/goei-plugin/src/data/guides/updater-extra.txt:75 (SEXUAL.WRITER) contains the quoted text verbatim, and line 58 (SEXUAL.PLAIN_STYLE) says \"Use the 0.10.7 style: blunt everyday sex words and slang ...\". The comment at src/core/people/sexual.ts:7 (\"원본 0.10.9 ... 아니면 0.10.7\") shows these are version numbers of the original Risupot plugin. Nothing in the request defines them for the model. The words that follow them (\"explicit vocabulary\" / \"blunt style\", and the full description after the colon on line 58) already carry the whole meaning, so removing the numbers loses no instruction, placeholder or marker. The edit removes text only, adds no rule, and conflicts with no owner decision (updater guides may be detailed, but this is a leftover fragment, not detail). The saving is about 10-15 tokens per updater call when the sexual profile setting is on; I did not measure it. Severity low is right.\n\nOne correction to the finder's also_change: the line-58 edit is not text-only. src/core/people/sexual.ts:75 matches the literal string 'Use the 0.10.7 style' to build \"When false, use the 0.10.7 style\". If line 58 changes without that code, the result falls through to \"When false: Use blunt everyday ...\" — still correct but clumsier — and tests/fix3-people.test.mjs:133 fails. I therefore stand behind the line-75 edit as the stand-alone change, with line 58 as an optional coordinated change listed under side effects.",
+    "old_text_found_exactly": true,
+    "final_old_text": "(true = 0.10.9 explicit vocabulary, false = 0.10.7 blunt style)",
+    "final_new_text": "(true = explicit vocabulary, false = blunt style)",
+    "side_effects": "For the line-75 edit, change at the same time:\n- src/core/people/sexual.ts:81 — the fallback copy of the same sentence.\n- tests/fixtures/guide-out-old.json (lines 281, 439-442 hold the assembled text) — tests/guide-out.test.mjs compares against it, so it will fail until the fixture or its expected-difference list is updated.\n- release/goei-body.*.txt are build outputs and change on the next build.\n\nOptional coordinated change for updater-extra.txt:58 (\"Use the 0.10.7 style: blunt everyday sex words and slang\" -> \"Use blunt everyday sex words and slang\"). All of these must change together:\n- src/core/people/sexual.ts:55 — the PLAIN_STYLE fallback.\n- src/core/people/sexual.ts:75 — the literal match: includes('Use the 0.10.7 style') / replace(..., 'When false, use the 0.10.7 style') becomes e.g. startsWith('Use blunt') -> 'When false, use blunt'.\n- tests/fix3-people.test.mjs:133 — asserts 'When false, use the 0.10.7 style'.\n- tests/guide-out.test.mjs:87 — pins the PLAIN_STYLE sentence.\n- tests/fixtures/guide-out-old.json:265.\n\nThere is no compact/detailed twin of this section and no shop-side twin.",
+    "needs_user_decision": false
+   }
+  }
+ ],
+ "unverified": [],
+ "rejected": [
+  {
+   "key": "gtoken",
+   "n": 6,
+   "title_ko": "쇼핑몰 진열에 「값은 자유롭게」와 「배정된 값 범위 안에서」가 같이 간다",
+   "file": "src/data/guides/shop.txt",
+   "why": "Both passages do reach the same model in one request, but they are not a contradiction, and the finding offers no text edit (old_text equals new_text; it is a code-change proposal).\n\nWhat I confirmed in the files:\n- src/core/shop.ts:952 SHELF_RULES always adds g.PRICING, and line 950 adds VARIETY when s.diverse is on.\n- src/core/malls.ts:135-201 turns the per-item assignment on by default and appe"
+  }
+ ]
+}

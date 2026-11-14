@@ -2,7 +2,7 @@
 // factions.ts 는 저장된 명부 글을 그대로 읽어서, 여기서 옮기지 않으면 옛 명부(roster_v 없음)를 가진 봇은 명부를 한 번 저장하기 전까지 「중립」 칸이 안 보인다.
 import type { DirectoryData } from './directory';
 
-export const ROSTER_V = 6; // 4: 중립 설명 글 고침(11-06) · 5: 「중립」→「다른 세력」 · 6: 「이면의 주민들」로 이름·영문·설명·그림 확정(11-06 사용자)
+export const ROSTER_V = 7; // 4: 중립 설명 글 고침(11-06) · 5: 「중립」→「다른 세력」 · 6: 「이면의 주민들」로 이름·영문·설명·그림 확정(11-06 사용자) · 7: 협회 기록 이름·선임 요원 직급(11-14 사용자)
 
 /** 시작 묶음 「이면의 주민들」(11-06 사용자, 옛 이름 「중립」→「다른 세력」)의 기본 인물 (2026-11-05 사용자): 기본 세력 밖 인물로 플레이하는 칸 */
 export const NEUTRAL_GROUP = '이면의 주민들';
@@ -62,6 +62,26 @@ function migrateNeutral(d: DirectoryData): void {
   }
 }
 
+/** 판 7 (2026-11-14 사용자): 11-13 에 기본 명부에서 고친 값(패치 01·09)을 이미 설치한 봇의 저장된 명부에도 옮긴다.
+ *  값이 옛 기본값 그대로인 칸만 바꾼다. 사용자가 고친 값(옛 기본값과 다른 값)은 건드리지 않는다. 두 번 돌아도 같다 */
+const SENIOR_V7: readonly string[] = ['스팡달', '잼트리', '고르고디오', '큐라스'];
+const SDRA = '특수재난대응협회';
+const SDRA_OLD = '협회';
+const SEED_E001_OLD: readonly string[] = [SDRA_OLD, '차여진', '서윤지'];
+const rec = (v: unknown): Record<string, unknown> | null => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null);
+function migrateV7(d: DirectoryData): void {
+  const agents = rec(d.요원);
+  for (const name of SENIOR_V7) {
+    const row = rec(agents?.[name]);
+    if (row && row.rank === '요원') row.rank = '선임 요원';
+  }
+  const base = rec(rec(d.거점)?.[SDRA]);
+  if (base && base.lore === SDRA_OLD) base.lore = SDRA;
+  const seeds = rec(d['시작 로어북']);
+  const e = seeds?.['E00-1'];
+  if (seeds && Array.isArray(e) && e.length === SEED_E001_OLD.length && e.every((x, i) => x === SEED_E001_OLD[i])) seeds['E00-1'] = [SDRA, ...SEED_E001_OLD.slice(1)];
+}
+
 /** 옛 명부(roster_v 없음)는 조직·요원마다 roster_for 를 다 적어 두어서, 민간인·프리랜서 목록이 저장된 채로 남는다.
  *  2026-11-05 사용자: 민간인·프리랜서 플레이에는 내 페르소나 말고 아무도 안 붙는다 → 한 번 D00·E00 을 전부 떼고 판을 올린다 */
 export function migrateRoster(d: DirectoryData): DirectoryData {
@@ -75,6 +95,7 @@ export function migrateRoster(d: DirectoryData): DirectoryData {
     strip(d.요원);
   }
   if (v < 6) migrateNeutral(d); // 판 3→4→5→6: 설명 글·이름만 바꿈 (migrateNeutral 은 두 번 돌아도 같음)
+  if (v < 7) migrateV7(d);
   d.roster_v = ROSTER_V;
   return d;
 }

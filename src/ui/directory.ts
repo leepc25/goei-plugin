@@ -717,8 +717,8 @@ export const directoryDoneClear = (text: string): void => {
 };
 
 
-export const directorySearch = (): string =>
-  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점·부록)" aria-label="명부 전체 검색" autocomplete="off">`;
+export const directorySearch = (scoped = false): string =>
+  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="${scoped ? '거점 검색' : '명부 전체 검색 (괴이·특수·요원·조직·거점·부록)'}" aria-label="${scoped ? '거점 검색' : '명부 전체 검색'}" autocomplete="off">`;
 
 /** 설정 위쪽 줄의 「덮어쓰기」「불러오기」 (설정·명부 공통, 누르면 확인) */
 export const barButtons = (off: boolean): string =>
@@ -744,7 +744,7 @@ export function directoryView(ctx: ChatContext, scoped = false): string {
       .map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? ' on' : ''}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`)
       .join('')}</div>
     <div class="dir-tools">
-      <div class="dir-qbox">${directorySearch()}</div>
+      <div class="dir-qbox">${directorySearch(scoped)}</div>
       ${ADD_LABEL[dirUi.kind] ? `<button class="dir-tool${dirUi.adding ? ' on' : ''}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}">${ICONS.plus}<span>${ADD_LABEL[dirUi.kind]}</span></button>` : ''}
       <button class="dir-tool icon" data-action="dir-reload" aria-label="로어북 다시 읽기" title="로어북 다시 읽기">${ICONS.refresh}</button>
       <button class="dir-tool icon${dirUi.help ? ' on' : ''}" data-action="dir-help" aria-expanded="${dirUi.help}" aria-label="명부 사용법" title="명부 사용법">?</button>

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -96,6 +96,30 @@ test('성적 지침: 고친 지침에도 「거짓일 때」 조건이 남는다
   assert.ok(/When false[,:]/.test(sec));
 });
 
+// 11-14 재검토 ①-11: 위 시험은 기본 글이라 고침이 없어도 통과한다. 지침을 고친 경로를 따로 본다.
+// (sexual 과 guides 가 같은 묶음에 있어야 고친 지침이 보인다)
+test('성적 지침: PLAIN_STYLE 절의 첫 구절을 고쳐도 「거짓일 때」 조건이 붙는다 (고친 글)', async () => {
+  const outfile = join(dir, `sexual-guides-${process.pid}.mjs`);
+  await build({
+    stdin: { contents: "export * as X from './src/core/people/sexual'; export * as G from './src/core/guides'; export * as St from './src/core/people/settings';", resolveDir: process.cwd(), loader: 'ts' },
+    bundle: true, platform: 'node', format: 'esm', charset: 'utf8', outfile, logLevel: 'silent',
+  });
+  const M = await import(pathToFileURL(outfile));
+  const flags = { ...M.St.peopleSettings({}), features: new Set(['axes']), sexualDesire: true, paraphilia: false, explicitStyle: false };
+  const EDIT = 'Keep the wording blunt and everyday ZZ-PLAIN-EDIT.';
+  const def = M.G.guideDefault('UpdaterExtra');
+  const edited = def.replace(/(@@SECTION SEXUAL\.PLAIN_STYLE\n)[\s\S]*?(\n@@END)/, (a, h, e) => h + EDIT + e);
+  assert.notEqual(edited, def, 'PLAIN_STYLE 절을 찾아 바꿨다');
+  M.G.setGuideOverride('UpdaterExtra', edited);
+  try {
+    const sec = M.X.sexualWriterSection(flags);
+    assert.ok(sec.includes(`When false: ${EDIT} When true, `), sec);
+    assert.ok(!sec.includes('Use the 0.10.7 style'));
+  } finally { M.G.setGuideOverride('UpdaterExtra', ''); }
+  // 되돌린 뒤에는 기본 글
+  assert.ok(M.X.sexualWriterSection(flags).includes('When false, use the 0.10.7 style'));
+});
+
 test('변경 기록: 지워진 메시지의 변경은 버리고, 상한을 넘으면 오래된 계기를 값이 같게 접는다', () => {
   const n = 260;
   const chat = { message: Array.from({ length: n }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: `m${i}`, chatId: `k${i}` })) };
@@ -124,4 +148,38 @@ test('변경 기록: 지워진 메시지의 변경은 버리고, 상한을 넘�
   for (let i = 0; i < 801; i++) s2.log.push({ id: `y${i}`, anchor: `k${1 + (i % 50) * 2}`, seq: i, src: 'field', who: '쟈알디', kind: 'cue', cue: '도움', ...(i === 3 ? { pin: 50, cue: undefined } : {}) });
   S.foldLog(s2, chat, () => 0);
   assert.equal(s2.log.length, 801);
+});
+
+// 사용자 결정 나-80 ②(전부 남기기): 접기 함수(foldLog)는 남아 있어도 실제 코드 어디서도 부르지 않는다 (11-14 재검토 ①-1)
+test('변경 기록: 갱신기를 비롯한 어느 코드도 foldLog 를 부르지 않는다 (전부 남기기)', async () => {
+  const walk = async (d) => (await Promise.all((await readdir(d, { withFileTypes: true })).map((e) => (e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.ts') ? [join(d, e.name)] : [])))).flat();
+  const callers = [];
+  for (const f of await walk('src')) {
+    if (f === join('src', 'core', 'people', 'store.ts')) continue;
+    if (/\bfoldLog\b/.test(await readFile(f, 'utf8'))) callers.push(f);
+  }
+  assert.deepEqual(callers, []);
+});
+
+// 사용자 2026-11-14 F-1 (나): 다시 굴려 사라진 응답이 만든 변경 줄만 버린다. 살아 있는 응답의 변경은 전부 남긴다 (접지 않는다)
+test('변경 기록: 사라진 응답이 만든 줄만 버리고, 살아 있는 응답의 줄은 상한을 넘어도 전부 남긴다', async () => {
+  const n = 260;
+  const chat = { message: Array.from({ length: n }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: `m${i}`, chatId: `k${i}` })) };
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  for (let i = 0; i < 900; i++) store.log.push({ id: `x${i}`, anchor: `k${1 + (i % 25) * 2}`, seq: i, src: 'story', who: '쟈알디', kind: 'cue', cue: '도움', reason: '' });
+  store.log.push({ id: 'gone-story', anchor: 'rerolled', seq: 900, src: 'story', who: '쟈알디', kind: 'cue', cue: '헌신', reason: '' });
+  store.log.push({ id: 'gone-address', anchor: 'rerolled', seq: 901, src: 'story', who: '쟈알디', kind: 'address', toUser: '선배', reason: '' });
+  store.log.push({ id: 'gone-manual', anchor: 'rerolled', seq: 902, src: 'manual', who: '쟈알디', kind: 'address', toUser: '후배', reason: '' });
+  store.log.push({ id: 'hash', anchor: '#999', seq: 903, src: 'story', who: '쟈알디', kind: 'cue', cue: '헌신', reason: '' });
+  assert.equal(typeof S.dropGoneChanges, 'function', 'dropGoneChanges 가 있다');
+  const dropped = S.dropGoneChanges(store, chat);
+  assert.equal(dropped, 2);
+  const ids = new Set(store.log.map((c) => c.id));
+  assert.ok(!ids.has('gone-story') && !ids.has('gone-address'), '사라진 응답이 만든 줄은 버린다');
+  assert.ok(ids.has('gone-manual') && ids.has('hash'), '직접 고친 줄·#N 기준 줄은 남긴다');
+  assert.equal(store.log.filter((c) => c.id.startsWith('x')).length, 900, '살아 있는 응답의 줄은 접지 않고 전부 남는다');
+  assert.deepEqual(store.folded, {});
+  // 갱신기 저장 길이 이 함수를 부른다
+  assert.match(await readFile(join('src', 'host', 'people.ts'), 'utf8'), /dropGoneChanges\(s, cur\)/);
 });

@@ -36,6 +36,11 @@ test('쓰임 글: 「소모 3」「소모3회」「소모(3)」「소모 x3」�
   assert.equal(T.parseTraits('소모').uses, 1);
   assert.equal(T.parseTraits('소모3').uses, 3);
   assert.deepEqual(T.parseTraits('장비·소모 2'), { use: true, equip: 'gear', uses: 2 });
+  // 재검토 11-14: 숫자 뒤를 띄어쓰기로 이어도 뒷말이 붙어 버려지지 않는다
+  assert.deepEqual(T.parseTraits('소모3 장비'), { use: true, uses: 3, equip: 'gear' });
+  assert.deepEqual(T.parseTraits('소모 3 손'), { use: true, uses: 3, equip: 'weapon' });
+  assert.deepEqual(T.parseTraits('소모3회 장비'), { use: true, uses: 3, equip: 'gear' });
+  assert.deepEqual(T.parseTraits('손 소모(2) 사용'), { use: true, uses: 2, equip: 'weapon' });
   assert.deepEqual(T.parseTraits('무기'), { use: false, equip: 'weapon' });
   assert.deepEqual(T.parseTraits('사용'), { use: true });
 });

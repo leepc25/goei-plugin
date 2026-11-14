@@ -3,8 +3,8 @@ import { setRow } from './setrow';
 import { cardVersion, compareVersions, isPayload, planUpdate, PLUGIN_VERSION, UPDATE_BASE, type CardPayload, type UpdatePlan } from '../core/update';
 import { readManifest } from '../core/start';
 import type { ChatContext } from '../host/risu';
-import { fetchPictures } from '../host/picpack';
-import { dropAssets, planPictures, type PicPlan } from '../core/pictures';
+import { fetchPictures, mergePictures } from '../host/picpack';
+import { dropAssets, planPictures, type PicPlan, type Picture } from '../core/pictures';
 import { forgetImages } from './images';
 import { loadModuleAssets } from '../host/assets';
 import type { SettingsEnv } from './settings';
@@ -258,16 +258,16 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
       updateUi.plan = planUpdate(char, p);
       updateUi.pics = planPictures(char.additionalAssets, readManifest(char.globalLore as never), readManifest(p.data.globalLore));
     } else if (action === 'upd-apply' && updateUi.payload) {
-      // 준비한 뒤 카드가 바뀌었을 수 있으니 저장 직전에 다시 합친다
-      const plan = planUpdate(char, updateUi.payload);
       // 사진은 다 받은 뒤에만 넣는다. 하나라도 못 받으면 카드도 바꾸지 않고 다시 누르게 한다
       const pics = planPictures(char.additionalAssets, readManifest(char.globalLore as never), readManifest(updateUi.payload.data.globalLore));
+      /** 받아 저장한 사진 줄 [이름, 저장 경로, 확장자] */
+      let got: unknown[] = [];
       if (pics.get.length) {
         let last = 0;
         updateUi.progress = `사진 받는 중 0/${pics.get.length}`;
         env.render();
         try {
-          plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n, phase) => {
+          got = await fetchPictures([], pics, (n, phase) => {
             if (n === 0) last = 0;
             updateUi.progress = `사진 ${phase === 'get' ? '받는' : '저장'} 중 ${n}/${pics.get.length}`;
             if (n - last >= 5 || n === 0 || n === pics.get.length) (last = n), env.render();
@@ -279,8 +279,16 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
         updateUi.progress = '카드에 적용 중…';
         env.render();
       }
+      // 준비한 뒤·사진을 받는 동안(몇 분) 카드·채팅이 바뀌었을 수 있으니 저장 직전에 다시 읽어 합친다.
+      // 처음 읽은 것을 그대로 쓰면 그 사이 온 응답·저장된 채팅이 옛 내용으로 덮인다 (11-14 재검토 loader#3. 설치 쪽 host/install.ts 의 fresh 와 같게)
+      const fresh = ((await risuai.getCharacterFromIndex(ctx.charIndex)) ?? char) as Record<string, unknown>;
+      const plan = planUpdate(fresh, updateUi.payload);
+      if (got.length) {
+        const saved = (got as [string, string, string?][]).map((r): [Picture, string] => [[r[0], '', r[2] ?? '', 0], r[1]]);
+        plan.next.additionalAssets = mergePictures(fresh.additionalAssets, saved) as typeof plan.next.additionalAssets;
+      }
       // 새 카드에서 뺀 사진(옛 요원 그림 등)은 카드에서도 뺀다. 직접 넣은 사진은 매니페스트에 없어 그대로
-      if (pics.drop.length) plan.next.additionalAssets = dropAssets(plan.next.additionalAssets ?? char.additionalAssets, pics.drop) as typeof plan.next.additionalAssets;
+      if (pics.drop.length) plan.next.additionalAssets = dropAssets(plan.next.additionalAssets ?? fresh.additionalAssets, pics.drop) as typeof plan.next.additionalAssets;
       await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
       if (pics.get.length || pics.drop.length) {
         forgetImages();

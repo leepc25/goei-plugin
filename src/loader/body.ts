@@ -2,6 +2,7 @@
 import type { BodyHandlers } from '../body';
 import { sha256Text, textHash } from '../core/texthash';
 import { fetchParts } from '../core/fetchparts';
+import { oldPluginMessage } from '../core/stalever';
 
 export type Body = BodyHandlers;
 export const BODY_KEY = 'goei:body';
@@ -78,7 +79,8 @@ export async function fetchBody(version: string): Promise<string> {
   } catch {
     throw new BodyError('본체 정보를 받지 못했어요.');
   }
-  if (index?.version !== version) throw new BodyError('아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.');
+  // 올라온 본체가 더 새 판이면 다시 받아도 안 맞는다 → 플러그인 업데이트 안내 (11-14 D-4)
+  if (index?.version !== version) throw new BodyError(oldPluginMessage(version, index?.version) ?? '아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.');
   if (!Array.isArray(index.parts) || typeof index.length !== 'number') throw new BodyError('본체 정보가 올바르지 않아요.');
   for (const name of index.parts) {
     if (typeof name !== 'string' || !/^goei-body\.\d+\.txt$/.test(name)) throw new BodyError('본체 정보가 올바르지 않아요.');

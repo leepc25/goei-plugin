@@ -1,4 +1,453 @@
- locked: false,
+ `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ""}</div></section>
+    </div></div>`;
+  }
+  function manageConfirmPopup() {
+    if (manUi.confirm !== "import") return "";
+    return `<div class="gw-confirm"><div class="gw-confirm-box"><p>가져온 설정으로 지금 기기 설정(과 세계 편집)을 통째로 덮어쓸까요? 덮어쓴 설정은 되돌릴 수 없어요.</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="man-import-yes">적용</button><button class="gx-mini" data-action="man-no">취소</button></div></div></div>`;
+  }
+  function managePage(ctx2, node, canChat) {
+    diagOpen = node === "manage:diag";
+    if (node === "manage:backup") return backupPage(ctx2, canChat);
+    if (node === "manage:diag") return diagPage(ctx2, canChat);
+    if (node === "manage:people") {
+      return `<div class="gw-page gw-set">${head2("", "인물 기록 점검", "인물 기록 갱신을 지금 돌려 보고, 최근 갱신의 입력 크기·결과·실패 이유를 봐요.")}
+    <div class="gx-settings gw-setbody"><div class="ps pp-set">${peopleDiagPane(ctx2, canChat)}</div></div></div>`;
+    }
+    if (node === "manage:flow") {
+      ensureFlow(flowView(ctx2, canChat).ctx, () => rerender3?.());
+      return flowPage(ctx2, head2, canChat);
+    }
+    if (node === "manage:trace") {
+      const confirm = traceUi.confirm ? `<button class="gx-mini danger" data-action="man-drop-trace-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-trace">${ICONS.trash}기록 지우기</button>`;
+      return tracePage(head2, confirm);
+    }
+    return logPage(ctx2, canChat);
+  }
+  function manageInput(name, value) {
+    if (name !== "man-import-text") return false;
+    manUi.importText = value;
+    manUi.importName = "";
+    return true;
+  }
+  async function manageFile(el) {
+    if (el.dataset.change !== "man-import-file") return false;
+    const f = el.files?.[0];
+    if (!f) return true;
+    try {
+      manUi.importText = await f.text();
+      manUi.importName = f.name;
+      manUi.notice = "";
+    } catch (error) {
+      manUi.notice = `파일을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    el.value = "";
+    return true;
+  }
+  async function manageAction(action, root3, ctx2 = null, canChat = true, value = "") {
+    if (!action.startsWith("man-")) return false;
+    manUi.notice = "";
+    manUi.info = "";
+    switch (action) {
+      case "man-no":
+        manUi.confirm = "";
+        traceUi.confirm = false;
+        return true;
+      case "man-trace-toggle":
+        if (traceUi.open.has(value)) traceUi.open.delete(value);
+        else traceUi.open.add(value);
+        return true;
+      case "man-drop-trace":
+        traceUi.confirm = true;
+        return true;
+      case "man-drop-trace-yes":
+        traceUi.confirm = false;
+        await clearTrace();
+        traceUi.turns = [];
+        traceUi.open.clear();
+        manUi.info = "호출 기록을 지웠어요.";
+        return true;
+      case "man-with-chat":
+        manUi.withChat = !manUi.withChat;
+        return true;
+      case "man-copy": {
+        if (!ctx2) return true;
+        const json = exportJson(ctx2, manUi.withChat && !!canChat);
+        const ok = await copyText(json);
+        manUi.info = ok ? `복사했어요 (${kb(json.length)}).` : "이 환경에서는 복사가 막혀 있어요. 「내려받기」로 파일로 받으세요.";
+        return true;
+      }
+      case "man-download": {
+        try {
+          const json = ctx2 ? exportJson(ctx2, manUi.withChat && !!canChat) : JSON.stringify(getPrefs(), null, 2);
+          downloadJson(`goei-settings-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`, json);
+          manUi.info = "내려받기를 시작했어요. 안 되면 「복사」로 글을 옮기세요.";
+        } catch (error) {
+          manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        return true;
+      }
+      case "man-diag-download": {
+        if (!ctx2) return true;
+        try {
+          downloadJson(`goei-diag-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`, diagBundle(ctx2, !!canChat));
+          manUi.info = "진단 묶음 내려받기를 시작했어요. 제보할 때 이 파일 하나를 보내면 돼요.";
+        } catch (error) {
+          manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        return true;
+      }
+      case "man-import":
+        manUi.confirm = "import";
+        return true;
+      case "man-import-yes": {
+        manUi.confirm = "";
+        try {
+          const parsed = JSON.parse(manUi.importText);
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("설정 JSON 이 아니에요.");
+          const { directory: directory2, chat, ...prefs2 } = parsed;
+          let wrote = "";
+          if (directory2 && typeof directory2 === "object" && !Array.isArray(directory2)) {
+            if (!ctx2) throw new Error("세계 편집을 적을 카드가 없어요.");
+            await updateCharacterLore(ctx2.charIndex, (lore) => withDirectory(lore, directory2));
+            wrote = " 세계 편집(명부)도 카드에 적었어요.";
+          }
+          const cv = chat && typeof chat === "object" && !Array.isArray(chat) ? chat.vars : null;
+          if (cv && typeof cv === "object" && !Array.isArray(cv)) {
+            const vars = Object.entries(cv).filter(([k, v]) => isChatSettingVar(k) && (typeof v === "string" || typeof v === "number" || typeof v === "boolean"));
+            if (ctx2 && canChat && vars.length) {
+              await updateChat(ctx2.charIndex, ctx2.chatIndex, (c) => {
+                c.scriptstate ??= {};
+                for (const [k, v] of vars) c.scriptstate[k] = String(v);
+                return c;
+              });
+              wrote += ` 채팅 값 ${vars.length}개도 이 채팅에 적었어요.`;
+            } else if (vars.length) wrote += " 채팅 값은 시작 전이라 적지 않았어요.";
+          }
+          await savePrefs(() => prefs2);
+          manUi.importText = "";
+          manUi.importName = "";
+          manUi.sizes = null;
+          manUi.info = `설정을 가져왔어요.${wrote} 창을 닫았다 열면 전부 반영돼요.`;
+        } catch (error) {
+          manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        return true;
+      }
+      case "man-get-tok":
+      case "man-get-wiki": {
+        if (manUi.getting) return true;
+        const what = action === "man-get-tok" ? "tok" : "wiki";
+        manUi.getting = what;
+        manUi.progress = "";
+        rerender3?.();
+        const progress4 = (t) => {
+          manUi.progress = t;
+          rerender3?.();
+        };
+        try {
+          if (what === "tok") await installTokenizer(progress4);
+          else await installWikiPack(progress4);
+          manUi.info = what === "tok" ? "토크나이저를 받았어요. 이제 토큰 수를 정확히 세요." : "위키 기본 문서를 받았어요. 위키 탭에서 읽을 수 있어요.";
+        } catch (error) {
+          manUi.notice = `${what === "tok" ? "토크나이저" : "위키 기본 문서"}를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        manUi.getting = "";
+        manUi.progress = "";
+        manUi.sizes = null;
+        return true;
+      }
+      case "man-drop-wiki":
+      case "man-drop-tok":
+      case "man-drop-diag":
+        manUi.confirm = action.slice(4);
+        return true;
+      case "man-drop-wiki-yes":
+        manUi.confirm = "";
+        await dropWikiPack();
+        manUi.info = "위키 기본 문서를 지웠어요.";
+        manUi.sizes = null;
+        return true;
+      case "man-drop-tok-yes":
+        manUi.confirm = "";
+        await dropTokenizer();
+        manUi.info = "토크나이저를 지웠어요. 토큰 수는 어림값이에요.";
+        manUi.sizes = null;
+        return true;
+      case "man-drop-diag-yes":
+        manUi.confirm = "";
+        await clearDiag();
+        manUi.info = "인물 기록 실행 기록을 지웠어요.";
+        manUi.sizes = null;
+        return true;
+      case "man-clear-fail":
+        clearBoardFailures();
+        phone.failure = null;
+        wiki.failure = null;
+        return true;
+    }
+    return true;
+  }
+
+  // src/core/consult.ts
+  var onOff2 = (l) => l === "ON" ? "켬" : l === "OFF" ? "끔" : l;
+  var EMPTY = "(빈 글)";
+  var oneLine = (s8) => s8.replace(/\r?\n/g, "\\n");
+  function consultLabel(item2, value) {
+    if (item2.kind === "text") return value === "" ? EMPTY : value;
+    if (item2.kind === "num" || item2.kind === "step") {
+      if (value.trim() === "") return item2.zero ?? "(비어 있음)";
+      const n3 = Number(value) || 0;
+      return n3 === 0 && item2.zero ? item2.zero : `${n3}${item2.unit ?? ""}`;
+    }
+    const o = item2.opts?.find(([v]) => v === value);
+    return o ? onOff2(o[1]) : value;
+  }
+  var consultCan = (i) => i.kind !== "info" && !i.locked;
+  function choices(i) {
+    if (i.kind === "num") return `${i.lo ?? 0}~${i.hi ?? 0}${i.unit ?? ""} (정수)`;
+    if (i.kind === "step") return `정수${i.unit ? ` (${i.unit})` : ""}, ${i.stride && i.stride > 1 ? `지금 값에서 ${i.stride}씩` : "화면의 − + 단추가 닿는 값"}`;
+    if (i.kind === "text") return `글${i.max ? ` (최대 ${i.max}자)` : ""}${i.multi ? ", 여러 줄은 \\n 으로 이음" : ", 한 줄"}`;
+    return (i.opts ?? []).map(([, l]) => onOff2(l)).join(" / ");
+  }
+  function itemLine2(i) {
+    const name = `${i.group && i.group !== i.menu && i.group !== i.name ? `${i.group} · ` : ""}${i.name}`;
+    const help = i.help ? ` | 설명: ${i.help}` : "";
+    if (i.kind === "info") return `[${i.id}] ${name} | 바꾸기: 못 함${help}`;
+    const cur = i.kind === "text" ? oneLine(consultLabel(i, i.cur)) : consultLabel(i, i.cur);
+    return `[${i.id}] ${name} | 지금: ${cur} | ${i.locked ? "바꾸기: 못 함 (지금 잠김)" : `고를 수 있는 값: ${choices(i)}`}${i.scope ? ` | 저장: ${i.scope}` : ""}${help}`;
+  }
+  var dropMax = (text5) => String(text5 ?? "").replace(/[^.\n(]*\{max\}[^.\n)]*\.?\s?/g, "");
+  function consultPrompt(src) {
+    const g2 = guideSections("Consult");
+    const system = [g2.COMMON, g2.KNOWLEDGE, g2.CHANGE, g2.OUTPUT].map((t) => fillGuide(dropMax(t), {})).filter(Boolean).join("\n\n");
+    const byId = new Map(src.all.map((i) => [i.id, i]));
+    const pending2 = src.pending.map((c) => {
+      const i = byId.get(c.id);
+      return i ? `${c.id}=${i.kind === "text" ? oneLine(consultLabel(i, c.value)) : consultLabel(i, c.value)} (${i.menu} · ${i.name}, 지금 ${i.kind === "text" ? oneLine(consultLabel(i, i.cur)) : consultLabel(i, i.cur)})` : "";
+    }).filter(Boolean).join("\n");
+    const talk = src.talk.map((l) => `${l.who === "me" ? "[사용자]" : "[상담]"} ${l.text}`).join("\n");
+    const list4 = src.opened.map((o) => `## ${o.menu}
+${o.items.map(itemLine2).join("\n")}`).join("\n\n");
+    return [
+      { role: "system", content: system },
+      { role: "user", content: `[지금 상태]
+${src.state}
+
+[지난 턴 실제]
+${src.last}
+
+[메뉴]
+${src.menus}
+
+[설정 목록]
+${list4 || "(펼친 메뉴 없음)"}
+
+[바꾸자고 한 것]
+${pending2 || "(없음)"}
+
+[이 창의 대화 — 마지막 줄이 사용자가 방금 한 말]
+${talk}` }
+    ];
+  }
+  function parseConsult(raw) {
+    const block5 = (name) => new RegExp(`<${name}>([\\s\\S]*?)</${name}>`, "i").exec(raw)?.[1] ?? "";
+    const say2 = block5("say").trim();
+    const open3 = block5("open").split(/[,\n]/).map((s8) => s8.replace(/[「」\[\]]/g, "").trim()).filter(Boolean);
+    if (!say2 && !open3.length) throw new Error("<say> 블록이 없어요.");
+    const set2 = block5("set").split("\n").map((l) => /^\s*\[?([^\s=\[\]]+)\]?\s*=\s?(.*?)\s*$/.exec(l)).filter((m) => !!m).map((m) => ({ id: m[1], raw: m[2] }));
+    return { say: say2, set: set2, apply: /<apply>\s*yes\s*<\/apply>/i.test(raw), open: open3, go: block5("go").replace(/[\[\]]/g, "").trim() };
+  }
+  var norm3 = (s8) => s8.replace(/[「」『』"'`()\s]/g, "").toLowerCase();
+  function consultValue(item2, raw) {
+    if (item2.kind === "info") return null;
+    if (item2.kind === "text") {
+      const t = raw === EMPTY ? "" : raw;
+      const text5 = (item2.multi ? t.replace(/\\n/g, "\n") : t.replace(/\\n|\r?\n/g, " ")).trim();
+      if (/[<>]/.test(text5)) return null;
+      if (item2.max && text5.length > item2.max) return null;
+      return text5;
+    }
+    if (item2.kind === "num" || item2.kind === "step") {
+      const t = raw.trim().replace(/(\d),(?=\d{3})/g, "$1");
+      const n3 = item2.zero && norm3(t) === norm3(item2.zero) ? 0 : /^-?\d+/.test(t) && /^-?\d+\s*\D{0,3}$/.test(t) ? Number.parseInt(t, 10) : NaN;
+      if (!Number.isInteger(n3)) return null;
+      if (item2.kind === "step") return (item2.lo === void 0 || n3 >= item2.lo) && (item2.hi === void 0 || n3 <= item2.hi) && (!item2.stride || (n3 - Number(item2.cur)) % item2.stride === 0) ? String(n3) : null;
+      return n3 >= (item2.lo ?? 0) && n3 <= (item2.hi ?? 0) ? String(n3) : null;
+    }
+    const want = norm3(raw);
+    const hit4 = (item2.opts ?? []).find(([v, l]) => norm3(onOff2(l)) === want || norm3(l) === want || v === raw.trim());
+    return hit4 ? hit4[0] : null;
+  }
+  function consultWhy(item2, raw) {
+    if (item2.kind === "info") return "상담에서 바꿀 수 없는 설정";
+    if (item2.locked) return "지금은 잠겨 있는 설정";
+    if (item2.kind === "text" && /[<>]/.test(raw)) return "글에 < > 는 쓸 수 없어요";
+    if (item2.kind === "text") return `글이 너무 길어요 (최대 ${item2.max}자)`;
+    return `고를 수 없는 값 「${raw.slice(0, 40)}」`;
+  }
+  function checkConsult(items, set2) {
+    const byId = new Map(items.map((i) => [i.id, i]));
+    const ok = /* @__PURE__ */ new Map();
+    const bad = [];
+    for (const s8 of set2) {
+      const item2 = byId.get(s8.id);
+      if (!item2) {
+        bad.push(`${s8.id}: 목록에 없는 설정`);
+        continue;
+      }
+      const value = consultCan(item2) ? consultValue(item2, s8.raw) : null;
+      if (value === null) {
+        bad.push(`${item2.name}: ${consultWhy(item2, s8.raw)}`);
+        continue;
+      }
+      ok.delete(s8.id);
+      if (value !== item2.cur) ok.set(s8.id, { id: s8.id, value });
+    }
+    return { ok: [...ok.values()], bad };
+  }
+
+  // src/ui/editor/catalog.ts
+  function txt(el) {
+    if (!el) return "";
+    const parts = [];
+    const walk = (n3) => n3.childNodes.forEach((c) => {
+      if (c.nodeType === 3) parts.push(c.textContent ?? "");
+      else if (c.nodeType === 1) {
+        parts.push(" ");
+        walk(c);
+        parts.push(" ");
+      }
+    });
+    walk(el);
+    return parts.join("").replace(/\s+/g, " ").trim();
+  }
+  var own = (el) => el ? [...el.childNodes].filter((n3) => n3.nodeType === 3).map((n3) => n3.textContent ?? "").join("").replace(/\s+/g, " ").trim() : "";
+  var ROW = ".ps-row, .ck-row, .mx-row, .st-col-row";
+  var NOT_SETTING = ".lc-row";
+  var TWIN = ".ck-ph, .fl-ph";
+  var CTL = "button[data-action], input[data-change], textarea[data-change]";
+  var keyOf3 = (v) => v.includes("=") ? v.slice(0, v.lastIndexOf("=")) : v.includes(":") ? v.slice(0, v.lastIndexOf(":")) : "";
+  function gridCols(section3) {
+    if (!section3) return [];
+    const opts = [...section3.querySelectorAll(":scope > .ps-rows > .ck-h2 > span")].slice(1).map(txt);
+    const groups = [];
+    section3.querySelectorAll(":scope > .ps-rows > .ck-h1 > b").forEach((b) => {
+      const n3 = Number(/span\s+(\d+)/.exec(b.getAttribute("style") ?? "")?.[1] ?? 1);
+      for (let i = 0; i < n3; i++) groups.push(txt(b));
+    });
+    return opts.map((o, i) => [groups[i] ?? "", o]);
+  }
+  function subOf2(el, rowLabel) {
+    const set1 = el.closest(".fam-set1");
+    if (set1) {
+      const l = txt(set1.querySelector(":scope > span"));
+      if (l) return l;
+    }
+    const box3 = el.closest(".st-step") ?? el.closest(".gx-switch-wrap") ?? el.closest(".gx-segs") ?? el;
+    const prev = box3.previousElementSibling;
+    if (prev && prev.tagName === "SPAN" && !prev.querySelector(CTL) && !prev.matches(".gx-switch-wrap, .ph-inline")) {
+      const l = txt(prev);
+      if (l && l.length <= 12) return l;
+    }
+    const site = txt(el.closest(".mx-cell")?.querySelector(":scope > .mx-site"));
+    if (site) return site;
+    const aria = (el.getAttribute("aria-label") ?? "").replace(/\s+/g, " ").trim();
+    const rest = aria.startsWith(rowLabel) ? aria.slice(rowLabel.length).trim() : aria;
+    return rest === rowLabel ? "" : rest;
+  }
+  function pageRows(html, page, menu) {
+    const doc2 = new DOMParser().parseFromString(html, "text/html");
+    const out = [];
+    const seen4 = /* @__PURE__ */ new Set();
+    let infoN = 0;
+    const cols = /* @__PURE__ */ new Map();
+    const colsOf = (s8) => {
+      if (!s8) return [];
+      if (!cols.has(s8)) cols.set(s8, gridCols(s8));
+      return cols.get(s8);
+    };
+    doc2.querySelectorAll(ROW).forEach((row8) => {
+      if (row8.closest(TWIN) || row8.matches(NOT_SETTING)) return;
+      const section3 = row8.closest(".ps-group, .ps-card, details");
+      const headEl = section3?.querySelector("h3, h4, summary") ?? null;
+      const group4 = own(headEl) || txt(headEl);
+      const isPs = row8.matches(".ps-row");
+      const isGrid = row8.matches(".ck-row");
+      const labelEl = row8.querySelector(isPs ? ":scope > .ps-label > b" : isGrid ? ":scope > .ck-name" : row8.matches(".mx-row") ? ":scope > .mx-label" : ":scope > .st-col-name > b");
+      const label2 = isPs ? own(labelEl) : txt(labelEl);
+      if (!label2) return;
+      const help = txt(row8.querySelector(isPs ? ":scope > .ps-label > small" : row8.matches(".mx-row") ? ":scope > .mx-help" : ":scope > .st-col-name > small"));
+      const badge3 = isPs ? txt(labelEl?.querySelector("i.gx-scope")) : "";
+      const scope = badge3 && badge3 !== "이 채팅" ? badge3 : void 0;
+      const grp = txt(section3?.querySelector("h3"));
+      const spot = (colGroup = "") => [`set:${page}`, isPs ? `r:${label2}${grp ? `@${grp}` : ""}` : colGroup ? `r:${colGroup}` : ""];
+      const els = [...row8.querySelectorAll(CTL)].filter((e) => e.closest(ROW) === row8 && !e.closest('[data-consult="no"]'));
+      const gcols = isGrid ? colsOf(section3) : [];
+      const cellAt = (e) => {
+        const cell3 = e.closest(".ck-cell");
+        const i = cell3 ? [...row8.querySelectorAll(":scope > .ck-cell")].indexOf(cell3) : -1;
+        return gcols[i] ?? ["", ""];
+      };
+      const made = [];
+      const used = /* @__PURE__ */ new Set();
+      const push3 = (r) => {
+        if (seen4.has(r.id)) return;
+        seen4.add(r.id);
+        const { colGroup, ...rest } = r;
+        made.push({ ...rest, page, menu, group: group4, help, scope, go: spot(colGroup), keys: colGroup ? [label2, colGroup] : [label2] });
+      };
+      for (const e of els) {
+        if (used.has(e)) continue;
+        used.add(e);
+        const locked = e.hasAttribute("disabled") || e.hasAttribute("readonly");
+        if (e.tagName !== "BUTTON") {
+          const input3 = e;
+          const type = (input3.getAttribute("type") ?? "text").toLowerCase();
+          if (["hidden", "file", "checkbox", "radio", "color"].includes(type)) continue;
+          const action2 = input3.dataset.change ?? "";
+          const key2 = input3.dataset.key ?? "";
+          const [cg3, co2] = cellAt(e);
+          const lone = isGrid && !!cg3 && gcols.filter(([g2]) => g2 === cg3).length === 1;
+          const sub = isGrid ? lone ? cg3 : [cg3, co2].filter(Boolean).join(" ") : subOf2(e, label2);
+          const value2 = (e.tagName === "TEXTAREA" ? e.textContent ?? "" : input3.getAttribute("value") ?? "").replace(/\r/g, "");
+          const lo = Number(input3.getAttribute("min"));
+          const hi = Number(input3.getAttribute("max"));
+          const isNum = (type === "number" || type === "range") && input3.hasAttribute("min") && input3.hasAttribute("max") && Number.isFinite(lo) && Number.isFinite(hi);
+          const unit = (lone ? co2 : "") || txt(e.closest(".st-step")?.querySelector(":scope > span")) || txt(e.parentElement?.querySelector(":scope > output")).replace(/^-?[\d,.\s]+/, "") || void 0;
+          const max = Number(input3.getAttribute("maxlength")) || void 0;
+          push3({ id: key2 ? `${action2}.${key2}` : action2, name: sub, kind: isNum ? "num" : "text", cur: isNum ? value2.trim() : value2.trim(), ...isNum ? { lo, hi, unit } : { max, multi: e.tagName === "TEXTAREA" }, locked, colGroup: cg3 || void 0, ctl: { t: "input", action: action2, key: key2 } });
+          continue;
+        }
+        const action = e.dataset.action ?? "";
+        const value = e.dataset.value ?? "";
+        if (e.getAttribute("role") === "switch") {
+          const on3 = e.getAttribute("aria-checked") === "true";
+          push3({ id: `${action}${keyOf3(value) ? `.${keyOf3(value)}` : ""}`, name: subOf2(e, label2), kind: "pick", cur: on3 ? "1" : "0", opts: [["1", "ON"], ["0", "OFF"]], locked, ctl: { t: "toggle", action, send: value } });
+          continue;
+        }
+        if (e.classList.contains("gx-step")) {
+          const box3 = e.closest(".st-step");
+          if (!box3 || box3.querySelector("input[data-change]")) continue;
+          const btns = [...box3.querySelectorAll("button.gx-step[data-action]")];
+          btns.forEach((b) => used.add(b));
+          const minus = btns.find((b) => (b.dataset.value ?? "").endsWith("-"));
+          const plus = btns.find((b) => (b.dataset.value ?? "").endsWith("+"));
+          if (!minus || !plus) continue;
+          const shown5 = txt(box3.querySelector(":scope > b"));
+          const m = /-?\d[\d,]*/.exec(shown5);
+          const n3 = m ? Number(m[0].replace(/,/g, "")) : 0;
+          const key2 = (minus.dataset.value ?? "").slice(0, -1).replace(/:$/, "");
+          push3({
+            id: key2 ? `${action}.${key2}` : action,
+            name: subOf2(e, label2),
+            kind: "step",
+            cur: String(n3),
+            unit: m ? shown5.slice((m.index ?? 0) + m[0].length).trim() || void 0 : void 0,
+            zero: m ? void 0 : shown5 || void 0,
+            ...Number(box3.dataset.step) > 1 ? { stride: Number(box3.dataset.step) } : {},
+            ...minus.hasAttribute("disabled") ? { lo: n3 } : {},
+            ...plus.hasAttribute("disabled") ? { hi: n3 } : {},
+            locked: false,
             ctl: { t: "rel", action, minus: minus.dataset.value ?? "", plus: plus.dataset.value ?? "" }
           });
           continue;
@@ -909,7 +1358,7 @@
     net: { desc: "괴담넷·괴담갤·세정게·연어 마켓의 설정이에요.", example: "" },
     factions: { desc: "세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지를 여기서 정해요.", example: "" },
     lore: { desc: "세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 다음 요청에 어떤 로어북이 들어가는지는 아래에서 바로 볼 수 있어요.", example: "" },
-    adv: { desc: "괴담넷·괴담톡·위키·상점(쇼핑몰·망상홈쇼핑 포함) 생성에 공통으로 쓰는 값이에요(재시도는 AI 상담도). 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.", example: "" }
+    adv: { desc: "괴담넷·괴담톡·위키·상점(쇼핑몰·망상홈쇼핑 포함) 생성에 공통으로 쓰는 값이에요(재시도는 AI 상담도). 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한(괴담넷·괴담톡·위키).", example: "" }
   };
   function settingsPage(ctx2, page) {
     const canChat = host3?.canChat?.() ?? true;
@@ -2757,271 +3206,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-wait { color: var(--amber) !important; }
 .ph-badge { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; }
 .ph-act { display: flex; align-items: center; gap: 2px; flex: none; }
-.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place-items: center; color: var(--on-signal); font-size: 13px; font-weight: 800; }
-.ph-main.on .ph-check { background: var(--signal); border-color: var(--signal); }
-
-/* 오른쪽 칸 */
-.gx-body .ph-pane { padding: 0; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; background: var(--sunk); }
-.ph-pane > .nw-busy, .ph-pane > .gn-notice { margin: 10px 14px 0; }
-.ph-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--dim); text-align: center; padding: 24px; }
-.ph-empty-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
-.ph-empty-ico svg { width: 32px; height: 32px; }
-.ph-empty b { color: var(--text); font-size: 17px; }
-.ph-empty p { margin: 0; font-size: 14px; }
-.ph-room, .ph-form { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.ph-room-head { flex: none; display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 12px; border-bottom: 1px solid var(--panel2); background: var(--void); }
-/* 대화방 머리 도구 (새로고침·전화·초대·삭제): 누르기 쉽게 크게 (v0.16.22) */
-.ph-room-head .ph-act { display: flex; align-items: center; gap: 2px; }
-.ph-room-head .ph-act .ph-tool { width: var(--ctl-h); height: var(--ctl-h); }
-.ph-room-head .ph-act .ph-tool svg { width: 23px; height: 23px; }
-.ph-room-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.ph-room-title b { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ph-head-q { flex: 0 1 220px; min-width: 0; min-height: 38px; }
-/* 단톡 만들기: 주제 칸은 고정, 사람 목록만 스크롤 */
-.ph-gbody { overflow: hidden; }
-.ph-gbody > textarea { flex: none; }
-.ph-gbody > .ph-pick { flex: 1; min-height: 0; overflow-y: auto; }
-.ph-room-title small { color: var(--dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.ph-members { flex: none; margin: 0; padding: 6px 16px; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--panel2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ph-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px 10px; overscroll-behavior: contain; }
-.ph-more { align-self: center; margin-bottom: 6px; }
-/* 쌓이는 목록(일지·연대기·가계부 거래·소지품 기록) 맨 아래 「더 보기」: 괴담톡의 「이전 대화 더 보기」와 같은 단추, 목록 가운데 (ui/more.ts) */
-.gx-more { display: flex; justify-content: center; padding: 12px 0 4px; }
-.gx-more .ph-more { margin: 0; }
-.gx-more .ph-more small { margin-left: 6px; color: var(--dim); font-size: 12px; font-weight: 400; }
-.ph-day { align-self: center; margin: 10px 0 6px; }
-.ph-day span { display: inline-block; padding: 3px 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel2) 80%, transparent); color: var(--sub); font-size: 12px; }
-.ph-msg { display: flex; gap: 8px; max-width: min(78%, 560px); }
-.ph-msg.first { margin-top: 8px; }
-.ph-msg.me { align-self: flex-end; flex-direction: row-reverse; }
-.ph-msg.npc { align-self: flex-start; }
-.ph-msg-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ph-msg.me .ph-msg-col { align-items: flex-end; }
-.ph-face, .ph-face-gap { flex: none; width: 38px; height: 38px; border-radius: 13px; font-size: 14px; }
-.ph-name { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 2px; }
-.ph-line { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
-.ph-msg.me .ph-line { flex-direction: row-reverse; }
-.ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
-.ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
-/* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
-.ph-msg.npc .ph-bubble { background: var(--panel2); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
-.gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
-.ph-msg.me .ph-bubble { background: color-mix(in srgb, var(--signal) 22%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); }
-.ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
-.ph-bubble p { margin: 0; }
-.ph-bubble p + p { margin-top: 4px; }
-.ph-bubble .at-card { margin: 4px 0; background: color-mix(in srgb, var(--void) 55%, transparent); border-color: transparent; color: var(--text); }
-.ph-msg.me .ph-bubble .at-card { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
-.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: var(--sub); }
-.ph-bubble:has(> .at-card-image:only-child) { padding: 0; background: none; }
-.ph-bubble > .at-card-image:only-child { margin: 0; border-radius: 16px; }
-.ph-meta-t { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--dim); white-space: nowrap; line-height: 1.3; }
-.ph-msg.npc .ph-meta-t { align-items: flex-start; }
-.ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
-.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
-.ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
-.ph-sys.skip { background: none; border-color: transparent; letter-spacing: 0.1em; }
-.ph-reacts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
-.ph-msg.me .ph-reacts { justify-content: flex-end; }
-.ph-react { display: inline-flex; align-items: center; gap: 2px; padding: 1px 7px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; }
-.ph-react small { color: var(--sub); font-size: 11px; }
-.ph-view-new { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
-.ph-view-new small { color: var(--sub); font-size: 12px; }
-/* 11-07 사용자: 왼쪽 도구 서랍(.ph-drawer: 윗선 1px + 64px, 폰 56px)과 높이·윗선을 똑같이 */
-.ph-view-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 65px; padding: 0 14px; border-top: 1px solid var(--panel2); background: var(--void); color: var(--sub); font-size: 13px; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .ph-view-foot { height: 57px; } }
-.ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
-.ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
-.ph-typing i:nth-child(2) { animation-delay: .15s; }
-.ph-typing i:nth-child(3) { animation-delay: .3s; }
-@keyframes ph-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .ph-typing i { animation: none; } }
-.ph-retry { align-self: center; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 8px 0; font-size: 13px; color: var(--amber); }
-/* 입력창: 늘 대화 아래 */
-.ph-composer { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
-.ph-composer .at-editor { gap: 8px; }
-.ph-compose { display: flex; align-items: flex-end; gap: 6px; }
-.ph-input { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
-.ph-input:focus { outline: none; border-color: var(--accent-line); }
-.ph-plus { width: 42px; height: 42px; border-radius: 50%; }
-.ph-plus.on svg { transform: rotate(45deg); }
-.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: var(--on-signal); box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
-.ph-send svg { width: 22px; height: 22px; }
-.ph-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
-.ph-send:active:not(:disabled) { transform: scale(.94); }
-.ph-back2 { display: none; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .ph-compose .ph-back2 { display: inline-grid; width: 44px; height: 44px; border-radius: 15px; background: var(--panel2); color: var(--text); } .ph-compose .ph-back2 svg { width: 22px; height: 22px; } }
-.ph-send:disabled { background: var(--panel2); color: var(--dim); box-shadow: none; }
-/* 단톡·전화·연락처 추가·설정 */
-.ph-form-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
-.ph-form-foot { flex: none; display: flex; justify-content: flex-end; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
-.ph-form-foot .gx-start { width: 100%; min-height: 44px; border-radius: 12px; font-size: 16px; letter-spacing: .08em; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.ph-form-foot .gx-start svg { width: 18px; height: 18px; }
-.ph-label { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; margin-bottom: -4px; }
-.ph-label small { font-weight: 400; color: var(--dim); font-size: 13px; }
-.ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
-.ph-pick { flex: none; }
-.ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-/* 이름표와 그 상자는 한 덩어리: 줄이 바뀌면 같이 넘어간다 (2026-11-12 전수점검 F1: 「최대」 이름표만 앞줄 끝에 남았다) */
-.ph-inline.ph-pair { flex-wrap: nowrap; }
-.ph-pct { width: 72px; min-height: 34px; }
-
-/* 설정 줄 (괴담톡 설정·설정 탭 공통): 묶음마다 카드, 줄마다 왼쪽 이름·설명 / 오른쪽 조작 */
-.ps { gap: 16px; }
-.gx-body .ps-group, .ps-group { padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.ps-group h3 { margin: 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
-.ps-rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow: hidden; }
-.ps-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 12px 14px; flex-wrap: wrap; }
-.ps-row + .ps-row { border-top: 1px solid var(--panel2); }
-.ps-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 200px; }
-.ps-label b { font-size: 15px; font-weight: 600; }
-.ps-label small { font-size: 13px; color: var(--dim); line-height: 1.45; }
-.ps-ctl { flex: 0 0 auto; display: flex; justify-content: flex-end; max-width: 100%; }
-.ps-ctl .gx-seg { flex: 0 0 auto; min-width: 56px; padding: 0 12px; }
-.ps-ctl .gx-segs { margin: 0; }
-
-/* 모바일: 목록 또는 대화 한 칸 */
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gx-body.ph-app { grid-template-columns: minmax(0, 1fr); padding: 0; }
-  .ph-app.is-list .ph-pane, .ph-app.is-detail .ph-side { display: none; }
-  .gx-body .ph-side { border-right: 0; padding: 12px 12px 0; }
-  .ph-content { margin: 0 -12px; padding: 0 4px 12px; }
-
-  .ph-room-head { min-height: 56px; padding: 6px 8px; gap: 8px; }
-  .ph-head-q { flex-basis: 150px; }
-  .ph-msg { max-width: 84%; }
-  .ph-log { padding: 10px 12px 8px; }
-  .ph-composer { padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
-  .ph-form-foot .gx-start { width: 100%; }
-}
-@media (min-width: 761px) and (max-width: 1080px) and (min-height: 500px), (min-width: 761px) and (max-width: 1080px) and (pointer: fine), (min-width: 761px) and (max-width: 1080px) and (pointer: none) {
-  .gx-body.ph-app { grid-template-columns: minmax(260px, 300px) minmax(0, 1fr); }
-}
-
-/* 설정 탭 (v0.12.0): 묶음 카드 + 줄. 넓은 화면에서 너무 퍼지지 않게 가운데 */
-.gx-settings { display: flex; flex-direction: column; gap: 18px; }
-.gx-settings > * { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
-.ps-note { margin: 0 4px; font-size: 13px; color: var(--dim); line-height: 1.5; }
-.ps-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
-.ps-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.ps-card h4 { margin: 0 4px; font-size: 15px; font-weight: 700; }
-.ps-card .ps-row { padding: 9px 12px; }
-.ps-card .ps-label { flex-basis: 90px; }
-.ps-card .ps-label b { font-size: 14px; font-weight: 500; }
-.ps-row .st-step { gap: 8px; }
-.ps-row .st-step b { min-width: 3.4em; }
-.ps-row .st-confirm { max-width: 360px; }
-/* 괴담넷: 넓은 PC 화면에서 글 목록이 끝까지 퍼지지 않게 */
-.gx-body.gn:not(.ph) > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
-
-/* 좁은 칸에서 버튼 글자가 두 줄로 쪼개지지 않게 (v0.12.0) */
-.gx-seg, .gx-mini, .gx-chip, .gx-badge, .gx-st, .ph-sub, .ph-tab, .at-add, .gx-start { white-space: nowrap; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .ps-row { padding: 12px; }
-  .ps-label { flex-basis: 180px; }
-}
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  /* 편성 요원: 모바일은 한 줄에 한 명. 두 칸이면 상태·상황이 안 보이고 부서·직급이 잘렸다 (v0.14.0) */
-  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .gx-acard.pick { gap: 10px; padding: 8px 36px 8px 8px; align-items: center; }
-  .gx-acard.pick .gx-ava { width: 44px; height: 44px; border-radius: 12px; }
-  .gx-acard.pick .gx-acard-top b { font-size: 15px; }
-  .gx-acard.pick small { white-space: normal; }
-  .gx-acard.pick .gx-acard-check { top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; font-size: 12px; }
-}
-/* 명부: 다른 폴더에서 온 발생 후보 (v0.12.0) */
-.dir-group-help { margin: -4px 2px 8px; font-size: 13px; }
-.dir-ext-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--line2); border-radius: 12px; background: none; color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; }
-.dir-ext-open:hover { border-color: var(--accent-line); background: var(--accent-bg); }
-.dir-ext { margin-top: 10px; padding: 12px; border: 1px solid var(--accent-line); border-radius: 14px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
-
-/* 설정 줄 안의 고르기 목록 (로어북 호출 「상시 로어북」): 조작 아래 한 줄을 다 쓴다 */
-.ps-row > .ps-ctl:has(> .dir-ext) { flex: 1 1 100%; flex-wrap: wrap; }
-.ps-ctl > .dir-ext { flex: 1 1 100%; min-width: 0; margin-top: 0; }
-.dir-ext-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
-.dir-ext-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n a" "s a"; align-items: center; gap: 0 10px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--text); text-align: left; font: inherit; }
-.dir-ext-item:hover { background: var(--accent-bg); }
-.dir-ext-item b { grid-area: n; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dir-ext-item small { grid-area: s; font-size: 12px; color: var(--dim); }
-.dir-ext-item span { grid-area: a; font-size: 13px; font-weight: 600; color: var(--signal); white-space: nowrap; }
-
-/* 명부 → 조직: 플레이 세력 값 (v0.13.0) */
-.dir-fac { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
-.dir-fac > .gx-muted { margin: -4px 0 0; font-size: 13px; }
-.dir-fac .gx-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.dir-code { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--signal); color: var(--void); font-size: 12px; letter-spacing: .04em; }
-.dir-in textarea { min-height: 84px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.5; resize: vertical; }
-.dir-in textarea:focus { outline: none; border-color: var(--signal); }
-
-/* ── v0.14.0: 모바일 정리 · 상황판 작전 현황 · 괴담톡 공지 카드 ── */
-/* 상황판 맨 위: 위협도 + 개수 칩(누르면 그 목록으로) + 누가 어디에 투입됐는지 */
-.gx-gmark.op { background: color-mix(in srgb, var(--blue) 18%, transparent); color: var(--blue); }
-.gx-sec { scroll-margin-top: 8px; }
-/* 배치·방문자 줄: 꼬리표 + 요원 칩(사진+이름) + 세력 이름표 */
-
-.gx-pchip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px 0 3px; border-radius: 999px; background: var(--panel2); color: var(--text); font-size: 13px; font-weight: 600; white-space: nowrap; }
-.gx-ava.xs { width: 24px; height: 24px; font-size: 11px; }
-
-/* 괴담톡: 빈 목록 안내는 목록 칸 한가운데 */
-.ph-content { display: flex; flex-direction: column; }
-.ph-blank { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 24px 20px; text-align: center; }
-.ph-blank p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.6; color: var(--dim); }
-.ph-blank-in { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.ph-blank-go { min-width: 102px; min-height: 56px; padding: 0 22px; border: 0; border-radius: 14px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 18px; font-weight: 800; letter-spacing: .08em; cursor: pointer; box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--signal) 70%, transparent); }
-.ph-blank-go:hover:not(:disabled) { filter: brightness(1.06); }
-.ph-blank-go:disabled { opacity: .5; cursor: default; }
-/* 괴담톡 공지: 대화 목록과 같은 줄 (테두리 없음, 마우스 올리면 판 색, 고르면 민트) */
-.ph-notices { gap: 2px; padding: 0; }
-.ph-notice { position: relative; border-radius: 14px; background: none; overflow: hidden; }
-.ph-notice:hover { background: var(--panel); }
-.ph-notice.on, .ph-notice.on:hover { background: var(--accent-bg); }
-.ph-ncard { width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; border: 0; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
-.ph-ncard-top { display: flex; align-items: center; gap: 8px; min-width: 0; padding-right: 40px; min-height: 26px; }
-.ph-ncard-top small { flex: 1; min-width: 0; font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-nfac { flex: none; max-width: 9em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line2); background: var(--panel2); color: var(--sub); font-size: 11.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-notice-facs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0 8px; }
-.ph-notice-facs .gx-chip small { margin-left: 4px; font-family: var(--mono); font-size: 11px; opacity: .75; }
-.ph-ncard-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ph-ncard-title b { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-notice .ph-ndel { position: absolute; top: 8px; right: 8px; }
-.ph-notice .ph-tool.ph-ndel { width: var(--ctl-sm); height: var(--ctl-sm); }
-.ph-notice-bar { padding: 0 8px; }
-/* 모바일에서 펼친 공지는 판 색 바탕으로 읽기 쉽게 */
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .ph-notice.open, .ph-notice.open:hover { background: var(--panel); } }
-.ph-notice-body { margin: 0 14px 14px; padding: 12px 0 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
-.ph-notice.open .ph-ncard-title b { white-space: normal; }
-/* PC는 목록에 첫 줄·제목만, 본문은 오른쪽 칸 */
-@media (min-width: 761px) and (min-height: 500px), (min-width: 761px) and (pointer: fine), (min-width: 761px) and (pointer: none) { .ph-notice-body { display: none; } }
-.ph-row .ph-rdel { flex: none; }
-.ph-row .ph-tool.ph-rdel { width: var(--ctl-sm); height: var(--ctl-sm); color: var(--dim); }
-.ph-row .ph-tool.ph-rdel:hover { color: var(--danger); }
-.ph-notice .ph-tool.ph-ndel { color: var(--dim); }
-.ph-notice .ph-tool.ph-ndel:hover { color: var(--danger); }
-
-/* 위키 설정 등 작은 선택 버튼: 글자가 칸 밖으로 넘치지 않게 */
-.gx-segs-sm .gx-seg { flex: 0 0 auto; }
-
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  /* 커스텀 임무: 모바일은 한 칸 (예전엔 .gx-field.gx-mission 두 칸 규칙이 이겨서 안내문이 세로로 한 글자씩 깨졌다) */
-  .gx-field.gx-mission { grid-template-columns: minmax(0, 1fr); }
-  /* 위키 설정: 선택 버튼 줄을 칸 너비만큼 */
-
-}
-@media (max-width: 520px) {
-  /* 머리글: 날짜·시간이 잘리지 않게 위협도 알약은 숫자만 */
-  .gx-head-act { gap: 6px; }
-  .gx-brand { gap: 10px; }
-  .gx-brand small { overflow: visible; text-overflow: clip; }
-}
-
-/* v0.15 지도 확대: 칸은 그대로, 안쪽 그림만 확대·이동 */
-.gx-mapzoom { position: relative; transform-origin: 0 0; }
-.gx-canvas.ph .gx-mapzoom { position: absolute; inset: 0; }
-.gx-mapzoom .gx-pin { transform: translate(-50%, -50%) scale(var(--pz, 1)); }
-.gx-canvas[data-map] { touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
-.gx-canvas:is(.zoomed, .pan) { touch-action: none; cursor: grab; }
-.gx-canvas:is(.zoomed, .pan):active { cursor: grabbing; }
-.gx-mapimg { -webkit-user-drag: none; pointer-events: none; }
-.gx-zbtn.txt { font-size: 12px; font-weight: 700; letter-spacing: -.02em; }
-.gx-zoom { position: absolute; right: 8px; bottom: 8px; displ
+.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place

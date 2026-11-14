@@ -4,7 +4,7 @@
 import { sitePicList } from './sitepics';
 import { hasAttachment } from './attach';
 import { viewSite, type BoardSite } from './boards';
-import { fillVars, GUIDE_LABEL, guideOr, type GuideName } from './guides';
+import { fillVars, GUIDE_LABEL, type GuideName } from './guides';
 import { evaluate } from './cbs';
 import {
   activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, countText, trimTokens, postLimit,
@@ -33,6 +33,8 @@ export interface GnetBooks {
   read(name: string): string;
   /** 출력 언어 문장 (고급 설정 → 생성 언어) */
   language: string;
+  /** 지침의 __SITE_PICS__ 자리 채우기: 이번 요청의 최근 본문·게시판/쪽지 내용(material)에 이름이 나온 사진만 (사용자 2026-11-14. 참고 기록은 넣지 않는다). read 는 자리를 그대로 두고, 요청문을 묶을 때(pack) 채운다 */
+  pics(text: string, material: string): string;
 }
 
 /** GNet 섹션을 읽는 함수. 섹션이 빠졌으면 바로 알린다. 생성 틀(SYSTEM 등)은 옛 카드면 LB Backend에 있다 */
@@ -45,11 +47,11 @@ export function gnetBooks(src: RefSource): GnetBooks {
   const cs = gnetSettings(src.chat.scriptstate).counts;
   return {
     language: genSettings(src.chat.scriptstate).language ?? (g.LANGUAGE?.trim() || LANGUAGE),
+    // 사진 목록 머리말도 이 사이트 지침의 절 (PICS_*. 전수검사 11-13)
+    pics: (text, material) => (text.includes('__SITE_PICS__') ? text.replace(/__SITE_PICS__/g, () => sitePicList(src.char, (k) => g[k], material)) : text),
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
-        // 사진 목록 머리말도 이 사이트 지침의 절 (PICS_*. 전수검사 11-13)
-        .replace(/__SITE_PICS__/g, () => sitePicList(src.char, (k) => g[k]))
         .replace(/__GN_POST_RANGE__/g, countText(cs.post))
         .replace(/__GN_CMT_RANGE__/g, countText(cs.cmt))
         .replace(/__GN_ACT_RANGE__/g, countText(cs.act))
@@ -106,11 +108,13 @@ function pack(src: RefSource, b: GnetBooks, fn: GnetOp, thoughts: ThoughtsKey, g
     related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
     extra: [{ source: '현재 발생 상황', content: b.read('LB.EXTRA') }],
   });
-  // 참고 자료 머리말은 공통 지침 절에서, 없으면 옛 글 (전수검사 11-13)
-  const material = `${guideOr('Common', 'HEAD.REFS', '[참고 자료 — 작중 인물에게 자동 공개되지 않음]')}\n${refText(rows)}\n[최근 본문]\n${story}\n[현재 작업]\n${extras}`;
+  // 참고 자료 머리말은 프로그램 안에 둔다 (사용자 2026-11-14 C-4 (나): 공통 지침에서 읽지 않음)
+  const material = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${refText(rows)}\n[최근 본문]\n${story}\n[현재 작업]\n${extras}`;
   const attachments = hasAttachment(material);
+  // 사진 이름은 최근 본문과 게시판·쪽지 내용(현재 작업)에서만 찾는다. 늘 붙는 참고 기록(🙂Roster 등)에는 모든 인물 이름이 있어 거르기가 듣지 않는다 (사용자 2026-11-14 E-14 물음 2)
+  const named = `${story}\n${extras}`;
   const messages: CraftMessage[] = [
-    { role: 'system', content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames) },
+    { role: 'system', content: factionCodesToNames(b.pics(systemText(b, guideline, format, identity, attachments), named), factionNames) },
     { role: 'user', content: factionCodesToNames(material, factionNames) },
   ];
   return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'gn'), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }), retryRule: b.read('RETRY.FORMAT') };

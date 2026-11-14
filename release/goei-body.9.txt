@@ -1,4 +1,261 @@
-OSED_MAX = 10;
+e(/^﻿/, ""));
+    } catch (error) {
+      throw new DataPackError(`${pack4.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
+    }
+    if (!index || !Array.isArray(index.parts) || typeof index.length !== "number") throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
+    if (index.hash !== pack4.expect.hash) throw new DataPackError(oldPluginMessage(PLUGIN_VERSION, index.version) ?? `아직 이 판의 ${pack4.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
+    const re = new RegExp(`^${pack4.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
+    for (const name of index.parts) {
+      if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
+    }
+    const parts = index.parts;
+    const t0 = Date.now();
+    const text5 = await fetchParts(parts, getText, (n3) => progress4?.(`${pack4.label} 받는 중 ${n3}/${parts.length}`));
+    console.log(`[goei] ${pack4.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
+    if (text5.length !== pack4.expect.length) throw new DataPackError(`${pack4.label}를 끝까지 받지 못했어요. (${text5.length}/${pack4.expect.length}자)`);
+    const got = await sha256Text(text5);
+    if (got !== null) {
+      if (got !== pack4.expect.sha256) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(sha256). 다시 받아 주세요.`);
+    } else if (textHash(text5) !== pack4.expect.hash) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(hash). 다시 받아 주세요.`);
+    return text5;
+  }
+  async function loadWorldData(force = false) {
+    let saved = null;
+    try {
+      saved = await risuai.pluginStorage.getItem(WORLD_KEY2);
+    } catch {
+    }
+    if (typeof saved === "string" && packMatches(saved, WORLD_PACK.expect)) {
+      try {
+        applyWorldPack(saved);
+        return "store";
+      } catch (error) {
+        console.log(`[goei] 저장된 세계 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+      }
+    } else if (typeof saved === "string") console.log("[goei] 저장된 세계 자료가 이 판과 달라 다시 받아요");
+    const g2 = globalThis;
+    if (!force && g2.__goeiWorldFail && Date.now() - g2.__goeiWorldFail.at < 6e4) throw new Error(g2.__goeiWorldFail.reason);
+    let text5;
+    try {
+      text5 = await fetchPack(WORLD_PACK);
+    } catch (error) {
+      const reason3 = `${WORLD_PACK.label}(${WORLD_PACK.name})를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      g2.__goeiWorldFail = { at: Date.now(), reason: reason3 };
+      throw new Error(reason3);
+    }
+    await keepWorldData(text5);
+    return "fetch";
+  }
+  async function keepWorldData(text5) {
+    const g2 = globalThis;
+    applyWorldPack(text5);
+    delete g2.__goeiWorldFail;
+    delete g2.__goeiWorldDismissed;
+    try {
+      await risuai.pluginStorage.setItem(WORLD_KEY2, text5);
+    } catch (error) {
+      console.log(`[goei] 세계 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  async function installWorldFile(raw) {
+    const text5 = raw.replace(/^\ufeff/, "");
+    if (!packMatches(text5, WORLD_PACK.expect)) {
+      let head3 = null;
+      try {
+        head3 = text5.length < 4e3 ? JSON.parse(text5) : null;
+      } catch {
+      }
+      if (head3 && typeof head3 === "object" && Array.isArray(head3.parts)) throw new DataPackError("그건 조각 목록(goei-data-world.json)이에요. 릴리스 zip 의 goei-data-world.txt 를 넣어 주세요.");
+      throw new DataPackError(`이 플러그인 판과 맞는 세계 자료(goei-data-world.txt)가 아니에요. (${text5.length.toLocaleString()}자, 기대 ${WORLD_PACK.expect.length.toLocaleString()}자)`);
+    }
+    await keepWorldData(text5);
+  }
+  var installPending = null;
+  async function ensureInstallData(progress4) {
+    if (installDataReady()) return;
+    installPending ??= (async () => {
+      let saved = null;
+      try {
+        saved = await risuai.pluginStorage.getItem(INSTALL_KEY);
+      } catch {
+      }
+      if (typeof saved === "string" && packMatches(saved, INSTALL_PACK.expect)) {
+        try {
+          applyInstallPack(saved);
+          return;
+        } catch (error) {
+          console.log(`[goei] 저장된 설치 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+        }
+      } else if (typeof saved === "string") console.log("[goei] 저장된 설치 자료가 이 판과 달라 다시 받아요");
+      const text5 = await fetchPack(INSTALL_PACK, progress4);
+      applyInstallPack(text5);
+      try {
+        await risuai.pluginStorage.setItem(INSTALL_KEY, text5);
+      } catch (error) {
+        console.log(`[goei] 설치 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+      }
+    })().finally(() => installPending = null);
+    await installPending;
+  }
+
+  // src/host/itemicons.ts
+  var ITEMS_KEY = "goei:data-items";
+  var pack3 = null;
+  var loading3 = null;
+  var failed = "";
+  var progress = "";
+  var redraw2 = () => {
+  };
+  var urls2 = /* @__PURE__ */ new Map();
+  var hits = /* @__PURE__ */ new Map();
+  var hitGen = -1;
+  function hitOf(key, f) {
+    const g2 = iconGen();
+    if (g2 !== hitGen) {
+      hits.clear();
+      hitGen = g2;
+    }
+    if (hits.has(key)) return hits.get(key);
+    const v = f();
+    if (hits.size > 3e3) hits.delete(hits.keys().next().value);
+    hits.set(key, v);
+    return v;
+  }
+  function setItemIconRedraw(fn2) {
+    redraw2 = fn2;
+  }
+  var itemIconStatus = () => ({ ready: !!pack3, loading: !!loading3, progress, failed });
+  function ensureItemIcons() {
+    if (pack3 || loading3) return loading3 ?? Promise.resolve();
+    loading3 = (async () => {
+      failed = "";
+      try {
+        let saved = null;
+        try {
+          saved = await risuai.pluginStorage.getItem(ITEMS_KEY);
+        } catch {
+        }
+        if (typeof saved === "string" && packMatches(saved, ITEMS_PACK.expect)) {
+          try {
+            pack3 = applyItemsPack(saved);
+            hits.clear();
+            return;
+          } catch (error) {
+            console.log(`[goei] 저장된 소지품 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+          }
+        }
+        const text5 = await fetchPack(ITEMS_PACK, (t) => {
+          progress = t;
+          redraw2();
+        });
+        pack3 = applyItemsPack(text5);
+        hits.clear();
+        try {
+          await risuai.pluginStorage.setItem(ITEMS_KEY, text5);
+        } catch (error) {
+          console.log(`[goei] 소지품 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
+        }
+      } catch (error) {
+        failed = error instanceof DataPackError || error instanceof Error ? error.message : String(error);
+        console.log(`[goei] 소지품 그림 팩: ${failed}`);
+      } finally {
+        progress = "";
+        loading3 = null;
+        redraw2();
+      }
+    })();
+    return loading3;
+  }
+  function itemIconUrl(name, icon, seed2, more) {
+    if (!pack3) {
+      if (!failed) void ensureItemIcons();
+      return null;
+    }
+    const p2 = pack3;
+    return urlOf(hitOf(`i${name}${icon ?? ""}${seed2 ?? ""}${more?.desc ?? ""}`, () => matchItemIcon(p2, name, icon, seed2, more)));
+  }
+  var itemPictures = (name, icon) => pack3 ? itemPictureNames(pack3, name, icon) : null;
+  function titleIconUrl(title2) {
+    if (!pack3) {
+      if (!failed) void ensureItemIcons();
+      return null;
+    }
+    const p2 = pack3;
+    return urlOf(hitOf(`t${title2}`, () => matchTitleIcon(p2, title2) ?? p2.base.misc ?? null));
+  }
+  function urlOf(file) {
+    if (!pack3 || !file) return null;
+    let u = urls2.get(file);
+    if (!u) {
+      u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
+      urls2.set(file, u);
+    }
+    return u;
+  }
+
+  // src/ui/needfill.ts
+  var bound = false;
+  var needAttr = (name, value, busy6 = false) => ` data-need="${name}"${busy6 ? ' data-busy="1"' : ""}${busy6 || !value.trim() ? " disabled" : ""}`;
+  function bindNeedFill(doc2 = document) {
+    if (bound) return;
+    bound = true;
+    doc2.addEventListener(
+      "input",
+      (ev) => {
+        const el = ev.target;
+        const name = el?.getAttribute?.("name");
+        if (!name) return;
+        doc2.querySelectorAll(`button[data-need="${CSS.escape(name)}"]:not([data-busy])`).forEach((b) => {
+          b.disabled = !el.value.trim();
+        });
+      },
+      true
+    );
+  }
+
+  // src/ui/browser.ts
+  var esc11 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var SITES = [
+    { id: "gn", name: "괴담넷", title: "괴담넷 - 자유게시판", host: "goedam.net", path: "/board/free" },
+    { id: "gal", name: "괴담 갤러리", title: "괴담 갤러리 - 괴담갤", host: "gall.goedam.co.kr", path: "/board/lists/?id=horror" },
+    { id: "wpf", name: "세정게", title: "::: 世界政治 게시판 :::", host: "www.wpf.or.kr", path: "/zboard/zboard.php?id=politics" },
+    { id: "sm", name: "연어 마켓", title: "연어 마켓 | 미친 세상을 거슬러 오르는 우리들", host: "salmon-market.kr", path: "" },
+    { id: "cos", name: "우주 쇼핑몰", title: "★우주 쇼핑몰★에 오는 것을 환영하는 것이다", host: "cosmic-mall.alien", path: "/~shop/index.html" },
+    { id: "wk", name: "괴이위키", title: "괴이위키", host: "goei.wiki", path: "/w/괴이위키:대문" },
+    { id: "bm", name: "백일몽 포인트몰", title: "백일몽 포인트몰", host: "point.baekilmong.intra", path: "/mall/main" },
+    { id: "hs", name: "망상홈쇼핑", title: "망상홈쇼핑 LIVE", host: "live.mangsang.tv", path: "/onair" }
+  ];
+  var siteOf = (id2) => SITES.find((s8) => s8.id === id2);
+  var isSite = (id2) => SITES.some((s8) => s8.id === id2);
+  var LOGO2 = {
+    gn: ["0 0 24 24", '<path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill="#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/>'],
+    gal: ["0 0 24 24", '<path fill="#3b4890" d="M3 3h18a1 1 0 011 1v12a1 1 0 01-1 1H10l-5 4v-4H3a1 1 0 01-1-1V4a1 1 0 011-1z"/><path fill="#fff" d="M12 5.5c-2.5 0-4.3 1.9-4.3 4.2v5.1l1.4-1 1.4 1 1.5-1 1.5 1 1.4-1 1.4 1V9.7c0-2.3-1.8-4.2-4.3-4.2z"/><circle fill="#3b4890" cx="10.5" cy="9.6" r=".9"/><circle fill="#3b4890" cx="13.5" cy="9.6" r=".9"/>'],
+    wpf: ["0 0 24 24", '<circle fill="#7a1010" cx="12" cy="12" r="11"/><circle fill="#1a5aa8" cx="12" cy="12" r="7.5"/><path fill="none" stroke="#ffd24a" stroke-width="1" d="M4.5 12h15M12 4.5v15M6 8.2h12M6 15.8h12"/><ellipse fill="none" stroke="#ffd24a" stroke-width="1" cx="12" cy="12" rx="3.4" ry="7.5"/><circle fill="none" stroke="#ffd24a" stroke-width="1.2" cx="12" cy="12" r="10"/>'],
+    sm: ["0 0 32 20", '<path fill="#f26c4f" d="M2 10C5 3.5 13 1.8 20 4.5L26 1.5 24.5 10 26 18.5 20 15.5C13 18.2 5 16.5 2 10z"/><path fill="#ffb49b" d="M4 11.2c4 3.3 10.5 3.8 16 2.2-5.5.6-11-.2-16-2.2z"/><path fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round" d="M11 5.2l1.5 4M14.5 4.6l1.5 4.2M18 4.8l1.3 4"/><circle fill="#fff" cx="6.3" cy="8.6" r="1.4"/><circle fill="#2a1a14" cx="6.5" cy="8.6" r=".7"/>'],
+    cos: ["0 0 32 24", '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
+    wk: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
+    bm: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
+    hs: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
+    home: ["0 0 24 24", '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>']
+  };
+  var siteLogo = (id2, cls = "br-fv") => {
+    const [vb, body5] = LOGO2[id2 || "home"];
+    return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body5}</svg>`;
+  };
+  var ic = (d, cls = "br-i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
+  var IC = {
+    back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
+    fwd: "M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z",
+    rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
+    x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
+    add: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
+    tune: "M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z",
+    acct: "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
+    home: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",
+    srch: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+  };
+  var HIST_MAX = 50;
+  var CLOSED_MAX = 10;
   var seq3 = 1;
   var br = {
     tabs: [{ id: seq3++, site: "", hist: [], at: -1 }],
@@ -1403,7 +1660,9 @@ ${previewText(p2.body)}`;
       `${LAST2} [data-gu-x] { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--goei-accentLine); color: var(--goei-signal); line-height: 1; cursor: pointer; }`,
       `${LAST2} [data-gu-x]::before { content: "×"; }`,
       ...show.map((n3, i) => `${LAST2} [data-gu="${i}"] { display: inline-flex; } ${LAST2} [data-gu="${i}"]::before { content: ${cssStr(n3.label)}; }`),
-      more > 0 ? `${LAST2} [data-gu-more]::before { content: "외 ${more}개"; }` : ""
+      more > 0 ? `${LAST2} [data-gu-more]::before { content: "외 ${more}개"; }` : "",
+      // 보내는 중에는 × 를 숨긴다: 이미 요청에 실려 나간 사용이라 뺄 수 없다 (재검토 11-14 B-9 사용자 결정)
+      sending ? `${LAST2} [data-gu-x] { display: none; } ${LAST2} [data-gu] { padding-right: 10px; }` : ""
     ].join("\n");
   }
   var host = null;
@@ -1419,6 +1678,10 @@ ${previewText(p2.body)}`;
       return null;
     }
     return sent.ids;
+  }
+  function useSending(chat, charIndex, chatIndex, id2) {
+    if (!sent || !chat || sent.charIndex !== charIndex || sent.chatIndex !== chatIndex) return false;
+    return !chat.scriptstate?.[ITEM_USE_AT_VAR] && lastUserKey(chat) === sent.userKey && sent.ids.has(id2);
   }
   async function markUseSent(charIndex, chatIndex, chat) {
     const userKey = lastUserKey(chat);
@@ -1461,6 +1724,11 @@ ${previewText(p2.body)}`;
     styleEl = style;
     return { doc: doc2, style };
   }
+  function dropUseUnlessSent(chat, charIndex, chatIndex, id2) {
+    if (sentUseIds(chat, charIndex, chatIndex)?.has(id2)) return null;
+    const next = dropUse(readItemUse(chat.scriptstate), id2);
+    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemUseVars(next) } };
+  }
   onChatClick("use", async (doc2, x, y) => {
     if (!shown.length || where.charIndex < 0) return "idle";
     if (busy3) return false;
@@ -1472,10 +1740,7 @@ ${previewText(p2.body)}`;
       busy3 = true;
       try {
         const { charIndex, chatIndex } = where;
-        await updateChat(charIndex, chatIndex, (chat) => {
-          const next = dropUse(readItemUse(chat.scriptstate), id2);
-          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemUseVars(next) } };
-        });
+        await updateChat(charIndex, chatIndex, (chat) => dropUseUnlessSent(chat, charIndex, chatIndex, id2));
         await refreshUseBox(charIndex, chatIndex);
       } catch (error) {
         console.log(`[goei] 사용 상자 빼기 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -2577,14 +2842,19 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ""}
     const job = chatKey4(ctx2);
     if (jobs4.has(job)) return;
     jobs4.add(job);
-    const s8 = hsSettings(ctx2.chat.scriptstate);
     ui.loading = true;
     ui.notice = "";
     ui.failRaw = "";
     env3.render();
     let failed4 = false;
     try {
-      if (!homeshopArt() && !homeshopStatus().failed) await ensureHomeshop();
+      if (!homeshopArt() && !homeshopStatus().failed) {
+        await ensureHomeshop();
+        const now2 = env3.current();
+        if (!now2 || chatKey4(now2) !== job) return;
+        ctx2 = now2;
+      }
+      const s8 = hsSettings(ctx2.chat.scriptstate);
       const show = readShow(ctx2.chat.scriptstate);
       const g2 = genSettings(ctx2.chat.scriptstate);
       const moods = moodMap(homeshopArt()?.pack ?? null);
@@ -3199,188 +3469,4 @@ ${nick}: ${text5.slice(0, 200)}`;
       const act2 = where2 === "sell" ? "shop-sell-pick" : "items-open";
       const left = itemLeft(items, it, alive);
       when3 ??= whenOf(ctx2);
-      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc17(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${it.equip ?? ""}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc17(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when3)}</button>`;
-    };
-    const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join("")}</div>`;
-    return { av: avatarHtml(ctx2), slots };
-  }
-  function useBox(ctx2) {
-    const live = liveOf(ctx2);
-    const q = useQueue(ctx2).flatMap((u) => {
-      const it = live.find((x) => x.id === u.id);
-      return it ? [{ it, n: u.n }] : [];
-    });
-    const chips3 = q.map(({ it, n: n3 }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc17(it.name)}</b>${n3 > 1 ? `<em>×${n3}</em>` : ""}<button class="it-ux" data-action="items-unuse" data-value="${esc17(it.id)}" aria-label="${esc17(it.name)} 사용 취소">${ICONS.close}</button></span>`).join("");
-    return `<div class="it-usebox${q.length ? "" : " empty"}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips3 || '<p class="it-uhint">쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.</p>'}</div></div>`;
-  }
-  var wtMark = (it, left) => {
-    const w = lineWeight(it, left);
-    return w !== void 0 ? `<span class="it-wt" title="무게">${weightText(w)}</span>` : "";
-  };
-  var stateCls = (it) => it.state === "broken" ? " broken" : it.state === "damaged" ? " damaged" : "";
-  function marks(it, left) {
-    return `${left !== void 0 ? `<span class="it-left" title="남은 횟수">${left}</span>` : ""}${it.state === "damaged" ? '<span class="it-crack" title="손상" aria-hidden="true"></span>' : it.state === "broken" ? '<span class="it-brk" title="고장">고장</span>' : ""}`;
-  }
-  function tipOf(it, left, w) {
-    const tr = traitsLine(it, left);
-    return `<span class="it-tip" aria-hidden="true"><b>${esc17(it.name)}</b><small>${esc17([tr, sourceLine(it, w)].filter(Boolean).join(" · "))}</small>${it.desc ? `<p>${esc17(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc17(it.effect)}</p>` : ""}</span>`;
-  }
-  function gridHtml(ctx2) {
-    const slots = itemSlots(ctx2.chat.scriptstate);
-    const q = itemsUi.q.trim();
-    const items = itemsOf(ctx2);
-    const alive = aliveAnchors(ctx2.chat);
-    const list4 = q ? searchItems(items, alive, q).items : gridItems(liveItems(items, alive));
-    if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
-    const w = whenOf(ctx2);
-    const queued2 = new Map(useQueue(ctx2).map((u) => [u.id, u.n]));
-    const live = liveItems(items, alive);
-    const cells2 = list4.map((it, i) => cell(it, itemLeft(items, it, alive), !q && i >= slots, w, queued2.get(it.id) ?? 0, canUse(it) && (it.equip !== "gear" || isEquipped(it, live))));
-    if (!q) for (let i = list4.length; i < slots; i++) cells2.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
-    return `<div class="it-grid" data-drop="grid">${cells2.join("")}</div>`;
-  }
-  function cell(it, left, over, w, queued2, usable) {
-    const all = queued2 > 0 && (left === void 0 || queued2 >= left);
-    const drag = !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${usable ? ' data-usable="1"' : ""}` : "";
-    return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}${all ? " queued" : ""}${stateCls(it)}" data-action="items-open" data-value="${esc17(it.id)}"${drag} aria-label="${esc17(it.name)}${over ? " (넘침)" : ""}${queued2 ? " (사용 예정)" : ""}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued2 ? `<span class="it-q8">사용 예정${queued2 > 1 ? ` ×${queued2}` : ""}</span>` : ""}<b>${esc17(it.name)}</b>${tipOf(it, left, w)}</button>`;
-  }
-  var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖", left: "없어짐", off: "해제" };
-  var BY = { story: "본문", manual: "직접", use: "사용 단추", store: "상점" };
-  var WEEK4 = "일월화수목금토";
-  function dayOf3(when3) {
-    const m = /(\d{4})\.(\d{2})\.(\d{2})/.exec(when3);
-    if (!m) return when3.split(" ")[0] || "날짜 없음";
-    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
-    return `${m[1]}.${m[2]}.${m[3]} (${WEEK4[d.getUTCDay()]})`;
-  }
-  function logList(ctx2) {
-    const q = itemsUi.q.trim();
-    const items = itemsOf(ctx2);
-    const alive = aliveAnchors(ctx2.chat);
-    const all = (q ? searchItems(items, alive, q).log : items.log.slice().reverse()).filter((l) => !l.anchor || alive.has(l.anchor));
-    const rows3 = all.filter((l) => itemsUi.logFilter === "get" ? l.what === "get" : itemsUi.logFilter === "out" ? l.what !== "get" : true);
-    const chip3 = (v, label2, n3) => `<button class="gx-chip${itemsUi.logFilter === v ? " on" : ""}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label2}${n3 ? ` <small>${n3}</small>` : ""}</button>`;
-    const got = all.filter((l) => l.what === "get").length;
-    const chips3 = `<div class="gx-rec-tools it-logchips">${chip3("all", "전체", all.length)}${chip3("get", "획득", got)}${chip3("out", "사용", all.length - got)}</div>`;
-    if (!rows3.length) return `${chips3}<p class="gx-wt-empty">${q ? "맞는 기록이 없어요." : itemsUi.logFilter === "get" ? "아직 획득한 물건이 없어요." : itemsUi.logFilter === "out" ? "아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요." : "아직 기록이 없어요. 물건을 얻거나 쓰면 여기에 쌓여요."}</p>`;
-    const w = whenOf(ctx2);
-    const pic3 = (l) => itemPic(l);
-    const row8 = (l) => {
-      const when3 = whenLabel(w, l.anchor, l.at);
-      const sub = [BY[l.by] ?? l.by, l.what === "use" && (l.n ?? 1) > 1 ? `×${l.n}` : "", l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · ");
-      return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic3(l)}</span><span class="gx-wt-memo"><b>${esc17(l.name)} <em class="it-what ${l.what === "get" ? "get" : "out"}">${WHAT[l.what] ?? l.what}</em></b><small>${esc17(sub)}</small></span><span class="gx-wt-amt"><small>${esc17(when3.split(" ")[1] ?? when3)}</small></span></div></li>`;
-    };
-    const groups = [];
-    for (const l of rows3) {
-      const day = dayOf3(whenLabel(w, l.anchor, l.at));
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.day === day) g2.rows.push(l);
-      else groups.push({ day, rows: [l] });
-    }
-    const cut3 = moreCut("items-log", `${itemsUi.logFilter}|${q}`, ctx2.chat.scriptstate, groups);
-    return `${chips3}<div class="gx-wallettab it-log">${cut3.groups.map((g2) => {
-      const gi = g2.rows.filter((l) => l.what === "get").length;
-      const go3 = g2.rows.length - gi;
-      return `<section class="gx-wt-day"><h3><span>${esc17(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go3 ? `사용 ${go3}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.shown.map(row8).join("")}</ul></section>`;
-    }).join("")}${cut3.more}</div>`;
-  }
-  function popup(ctx2) {
-    if (itemsUi.mode === "add") return shell2("직접 넣기", form(null));
-    if (!itemsUi.open) return "";
-    const it = liveOf(ctx2).find((x) => x.id === itemsUi.open);
-    if (!it) return "";
-    if (itemsUi.mode === "edit" && itemEditOn(ctx2.chat.scriptstate)) return shell2("고치기", form(it, leftOf(ctx2, it)));
-    if (itemsUi.mode === "merge") return shell2("합치기", mergePick(ctx2, it));
-    const head3 = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc17(it.name)}</b><small>${esc17([traitsLine(it, leftOf(ctx2, it)), sourceLine(it, whenOf(ctx2))].filter(Boolean).join(" · "))}</small></div></div>`;
-    if (itemsUi.mode === "drop") {
-      return shell2("버리기", `${head3}<p>버릴까요? 목록에서 빠지고 기록에 남아요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-drop" data-value="${esc17(it.id)}">버리기</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
-    }
-    if (itemsUi.mode === "purge") {
-      return shell2("삭제", `${head3}<p>삭제할까요? 목록과 기록에서 지워지고 되돌릴 수 없어요.</p><div class="it-btns"><button class="gx-chip red" data-action="items-purge" data-value="${esc17(it.id)}">삭제</button><button class="gx-chip" data-action="items-back">취소</button></div>`);
-    }
-    const queued2 = useQueue(ctx2).find((u) => u.id === it.id)?.n ?? 0;
-    const left = leftOf(ctx2, it);
-    const more = usableNow(ctx2, it) && (left === void 0 ? !queued2 : queued2 < left);
-    const equipped = isEquipped(it, liveOf(ctx2));
-    const body5 = `${head3}
-    ${it.desc ? `<p>${esc17(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
-    ${it.effect ? `<p class="ef">효과: ${esc17(it.effect)}</p>` : ""}
-    ${it.state === "broken" ? '<p class="bad">고장 나서 쓸 수 없어요.</p>' : ""}
-    ${it.text ? `<div class="it-note">${esc17(it.text)}</div>` : ""}
-    ${it.quote ? `<p class="qt">근거 「${esc17(it.quote)}」</p>` : ""}
-    <div class="it-btns">
-      ${it.use ? `<button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc17(it.id)}" ${more || queued2 ? "" : "disabled"}${needsEquip(ctx2, it) ? ' title="장착해야 쓸 수 있어요"' : ""}>${queued2 ? more ? `한 번 더 (×${queued2 + 1})` : `사용 ×${queued2}` : "사용"}</button>` : ""}
-      ${queued2 ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc17(it.id)}">사용 취소</button>` : ""}
-      ${boxButton(ctx2, it.id)}
-      <button class="gx-chip" data-action="${equipped ? "items-unequip" : "items-equip"}" data-value="${esc17(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ""}>${equipLabel(it, equipped)}</button>
-      ${itemEditOn(ctx2.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ""}
-      ${it.uses !== void 0 ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx2, it).length ? "" : "disabled"} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ""}
-      <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc17(it.id)}">버리기</button>
-    </div>
-    ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 메인 요청에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
-    return shell2(it.name, body5, it.id);
-  }
-  var shell2 = (label2, inner, del = "") => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc17(label2)}"><div class="gx-agpop-card it-card" data-action="items-keep">${del ? `<button class="gx-agpop-x it-del" data-action="items-purge-ask" data-value="${esc17(del)}" aria-label="삭제" title="삭제">${ICONS.trash}</button>` : ""}<button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
-  function form(it, left) {
-    const eq = it?.equip ?? "";
-    const opt = (v, l) => `<option value="${v}"${eq === v ? " selected" : ""}>${l}</option>`;
-    const pics2 = it ? itemPictures(it.name, it.icon) : null;
-    const picNow = it ? splitIconWord(it.icon).word : "";
-    return `<div class="it-form" data-it-form="1">
-    <label><span>이름</span><input name="name" maxlength="30" required value="${esc17(it?.name ?? "")}" placeholder="예: 소금 봉지"></label>
-    <label><span>설명</span><input name="desc" maxlength="80" value="${esc17(it?.desc ?? "")}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
-    <label><span>효과</span><input name="effect" maxlength="60" value="${esc17(it?.effect ?? "")}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
-    <label><span>장착</span><select name="equip">${opt("", "없음")}${opt("weapon", "손")}${opt("gear", "장비")}</select></label>
-    <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? " checked" : ""}> 쓸 수 있음</span></label>
-    <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ""}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
-    <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ""}" placeholder="kg"></label>
-${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 === picNow) ? "" : '<option value="" selected>그대로</option>'}${pics2.map((n3) => `<option value="${esc17(n3)}"${n3 === picNow ? " selected" : ""}>${esc17(n3)}</option>`).join("")}</select></label>` : ""}
-    <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc17(it?.id ?? "")}">${it ? "저장" : "넣기"}</button><button type="button" class="gx-chip" data-action="${it ? "items-back" : "items-close"}">취소</button></div>
-  </div>`;
-  }
-  function mergePick(ctx2, keep2) {
-    const others = mergeMates(ctx2, keep2);
-    const w = whenOf(ctx2);
-    return `<div class="it-ph"><span class="it-ic">${itemPic(keep2)}</span><div><b>${esc17(keep2.name)}</b><small>합칠 상대를 고르세요. 이름·설명은 이 물건 그대로, 남은 횟수와 무게만 더해져요.</small></div></div>
-    <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc17(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc17(o.name)}</b><small>${esc17(o.desc || sourceLine(o, w))}</small></span></button></li>`).join("")}</ul>
-    <div class="it-btns"><button class="gx-chip" data-action="items-back">취소</button></div>`;
-  }
-  async function itemsAction(action, value, ctx2, env3, formEl) {
-    const write = (fn2) => updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const cur = readItems(chat.scriptstate);
-      const next = fn2(cur, aliveAnchors(chat));
-      if (next === cur) return null;
-      return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemsVars(next) } };
-    });
-    const full = (k) => {
-      itemsUi.info = fullText(k);
-      env3.render();
-    };
-    const holdFirst = async (it) => {
-      if (it.equip !== "weapon" || !canUse(it) || isEquipped(it, liveOf(ctx2))) return true;
-      if (!equippedOf(liveOf(ctx2)).weapon.some((x) => !x)) {
-        full("weapon");
-        return false;
-      }
-      await write((x, alive) => equipItem(x, alive, it.id));
-      return true;
-    };
-    switch (action) {
-      case "items-sub":
-        itemsUi.sub = value === "wallet" || value === "points" ? value : "items";
-        Object.assign(walletUi, { open: null, edit: false, notice: "" });
-        itemsUi.open = "";
-        itemsUi.mode = "view";
-        itemsUi.notice = "";
-        env3.render();
-        return true;
-      case "items-log-filter":
-        itemsUi.logFilter = value === "get" ? "get" : value === "out" ? "out" : "all";
-        env3.render();
-        return true;
-      case "items-view":
-        itemsUi.view = value === "log" ? "log" : "grid";
-        env3.render();
-        return true;
-      case "items-open":
-        itemsU
+      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc17(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhon

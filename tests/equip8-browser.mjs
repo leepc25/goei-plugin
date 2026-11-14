@@ -72,7 +72,8 @@ function checkSlots(tag, m, size, cols) {
   if (m.boxOver) bad(`[${tag}] 띠 안 가로 넘침`);
   return { size: sz.join(' '), cols: xs.length, rows: ys.length };
 }
-const stateOf = (page) => page.evaluate(() => ({ use: JSON.parse(window.__chat.scriptstate.$st_item_use || '[]'), slots: Object.fromEntries(JSON.parse(window.__chat.scriptstate.$st_items).list.filter((x) => x.slot !== undefined).map((x) => [x.id, `${x.equip}:${x.slot}`])), note: [...document.querySelectorAll('.gx-toast, .gx-note, [role="status"]')].map((e) => e.textContent.trim()).filter(Boolean).join(' / ') }));
+/** 사용 예정·칸 자리. 칸 값은 `갈래:번호`, 제 갈래가 아닌데 손에 든(held) 물건은 `held:번호` (held 표시가 빠지면 화면 손 칸에 안 보인다) */
+const stateOf = (page) => page.evaluate(() => ({ use: JSON.parse(window.__chat.scriptstate.$st_item_use || '[]'), slots: Object.fromEntries(JSON.parse(window.__chat.scriptstate.$st_items).list.filter((x) => x.slot !== undefined).map((x) => [x.id, `${x.held === true ? 'held' : x.equip}:${x.slot}`])), note: [...document.querySelectorAll('.gx-toast, .gx-note, [role="status"]')].map((e) => e.textContent.trim()).filter(Boolean).join(' / ') }));
 
 // ── 1. PC 배치: 실제 창 1920×1080, 그리고 1100×900·좁은 PC 800×900
 if (PART.includes('layout')) {
@@ -134,15 +135,31 @@ if (PART.includes('drag')) {
   await drag(cell('i_boot'), '[data-drop="equip:gear:4"]');
   const s5 = await stateOf(page);
   if (s5.slots.i_boot !== 'gear:4') bad(`[drag] 칸에 직접 놓기(장비 5번째 칸): ${JSON.stringify(s5.slots)}`);
+  const sans = (o, id) => JSON.stringify(Object.fromEntries(Object.entries(o).filter(([k]) => k !== id)));
+  // 갈래도 사용도 없는 물건 → 아바타 = 빈 손 칸에 든다 (사용자 2026-11-14: 손 칸에는 아무 물건이나). 손 0 은 삼단봉이라 빈 손 칸은 1
+  await drag(cell('i_pouch'), '.gx-items .it-av');
+  const s5p = await stateOf(page);
+  const m5p = await measure(page);
+  if (s5p.slots.i_pouch !== 'held:1' || m5p.slots[1].id !== 'i_pouch') bad(`[drag] 갈래 없는 물건 → 아바타(빈 손 칸): ${JSON.stringify(s5p.slots)} / 화면 ${m5p.slots.map((x) => x.id || '-').join()}`);
+  if (sans(s5p.slots, 'i_pouch') !== JSON.stringify(s5.slots) || JSON.stringify(s5p.use) !== JSON.stringify(s5.use)) bad(`[drag] 갈래 없는 물건을 들었는데 다른 것이 바뀜 ${JSON.stringify(s5p)}`);
+  // 손 칸의 물건 → 격자 = 손에서 내린다 (다음 단계가 빈 손 칸 1 을 쓴다)
+  await drag('.gx-items .it-eqslots .it-slot[data-value="i_pouch"]', '.gx-items .it-grid', { x: 8, y: 8 });
+  const s5q = await stateOf(page);
+  if (JSON.stringify([s5q.use, s5q.slots]) !== JSON.stringify([s5.use, s5.slots]) || !(await page.$(cell('i_pouch')))) bad(`[drag] 손 칸 → 격자로 안 내려감 ${JSON.stringify(s5q.slots)}`);
   // 손 칸에는 아무 물건이나 (사용자 2026-11-14): 쓰는 물건(장착 갈래 없음)을 빈 손 칸 위에 놓으면 그 손 칸에 든다. 사용 예정에는 안 들어간다
   await drag(cell('i_light'), '[data-drop="equip:weapon:1"]');
   const s6 = await stateOf(page);
-  if (s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 손 칸에 놓은 물건이 사용 예정에: ${JSON.stringify(s6.use)}`);
-  if (!String(s6.slots.i_light ?? '').endsWith(':1')) bad(`[drag] 손 칸에 안 들어감 ${JSON.stringify(s6.slots)}`);
-  // 쓰지도 장착하지도 않는 물건 → 아바타 = 아무 일 없음
+  const m6 = await measure(page);
+  if (s6.use.some((u) => u.id === 'i_light') || JSON.stringify(s6.use) !== JSON.stringify(s5q.use)) bad(`[drag] 손 칸에 놓은 물건이 사용 예정에: ${JSON.stringify(s6.use)}`);
+  if (s6.slots.i_light !== 'held:1' || m6.slots[1].id !== 'i_light') bad(`[drag] 손 칸에 안 들어감 ${JSON.stringify(s6.slots)} / 화면 ${m6.slots.map((x) => x.id || '-').join()}`);
+  if (sans(s6.slots, 'i_light') !== JSON.stringify(s5q.slots)) bad(`[drag] 손 칸에 놓았는데 다른 칸이 바뀜 ${JSON.stringify(s6.slots)}`);
+  // 손 2칸이 다 참(삼단봉·손전등) → 갈래 없는 물건을 아바타에 놓으면 제자리 + 안내 글
   await drag(cell('i_pouch'), '.gx-items .it-av');
   const s7 = await stateOf(page);
-  if (JSON.stringify([s7.use, s7.slots]) !== JSON.stringify([s6.use, s6.slots])) bad(`[drag] 못 쓰는 물건이 무언가 바꿈 ${JSON.stringify(s7)}`);
+  const txt7 = await page.evaluate(() => document.querySelector('.gx')?.innerText ?? '');
+  if (JSON.stringify([s7.use, s7.slots]) !== JSON.stringify([s6.use, s6.slots])) bad(`[drag] 손이 꽉 찼는데 무언가 바뀜 ${JSON.stringify(s7)}`);
+  if (!txt7.includes('손 칸이 다 찼어요')) bad(`[drag] 손이 꽉 찼는데 안내 글이 안 보임`);
+  if (!(await page.$(cell('i_pouch')))) bad(`[drag] 손이 꽉 찼는데 물건이 격자에서 사라짐`);
   // ④ 장비 6칸이 다 참 → 아바타에 놓으면 제자리 + 안내 글
   const before = await stateOf(page);
   if (Object.values(before.slots).filter((v) => v.startsWith('gear:')).length !== 6) bad(`[drag④] 준비: 장비 6칸이 다 안 참 ${JSON.stringify(before.slots)}`);
@@ -167,7 +184,7 @@ if (PART.includes('drag')) {
   await page.screenshot({ path: `${out}/pc_drag_over_avatar.png` });
   await page.mouse.up(); await sleep(300);
   if (!hover.av) bad(`[drag] 끄는 동안 아바타 자리 표시가 없음 ${JSON.stringify(hover)}`);
-  report.drag = { '①쓰는 물건→아바타': s1b.use, '②장비→아바타': s2.slots.i_gown, '②b장비→장착 묶음': s2b.slots.i_glove, '③둘 다→아바타': s3.slots.i_baton, '칸에 직접(장비5·6번째)': [s5.slots.i_boot, s4.slots.i_suit], '쓰는 물건→칸 위': s6.use.map((u) => u.id), '④꽉 참': '제자리 + 안내 글' };
+  report.drag = { '①쓰는 물건→아바타': s1b.use, '②장비→아바타': s2.slots.i_gown, '②b장비→장착 묶음': s2b.slots.i_glove, '③둘 다→아바타': s3.slots.i_baton, '칸에 직접(장비5·6번째)': [s5.slots.i_boot, s4.slots.i_suit], '갈래 없는 물건→아바타': s5p.slots.i_pouch, '쓰는 물건→칸 위': s6.slots.i_light, '손 꽉 참': '제자리 + 안내 글', '④꽉 참': '제자리 + 안내 글' };
   errorsAll.push(...errors.map((e) => `[drag] ${e}`));
   await page.close();
 }

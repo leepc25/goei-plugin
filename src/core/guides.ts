@@ -70,7 +70,9 @@ function salmonGuide(): string {
     .replace(/^괴담갤 \(괴담 갤러리\) is a completely civilian[^\n]*$/m, SALMON_ABOUT)
     .replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS)
     // 괴담갤에서 물려받은 DC 말투 기본 문장 대신 여러 사람이 쓰는 중고 거래 앱 말투 (사용자 2026-11-14)
-    .replace('Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', SALMON_TONE);
+    .replace('Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', SALMON_TONE)
+    // 「not a story board」 바로 뒤에 붙는 괴담갤 문장은 연어 마켓에서만 뺀다 (사용자 2026-11-14, C-13)
+    .replace('{{/when}}Include serious firsthand accounts too. Vary ages', '{{/when}}Vary ages');
 }
 const SALMON_TONE = 'Write like a busy neighborhood resale app used by very different people, each in their own way: terse sellers who give only the item, condition and price; chatty sellers who explain why they are selling; older users in polite full sentences; younger users in clipped casual speech; collectors precise about provenance; brokers vague about where things came from; buyers who haggle, ask to reserve, ask for more photos or never reply. Vary length, politeness, spelling care and how much each poster reveals. Keep it a trade board, not a story board. ';
 const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
@@ -370,7 +372,7 @@ export const fillVars = (text: string, vars: Record<string, string | number>): s
 /* 비우면 기본 글이 쓰이는 절 (전수검사 11-13 나-51 사용자: 지금처럼 기본 글을 쓰고, 빈 칸에 「비우면 기본 글이 쓰여요」라고 표시).
    guideOr·guideSec 나 「읽은 글 || 옛 글」 꼴로 읽는 절이다. 그 밖의 절은 비우면 요청에서 정말로 빠진다 */
 const BLANK_DEFAULT_ALL: GuideName[] = ['Common', 'Main', 'UpdaterExtra', 'Asset'];
-const BLANK_DEFAULT_GNET = /^(LANGUAGE|IMPORTANT_NOTE|POST\.TAG_RULE|POST\.TAG_FORMAT|COMMENT\.TIME_RULE|KEYFIGURES\.FORMAT|SAMPLING|ACTION\.COMMENT|ACTION\.POST_REFRESH|PUBLIC\.ACCESS|RETRY\.FORMAT|DM\.QUOTE_UNKNOWN)$/;
+const BLANK_DEFAULT_GNET = /^(LANGUAGE|IMPORTANT_NOTE|POST\.TAG_RULE|POST\.TAG_FORMAT|COMMENT\.TIME_RULE|KEYFIGURES\.FORMAT|SAMPLING|ACTION\.COMMENT|ACTION\.POST_REFRESH|PUBLIC\.ACCESS|RETRY\.FORMAT|DM\.QUOTE_UNKNOWN|PICS_(NONE|PEOPLE|EXPR|THINGS))$/;
 const BLANK_DEFAULT_SHOP = /^(TRUTH_(ALL|MIX|NONE)|SECRET_NOTE|WHERE_(ANY|SHOP)|ASSIGN_(ROLE_USEFUL|ROLE_BROAD|RULE)|HEAD_(REFS|ASSIGN|ORDERS|NOTES))$/;
 const BLANK_DEFAULT: Partial<Record<GuideName, RegExp>> = {
   GNet: BLANK_DEFAULT_GNET, Gal: BLANK_DEFAULT_GNET, Wpf: BLANK_DEFAULT_GNET, Salmon: BLANK_DEFAULT_GNET,

@@ -17,12 +17,27 @@ const BASE = calls(M);
 // 상점 파일의 절 가운데 몇은 그 몰 지침에만 있다 (전수검사 11-13: 상점 지침은 몰 전용 절을, 우주몰·백일몽몰은 상점 전용 절을 뺌)
 const IN = { TRUTH_ALL: ['Cos'], TRUTH_MIX: ['Cos'], TRUTH_NONE: ['Cos'], SECRET_NOTE: ['Cos'], WHERE_ANY: ['Shop'], WHERE_SHOP: ['Shop'], ASSIGN_ROLE_USEFUL: ['Cos', 'Bm'], ASSIGN_ROLE_BROAD: ['Cos', 'Bm'], ASSIGN_RULE: ['Cos', 'Bm'] };
 const guidesOf = (file, name) => (file === 'Shop' && IN[name]) || GUIDES_OF[file];
+// 사용자 2026-11-14 (여쭐 것 B~E 답): 옮긴 뒤 고친 지침 문장. 옛 글에 같은 고침을 입혀 견준다
+const ANSWERED = [
+  ['"react":"<≤400 chars or omit>"', '"react":"<≤400 chars, only when `react` is defined above; else omit>"'],
+  [' `affinity.appraisal` (first impression) is never rewritten: return it unchanged or leave the slot out.', ''],
+  ['(true = 0.10.9 explicit vocabulary, false = 0.10.7 blunt style)', '(true = explicit vocabulary, false = blunt style)'],
+  [' rather than the summary fields', ''],
+  ['Never propose dialogue, emotion, next actions, plot or outcomes.', 'Never propose dialogue, emotion, next actions, plot or outcomes beyond what a feature section below asks for.'],
+  ["the user's latest input (≤120 chars)", "the user's latest input (≤400 chars)"],
+  ['{"name":"<canonical>","reason":"<≤40 chars>"}', '{"name":"<canonical>"}'],
+  ['updates: PATCH rows, add /messages/- only, each supplied room ID at most once.', 'updates: PATCH rows, each supplied room ID at most once.'],
+  // 11-14 사용자: 「댓글을 다 비우지 마라」 네 번 → 한 번만 (AUTO.GUIDELINE 것만 남김)
+  [' Empty comments is [] only for a quiet thread.', ''],
+  [' do not copy identical counts or treat every topic as a silent thread.', ' do not copy identical counts.'],
+  [' Zero comments is valid for an individual quiet post, not a default for every topic.', ''],
+];
 const moved = Object.entries(OLD.sections).flatMap(([file, list]) => list.map(([name, body]) => ({ file, name, body })));
 
 test('옮긴 절: 기본 지침의 글이 옛 소스 글자와 같다', () => {
   assert.equal(moved.length, 95);
   for (const { file, name, body } of moved) {
-    for (const guide of guidesOf(file, name)) assert.equal(sectionsOf(guide)[name], body, `${guide} / ${name}`);
+    for (const guide of guidesOf(file, name)) assert.equal(sectionsOf(guide)[name], ANSWERED.reduce((x, [o, n]) => x.split(o).join(n), body), `${guide} / ${name}`);
   }
 });
 
@@ -100,7 +115,9 @@ test('기본 지침으로 만든 요청문 = 옮기기 전 코드가 만들던 �
     // 사용자 2026-11-14: 「무기」 칸 → 「손」 칸 (손에 드는 것 전부)
     ['무기 (held and fought with)', '손 (held in the hand to be used or fought with: weapons, tools, lights, umbrellas and anything else the protagonist holds rather than wears; the protagonist has two hands)'],
   ];
-  const later = (t) => LATER.reduce((x, [a, b]) => x.split(a).join(b), t);
+  // 요청문은 JSON 글자열 꼴(따옴표 \\")로 견주므로 두 꼴 모두 입힌다
+  const esc = (t) => JSON.stringify(t).slice(1, -1);
+  const later = (t) => [...LATER, ...ANSWERED, ...ANSWERED.map(([a, b]) => [esc(a), esc(b)])].reduce((x, [a, b]) => x.split(a).join(b), t);
   for (const k of names) assert.equal(BASE[k], later(OLD.calls[k]), k);
 });
 

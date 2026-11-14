@@ -1,4 +1,4 @@
-// 릴리스 준비 (전수점검 §11-8, 2026-11-06): 손으로 하던 ①판 올림 → ②빌드 → ③카드·release 부속 → ④release 복사 → ⑤형 검사·단위 시험을
+// 릴리스 준비 (전수점검 §11-8, 2026-11-06): 손으로 하던 ①판 올림 → ②빌드(카드 빌드가 쓰는 dist-test/core.mjs 용) → ③카드·release 부속 → ②빌드(카드 빌드가 팩 원료를 다시 쓰므로 그 뒤) → ④release 복사 → ⑤형 검사·단위 시험을
 // 한 번에 돌리고, 남은 절차(브라우저 시험·PR·릴리스)를 체크리스트로 보여 준다. main 반영·릴리스는 하지 않는다 (사용자가 「릴리스해」라고 할 때만).
 //
 // 사용법: npm run release:prep -- [옵션]
@@ -63,13 +63,13 @@ if (version !== before) {
   }
 } else log(`① 판 그대로 ${version} (--bump 또는 --version 으로 올릴 수 있음)`);
 
-// ② 빌드
-run('npm', ['run', 'build'], '② 빌드');
-
 // ③ 카드 + release 부속 (card-update.* · version.json · wiki-base.* · icon.png · pic/)
 if (opt.card) {
   const src = 'card/원본_봇카드.jpeg';
   if (!existsSync(resolve(ROOT, src))) { console.error(`[release:prep] ✗ ${src} 가 없어요 (카드 원본은 저장소에 있어야 함).`); process.exit(1); }
+  // 카드 빌드는 scripts/migrate-lore.mjs 로 dist-test/core.mjs(빌드가 만드는 파일, git 에 없음)를 불러 카드 명부를 만든다.
+  // 그래서 카드 앞에서도 한 번 빌드한다 — 없으면 새 클론에서 바로 실패하고, 옛 것이 남아 있으면 옛 코드로 명부를 만든다
+  run('npm', ['run', 'build'], '② 빌드');
   run('python3', ['tools/build_lite_card.py', src, 'release/괴이_ANOMALY.charx'], '③ 카드 빌드');
   // 카드 빌드는 지난 판 pic 파일을 지운다 → 결과물 삭제 금지 규칙대로 되살린다 (2026-11-05 와 같게)
   const deleted = git(['status', '--porcelain', '--', 'release/pic']).split('\n').filter((l) => l.startsWith(' D') || l.startsWith('D ')).map((l) => l.slice(3).trim());
@@ -78,6 +78,10 @@ if (opt.card) {
     if (!opt.dry) spawnSync('git', ['checkout', '--', ...deleted], { cwd: ROOT, stdio: 'inherit' });
   }
 } else log('③ 카드 빌드 건너뜀 (--no-card)');
+
+// ② 빌드 — 카드 빌드(③) 뒤에 돌린다. 카드 빌드가 팩의 원료(src/data/install/*.json · src/data/world/greetings.json)를 다시 쓰므로,
+// 먼저 빌드하면 ④ 가 옛 자료로 만든 본체·팩을 release 에 복사한다 (재검토 11-14 loader#10). 카드 빌드는 dist 는 읽지 않지만 dist-test/core.mjs 는 읽는다(위 ③ 앞의 빌드)
+run('npm', ['run', 'build'], '② 빌드');
 
 // ④ dist → release (시작기·본체 조각·자료 팩·토크나이저 조각). 옛 조각은 지우지 않는다
 {

@@ -61,3 +61,15 @@ test('applyPlayer: 한글 이름은 앞뒤가 다른 한글 낱말일 때 바꾸
   const b = Player.applyPlayer([{ role: 'user', content: '민수가 문을 연다. 민수는 민수' }], block, '', '민수', '쟈알디');
   assert.equal(b.at(-1).content, '쟈알디가 문을 연다. 쟈알디는 쟈알디');
 });
+
+test('applyPlayer: 겹친 조사·서술격·씨/님+조사도 바꾸고, 다른 낱말은 그대로 둔다 (재검토 11-14 ①-4)', () => {
+  const block = '## Player Character\nX';
+  const run = (text, from = '민수', to = '에일린') => Player.applyPlayer([{ role: 'system', content: 's' }, { role: 'user', content: text }], block, '', from, to).at(-1).content;
+  assert.equal(run('민수는 민수였고, 민수에게도 민수로서의 사정이 있었다'), '에일린는 에일린였고, 에일린에게도 에일린로서의 사정이 있었다');
+  for (const tail of ['에게는', '였다', '입니다', '씨는', '님이', '로서', '처럼', '라고', '에', '로', '까지', '이다', '이었다', '씨에게는', '님께서는', '이에게도', '한테서만', '예요', '인데']) {
+    assert.equal(run(`그때 민수${tail} 그랬다.`), `그때 에일린${tail} 그랬다.`, tail);
+    assert.equal(run(`민수${tail}`), `에일린${tail}`, `${tail} (글 끝)`);
+  }
+  // 이름이 다른 낱말의 일부일 때는 그대로
+  for (const word of ['지원팀', '강지원', '지원이사', '지원자', '지원금', '지원인력', '지원부서', '지원사격']) assert.equal(run(`현장 ${word} 소속`, '지원'), `현장 ${word} 소속`, word);
+});

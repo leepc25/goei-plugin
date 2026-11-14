@@ -22,6 +22,13 @@ export async function digest(b: Uint8Array): Promise<string | null> {
   }
 }
 
+/** 받기 하나에 기다리는 시간. 응답이 영영 안 오면 설치·업데이트가 「사진 받는 중」으로 굳지 않게 (11-14 재검토 loader#4; host/datapack.ts·ui/update.ts·loader/body.ts 와 같은 값) */
+export const PIC_TIMEOUT_MS = 40_000;
+function timeout<T>(p: Promise<T>): Promise<T> {
+  let t: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([p, new Promise<never>((_, rej) => (t = setTimeout(() => rej(new Error('timeout')), PIC_TIMEOUT_MS)))]).finally(() => clearTimeout(t));
+}
+
 /** 사진 한 장을 받는다. Risu 본 화면에서 직접(risuFetch), 안 되면 nativeFetch. 지문이 다르면 실패 */
 export async function fetchPicture(p: Picture): Promise<Uint8Array> {
   const url = `${UPDATE_BASE}/pic/${p[1]}.${p[2]}`;
@@ -29,7 +36,7 @@ export async function fetchPicture(p: Picture): Promise<Uint8Array> {
   const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
   if (legacy) {
     try {
-      const r = await legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } });
+      const r = await timeout(legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } }));
       const b = r?.ok ? toBytes(r.data) : null;
       if (await ok(b)) return b!;
     } catch {
@@ -37,13 +44,13 @@ export async function fetchPicture(p: Picture): Promise<Uint8Array> {
     }
   }
   try {
-    const res = await risuai.nativeFetch(url, { method: 'GET' });
+    const res = await timeout(risuai.nativeFetch(url, { method: 'GET' }));
     if (res.ok) {
-      const b = new Uint8Array(await res.arrayBuffer());
+      const b = new Uint8Array(await timeout(res.arrayBuffer()));
       if (await ok(b)) return b;
     }
   } catch {
-    // 아래 안내
+    // 아래 안내 (시간 초과도 같은 안내: 부르는 쪽이 「n장까지 받았어요 … 」로 이어 받게 한다)
   }
   throw new PicError(`사진 「${p[0]}」을 받지 못했어요.`);
 }

@@ -27,6 +27,8 @@ export function worldPackText() {
   const rel = readJson('src/data/world/relations.json');
   out.relations = { pairs: rel.pairs, common: rel.common };
   out.scenes = scenesData();
+  // 부록이 켜지는 조건의 기본값 (기본 명부의 「부록」 그대로). 카드 명부에 줄이 없는 부록이 이 값을 쓴다 (src/core/world/directory.ts buildAppendices)
+  out.appendixWhen = readJson('src/data/install/directory.json').부록 ?? {};
   return JSON.stringify(out);
 }
 

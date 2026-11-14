@@ -19,7 +19,7 @@ order: 500
 - At Baekilmong's Namhae Branch it sits behind a lightless containment door for Night Special Work: 100+ Workers in rows of five, a brochure each, flashlight requests refused, smuggled flashlights left alone as a control group; about a third usually vanish.
 
 #### Brochure and Course
-- Brochure text: "Cool Test of Courage / Collect 43 stamps and claim your prize. / Visit the famous spots of sunless, dark Sagyeongsan to build courage and self-discipline and train your mind. / Fairy Rock – Sagyeong Lodge – Five-Color Spring / Prize Office: Information Desk in front of the Training Center's 1st-floor entrance." Footer: "A standing program for our Sinmaru Training Center's group rentals. Join any time without registration." The "4" is handwritten over a printed "3": the real count is four. Let entrants notice it. Stamps also count on clothing or cloth.
+- Brochure text: "Cool Test of Courage / Collect 43 stamps and claim your prize. / Visit the famous spots of sunless, dark Sagyeongsan to build courage and self-discipline and train your mind. / Fairy Rock – Sagyeong Lodge – Five-Color Spring / Prize Office: Information Desk in front of the Training Center's 1st-floor entrance." Footer: "A standing program for our Sinmaru Training Center's group rentals. Join any time without registration." The printed "4" is struck out by hand and corrected to "3": the real count is four. Let entrants notice it. Stamps also count on clothing or cloth.
 - A loop trail. About 70 m uphill is a fork: a green sign "«- Fairy Rock" and a corroded one "«- Fairy Rock / Sinmaru Training Center -»". Always going left visits the three spots in order and returns to the fork; right climbs to the retreat, noticeably steeper because the trail circles below a cliff.
 - Fairy Rock (선녀바위): a boulder in a clearing bound with old straw rope; touching it, a cold finger grips the wrist. Behind it a folding desk holds a dusty plastic stamp whose ink never dries and a plaque: "A fairy in a five-colored robe missed her footing in the clouds, fell, and landed on this rock halfway up the mountain. The marks of where she sat remain on its surface."
 - Sagyeong Lodge (사경산장): a cabin; faint natural light through the far window; a stamp by the window. Walls of old flyers ("Looking for a missing child", "Phone repair here!", "Come to Sinmaru Training Center"), a light switch, curtains, and a public phone ("※Please keep calls short^^", speed-dial 3 "24-hour hotline") whose lifted receiver lights the keypad. A fake Management Bureau rescue poster promises guaranteed escape; its tiny unspaced footer reads "TheManagementBureaudoesnotdistributenoticesinthisformatIfyoucanreadthisturnaroundandrunnow". The anomaly mimics the Bureau to bait the phone and the light; the footer is the Bureau's countermeasure.
@@ -27,7 +27,7 @@ order: 500
 - Prize Office: in the dark behind the retreat's 1st-floor window, an ordinary middle-aged hand in a guard's sleeve takes sheets and gives prizes.
 
 #### The Light Rule
-- Whoever turns on a light vanishes, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. The light-starter is fixed for that run.
+- Whoever turns on a light ends up missing (they stay in the run but cannot clear normally), intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. The light-starter is fixed for that run.
 - Everyone who sees what a light lit also vanishes. Shutting the eyes the instant light appears is the only defense; light through closed lids is survivable.
 - Seers say "So bright, nice… nice. Nice," laugh in a warping loop ("uh-uh-uh yes nice nice-nice-niiice"), say "It was on the mountain," and are gone.
 - Something wearing each vanished person rejoins the group: same voice and story, clothes finer than they should be. It gives directions and coaxes lighting or opening eyes ("Want to guess what I'm doing right now? What I look like?… Curious, aren't you?"); when noticed, "Did you notice?… You did." It never attacks directly; if it meant to, it already would have. Do not answer or follow it; take the opposite fork; wrapped and bound in cloth such as a curtain, it vanishes from beneath.
@@ -45,6 +45,6 @@ order: 500
 - Leaving the retreat grounds with a prize clears the run: fog, then a door near the entry point. Spring water carried out in a prize container is lost at the clear.
 
 #### Light-Starter
-- The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp. Another way out is hidden inside the retreat.
+- The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp, hidden inside the retreat.
 
 ---

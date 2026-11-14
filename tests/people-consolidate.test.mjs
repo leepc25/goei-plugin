@@ -64,3 +64,28 @@ test('설정: 기록 언어 영어면 지침 끝에 언어 규칙, 저장 10,000
   assert.ok(!U.assemblePrompt('A <<USER_RULES>> B', new Set(), '', 'ko').includes('Record language'));
   assert.ok(C.CONSOLIDATE_PROMPT('en').includes('in English'));
 });
+
+test('정리: 수치 모드 의심 칸은 정리 자료에 넣지 않고, 모델이 돌려줘도 반영하지 않는다 (종류·점수 보존)', () => {
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  store.people.쟈알디.slots.state = [e('s1', '본부에 있음'), e('s2', '왼팔 부상')];
+  store.people.쟈알디.slots.suspicion = [
+    e('q1', '[시작] 명단을 몰래 봄', { target: '@user', kind: '배신' }),
+    e('q2', '[단서·중] 밤에 자료실 출입', { target: '@user', kind: '배신', seq: 2 }),
+  ];
+  const settings = { ...St.peopleSettings({}), features: new Set(['suspicion']), qualitative: new Set() };
+  assert.ok(T.slotsFor(settings.features, settings.qualitative).includes('suspicion'), '수치 모드에서 의심 칸이 켜져 있음');
+  const live = S.liveness(chat);
+  const before = JSON.stringify(U.suspicionCases(store.people.쟈알디, live));
+  const input = C.buildConsolidate(store, chat, '쟈알디', settings);
+  assert.equal(input.data.slots.suspicion, undefined, '의심 칸은 입력에 없음');
+  assert.ok(![...input.ids.keys()].some((id) => id === 'q1' || id === 'q2'));
+  const r = C.parseConsolidate('{"slots":{"suspicion":[{"text":"[시작] 명단을 몰래 보고 밤에 자료실 출입","target":"@user","from":["q1","q2"]}]}}');
+  const rep = C.applyConsolidate(store, '쟈알디', input, r, live, settings);
+  assert.equal(rep.slots, 0);
+  assert.deepEqual(S.liveEntries(store.people.쟈알디.slots.suspicion, live).map((x) => x.id), ['q1', 'q2']);
+  assert.equal(JSON.stringify(U.suspicionCases(store.people.쟈알디, live)), before, '사례(종류·점수) 그대로');
+  // 의심 칸만 있으면 정리할 것이 없다
+  delete store.people.쟈알디.slots.state;
+  assert.equal(C.buildConsolidate(store, chat, '쟈알디', settings), null);
+});

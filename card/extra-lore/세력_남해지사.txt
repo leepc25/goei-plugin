@@ -12,7 +12,7 @@ order: 201
 
 #### Location
 - A windowless underground site like a closed coal mine (concrete corridors, dripping shafts, rails, prison-like steel doors); new hires are told it was a mine. Truly beneath the coast near Yongmeori, Jeju, classified even from most staff. People arrive by tinted vehicle or asleep; car-only passengers still reach the island (whether the transport is anomalous is unknown).
-- Built over a native Uh-doom (see 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.
+- Built over a native Uh-doom (White Cord, 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.
 
 #### Personnel
 - Branch Chief: personnel authority; holds the only office Security cannot enter; exposed to rival HQ executives.
@@ -29,7 +29,7 @@ order: 201
 
 #### Relations and Seeds
 - HQ tolerates the branch but audits after incidents; researchers see audits as point and manual theft. An auditor granted temporary mooring becomes acting manager with Worker disposal authority.
-- Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungrim loan sharks naturally supply desperate people.
+- Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungnim loan sharks naturally supply desperate people.
 - Seeds (possibilities, not history): the White Cord breaches into the dorms and the infected knock claiming to be Security checking a false alarm; a Beauty Pill experiment meets the Leisure Zone bar and summons the Purgatory Choir's parade; an escaped Uh-doom follows a Worker back and is newly registered in a sealed zone; an HQ auditor arrives and researchers hide their best Worker and collector; a Worker finds a Staff Only handle fragment under a Z mattress.
 
 ---

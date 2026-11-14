@@ -309,3 +309,55 @@ test('다시 읽기: only 인물만 반영하고 읽음 표시는 그대로; 이
   assert.deepEqual(store.read, {}, '읽음 표시 안 바뀜');
 });
 
+
+test('replace 없는 upsert: 의심 칸은 같은 대상의 다른 종류 기록을 덮지 않는다 (재검토 11-14 ①-7)', () => {
+  const { c, store, input } = setup();
+  const qual = { ...St.peopleSettings({ $pp_director: 'note', $pp_prev_pairs: '1', $pp_suspicion: '1', $pp_num_suspicion: '0', $pp_affinity: '1' }) };
+  assert.ok(qual.features.has('suspicion') && qual.qualitative.has('suspicion'));
+  store.people.쟈알디.slots['suspicion.concern'] = [{ id: 'c1', text: '[정체] 유저가 신분을 숨긴다고 본다', src: 'seed', anchor: '#0', seq: 2, target: '@user' }];
+  store.people.쟈알디.slots['affinity.stance'] = [{ id: 's1', text: '유저를 경계한다', src: 'seed', anchor: '#0', seq: 3, target: '@user' }];
+  const r = {
+    entries: [
+      { who: '쟈알디', slot: 'suspicion.concern', op: 'upsert', target: '@user', text: '[거짓말] 명단을 봤다는 말이 앞뒤가 안 맞는다', m: 'm3', quote: '명단을 봤다' },
+      { who: '쟈알디', slot: 'affinity.stance', op: 'upsert', target: '@user', text: '감싸 준 뒤로 유저를 믿기 시작했다', m: 'm4', quote: '감싸 안으며' },
+    ],
+  };
+  const rep = U.applyUpdate(store, c, input, r, { settings: qual });
+  assert.equal(rep.applied.entries, 2, JSON.stringify(rep.dropped));
+  const live = S.liveness(c);
+  const concern = S.liveEntries(store.people.쟈알디.slots['suspicion.concern'], live);
+  assert.deepEqual(concern.map((e) => e.text).sort(), ['[거짓말] 명단을 봤다는 말이 앞뒤가 안 맞는다', '[정체] 유저가 신분을 숨긴다고 본다'], '[정체] 기록이 살아 있다');
+  assert.ok(!store.people.쟈알디.slots['suspicion.concern'].some((e) => e.replaces), '자동 대체 없음');
+  // 다른 대상 칸은 그대로: 하나뿐이면 그것을 고친다
+  assert.deepEqual(S.liveEntries(store.people.쟈알디.slots['affinity.stance'], live).map((e) => e.text), ['감싸 준 뒤로 유저를 믿기 시작했다']);
+});
+
+test('재검토 11-14 ①-9: 그림 태그·주석·상점 표식을 사이에 둔 인용도 받고, 그 항목이 살아 있다', () => {
+  const c = chat(
+    ['user', '출근했다', 'u1'],
+    ['char', '쟈알디가 커피를 내밀었다.\n<img="쟈알디_미소">\n"고마웠어, 어제." <!-- 메모 --> 그러고는 자리에 [shop: 매점] 앉았다.', 'c1'],
+  );
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  const input = U.buildUpdate(c, store, [1], { settings: settings(), system: 'S', values: {}, names });
+  const sent = input.data.span.find((x) => x.m === 'm2').text;
+  assert.ok(!sent.includes('<img') && sent.includes('커피를 내밀었다.'), '갱신기에 보내는 글에는 태그가 없다');
+  const rep = U.applyUpdate(store, c, input, {
+    entries: [
+      { who: '쟈알디', slot: 'history', op: 'add', text: '유저에게 커피를 건넸다', m: 'm2', quote: '커피를 내밀었다. "고마웠어, 어제."' },
+      { who: '쟈알디', slot: 'state', op: 'add', text: '자리에 앉음', m: 'm2', quote: '그러고는 자리에 앉았다' },
+      { who: '쟈알디', slot: 'scene', op: 'add', text: '지어낸 일', m: 'm2', quote: '여기 없는 말이다' },
+    ],
+    cues: [{ who: '쟈알디', cue: '작은친절', m: 'm2', quote: '커피를 내밀었다. "고마웠어, 어제."', reason: 'x' }],
+  }, { settings: settings() });
+  assert.deepEqual(rep.dropped.map((d) => `${d.kind}:${d.reason}`), ['entry:인용이 원문에 없음'], '없는 인용만 버린다');
+  assert.equal(rep.applied.entries, 2);
+  assert.equal(rep.applied.cues, 1);
+  const live = S.liveness(c);
+  assert.equal(S.liveEntries(store.people.쟈알디.slots.history, live).length, 1, '태그를 사이에 둔 인용의 항목이 살아 있다');
+  assert.equal(S.liveChanges(store, live).filter((x) => x.kind === 'cue').length, 1);
+  // 태그 없이 적은 인용은 뒤에 그림 태그가 끼어도(그림 태그 보충) 살아 있다
+  const e = { id: 'x1', text: 't', src: 'story', anchor: 'c1', seq: 9, quote: '커피를 내밀었다 고마웠어' };
+  assert.ok(S.isAlive(e, live));
+  assert.ok(!S.isAlive({ ...e, quote: '원문에 없는 인용' }, live));
+});

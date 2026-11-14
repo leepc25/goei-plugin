@@ -120,7 +120,15 @@ export function calls(M) {
   const person = (name) => ({ name, faction: 'A00', seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [], axes: T.DEFAULT_AXES(), axesFrom: 'default', patterns: [], candidates: {} });
   const chat = { message: [['user', '출근했다', 'u1'], ['char', '쟈알디가 말했다. "명일 아파트 건은 네가 맡아."', 'c1']].map(([role, data, chatId]) => ({ role, data, chatId })) };
   const allOn = { $pp_director: 'scene', $pp_perception: '1', $pp_perception_ext: '1', $pp_suspicion: '1', $pp_openness: '1', $pp_rhythm: '1', $pp_axes: '1', $pp_register: '1', $pp_affinity: '1', $pp_register_variety: 'two', $pp_sexual_desire: '1', $pp_paraphilia: '1', $pp_director_search: '1', $pp_director_features: '1' };
-  const dstore = () => { const s = T.emptyStore(); s.people.쟈알디 = person('쟈알디'); return s; };
+  // 의심·리듬·성적 절은 그 자료가 실릴 때만 붙는다 (11-14 재검토 gtoken#5): 요청문 전체를 견주려고 자료를 하나씩 둔다
+  const dstore = () => {
+    const s = T.emptyStore();
+    s.people.쟈알디 = person('쟈알디');
+    s.people.쟈알디.slots['suspicion.concern'] = [{ id: 'su1', text: '서류 날짜가 맞지 않는다', src: 'story', anchor: 'c1', seq: 1, target: '@user', quote: '명일' }];
+    s.people.쟈알디.sexual = { desire: { text: '직설적이다', at: 'T' }, paraphilia: { text: '', at: '' }, desireOn: true, paraphiliaOn: true, explicit: null };
+    s.docs['rhythm:hook:서류'] = { type: 'rhythm', key: 'hook:서류', entries: [{ id: 'h1', text: '[stage:seeded] [tier:mid] 서류', src: 'story', anchor: 'c1', seq: 1 }] };
+    return s;
+  };
   const dbuild = () => M.director.buildDirector(chat, dstore(), ['쟈알디'], '서류를 받았다', M.psettings.peopleSettings(allOn), { 쟈알디: '규칙' });
   put('director.system', () => dbuild().system);
   put('director.repair', () => M.director.repairDirector(dbuild(), '{bad', 'notes missing').system);

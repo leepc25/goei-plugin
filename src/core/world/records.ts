@@ -68,6 +68,8 @@ export interface WorldData {
   relations: Relations;
   /** 첫 장면 기본값 (scripts/data-pack.mjs scenesData). 세력 공용 장면(코드 → fm → 글)과 인물별 장면(요원 ID → 글). core/scenes.ts 가 읽는다 */
   scenes?: ScenesDefaults;
+  /** 부록이 켜지는 조건의 기본값: 부록 이름 → 기본 명부(src/data/install/directory.json)의 「부록」 줄. 옛 팩에는 없다 */
+  appendixWhen?: Record<string, Record<string, unknown>>;
 }
 
 export interface SceneDefault {
@@ -99,6 +101,11 @@ let dataGen = 0;
 export const worldDataGen = (): number => dataGen;
 /** 첫 장면 기본값. 팩에 없으면(옛 팩) 빈 값 */
 export const defaultScenes = (): ScenesDefaults => world().scenes ?? { 세력: {}, 인물: {} };
+/** 부록 조건 기본값 (기본 명부의 같은 이름 줄). 자료가 아직 없거나 팩에 없으면 undefined (던지지 않는다: 명부 읽기는 자료 전에도 불린다) */
+export function defaultAppendixWhen(name: string): Record<string, unknown> | undefined {
+  const row = data?.appendixWhen?.[name];
+  return row && typeof row === 'object' && !Array.isArray(row) ? row : undefined;
+}
 /** 세계 자료가 들어왔나 (본체 부팅 순서 확인용) */
 export const worldDataReady = (): boolean => data !== null;
 

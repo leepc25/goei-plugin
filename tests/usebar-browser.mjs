@@ -174,7 +174,7 @@ for (const vp of ['pc', 'phone']) {
   s = await bar();
   v = await vars();
   console.log(vp, '5 timeout', JSON.stringify(s), JSON.stringify(v));
-  if (s.shown !== 1 || s.names.length !== 2 || v.at) bad(`응답이 안 오면 칩이 다시 보여야 한다(아직 안 쓰임): ${JSON.stringify(s)} ${JSON.stringify(v)}`);
+  if (s.shown !== 1 || s.label !== '다음 메시지에 사용' || s.names.length !== 2 || v.at) bad(`응답이 안 오면 칩이 다시 보여야 한다(아직 안 쓰임): ${JSON.stringify(s)} ${JSON.stringify(v)}`);
   if (s.under !== 'user') bad(`이때 칩은 마지막 메시지(보낸 유저 메시지) 아래다: ${JSON.stringify(s)}`);
   await shot('3_failed_back');
   r = await send(null);

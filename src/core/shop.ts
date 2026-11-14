@@ -558,15 +558,16 @@ export function parseOrderLine(line: string): Omit<ShopQuote, 'id'> | null {
   const cells = lineCells(line);
   if (cells.length < 3) return null;
   // 납기: 첫 숫자와 그 단위만 (「3일」= 72시간, 「48시간 (2일)」= 48시간) (전수검사 11-13)
-  const hm = /(\d+(?:\.\d+)?)\s*(일|days?\b|d\b|주|weeks?\b|w\b)?/i.exec((cells[2] ?? '').replace(/,/g, ''));
+  // 개월·달 = 720시간, 분 = 1/60시간 (11-14 재검토: 「1개월」이 1시간, 「30분」이 30시간으로 읽혔다). 범위(「2~3일」)는 뒤 숫자를 쓴다 = 72시간 (사용자 11-14: 늦어도 그때는 나와 있게)
+  const hm = /(?:\d+(?:\.\d+)?\s*[~\-–〜]\s*)?(\d+(?:\.\d+)?)\s*(개월|달|months?\b|mo\b|분|mins?\b|minutes?\b|일|days?\b|d\b|주|weeks?\b|w\b)?/i.exec((cells[2] ?? '').replace(/,/g, ''));
   const hn = hm ? Number(hm[1]) : NaN;
   const hu = (hm?.[2] ?? '').toLowerCase();
-  const hours = /^(일|d)/.test(hu) ? hn * 24 : /^(주|w)/.test(hu) ? hn * 168 : hn;
+  const hours = /^(개월|달|mo)/.test(hu) ? hn * 720 : /^(분|mi)/.test(hu) ? hn / 60 : /^(일|d)/.test(hu) ? hn * 24 : /^(주|w)/.test(hu) ? hn * 168 : hn;
   if (!Number.isFinite(hours) || hours <= 0) return null;
   const it = parseLine([cells[0], cells[1], cells[3] ?? '-', cells[4] ?? '-', cells[5] ?? '-', cells[6] ?? '', cells[7] ?? '', '', cells[8] ?? ''].join('|'));
   if (!it || it.pay) return null;
   const { price, ...item } = it;
-  return { price, hours: Math.min(24 * 30, Math.round(hours * 10) / 10), item };
+  return { price, hours: Math.min(24 * 30, Math.max(0.1, Math.round(hours * 10) / 10)), item };
 }
 
 /** 물건 줄 → 칸. 글머리표·번호(「1. 」「2) 」)·마크다운 표 앞뒤 「|」를 뗀다 (전수검사 11-13) */

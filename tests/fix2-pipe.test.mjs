@@ -51,6 +51,23 @@ test('지시문: 카드가 채팅의 마지막이면 뒤의 프리셋 user 글�
   assert.deepEqual(tail, ['BODY\n\nSituation:\n문을 연다', 'P']);
 });
 
+test('지시문: 아직 답이 없는 새 지시문은 프리셋 프리필(assistant)이 뒤에 붙어도 지시 문장을 남긴다 (11-14 재검토 ①-5)', () => {
+  const body = 'COMMON 지시\n\nOPENING 지시\n\nSubject: X\nCompanions: A';
+  const rec = M.sceneRecord({ target: 'T', party: 'P' }, body);
+  const pre = { role: 'assistant', content: '(prefill) Understood.' };
+  // 카드가 채팅의 마지막
+  assert.deepEqual(M.unwrapScenes([{ role: 'user', content: rec }, pre], { cardIsLast: true, cardFresh: true }).messages.map((m) => m.content), [body, pre.content]);
+  // 카드 뒤에 덧붙여 보낸 글이 채팅의 마지막: 합치고, 지시 문장도 남긴다
+  const withText = M.unwrapScenes([{ role: 'user', content: rec }, { role: 'user', content: '문을 연다' }, pre], { cardIsLast: false, cardFresh: true }).messages.map((m) => m.content);
+  assert.deepEqual(withText, [`${body}\n\nSituation:\n문을 연다`, pre.content]);
+  // 이미 답이 나온 지난 지시문은 그대로 줄인다 (나-12). 새 카드만 남긴다
+  const old = M.unwrapScenes([{ role: 'user', content: rec }, { role: 'assistant', content: '답' }, { role: 'user', content: rec }, pre], { cardIsLast: true, cardFresh: true }).messages.map((m) => m.content);
+  assert.deepEqual(old, ['Subject: X\nCompanions: A', '답', body, pre.content]);
+  // 채팅 끝이 지시문이 아니면(답이 이미 있음) 줄인다
+  const done = M.unwrapScenes([{ role: 'user', content: rec }, { role: 'assistant', content: '답' }, { role: 'user', content: '다음' }, pre], { cardIsLast: false, cardFresh: false }).messages.map((m) => m.content);
+  assert.deepEqual(done, ['Subject: X\nCompanions: A', '답', '다음', pre.content]);
+});
+
 test('지시문: Situation 틀은 지침 FORMAT.user_input 을 쓰고, 지침이 깨지면 기본 글', () => {
   const rec = M.sceneRecord({ target: 'T', party: 'P' }, 'BODY');
   const def = M.guideDefault('Directive');

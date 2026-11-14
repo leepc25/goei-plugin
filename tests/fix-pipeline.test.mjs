@@ -28,9 +28,17 @@ test('asset: 맨 앞 <Thoughts> 칸은 번호에서 빠지고 저장 본문 앞�
   assert.equal(s.leading, think);
   assert.equal(s.narrative, '첫 단락\n\n둘째 단락');
   assert.equal(s.trailing, '[▣|상태]');
+  // 재검토 11-14 F-7 (사용자 답 (나)): 상황판 쪽(core/thoughts.ts)과 같은 기준 — 소문자·<think>·이어진 블록도 앞칸이다
   const plain = AS.splitNarrative('<thoughts>x</thoughts>본문');
-  assert.equal(plain.leading, '');
+  assert.equal(plain.leading, '<thoughts>x</thoughts>');
   assert.equal(plain.narrative, '본문');
+  const mix = '\n<Thoughts>a</Thoughts>\n\n<think>b [▣| c</think>\n\n';
+  const m = AS.splitNarrative(`${mix}첫 단락\n\n<think>d</think>\n\n둘째 단락\n[▣|상태]`);
+  assert.equal(m.leading, mix);
+  assert.equal(m.narrative, '첫 단락\n\n둘째 단락');
+  assert.equal(m.trailing, '[▣|상태]');
+  // 맨 앞에서 닫히지 않은 블록은 통째로 생각 — 그림 태그를 붙일 본문이 없다
+  assert.equal(AS.splitNarrative('<think>끝나지 않음\n\n단락').narrative, '');
   const job = { original: '', paras: ['첫 단락', '둘째 단락'], leading: think, trailing: '[▣|상태]', messages: [] };
   const d = { characters: ['Aileen'], aliases: new Map([['aileen', 'Aileen']]), keywords: ['smile'], keywordSet: new Set(['smile']) };
   const out = AS.finishAsset(job, '[{"line": 1, "tag": "<img=Aileen_smile>"}]', d, 2);

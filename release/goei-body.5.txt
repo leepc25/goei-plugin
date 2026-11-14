@@ -1,4 +1,74 @@
-     register: "반말",
+장님",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      신유리: {
+        level: null,
+        register: "반말",
+        self: "",
+        up: "사장",
+        peer: "너",
+        down: "너",
+        outsider: "너"
+      },
+      에일린: {
+        level: 2,
+        register: "반말",
+        self: "",
+        up: "부장",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      윤병수: {
+        level: 3,
+        register: "반말",
+        self: "",
+        up: "과장님",
+        peer: "대리",
+        down: "너",
+        outsider: "너"
+      },
+      윤지아: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "선생님",
+        peer: "사장님",
+        down: "손님",
+        outsider: "손님"
+      },
+      은하제: {
+        level: 3,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "동기",
+        down: "신입",
+        outsider: "댁"
+      },
+      이기석: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "차장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "손님"
+      },
+      이길환: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "부장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "선생님"
+      },
+      이도형: {
+        level: 6,
+        register: "반말",
         self: "나",
         up: "국장님",
         peer: "부장",
@@ -795,11 +865,11 @@
       const who = t.who.trim().toLowerCase();
       const p2 = roster.find((r) => r.id === key) ?? roster.find((r) => r.name === t.who.trim() || !!r.english && r.english.toLowerCase() === who);
       if (!p2) continue;
-      const rec2 = agentRecord(w, p2.id);
-      if (rec2.st !== t.state || rec2.since === null) rec2.since = w.minute;
-      rec2.st = t.state;
-      rec2.tagged = true;
-      rec2.situation = t.situation ? codesToNames(t.situation, c, faction) : "";
+      const rec3 = agentRecord(w, p2.id);
+      if (rec3.st !== t.state || rec3.since === null) rec3.since = w.minute;
+      rec3.st = t.state;
+      rec3.tagged = true;
+      rec3.situation = t.situation ? codesToNames(t.situation, c, faction) : "";
     }
   }
   function refillAgents(w, c, s8, faction) {
@@ -807,15 +877,15 @@
     const before = rosterFor(w, c, faction, s8.agent_limit).map((p2) => p2.id);
     let retired = false;
     for (const code2 of before) {
-      const rec2 = agentRecord(w, code2);
-      if (rec2.st === "사망") {
-        rec2.dead += 1;
-        if (rec2.dead >= c.refill) {
-          rec2.dead = 0;
+      const rec3 = agentRecord(w, code2);
+      if (rec3.st === "사망") {
+        rec3.dead += 1;
+        if (rec3.dead >= c.refill) {
+          rec3.dead = 0;
           w.retired.push(code2);
           retired = true;
         }
-      } else rec2.dead = 0;
+      } else rec3.dead = 0;
     }
     if (!retired) return;
     for (const p2 of rosterFor(w, c, faction, s8.agent_limit)) {
@@ -1118,10 +1188,10 @@
     const lines3 = [];
     const map = [];
     for (const p2 of rosterFor(w, c, faction, s8.agent_limit)) {
-      const rec2 = w.agents[p2.id];
+      const rec3 = w.agents[p2.id];
       map.push(`${p2.id} ${p2.name && p2.english && p2.name !== p2.english ? `${p2.name} (${p2.english})` : p2.name || p2.english}`);
-      if (!rec2 || rec2.st === "미정") lines3.push(`NEW [AG|${p2.id}|<상태>|<상황>]`);
-      else lines3.push(`[AG|${p2.id}|${rec2.st}|${rec2.situation}]${age(w, rec2.since)}`);
+      if (!rec3 || rec3.st === "미정") lines3.push(`NEW [AG|${p2.id}|<상태>|<상황>]`);
+      else lines3.push(`[AG|${p2.id}|${rec3.st}|${rec3.situation}]${age(w, rec3.since)}`);
     }
     lines3.sort();
     map.sort();
@@ -1177,9 +1247,9 @@
     w.notice = "";
   }
   var LOCKED_STATES = ["작전투입", "실종", "사망", "미정"];
-  function agentLocked(rec2) {
-    if (!rec2 || !LOCKED_STATES.includes(rec2.st)) return false;
-    return rec2.st !== "미정" || rec2.tagged === true;
+  function agentLocked(rec3) {
+    if (!rec3 || !LOCKED_STATES.includes(rec3.st)) return false;
+    return rec3.st !== "미정" || rec3.tagged === true;
   }
 
   // src/core/imgtag.ts
@@ -1665,9 +1735,9 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       const name = raw.replace(/\s*[(（][^)）]*[)）]\s*$/, "").trim() || raw;
       if (out.some((a) => a.name === name)) continue;
       const p2 = c.people.find((x) => x.name === name || !!x.english && x.english.toLowerCase() === name.toLowerCase());
-      const rec2 = p2 ? world2.agents[p2.id] : void 0;
-      const st = rec2 && rec2.st !== "미정" ? rec2.st : "";
-      out.push({ id: p2?.id ?? "", name: p2?.name ?? name, st, ...rec2?.situation ? { situation: cut2(rec2.situation, 80) } : {} });
+      const rec3 = p2 ? world2.agents[p2.id] : void 0;
+      const st = rec3 && rec3.st !== "미정" ? rec3.st : "";
+      out.push({ id: p2?.id ?? "", name: p2?.name ?? name, st, ...rec3?.situation ? { situation: cut2(rec3.situation, 80) } : {} });
       if (out.length >= 8) break;
     }
     return out;
@@ -2375,24 +2445,24 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     let made = [];
     if (reroll || closed.length) {
       let journal = readJournal(state2);
-      let rec2 = readReports(state2);
+      let rec3 = readReports(state2);
       let changed = false;
       if (reroll) {
-        const r = rewindClosures(journal, rec2, before.made ?? index);
+        const r = rewindClosures(journal, rec3, before.made ?? index);
         journal = r.journal;
-        rec2 = r.reports;
+        rec3 = r.reports;
         changed = r.changed;
       }
       if (closed.length) {
-        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index, world: result.world, closed, catalog: c, faction: now2, settings: journalSettings(state2) });
+        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec3) } }, index, world: result.world, closed, catalog: c, faction: now2, settings: journalSettings(state2) });
         if (built.rows.length) {
           journal = built.journal;
-          rec2 = built.reports;
+          rec3 = built.reports;
           made = built.rows.map((r) => r.id);
           changed = true;
         }
       }
-      if (changed) Object.assign(next.scriptstate, recordVars(journal, rec2));
+      if (changed) Object.assign(next.scriptstate, recordVars(journal, rec3));
     }
     next.scriptstate[PREV_KEY] = JSON.stringify({ ...before, made });
     return next;
@@ -2730,9 +2800,9 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const close3 = "{{/if}}".repeat(branches.length);
     return `${others}${def}${close3}${branches.map(([v, en2]) => `{{#if {{equal::${VAR}::${v}}}}}${en2}{{/if}}`).join("")}`;
   }
-  var lines = (rec2, sec2, fields3, values) => {
+  var lines = (rec3, sec2, fields3, values) => {
     const out = [];
-    const extras2 = (at) => rec2.extra.filter((e) => e.kind === "line" && e.sec === sec2 && (e.at ?? "") === at).map((e) => `- ${e.name}: ${e.value}`);
+    const extras2 = (at) => rec3.extra.filter((e) => e.kind === "line" && e.sec === sec2 && (e.at ?? "") === at).map((e) => `- ${e.name}: ${e.value}`);
     out.push(...extras2(""));
     for (const f of fields3) {
       const v = values(f);
@@ -2741,16 +2811,16 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     }
     return out;
   };
-  var blockExtras = (rec2) => rec2.extra.filter((e) => e.kind === "block" && e.value.trim()).map((e) => `#### ${e.name}
+  var blockExtras = (rec3) => rec3.extra.filter((e) => e.kind === "block" && e.value.trim()).map((e) => `#### ${e.name}
 ${e.value.trim()}`);
-  function assembleAgent(rec2, a, dir2, faction) {
-    const v = (id2) => fieldValue(rec2, id2, faction);
+  function assembleAgent(rec3, a, dir2, faction) {
+    const v = (id2) => fieldValue(rec3, id2, faction);
     const org = orgOf(dir2.orgs, a.affiliation);
-    const identity = lines(rec2, "identity", AGENT_FIELDS.filter((f) => f.sec === "identity"), (f) => {
+    const identity = lines(rec3, "identity", AGENT_FIELDS.filter((f) => f.sec === "identity"), (f) => {
       if (f.id === "organization") return v("organization") || (org ? orgNameCbs(dir2, org) : "");
       return v(f.id);
     });
-    const appearance = lines(rec2, "appearance", AGENT_FIELDS.filter((f) => f.sec === "appearance"), (f) => v(f.id));
+    const appearance = lines(rec3, "appearance", AGENT_FIELDS.filter((f) => f.sec === "appearance"), (f) => v(f.id));
     const parts = [`### Character - ${a.english || a.name}`];
     if (identity.length) parts.push(`#### Identity
 ${identity.join("\n")}`);
@@ -2761,47 +2831,88 @@ ${appearance.join("\n")}`);
       if (t) parts.push(`#### ${f.title}
 ${t}`);
     }
-    parts.push(...blockExtras(rec2));
+    parts.push(...blockExtras(rec3));
     return parts.join("\n\n");
   }
-  function sections(rec2, defs, faction, skip = []) {
+  var paragraphs = (t) => t.trim().split(/\n\s*\n/).map((p2) => p2.trim()).filter(Boolean);
+  function sections(rec3, defs, faction, skip = []) {
     const out = [];
     const kind = defs === ORG_FIELDS ? "org" : defs === ANOMALY_FIELDS ? "anomaly" : "site";
-    for (const id2 of fieldOrder(kind, rec2)) {
+    for (const id2 of fieldOrder(kind, rec3)) {
       if (id2.startsWith("x:")) {
-        const e = rec2.extra.find((x) => x.kind === "block" && `x:${x.name}` === id2);
+        const e = rec3.extra.find((x) => x.kind === "block" && `x:${x.name}` === id2);
         if (e && e.value.trim()) out.push(`#### ${e.name}
 ${e.value.trim()}`);
         continue;
       }
       if (skip.includes(id2)) continue;
       const def = defs.find((f) => f.id === id2);
-      const t = def ? fieldValue(rec2, id2, faction) : "";
-      if (def && t) out.push(`#### ${def.title}
+      if (!def) continue;
+      const base = fieldValue(rec3, id2);
+      const cut3 = kind === "org" && id2 === "intro" && !rec3.noSummary;
+      const tail2 = (t2) => t2.trim().replace(/^[\s\S]*?\n\s*\n/, "").trim();
+      const baseMulti = paragraphs(base).length > 1;
+      const detail = (t2, own2) => {
+        if (!cut3) return t2;
+        const n3 = paragraphs(t2).length;
+        if (own2 && n3 === 1 && baseMulti) return tail2(base);
+        return n3 > 1 ? tail2(t2) : t2;
+      };
+      const b = detail(base, false);
+      const vs = Object.entries(rec3.variants ?? {}).filter(([c, f]) => typeof f[id2] === "string" && f[id2].trim() && (faction === void 0 || c === faction)).map(([c, f]) => [c, detail(f[id2].trim(), true)]);
+      if (!vs.length || cut3 && vs.every(([, v]) => v === b)) {
+        if (b) out.push(`#### ${def.title}
+${b}`);
+        continue;
+      }
+      if (faction !== void 0) {
+        out.push(`#### ${def.title}
+${vs[0][1]}`);
+        continue;
+      }
+      const on3 = (c, t2) => `{{#if {{equal::${VAR}::${c}}}}}${t2}{{/if}}`;
+      if (!b) {
+        out.push(vs.map(([c, v]) => on3(c, `#### ${def.title}
+${v}`)).join(""));
+        continue;
+      }
+      const others = (t2) => `${vs.map(([c]) => `{{#if {{not_equal::${VAR}::${c}}}}}`).join("")}${t2}${"{{/if}}".repeat(vs.length)}`;
+      const t = `${others(b)}${vs.map(([c, v]) => on3(c, v)).join("")}`;
+      out.push(`#### ${def.title}
 ${t}`);
     }
     return out;
   }
-  function assembleAnomaly(rec2, p2, faction) {
-    const title2 = rec2.title || `${p2.english || p2.label} (${p2.label})`;
-    const head3 = rec2.titleRaw ? `### Instructions for the Implementation of ${title2}` : `### Instructions for the Implementation of the Anomaly - ${title2}`;
-    return [head3, ...sections(rec2, ANOMALY_FIELDS, faction)].join("\n\n");
+  function assembleAnomaly(rec3, p2, faction) {
+    const title2 = rec3.title || `${p2.english || p2.label} (${p2.label})`;
+    const head3 = rec3.titleRaw ? `### Instructions for the Implementation of ${title2}` : `### Instructions for the Implementation of the Anomaly - ${title2}`;
+    return [head3, ...sections(rec3, ANOMALY_FIELDS, faction)].join("\n\n");
   }
-  function assembleSite(rec2, p2, faction) {
-    const title2 = rec2.title || p2.english || p2.label;
-    return [`### ${title2}`, ...sections(rec2, SITE_FIELDS, faction)].join("\n\n");
+  function assembleSite(rec3, p2, faction) {
+    const title2 = rec3.title || p2.english || p2.label;
+    return [`### ${title2}`, ...sections(rec3, SITE_FIELDS, faction)].join("\n\n");
   }
-  function assembleOrg(rec2, org, dir2, faction) {
-    const title2 = rec2.title || `${orgNameCbs(dir2, org)} (${org.name})`;
+  function orgKoName(dir2, org, faction) {
+    const shown5 = (viewer) => org.faction && dir2.display[viewer]?.[org.faction] || "";
+    const ko = (viewer) => shown5(viewer) && shown5(viewer) !== shown5("none") ? shown5(viewer) : org.name;
+    const def = org.name;
+    if (faction !== void 0) return ko(faction);
+    const swaps = Object.keys(dir2.display).filter((v) => v !== "none" && ko(v) !== def);
+    if (!swaps.length) return def;
+    const others = swaps.map((v) => `{{#if {{not_equal::${VAR}::${v}}}}}`).join("");
+    return `${others}${def}${"{{/if}}".repeat(swaps.length)}${swaps.map((v) => `{{#if {{equal::${VAR}::${v}}}}}${ko(v)}{{/if}}`).join("")}`;
+  }
+  function assembleOrg(rec3, org, dir2, faction) {
+    const title2 = rec3.title || `${orgNameCbs(dir2, org)} (${orgKoName(dir2, org, faction)})`;
     const head3 = org.faction ? `### ${title2}
 
 [Affiliation code: ${org.faction}]` : `### ${title2}`;
-    return [head3, ...sections(rec2, ORG_FIELDS, faction)].join("\n\n");
+    return [head3, ...sections(rec3, ORG_FIELDS, faction)].join("\n\n");
   }
-  function assembleAppendix(rec2, r, faction) {
-    const title2 = fieldValue(rec2, "title", faction) || r.lore;
-    const body5 = fieldValue(rec2, "body", faction);
-    return [`### ${title2}`, body5, ...blockExtras(rec2)].filter(Boolean).join("\n\n");
+  function assembleAppendix(rec3, r, faction) {
+    const title2 = fieldValue(rec3, "title", faction) || r.lore;
+    const body5 = fieldValue(rec3, "body", faction);
+    return [`### ${title2}`, body5, ...blockExtras(rec3)].filter(Boolean).join("\n\n");
   }
 
   // src/core/world/faction.ts
@@ -2810,9 +2921,9 @@ ${t}`);
   var ROSTER_INTRO = "- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.";
   var STAGE_MARK = { hostile: "H", wary: "W", neutral: "N", favorable: "F", friendly: "A" };
   var firstParagraph = (t) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? "";
-  function variantText(rec2, id2, pick4 = (t) => t) {
-    const base = pick4(fieldValue(rec2, id2));
-    const vs = Object.entries(rec2.variants ?? {}).filter(([, f]) => typeof f[id2] === "string").map(([code2, f]) => [code2, pick4(f[id2])]);
+  function variantText(rec3, id2, pick4 = (t) => t) {
+    const base = pick4(fieldValue(rec3, id2));
+    const vs = Object.entries(rec3.variants ?? {}).filter(([, f]) => typeof f[id2] === "string").map(([code2, f]) => [code2, pick4(f[id2])]);
     if (!vs.length) return base;
     const others = vs.map(([c]) => `{{#if {{not_equal::${VAR2}::${c}}}}}`).join("");
     return `${others}${base}${"{{/if}}".repeat(vs.length)}${vs.map(([c, t]) => `{{#if {{equal::${VAR2}::${c}}}}}${t}{{/if}}`).join("")}`;
@@ -2831,19 +2942,19 @@ ${t}`);
       return o ? orgNameCbs(dir2, o) : name;
     };
     for (const o of dir2.orgs) {
-      const rec2 = orgs.get(o.name);
-      if (rec2?.noSummary) continue;
-      const intro = rec2 ? variantText(rec2, "intro", firstParagraph) : "";
+      const rec3 = orgs.get(o.name);
+      if (rec3?.noSummary) continue;
+      const intro = rec3 ? variantText(rec3, "intro", firstParagraph) : "";
       const desc = intro || (o.spec.gm_desc ?? "").trim();
       if (!desc) continue;
-      const title2 = o.spec.gm_name && !rec2 ? o.spec.gm_name : orgNameCbs(dir2, o);
+      const title2 = o.spec.gm_name && !rec3 ? o.spec.gm_name : orgNameCbs(dir2, o);
       parts.push(`### ${title2}${code(o)}
 ${desc}`);
     }
-    for (const [name, rec2] of orgs) {
-      if (!rec2.summaryOnly || dir2.orgs.some((o) => o.name === name)) continue;
-      const intro = variantText(rec2, "intro", firstParagraph);
-      if (intro) parts.push(`### ${rec2.title || name}
+    for (const [name, rec3] of orgs) {
+      if (!rec3.summaryOnly || dir2.orgs.some((o) => o.name === name)) continue;
+      const intro = variantText(rec3, "intro", firstParagraph);
+      if (intro) parts.push(`### ${rec3.title || name}
 ${intro}`);
     }
     const excluded = excludedOrgs(orgs);
@@ -2875,8 +2986,8 @@ ${fillCodes(rel.common.trim(), dir2)}`);
 ${guideOr("Main", "ROSTER.INTRO", ROSTER_INTRO)}`];
     const byOrg = /* @__PURE__ */ new Map();
     for (const a of dir2.agents) {
-      const rec2 = agents.get(a.lore);
-      if (!rec2 || !fieldValue(rec2, "intro") || rec2.rosterOff) continue;
+      const rec3 = agents.get(a.lore);
+      if (!rec3 || !fieldValue(rec3, "intro") || rec3.rosterOff) continue;
       const o = orgOf(dir2.orgs, a.affiliation);
       const key = o?.name ?? a.affiliation ?? "";
       (byOrg.get(key) ?? byOrg.set(key, []).get(key)).push(a);
@@ -2895,7 +3006,8 @@ ${guideOr("Main", "ROSTER.INTRO", ROSTER_INTRO)}`];
         const en2 = a.department ? depts[a.department] ?? "" : "";
         (groups.get(en2) ?? groups.set(en2, []).get(en2)).push(a);
       }
-      for (const [en2, list4] of groups) {
+      const ordered2 = [...groups].sort(([a], [b]) => Number(!!a) - Number(!!b));
+      for (const [en2, list4] of ordered2) {
         if (en2) lines3.push(`
 #### ${en2}`);
         let lastDept = "";
@@ -2949,7 +3061,7 @@ ${guideOr("Main", "ROSTER.INTRO", ROSTER_INTRO)}`];
       make: { key: VIRTUAL_FOLDER_KEY[kind], comment: FOLDER_NAME[kind], content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2, [VIRTUAL]: true }
     };
   }
-  var keysOf2 = (rec2, fallback) => rec2.keys?.trim() ? rec2.keys.trim() : [...new Set(fallback.filter(Boolean))].join(", ");
+  var keysOf2 = (rec3, fallback) => rec3.keys?.trim() ? rec3.keys.trim() : [...new Set(fallback.filter(Boolean))].join(", ");
   function entry(kind, name, key, content, folder, order2) {
     return {
       key,
@@ -3006,30 +3118,30 @@ ${content}
       if (!isVirtual(e) || e.mode === "folder") continue;
       const kind = e.goeiKind;
       const name = s7(e.comment);
-      const rec2 = recs[kind]?.get(name);
-      if (!rec2) continue;
+      const rec3 = recs[kind]?.get(name);
+      if (!rec3) continue;
       let content = "";
       let keys = "";
       if (kind === "agent") {
         const a = dir2.agents.find((x) => x.lore === name);
         if (!a) continue;
-        content = assembleAgent(rec2, a, dir2, faction);
-        keys = keysOf2(rec2, [a.english, a.name, ...a.aliases]);
+        content = assembleAgent(rec3, a, dir2, faction);
+        keys = keysOf2(rec3, [a.english, a.name, ...a.aliases]);
       } else if (kind === "anomaly" || kind === "site") {
         const p2 = (kind === "anomaly" ? dir2.anomalies : dir2.sites).find((x) => x.lore === name);
         if (!p2) continue;
-        content = kind === "anomaly" ? assembleAnomaly(rec2, p2, faction) : assembleSite(rec2, p2, faction);
-        keys = keysOf2(rec2, [p2.english, p2.label, p2.lore, ...p2.aliases]);
+        content = kind === "anomaly" ? assembleAnomaly(rec3, p2, faction) : assembleSite(rec3, p2, faction);
+        keys = keysOf2(rec3, [p2.english, p2.label, p2.lore, ...p2.aliases]);
       } else if (kind === "org") {
         const o = dir2.orgs.find((x) => x.name === name);
         if (!o) continue;
-        content = assembleOrg(rec2, o, dir2, faction);
-        keys = keysOf2(rec2, [o.spec.english ?? "", o.name]);
+        content = assembleOrg(rec3, o, dir2, faction);
+        keys = keysOf2(rec3, [o.spec.english ?? "", o.name]);
       } else {
         const r = dir2.appendices.find((x) => x.lore === name);
         if (!r) continue;
-        content = assembleAppendix(rec2, r, faction);
-        keys = rec2.keys ?? "";
+        content = assembleAppendix(rec3, r, faction);
+        keys = rec3.keys ?? "";
       }
       e.key = keys;
       e.content = `@@dont_activate
@@ -3131,21 +3243,21 @@ ${content}
     return next;
   }
   var emptyRecord = () => ({ fields: {}, extra: [] });
-  function recordText(kind, name, rec2, dir2, faction) {
+  function recordText(kind, name, rec3, dir2, faction) {
     if (kind === "agent") {
       const a = dir2.agents.find((x) => x.lore === name);
-      if (a) return assembleAgent(rec2, a, dir2, faction);
+      if (a) return assembleAgent(rec3, a, dir2, faction);
     } else if (kind === "anomaly" || kind === "site") {
       const p2 = (kind === "anomaly" ? dir2.anomalies : dir2.sites).find((x) => x.lore === name);
-      if (p2) return kind === "anomaly" ? assembleAnomaly(rec2, p2, faction) : assembleSite(rec2, p2, faction);
+      if (p2) return kind === "anomaly" ? assembleAnomaly(rec3, p2, faction) : assembleSite(rec3, p2, faction);
     } else if (kind === "org") {
       const o = dir2.orgs.find((x) => x.name === name) ?? orgOf(dir2.orgs, name);
-      if (o) return assembleOrg(rec2, o, dir2, faction);
+      if (o) return assembleOrg(rec3, o, dir2, faction);
     } else {
       const r = dir2.appendices.find((x) => x.lore === name);
-      if (r) return assembleAppendix(rec2, r, faction);
+      if (r) return assembleAppendix(rec3, r, faction);
     }
-    return fieldOrder(kind, rec2).map((id2) => id2.startsWith("x:") ? rec2.extra.find((e) => `x:${e.name}` === id2)?.value ?? "" : rec2.fields[id2] ?? "").filter(Boolean).join("\n\n");
+    return fieldOrder(kind, rec3).map((id2) => id2.startsWith("x:") ? rec3.extra.find((e) => `x:${e.name}` === id2)?.value ?? "" : rec3.fields[id2] ?? "").filter(Boolean).join("\n\n");
   }
   var SYN = {
     agent: [
@@ -3292,16 +3404,16 @@ ${body5}` : `##### ${sec2.title}`);
       }
     }
   }
-  function moveField(kind, rec2, id2, dir2) {
-    const order2 = fieldOrder(kind, rec2);
+  function moveField(kind, rec3, id2, dir2) {
+    const order2 = fieldOrder(kind, rec3);
     const i = order2.indexOf(id2);
     const j = i + dir2;
     if (i < 0 || j < 0 || j >= order2.length) return order2;
     [order2[i], order2[j]] = [order2[j], order2[i]];
     return order2;
   }
-  function moveFieldTo(kind, rec2, id2, before) {
-    const order2 = fieldOrder(kind, rec2).filter((x) => x !== id2);
+  function moveFieldTo(kind, rec3, id2, before) {
+    const order2 = fieldOrder(kind, rec3).filter((x) => x !== id2);
     const at = before ? order2.indexOf(before) : -1;
     if (at < 0) order2.push(id2);
     else order2.splice(at, 0, id2);
@@ -3382,7 +3494,11 @@ ${body5}` : `##### ${sec2.title}`);
     const anchor = messageKey(m, i);
     const id2 = `ps_${anchor}`;
     const base = removeWalletEntry(w, id2);
-    const before = { ...base, log: base.log.filter((e) => !(e.src === "store" && e.anchor === anchor)) };
+    const t = typeof m.time === "number" ? m.time : NaN;
+    const later2 = (e) => e.src === "manual" && Number.isFinite(t) && Date.parse(e.at) > t;
+    const prior = { ...base, log: base.log.filter((e) => e.anchor !== anchor && !later2(e)) };
+    if (target === walletBalance(prior, alive)) return JSON.stringify(base) === JSON.stringify(w0) ? null : base;
+    const before = { ...base, log: base.log.filter((e) => !(e.src === "store" && e.anchor === anchor) && !later2(e)) };
     const diff = target - walletBalance(before, alive);
     const next = diff === 0 ? base : addWalletEntry(base, { id: id2, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: "story" }, alive);
     return JSON.stringify(next) === JSON.stringify(w0) ? null : next;
@@ -3874,81 +3990,4 @@ ${themeVars("[x-goei-fab]")}
         if (r === "idle") h.armed = false;
         else if (r) return;
       } catch (error) {
-        console.log(`[goei] 채팅 클릭 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
-  }
-  async function elements(doc2, selector) {
-    const got = await risuai.unwarpSafeArray(await doc2.querySelectorAll(selector)).catch(() => []);
-    if (Array.isArray(got)) return got;
-    const sa = got;
-    if (!sa || typeof sa.length !== "function" || typeof sa.at !== "function") return [];
-    const n3 = await sa.length();
-    const out = [];
-    for (let i = 0; i < n3; i++) out.push(await sa.at(i));
-    return out;
-  }
-  async function hit2(el, x, y) {
-    const r = await el.getBoundingClientRect().catch(() => null);
-    return !!r && r.width > 0 && x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height;
-  }
-
-  // src/core/iconmatch.ts
-  var normIcon = (s8) => String(s8 ?? "").toLowerCase().replace(/[^0-9a-z가-힣]+/g, " ").trim();
-  var ICON_KIND_LABEL = { wear: "옷", food: "음식", tool: "도구", device: "기기", medical: "의료", consumable: "소모품", charm: "부적", weapon: "무기", paper: "서류", valuable: "귀중품", key: "열쇠", seal: "봉인", anomaly: "괴이", adult: "성인", body: "신체", misc: "잡동사니" };
-  var ICON_KINDS_TEXT = Object.values(ICON_KIND_LABEL).join("·");
-  var KIND_OF = {};
-  for (const [k, v] of Object.entries(ICON_KIND_LABEL)) KIND_OF[v] = k, KIND_OF[k] = k;
-  KIND_OF["의류"] = "wear";
-  KIND_OF["음식물"] = "food";
-  KIND_OF["장비"] = "device";
-  KIND_OF["기계"] = "device";
-  KIND_OF["약"] = "medical";
-  KIND_OF["의약"] = "medical";
-  KIND_OF["의료품"] = "medical";
-  KIND_OF["문서"] = "paper";
-  KIND_OF["종이"] = "paper";
-  KIND_OF["보석"] = "valuable";
-  KIND_OF["귀중"] = "valuable";
-  KIND_OF["잡화"] = "misc";
-  KIND_OF["기타"] = "misc";
-  KIND_OF["clothes"] = "wear";
-  KIND_OF["clothing"] = "wear";
-  KIND_OF["medicine"] = "medical";
-  KIND_OF["gadget"] = "device";
-  KIND_OF["document"] = "paper";
-  KIND_OF["etc"] = "misc";
-  function splitIconWord(icon) {
-    const raw = String(icon ?? "").trim();
-    const words = (rest) => {
-      const ps = rest.split(/\s*[/／|｜]\s*/).map((x) => x.trim()).filter(Boolean);
-      const ko = ps.find((x) => /[가-힣]/.test(x));
-      const en2 = ps.find((x) => !/[가-힣]/.test(x));
-      return ko ? { word: ko, en: en2 ?? "" } : { word: en2 ?? "", en: "" };
-    };
-    const m = /^([^/／:：|｜]+?)\s*[/／:：|｜]\s*(.*)$/.exec(raw);
-    if (m) {
-      const k = KIND_OF[normIcon(m[1])];
-      if (k) return { kind: k, ...words(m[2]) };
-    }
-    const k1 = KIND_OF[normIcon(raw)];
-    if (k1) return { kind: k1, word: "", en: "" };
-    return { kind: "", ...words(raw) };
-  }
-  function parseIconAliases(text5) {
-    const out = {};
-    for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
-      const m = /^\s*([^→=:>]+?)\s*(?:→|=>|->|=|:)\s*(.+?)\s*$/.exec(line2);
-      if (!m) continue;
-      const a = normIcon(m[1]);
-      const b = normIcon(m[2]);
-      if (a && b && a !== b) out[a] = b;
-    }
-    return out;
-  }
-  var ICON_ALIAS_DEFAULT = ["외투 → 코트", "점퍼 → 재킷", "안정수 → 안정제", "캡슐 → 알약", "영양 바 → 에너지바", "영양바 → 에너지바", "숙취해소제 → 숙취 음료", "택배 → 택배 상자", "소설책 → 책", "알 → 계란", "하이라이터 → 형광펜", "다마고치 → 게임기", "인라인 → 인라인 스케이트", "선스틱 → 선크림", "곱창밴드 → 머리끈", "렌즈케이스 → 콘택트렌즈 통", "콘택트렌즈 → 콘택트렌즈 통", "약상자 → 구급상자", "나이프 → 칼", "정원가위 → 원예 가위", "전지가위 → 원예 가위", "간식 → 과자", "온수매트 → 전기장판", "종이가방 → 쇼핑백", "여행가방 → 캐리어", "햇반 → 즉석밥", "링거팩 → 링거", "인슐린 → 인슐린 펜", "DVD → CD", "바 → 에너지바", "속옷 → 팬티", "내의 → 팬티"].join("\n");
-  var aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
-  var poolOn = true;
-  var gen = 0;
-  var aliasText = ICON_ALIAS_DEFAULT;
-  
+        console.log(`[goei] 채팅 클릭 처리 실패: ${error instanc

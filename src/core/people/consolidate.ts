@@ -20,7 +20,7 @@ export const CONSOLIDATE_PROMPT = (lang: 'ko' | 'en', slots: SlotId[] = [...CORE
   'Rules:',
   '- Merge entries that describe the same thing; drop nothing that is still true. Keep concrete details (names, numbers, places, dates). When two entries conflict, keep the later one (entries are listed oldest first) and you may note the change.',
   `- \`chars\` is the record's current size and \`target\` the size to reach (sum of entry texts). Reduce toward target; a result near it is enough; never pad. Each entry is one statement ≤300 chars${lang === 'en' ? ' in English' : ' in Korean'}. Names, quotes, address terms, Korean labels and prefixes stay as written.`,
-  '- `state` and `scene` are the present: merge aggressively, keep only what is still true. `history` is a chronological digest: merge adjacent events into one line each. `relationship`, `speech` and the feature slots (`affinity.*`, `register.*`) keep one entry per `target`. `affinity.appraisal` (first impression) is never rewritten: return it unchanged or leave the slot out.',
+  '- `state` and `scene` are the present: merge aggressively, keep only what is still true. `history` is a chronological digest: merge adjacent events into one line each. `relationship`, `speech` and the feature slots (`affinity.*`, `register.*`) keep one entry per `target`.',
   '- Give every result entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.',
   '- Slots you do not return stay as they are.',
   '',
@@ -40,7 +40,8 @@ export function buildConsolidate(store: PeopleStore, chat: Parameters<typeof liv
   const ids = new Map<string, { slot: SlotId; entry: Entry }>();
   const enabled = slotsFor(settings.features, settings.qualitative);
   for (const slot of enabled) {
-    if (SLOT_META[slot].once) continue;
+    // 수치 모드 의심 칸은 정리하지 않는다: 항목마다 종류(kind)와 맨 앞 표식 하나로 점수를 세므로 합치면 깨진다 (갱신기 merge 도 막음)
+    if (SLOT_META[slot].once || slot === 'suspicion') continue;
     const cur = liveEntries(p.slots[slot], live).filter((e) => !e.pin);
     if (!cur.length) continue;
     const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;

@@ -1,0 +1,559 @@
+{
+ "group": "MISS2",
+ "coverage": [
+  {
+   "key": "lorg",
+   "covered": "Read in full: all 17 org records, 11 site records and 6 appendix records under /tmp/audit_1113/lore/world/{orgs,sites,appendices}/; src/data/guides/_old/faction-original.txt (81 lines; confirmed it is not imported by any code, the live 📜Faction is assembled by src/core/world/faction.ts from orgs.json + relations.json); all 9 files in card/extra-lore/; src/core/world/faction.ts, assemble.ts, virtual.ts, schema.ts, the key/appendix parts of src/core/lore.ts and directory.ts; relations.json pairs and docs/세력관계_기본표.md; the 부록/호칭/조직/미스틱 사이트 sections of src/data/install/directory.json; the 11-13 audit results (검사결과/all.json) for these files, so already-decided items are not repeated.\n\nScripts under /tmp/audit_1113/lorg/: probe.mjs and probe2.mjs bundle withWorldLore with esbuild and render every org/site/appendix entry and the 📜Faction text (without and with the install directory, to see the B00 CBS branches); a line diff of each rendered org and site entry against the original card entry (dist-test/real-module.json lorebook[18–30], [156–165]); a line diff of each extra-lore file against its record (all 9 match, apart from section headings); tok.mjs counts tokens with js-tiktoken o200k (📜Faction 2,139; org details 219–1,402; sites 458–1,319; appendices 99–710; duplicated summary paragraphs 32–54 each, 512 in total).\n\nChecked against card/wiki-base.json: headquarters (관리국·가짜 관리국 종로구, 백일몽 강남구, 협회 영등포구, 중림 중구 중림동) all correct; 관리국 team list; 백일몽 clear rewards, Annex fee 1,000p and two free runs, 25F 여우 상담실, 보안팀 rental storage, 경비팀; 무명찬란교 six sects (three known); 중림 loan sharks; 이정 책방; 얼굴 없는 장터; 망상홈쇼핑 product names. Searched the rendered texts for banned or minor-related words: only 'government registry' in 백일몽 (ruled original-author lore on 11-13, wording#3), not re-reported.",
+   "dropped": "9 weaker candidates left out. (1) 협회 detail repeats the Freelancer definition sentence that the always-on Faction already carries (33 tokens; both are the original author's). (2) 백일몽 intro line '- Field Exploration Team: Field attire: suits and assigned animal masks.' partly repeats the Recruitment line about animal masks (about 15 tokens; placed there by the 11-13 roster decision). (3) 무명찬란교 says 'Six sects' but lists three; the wiki says the other three are unknown, and fixing it would mean adding text. (4) 남해지사 intro says 'early wiki stories' (a meta word inside lore; owner-supplied text). (5) 백일몽 is named three ways (Baekilmong / Baekilmong Co., Ltd / Baekilmong corporation) and 세정게 Surveillance calls both Bureaus 'The Anomaly Management Bureau' with only the code differing (original author). (6) The 가짜 관리국 summary for A00 players starts with a lowercase fragment 'the Bureau's absolute enemy…' (same in the original Faction text). (7) Directory English name 'Space Shopping Mall' versus record title 'Cosmic Shopping Mall' (the banner in the record itself says SPACE SHOPPING MALL). (8) 관리국 hq 'A concealment veil wraps both' has no referent for 'both' (original author). (9) The secret appendix 관리국 · 하나의 건물 goes out on almost every 관리국 turn (99 tokens) and is not locked like the other hidden-truth appendices; this is the owner's 11-13 decision (lplumb#5), so not reported. Also not reported because already decided: relations table 관리국→교황청 'wary' versus record 'classified hostile' (lagB#13), and the removal of the 'Hostile Organizations' sections into the relations grid (10-27 design)."
+  },
+  {
+   "key": "lan3",
+   "covered": "전부 읽은 것: _index.tsv 43~63번 괴이 기록 21개(자정역, 한밤역, 황혼역, 오후역, 한낮역, 아침역, 유쾌연구소, 차원 승강기, 샛별 고시원, 유계역, 어두운 정원, 거대한 세상, 영원마을, 프러스트 워터파크, 피어블 극장, 페어리테일 파크, 코즈믹 판타지 동물원, 환상드라마 민속촌, 미스테리 월드 어드벤쳐 파크, 소토스 백화점, 빛이 없으라)의 모든 칸. 관련해 읽은 것: 부록 「빛이 없으라 · 수도원」「망상홈쇼핑 · 상품」, 파밍 「망상홈쇼핑」, card/extra-lore/괴이_빛이없으라.txt, docs/설정집_어둠탐사기록_남해지사편.md 5-2·5-3절, 자정역 위키 전문.\n스크립트로 확인한 것(/tmp/audit_1113/lan3/): (1) 20개 기록을 원작 카드(dist-test/real-module.json)와 줄 단위 대조 → 본문은 한 글자도 다르지 않고 머리말 단계(####→#####)와 절 순서만 바뀜(한낮역·아침역·영원마을·프러스트·코즈믹·소토스 6개 순서 바뀜, above/below 참조가 깨진 곳 없음). 빛이 없으라만 원작 카드·위키에 없음(이전 Claude가 설정집에서 작성). (2) 키: 원작에서 빠진 키(Dark Garden, Giant World, 차원승강기, 망상홈쇼핑 등)는 명부 영문명·별칭 또는 파밍 기록으로 옮겨져 있고 lore.ts keyRegex 가 띄어쓰기를 봐주므로 안 켜지는 키 없음. (3) 위키 20개 문서의 숫자를 기록과 대조 → 어긋나는 수치 없음(영원마을 화폐 순서, 유쾌연구소 지점별 상태, 소토스 결제 수단 등 일치). (4) 금지어(government/정부/이면)·CBS 조각·깨진 서식 검색 → 없음. (5) 다른 괴이·요원·조직 기록과 교차 참조(세광특별시의 역 목록, 등급 이름 C=Gloaming, 가온나래 등) 확인. (6) js-tiktoken(o200k) 토큰: 21개 합계 29,154, 기록당 518~2,092; 칸 제목 겹머리(#### Identity + ##### 원제목) 기록당 6~21토큰; 역 사무실 문단 90토큰; 오후역 notes 115토큰.",
+   "dropped": "약한 후보 7개를 뺐다. (1) 칸 제목 겹머리: assemble.ts 가 「#### Identity」 같은 칸 제목을 붙이고 본문이 다시 「##### 원제목」으로 시작해 기록당 6~21토큰(21개 합 301) 낭비, 유쾌연구소는 핵심 설정 556토큰이 「#### Notes」 아래에 놓임 — 코드 쪽 문제이고 작다. (2) 미스테리 월드 어드벤쳐 파크: 표준 표기 「미스터리 월드/어드벤처 파크」로 쓰면 안 켜짐(위키는 전부 「미스테리」) — 별칭 추가는 취향. (3) 거대한 세상의 'unconfirmed by the Company': 어느 회사인지 불명(원작자 글). (4) 아침역·세광특별시 'Segwang Provincial Court'(위키는 세광지방법원 = District Court) 번역 차이. (5) 황혼역 제목의 두 칸 띄어쓰기, 한밤역 본문의 'Deep-Night'와 제목 'Deep Night' 표기 차이. (6) 코즈믹 판타지 동물원: 순서가 바뀌어 'Stalker'가 정의되기 전에 먼저 언급됨. (7) 유계역의 확률 굴림 지시(러시아워 20~60%, 구매 15% 등)는 원작자 글 그대로라 보고하지 않음. 또 고등학생 언급(빛이 없으라의 실종 고교생, 한밤역의 세광공업고)은 CLAUDE.md 의 2026-11-13 사용자 결정(콘쥬스 17세 고등학생)과 위키·원작에 근거가 있어 보고하지 않았다."
+  }
+ ],
+ "counts": {
+  "total": 19,
+  "confirmed": 18,
+  "rejected": 1,
+  "unverified": 0
+ },
+ "confirmed": [
+  {
+   "key": "lorg",
+   "n": 1,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "가짜 관리국으로 플레이하면 자기 조직 설명 첫머리에 「관리국의 절대적인 적, 발견 즉시 제거」가 나오고, 세력 요약 문단이 상세 글에 한 번 더 들어간다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/core/world/assemble.ts",
+    "line": 75,
+    "record": "조직 상세 조립 (가짜 관리국 intro 첫 문단 외 조직 12개)",
+    "old_text": "    const t = def ? fieldValue(rec, id, faction) : '';",
+    "new_text": "    let t = def ? fieldValue(rec, id, faction) : '';\n    // 조직 소개의 첫 문단은 📜Faction 요약으로 늘 가므로, 뒤에 글이 더 있으면 상세 로어에서는 뺀다 (세력별 시점 글은 요약에만 있다)\n    if (kind === 'org' && id === 'intro' && !rec.noSummary) t = t.split(/\\n\\s*\\n/).slice(1).join('\\n\\n').trim() || t;",
+    "evidence": "Rendered with /tmp/audit_1113/lorg/probe2.mjs (withWorldLore + install directory). The 가짜 관리국 detail entry is: `### {{…B00}}Management Bureau{{/if}} (가짜 관리국)` / `[Affiliation code: B00]` / `#### Identity` / `the Bureau's absolute enemy and an organizational anomaly officially classified as \"anomaly; communication impossible.\" … every confirmed manifestation is subject to immediate elimination.` That paragraph is the 관리국 (A00) viewpoint. The B00 variant (orgs.json 가짜 관리국 variants.B00.intro) is applied only in the 📜Faction summary (faction.ts variantText); virtual.ts:103 passes faction = undefined to assembleOrg, so the detail always prints the base intro. A B00 player's own organization is therefore introduced as the enemy to be eliminated. The original card entry (dist-test/real-module.json lorebook[19]) starts Identity with 'The organization that controls this world's secrets…' and has no such paragraph; the port prepended the summary to intro. The same prepending makes 12 org details repeat the paragraph that the always-on 📜Faction already carries: js-tiktoken o200k count 32–54 tokens each (가짜 관리국 39, 백일몽 33, 협회 35, 중림 43, 교황청 54, 이슬람 44, 발푸르기스 52, 흡혈귀 52, 무명찬란교 51, 병원 38, 극단 32, 세정게 39; 512 in total). With the edit, 가짜 관리국's detail equals the original entry. 관리국 (single paragraph) and 남해지사 (noSummary) are unchanged.",
+    "needs_user_decision": false,
+    "token_saving": 45,
+    "also_change": "tests/world-guides.test.mjs and tools/check-world.mjs may pin the assembled org text; re-pin if so. tools/build_lite_card.py builds the Lite card separately and is not affected. In calls where the always-on lore is switched off but related lore is on (board tables), the detail then starts at its second paragraph, which restates the summary in every record I checked."
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "Confirmed from the files; nothing was run with the edit applied (read-only).\n\n1. old_text is verbatim at /home/user/goei-plugin/src/core/world/assemble.ts:75.\n\n2. The B00 contradiction is real. orgs.json 가짜 관리국 fields.intro has three paragraphs. The first is the 관리국 (A00) viewpoint: \"the Bureau's absolute enemy and an organizational anomaly ... every confirmed manifestation is subject to immediate elimination.\" The record has variants.B00.intro, but that is only used by faction.ts variantText (lines 22-28, 51) for the always-on Faction summary. virtual.ts:103 sets `const faction = undefined` and passes it to assembleOrg (line 124), and fieldValue (records.ts:285) returns the base intro when faction is undefined. So the detail lore for 가짜 관리국 always opens \"#### Identity\" with the enemy paragraph, including for a B00 player.\n\n3. The original card agrees with the finder. dist-test/real-module.json lorebook[19] (가짜 관리국) starts Identity with \"The organization that controls this world's secrets under the creed...\" and does not contain the \"absolute enemy\" paragraph. That paragraph exists only in the original 📜Faction entry (lorebook[14]).\n\n4. The duplication is real for all 12 orgs with a multi-paragraph intro (가짜 관리국, 백일몽, 협회, 중림, 교황청, 이슬람, 발푸르기스, 흡혈귀, 무명찬란교, 병원, 극단, 세정게). For the 9 that have an original detail entry, paragraph 1 is in the original Faction text and not in the original detail entry. In every one of the 12 the second paragraph restates the summary, so no information is lost. I did not re-measure the token counts (32-54 per org); they are plausible from paragraph length.\n\n5. The edit is safe in the edge cases I checked:\n- Single-paragraph intros (관리국, 민간인, 프리랜서, 탐미주의) are kept by the `|| t` fallback.\n- 남해지사 (noSummary) is kept by the `!rec.noSummary` guard.\n- When a faction is passed (editor preview via draft.ts recordText), the single-paragraph variant is kept by the same fallback.\n- `kind` is already in scope in sections() (line 66) and `noSummary` is on WorldRecord (records.ts:34).\n\n6. It does not conflict with any owner decision: it adds no guide rule and changes no lore fact, and it restores the original card's detail text.\n\nOne design note: schema.ts:40-42 currently documents \"whole intro goes to the detail lore\", so this is a deliberate behaviour change and that comment and hint must change with it.",
+    "old_text_found_exactly": true,
+    "final_old_text": "    const t = def ? fieldValue(rec, id, faction) : '';",
+    "final_new_text": "    let t = def ? fieldValue(rec, id, faction) : '';\n    // 조직 소개의 첫 문단은 📜Faction 요약으로 늘 가므로, 뒤에 글이 더 있으면 상세 로어에서는 뺀다 (세력별 시점 글은 요약에만 있다)\n    if (kind === 'org' && id === 'intro' && !rec.noSummary) t = t.split(/\\n\\s*\\n/).slice(1).join('\\n\\n').trim() || t;",
+    "side_effects": "- Must change together: /home/user/goei-plugin/src/core/world/schema.ts line 40 comment and line 42 hint ('첫 문단은 Faction 지침 요약에, 전체는 세력 상세 로어에') should say the rest (나머지) goes to the detail lore, since the world editor shows this hint.\n- Editor preview and token count (draft.ts recordText -> assembleOrg) will show org details without the first paragraph. That matches what is sent.\n- Round trip: exporting an org's assembled detail and re-importing it with parseImport would no longer carry the summary paragraph into intro.\n- Tests: I found no unit test that pins the org detail's first paragraph. world-data.test.mjs pins only agent content, the org name CBS and variants keys; world-guides.test.mjs pins the Faction summary, which is unchanged. tools/check-world.mjs has no intro-specific check that I could grep, but it compares against the original card and should be rerun; the result should be closer to the original. tests/guide-out fixtures may include org detail lore in rendered requests; re-pin if so.\n- Where the always-on Faction text is not sent but org detail lore is, the detail starts at paragraph 2. That paragraph restates the summary in all 12 records, and for 가짜 관리국 it drops only the A00-viewpoint line.\n- A user-made org with a multi-paragraph intro and noSummary=false gets the same split, consistent with the Faction summary rule.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 2,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "가짜 관리국으로 플레이할 때 조직 상세 제목의 한글 이름이 뒤바뀌지 않아 자기 조직이 「Management Bureau (가짜 관리국)」으로 나온다",
+    "kind": "mismatch",
+    "severity": "medium",
+    "file": "src/core/world/assemble.ts",
+    "line": 96,
+    "record": "assembleOrg 제목",
+    "old_text": "  const title = rec.title || `${orgNameCbs(dir, org)} (${org.name})`;",
+    "new_text": "  // 한글 이름도 호칭 표대로 바꾼다 (가짜 관리국으로 플레이하면 제 조직이 「관리국」)\n  const ko = (viewer: string) => (org.faction && dir.display[viewer]?.[org.faction]) || org.name;\n  const swaps = Object.keys(dir.display).filter((v) => v !== 'none' && ko(v) !== ko('none'));\n  const koName = `${swaps.map((v) => `{{#if {{not_equal::${VAR}::${v}}}}}`).join('')}${ko('none')}${'{{/if}}'.repeat(swaps.length)}${swaps.map((v) => `{{#if {{equal::${VAR}::${v}}}}}${ko(v)}{{/if}}`).join('')}`;\n  const title = rec.title || `${orgNameCbs(dir, org)} (${koName})`;",
+    "evidence": "Rendered titles (probe2): `### {{#if not B00}}Management Bureau{{/if}}{{#if B00}}Fake Management Bureau{{/if}} (관리국)` and `### {{#if not B00}}Fake Management Bureau{{/if}}{{#if B00}}Management Bureau{{/if}} (가짜 관리국)`. Only the English half follows the 호칭 table (src/data/install/directory.json 호칭.B00 = {A00: 가짜 관리국, B00: 관리국}). The original card swapped both halves: lorebook[18] `{{#if not B00}}### Management Bureau (관리국){{/if}}{{#if B00}}### Fake Management Bureau (가짜 관리국){{/if}}`, lorebook[19] the reverse. Play is in Korean, so a B00 player's model reads that its own 'Management Bureau' is called 「가짜 관리국」 in Korean. This conflicts with the always-on Faction text, relations.json common: 'members of each Bureau call their own organization the “Management Bureau” and their counterpart the “Fake Management Bureau.”'",
+    "needs_user_decision": false,
+    "also_change": "Only 관리국 and 가짜 관리국 have no title field, so only these two change. Re-pin tests/world-guides.test.mjs if it fixes these headings."
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "Confirmed from the files. src/core/world/assemble.ts:96 builds the org heading as `${orgNameCbs(dir, org)} (${org.name})`: only the English half goes through the 호칭 table CBS (orgNameCbs, lines 11-27); the Korean half is the fixed org.name. src/data/install/directory.json 호칭.B00 = {A00: \"가짜 관리국\", B00: \"관리국\"}, so for a B00 player the headings come out as \"### Fake Management Bureau (관리국)\" for A00 and \"### Management Bureau (가짜 관리국)\" for their own organisation. The original card (dist-test/real-module.json lorebook[18], [19]) swaps both halves together: `{{#if not B00}}### Management Bureau (관리국){{/if}}{{#if B00}}### Fake Management Bureau (가짜 관리국){{/if}}` and the reverse. The file header comment of assemble.ts itself says the output must match the card lorebook text, so this is a porting defect, not a design choice. It also disagrees with the always-on Faction text (each Bureau calls itself the Management Bureau). It only affects B00 play and only the two headings (the rest of the record is unaffected), so medium is the ceiling; low-medium in practice. The proposed edit is code-only, adds no guide rules, touches no owner decision, and produces `{{#if not_equal B00}}관리국{{/if}}{{#if equal B00}}가짜 관리국{{/if}}` for A00 and the reverse for B00; for every other org no viewer differs, so swaps is empty and the output is the plain name as before. `VAR` and `dir.display` are already in scope in that file. I did not run a probe of the edited code (read-only), but the logic mirrors orgNameCbs.",
+    "old_text_found_exactly": true,
+    "final_old_text": "  const title = rec.title || `${orgNameCbs(dir, org)} (${org.name})`;",
+    "final_new_text": "  // 한글 이름도 호칭 표대로 바꾼다 (가짜 관리국으로 플레이하면 제 조직이 「관리국」)\n  const ko = (viewer: string) => (org.faction && dir.display[viewer]?.[org.faction]) || org.name;\n  const swaps = Object.keys(dir.display).filter((v) => v !== 'none' && ko(v) !== ko('none'));\n  const koName = `${swaps.map((v) => `{{#if {{not_equal::${VAR}::${v}}}}}`).join('')}${ko('none')}${'{{/if}}'.repeat(swaps.length)}${swaps.map((v) => `{{#if {{equal::${VAR}::${v}}}}}${ko(v)}{{/if}}`).join('')}`;\n  const title = rec.title || `${orgNameCbs(dir, org)} (${koName})`;",
+    "side_effects": "Only the two org headings without a title field (관리국, 가짜 관리국) change; other orgs render identically. No pinned text found: grep for \"Management Bureau (\" / \"(가짜 관리국)\" in tests/world-data.test.mjs, tests/world-guides.test.mjs, tests/guide-out.test.mjs and tests/fixtures/guide-out-old.json returned nothing, so no re-pin is expected; run `npm run typecheck` and `node --test tests/world-guides.test.mjs tests/world-data.test.mjs` after the change. The heading gains a second CBS block (about 40 extra raw characters before CBS evaluation; no token cost after evaluation). src/core/world/draft.ts (editor preview/token count) uses the same function and will show the new heading. For display tables where the Korean name for an org's own faction code is not an org name (e.g. 민간인/프리랜서 for D00/E00), ko('none') would replace org.name with that label ONLY if an org with faction D00/E00 has no title field — check that such orgs all carry a title (or the label equals the name) before applying; if not, guard with `swaps.length ? koName : org.name`.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 3,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "우주 쇼핑몰 로어가 「이 글이 켜지면 팝업 스토어가 나타난 것」이라고 해서, 이름만 말해도 가게가 눈앞에 생긴 것으로 읽힌다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/data/world/sites.json",
+    "line": 125,
+    "record": "우주 쇼핑몰 / fields.identity",
+    "old_text": " When this entry is active in a scene, the Mall has manifested as that pop-up store.",
+    "new_text": "",
+    "evidence": "The entry turns on by key match, not only on a visit: keys 'Cosmic Shopping Mall, Cosmic Shopping, Space Shopping, Cosmos Shopping, 우주 쇼핑몰' plus the directory names (lore.ts:253 callNames), all plain keys. So a mention in talk, or the protagonist browsing the website, activates it, and this sentence then tells the main model that the physical pop-up store has manifested in the scene. The same record says the pop-up opens 'very rarely', and shop.txt OWN_SHOPS (line 177, sent in the same request) says: 'its name in talk, a rumour, an ad or a document, a plan to go, a past visit, or someone else shopping there → no shop. Using it online … → @web'. Owner note of 11-09 (docs/인계/2026-11-13_전수검사/memory/goei-shop-judge-1109.md:11): 'Mere mention must NOT open'. The sentence came in with commit 02fe29f88 (11-10) and is not in the original card entry (lorebook[163]). Deleting it leaves the website/pop-up distinction intact.",
+    "needs_user_decision": true,
+    "token_saving": 19
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "medium",
+    "reasoning": "Confirmed from the files.\n\n- The sentence is present verbatim at src/data/world/sites.json:125, at the end of the 우주 쇼핑몰 record's fields.identity.\n- The record is switched on by plain key match: keys \"Cosmic Shopping Mall, Cosmic Shopping, Space Shopping, Cosmos Shopping, 우주 쇼핑몰\" plus directory call names (src/core/lore.ts, the `calls` line). A mention in talk or browsing the website activates it.\n- Once active, the sentence tells the main model the physical pop-up \"has manifested\" in the scene. That conflicts with the same paragraph (\"very rarely ... opens an OFFLINE pop-up\", \"The website is its original and normal form\").\n- It also conflicts with src/data/guides/shop.txt:177 (OWN_SHOPS): \"its name in talk, a rumour, an ad or a document, a plan to go, a past visit, or someone else shopping there → no shop. Using it online ... → @web\".\n- The original card entry (dist-test/real-module.json, lorebook[163]) has no such sentence. It only says \"Once manifested, the Mall remains open for approximately one day\", which the current record already carries in fields.access.\n\nDeleting the sentence loses no fact: the website/pop-up distinction, the one-day duration and the vacant-storefront access all stay. It adds no rule and undoes no owner decision; it fits the mall rule that the screen opens only on actual use.\n\nNot checked: I did not render a full request to prove OWN_SHOPS and this record land in the same main-model call, and I did not open the 11-09 owner note or the commit the finder cites. The contradiction inside the record itself holds regardless.\n\nSeverity medium: it misleads only when the mall is mentioned without a visit, but then it can make a store appear on mere mention.",
+    "old_text_found_exactly": true,
+    "final_old_text": " When this entry is active in a scene, the Mall has manifested as that pop-up store.",
+    "final_new_text": "",
+    "side_effects": "- The string appears nowhere else in src/, tests/ or card/ (grep), so no pinned test text or code depends on it.\n- /tmp/audit_1113/lore/world/ holds a scratch copy of the record, which is not part of the repo.\n- The preceding sentence still ends with a period, so the JSON string stays valid.\n- No twin text needs changing; shop.txt is untouched.\n- Saving is about 19 tokens whenever the record is active.",
+    "needs_user_decision": true,
+    "decision_question_ko": "우주 쇼핑몰 로어 끝의 「이 글이 켜지면 팝업 스토어가 나타난 것이다」 문장을 지울까요? 이 글은 이름만 나와도 켜져서, 말만 꺼내도 가게가 눈앞에 생긴 것으로 읽힐 수 있습니다. (1) 지운다 — 추천. 원본 카드에 없는 문장이고, 「아주 드물게 열린다」·「이름만 나오면 가게 아님」과 어긋납니다. (2) 그대로 둔다."
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 4,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "망상홈쇼핑 상품 부록이 흔한 말 「다이어트 보조제」만 나와도 통째로 켜진다",
+    "kind": "over-token",
+    "severity": "medium",
+    "file": "src/data/world/appendices.json",
+    "line": 30,
+    "record": "망상홈쇼핑 · 상품 / keys",
+    "old_text": "혈액 욕조, 다이어트 보조제, Beauty Pills",
+    "new_text": "혈액 욕조, 알주머니 다이어트 보조제, Beauty Pills",
+    "evidence": "src/data/install/directory.json 부록['망상홈쇼핑 · 상품'] = keys:true, need_parent:false, so a key hit alone turns the appendix on in any scene. '다이어트 보조제' is an everyday phrase and a plain key (not in CONFIRM_KEYS, lore.ts:38). The appendix is 593 tokens (o200k). The product's name in the wiki is 「미용 애벌레 알주머니 다이어트 보조제」 (card/wiki-base.json 오후역 table row), so the narrower key still matches the product. The 11-13 audit removed 쇼룸·카탈로그 from this key list for the same reason (lplumb#8) and left this one. Inside 망상홈쇼핑/오후역 the appendix still turns on through places and target.",
+    "needs_user_decision": false,
+    "token_saving": 593,
+    "also_change": "Twin key line in card/extra-lore/부록_망상홈쇼핑_상품.txt:3 (same text)."
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "medium",
+    "reasoning": "The problem is real. src/data/world/appendices.json:30 holds the key list verbatim, including the bare key 「다이어트 보조제」. src/data/install/directory.json sets 부록['망상홈쇼핑 · 상품'] to keys:true, with_parent:false, need_parent:false, target:true, places [망상홈쇼핑, 망상 홈쇼핑, 오후역], so a key hit alone turns the appendix on in any scene. 「다이어트 보조제」 is not in CONFIRM_KEYS (src/core/lore.ts:38-48), so it is a plain key. It is an everyday phrase that can come up in ordinary talk about dieting, and it then pulls in the whole Catalog Examples body (about 590 tokens by the finder's count; I did not re-measure, but the body is roughly 2,900 characters of English, which fits). The wiki (card/wiki-base.json, 오후역 table) names the product 「미용 애벌레 알주머니 다이어트 보조제」, so the narrowed key 「알주머니 다이어트 보조제」 still matches the product's real name. Inside 망상홈쇼핑/오후역 the appendix still turns on through places/target, so nothing is lost where it matters. The edit adds no rules, changes only a trigger key, and conflicts with no owner decision. One caveat: the wiki also uses the bare phrase 「다이어트 보조제 시연」 in a 망상홈쇼핑 context, but there the place trigger covers it.",
+    "old_text_found_exactly": true,
+    "final_old_text": "혈액 욕조, 다이어트 보조제, Beauty Pills",
+    "final_new_text": "혈액 욕조, 알주머니 다이어트 보조제, Beauty Pills",
+    "side_effects": "The twin key line in card/extra-lore/부록_망상홈쇼핑_상품.txt:3 has the same text and must change at the same time. No file under tests/ contains 「다이어트 보조제」, so no pinned-text test should break (guide-out fixtures do not pin lore keys). After the change the appendix no longer turns on from the bare phrase outside 망상홈쇼핑/오후역; it turns on only from the full product name, the other keys, or the place/target.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 5,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "협회 로어 소개 끝에 쓸모없는 「- ---」 줄이 남아 있다",
+    "kind": "lore-error",
+    "severity": "low",
+    "file": "src/data/world/orgs.json",
+    "line": 141,
+    "record": "특수재난대응협회 / fields.intro",
+    "old_text": "engaged in anomaly response.\\n\\n- ---\",",
+    "new_text": "engaged in anomaly response.\",",
+    "evidence": "The assembled 협회 entry (/tmp/audit_1113/lorg/ren/org_특수재난대응협회.txt) prints a list item '- ---' under #### Identity. The original card entry (lorebook[21]) has no such line: Identity is the single bullet '- The Special Disaster Response Association is a private civilian organization…'. It is a leftover of the entry separator picked up when the record was ported.",
+    "needs_user_decision": false,
+    "token_saving": 3
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. /home/user/goei-plugin/src/data/world/orgs.json line 141 (특수재난대응협회 fields.intro) ends with \"...engaged in anomaly response.\\n\\n- ---\", and the old_text is there verbatim, exactly once. The rendered entry (/tmp/audit_1113/lorg/ren/org_특수재난대응협회.txt line 10) prints a list item \"- ---\" under Identity. In the original card (dist-test/real-module.json lorebook[21] 협회), the Identity bullet is followed directly by \"#### Characteristic\", with no such line, so it is a porting leftover. No other world file has this fragment. The edit removes only the fragment and no meaning. The saving is about 3 tokens, so this is cosmetic.",
+    "old_text_found_exactly": true,
+    "final_old_text": "engaged in anomaly response.\\n\\n- ---\",",
+    "final_new_text": "engaged in anomaly response.\",",
+    "side_effects": "The string \"engaged in anomaly response\" appears in no file under tests/, so no text-pinning test should break; I did not run the tests. No code depends on the \"- ---\" fragment (the only '---' in src/core/world is the table separator in faction.ts). No twin text needs changing.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 6,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "중림 지하상가 사채업자 설명에서 낱말이 빠져 「제도권 금융을 이용하는 사람에게 빌려준다」로 읽힌다",
+    "kind": "lore-error",
+    "severity": "low",
+    "file": "src/data/world/orgs.json",
+    "line": 160,
+    "record": "중림 지하상가 / fields.personnel",
+    "old_text": "high-risk loans to people access to legitimate financial institutions",
+    "new_text": "high-risk loans to people without access to legitimate financial institutions",
+    "evidence": "card/wiki-base.json 중림 지하상가: 「사채업자: 제도권 금융이 상대해 주지 않는 사람에게 고위험 대출을 해 준다.」 The record sentence lost 'without' (the same slip is in the original card entry, lorebook[22]), so it is ungrammatical and reads as the opposite.",
+    "needs_user_decision": false
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. /home/user/goei-plugin/src/data/world/orgs.json line 160 (중림 지하상가, fields.personnel) contains \"Loan Sharks provide high-risk loans to people access to legitimate financial institutions.\" exactly once. The sentence is ungrammatical and can be read as the opposite of the intended meaning. The owner's wiki (card/wiki-base.json, 중림 지하상가) says 「사채업자: 제도권 금융이 상대해 주지 않는 사람에게 고위험 대출을 해 준다.」, so the intended meaning is \"without access\". The original card (dist-test/real-module.json) has the same slip, so this is an original-author typo carried over, not a Claude alteration. The fix adds one word, restores the wiki meaning, adds no rule and conflicts with no owner decision. orgs.json is world data, not one of the two original-author files that need a user decision. I did not run any test or grep the tests for this string.",
+    "old_text_found_exactly": true,
+    "final_old_text": "high-risk loans to people access to legitimate financial institutions",
+    "final_new_text": "high-risk loans to people without access to legitimate financial institutions",
+    "side_effects": "One word (+1 token) in the 중림 지하상가 record. The per-record copy under /tmp/audit_1113/lore/world/ is scratch only. Guide texts are untouched, so tests/guide-out.test.mjs should not be affected; whether any test or fixture pins this lore string was not checked. No code or twin text needs to change with it.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 7,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "얼굴 없는 장터 접근 방법 문장이 깨져 있다 (a anomalous manholes … phenomenon., and)",
+    "kind": "lore-error",
+    "severity": "low",
+    "file": "src/data/world/sites.json",
+    "line": 50,
+    "record": "얼굴 없는 장터 / fields.access",
+    "old_text": "insert only your arm into a anomalous manholes occupied by the Manhole Arms phenomenon., and you join",
+    "new_text": "insert only your arm into a manhole occupied by the Manhole's Arm phenomenon, and you join",
+    "evidence": "Broken leftover of an edit: 'a anomalous manholes', a stray '.,', and the parent tale named 'Manhole Arms' here but 'The Manhole's Arm' two sentences earlier in the same field (wiki: 「맨홀의 팔」). The next sentence already says 'a manhole occupied by the phenomenon'. Same broken text in the original card entry (lorebook[159]); meaning unchanged by the fix.",
+    "needs_user_decision": false,
+    "token_saving": 3
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "The quoted text is verbatim at /home/user/goei-plugin/src/data/world/sites.json line 50 (record 얼굴 없는 장터, fields.access). The sentence is broken: \"a anomalous manholes\" (article/number mismatch), a stray \".,\" and the parent tale called \"Manhole Arms\" although the same field opens with 'The Manhole's Arm'. The very next sentence already reads \"a manhole occupied by the phenomenon\", so the fix loses nothing.\n\nThe breakage is not a Claude edit leftover: the identical text is in the original card (dist-test/real-module.json, lorebook[159] 얼굴 없는 장터). So this is the original author's typo carried over. The fix is grammar and name consistency only; no lore fact changes. The only word dropped is \"anomalous\", which is redundant with \"occupied by the ... phenomenon\".\n\nI did not run any tests or grep the tests for this string. Saving is about 3 tokens; the value is correctness, not size.",
+    "old_text_found_exactly": true,
+    "final_old_text": "insert only your arm into a anomalous manholes occupied by the Manhole Arms phenomenon., and you join",
+    "final_new_text": "insert only your arm into a manhole occupied by the Manhole's Arm phenomenon, and you join",
+    "side_effects": "Only src/data/world/sites.json needs editing. The same string sits in the built outputs dist/goei-data-world.txt, dist/goei-data-world.5.txt, release/goei-data-world.txt and release/goei-data-world.5.txt, which will pick it up on the next build. dist-test/real-module.json is the original card and must stay untouched. Not checked: whether any test pins this text (tests/guide-out fixtures pin guide output, not this site field, so unlikely). Line 52 of the same record says \"a Manhole Arm waits\", which is a creature reference and can stay.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 8,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "남해지사 로어가 「하얀 끈 참고」라고 하지만 하얀 끈 로어 기록은 없다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/world/orgs.json",
+    "line": 276,
+    "record": "남해지사 / fields.hq",
+    "old_text": "Built over a native Uh-doom (see 하얀 끈);",
+    "new_text": "Built over a native Uh-doom (White Cord, 하얀 끈);",
+    "evidence": "There is no anomaly, site or appendix record named 하얀 끈 (/tmp/audit_1113/lore/world/anomalies has none; wiki-base.json has no such page), so 'see 하얀 끈' points the model at lore it never receives. The only description is one line in the appendix 남해지사 · 시설 ('White Cord (하얀 끈, Qterw-A-89, Darkness), the native Uh-doom'), which uses the English name 'White Cord'; the record's own Seeds block also says 'the White Cord'. Naming it here ties the three mentions together without a dangling reference.",
+    "needs_user_decision": false,
+    "also_change": "Twin text in card/extra-lore/세력_남해지사.txt:15."
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. The quoted text occurs exactly once in /home/user/goei-plugin/src/data/world/orgs.json (line 276, 남해지사 fields.hq) and once in the twin /home/user/goei-plugin/card/extra-lore/세력_남해지사.txt:15.\n\n\"하얀 끈\" appears nowhere in card/wiki-base.json or dist-test/real-module.json, and no anomaly, site or appendix record has that name. The only description is one line in the appendix \"Namhae Branch Appendix: Facilities and Registered Uh-doom\" (src/data/world/appendices.json:25): \"White Cord (하얀 끈, Qterw-A-89, Darkness), the native Uh-doom\". That appendix's keys are Leisure Zone, 휴무 구역, 남해술집, 숙면관리점, 종교활동실, 광차, 작업 대기 구역, 옛 중앙시스템. Neither 하얀 끈 nor 남해지사 is a key, so the appendix usually does not arrive with the org record and \"see 하얀 끈\" points at lore the model does not get.\n\nThe same org record's Seeds block (orgs.json:282) already says \"the White Cord\", so the one thing has two names inside one record. The original card only has the code Qterw-A-89 (in an agent record), so \"하얀 끈 / White Cord\" is earlier-Claude naming, not the original author's; no lore fact changes.\n\nThe proposed edit is minimal, adds no rule, and ties the names together. Low severity: no false fact, just a dangling cross-reference, token-neutral.",
+    "old_text_found_exactly": true,
+    "final_old_text": "Built over a native Uh-doom (see 하얀 끈);",
+    "final_new_text": "Built over a native Uh-doom (White Cord, 하얀 끈);",
+    "side_effects": "Apply the same replacement to the twin text in /home/user/goei-plugin/card/extra-lore/세력_남해지사.txt line 15. No guide text is involved, so tests/guide-out.test.mjs is unaffected. I did not check whether any test pins the orgs.json record text or the per-record size, so run npm test after the edit. No code references the string.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 9,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "이정 책방 로어만 관리국을 「Supernatural Disaster Management Bureau」라는 다른 이름으로 부른다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/world/sites.json",
+    "line": 21,
+    "record": "이정 책방 / fields.rules",
+    "old_text": "One of the Supernatural Disaster Management Bureau's standing sources",
+    "new_text": "One of the Management Bureau's standing sources",
+    "evidence": "This name appears nowhere else in src/data (grep: only sites.json:21). The Faction text, the org record and the roster all say 'Management Bureau'; the wiki page 이정 책방 says 「관리국이 영물을 조달하는 거래처 가운데 가장 오래된 곳」 and 「단골: 관리국 (조선 말기부터)」. With the association also called 'Special Disaster Response Association', a model can read this as a third organization.",
+    "needs_user_decision": false,
+    "token_saving": 3
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "The mismatch is confirmed, but it is small. /home/user/goei-plugin/src/data/world/sites.json line 21 (이정 책방, fields.rules) is the only place in src/ that says \"Supernatural Disaster Management Bureau\". Everywhere else in src/data the organisation is \"Management Bureau\" (65 occurrences across faction-original.txt, roster-original.txt, orgs.json, agents.json, anomalies.json, greetings.json, relations.json, tag.txt). Neither faction-original.txt nor orgs.json ever introduces the longer name, so the model is never told the two are the same body.\n\nTwo points weaken the finder's case:\n- The phrase is not a Claude artefact. The original card (dist-test/real-module.json, lorebook entry 「이정 책방」) has the identical sentence, and it matches the source work's full official name (초자연 재난관리국).\n- The longer name contains \"Management Bureau\", and the same sentence continues \"its oldest: the cooperative relationship dates to the late Joseon period\". A model reading it as a third organisation is possible but unlikely.\n\ncard/wiki-base.json has no 「초자연 재난관리국」 string, which is consistent with the finder's wiki quotes that say only 관리국. The edit is harmless: it changes no fact, adds no rule, and saves about 3 tokens. I would keep it as a low-priority consistency fix.",
+    "old_text_found_exactly": true,
+    "final_old_text": "One of the Supernatural Disaster Management Bureau's standing sources",
+    "final_new_text": "One of the Management Bureau's standing sources",
+    "side_effects": "No test or fixture pins this string (grep of tests/ for \"Supernatural Disaster\" finds nothing), and no code references it. No twin text needs changing. The per-record copy under /tmp/audit_1113/lore/world/ is scratch only. After the edit the sentence differs from the original card's wording by these two words.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 10,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "이빨 요정 로어는 「Bureau psychiatric team」, 관리국 로어는 「Mental Care Team」으로 같은 팀 이름이 다르다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/world/sites.json",
+    "line": 161,
+    "record": "이빨 요정 / fields.identity",
+    "old_text": "must report immediately to the Bureau psychiatric team.",
+    "new_text": "must report immediately to the Mental Care Team.",
+    "evidence": "orgs.json 관리국 structure: 'Mental Care Team: handles mandatory referrals, including agents who develop affection for containment subjects' — the same duty this rule describes. Wiki 관리국 table: 「정신 관리팀: 의무 상담, 격리 대상에 정 붙은 직원 상담」. Both wordings come from the original author, so this is a consistency fix only.",
+    "needs_user_decision": true
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed from the files. /home/user/goei-plugin/src/data/world/sites.json line 161 (이빨 요정, fields.identity) contains \"must report immediately to the Bureau psychiatric team.\" exactly once. /home/user/goei-plugin/src/data/world/orgs.json line 11 (관리국 structure) names the same unit \"Mental Care Team: handles mandatory referrals, including agents who develop affection for containment subjects.\" The owner's wiki (card/wiki-base.json) uses one name for both: the 이빨 요정 rule reads 「정이 들기 시작한 직원은 즉시 관리국 정신 관리팀에 보고할 것」 and the 관리국 team table has 「정신 관리팀: 의무 상담, 격리 대상에 정 붙은 직원 상담」. So it is one team under two English names. Both English wordings are the original author's own (dist-test/real-module.json has both \"Mental Care Team\" and \"Bureau psychiatric team\"), so this is not a Claude-introduced error, only an inconsistency in the original. Practical harm is small: a model would most likely treat the two as the same unit, but could voice two different team names. The edit is one phrase, token-neutral, adds no rule and conflicts with no owner decision. I kept \"the Bureau\" in the replacement so the sentence still says whose team it is, matching the wiki's 「관리국 정신 관리팀」.",
+    "old_text_found_exactly": true,
+    "final_old_text": "must report immediately to the Bureau psychiatric team.",
+    "final_new_text": "must report immediately to the Bureau's Mental Care Team.",
+    "side_effects": "No test or source file under tests/ or src/ pins the string \"psychiatric\" other than sites.json itself, so no test should break. The per-record copies under /tmp/audit_1113/lore/world/ are scratch and need no change. No twin text has to change with it. It is not a guide, so tests/guide-out.test.mjs is unaffected.",
+    "needs_user_decision": true,
+    "decision_question_ko": "이빨 요정 로어의 「Bureau psychiatric team」을 관리국 로어와 같은 「Mental Care Team」(위키의 정신 관리팀)으로 맞출까요? 둘 다 원작자 글입니다. ① 맞춘다(추천: 위키가 두 곳 모두 「정신 관리팀」) ② 원작 그대로 둔다."
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 11,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "무명찬란교 영문 표기가 조직 상세 제목만 「Chanran-gyo」이고 세력 요약·명부는 「Chanrangyo」다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/world/orgs.json",
+    "line": 222,
+    "record": "무명찬란교 / title",
+    "old_text": "\"title\": \"Mumyeong Chanran-gyo (무명찬란교)\"",
+    "new_text": "\"title\": \"Mumyeong Chanrangyo (무명찬란교)\"",
+    "evidence": "Always-on Faction heading is '### Mumyeong Chanrangyo' (directory.json 조직.무명찬란교.english; also faction-original.txt, pictures.json, 3 places in anomalies.json). The detail title in orgs.json:222 and one place in anomalies.json:601 use 'Chanran-gyo'. Leave the keys line (215) as it is so both spellings still match.",
+    "needs_user_decision": false,
+    "also_change": "anomalies.json:601 has the same hyphenated spelling once (another auditor's file)."
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "The mismatch is real, but it is the original author's own spelling, so it is not an error introduced later and the fix is cosmetic.\n\n- **Current text:** `/home/user/goei-plugin/src/data/world/orgs.json:222` reads `\"title\": \"Mumyeong Chanran-gyo (무명찬란교)\"`, exactly as quoted.\n- **Other spelling in use:** the always-on Faction heading is `### Mumyeong Chanrangyo` (`src/data/guides/_old/faction-original.txt:42`), and `src/core/world/directory.ts:645` and `src/data/install/directory.json` (`english`) use the same. `anomalies.json` has the unhyphenated form on lines 564, 566 and 567 and the hyphenated form on line 601.\n- **Original card:** `dist-test/real-module.json` already has both. The detail entry is headed `### Mumyeong Chanran-gyo (무명찬란교)`, while the Faction text and several anomaly entries say `Mumyeong Chanrangyo`.\n- **Impact on the model:** negligible. The Korean name in brackets ties the two spellings together, and there is no token saving.\n- **Code safety:** the title is only rendered as a heading (`src/core/world/assemble.ts:96`) and used in a squash-compare fallback (`directory.ts:510`). The keys on line 215 are untouched, so matching still works.\n\nThe edit is safe and minimal. Because it alters the original author's heading purely for consistency, I set needs_user_decision to true rather than false as the finder had it.",
+    "old_text_found_exactly": true,
+    "final_old_text": "\"title\": \"Mumyeong Chanran-gyo (무명찬란교)\"",
+    "final_new_text": "\"title\": \"Mumyeong Chanrangyo (무명찬란교)\"",
+    "side_effects": "No test pins this title: the string `Chanran-gyo (무명찬란교)` appears only in `orgs.json` and `dist-test/real-module.json`, and `tests/directory.test.mjs:146` mentions the name only in a comment. I did not run any tests.\n\n- **Twin text:** for full consistency, `src/data/world/anomalies.json:601` (`Mumyeong Chanran-gyo's Happy Ending Sect`) should change to `Mumyeong Chanrangyo's` in the same pass.\n- **Leave as is:** the keys in `orgs.json:215` (`Chanran-gyo`) and the alias in `src/core/world/alias-drop.json:23` (`Mumyeong Chanran-gyo`) are match keys and should keep the hyphenated spelling.\n- **Optional:** the original card's key list also had `Chanrangyo`; adding it to the line 215 keys would let the unhyphenated spelling match too. It is not required, because `Mumyeong` already matches.",
+    "needs_user_decision": true,
+    "decision_question_ko": "무명찬란교 영문 표기가 원작 카드에서부터 두 가지로 섞여 있습니다(조직 상세 제목은 「Chanran-gyo」, 세력 요약·괴이 본문은 「Chanrangyo」). (1) 「Chanrangyo」로 통일(orgs.json 제목과 anomalies.json 601줄 한 곳) (2) 원작 그대로 둠. 추천: (1) — 뜻 변화 없이 표기만 맞추는 것이고, 검색 키는 그대로 둡니다."
+   }
+  },
+  {
+   "key": "lorg",
+   "n": 12,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "가짜 관리국 모집 절차 번호가 1·2·3 다음에 5로 건너뛴다",
+    "kind": "lore-error",
+    "severity": "low",
+    "file": "src/data/world/orgs.json",
+    "line": 36,
+    "record": "가짜 관리국 / fields.recruitment",
+    "old_text": "sunglasses.\\n5. Life in the Bureau:",
+    "new_text": "sunglasses.\\n4. Life in the Bureau:",
+    "evidence": "The list runs 1. Abduction, 2. The Education Device, 3. Graduates wake…, 5. Life in the Bureau. No step 4 exists in the original card entry either (lorebook[19]), so nothing is missing; the jump only suggests a lost step.",
+    "needs_user_decision": true
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "Confirmed. In /home/user/goei-plugin/src/data/world/orgs.json, record 「가짜 관리국」 fields.recruitment, the numbered list runs \"1. Abduction\", \"2. The Education Device\", \"3. Graduates wake in an orientation auditorium\", then \"5. Life in the Bureau\". No step 4 exists.\nThe original card (dist-test/real-module.json, module.lorebook[19] 「가짜 관리국」) has the identical 1-2-3-5 numbering, so this is the original author's typo carried over, not content lost by a later edit. The wiki (card/wiki-base.json 「가짜 관리국」) orders the process as 납치 → 심문 → 교육과 오리엔테이션 → life in the organisation; the card never had a separate interrogation step, so there is no step to restore.\nThe defect is cosmetic: a model may at most infer a missing step. Token saving is zero. Renumbering 5 to 4 changes no meaning and adds no rule. The text is the original author's wording, so the owner should confirm.",
+    "old_text_found_exactly": true,
+    "final_old_text": "sunglasses.\\n5. Life in the Bureau:",
+    "final_new_text": "sunglasses.\\n4. Life in the Bureau:",
+    "side_effects": "The old_text occurs exactly once in orgs.json (the 「관리국」 record has no such list). No file under tests/ or src/ other than orgs.json contains \"Life in the Bureau\", so no pinned-text test (including tests/guide-out.test.mjs) is affected. No code parses these step numbers; fields.recruitment is rendered as plain text. The per-record copy under /tmp/audit_1113/lore/world/ is scratch only. No twin text needs to change.",
+    "needs_user_decision": true,
+    "decision_question_ko": "가짜 관리국 모집 절차 번호가 1·2·3 다음 5로 건너뜁니다. 원작 카드에도 똑같이 5로 적혀 있고, 빠진 4번 내용은 없습니다. (가) 5를 4로 고친다 (나) 원작 그대로 둔다. 권장: (가) — 뜻은 그대로이고 번호만 바로잡습니다."
+   }
+  },
+  {
+   "key": "lan3",
+   "n": 1,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "「빛이 없으라」 안내문의 스탬프 숫자 설명이 원작과 거꾸로 적혀 있다 (인쇄된 4를 손으로 3으로 고친 것인데, 3 위에 4를 썼다고 되어 있음)",
+    "kind": "lore-error",
+    "severity": "medium",
+    "file": "src/data/world/anomalies.json",
+    "line": 956,
+    "record": "빛이 없으라 / fields.space",
+    "old_text": "The \\\"4\\\" is handwritten over a printed \\\"3\\\": the real count is four.",
+    "new_text": "The printed \\\"4\\\" is struck out by hand and corrected to \\\"3\\\": the real count is four.",
+    "evidence": "docs/설정집_어둠탐사기록_남해지사편.md:424 「스탬프 4̶3개를 모으고 경품을 받아가세요.(4를 손으로 3으로 고침)」 — 인쇄는 4, 누군가 4를 지우고 3으로 고쳐 네 번째 스탬프를 숨긴 것이 단서다. 지금 문장대로면 누군가 일부러 4라고 알려 준 것이 되어 「숨은 네 번째 스탬프」 수수께끼가 뒤집힌다. 이 기록은 원작 카드·위키에 없고 이전 Claude가 설정집에서 옮겨 쓴 글이다(docs/로어북_초안/괴이_빛이없으라.md).",
+    "also_change": "card/extra-lore/괴이_빛이없으라.txt:22 의 같은 문장(따옴표 이스케이프 없이 `The \"4\" is handwritten over a printed \"3\": the real count is four.`)도 똑같이 고친다.",
+    "needs_user_decision": false
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "medium",
+    "reasoning": "The passage is at src/data/world/anomalies.json:956 (record 빛이 없으라, fields.space), exactly once, and the same sentence is at card/extra-lore/괴이_빛이없으라.txt:22. The only in-repo source for this brochure is docs/설정집_어둠탐사기록_남해지사편.md:424: 「스탬프 4̶3개를 모으고 경품을 받아가세요.(4를 손으로 3으로 고침)」 — the printed number is 4, struck out and hand-corrected to 3. Lines 442-447 of the same doc describe the hidden fourth stamp. The current sentence says the reverse (a handwritten 4 over a printed 3), which makes the brochure openly announce four stamps and removes the clue. The record itself still says the real count is four and line 48 of the extra-lore says \"even with three stamps ... they need the fourth stamp\", so the proposed wording stays consistent with the rest of the record. Limits on confidence: card/wiki-base.json and dist-test/real-module.json contain no mention of 스탬프 at all (I searched both), so the 설정집 is the sole source and its authorship could not be checked (the folder is not a git repository). The 설정집 reading matches the strikethrough notation it quotes, so I accept it. The edit is one sentence, same language, adds no rule and touches no marker or placeholder. The brochure quote \"Collect 43 stamps\" is left unchanged; with the corrected explanation it reads as a struck 4 followed by 3.",
+    "old_text_found_exactly": true,
+    "final_old_text": "The \\\"4\\\" is handwritten over a printed \\\"3\\\": the real count is four.",
+    "final_new_text": "The printed \\\"4\\\" is struck out by hand and corrected to \\\"3\\\": the real count is four.",
+    "side_effects": "No test or fixture pins this sentence (grep of tests/, src/, card/, dist-test/ finds it only in the two files below). Twin text to change at the same time: /home/user/goei-plugin/card/extra-lore/괴이_빛이없으라.txt line 22, same sentence without JSON escaping (`The \"4\" is handwritten over a printed \"3\": the real count is four.` -> `The printed \"4\" is struck out by hand and corrected to \"3\": the real count is four.`). The draft copies under /home/user/goei-plugin/docs/로어북_초안/ (괴이_빛이없으라.md:42, 괴이_빛이없으라.html, 카드반영_원작3부.html) carry the same sentence but are not sent to any model; changing them is optional. In /home/user/goei-plugin/src/data/world/anomalies.json the quotes are JSON-escaped (\\\"), as given in final_old_text.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lan3",
+   "n": 2,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "「빛이 없으라」에서 불을 켠 사람은 '사라진다'고 해 놓고, 뒤에서는 그 사람이 네 번째 스탬프로 탈출하는 길을 설명한다",
+    "kind": "contradiction",
+    "severity": "medium",
+    "file": "src/data/world/anomalies.json",
+    "line": 957,
+    "record": "빛이 없으라 / fields.rules",
+    "old_text": "##### The Light Rule\\n- Whoever turns on a light vanishes, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. The light-starter is fixed for that run.",
+    "new_text": "##### The Light Rule\\n- Whoever turns on a light is marked as missing, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. They stay present but can no longer clear normally. The light-starter is fixed for that run.",
+    "evidence": "같은 기록 fields.survival(anomalies.json:959) 「The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp」와 부록 「빛이 없으라 · 수도원」(appendices.json, 'The fourth stamp on clothing, submitted at the Prize Office, lets the light-starter clear', 켜짐 조건 'someone in the party becomes the one who turned on a light')은 불을 켠 사람이 계속 그 자리에 있어야 성립한다. 그런데 규칙 첫 줄과 fields.identity 첫 줄('Anyone who lights anything ... disappears')은 켠 사람이 사라진다고 한다. 모델이 켠 사람을 바로 없애면 네 번째 스탬프 경로는 쓸 수 없다. 설정집 434·447행: 「불을 켠 당사자는 무조건 실종된다」+「불을 켠 당사자는 4번째 스탬프를 찍은 작업복을 추가 제출해야 나갈 수 있었다」— 원작의 '실종'은 '정상 탈출 불가'에 가깝다. 바로 사라지는 쪽은 '빛이 비춘 것을 본 사람'(규칙 둘째·셋째 줄)이다. 뜻을 바꾸는 고침이라 사용자 확인이 필요하다.",
+    "also_change": "card/extra-lore/괴이_빛이없으라.txt 「#### The Light Rule」 첫 줄도 같이. fields.identity 첫 줄의 'disappears'는 그대로 두어도 되지만, 맞추려면 'is lost to the mountain' 정도로.",
+    "needs_user_decision": true
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "medium",
+    "reasoning": "The inconsistency is real inside one record. In /home/user/goei-plugin/src/data/world/anomalies.json:957 (record 「빛이 없으라」, fields.rules) the first bullet says the person who turns on a light \"vanishes\", and bullet 3 uses the same word for seers who are \"gone\" on the spot. But fields.survival (line 959, \"##### Light-Starter\") says \"The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp\", and the appendix 「빛이 없으라 · 수도원」 in appendices.json (\"#### Light-Starter Route\") says the fourth stamp \"lets the light-starter clear\". Both need the light-starter to still be present. The rules bullet itself adds \"The light-starter is fixed for that run\", which only makes sense if the person stays. A model that removes the light-starter at once makes the fourth-stamp route unusable.\n\nSource check: card/wiki-base.json and dist-test/real-module.json contain nothing on this anomaly (no hits for 불을 켠, light-starter, fourth stamp, 4번째 스탬프). The only source is /home/user/goei-plugin/docs/설정집_어둠탐사기록_남해지사편.md: line 422 (quoted as wiki text) \"불을 켤 시 실종된다 ... 불을 켠 당사자뿐만 아니라 빛으로 비춘 것을 본 모든 사람이 실종된다\", line 433 \"불을 켠 당사자는 무조건 실종된다\", line 447 \"불을 켠 당사자는 4번째 스탬프를 찍은 작업복을 '추가 제출'해야 나갈 수 있었다\". So the source says both \"goes missing\" and \"can still get out with the fourth stamp\". That supports reading 실종 as \"cannot get out normally\" for the light-starter, but the 설정집 is a secondary summary, not the owner's wiki, so this is a lore judgement for the owner.\n\nThe finder's edit is right in direction but adds a full sentence that repeats the survival field. I shortened it to a parenthesis in the same bullet. fields.identity (\"Anyone who lights anything ... disappears\") matches the wiki sentence and can stay as the general statement.",
+    "old_text_found_exactly": true,
+    "final_old_text": "- Whoever turns on a light vanishes, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts.",
+    "final_new_text": "- Whoever turns on a light ends up missing (they stay in the run but cannot clear normally), intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts.",
+    "side_effects": "The same line must change in the twin text /home/user/goei-plugin/card/extra-lore/괴이_빛이없으라.txt:30, where it is identical. In anomalies.json the bullet sits inside a JSON string (line 957, fields.rules of 「빛이 없으라」); the replacement has no quotes or newlines, so the JSON stays valid. Grep found the sentence only in these two files: no test in tests/ pins it, and tests/guide-out.test.mjs is not affected. Adds about 8 tokens to the record. fields.identity \"disappears\" is left unchanged.",
+    "needs_user_decision": true,
+    "decision_question_ko": "「빛이 없으라」에서 불을 켠 사람이 어떻게 되는지 정해 주세요. 지금 기록은 앞에서는 \"사라진다\"고 하고, 뒤에서는 그 사람이 네 번째 스탬프로 나가는 길을 설명합니다. 위키 원본(wiki-base)에는 이 괴담이 없고, 근거는 설정집(docs/설정집_어둠탐사기록_남해지사편.md 433·447행)뿐입니다.\n(1) 불을 켠 사람은 그 자리에 남지만 정상 탈출이 안 되고, 네 번째 스탬프가 있어야 나간다 — 규칙 첫 줄을 그렇게 고침 (추천: 설정집 447행과 뒤쪽 기록·부록에 맞음)\n(2) 불을 켠 사람도 바로 사라진다 — 그러면 네 번째 스탬프 탈출 설명을 손봐야 함\n(3) 그대로 둔다"
+   }
+  },
+  {
+   "key": "lan3",
+   "n": 3,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "「빛이 없으라」 끝 문장이 '또 다른 출구가 있다'로 읽혀, 없는 출구를 모델이 지어낼 수 있다",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/world/anomalies.json",
+    "line": 959,
+    "record": "빛이 없으라 / fields.survival",
+    "old_text": "they need the fourth stamp. Another way out is hidden inside the retreat.",
+    "new_text": "they need the fourth stamp, hidden inside the retreat.",
+    "evidence": "초안(docs/로어북_초안/괴이_빛이없으라.md:68)은 「they need the fourth stamp.」뿐이었고, 경로를 부록으로 뗄 때 'Another way out is hidden inside the retreat.'가 덧붙었다. 부록 「빛이 없으라 · 수도원」과 설정집 445~447행에 따르면 길은 하나(수련원 로비 비품함 아래 지하의 네 번째 스탬프 → 경품 수령처 제출)다. 'Another way out'은 네 번째 스탬프와 별개의 출구가 있는 것처럼 읽힌다. 약 4토큰 절약.",
+    "also_change": "card/extra-lore/괴이_빛이없으라.txt:48 같은 문장.",
+    "needs_user_decision": false
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "문제는 실제로 있으나 가벼운 모호함 수준이다. 인용문은 src/data/world/anomalies.json 959행(레코드 「빛이 없으라」 fields.survival, 맨 끝 「##### Light-Starter」)에 그대로 있다.\n\n- 초안 docs/로어북_초안/괴이_빛이없으라.md:68은 「…they need the fourth stamp.」에서 끝난다. 경로 설명(초안 70~71행)이 부록으로 옮겨지면서 「Another way out is hidden inside the retreat.」가 붙었다.\n- 부록 「빛이 없으라 · 수도원」(src/data/world/appendices.json)의 Light-Starter Route와 docs/설정집_어둠탐사기록_남해지사편.md 445~447행은 길을 하나만 적는다: 로비 비품함 → 지하 신마음수도원의 네 번째 스탬프 → 경품 수령처 제출. 별개의 출구는 없다.\n- 지금 문장은 \"정상 클리어 대신 쓰는 길\"로도 읽히지만, 바로 앞에 \"fourth stamp\"가 나온 뒤라 \"스탬프 말고 또 다른 출구\"로도 읽힌다. 부록은 키(신마음수도원, 네 번째 스탬프 등)가 맞을 때만 들어가므로, 부록 없이 이 문장만 받은 모델이 없는 출구를 지어낼 여지가 있다.\n\n제안된 고침은 의미를 지킨다. 불 켠 사람에게 네 번째 스탬프가 필요하고 그것이 수련원 안에 숨겨져 있다는 단서는 남고, 규칙을 더하지 않으며 소유자 결정과 부딪히지 않는다. 절약은 4토큰 안팎이라 토큰 면의 가치는 거의 없고, 값은 모호함 제거에 있다.\n\ncard/wiki-base.json에서는 「네 번째 스탬프」「또 다른 출구」 등의 문자열이 검색되지 않아, 근거는 설정집과 부록·초안이다.",
+    "old_text_found_exactly": true,
+    "final_old_text": "they need the fourth stamp. Another way out is hidden inside the retreat.",
+    "final_new_text": "they need the fourth stamp, hidden inside the retreat.",
+    "side_effects": "같은 문장이 /home/user/goei-plugin/card/extra-lore/괴이_빛이없으라.txt 48행에 있어 함께 고쳐야 한다. docs/로어북_초안/카드반영_원작3부.html 317·361행에도 같은 문장이 있으나 기록용 문서라 고칠 필요는 없다. tests/와 src/core에서 \"Another way out\"·\"fourth stamp\"를 grep한 결과 이 문장을 고정하는 시험이나 코드는 없다. 단위 시험은 돌리지 않았다.",
+    "needs_user_decision": false
+   }
+  },
+  {
+   "key": "lan3",
+   "n": 4,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "페어리테일 파크 기록에는 공원이 흩어졌다는 사실이 없어, 연꽃 바다와 이야기꾼이 두 곳에 동시에 있는 것으로 나온다",
+    "kind": "lore-error",
+    "severity": "medium",
+    "file": "src/data/world/anomalies.json",
+    "line": 895,
+    "record": "페어리테일 파크 / fields.identity",
+    "old_text": "Each zone's correct/inverted behavioral responses have different, potentially fatal outcomes.\"",
+    "new_text": "Each zone's correct/inverted behavioral responses have different, potentially fatal outcomes.\\n- Much of the park has since dispersed: the Lotus Sea now sits in Mystery World Adventure Park, and many performers have moved to Fantasy Drama Folk Village, where the Storyteller commutes.\"",
+    "evidence": "기록끼리 어긋남: 페어리테일 파크 fields.space 「Lotus Sea: An artificial lake immediately inside the entrance」·fields.entities 「Storyteller」 vs 미스테리 월드 어드벤쳐 파크 fields.space 「Fairytale Park's transplanted Lotus Sea has physically overwritten the decorative pond」, 환상드라마 민속촌 fields.identity 「resident population inherited from Fairytale Park's performers … the relocated Storyteller」. 위키(card/wiki-base.json 「페어리테일 파크」): 「지금 이 공원의 상당 부분은 다른 곳으로 흩어졌다. 주민 일부는 환상드라마 민속촌으로 옮겨 갔고, 공원의 호수 하나는 통째로 미스테리 월드 어드벤쳐 파크에 가 있다」. 원작 카드 본문에도 이 줄이 없어 원작자 글에 한 줄을 더하는 고침이다.",
+    "needs_user_decision": true
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "The mismatch is confirmed, but the proposed line would create a new contradiction inside the same record, so I changed the edit.\n\nConfirmed from the files:\n- /home/user/goei-plugin/src/data/world/anomalies.json line 895 (페어리테일 파크 fields.identity) says nothing about dispersal. Its fields.space still has \"Lotus Sea: An artificial lake immediately inside the entrance\", and fields.entities still lists the Storyteller as a resident.\n- Line 936 (미스테리 월드 어드벤쳐 파크) says \"Fairytale Park's transplanted Lotus Sea has physically overwritten the decorative pond\".\n- Line 916 (환상드라마 민속촌) says \"resident population inherited from Fairytale Park's performers ... the relocated Storyteller ... resident commuting\".\n- card/wiki-base.json (페어리테일 파크 개요) says: 「지금 이 공원의 상당 부분은 다른 곳으로 흩어졌다. 주민 일부는 환상드라마 민속촌으로 옮겨 갔고, 공원의 호수 하나는 통째로 미스테리 월드 어드벤쳐 파크에 가 있다」.\n- The original card (dist-test/real-module.json, entry 「페어리테일 파크」) has the same gap. It describes the park intact, while the original 미스테리 월드 and 민속촌 entries already call the lake transplanted and the Storyteller relocated. So this is the original author's inconsistency, not a later Claude error.\n\nWhy severity is low, not medium: each park record is normally sent only when that park is the stage, so the model rarely sees both versions in one request. The practical effect is that a Fairytale Park scene shows the lake and Storyteller in place, against the wiki's 「지금」 state.\n\nProblem with the proposed edit: adding \"the Lotus Sea now sits in Mystery World Adventure Park\" to identity while fields.space of the same record still describes the Lotus Sea just inside the entrance, with full survival rules, tells the model the lake is both gone and present. My final text states that this entry describes the park intact and that it has since dispersed, which avoids that. It is still one added sentence in the original author's text, so the owner must decide.\n\nThe quoted old_text is present and occurs once in the file (the actual line continues with a comma after the closing quote).",
+    "old_text_found_exactly": true,
+    "final_old_text": "Each zone's correct/inverted behavioral responses have different, potentially fatal outcomes.\"",
+    "final_new_text": "Each zone's correct/inverted behavioral responses have different, potentially fatal outcomes.\\n- This entry describes the park intact. Much of it has since dispersed: the Lotus Sea was transplanted whole to Mystery World Adventure Park, and many performers moved to Fantasy Drama Folk Village, where the Storyteller commutes.\"",
+    "side_effects": "No test or source file pins this passage: a grep for \"potentially fatal\" in tests/ and src/ hits only anomalies.json. tests/guide-out.test.mjs was not run. The edit adds about 45 tokens whenever the 페어리테일 파크 record is sent. The per-record copy under /tmp/audit_1113/lore/world/ is a scratch copy and does not need to change. If the owner instead wants the lake truly gone from Fairytale Park, fields.space (Lotus Sea section) and the Storyteller entry in fields.entities of the same record would also have to change, which is a much larger rewrite of the original author's text.",
+    "needs_user_decision": true,
+    "decision_question_ko": "페어리테일 파크 기록은 연꽃 바다와 이야기꾼이 그대로 있는 온전한 공원으로 적혀 있는데, 위키와 다른 두 공원 기록은 「호수는 미스테리 월드로, 주민 일부는 민속촌으로 흩어졌다」고 합니다(원작 카드도 같은 상태). 어떻게 할까요? (1) 그대로 둔다 — 원작자 글이고, 공원마다 따로 무대가 되므로 실제 혼동은 드묾. (2) 「이 기록은 온전한 공원의 모습이며, 지금은 호수와 주민 상당수가 흩어졌다」는 한 줄만 덧붙인다. (3) 공원 기록에서 연꽃 바다·이야기꾼을 실제로 빼고 다시 쓴다(큰 고침). 추천: (2). 한 줄로 위키와 맞추고 원작 본문은 건드리지 않습니다."
+   }
+  },
+  {
+   "key": "lan3",
+   "n": 5,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "오후역 기록의 상품 목록 4개가 오후역에 있을 때 함께 켜지는 「망상홈쇼핑 · 상품」 부록과 겹친다",
+    "kind": "over-token",
+    "severity": "medium",
+    "file": "src/data/world/anomalies.json",
+    "line": 691,
+    "record": "오후역 / fields.notes",
+    "old_text": "\"notes\": \"##### Documented Merchandise\\n- Samra-Manshang Co. \\\"Into the Vacuum\\\": vacuum containers suspending food decay indefinitely.\\n- Happy-Maker: narcotic-grade painkiller sticks.\\n- Gold-Edition Blood Bathtub: a full-size bathtub associated with drawing youth.\\n- Aesthetic-Caterpillar Egg-Sac Diet Aid: hatches leech-toothed parasitic worms that eat fat, tunnel through the host, and progressively liquefy internal organs.\\n- Products vary by program, but advertised anomalous effects are generally real enough to make recurring demonstrations lethal.\"",
+    "new_text": "\"notes\": \"\"",
+    "evidence": "부록 「망상홈쇼핑 · 상품」(src/data/world/appendices.json, 'Catalog Examples')에 같은 네 상품(Into the Vacuum, Happy-Maker, Gold-Edition Blood Bathtub, Aesthetic-Caterpillar Egg-Sac Diet Aid)이 더 자세히 있고, 명부(src/data/install/directory.json 부록 「망상홈쇼핑 · 상품」 places: [\"망상홈쇼핑\",\"망상 홈쇼핑\",\"오후역\"])와 src/core/lore.ts:495 에 따라 현재 장소가 오후역이면 이 부록이 켜진다. 마지막 줄('Products vary by program…')은 파밍 「망상홈쇼핑」 rules 의 Merchandise 문단과 같은 뜻. 측정: notes 칸 115토큰(o200k) + 「#### Notes」 머리 4토큰. 다만 notes 는 원작자 글이고, 오후역이 이름만 언급되어 켜질 때(장소가 오후역이 아닐 때)는 부록이 안 켜져 예시가 사라지므로 사용자 결정 필요.",
+    "token_saving": 119,
+    "needs_user_decision": true
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "medium",
+    "severity": "low",
+    "reasoning": "The duplication is real, but only conditional, and the proposed deletion is the wrong way round. I recommend leaving the text as it is.\n\nConfirmed:\n- /home/user/goei-plugin/src/data/world/anomalies.json:691 (record 오후역, fields.notes) holds the quoted text verbatim.\n- It is the original author's text: the original card entry 「오후역」 in dist-test/real-module.json has the identical \"#### Documented Merchandise\" block.\n- /home/user/goei-plugin/src/data/world/appendices.json:33 (「망상홈쇼핑 · 상품」, Catalog Examples) lists the same four products with slightly different wording, plus Beauty Pills, Bad Luck Post-it and Egg Mood Lamp.\n- src/data/install/directory.json gives that appendix places [\"망상홈쇼핑\",\"망상 홈쇼핑\",\"오후역\"], target:true, keys:true; pickAppendices in /home/user/goei-plugin/src/core/lore.ts (~line 495) turns it on by place.\n\nWhy I would not apply the deletion:\n- The overlap exists only when both the 오후역 record and the appendix are on. The 오후역 record also fires on its keys (Afternoon Station, 혈액 방송국, …) when the scene is elsewhere; then the appendix is off and the notes are the only merchandise information.\n- Appendices are kept last under the token budget (lore.ts budget loop sorts appendix entries after main ones), so the appendix can be dropped while the record stays.\n- with_parent is false, so the appendix does not automatically accompany the record.\n- The appendix is the long one (it comes from card/extra-lore, not from the original 오후역 entry). Deleting the original author's 115 tokens to keep it reverses the authority order.\n- The last notes line (\"Products vary by program… recurring demonstrations lethal\") is not in the appendix. It is only paraphrased in the separate 망상홈쇼핑 site record, which is not guaranteed to be on with 오후역.\n\nThe saving is at most about 119 tokens (the finder's measurement, not re-measured), and only in scenes at 오후역 or 망상홈쇼핑. That makes it low severity, not medium. I did not check how an empty notes field renders; the \"#### Notes\" header saving assumes the assembler skips empty fields.",
+    "old_text_found_exactly": true,
+    "final_old_text": "\"notes\": \"##### Documented Merchandise\\n- Samra-Manshang Co. \\\"Into the Vacuum\\\": vacuum containers suspending food decay indefinitely.\\n- Happy-Maker: narcotic-grade painkiller sticks.\\n- Gold-Edition Blood Bathtub: a full-size bathtub associated with drawing youth.\\n- Aesthetic-Caterpillar Egg-Sac Diet Aid: hatches leech-toothed parasitic worms that eat fat, tunnel through the host, and progressively liquefy internal organs.\\n- Products vary by program, but advertised anomalous effects are generally real enough to make recurring demonstrations lethal.\"",
+    "final_new_text": "\"notes\": \"##### Documented Merchandise\\n- Samra-Manshang Co. \\\"Into the Vacuum\\\": vacuum containers suspending food decay indefinitely.\\n- Happy-Maker: narcotic-grade painkiller sticks.\\n- Gold-Edition Blood Bathtub: a full-size bathtub associated with drawing youth.\\n- Aesthetic-Caterpillar Egg-Sac Diet Aid: hatches leech-toothed parasitic worms that eat fat, tunnel through the host, and progressively liquefy internal organs.\\n- Products vary by program, but advertised anomalous effects are generally real enough to make recurring demonstrations lethal.\"",
+    "side_effects": "Recommended: no change, so no side effects. If the owner chooses deletion anyway:\n- The 오후역 record loses all merchandise information whenever the appendix is off (fired by key away from the place, or appendix dropped by the token budget).\n- The \"Products vary by program…\" sentence disappears from the 오후역 record entirely.\n- Check that the assembler skips an empty notes field, and that the 오후역 record's \"order\" list and /tmp/audit_1113/lore/world copies need no update.\n- No test pins this text: grep for \"Documented Merchandise\" / \"Into the Vacuum\" hits only anomalies.json and appendices.json (plus card/extra-lore).\n- An alternative with less loss is to delete the four duplicate product lines from the appendix instead, but that weakens the appendix when it fires alone by key.",
+    "needs_user_decision": true,
+    "decision_question_ko": "오후역 기록의 「상품 목록」 4줄(원작자 글, 약 115토큰)이 오후역·망상홈쇼핑에 있을 때 켜지는 부록 「망상홈쇼핑 · 상품」과 겹칩니다. (1) 그대로 둔다 — 부록이 안 켜질 때(다른 곳에서 오후역이 언급될 때, 토큰 한도로 부록이 빠질 때)도 상품 정보가 남음. (2) 오후역 기록에서 지운다 — 겹칠 때 약 119토큰 절약, 대신 부록이 꺼지면 상품 정보가 없음. 추천: (1) 그대로 둔다."
+   }
+  },
+  {
+   "key": "lan3",
+   "n": 6,
+   "status": "confirmed",
+   "finding": {
+    "title_ko": "한밤역 기록이 다른 괴이 「검은 그늘 속에서」의 영어 이름을 다르게 적었다 (Shade ↔ Shadow)",
+    "kind": "mismatch",
+    "severity": "low",
+    "file": "src/data/world/anomalies.json",
+    "line": 656,
+    "record": "한밤역 / fields.space",
+    "old_text": "Its separate anomaly, In the Black Shade, retains",
+    "new_text": "Its separate anomaly, In the Black Shadow, retains",
+    "evidence": "해당 괴이 기록의 제목은 「Segwang Technical High School / In the Black Shadow (세광공업고등학교 / 검은 그늘 속에서)」, 키·명부 영문명도 'In the Black Shadow'(anomalies.json 「검은 그늘 속에서」 4회, directory.json). 'In the Black Shade'는 전체 데이터에서 한밤역 이 한 곳뿐이다. 두 기록이 함께 들어가면 모델이 서로 다른 괴이로 볼 수 있다. 원작 카드 본문의 오타를 그대로 옮긴 것.",
+    "needs_user_decision": false
+   },
+   "verdict": {
+    "real": true,
+    "confidence": "high",
+    "severity": "low",
+    "reasoning": "확인됨. /home/user/goei-plugin/src/data/world/anomalies.json 656행(한밤역 fields.space)에 \"Its separate anomaly, In the Black Shade, retains\"가 정확히 1회 있다. 같은 괴이의 본 기록(anomalies.json 494·496·502행)과 src/data/install/directory.json, pictures.json은 모두 \"In the Black Shadow\"이다. 원작 카드(dist-test/real-module.json)도 World catalog와 「검은 그늘 속에서」 항목은 \"In the Black Shadow\"이고, 한밤역 항목 한 곳만 \"Shade\"라서 원작자의 오타가 그대로 옮겨진 것이다. 위키(card/wiki-base.json)에는 한국어 이름 「검은 그늘 속에서」만 있어 영어 표기 근거는 없지만 어긋나지도 않는다. 수정은 한 단어이고 뜻을 바꾸지 않으며 사용자 결정과 충돌하지 않는다. 실제 영향은 작다(두 기록이 함께 들어갈 때 이름이 달라 보이는 정도).",
+    "old_text_found_exactly": true,
+    "final_old_text": "Its separate anomaly, In the Black Shade, retains",
+    "final_new_text": "Its separate anomaly, In the Black Shadow, retains",
+    "side_effects": "tests/, src/의 다른 파일에는 \"Black Shade\" 문자열이 없어 깨질 시험은 찾지 못했다(시험은 돌리지 않음). 같이 바꿔야 할 코드나 쌍둥이 문장도 없다. dist-test/real-module.json(원작 카드 사본)에는 오타가 남지만 참조용이므로 건드리지 않는다. src/data/world/anomalies.json에서 만들어지는 빌드 산출물이 있다면 다음 빌드에서 반영된다.",
+    "needs_user_decision": false
+   }
+  }
+ ],
+ "unverified": [],
+ "rejected": [
+  {
+   "key": "lan3",
+   "n": 7,
+   "title_ko": "세광 네 역 기록마다 '연구소 지점 들어가는 법'이 똑같이 반복되고, 세광특별시·유쾌연구소 기록에도 같은 절차가 있다",
+   "file": "src/data/world/anomalies.json",
+   "why": "The quoted sentence is in src/data/world/anomalies.json line 656 (한밤역 fields.space) verbatim, and the overlap with 세광특별시 fields.space and 유쾌연구소 fields.entry exists. But I do not confirm it as a waste worth cutting.\n\n1. It is the original author's text. dist-test/real-module.json has the same sentence, word for word, in the original 한밤역, 오후역, 한낮역 and 아침역 entries. No earlier Claude session added it."
+  }
+ ]
+}

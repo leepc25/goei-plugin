@@ -141,6 +141,9 @@ export function mergeLate(now: ShopState, next: ShopState, st0: ShopState): Shop
   return { ...next, items, sell };
 }
 
+/** mergeLate 에 넘길 「저장 직전 상태」: 요청 전 상태를 읽을 때와 똑같이 살아 있는 응답 기준으로 읽는다 */
+export const lateNow = (chat: ChatContext['chat'], site: MallSite): ShopState => readMall(chat.scriptstate, site, aliveAnchors(chat));
+
 async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf' | 'talk', st0: ShopState): Promise<void> {
   const job = `${chatKey(ctx)}:${site}`;
   if (jobs.has(job)) return;
@@ -194,7 +197,8 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     let merged = next;
     await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
       // 기다리는 동안 결제·판매 취소한 것을 되돌리지 않게 지금 상태와 합친다 (전수검사 11-13)
-      const now = readMall(chat.scriptstate, site);
+      // 요청 전 상태(st0)와 같은 기준(살아 있는 응답)으로 읽는다: 산 응답이 지워진 물건을 「기다리는 동안 산 것」으로 잘못 보지 않게 (재검토 11-14)
+      const now = lateNow(chat, site);
       merged = mergeLate(now, next, st0);
       if (st0.sell && !now.sell) deal = '';
       const saved = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, { ...merged, key }), ...(note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: turnKey(chat) } : {}) } };

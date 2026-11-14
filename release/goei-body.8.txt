@@ -1,4 +1,299 @@
-/span>` : ""}</span>`;
+ ?? "")}"`;
+      return `<figure class="ax ax-img at-card-image${!url && asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}"${data3} alt="${esc6(text5)}" loading="lazy"><span class="zm" aria-hidden="true">⤢</span></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${kind === "image" && text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
+    }
+    if (kind === "photo") return `<figure class="ax ax-ph"><div class="fr">${camera}<p>${esc6(text5).replace(/\n/g, "<br>")}</p></div></figure>`;
+    if (kind === "video") return `<figure class="ax ax-vd"><div class="fr"><span class="pl" aria-hidden="true">▶</span><p>${esc6(text5).replace(/\n/g, "<br>")}</p><div class="bar" aria-hidden="true"><span>▶</span><i></i><span>0:00</span></div></div></figure>`;
+    return card(kind, text5, asset);
+  }
+  function textWithPics(text5, board2) {
+    const out = [];
+    let last2 = 0;
+    const para = (t) => t.trim() ? out.push(`<p>${esc6(t.trim()).replace(/\n/g, "<br>")}</p>`) : 0;
+    for (const m of text5.matchAll(SITE_PIC)) {
+      para(text5.slice(last2, m.index));
+      const url = sitePic?.(m[1]) ?? null;
+      out.push(url ? board2 ? boardCard("image", "", void 0, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(url)}" alt="" loading="lazy"></button></figure>` : board2 ? boardCard("photo", m[1].replace(/_[a-z ]+$/i, "")) : card("photo", m[1].replace(/_[a-z ]+$/i, "")));
+      last2 = m.index + m[0].length;
+    }
+    para(text5.slice(last2));
+    return out;
+  }
+  function boardFiles(text5) {
+    return bodyParts(text5).filter((p2) => p2.kind === "file" || p2.kind === "link").map((p2) => ({ kind: p2.kind, text: p2.text, url: p2.kind === "link" ? attachUrl(p2.text) : null }));
+  }
+  function boardThumb(text5) {
+    let desc = false;
+    for (const p2 of bodyParts(text5)) {
+      if (p2.kind === "image" && p2.asset && photos.get(p2.asset)) return { url: photos.get(p2.asset) };
+      if (p2.kind === "text") {
+        for (const m of p2.text.matchAll(SITE_PIC)) {
+          const url = sitePic?.(m[1]) ?? null;
+          if (url) return { url };
+          desc = true;
+        }
+      }
+      if (p2.kind === "photo" || p2.kind === "image") desc = true;
+    }
+    return desc ? { url: null } : null;
+  }
+  function attachBody(text5, board2 = false, noFiles = false) {
+    const out = [];
+    const files = [];
+    for (const p2 of bodyParts(text5)) {
+      if (p2.kind === "text") out.push(...textWithPics(p2.text, board2));
+      else if (board2 && (p2.kind === "file" || p2.kind === "link")) {
+        if (noFiles) continue;
+        const url = p2.kind === "link" ? attachUrl(p2.text) : null;
+        files.push(`<div class="r"><span class="ic" aria-hidden="true">${p2.kind === "file" ? "📎" : "🔗"}</span>${url ? `<a href="${esc6(url)}" target="_blank" rel="noopener noreferrer">${esc6(p2.text)}</a>` : `<span>${esc6(p2.text)}</span>`}</div>`);
+      } else out.push(board2 ? boardCard(p2.kind, p2.text, p2.asset) : card(p2.kind, p2.text, p2.asset));
+    }
+    if (files.length) out.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join("")}</div>`);
+    return out.join("");
+  }
+
+  // src/host/assets.ts
+  var MIME2 = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
+  var cache7 = /* @__PURE__ */ new Map();
+  function toBytes3(data3) {
+    if (data3 instanceof Uint8Array) return data3;
+    if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
+    if (Array.isArray(data3)) return new Uint8Array(data3);
+    if (data3 && typeof data3 === "object") {
+      const values = Object.values(data3);
+      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
+    }
+    return null;
+  }
+  async function load(path, ext) {
+    try {
+      const data3 = await risuai.readImage(path);
+      if (typeof data3 === "string") return data3.startsWith("data:") || data3.startsWith("blob:") || data3.startsWith("http") ? data3 : null;
+      const bytes = toBytes3(data3);
+      if (!bytes?.length) return null;
+      return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
+    } catch (error) {
+      console.log(`[goei] 이미지를 읽지 못했어요 (${path}): ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  }
+  var isRow4 = (a) => Array.isArray(a) && typeof a[0] === "string" && typeof a[1] === "string";
+  var modRows = [];
+  var modVer = 0;
+  var modBusy = null;
+  function loadModuleAssets() {
+    modBusy ??= (async () => {
+      let rows3 = [];
+      try {
+        const idx = await risuai.getCurrentCharacterIndex();
+        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
+        rows3 = (char?.additionalAssets ?? []).filter(isRow4);
+      } catch {
+      }
+      try {
+        const db = await risuai.getDatabase(["modules", "enabledModules"]);
+        const on3 = new Set(db?.enabledModules ?? []);
+        const mods = [...db?.modules ?? []].sort((a, b) => Number(on3.has(b.id)) - Number(on3.has(a.id)));
+        rows3 = rows3.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow4) : []));
+      } catch {
+      }
+      const changed = JSON.stringify(rows3) !== JSON.stringify(modRows);
+      if (changed) modRows = rows3, modVer++;
+      return changed;
+    })().finally(() => {
+      modBusy = null;
+    });
+    return modBusy;
+  }
+  var moduleAssetStamp = () => modVer;
+  var modIndex = null;
+  var modIndexVer = -1;
+  function modRow(name) {
+    if (!modIndex || modIndexVer !== modVer) {
+      modIndex = { exact: /* @__PURE__ */ new Map(), lower: /* @__PURE__ */ new Map() };
+      for (const r of modRows) {
+        if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
+        if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
+      }
+      modIndexVer = modVer;
+    }
+    return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
+  }
+  function modulePicker() {
+    if (!modRows.length) return void 0;
+    return (name) => modRow(name)?.[0] ?? null;
+  }
+  function findRow(char, name) {
+    const lower = name.toLowerCase();
+    const card3 = (char.additionalAssets ?? []).filter(isRow4);
+    return card3.find((a) => a[0] === name) ?? card3.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
+  }
+  function assetNames(char) {
+    const card3 = (char.additionalAssets ?? []).filter(isRow4);
+    return [...new Set([...card3, ...modRows].map((r) => r[0]))].filter((n3) => !/^map\d+$/i.test(n3));
+  }
+  var DEFAULT_CROP = "50,16,44";
+  var AGENT_CROPS = {
+    "Aestheticism": "53,18,40",
+    "Aileen": "43,21,46",
+    "Baek Sa-heon": "50,18,44",
+    "Cha Yeo-jin": "54,18,44",
+    "Cho Seong-choon": "48,18,44",
+    "Do Pil-heon": "48,16,44",
+    "Go Young-eun": "46,16,44",
+    "Jang Heo-un": "52,18,44",
+    "Jay": "53,16,44",
+    "Jyaldi": "56,18,44",
+    "Kwak Je-gang": "56,19,44",
+    "Kyuras": "49,19,44",
+    "Lee Do-hyeong": "61,16,44",
+    "Ma Deok-hee": "49,19,44",
+    "Mun Hye-ran": "46,18,44",
+    "Secriem": "54,16,44",
+    "Seo Yun-ji": "46,18,44",
+    "Spangdal": "52,18,44"
+  };
+  var personCrop = (p2) => parseCrop(p2.crop) ?? parseCrop(!p2.photo && AGENT_CROPS[p2.english ?? ""] || DEFAULT_CROP);
+  function parseCrop(s8) {
+    const n3 = String(s8 ?? "").split(",").map(Number);
+    if (n3.length !== 3 || n3.some((x) => !Number.isFinite(x))) return null;
+    const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+    return [c(n3[0], 0, 100), c(n3[1], 0, 100), c(n3[2], 5, 100)];
+  }
+  function splitPic(pic3) {
+    const at = pic3.lastIndexOf("#");
+    const [cut3, t] = at > 0 ? pic3.slice(at + 1).split("~") : ["", ""];
+    const crop = at > 0 ? parseCrop(cut3) : null;
+    const tall = Number(t);
+    return crop ? { name: pic3.slice(0, at), crop, ...tall > 1 && tall <= 4 ? { tall } : {} } : { name: pic3, crop: null };
+  }
+  function mainPic(char, p2) {
+    const en2 = p2.english ?? "";
+    if (p2.photo) return p2.photo;
+    if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
+    if (en2 && hasAsset(char, en2)) return en2;
+    return p2.shared?.find((n3) => hasAsset(char, n3)) ?? "";
+  }
+  function facePic(char, p2, person = false) {
+    if (p2.face) return p2.face;
+    const en2 = p2.english ?? "";
+    if (person && !p2.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p2).join(",")}`;
+    if (en2 && hasAsset(char, en2)) return en2;
+    const main = mainPic(char, p2);
+    const crop = person ? personCrop(p2) : parseCrop(p2.crop);
+    return main && crop ? `${main}#${crop.join(",")}` : main;
+  }
+  var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
+  function assetUrl(char, name) {
+    const row8 = findRow(char, name);
+    if (!row8) return Promise.resolve(null);
+    const key = `${String(char.chaId ?? char.name ?? "")}|${row8[1]}`;
+    let hit4 = cache7.get(key);
+    if (!hit4) {
+      hit4 = load(row8[1], String(row8[2] ?? row8[1].split(".").pop() ?? ""));
+      cache7.set(key, hit4);
+      void hit4.then((url) => {
+        if (!url) cache7.delete(key);
+      });
+    }
+    return hit4;
+  }
+  setAssetCheck(hasAsset);
+
+  // src/ui/images.ts
+  var urls = /* @__PURE__ */ new Map();
+  var redraw = () => {
+  };
+  var queued = false;
+  function forgetImages() {
+    urls.clear();
+    schedule();
+  }
+  function setImageRedraw(fn2) {
+    redraw = fn2;
+  }
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    setTimeout(() => {
+      queued = false;
+      redraw();
+    }, 30);
+  }
+  var MAX_SIDE = 720;
+  var FACE_SIDE = 256;
+  async function shrink(url, crop = null, tall = 1) {
+    try {
+      const im = new Image();
+      im.src = url;
+      await im.decode();
+      const W3 = im.naturalWidth;
+      const H2 = im.naturalHeight;
+      let [sx, sy, sw2, sh] = [0, 0, W3, H2];
+      if (crop) {
+        const side = Math.min(W3, H2, crop[2] / 100 * W3);
+        sx = Math.min(W3 - side, Math.max(0, crop[0] / 100 * W3 - side / 2));
+        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
+        sw2 = sh = side;
+        if (tall > 1) sh = Math.max(side, Math.min(H2 - sy, side * tall));
+      }
+      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw2, sh));
+      if (!crop && !(scale < 1)) return url;
+      const canvas2 = document.createElement("canvas");
+      canvas2.width = Math.max(1, Math.round(sw2 * scale));
+      canvas2.height = Math.max(1, Math.round(sh * scale));
+      const g2 = canvas2.getContext("2d");
+      if (!g2) return url;
+      g2.imageSmoothingQuality = "high";
+      g2.drawImage(im, sx, sy, sw2, sh, 0, 0, canvas2.width, canvas2.height);
+      const blob = await new Promise((res) => canvas2.toBlob(res, "image/webp", 0.88));
+      return blob ? URL.createObjectURL(blob) : url;
+    } catch {
+      return url;
+    }
+  }
+  function imageUrl(char, pic3) {
+    if (!pic3) return null;
+    const key = `${String(char.chaId ?? char.name ?? "")}|${pic3}`;
+    const hit4 = urls.get(key);
+    if (hit4 === void 0) {
+      urls.set(key, "loading");
+      const { name, crop, tall } = splitPic(pic3);
+      void assetUrl(char, name).then(async (raw) => {
+        const url = raw ? await shrink(raw, crop, tall) : null;
+        urls.set(key, url);
+        if (url) schedule();
+      });
+      return null;
+    }
+    return hit4 === "loading" ? null : hit4;
+  }
+  var escAttr = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function agentFace(char, english) {
+    if (!english) return "";
+    const a = readDirectory(char.globalLore ?? []).agents.find((x) => x.english === english);
+    return facePic(char, a ?? { english }, true);
+  }
+  function factionPic(char, f, slot = "main") {
+    const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
+    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
+    return slot === "face" ? facePic(char, src) : mainPic(char, src);
+  }
+  function picAvatar(char, pic3, name, cls = "") {
+    const url = imageUrl(char, pic3);
+    const first = escAttr(Array.from(name.trim())[0] ?? "?");
+    return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
+  }
+  var avatar = (char, english, name, cls = "") => picAvatar(char, agentFace(char, english), name, cls);
+  function prefetchFactions(char) {
+    for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
+  }
+  var stLabel = (st) => st === "작전투입" ? "작전" : st;
+  var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
+  var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
+  function agentInner(char, p2, st, situation = "", act2 = "") {
+    const role = [p2.department, p2.rank].filter(Boolean).join(" · ");
+    return `<span class="gx-acard-side">${avatar(char, p2.english, p2.name, "sq")}${act2}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p2.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
   }
   function showIdCard(html, act2, cls = "") {
     document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
@@ -540,7 +835,8 @@ ${s8.slice(-tail2)}`;
   }
   async function traceCall(c) {
     let t = open;
-    let phase = ended ? "manual" : replied ? "after" : "before";
+    const dead = !!t && !replied && Date.now() - new Date(t.at).getTime() >= PROGRESS_WATCHDOG;
+    let phase = ended || dead ? "manual" : replied ? "after" : "before";
     if (!t) {
       const list4 = await load2();
       const last2 = list4[list4.length - 1];
@@ -3448,6 +3744,20 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
     return out.join("");
   }
 
+  // src/core/stalever.ts
+  var VERSION = /^\d+(\.\d+)*$/;
+  function oldPluginMessage(mine3, up) {
+    if (typeof up !== "string" || !VERSION.test(up) || !VERSION.test(mine3)) return null;
+    const a = mine3.split(".").map(Number);
+    const b = up.split(".").map(Number);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      const d = (b[i] ?? 0) - (a[i] ?? 0);
+      if (d < 0) return null;
+      if (d > 0) return `플러그인이 옛 판(v${mine3})이에요. 새 판 v${up}가 나왔어요. Risu 설정 → 플러그인에서 업데이트해 주세요.`;
+    }
+    return null;
+  }
+
   // src/host/datapack.ts
   var WORLD_KEY2 = "goei:data-world";
   var INSTALL_KEY = "goei:data-install";
@@ -3493,261 +3803,4 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
     progress4?.(`${pack4.label} 목록 받는 중…`);
     let index = null;
     try {
-      index = JSON.parse((await getText(`${pack4.name}.json`)).replace(/^﻿/, ""));
-    } catch (error) {
-      throw new DataPackError(`${pack4.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
-    }
-    if (!index || !Array.isArray(index.parts) || typeof index.length !== "number") throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
-    if (index.hash !== pack4.expect.hash) throw new DataPackError(`아직 이 판의 ${pack4.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
-    const re = new RegExp(`^${pack4.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
-    for (const name of index.parts) {
-      if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
-    }
-    const parts = index.parts;
-    const t0 = Date.now();
-    const text5 = await fetchParts(parts, getText, (n3) => progress4?.(`${pack4.label} 받는 중 ${n3}/${parts.length}`));
-    console.log(`[goei] ${pack4.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
-    if (text5.length !== pack4.expect.length) throw new DataPackError(`${pack4.label}를 끝까지 받지 못했어요. (${text5.length}/${pack4.expect.length}자)`);
-    const got = await sha256Text(text5);
-    if (got !== null) {
-      if (got !== pack4.expect.sha256) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(sha256). 다시 받아 주세요.`);
-    } else if (textHash(text5) !== pack4.expect.hash) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(hash). 다시 받아 주세요.`);
-    return text5;
-  }
-  async function loadWorldData(force = false) {
-    let saved = null;
-    try {
-      saved = await risuai.pluginStorage.getItem(WORLD_KEY2);
-    } catch {
-    }
-    if (typeof saved === "string" && packMatches(saved, WORLD_PACK.expect)) {
-      try {
-        applyWorldPack(saved);
-        return "store";
-      } catch (error) {
-        console.log(`[goei] 저장된 세계 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-      }
-    } else if (typeof saved === "string") console.log("[goei] 저장된 세계 자료가 이 판과 달라 다시 받아요");
-    const g2 = globalThis;
-    if (!force && g2.__goeiWorldFail && Date.now() - g2.__goeiWorldFail.at < 6e4) throw new Error(g2.__goeiWorldFail.reason);
-    let text5;
-    try {
-      text5 = await fetchPack(WORLD_PACK);
-    } catch (error) {
-      const reason3 = `${WORLD_PACK.label}(${WORLD_PACK.name})를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      g2.__goeiWorldFail = { at: Date.now(), reason: reason3 };
-      throw new Error(reason3);
-    }
-    await keepWorldData(text5);
-    return "fetch";
-  }
-  async function keepWorldData(text5) {
-    const g2 = globalThis;
-    applyWorldPack(text5);
-    delete g2.__goeiWorldFail;
-    delete g2.__goeiWorldDismissed;
-    try {
-      await risuai.pluginStorage.setItem(WORLD_KEY2, text5);
-    } catch (error) {
-      console.log(`[goei] 세계 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-  async function installWorldFile(raw) {
-    const text5 = raw.replace(/^\ufeff/, "");
-    if (!packMatches(text5, WORLD_PACK.expect)) {
-      let head3 = null;
-      try {
-        head3 = text5.length < 4e3 ? JSON.parse(text5) : null;
-      } catch {
-      }
-      if (head3 && typeof head3 === "object" && Array.isArray(head3.parts)) throw new DataPackError("그건 조각 목록(goei-data-world.json)이에요. 릴리스 zip 의 goei-data-world.txt 를 넣어 주세요.");
-      throw new DataPackError(`이 플러그인 판과 맞는 세계 자료(goei-data-world.txt)가 아니에요. (${text5.length.toLocaleString()}자, 기대 ${WORLD_PACK.expect.length.toLocaleString()}자)`);
-    }
-    await keepWorldData(text5);
-  }
-  var installPending = null;
-  async function ensureInstallData(progress4) {
-    if (installDataReady()) return;
-    installPending ??= (async () => {
-      let saved = null;
-      try {
-        saved = await risuai.pluginStorage.getItem(INSTALL_KEY);
-      } catch {
-      }
-      if (typeof saved === "string" && packMatches(saved, INSTALL_PACK.expect)) {
-        try {
-          applyInstallPack(saved);
-          return;
-        } catch (error) {
-          console.log(`[goei] 저장된 설치 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-        }
-      } else if (typeof saved === "string") console.log("[goei] 저장된 설치 자료가 이 판과 달라 다시 받아요");
-      const text5 = await fetchPack(INSTALL_PACK, progress4);
-      applyInstallPack(text5);
-      try {
-        await risuai.pluginStorage.setItem(INSTALL_KEY, text5);
-      } catch (error) {
-        console.log(`[goei] 설치 자료를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-      }
-    })().finally(() => installPending = null);
-    await installPending;
-  }
-
-  // src/host/itemicons.ts
-  var ITEMS_KEY = "goei:data-items";
-  var pack3 = null;
-  var loading3 = null;
-  var failed = "";
-  var progress = "";
-  var redraw2 = () => {
-  };
-  var urls2 = /* @__PURE__ */ new Map();
-  var hits = /* @__PURE__ */ new Map();
-  var hitGen = -1;
-  function hitOf(key, f) {
-    const g2 = iconGen();
-    if (g2 !== hitGen) {
-      hits.clear();
-      hitGen = g2;
-    }
-    if (hits.has(key)) return hits.get(key);
-    const v = f();
-    if (hits.size > 3e3) hits.delete(hits.keys().next().value);
-    hits.set(key, v);
-    return v;
-  }
-  function setItemIconRedraw(fn2) {
-    redraw2 = fn2;
-  }
-  var itemIconStatus = () => ({ ready: !!pack3, loading: !!loading3, progress, failed });
-  function ensureItemIcons() {
-    if (pack3 || loading3) return loading3 ?? Promise.resolve();
-    loading3 = (async () => {
-      failed = "";
-      try {
-        let saved = null;
-        try {
-          saved = await risuai.pluginStorage.getItem(ITEMS_KEY);
-        } catch {
-        }
-        if (typeof saved === "string" && packMatches(saved, ITEMS_PACK.expect)) {
-          try {
-            pack3 = applyItemsPack(saved);
-            hits.clear();
-            return;
-          } catch (error) {
-            console.log(`[goei] 저장된 소지품 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-          }
-        }
-        const text5 = await fetchPack(ITEMS_PACK, (t) => {
-          progress = t;
-          redraw2();
-        });
-        pack3 = applyItemsPack(text5);
-        hits.clear();
-        try {
-          await risuai.pluginStorage.setItem(ITEMS_KEY, text5);
-        } catch (error) {
-          console.log(`[goei] 소지품 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
-        }
-      } catch (error) {
-        failed = error instanceof DataPackError || error instanceof Error ? error.message : String(error);
-        console.log(`[goei] 소지품 그림 팩: ${failed}`);
-      } finally {
-        progress = "";
-        loading3 = null;
-        redraw2();
-      }
-    })();
-    return loading3;
-  }
-  function itemIconUrl(name, icon, seed2, more) {
-    if (!pack3) {
-      if (!failed) void ensureItemIcons();
-      return null;
-    }
-    const p2 = pack3;
-    return urlOf(hitOf(`i${name}${icon ?? ""}${seed2 ?? ""}${more?.desc ?? ""}`, () => matchItemIcon(p2, name, icon, seed2, more)));
-  }
-  var itemPictures = (name, icon) => pack3 ? itemPictureNames(pack3, name, icon) : null;
-  function titleIconUrl(title2) {
-    if (!pack3) {
-      if (!failed) void ensureItemIcons();
-      return null;
-    }
-    const p2 = pack3;
-    return urlOf(hitOf(`t${title2}`, () => matchTitleIcon(p2, title2) ?? p2.base.misc ?? null));
-  }
-  function urlOf(file) {
-    if (!pack3 || !file) return null;
-    let u = urls2.get(file);
-    if (!u) {
-      u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
-      urls2.set(file, u);
-    }
-    return u;
-  }
-
-  // src/ui/needfill.ts
-  var bound = false;
-  var needAttr = (name, value, busy6 = false) => ` data-need="${name}"${busy6 ? ' data-busy="1"' : ""}${busy6 || !value.trim() ? " disabled" : ""}`;
-  function bindNeedFill(doc2 = document) {
-    if (bound) return;
-    bound = true;
-    doc2.addEventListener(
-      "input",
-      (ev) => {
-        const el = ev.target;
-        const name = el?.getAttribute?.("name");
-        if (!name) return;
-        doc2.querySelectorAll(`button[data-need="${CSS.escape(name)}"]:not([data-busy])`).forEach((b) => {
-          b.disabled = !el.value.trim();
-        });
-      },
-      true
-    );
-  }
-
-  // src/ui/browser.ts
-  var esc11 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var SITES = [
-    { id: "gn", name: "괴담넷", title: "괴담넷 - 자유게시판", host: "goedam.net", path: "/board/free" },
-    { id: "gal", name: "괴담 갤러리", title: "괴담 갤러리 - 괴담갤", host: "gall.goedam.co.kr", path: "/board/lists/?id=horror" },
-    { id: "wpf", name: "세정게", title: "::: 世界政治 게시판 :::", host: "www.wpf.or.kr", path: "/zboard/zboard.php?id=politics" },
-    { id: "sm", name: "연어 마켓", title: "연어 마켓 | 수상한 중고거래", host: "salmon-market.kr", path: "" },
-    { id: "cos", name: "우주 쇼핑몰", title: "★우주 쇼핑몰★에 오는 것을 환영하는 것이다", host: "cosmic-mall.alien", path: "/~shop/index.html" },
-    { id: "wk", name: "괴이위키", title: "괴이위키", host: "goei.wiki", path: "/w/괴이위키:대문" },
-    { id: "bm", name: "백일몽 포인트몰", title: "백일몽 포인트몰", host: "point.baekilmong.intra", path: "/mall/main" },
-    { id: "hs", name: "망상홈쇼핑", title: "망상홈쇼핑 LIVE", host: "live.mangsang.tv", path: "/onair" }
-  ];
-  var siteOf = (id2) => SITES.find((s8) => s8.id === id2);
-  var isSite = (id2) => SITES.some((s8) => s8.id === id2);
-  var LOGO2 = {
-    gn: ["0 0 24 24", '<path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill="#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/>'],
-    gal: ["0 0 24 24", '<path fill="#3b4890" d="M3 3h18a1 1 0 011 1v12a1 1 0 01-1 1H10l-5 4v-4H3a1 1 0 01-1-1V4a1 1 0 011-1z"/><path fill="#fff" d="M12 5.5c-2.5 0-4.3 1.9-4.3 4.2v5.1l1.4-1 1.4 1 1.5-1 1.5 1 1.4-1 1.4 1V9.7c0-2.3-1.8-4.2-4.3-4.2z"/><circle fill="#3b4890" cx="10.5" cy="9.6" r=".9"/><circle fill="#3b4890" cx="13.5" cy="9.6" r=".9"/>'],
-    wpf: ["0 0 24 24", '<circle fill="#7a1010" cx="12" cy="12" r="11"/><circle fill="#1a5aa8" cx="12" cy="12" r="7.5"/><path fill="none" stroke="#ffd24a" stroke-width="1" d="M4.5 12h15M12 4.5v15M6 8.2h12M6 15.8h12"/><ellipse fill="none" stroke="#ffd24a" stroke-width="1" cx="12" cy="12" rx="3.4" ry="7.5"/><circle fill="none" stroke="#ffd24a" stroke-width="1.2" cx="12" cy="12" r="10"/>'],
-    sm: ["0 0 32 20", '<path fill="#f26c4f" d="M2 10C5 3.5 13 1.8 20 4.5L26 1.5 24.5 10 26 18.5 20 15.5C13 18.2 5 16.5 2 10z"/><path fill="#ffb49b" d="M4 11.2c4 3.3 10.5 3.8 16 2.2-5.5.6-11-.2-16-2.2z"/><path fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round" d="M11 5.2l1.5 4M14.5 4.6l1.5 4.2M18 4.8l1.3 4"/><circle fill="#fff" cx="6.3" cy="8.6" r="1.4"/><circle fill="#2a1a14" cx="6.5" cy="8.6" r=".7"/>'],
-    cos: ["0 0 32 24", '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
-    wk: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
-    bm: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
-    hs: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
-    home: ["0 0 24 24", '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>']
-  };
-  var siteLogo = (id2, cls = "br-fv") => {
-    const [vb, body5] = LOGO2[id2 || "home"];
-    return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body5}</svg>`;
-  };
-  var ic = (d, cls = "br-i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
-  var IC = {
-    back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
-    fwd: "M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z",
-    rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
-    x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
-    add: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
-    tune: "M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z",
-    acct: "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
-    home: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",
-    srch: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-  };
-  var HIST_MAX = 50;
-  var CL
+      index = JSON.parse((await getText(`${pack4.name}.json`)).replac

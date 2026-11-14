@@ -152,6 +152,30 @@ test('맞춤 주문 납기 단위 (shop#11)', () => {
   assert.equal(h(''), undefined);
 });
 
+test('맞춤 주문 납기 단위: 개월·달·분 (11-14 재검토 ①-6)', () => {
+  const h = (cell) => M.parseOrderLine(`가림 내의|1200000|${cell}|장비|-|0.3|설명|효과|진실`)?.hours;
+  assert.equal(h('1개월'), 720);
+  assert.equal(h('1달'), 720);
+  assert.equal(h('1 month'), 720);
+  assert.equal(h('2개월'), 720, '위 한도 30일');
+  assert.equal(h('30분'), 0.5);
+  assert.equal(h('90 min'), 1.5);
+  assert.equal(h('1분'), 0.1, '0시간이 되지 않는다');
+  // 그대로여야 하는 것
+  assert.equal(h('12시간'), 12);
+  assert.equal(h('3일'), 72);
+  assert.equal(h('2주'), 336);
+});
+
+test('맞춤 주문 납기 범위는 뒤 숫자 (사용자 11-14)', () => {
+  const h = (cell) => M.parseOrderLine(`가림 내의|1200000|${cell}|장비|-|0.3|설명|효과|진실`)?.hours;
+  assert.equal(h('2~3일'), 72);
+  assert.equal(h('2-3 days'), 72);
+  assert.equal(h('1~2주'), 336);
+  assert.equal(h('24~48'), 48);
+  assert.equal(h('48시간 (2일)'), 48, '범위가 아니면 첫 숫자 그대로');
+});
+
 test('currency 줄: 원으로 시작하면 원 가게 (shop#10)', () => {
   const id = (cur) => M.parseShelf(`<shop-identity>\nsells: x\ncurrency: ${cur}\n</shop-identity>\n<shelf>\n붕대|2500\n</shelf>`, null).identity.points === true;
   assert.equal(id('points'), true);

@@ -4,7 +4,6 @@ import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
 import { guideOr } from '../guides';
 import { scanAgents } from '../world/tags';
-import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf, type AffinityOpts } from './affinity';
 import { SPEECH_ENTRY_CHARS, applySpeechSign, parseSpeechMarker, speechVariety } from './speech';
 import { SEXUAL_FIELDS, SEXUAL_AXIS_OF, explicitOn, isSexualAxis, sexualAnyOn, sexualFieldOn, sexualGlobal, setSexualText } from './sexual';
@@ -21,7 +20,7 @@ import { mentionsPoints, parsePoints } from '../points';
 import { cleanIcon, itemsRule, itemEquip, itemState, stripGrades, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
 import { leftWordIn, offWordIn } from '../itemrules';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
-import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
+import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, sentText, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
 import { CUES, DOC_TYPES, FACTION_STAGES, OPENNESS_BASELINES, factionWho, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, SLOT_META, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, slotsFor, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
@@ -100,14 +99,8 @@ export interface ItemNow { name: string; desc: string; use: boolean; left?: numb
 
 /** 응답 본문 정리: 상태창·상황판 태그·플러그인 표식은 messageText 가 지운다. 길면 중간을 접는다 */
 export function cleanSpan(raw: string, cap: number): string {
-  let t = String(raw ?? '');
-  for (const tag of findStatusTags(t)) t = t.replace(tag.raw, '');
-  // 생각·주석·그림 태그·상점 표식도 뺀다 (store.ts messageHash 와 같은 것. 지침은 「지웠다」고 말한다) (전수검사 11-13)
-  t = messageText(t)
-    .replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<img\s*=[^>]*>/g, '')
-    .replace(/\[\s*shop\s*[:：][^\]]*\]/giu, '')
+  // 생각·주석·그림 태그·상점 표식도 뺀다 (store.ts sentText — messageHash 와 같은 것. 지침은 「지웠다」고 말한다) (전수검사 11-13)
+  const t = sentText(raw)
     .replace(/\n{3,}/g, '\n\n')
     .trim();
   if (t.length <= cap) return t;
@@ -389,13 +382,18 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
+  // 계기 뜻풀이 표(cue_table 절: 제목 줄 + 표)는 호감 수치 절 안에 있다. 호감 수치가 빠지고 세력 평판 수치만 켜진 요청에는
+  // 같은 글을 <<CUE_TABLE>> 자리에 한 번 싣는다 (사용자 2026-11-14 A-8). 호감 수치가 켜져 있으면 제자리 것만 남는다
+  const cueTable = on.has('cue_table') && !(on.has('affinity') && on.has('affinity_num'))
+    ? `\n${[...text.matchAll(/<<SECTION:cue_table>>\n?([\s\S]*?)<<END:cue_table>>/g)].map((m) => m[1]).join('')}`
+    : '';
   let out = text;
   for (let prev = ''; prev !== out; ) {
     prev = out;
     out = out.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
   }
   // 성적 욕망·이상성욕 절 본문은 설정(켠 칸·발정모드)에 따라 조립된다 (sexual.ts sexualWriterSection)
-  out = out.replace('<<SEXUAL_RULES>>', () => sexualRules.trim()).replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  out = out.replace('<<CUE_TABLE>>', () => cueTable).replace('<<SEXUAL_RULES>>', () => sexualRules.trim()).replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
   if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
 }
@@ -407,6 +405,8 @@ export function enabledSections(s: PeopleSettings): Set<string> {
   for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
   // 세력 평판도 수치/정성 (11-07 사용자: 호감·의심·음란도처럼 같이 따라간다)
   if (s.features.has('faction_rep')) on.add(s.factionQual ? 'faction_rep_qual' : 'faction_rep_num');
+  // 계기 뜻풀이 표: 호감 수치나 세력 평판 수치 중 하나만 켜져도 싣는다 (자료의 cues 와 같은 조건. 사용자 2026-11-14 A-8)
+  if (on.has('affinity_num') || on.has('faction_rep_num')) on.add('cue_table');
   if (s.director === 'note') on.add('next_note');
   if (sexualAnyOn(s)) on.add('sexual');
   return on;
@@ -592,7 +592,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     if (idx === undefined || !input.confirmed.has(idx)) return '확정 구간 밖 메시지';
     const q = norm(quote);
     if (!q || q.length < 3) return '인용 없음';
-    if (!norm(messageText(str(list[idx].data))).includes(q)) return '인용이 원문에 없음';
+    // 모델은 지운 글(cleanSpan)을 보고 인용한다: 지우기 전 글이나 지운 글 중 하나에 있으면 된다 (재검토 11-14 ①-9)
+    if (!norm(messageText(str(list[idx].data))).includes(q) && !norm(sentText(str(list[idx].data))).includes(q)) return '인용이 원문에 없음';
     return { anchor: messageKey(list[idx], idx), index: idx };
   };
   /** 인용 없이 기준 메시지만 (문서용) */
@@ -762,7 +763,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     let found: (typeof cur)[number] | undefined;
     if (op === 'upsert' && !rid) {
       const same = meta.targeted ? cur.filter((x) => (x.target ?? '@user') === (target ?? '@user')) : cur;
-      if (!same.length) opx = 'add';
+      // 의심 칸은 「대상과 종류마다 하나」라 같은 대상에 다른 종류(정체·거짓말…)가 따로 있을 수 있다: 종류를 모르니 자동으로 고치지 않고 add (재검토 11-14 ①-7)
+      if (!same.length || meta.feature === 'suspicion') opx = 'add';
       else if (meta.targeted && target && same.length === 1) found = same[0];
     } else if (op === 'upsert') found = cur.find((x) => x.id === rid);
     if (opx === 'upsert') {

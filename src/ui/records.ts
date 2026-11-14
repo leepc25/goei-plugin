@@ -11,7 +11,7 @@ import {
 } from '../core/journal';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
-import { refreshStatusContext } from '../host/statusview';
+import { redrawChatCards } from '../host/statusview';
 import { downloadPng, reportPng } from './reportpng';
 import type { RecordsNav } from '../core/navhist';
 import { anchorPositions, messageKey } from '../core/people/store';
@@ -637,16 +637,6 @@ async function setVars(ctx: ChatContext, env: RecordsEnv, vars: Record<string, s
   await env.refresh();
 }
 
-/** 채팅 카드는 display 처리기가 그린다: 열쇠 표를 다시 모으고, 이미 그려진 메시지도 다시 그리게 채팅을 그대로 한 번 저장한다 (끄면 카드가 사라진다) */
-async function redrawChatCards(ctx: ChatContext): Promise<void> {
-  try {
-    await refreshStatusContext(ctx.charIndex, ctx.chatIndex);
-    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
-  } catch {
-    /* 다시 못 그려도 설정은 저장됐다 (다음 채팅 전환 때 반영) */
-  }
-}
-
 async function handleJournalSettings(action: string, v: string, ctx: ChatContext, env: RecordsEnv): Promise<boolean> {
   // 불러오기인지는 defaultsAction 이 비우기 전에 읽어 둔다 (전수검사 11-13)
   const isLoad = action === 'jr-def-yes' && defaultsAsk.pane === 'jr' && defaultsAsk.what === 'load';
@@ -654,7 +644,7 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
   if (def !== null) {
     if (def) rec.info = def;
     // 기본값 불러오기로 카드 표시가 바뀌어도 이미 뜬 카드에 반영 (전수검사 11-13)
-    if (isLoad) await redrawChatCards(ctx);
+    if (isLoad) await redrawChatCards(ctx.charIndex, ctx.chatIndex);
     env.render();
     return true;
   }
@@ -666,7 +656,7 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     if (key === 'chat_card') val = val === 'off' || val === 'all' ? val : 'mine';
     else return true;
     await setVars(ctx, env, { [JR(key)]: val });
-    if (key === 'chat_card') await redrawChatCards(ctx);
+    if (key === 'chat_card') await redrawChatCards(ctx.charIndex, ctx.chatIndex);
     return true;
   }
   if (action === 'jr-step') {
