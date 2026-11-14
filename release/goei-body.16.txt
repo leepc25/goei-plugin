@@ -1,4 +1,13 @@
-idth: 760px), (max-height: 499px) and (pointer: coarse) { .gx-zbtn { width: 40px; height: 40px; } }
+ay: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.gx-zbtn {
+  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--void) 88%, transparent); color: var(--text);
+  font-family: inherit; font-size: 18px; font-weight: 600; line-height: 1; padding: 0; display: grid; place-items: center; cursor: pointer;
+}
+.gx-zbtn:hover { border-color: var(--signal); }
+.gx-zbtn.reset { display: none; font-size: 16px; }
+.gx-canvas.zoomed .gx-zbtn.reset { display: grid; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-zbtn { width: 40px; height: 40px; } }
 
 /* v0.15 왼쪽 위 간이 상태창 */
 
@@ -2079,7 +2088,4 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-c .it-ic { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-c .it-ic svg { width: 56%; height: 56%; }
 .it-c .it-ic img { width: min(85px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; } /* 그림 팩 원본 85px 그대로 (비정수 확대는 깨짐, 2026-11-07 사용자). 칸이 작으면 정사각형 그대로 줄인다 (높이를 박으면 폰에서 길쭉해짐) */
-.it-ph .it-ic img, .it-pickrow .it-ic img { width: 42.5px; height: 42.5px; max-width: 90%; max-height: 90%; object-fit: contain; image-rendering: pixelated; } /* 원본의 절반 */
-.it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
-.it-c b { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: calc(12.5px * 1.2 * 2 + 5px); padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; word-break: break-all; } /* 이름 두 줄까지, 그 뒤 생략, 높이는 늘 두 줄 */
-.it-c.empty { background: none; border-style: dashed; border-color: var(--line2); curs
+.it-ph .it-ic img, .it-pickrow .it-ic img { width: 42.5px; height: 42.5px; max-width: 90%; max-height: 90%; object-fit: contain; im

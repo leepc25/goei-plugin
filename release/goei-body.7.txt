@@ -1,4 +1,16 @@
-== "any" || gm === "one" ? gm : "uniq",
+"0";
+    const g2 = parseGenres(String(vars?.[K.genres] ?? ""));
+    const t = parseTiers(String(vars?.[K.tiers] ?? ""));
+    const u = String(vars?.[K.useful] ?? "");
+    const gm = String(vars?.[K.gmode] ?? "");
+    const tm = String(vars?.[K.tmode] ?? "");
+    const tiers = t.length ? t : D.tiers;
+    return {
+      on: on3,
+      genres: g2.length ? g2 : D.genres,
+      tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
+      useful: u === "0" || u === "1" || u === "2" ? u : "auto",
+      gmode: gm === "any" || gm === "one" ? gm : "uniq",
       tmode: tm === "even" || tm === "same" ? tm : "weight"
     };
   }
@@ -3737,13 +3749,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
   var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
   function agentInner(char, p2, st, situation = "", act2 = "") {
     const role = [p2.department, p2.rank].filter(Boolean).join(" · ");
-    return `<span class="gx-acard-side">${avatar(char, p2.english, p2.name, "sq")}${act2}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p2.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
-  }
-  function showIdCard(html, act2, cls = "") {
-    document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
-    const box3 = document.createElement("div");
-    box3.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
-    box3.setAttribute("role", "dialog");
-    box3.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
-    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box3.setAttribute("da
+    return `<span class="gx-acard-side">${avatar(char, p2.english, p2.name, "sq")}${act2}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p2.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}<

@@ -1,4 +1,22 @@
-
+i.open = value ?? "";
+        itemsUi.mode = "view";
+        env3.render();
+        return true;
+      case "items-keep":
+        return true;
+      case "items-close":
+        itemsUi.open = "";
+        itemsUi.mode = "view";
+        itemsUi.dragDrop = false;
+        env3.render();
+        return true;
+      case "items-back":
+        if (itemsUi.mode === "drop" && itemsUi.dragDrop) itemsUi.open = "";
+        itemsUi.mode = "view";
+        itemsUi.dragDrop = false;
+        env3.render();
+        return true;
+      case "items-add":
         itemsUi.open = "";
         itemsUi.mode = "add";
         env3.render();
@@ -3427,11 +3445,4 @@ ${themeVars("[x-goei-prog]")}
     rows3.push(row8(
       "플러그인",
       `<span class="upd-ver">v${esc21(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc21(L.plugin)}</b>` : ""}</span>`,
-      pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
-    ));
-    const cardNew = lite && L && compareVersions(L.card, cur) > 0;
-    const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
-    rows3.push(row8(
-      "카드",
-      `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc21(cur)}`}${cardNew ? ` → <b>v${esc21(L.card)}</b>` : ""}</span>`,
-      !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 
+      pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플

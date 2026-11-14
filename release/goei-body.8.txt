@@ -1,4 +1,13 @@
-ta-theme", theme);
+/span>` : ""}</span>`;
+  }
+  function showIdCard(html, act2, cls = "") {
+    document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
+    const box3 = document.createElement("div");
+    box3.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
+    box3.setAttribute("role", "dialog");
+    box3.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
+    if (theme) box3.setAttribute("data-theme", theme);
     box3.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
       if (btn && act2 && box3.contains(btn)) {
@@ -3741,21 +3750,4 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
     srch: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
   };
   var HIST_MAX = 50;
-  var CLOSED_MAX = 10;
-  var seq3 = 1;
-  var br = {
-    tabs: [{ id: seq3++, site: "", hist: [], at: -1 }],
-    cur: 0,
-    /** 로그인 창 열림 */
-    login: false,
-    /** 폰: 탭 목록 화면 */
-    list: false,
-    /** 닫은 탭 (최근 것이 끝, 마우스 제스처 ㄱ 으로 되살림) */
-    closed: []
-  };
-  var curTab = () => br.tabs[Math.min(br.cur, br.tabs.length - 1)];
-  function recordTab(state2) {
-    const t = curTab();
-    const key = JSON.stringify(state2);
-    if (t.hist[t.at] === key) return;
-    t.hist = t.hist.
+  var CL

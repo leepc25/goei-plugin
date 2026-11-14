@@ -1,4 +1,12 @@
-; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
+: minmax(0, 1fr); padding: 8px 11px; margin-bottom: 14px; }
+  .gw .fl-bar > p { font-size: 12.5px; line-height: 1.35; }
+  .gw .fl-bar > div { display: none; }
+  .gw .fl-bar > div > span { font-size: 11.5px; }
+  .gw .fl-bar > div > b { font-size: 14px; }
+  .gw .fl-bar > i { display: none; }
+  .gw .fl .ps-rows.fl-ph { background: none; border: 0; box-shadow: none; padding: 0; flex-direction: column; gap: 8px; }
+  .gw .fl .ps-rows.fl-ph > .flc { border: 1px solid var(--line); }
+  .gw .flc { display: flex; flex-direction: column; gap: 6px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
   .gw .flc.sub { margin-left: 18px; position: relative; }
   .gw .flc.sub::before { content: ''; position: absolute; left: -13px; top: -9px; width: 9px; height: 34px; border-left: 1.5px solid var(--gline); border-bottom: 1.5px solid var(--gline); }
   .gw .flc.sub { margin-top: -4px; }
@@ -3054,10 +3062,4 @@ ${rules3}`;
     "- Merge entries that describe the same thing; drop nothing that is still true. Keep concrete details (names, numbers, places, dates). When two entries conflict, keep the later one (entries are listed oldest first) and you may note the change.",
     `- \`chars\` is the record's current size and \`target\` the size to reach (sum of entry texts). Reduce toward target; a result near it is enough; never pad. Each entry is one statement ≤300 chars${lang === "en" ? " in English" : " in Korean"}. Names, quotes, address terms, Korean labels and prefixes stay as written.`,
     "- `state` and `scene` are the present: merge aggressively, keep only what is still true. `history` is a chronological digest: merge adjacent events into one line each. `relationship`, `speech` and the feature slots (`affinity.*`, `register.*`) keep one entry per `target`. `affinity.appraisal` (first impression) is never rewritten: return it unchanged or leave the slot out.",
-    "- Give every result entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.",
-    "- Slots you do not return stay as they are.",
-    "",
-    "Output exactly one JSON object, nothing else:",
-    '{"slots":{"<slot>":[{"text":"<statement>","target":"<name|@user|null>","from":["<id>"]}]}}',
-    "Slot hints: " + slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ")
-  ].join("\n"), { lang_note: 
+    "- Give every resu
