@@ -1,9 +1,10 @@
 // 소지품 판정 칸 (장착 갈래·상태·소모 횟수·쓰임 글). 다른 데에 기대지 않는 순수 함수만 — 명부(world/directory)·시작 소지품이 소지품 전체를 끌어오지 않게 (core/items.ts 가 다시 내보냄)
 
-/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 무기·무기 아닌 것 둘만). 칸: 무기 2 · 장비 6 (2026-11-12 사용자: 장비 칸 둘 더) */
+/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 둘만). 칸: 손 2 · 장비 6 (2026-11-12 사용자: 장비 칸 둘 더).
+ *  'weapon' = 손에 드는 것 전부(무기·도구·불빛·우산…), 'gear' = 몸에 입거나 차는 것. 저장된 채팅이 그대로 읽히게 안쪽 값은 'weapon' 그대로 (사용자 2026-11-14) */
 export type ItemEquip = 'weapon' | 'gear';
 export const EQUIP_SLOTS: Record<ItemEquip, number> = { weapon: 2, gear: 6 };
-export const EQUIP_LABEL: Record<ItemEquip, string> = { weapon: '무기', gear: '장비' };
+export const EQUIP_LABEL: Record<ItemEquip, string> = { weapon: '손', gear: '장비' };
 export const itemEquip = (v: unknown): ItemEquip | undefined => (v === 'weapon' || v === 'gear' ? v : undefined);
 
 /** 상태 (파괴는 목록에서 빠지고 기록 「파괴」) */
@@ -38,7 +39,7 @@ export interface ItemTraits {
   weight?: number;
 }
 
-/** 「쓰임」 칸 글 → 판정: 무기·장비·사용·소모N (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
+/** 「쓰임」 칸 글 → 판정: 손·장비·사용·소모N (옛 글의 「무기」도 손으로 읽는다, 사용자 2026-11-14) (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
 export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> {
   const out: Omit<ItemTraits, 'icon' | 'weight'> = { use: false };
   // 「소모 3」「소모3회」「소모(3)」「소모 x3」은 쪼개기 전에 「소모3」으로 붙인다: 띄우면 1회로, 글자가 붙으면 소모가 빠졌다 (전수검사 11-13)
@@ -46,7 +47,7 @@ export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> 
   for (const t0 of src.split(/[\s,，/·+]+/)) {
     const t = t0.trim().toLowerCase();
     if (!t) continue;
-    if (/^(무기|weapon)$/.test(t)) out.equip = 'weapon';
+    if (/^(손|hand|held|무기|weapon)$/.test(t)) out.equip = 'weapon';
     else if (/^(장비|gear|wear)$/.test(t)) out.equip = out.equip ?? 'gear';
     else if (/^(사용|use|usable)$/.test(t)) out.use = true;
     else {

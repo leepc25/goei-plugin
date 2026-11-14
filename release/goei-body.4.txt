@@ -1,4 +1,18 @@
-f (prev.down) q.down = true;
+(0, int(raw.views) ?? 0),
+        votes: Math.max(0, int(raw.upvotes) ?? 0),
+        mine: prev?.mine ?? false,
+        comments: [],
+        ...cleanTag(raw.tag) ? { tag: cleanTag(raw.tag) } : {}
+      };
+      const sigs = /* @__PURE__ */ new Map();
+      const loose = /* @__PURE__ */ new Map();
+      const remap = /* @__PURE__ */ new Map([[0, 0]]);
+      if (prev) {
+        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
+        if (prev.tag) q.tag = prev.tag;
+        if (prev.scrap) q.scrap = true;
+        if (prev.voted) q.voted = true;
+        if (prev.down) q.down = true;
         if (prev.back !== void 0) q.back = prev.back;
         if (prev.touch !== void 0) q.touch = prev.touch;
         for (const c of prev.comments) {
@@ -4761,35 +4775,4 @@ ${c}`)]).join("\n\n");
         up: "선배님",
         peer: "선배님",
         down: "신입님",
-        outsider: "손님"
-      },
-      이연화: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "선생님",
-        down: "신입 씨",
-        outsider: "그쪽 분"
-      },
-      이자헌: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "조장님",
-        down: "신입 님",
-        outsider: "손님"
-      },
-      장허운: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "동기분",
-        down: "후배님",
-        outsider: "선생님"
-      },
-      잼트리: {
-        level: 2,
-       
+        outsider: "

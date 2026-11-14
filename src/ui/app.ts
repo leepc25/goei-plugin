@@ -429,8 +429,9 @@ function ensureRoot(): HTMLElement {
   const dropOk = (z: HTMLElement | null) => {
     if (!z || !dragItem) return false;
     const to = z.dataset.drop ?? '';
-    if (to === 'auto') return !!dragItem.equip || dragItem.usable;
-    if (to.startsWith('equip:')) return to.split(':')[1] === dragItem.equip;
+    if (to === 'auto') return true; // 갈래도 사용도 없는 물건은 손 칸으로 (사용자 2026-11-14)
+    // 손 칸에는 아무 물건이나, 장비 칸에는 장비만 (사용자 2026-11-14)
+    if (to.startsWith('equip:')) return to.split(':')[1] === 'weapon' || dragItem.equip === 'gear';
     if (to === 'use') return dragItem.usable;
     return to === 'grid' || to === 'drop';
   };
@@ -444,6 +445,7 @@ function ensureRoot(): HTMLElement {
     dragItem = null;
     root?.querySelector('.gx-items')?.classList.remove('it-dragging');
     root?.querySelectorAll('.it-over-ok').forEach((x) => x.classList.remove('it-over-ok'));
+    root?.querySelectorAll('.it-can, .it-cant').forEach((x) => x.classList.remove('it-can', 'it-cant'));
   };
   root.addEventListener('dragstart', (ev) => {
     const el = ev.target instanceof Element ? ev.target.closest<HTMLElement>('[data-drag]') : null;
@@ -452,6 +454,8 @@ function ensureRoot(): HTMLElement {
     ev.dataTransfer?.setData('text/plain', dragItem.id);
     if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move';
     root?.querySelector('.gx-items')?.classList.add('it-dragging');
+    // 잡는 순간 놓을 수 있는 칸(그 갈래의 장착 칸·사용 상자)을 밝히고 나머지는 흐리게 (사용자 2026-11-14)
+    root?.querySelectorAll<HTMLElement>('.it-slot[data-drop^="equip:"], .it-usebox[data-drop="use"]').forEach((z) => z.classList.add(dropOk(z) ? 'it-can' : 'it-cant'));
   });
   root.addEventListener('dragover', (ev) => {
     if (!dragItem) return;

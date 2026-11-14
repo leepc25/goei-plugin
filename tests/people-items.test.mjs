@@ -35,7 +35,7 @@ test('자료·절: 켜면 items_now(판정·상태)와 소지품 절, 끄면 둘
   const store = T.emptyStore();
   store.people.쟈알디 = person('쟈알디');
   const on = U.buildUpdate(c, store, [3], { settings: s, system: 'S', values: {}, names, items: itemsNow });
-  assert.deepEqual(JSON.parse(JSON.stringify(on.data.items_now)), [{ name: '소금 봉지', desc: '두 봉지', usable: true, uses_left: 2 }, { name: '부적', usable: true, condition: 'damaged' }, { name: '권총', usable: true, equip: 'weapon', equipped: true }]);
+  assert.deepEqual(JSON.parse(JSON.stringify(on.data.items_now)), [{ name: '소금 봉지', desc: '두 봉지', usable: true, uses_left: 2 }, { name: '부적', usable: true, condition: 'damaged' }, { name: '권총', usable: true, equip: 'hand', equipped: true }]);
   assert.equal(on.data.item_kinds, undefined, '종류 표는 없앰');
   assert.deepEqual(on.items, ['소금 봉지', '부적', '권총']);
   assert.equal(on.data.want.items, true);

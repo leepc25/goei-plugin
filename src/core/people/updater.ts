@@ -346,7 +346,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
     items_now: o.items
-      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
+      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip === 'weapon' ? 'hand' : e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
       : undefined,
     // 물건으로 만드는 범위·만들지 않을 것 (설정 → 소지품, core/items.ts itemsRule)
     items_rule: o.items ? itemsRule(chat.scriptstate) : undefined,
@@ -1376,7 +1376,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       }
       seen.add(norm(listed ?? name));
       const act = action === 'new' && listed ? 'update' : (action as ItemChange['action']);
-      const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase());
+      const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase().replace(/^(hand|held|손)$/, 'weapon')); // 손 칸 = hand (옛 weapon 도 받음, 사용자 2026-11-14)
       const uses = t.uses === undefined || t.uses === null ? undefined : str(t.uses).trim() === '0' ? 0 : itemUses(t.uses);
       const cond = t.condition ? str(t.condition).trim().toLowerCase() : '';
       const icon = cleanIcon(t.icon);

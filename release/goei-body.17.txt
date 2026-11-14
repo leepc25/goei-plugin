@@ -1,4 +1,32 @@
-ground: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
+or: default; }
+.it-c.empty .it-ic { background: none; }
+.it-c.sel { border-color: var(--signal); }
+.it-c.over { border-color: var(--danger); }
+.it-c:not(.empty):hover { background: color-mix(in srgb, var(--signal) 6%, var(--panel)); }
+/* PC: 칸에 마우스를 올리면 설명 말풍선 (누르면 팝업) */
+.it-tip { display: none; position: absolute; left: calc(100% + 8px); top: 0; z-index: 6; width: 240px; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 12px; background: var(--void); color: var(--text); text-align: left; box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .8); pointer-events: none; }
+.it-c:nth-child(8n) .it-tip, .it-c:nth-child(8n-1) .it-tip, .it-c:nth-child(8n-2) .it-tip { left: auto; right: calc(100% + 8px); }
+.it-tip b { display: block; font-size: 14px; }
+.it-tip small { display: block; color: var(--dim); font-size: 11.5px; }
+.it-tip p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--sub); }
+.it-tip .ef { color: var(--text); }
+/* 칸 안의 설명은 내용만 들고 보이지 않는다. 보여 주기는 .it-tipfloat (app.ts showTip, 2026-11-08 사용자: 잘림·스크롤 움찔) */
+.it-tipfloat { display: none; position: fixed; z-index: 60; width: 240px; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 12px; background: var(--void); color: var(--text); text-align: left; box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .8); pointer-events: none; }
+.it-tipfloat.on { display: block; }
+.it-tipfloat b { display: block; font-size: 14px; }
+.it-tipfloat small { display: block; color: var(--dim); font-size: 11.5px; }
+.it-tipfloat p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--sub); }
+.it-tipfloat .ef { color: var(--text); }
+.it-tipfloat .sh-amt { display: block; margin-top: 8px; }
+.it-log ul { list-style: none; margin: 0; padding: 0; } /* ul 기본 들여쓰기 없음 (2026-11-07 사용자) */
+.it-logchips { margin-bottom: 2px; }
+.it-logchips .gx-chip small { margin-left: 2px; font-size: 11px; color: var(--dim); }
+.it-what { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; vertical-align: 1px; }
+.it-what.get { color: var(--signal); background: color-mix(in srgb, var(--signal) 14%, var(--panel2)); }
+.it-what.out { color: var(--sub); background: var(--panel2); }
+.it-log .gx-wt-row { grid-template-columns: minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.it-log .gx-wt-main { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 14px 8px 10px; cursor: default; }
+.it-log .it-ic { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-log .it-ic svg { width: 26px; height: 26px; }
 .it-log .it-ic img { width: 42.5px; height: 42.5px; object-fit: contain; image-rendering: pixelated; } /* 원본 85px 의 꼭 절반 (2026-11-07 사용자) */
 /* 팝업 */
@@ -43,7 +71,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-slot .it-ic { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-slot .it-ic svg { width: 56%; height: 56%; }
 .it-slot .it-ic img { width: min(85px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; }
-/* 무기 칸만 색이 다름 (호박색), 빈 칸은 기호(칼·방패)로 갈래 */
+/* 손 칸만 색이 다름 (호박색), 빈 칸은 기호(손·방패)로 갈래 (사용자 2026-11-14: 무기 칸 → 손 칸) */
 .it-slot.it-s-weapon { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 7%, var(--panel)); }
 .it-slot.it-s-weapon .it-ic { background: color-mix(in srgb, var(--amber) 6%, color-mix(in srgb, var(--void) 60%, var(--panel))); }
 .it-slot.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
@@ -91,6 +119,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 버리기 띠: 격자 위에 뜬다 — 격자 줄 수와 상관없이 같은 높이, 아래 줄 칸을 집기 어렵지 않게 적당히 (2026-11-08 사용자) */
 .it-dragging .it-trash { position: absolute; left: 4px; right: 4px; bottom: 8px; z-index: 7; display: flex; align-items: center; justify-content: center; gap: 8px; height: 72px; box-sizing: border-box; border: 1px dashed color-mix(in srgb, var(--danger) 70%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--danger) 16%, var(--void)); color: color-mix(in srgb, var(--danger) 75%, var(--text)); font-size: 13.5px; font-weight: 700; }
 .it-dragging .it-trash svg { width: 16px; height: 16px; }
+/* 끄는 동안: 놓을 수 있는 칸은 밝게, 못 놓는 칸은 흐리게 (사용자 2026-11-14) */
+.it-dragging .it-can { border-color: var(--signal); border-style: solid; background: color-mix(in srgb, var(--signal) 12%, var(--panel)); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 40%, transparent); }
+.it-dragging .it-can .it-ic { color: var(--signal); }
+.it-dragging .it-cant { opacity: .28; filter: grayscale(1); }
 .it-dragging .it-trash.it-over-ok { outline: 0; background: color-mix(in srgb, var(--danger) 30%, var(--void)); border-style: solid; }
 .it-card p.bad { color: var(--danger); font-size: 12.5px; }
 .it-form label.it-chk > span:last-child { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
@@ -2098,68 +2130,4 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
         box3.style.opacity = String(1 - d / 400);
       }
     }, { passive: true });
-    const end = (e) => {
-      if (mode2 !== "back") return void (mode2 = "off");
-      mode2 = "off";
-      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-      const run6 = dx * sign >= FIRE ? act2 : null;
-      act2 = null;
-      reset(!run6);
-      run6?.();
-    };
-    root3.addEventListener("touchend", end, { passive: true });
-    root3.addEventListener("touchcancel", () => {
-      mode2 = "off";
-      reset(true);
-    }, { passive: true });
-  }
-
-  // src/ui/mapzoom.ts
-  var MAX = 4;
-  var MOVE = 6;
-  var views = /* @__PURE__ */ new Map();
-  function mapZoomControls(nation = false) {
-    return `<div class="gx-zoom" aria-label="지도 확대">
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
-      <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
-      ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
-    </div>`;
-  }
-  function clamp3(v, cw, ch, lw, lh) {
-    const z = Math.min(MAX, Math.max(1, v.z));
-    const fit = (p2, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p2));
-    return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
-  }
-  var hit3 = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
-  var box2 = (el) => {
-    const r = el.getBoundingClientRect();
-    return { l: r.left, t: r.top, r: r.right, b: r.bottom };
-  };
-  var rank2 = (el) => el.classList.contains("sel") ? 0 : /\bhot/.test(el.className) ? 1 : 2;
-  function declutter(layer, frame, z) {
-    const labs = [...layer.querySelectorAll(".gx-pin.gx-plab")];
-    const dots = [...layer.querySelectorAll(".gx-pin.gx-pdot")];
-    if (!labs.length) return;
-    for (const el of labs) el.style.removeProperty("--lx"), el.style.removeProperty("--ly");
-    const F = box2(frame);
-    const inFrame = (r) => r.l >= F.l && r.r <= F.r && r.t >= F.t && r.b <= F.b;
-    const dotBox = dots.map((d) => {
-      const dot2 = d.querySelector(".gx-dot");
-      return dot2 ? box2(dot2) : null;
-    });
-    const order2 = labs.map((el, i) => ({ el, i })).sort((a, b) => rank2(a.el) - rank2(b.el) || a.i - b.i);
-    const placed = [...frame.querySelectorAll(".gx-zbtn")].map(box2);
-    for (const { el, i } of order2) {
-      const name = el.querySelector(".gx-pname");
-      const D = dotBox[i];
-      if (!name || !D) continue;
-      const N2 = box2(name);
-      const w = N2.r - N2.l, h = N2.b - N2.t, my = (D.t + D.b) / 2 - h / 2;
-      const up = D.t - 2 - h, dn = D.b + 2, rt = D.r + 1, lt = D.l - 1 - w;
-      const spots = [[N2.l, N2.t], [N2.l, up], [D.r + 3, my], [D.l - 3 - w, my], [rt, up], [lt, up], [rt, dn], [lt, dn]];
-      const free = (r) => !placed.some((p2) => hit3(p2, r)) && !dotBox.some((d2, j) => j !== i && d2 && hit3(d2, r));
-      let at = -1;
-      spots.some(([l, t], k) => {
-        const r = { l, t, r: l + w, b: t + h };
-        if ((k === 0 || inFrame(r)) && (rank2(el
+    const end = 

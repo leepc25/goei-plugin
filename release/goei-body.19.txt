@@ -1,0 +1,52 @@
+void openWiki2(title2));
+    setRecordsOpener((id2) => void openRecords2(id2));
+    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
+    setShopOpener((site) => void openShop(site));
+    let stopWatcher = null;
+    let fab = null;
+    try {
+      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
+      const f = fab;
+      void f.setTheme(currentTheme());
+      onThemeChange((t) => void f.setTheme(t).catch(() => {
+      }));
+      try {
+        prog = await createProgWin();
+        const pw = prog;
+        void pw.setTheme(currentTheme());
+        onThemeChange((t) => void pw.setTheme(t).catch(() => {
+        }));
+      } catch (error) {
+        console.log(`[goei] 호출 진행 창을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+        prog = null;
+      }
+      stopWatcher = startWatcher(fab);
+      lap("유령 단추 붙임");
+    } catch (error) {
+      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      fab = null;
+      stopWatcher = startWatcher(null);
+      await risuai.registerButton({ name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` }, () => void openApp({ quietIfNotLite: true })).catch((e) => console.log(`[goei] 채팅 메뉴 단추를 두지 못했어요: ${e instanceof Error ? e.message : String(e)}`));
+    }
+    return {
+      beforeRequest: onBeforeRequest,
+      sanitize,
+      input: onInput,
+      output: onOutput,
+      display: onDisplay,
+      install: () => openInstall(),
+      unload: async () => {
+        stopWatcher?.();
+        await fab?.remove().catch(() => {
+        });
+        await prog?.remove().catch(() => {
+        });
+        prog = null;
+        progKey = "";
+      }
+    };
+  }
+
+  // src/body-entry.ts
+  globalThis.__goeiBody = { version: "0.21.13", start: start2 };
+})();

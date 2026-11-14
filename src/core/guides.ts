@@ -68,7 +68,9 @@ const boardGuide = (style: 'net' | 'gal' | 'wpf') => pickStyle(gnetBase.replace(
 function salmonGuide(): string {
   return boardGuide('gal')
     .replace(/^괴담갤 \(괴담 갤러리\) is a completely civilian[^\n]*$/m, SALMON_ABOUT)
-    .replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS);
+    .replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS)
+    // 괴담갤에서 물려받은 DC 말투 기본 문장은 거래 게시판과 맞지 않아 뺀다 (사용자 2026-11-14)
+    .replace('Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', '');
 }
 const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services, all listed in the same plain resale tone. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
 const SALMON_TOPICS = 'Each post is a listing whose tag is exactly one of 팝니다 (selling), 삽니다 (buying), 나눔 (giving away) or 정보 (occult information). Start the title with the plain name of the one item being sold or sought (e.g. 「업소용 튀김기 팝니다」, 「방검복 구합니다」) so the app can show its picture; put district, condition and extras in the body, not the title. Give the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.';
@@ -209,8 +211,9 @@ const DEFAULTS: Record<GuideName, string> = {
   Tag: tag.replace(/\r/g, ''),
   Shop: dropSections(shop.replace(/\r/g, ''), MALL_ONLY),
   // 우주 쇼핑몰은 흥정하지 않는다: 대화 절의 흥정 문장만 뺀다 (전수검사 11-13)
-  Cos: mallGuide(COS_COMMON, SHOP_ONLY).replace(" Haggling: the owner may refuse, counter, or accept; accept only when it makes sense for this owner, and then change that item's price: a lower figure, or another payment the owner agrees to take instead, written in words.", ''),
-  Bm: mallGuide(BM_COMMON, [...SHOP_ONLY, ...BM_UNUSED]),
+  // 「실제 한국 물가처럼」(PRICE_DEFAULT)은 일반 상점에만 (사용자 2026-11-14: 우주몰·포인트몰 값 규칙과 부딪침)
+  Cos: mallGuide(COS_COMMON, [...SHOP_ONLY, 'PRICE_DEFAULT']).replace(" Haggling: the owner may refuse, counter, or accept; accept only when it makes sense for this owner, and then change that item's price: a lower figure, or another payment the owner agrees to take instead, written in words.", ''),
+  Bm: mallGuide(BM_COMMON, [...SHOP_ONLY, ...BM_UNUSED, 'PRICE_DEFAULT']),
   BmDesk: bmdesk.replace(/\r/g, ''),
   Hs: hsGuide(),
   Updater: updater.replace(/\r/g, ''),

@@ -1,4 +1,4 @@
-// 소지품 위쪽 띠 (2026-11-12 사용자): 장착 8칸(무기 2 · 장비 6), PC [아바타 256 | 장착 4열×2줄 칸 97 | 사용 칸], 아바타·장착 묶음에 끌어 놓기,
+// 소지품 위쪽 띠 (2026-11-12 사용자): 장착 8칸(손 2 · 장비 6, 사용자 2026-11-14: 무기 칸 → 손 칸), PC [아바타 256 | 장착 4열×2줄 칸 97 | 사용 칸], 아바타·장착 묶음에 끌어 놓기,
 // 폰 [아바타 | 장착 2열×4줄 칸 59] · 사용 칸 없음 · 장착 칸 무게 글자 숨김 · 누르면 「사용」/「사용 취소」, 상점 팔기 화면의 8칸.
 // 사용법: node tests/equip8-browser.mjs [out-dir]   (PART=layout,drag,phone,sell 로 절 고르기)
 import { mkdirSync } from 'node:fs';
@@ -134,11 +134,11 @@ if (PART.includes('drag')) {
   await drag(cell('i_boot'), '[data-drop="equip:gear:4"]');
   const s5 = await stateOf(page);
   if (s5.slots.i_boot !== 'gear:4') bad(`[drag] 칸에 직접 놓기(장비 5번째 칸): ${JSON.stringify(s5.slots)}`);
-  // 쓰는 물건(장착 아님)을 빈 무기 칸 위에 놓으면 = 장착 묶음에 놓은 것 → 사용 예정
+  // 손 칸에는 아무 물건이나 (사용자 2026-11-14): 쓰는 물건(장착 갈래 없음)을 빈 손 칸 위에 놓으면 그 손 칸에 든다. 사용 예정에는 안 들어간다
   await drag(cell('i_light'), '[data-drop="equip:weapon:1"]');
   const s6 = await stateOf(page);
-  if (!s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 쓰는 물건을 칸 위에: ${JSON.stringify(s6.use)}`);
-  if (JSON.stringify(s6.slots) !== JSON.stringify(s5.slots)) bad(`[drag] 쓰는 물건이 칸에 들어감 ${JSON.stringify(s6.slots)}`);
+  if (s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 손 칸에 놓은 물건이 사용 예정에: ${JSON.stringify(s6.use)}`);
+  if (!String(s6.slots.i_light ?? '').endsWith(':1')) bad(`[drag] 손 칸에 안 들어감 ${JSON.stringify(s6.slots)}`);
   // 쓰지도 장착하지도 않는 물건 → 아바타 = 아무 일 없음
   await drag(cell('i_pouch'), '.gx-items .it-av');
   const s7 = await stateOf(page);

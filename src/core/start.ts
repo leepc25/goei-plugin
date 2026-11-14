@@ -149,7 +149,7 @@ export function planStart(
       $seed_lore: seed.text,
       $seed_inputs: '0',
       $goei_last: '',
-      // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
+      // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 손에 드는 것은 손 칸, 장비는 장착 (모델 호출 없음, 11-07 사용자; 손 칸은 사용자 2026-11-14). 페르소나는 빈 소지품
       ...startItemsVars(startItems && choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
       // 소지 한도 (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」, 페르소나·값 없는 인물은 설정 값
       ...startCarryVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.carry : undefined),

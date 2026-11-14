@@ -1,4 +1,38 @@
-lex; align-items: center; gap: 6px; flex: none; }
+idth: 760px), (max-height: 499px) and (pointer: coarse) { .gx-zbtn { width: 40px; height: 40px; } }
+
+/* v0.15 왼쪽 위 간이 상태창 */
+
+/* 설정 → 업데이트 */
+.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
+.upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
+.upd-ver b { color: var(--signal); }
+.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
+.upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
+.upd-plan small { color: var(--dim); }
+.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
+.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
+.upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
+.upd-banner-t b { color: var(--text); margin-right: 4px; }
+.upd-banner-b { display: flex; gap: 6px; flex: none; }
+.gx-x { position: relative; }
+.gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
+
+/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
+.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
+.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
+.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
+.gx-team .gx-note { margin-top: 0; }
+/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
+.gx-team .gx-note textarea { min-height: 0; }
+.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
+.gx-notice { margin: 12px 20px 0; }
+/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
+.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
+.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
+.gx-scard .gx-ava svg { width: 26px; height: 26px; }
+.gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
 .gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
 .gx-scard-step .gx-step { width: var(--ctl-sm); height: var(--ctl-sm); border-radius: 8px; color: var(--text); }
 .gx-acard.pick.gx-scard.on { border-color: var(--signal); }
@@ -2048,32 +2082,4 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-ph .it-ic img, .it-pickrow .it-ic img { width: 42.5px; height: 42.5px; max-width: 90%; max-height: 90%; object-fit: contain; image-rendering: pixelated; } /* 원본의 절반 */
 .it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
 .it-c b { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: calc(12.5px * 1.2 * 2 + 5px); padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; word-break: break-all; } /* 이름 두 줄까지, 그 뒤 생략, 높이는 늘 두 줄 */
-.it-c.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
-.it-c.empty .it-ic { background: none; }
-.it-c.sel { border-color: var(--signal); }
-.it-c.over { border-color: var(--danger); }
-.it-c:not(.empty):hover { background: color-mix(in srgb, var(--signal) 6%, var(--panel)); }
-/* PC: 칸에 마우스를 올리면 설명 말풍선 (누르면 팝업) */
-.it-tip { display: none; position: absolute; left: calc(100% + 8px); top: 0; z-index: 6; width: 240px; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 12px; background: var(--void); color: var(--text); text-align: left; box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .8); pointer-events: none; }
-.it-c:nth-child(8n) .it-tip, .it-c:nth-child(8n-1) .it-tip, .it-c:nth-child(8n-2) .it-tip { left: auto; right: calc(100% + 8px); }
-.it-tip b { display: block; font-size: 14px; }
-.it-tip small { display: block; color: var(--dim); font-size: 11.5px; }
-.it-tip p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--sub); }
-.it-tip .ef { color: var(--text); }
-/* 칸 안의 설명은 내용만 들고 보이지 않는다. 보여 주기는 .it-tipfloat (app.ts showTip, 2026-11-08 사용자: 잘림·스크롤 움찔) */
-.it-tipfloat { display: none; position: fixed; z-index: 60; width: 240px; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 12px; background: var(--void); color: var(--text); text-align: left; box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .8); pointer-events: none; }
-.it-tipfloat.on { display: block; }
-.it-tipfloat b { display: block; font-size: 14px; }
-.it-tipfloat small { display: block; color: var(--dim); font-size: 11.5px; }
-.it-tipfloat p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--sub); }
-.it-tipfloat .ef { color: var(--text); }
-.it-tipfloat .sh-amt { display: block; margin-top: 8px; }
-.it-log ul { list-style: none; margin: 0; padding: 0; } /* ul 기본 들여쓰기 없음 (2026-11-07 사용자) */
-.it-logchips { margin-bottom: 2px; }
-.it-logchips .gx-chip small { margin-left: 2px; font-size: 11px; color: var(--dim); }
-.it-what { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; vertical-align: 1px; }
-.it-what.get { color: var(--signal); background: color-mix(in srgb, var(--signal) 14%, var(--panel2)); }
-.it-what.out { color: var(--sub); background: var(--panel2); }
-.it-log .gx-wt-row { grid-template-columns: minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.it-log .gx-wt-main { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 14px 8px 10px; cursor: default; }
-.it-log .it-ic { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; back
+.it-c.empty { background: none; border-style: dashed; border-color: var(--line2); curs

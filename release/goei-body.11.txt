@@ -1,4 +1,46 @@
-  await risuai.pluginStorage.setItem(SKIP_KEY, skipped).catch(() => {
+뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
+    ));
+    let actions = `<button class="gx-mini" data-action="upd-check" ${busy6 ? "disabled" : ""}>${busy6 && !updateUi.payload ? esc21(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
+    if (cardNew && !needPlugin) {
+      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy6 ? "disabled" : ""}>${busy6 ? esc21(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy6 ? "disabled" : ""}>카드 업데이트 준비</button>`;
+    }
+    const plan = updateUi.plan;
+    const pics2 = updateUi.pics;
+    const summary = plan ? `<ul class="upd-plan">
+        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc21(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
+        <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
+        <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
+        ${pics2?.get.length || pics2?.drop.length ? `<li>카드 사진: 바뀜 ${pics2.replaced} · 새로 ${pics2.added}${pics2.drop.length ? ` · 지움 ${pics2.drop.length}` : ""} <small>(약 ${mb(pics2.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ""}
+      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>` : "";
+    return section2(rows3.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc21(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc21(updateUi.done)}</p>` : ""));
+  }
+  var mb = (n3) => n3 >= 1e6 ? `${(n3 / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n3 / 1e3))}KB`;
+  function section2(body5) {
+    return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body5}</div></section>`;
+  }
+  var FIELD_NAMES = {
+    characterVersion: "캐릭터 버전",
+    firstMessage: "첫 안내",
+    alternateGreetings: "첫 장면",
+    creatorNotes: "제작 노트",
+    desc: "설명",
+    personality: "성격",
+    scenario: "시나리오",
+    exampleMessage: "예시 대화",
+    systemPrompt: "시스템 프롬프트",
+    postHistoryInstructions: "탈옥 프롬프트",
+    backgroundHTML: "배경 HTML",
+    lowLevelAccess: "저수준 접근",
+    virtualscript: "가상 스크립트",
+    triggerscript: "트리거"
+  };
+  var fieldName = (f) => FIELD_NAMES[f] ?? f;
+  async function handleUpdate(action, ctx2, env3) {
+    if (!action.startsWith("upd-")) return false;
+    if (updateUi.busy) return true;
+    if (action === "upd-skip") {
+      skipped = skipKey(newVersions(ctx2));
+      await risuai.pluginStorage.setItem(SKIP_KEY, skipped).catch(() => {
       });
       env3.render();
       return true;
@@ -903,7 +945,7 @@
     ${photoBlock(a.lore, ctx2)}
     ${input2(k("aliases"), a.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
     ${input2(k("carry"), a.carry ? String(a.carry) : "", "소지 한도(kg)", "이 인물로 시작하면 이 무게가 소지 한도예요. 비우면 설정 「소지 한도」를 써요")}
-    ${area2(k("items"), startItemsText(a.startItems ?? []), "시작 소지품", `이 인물로 시작하면 소지품에 넣고 무기·장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
+    ${area2(k("items"), startItemsText(a.startItems ?? []), "시작 소지품", `이 인물로 시작하면 소지품에 넣고 손에 드는 것은 손 칸, 장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
     <p class="gx-muted">로어북: ${esc26(a.lore)} · ID ${esc26(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
   </div>`;
   }
@@ -2859,40 +2901,4 @@
   .gw .fl-bar > i { display: none; }
   .gw .fl .ps-rows.fl-ph { background: none; border: 0; box-shadow: none; padding: 0; flex-direction: column; gap: 8px; }
   .gw .fl .ps-rows.fl-ph > .flc { border: 1px solid var(--line); }
-  .gw .flc { display: flex; flex-direction: column; gap: 6px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
-  .gw .flc.sub { margin-left: 18px; position: relative; }
-  .gw .flc.sub::before { content: ''; position: absolute; left: -13px; top: -9px; width: 9px; height: 34px; border-left: 1.5px solid var(--gline); border-bottom: 1.5px solid var(--gline); }
-  .gw .flc.sub { margin-top: -4px; }
-  .gw .flc-top { display: flex; align-items: center; gap: 8px; min-height: 34px; }
-  .gw .flc-nm { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; flex: 1 1 auto; min-width: 0; }
-  .gw .flc-calls { font-size: 12.5px; line-height: 1.35; color: var(--dim); }
-  .gw .flc.on .flc-calls { color: var(--text); }
-  .gw .flc-num { margin-top: -4px; font-size: 12.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
-  .gw .flc-num b { font-weight: 600; color: var(--text); }
-  /* 조작 줄 (전수점검 B1): 조작 하나에 한 줄, 카드 안쪽 왼쪽 끝에서 시작. 격자 줄(.row)만 두 조작을 한 줄에 */
-  .gw .flc-sw { display: inline-flex; align-items: center; flex: none; }
-  .gw .flc-top > .fl-go { flex: none; }
-  .gw .flc-top > span.fl-go { width: 59px; height: 1px; }
-  .gw .flc-side { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-  .gw .flc-side.row { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-  .gw .flc-c { display: flex; align-items: center; gap: 8px; min-height: 34px; min-width: 0; max-width: 100%; }
-  .gw .flc-c > .gx-segs { display: flex; min-width: 0; }
-  .gw .flc-c > .gx-segs > .gx-seg { flex: 0 1 auto; white-space: nowrap; }
-  .gw .flc-c .fl-help { margin: 0; }
-}
-/* 본문 칸이 한 줄(약 930px)보다 좁으면 (노트북 1280·1366, AI 상담을 연 창, 창 폭을 줄인 경우) PC 줄이 오른쪽에서 잘렸다 → 폰과 같은 카드로 (전수검사 11-13, 사용자 승인).
-   1002 = 줄 932(테두리 포함) + .gw-page 좌우 48 + .fl-page 오른쪽 22. 둘 중 하나가 바뀌면 다시 셈. 위 폰 규칙을 그대로 옮긴 것 (@media 와 @container 는 규칙을 나눠 쓸 수 없다) */
-@container (max-width: 1001px) {
-  .gw .fl-pc { display: none; }
-  .gw .fl-ph { display: flex; }
-  /* 폰: 오른쪽 숫자 칸은 왼쪽 두 줄(메인 + 보조 = 합)에 이미 있어 숨긴다. 글이 한 줄씩 들어가게 */
-  .gw .fl-bar { position: static; grid-template-columns: minmax(0, 1fr); padding: 8px 11px; margin-bottom: 14px; }
-  .gw .fl-bar > p { font-size: 12.5px; line-height: 1.35; }
-  .gw .fl-bar > div { display: none; }
-  .gw .fl-bar > div > span { font-size: 11.5px; }
-  .gw .fl-bar > div > b { font-size: 14px; }
-  .gw .fl-bar > i { display: none; }
-  .gw .fl .ps-rows.fl-ph { background: none; border: 0; box-shadow: none; padding: 0; flex-direction: column; gap: 8px; }
-  .gw .fl .ps-rows.fl-ph > .flc { border: 1px solid var(--line); }
-  .gw .flc { display: flex; flex-direction: column; gap: 6px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
-  .
+  .gw .flc { display: flex; flex-direction: column; gap: 6px

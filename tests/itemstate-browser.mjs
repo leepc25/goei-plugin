@@ -126,20 +126,23 @@ for (const vp of ['pc', 'phone']) {
     assert.equal((await ss()).$it_left_words, '두고, 놓고, 보관해, 맡겨, 반납, 압수, 버리고, 잃어, 맡기고');
     await setInput(page, L, ''); await sleep(400);
     assert.ok(!(await ss()).$it_left_words, '비우면 기본값'); assert.equal(await val(L), '두고, 놓고, 보관해, 맡겨, 반납, 압수, 버리고, 잃어');
-    // 판정 표: 접혀 있다 → 펴서 한 칸 고침 → 저장 → 기본값으로
+    // 판정 표: 접혀 있다 → 기본 표는 비었다(모델이 지침대로, 사용자 2026-11-14) → 펴서 예외 줄 하나 추가 → 저장 → 기본값으로
     assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"]')?.open), false, '판정 표는 접혀 있다');
-    assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"] .adv-count')?.textContent), '14줄');
+    assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"] .adv-count')?.textContent), '0줄', '기본 판정 표는 비었다');
     await page.evaluate(() => { const d = document.querySelector('.gw details[data-keep="items-rules"]'); d.open = true; d.dispatchEvent(new Event('toggle')); d.scrollIntoView({ block: 'start' }); }); await sleep(300);
     await page.screenshot({ path: `${out}/${vp}_9_설정_판정표.png` });
     const cell = (k) => `.gw [data-change="set-items-rules-cell"][data-key="${k}"]`;
-    assert.deepEqual([await val(cell('12:a')), await val(cell('12:b'))], ['도구', '사용']);
-    await setInput(page, cell('12:b'), '장비·사용'); await sleep(400);
-    assert.ok(String((await ss()).$it_rules).includes('도구 → 장비·사용'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
+    await page.evaluate(() => document.querySelector('.gw [data-action="set-items-rules-add"]')?.click()); await sleep(400);
+    await setInput(page, cell('0:a'), '망치'); await sleep(400);
+    await setInput(page, cell('0:b'), '손'); await sleep(400);
+    assert.deepEqual([await val(cell('0:a')), await val(cell('0:b'))], ['망치', '손']);
+    assert.ok(String((await ss()).$it_rules).includes('망치 → 손'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
+    assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"] .ms-tb-r.bad')), null, `[${vp}] 「손」 줄은 쓰이는 줄`);
+    // 조작 높이 34px (예외 줄 하나가 있을 때: 말 칸 2 · 표 칸 2 · 지우기 · 추가 · 기본값으로) · 가로 넘침 없음
+    const hs = await page.evaluate(() => [...document.querySelectorAll('.gw [data-change="set-items-left-words"], .gw [data-change="set-items-off-words"], .gw details[data-keep="items-rules"] input, .gw details[data-keep="items-rules"] .gx-mini')].map((e) => Math.round(e.getBoundingClientRect().height * 10) / 10).filter((h) => h > 0));
+    assert.ok(hs.length >= 7 && hs.every((h) => Math.abs(h - 34) <= 0.6), `[${vp}] 조작 높이: ${[...new Set(hs)]}`);
     await page.evaluate(() => document.querySelector('.gw [data-action="set-items-rules-reset"]')?.click()); await sleep(400);
     assert.ok(!(await ss()).$it_rules, '기본값으로');
-    // 조작 높이 34px · 가로 넘침 없음
-    const hs = await page.evaluate(() => [...document.querySelectorAll('.gw [data-change="set-items-left-words"], .gw [data-change="set-items-off-words"], .gw details[data-keep="items-rules"] input, .gw details[data-keep="items-rules"] .gx-mini')].map((e) => Math.round(e.getBoundingClientRect().height * 10) / 10).filter((h) => h > 0));
-    assert.ok(hs.length > 10 && hs.every((h) => Math.abs(h - 34) <= 0.6), `[${vp}] 조작 높이: ${[...new Set(hs)]}`);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, '가로 넘침 없음');
     await page.evaluate(() => document.querySelector('.gw [data-change="set-items-left-words"]')?.scrollIntoView({ block: 'center' })); await sleep(300);
     await page.screenshot({ path: `${out}/${vp}_10_설정_말.png` });
@@ -150,8 +153,8 @@ for (const vp of ['pc', 'phone']) {
   if (before) continue;
   const P = JSON.parse(distPack('goei-data-items'));
   const fileOf = (name) => P.table.find((r) => r.k[0] === name)?.f;
-  // 손전등 갈래: 기기 → 사용 (전수검사 11-13 승인: 도구·기기는 사용만)
-  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
+  // 손전등 갈래: 기본 표는 비어 모델 값(usable, equip 없음) 그대로 → 사용, 손 칸에는 아무 물건이나 들 수 있어 「들기」도 (사용자 2026-11-14)
+  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착') && torch.btns.includes('들기'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
   // 정장 사례: 격자·장착 칸에서 빠지고 무게가 줄고, 기록에 「없어짐 · 두고 옴」
   assert.ok(v1.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 처음엔 장착 칸에`);
   assert.ok(!v2.grid.includes('사내용 정장 세트') && !v2.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 정장이 소지품에서 빠짐: ${JSON.stringify(v2)}`);
@@ -165,7 +168,7 @@ for (const vp of ['pc', 'phone']) {
   assert.ok(!v3.grid.includes('손전등'), `[${vp}] 버린 뒤 격자: ${v3.grid}`);
   assert.deepEqual(result[vp].same.includes('손전등'), false, `[${vp}] 같은 응답 근거로는 안 되살아남`);
   assert.ok(v4.grid.includes('손전등'), `[${vp}] 다시 주움: ${v4.grid}`);
-  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
+  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착') && torch2.btns.includes('들기'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
   assert.equal(again.list.filter((e) => e.name === '손전등').length, 1, '새 줄이 생기지 않음');
   assert.equal(await Promise.resolve(errorsAll.length), 0, errorsAll.join('\n'));
 }

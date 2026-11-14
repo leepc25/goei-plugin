@@ -395,7 +395,7 @@ export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string 
     ${photoBlock(a.lore, ctx)}
     ${input(k('aliases'), a.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
     ${input(k('carry'), a.carry ? String(a.carry) : '', '소지 한도(kg)', '이 인물로 시작하면 이 무게가 소지 한도예요. 비우면 설정 「소지 한도」를 써요')}
-    ${area(k('items'), startItemsText(a.startItems ?? []), '시작 소지품', `이 인물로 시작하면 소지품에 넣고 무기·장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
+    ${area(k('items'), startItemsText(a.startItems ?? []), '시작 소지품', `이 인물로 시작하면 소지품에 넣고 손에 드는 것은 손 칸, 장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
     <p class="gx-muted">로어북: ${esc(a.lore)} · ID ${esc(a.id)}${a.inFolder ? '' : ' (폴더 밖)'}</p>
   </div>`;
 }

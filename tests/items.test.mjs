@@ -2,8 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  addItem, addUse, equipItem, equippedOf, gridItems, itemLeft, itemsBlock, liveItems, mergeItems, parseTraits, readItemUse, readItems, removeItem, itemSlots, itemUseVars, itemsVars, searchItems,
-  setItemLeft, traitsText, unequipItem, updateItem, ITEM_SLOTS_DEFAULT,
+  addItem, addUse, equipItem, equippedOf, isEquipped, gridItems, itemLeft, itemsBlock, liveItems, mergeItems, parseTraits, readItemUse, readItems, removeItem, itemSlots, itemUseVars, itemsVars, searchItems,
+  setItemLeft, traitsText, unequipItem, updateItem, ITEM_SLOTS_DEFAULT, itemLine, setItemRules, ITEM_RULES_DEFAULT,
   canMerge, mergedNow, itemWeight, weightText, totalWeight, itemCarry, itemEditOn, ITEM_CARRY_DEFAULT,
 } from '../dist-test/core.mjs';
 
@@ -43,8 +43,22 @@ test('쓰임 글 읽기·쓰기', () => {
   assert.deepEqual(parseTraits('소모3'), { use: true, uses: 3 });
   assert.deepEqual(parseTraits('무기, 소모'), { use: true, uses: 1, equip: 'weapon' }, '숫자 없는 소모는 1');
   assert.deepEqual(parseTraits('-'), { use: false });
-  assert.equal(traitsText({ use: true, uses: 3, equip: 'weapon' }), '무기·소모3');
+  assert.equal(traitsText({ use: true, uses: 3, equip: 'weapon' }), '손·소모3', '손 칸은 「손」으로 쓴다 (사용자 2026-11-14)');
   assert.equal(traitsText({ use: false }), '-');
+});
+
+test('손 칸 (사용자 2026-11-14): 「손」 글은 손 칸, 기본 판정 표는 비어 모델이 손으로 정한 망치가 그대로, 본편 글은 in hand·worn', () => {
+  assert.deepEqual(parseTraits('손'), { use: false, equip: 'weapon' });
+  assert.deepEqual(parseTraits('hand·사용'), { use: true, equip: 'weapon' });
+  assert.deepEqual(parseTraits('무기'), { use: false, equip: 'weapon' }, '옛 글 「무기」도 손 칸');
+  assert.equal(ITEM_RULES_DEFAULT, '');
+  setItemRules(undefined);
+  const s = addItem(empty, alive, { name: '망치', use: true, equip: 'weapon', icon: '도구/망치/hammer', from: 'story', anchor: 'c1' });
+  assert.deepEqual([s.list[0].use, s.list[0].equip], [true, 'weapon'], '도구라도 모델이 손이라 하면 손');
+  const hand = { ...s.list[0], state: 'ok' };
+  assert.equal(itemLine(hand, undefined, true), '- 망치 [in hand]');
+  assert.equal(itemLine({ ...hand, name: '코트', equip: 'gear' }, undefined, true), '- 코트 [worn]');
+  assert.equal(itemLine(hand, undefined, false), '- 망치', '장착 안 했으면 표시 없음');
 });
 
 test('소모성: 사용 기록만큼 남은 횟수가 줄고 0이면 목록에서 빠진다. 기준 응답이 지워지면 돌아온다', () => {
@@ -83,7 +97,12 @@ test('장착: 빈 칸 첫 번째로, 칸을 주면 그 칸(있던 것은 격자�
   it = addItem(it, alive, { name: '열쇠', from: 'manual', anchor: '' });
   const [gun, knife] = it.list;
   assert.equal(gun.slot, 0);
-  assert.equal(equipItem(it, alive, it.list[3].id), it, '장착 갈래 없는 물건');
+  // 갈래 없는 물건도 손 칸에 든다 (held), 장비 칸에는 못 넣는다 (사용자 2026-11-14)
+  const keyHeld = equipItem(it, alive, it.list[3].id);
+  assert.deepEqual([keyHeld.list[3].slot, keyHeld.list[3].held, isEquipped(keyHeld.list[3], keyHeld.list)], [1, true, true], '열쇠 → 손 둘째 칸');
+  assert.equal(itemLine(keyHeld.list[3], undefined, true), '- 열쇠 [in hand]');
+  assert.equal(unequipItem(keyHeld, it.list[3].id).list[3].held, undefined, '해제하면 held 도 빠짐');
+  assert.equal(equipItem(it, alive, it.list[3].id, 0, 'gear'), it, '장비 아닌 물건은 장비 칸에 안 들어감');
   it = equipItem(it, alive, knife.id, 0);
   const eq = equippedOf(liveItems(it, alive));
   assert.equal(eq.weapon[0].name, '칼');
@@ -172,7 +191,7 @@ test('본편 글: 목록 전부(장착·남은 횟수·상태)·한계·이번 �
   it = addItem(it, alive, { name: '권총', equip: 'weapon', use: true, from: 'manual', anchor: '', wear: true });
   const text = itemsBlock(it.list, { slots: 1, limit: '가방 하나', left: (e) => itemLeft(it, e, alive), use: [{ name: '소금 봉지', n: 2, after: 1 }], bought: ['손전등'] });
   assert.equal(text, [
-    '[Inventory] 2/1 (over the limit)', '- 소금 봉지 — 두 봉지 (괴이를 늦춤) [3 uses left]', '- 손전등 [broken, cannot be used]', '- 권총 [equipped weapon]',
+    '[Inventory] 2/1 (over the limit)', '- 소금 봉지 — 두 봉지 (괴이를 늦춤) [3 uses left]', '- 손전등 [broken, cannot be used]', '- 권총 [in hand]',
     'Carry limit: 가방 하나', 'This turn: uses 소금 봉지 ×2 (1 left after this); just bought 손전등; carrying more than the limit',
   ].join('\n'));
 });

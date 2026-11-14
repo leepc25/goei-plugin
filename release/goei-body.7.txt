@@ -1,4 +1,17 @@
-h - 1];
+== "any" || gm === "one" ? gm : "uniq",
+      tmode: tm === "even" || tm === "same" ? tm : "weight"
+    };
+  }
+  var rollChanged = (vars, site) => Object.values(rollKeys(site)).some((k) => String(vars?.[k] ?? "") !== "");
+  var rollPrice = (site, lo, hi) => site === "bm" ? `${lo.toLocaleString("en-US")}-${hi.toLocaleString("en-US")} p` : `₩${lo.toLocaleString("en-US")}-${hi.toLocaleString("en-US")}`;
+  var pickTier = (tiers, rnd) => {
+    const total = tiers.reduce((a, t) => a + t.w, 0);
+    let x = rnd() * total;
+    for (const t of tiers) {
+      x -= t.w;
+      if (x < 0) return t;
+    }
+    return tiers[tiers.length - 1];
   };
   var shuffle = (xs, rnd) => {
     const g2 = [...xs];
@@ -146,11 +159,13 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   };
   var clean6 = (s8, max) => String(s8 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
   function normItem(x) {
-    const { uses: u0, equip: e0, slot: s0, icon: i0, weight: w0, ...rest } = x;
+    const { uses: u0, equip: e0, slot: s0, held: h0, icon: i0, weight: w0, ...rest } = x;
     const uses = itemUses(u0);
     const weight = itemWeight(w0);
     const equip = itemEquip(e0);
-    const slot = equip && Number.isSafeInteger(s0) && s0 >= 0 && s0 < EQUIP_SLOTS[equip] ? s0 : void 0;
+    const kind = h0 === true ? "weapon" : equip;
+    const slot = kind && Number.isSafeInteger(s0) && s0 >= 0 && s0 < EQUIP_SLOTS[kind] ? s0 : void 0;
+    const held = h0 === true && slot !== void 0;
     const icon = cleanIcon(i0);
     return {
       ...rest,
@@ -161,6 +176,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
       ...uses ? { uses } : {},
       ...equip ? { equip } : {},
       ...slot !== void 0 ? { slot } : {},
+      ...held ? { held } : {},
       ...icon ? { icon } : {},
       ...weight !== void 0 ? { weight } : {}
     };
@@ -198,25 +214,38 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   var outItems = (it, alive) => it.list.filter((e) => isOut(e, alive) && (!e.anchor || alive.has(e.anchor)));
   function equippedOf(list4) {
     const out = { weapon: Array(EQUIP_SLOTS.weapon).fill(void 0), gear: Array(EQUIP_SLOTS.gear).fill(void 0) };
-    for (const e of list4) if (e.equip && e.slot !== void 0 && !out[e.equip][e.slot]) out[e.equip][e.slot] = e;
+    for (const e of list4) {
+      const k = slotKind(e);
+      if (k && e.slot !== void 0 && !out[k][e.slot]) out[k][e.slot] = e;
+    }
     return out;
   }
-  var isEquipped = (e, list4) => !!e.equip && e.slot !== void 0 && equippedOf(list4)[e.equip][e.slot]?.id === e.id;
+  var slotKind = (e) => e.held ? "weapon" : e.equip;
+  var isEquipped = (e, list4) => {
+    const k = slotKind(e);
+    return !!k && e.slot !== void 0 && equippedOf(list4)[k][e.slot]?.id === e.id;
+  };
   var gridItems = (list4) => list4.filter((e) => !isEquipped(e, list4));
-  function equipItem(it, alive, id2, slot) {
+  function equipItem(it, alive, id2, slot, kind) {
     const live = liveItems(it, alive);
     const cur = live.find((x) => x.id === id2);
-    if (!cur?.equip) return it;
-    const occ = equippedOf(live)[cur.equip];
-    const at = slot ?? occ.findIndex((x) => !x);
-    if (!Number.isSafeInteger(at) || at < 0 || at >= EQUIP_SLOTS[cur.equip]) return it;
+    if (!cur) return it;
+    const k = kind ?? cur.equip ?? "weapon";
+    if (k === "gear" && cur.equip !== "gear") return it;
+    const occ = equippedOf(live)[k];
+    const at = slot ?? occ.findIndex((x) => !x || x.id === id2);
+    if (!Number.isSafeInteger(at) || at < 0 || at >= EQUIP_SLOTS[k]) return it;
     const other = occ[at];
+    const held = k === "weapon" && cur.equip !== "weapon";
     return {
       ...it,
       list: it.list.map((x) => {
-        if (x.id === id2) return { ...x, slot: at };
+        if (x.id === id2) {
+          const { held: _h, ...base } = x;
+          return { ...base, slot: at, ...held ? { held: true } : {} };
+        }
         if (other && x.id === other.id && other.id !== id2) {
-          const { slot: _s, ...rest } = x;
+          const { slot: _s, held: _h, ...rest } = x;
           return rest;
         }
         return x;
@@ -226,7 +255,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   function unequipItem(it, id2) {
     const cur = it.list.find((x) => x.id === id2);
     if (!cur || cur.slot === void 0) return it;
-    const { slot: _s, ...rest } = cur;
+    const { slot: _s, held: _h, ...rest } = cur;
     return { ...it, list: it.list.map((x) => x.id === id2 ? rest : x) };
   }
   var liveItemsOf = (it, chat) => liveItems(it, aliveAnchors(chat));
@@ -252,7 +281,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     if (next.uses) next.use = true;
     if (p2.equip !== void 0) {
       const eq = itemEquip(p2.equip);
-      if (eq !== next.equip) delete next.slot;
+      if (eq !== next.equip && !next.held) delete next.slot;
       if (eq) next.equip = eq;
       else delete next.equip;
     }
@@ -412,7 +441,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     const note2 = what === "left" ? [`두고 옴${place3 ? `: ${place3}` : ""}`, logExtra.note].filter(Boolean).join(" · ") : logExtra.note;
     const log = { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what, by, anchor, ...logExtra.quote ? { quote: logExtra.quote } : {}, ...note2 ? { note: note2 } : {} };
     if (!how) return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id2) }, log);
-    const { slot: _s, backAt: _b, place: _p, outKey: _k, ...rest } = cur;
+    const { slot: _s, held: _h, backAt: _b, place: _p, outKey: _k, ...rest } = cur;
     const out = { ...rest, outHow: how, outAt: anchor, ...place3 ? { place: place3 } : {}, ...key ? { outKey: key } : {} };
     return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? out : x) }, log);
   }
@@ -423,7 +452,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   function sellItem(it, id2, anchor, note2) {
     const cur = it.list.find((x) => x.id === id2);
     if (!cur || !anchor) return it;
-    const { slot: _slot, ...rest } = cur;
+    const { slot: _slot, held: _held, ...rest } = cur;
     return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? { ...rest, soldAt: anchor } : x) }, { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what: "sell", by: "manual", anchor, ...note2 ? { note: note2 } : {} });
   }
   function canMerge(a, b) {
@@ -557,6 +586,10 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
       return [];
     });
   }
+  function droppedNow(it, lastAnchor) {
+    if (!lastAnchor) return [];
+    return it.list.filter((x) => x.outHow === "drop" && x.outKey === lastAnchor).map((x) => `threw ${x.name} away — the protagonist discarded it on purpose and no longer has it`);
+  }
   function soldNow(it, lastAnchor, skipPlace = "", passes) {
     if (!lastAnchor) return [];
     return it.log.filter((l) => l.what === "sell" && l.anchor === lastAnchor).flatMap((l) => {
@@ -573,7 +606,8 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   var boughtLine = (e) => e.paidWith ? `${e.name} (paid with ${e.paidWith}${e.price ? ` + ${e.price.toLocaleString("en-US")} won` : ""})` : e.name;
   function itemLine(e, left, equipped, detail = "full") {
     const tags = detail === "name" ? [] : [
-      equipped ? `equipped ${e.equip === "weapon" ? "weapon" : "gear"}` : "",
+      equipped ? slotKind(e) === "weapon" ? "in hand" : "worn" : "",
+      // 손 칸 = in hand, 장비 칸 = worn (사용자 2026-11-14)
       left === 0 ? "used up" : left !== void 0 ? `${left} use${left === 1 ? "" : "s"} left` : "",
       e.state === "damaged" ? "damaged" : e.state === "broken" ? "broken, cannot be used" : ""
     ].filter(Boolean);
@@ -691,7 +725,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
       left,
       use,
       bought: newlyBought(live, lastBotKey(chat)).filter((e) => e.store === "hs" ? hsBuyPasses(vars) : boughtPasses(vars, e.store)).map(boughtLine),
-      events: [...resumed ? [resumedEvent()] : [], ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...soldOff, ...shop ? shopEvents(chat) : []],
+      events: [...resumed ? [resumedEvent()] : [], ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...droppedNow(it, lastBotKey(chat)), ...soldOff, ...shop ? shopEvents(chat) : []],
       always: shop || resumed || soldOff.length > 0,
       detail: itemDetail(vars),
       recent: recentItemLog(chat, it, itemLogTurns(vars), vars)
@@ -752,7 +786,7 @@ ${guide}` : ""}` : "";
     const live = liveItems(it, alive);
     return live.map((e) => {
       const left = itemLeft(it, e, alive);
-      return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...left !== void 0 ? { left } : {}, ...e.weight !== void 0 ? { weight: e.weight } : {}, ...e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}, ...pictures2?.(e.name, e.icon)?.length ? { pictures: pictures2(e.name, e.icon) } : {} };
+      return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...left !== void 0 ? { left } : {}, ...e.weight !== void 0 ? { weight: e.weight } : {}, ...slotKind(e) ? { equip: isEquipped(e, live) ? slotKind(e) : e.equip, equipped: isEquipped(e, live) } : {}, ...pictures2?.(e.name, e.icon)?.length ? { pictures: pictures2(e.name, e.icon) } : {} };
     });
   }
   function itemsAwayOf(chat) {
@@ -3712,44 +3746,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
     box3.setAttribute("role", "dialog");
     box3.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
     const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box3.setAttribute("data-theme", theme);
-    box3.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-action]");
-      if (btn && act2 && box3.contains(btn)) {
-        box3.remove();
-        act2(btn.dataset.action, btn.dataset.value);
-        return;
-      }
-      if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
-      box3.remove();
-    });
-    document.body.appendChild(box3);
-  }
-
-  // src/core/josa.ts
-  function josa(word, withBatchim, without) {
-    const last2 = word.trim().slice(-1);
-    const code2 = last2.charCodeAt(0) - 44032;
-    if (!(code2 >= 0 && code2 <= 11171)) return `${word}${withBatchim}(${without})`;
-    return `${word}${code2 % 28 ? withBatchim : without}`;
-  }
-
-  // src/host/prefs.ts
-  var KEY = "goei:prefs";
-  async function loadPrefs() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY);
-      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
-    } catch (error) {
-      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      return getPrefs();
-    }
-  }
-  async function saveVarDefaults(prefixes, state2) {
-    const mine3 = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
-    await savePrefs((p2) => {
-      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state2 ?? {}), ...Object.keys(p2.vars ?? {})])].filter(mine3);
-      const vars = { ...p2.vars ?? {} };
-      for (const k of keys) {
-        const v = state2?.[k];
-        if (v === void 0 || v === null || v === "" || v === 
+    if (theme) box3.setAttribute("da

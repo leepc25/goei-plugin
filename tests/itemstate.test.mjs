@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   addItem, applyItemChanges, applyItemsPack, equipItem, equippedOf, gradeHits, gradeInQuote, inventoryText, isEquipped, itemLine, itemsBlock, itemsAwayOf, itemsNowOf, itemsVars, liveItems, matchItemIcon, movedNow, outItems,
-  parseItemRules, readItems, removeItem, setItemRules, stripGrades, totalWeight, traitsFor, itemPictureNames, formFamilies, ITEM_FORM_DEFAULT, ITEM_RULES_VAR, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_VAR,
+  parseItemRules, readItems, removeItem, setItemRules, stripGrades, totalWeight, traitsFor, itemPictureNames, formFamilies, ITEM_FORM_DEFAULT, ITEM_RULES_DEFAULT, ITEM_RULES_VAR, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_VAR,
 } from '../dist-test/core.mjs';
 import { itemsPackText } from '../scripts/data-pack.mjs';
 
@@ -127,9 +127,17 @@ test('다 쓴 소모품·상점 맞교환은 지금처럼 줄을 지운다', () 
   assert.equal(removeItem(s, s.list[0].id, 'sell', 'store').list.length, 0);
 });
 
-test('갈래 표: 종류 → 판정. 손전등(기기)은 사용, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
+test('갈래 표: 기본 표는 비어 모델 값 그대로. 사용자가 적은 표는 종류 → 판정, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
   setItemRules(undefined);
   const t = (icon, name, model = {}) => traitsFor(icon.split('/')[0] && { 옷: 'wear', 음식: 'food', 도구: 'tool', 기기: 'device', 의료: 'medical', 소모품: 'consumable', 부적: 'charm', 무기: 'weapon', 서류: 'paper', 귀중품: 'valuable', 열쇠: 'key', 봉인: 'seal', 괴이: 'anomaly', 잡동사니: 'misc', 성인: 'adult' }[icon.split('/')[0]], icon, name, model);
+  // 기본 표는 비었다: 어느 종류든 모델 값 (사용자 2026-11-14)
+  assert.equal(ITEM_RULES_DEFAULT, '');
+  assert.equal(t('기기/손전등/flashlight', '손전등', { use: true, equip: 'weapon' }), undefined, '기본 표 → 모델 값');
+  assert.equal(t('도구/망치/hammer', '망치', { use: true, equip: 'weapon' }), undefined);
+  assert.equal(t('옷/정장/suit', '정장', { use: true }), undefined);
+  // 사용자가 적은 표 (옛 기본 줄을 예외 줄로 적은 경우): 표대로
+  const OLD = ['옷 → 장비', '무기 → 손', '음식 → 소모1', '의료 → 소모1', '소모품 → 소모1', '열쇠 → 사용', '부적 → 사용', '봉인 → 사용', '서류 → -', '귀중품 → -', '잡동사니 → -', '괴이 → -', '도구 → 사용', '기기 → 사용'].join('\n');
+  setItemRules({ [ITEM_RULES_VAR]: OLD });
   assert.deepEqual(t('기기/손전등/flashlight', '손전등', { use: true }), { use: true });
   assert.deepEqual(t('도구/라이터/lighter', '라이터', { use: true }), { use: true });
   assert.deepEqual(t('기기/무전기/radio', '무전기'), { use: true });
@@ -146,20 +154,24 @@ test('갈래 표: 종류 → 판정. 손전등(기기)은 사용, 물건말 줄�
   assert.equal(t('성인/콘돔/condom', '콘돔', { use: true }), undefined, '표에 없는 종류 → 모델 값');
   assert.equal(traitsFor('', undefined, '녹음기', { use: true }), undefined, '종류를 모르면 모델 값');
   // 설정으로 고침: 물건말 줄
-  setItemRules({ [ITEM_RULES_VAR]: '기기 → 사용\n배터리 → 소모2\n우산 → 장비' });
+  setItemRules({ [ITEM_RULES_VAR]: '기기 → 사용\n배터리 → 소모2\n우산 → 장비\n망치 → 손' });
+  assert.deepEqual(t('도구/망치/hammer', '쇠 망치'), { use: false, equip: 'weapon' }, '오른쪽 「손」 = 손 칸');
   assert.deepEqual(t('기기/손전등/flashlight', '손전등'), { use: true });
   assert.deepEqual(t('기기/배터리/battery', 'AA 배터리'), { use: true, uses: 2 });
   assert.deepEqual(t('잡동사니/우산/umbrella', '검은 우산'), { use: false, equip: 'gear' });
   assert.equal(t('옷/정장/suit', '정장'), undefined, '고친 표에 없는 종류');
   setItemRules(undefined);
   assert.equal(parseItemRules('도구 → 뭐지\n → 장비\n칼 → 무기').words.size, 1, '판정 말이 없는 줄·빈 줄은 안 쓴다');
-  // 들어올 때: 본문·상점은 표, 직접은 적힌 대로
+  assert.deepEqual(parseItemRules('칼 → 손').words.get('칼'), { use: false, equip: 'weapon' }, '오른쪽 「손」도 손 칸');
+  // 들어올 때: 본문·상점은 표, 직접은 적힌 대로 (사용자가 적은 표)
+  setItemRules({ [ITEM_RULES_VAR]: OLD });
   let s = addItem(empty, alive, { name: '손전등', use: true, equip: undefined, icon: '기기/손전등/flashlight', from: 'story', anchor: 'c1' });
   assert.deepEqual([s.list[0].use, s.list[0].equip, s.list[0].kind], [true, undefined, 'device']);
   s = addItem(empty, alive, { name: '손전등', use: true, icon: '기기/손전등/flashlight', from: 'manual', anchor: '' });
   assert.deepEqual([s.list[0].use, s.list[0].equip], [true, undefined]);
   s = addItem(empty, alive, { name: '낡은 코트', use: true, equip: '', icon: '옷/코트/coat', from: 'store', anchor: 'c1' });
   assert.deepEqual([s.list[0].use, s.list[0].equip], [false, 'gear']);
+  setItemRules(undefined);
 });
 
 // ── 상태 그림 ──

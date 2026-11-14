@@ -1,4 +1,47 @@
-find(([id2]) => id2 === page);
+ns("round");
+        const [cg2, co] = cellAt(e);
+        if (mates.length < 2 && !round) {
+          const on3 = e.getAttribute("aria-pressed") === "true";
+          const name = isGrid ? [cg2, co === "켬" ? "" : co].filter(Boolean).join(" ") : e.classList.contains("gx-chip") ? txt(e) : subOf2(e, label2);
+          push3({ id: `${action}${key ? `.${key}` : ""}`, name, kind: "pick", cur: on3 ? "1" : "0", opts: [["1", "ON"], ["0", "OFF"]], locked, colGroup: cg2 || void 0, ctl: { t: "toggle", action, send: value } });
+          continue;
+        }
+        mates.forEach((x) => used.add(x));
+        const opts = mates.map((x) => [x.dataset.value ?? "", (isGrid ? cellAt(x)[1] : "") || txt(x) || (x.getAttribute("aria-label") ?? "")]);
+        const curEl = mates.find((x) => x.getAttribute("aria-pressed") === "true");
+        push3({ id: `${action}${key ? `.${key}` : ""}`, name: isGrid ? cg2 : "", kind: "pick", cur: curEl?.dataset.value ?? "", opts, locked: mates.every((x) => x.hasAttribute("disabled")), colGroup: cg2 || void 0, ctl: { t: "pick", action, send: Object.fromEntries(opts.map(([v]) => [v, v])) } });
+      }
+      if (!made.length) {
+        out.push({ id: `row.${page}.${++infoN}`, page, menu, group: group4, name: label2, kind: "info", cur: "", help, go: spot(), keys: [label2] });
+        return;
+      }
+      for (const r of made) {
+        r.name = r.name && (made.length > 1 || !isPs) ? `${label2} · ${r.name}` : label2;
+        out.push(r);
+      }
+    });
+    doc2.querySelectorAll(".ps-group > .mx-foot").forEach((foot) => {
+      if (foot.closest(TWIN)) return;
+      const title2 = txt(foot.parentElement?.querySelector("h3"));
+      const help = txt(foot);
+      if (title2 && help) out.push({ id: `row.${page}.${++infoN}`, page, menu, group: title2, name: title2, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [title2] });
+    });
+    doc2.querySelectorAll("details.ps-adv").forEach((d) => {
+      if (d.closest(TWIN) || !d.querySelector(".ms-tb") || d.querySelector(ROW)) return;
+      const name = txt(d.querySelector(":scope > summary > b"));
+      if (!name) return;
+      const count2 = txt(d.querySelector(":scope > summary > .adv-count"));
+      const help = `${count2 ? `지금 ${count2}. ` : ""}${txt(d.querySelector(".ps-note"))} 상담에서는 바꾸지 못해요. 설정 화면에서 펼쳐 칸으로 고쳐요.`.trim();
+      out.push({ id: `row.${page}.${++infoN}`, page, menu, group: txt(d.closest(".ps-group")?.querySelector("h3")), name, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [name] });
+    });
+    return out;
+  }
+  var host2 = null;
+  var setCatalogHost = (h) => {
+    host2 = h;
+  };
+  function catalogPage(page) {
+    const p2 = host2?.pages().find(([id2]) => id2 === page);
     if (!host2 || !p2) return [];
     try {
       return pageRows(host2.render(page), page, p2[1]);
@@ -2982,38 +3025,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-zbtn:hover { border-color: var(--signal); }
 .gx-zbtn.reset { display: none; font-size: 16px; }
 .gx-canvas.zoomed .gx-zbtn.reset { display: grid; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-zbtn { width: 40px; height: 40px; } }
-
-/* v0.15 왼쪽 위 간이 상태창 */
-
-/* 설정 → 업데이트 */
-.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
-.upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
-.upd-ver b { color: var(--signal); }
-.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
-.upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
-.upd-plan small { color: var(--dim); }
-.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
-.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
-.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
-.upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
-.upd-banner-t b { color: var(--text); margin-right: 4px; }
-.upd-banner-b { display: flex; gap: 6px; flex: none; }
-.gx-x { position: relative; }
-.gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
-
-/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
-.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
-.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
-.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
-.gx-team .gx-note { margin-top: 0; }
-/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
-.gx-team .gx-note textarea { min-height: 0; }
-.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
-.gx-notice { margin: 12px 20px 0; }
-/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
-.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
-.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
-.gx-scard .gx-ava svg { width: 26px; height: 26px; }
-.gx-scard-step { display: f
+@media (max-w

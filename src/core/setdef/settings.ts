@@ -69,7 +69,7 @@ export const SETTINGS_SET: SetPage = {
         { key: 'items-carry', label: '소지 한도', ctl: { t: 'custom' } },
         { key: 'items-edit', label: '고치기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요.' },
         { key: 'items-limit', label: '지닐 수 있는 한계', ctl: { t: 'custom' }, help: '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.' },
-        { key: 'items-rules', label: '판정 표', ctl: { t: 'custom' }, help: '물건의 판정(무기·장비·사용·소모)을 모델이 적은 대로 믿지 않고 이 표로 정해요. 왼쪽은 종류(옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니)나 물건말, 오른쪽은 판정이에요(무기·장비·사용·소모N을 「·」로 잇고, 없으면 -). 물건말 줄이 종류 줄보다 먼저예요. 표에 없는 종류는 모델이 적은 대로 들어가요. 직접 넣은 물건과 시작 소지품에는 쓰지 않아요. 줄을 전부 지우면 기본 표로 돌아가요.' },
+        { key: 'items-rules', label: '판정 표', ctl: { t: 'custom' }, help: '표에 적은 종류·물건만 이 표대로 정하고, 나머지는 모델이 지침대로 정해요. 예: 망치 → 손' }, // 기본 표는 비움 (사용자 2026-11-14)
         { key: 'items-left-words', label: '두고 옴 말', ctl: { t: 'text', ph: '', def: ITEM_LEFT_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: '갱신기가 물건을 없앴다고 알리지 않고 설명만 「…에 두고 온」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 소지품에서 빼요(기록에 남고, 본문에서 다시 얻으면 같은 물건으로 돌아와요). 쉼표로 나눠 적어요.' },
         { key: 'items-off-words', label: '장착 풀기 말', ctl: { t: 'text', ph: '', def: ITEM_OFF_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: '갱신기가 장착한 물건의 설명을 「벗어 둔 …」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 장착만 풀어요(소지품에는 남아요). 쉼표로 나눠 적어요.' },
         { key: 'items-alias', label: '그림 대체 말', ctl: { t: 'custom' }, help: '물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 「외투 → 코트」면 이름이 외투로 끝나는 물건을 코트 그림으로 찾아요. 줄을 전부 지우면 기본 표로 돌아가요. 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 전체에서 찾아요. 그래도 없으면 상자 그림이에요.' },
@@ -81,7 +81,7 @@ export const SETTINGS_SET: SetPage = {
         { key: 'items-state', label: '상태 바꾸기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 갱신기가 응답을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요.' },
         { key: 'items-spent', label: '다 쓴 물건', ctl: { t: 'seg', opts: [['remove', '목록에서 빼기'], ['keep', '남겨 두기']] }, help: '남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 메인 요청에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼).' },
         { key: 'items-logturns', label: '사용·처분 기록 넘기기', ctl: { t: 'custom' } },
-        { key: 'items-start', label: '시작 소지품', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 무기·장비를 장착할지예요. 새 채팅을 시작할 때만 쓰여요.' },
+        { key: 'items-start', label: '시작 소지품', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 손에 드는 것은 손 칸, 장비는 장착할지예요. 새 채팅을 시작할 때만 쓰여요.' },
       ],
     },
     {
