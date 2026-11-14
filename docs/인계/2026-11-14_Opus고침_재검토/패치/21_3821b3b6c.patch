@@ -1,0 +1,97 @@
+From 3821b3b6cee06beca5d9a8fa6efa2571cad4bb64 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 14 Nov 2026 05:19:27 +0000
+Subject: [PATCH] =?UTF-8?q?=EC=86=8C=EC=A7=80=ED=92=88:=20=EC=86=90=20?=
+ =?UTF-8?q?=EC=B9=B8=20=EB=8B=A8=EC=B6=94=20=EB=A7=90=20=EB=93=A4=EA=B8=B0?=
+ =?UTF-8?q?/=EB=84=A3=EA=B8=B0=20(=EC=9E=A5=EB=B9=84=20=EC=B9=B8=EC=9D=80?=
+ =?UTF-8?q?=20=EC=9E=A5=EC=B0=A9/=ED=95=B4=EC=A0=9C),=20=ED=8F=B0=20?=
+ =?UTF-8?q?=EC=95=8C=EB=A6=BC=EC=97=90=20=EB=81=8C=EA=B8=B0=20=EB=A7=90=20?=
+ =?UTF-8?q?=EB=B9=BC=EA=B8=B0?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ src/ui/items.ts             | 11 +++++++----
+ tests/itemstate-browser.mjs |  6 +++---
+ 2 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/src/ui/items.ts b/src/ui/items.ts
+index 7fe5c998c7..575e85527e 100644
+--- a/src/ui/items.ts
++++ b/src/ui/items.ts
+@@ -12,7 +12,7 @@ import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
+ import { aliveAnchors } from '../core/wallet';
+ import {
+   addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
+-  purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
++  purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, slotKind, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
+   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
+ } from '../core/items';
+ import { findStatusTags } from '../core/world/status';
+@@ -90,6 +90,9 @@ interface When { at: Map<string, string>; last: string }
+ /** 지금 쓸 수 있나: 장비 칸 물건은 장착해야 쓴다 (사용자 2026-11-14: 「장착 안 하고는 활성화 안 되게」).
+  *  손 칸 물건은 들지 않았으면 「사용」 때 빈 손 칸에 자동으로 장착하고 쓴다 (사용자 2026-11-14: 조작이 번거로우니) — holdFirst */
+ const needsEquip = (ctx: ChatContext, it: Item): boolean => it.equip === 'gear' && !isEquipped(it, liveOf(ctx));
++/** 장착 단추 말: 손 칸은 들기/넣기, 장비 칸은 장착/해제 (사용자 2026-11-14 카드) */
++const equipLabel = (it: Item, equipped: boolean): string => ((equipped ? slotKind(it) : it.equip ?? 'weapon') === 'weapon' ? (equipped ? '넣기' : '들기') : equipped ? '해제' : '장착');
++const fullText = (k: ItemEquip): string => `${EQUIP_LABEL[k]} 칸이 다 찼어요. ${k === 'weapon' ? '손에 든 것을 먼저 넣으세요' : '칸에 있는 것을 먼저 해제하세요'}${isPhone() ? '' : ' (칸으로 끌어다 바꿔도 돼요)'}.`; // 폰은 끌기가 없다
+ const usableNow = (ctx: ChatContext, it: Item): boolean => canUse(it) && !needsEquip(ctx, it);
+ 
+ function whenOf(ctx: ChatContext): When {
+@@ -366,7 +369,7 @@ function popup(ctx: ChatContext): string {
+       ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}${needsEquip(ctx, it) ? ' title="장착해야 쓸 수 있어요"' : ''}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
+       ${queued ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
+       ${boxButton(ctx, it.id)}
+-      <button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ''}>${equipped ? '해제' : '장착'}</button>
++      <button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ''}>${equipLabel(it, equipped)}</button>
+       ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
+       ${it.uses !== undefined ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx, it).length ? '' : 'disabled'} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ''}
+       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc(it.id)}">버리기</button>
+@@ -423,7 +426,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
+     return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(next) } };
+   });
+   const full = (k: ItemEquip) => {
+-    itemsUi.info = `${EQUIP_LABEL[k]} 칸이 다 찼어요. 칸에 있는 것을 먼저 해제하거나, 칸으로 끌어다 바꾸세요.`;
++    itemsUi.info = fullText(k);
+     env.render();
+   };
+   // 손 칸 물건(무기·도구)을 들지 않은 채 쓰면 빈 손 칸에 먼저 장착한다. 두 손이 다 찼으면 알리고 false (사용자 2026-11-14)
+@@ -607,7 +610,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
+       await write((it, alive) => (action === 'items-equip' ? equipItem(it, alive, value) : unequipItem(it, value)));
+       if (action === 'items-unequip') await dropFromUse(ctx, value); // 해제하면 사용 예정도 뺀다 (장착해야 쓴다, 사용자 2026-11-14)
+       const it = liveOf(ctx).find((x) => x.id === value);
+-      if (action === 'items-equip' && it && !isEquipped(it, liveOf(ctx))) itemsUi.info = `${EQUIP_LABEL[it.equip ?? 'weapon']} 칸이 다 찼어요. 칸에 있는 것을 먼저 해제하거나, 칸으로 끌어다 바꾸세요.`; // 갈래 없는 물건은 손 칸 (사용자 2026-11-14)
++      if (action === 'items-equip' && it && !isEquipped(it, liveOf(ctx))) itemsUi.info = fullText(it.equip ?? 'weapon'); // 갈래 없는 물건은 손 칸 (사용자 2026-11-14)
+       await env.refresh();
+       return true;
+     }
+diff --git a/tests/itemstate-browser.mjs b/tests/itemstate-browser.mjs
+index 35161e1ccb..010ea553ff 100644
+--- a/tests/itemstate-browser.mjs
++++ b/tests/itemstate-browser.mjs
+@@ -153,8 +153,8 @@ for (const vp of ['pc', 'phone']) {
+   if (before) continue;
+   const P = JSON.parse(distPack('goei-data-items'));
+   const fileOf = (name) => P.table.find((r) => r.k[0] === name)?.f;
+-  // 손전등 갈래: 기본 표는 비어 모델 값(usable, equip 없음) 그대로 → 사용만 (사용자 2026-11-14)
+-  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착') && !torch.btns.includes('들기'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
++  // 손전등 갈래: 기본 표는 비어 모델 값(usable, equip 없음) 그대로 → 사용, 손 칸에는 아무 물건이나 들 수 있어 「들기」도 (사용자 2026-11-14)
++  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착') && torch.btns.includes('들기'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
+   // 정장 사례: 격자·장착 칸에서 빠지고 무게가 줄고, 기록에 「없어짐 · 두고 옴」
+   assert.ok(v1.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 처음엔 장착 칸에`);
+   assert.ok(!v2.grid.includes('사내용 정장 세트') && !v2.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 정장이 소지품에서 빠짐: ${JSON.stringify(v2)}`);
+@@ -168,7 +168,7 @@ for (const vp of ['pc', 'phone']) {
+   assert.ok(!v3.grid.includes('손전등'), `[${vp}] 버린 뒤 격자: ${v3.grid}`);
+   assert.deepEqual(result[vp].same.includes('손전등'), false, `[${vp}] 같은 응답 근거로는 안 되살아남`);
+   assert.ok(v4.grid.includes('손전등'), `[${vp}] 다시 주움: ${v4.grid}`);
+-  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착') && !torch2.btns.includes('들기'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
++  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착') && torch2.btns.includes('들기'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
+   assert.equal(again.list.filter((e) => e.name === '손전등').length, 1, '새 줄이 생기지 않음');
+   assert.equal(await Promise.resolve(errorsAll.length), 0, errorsAll.join('\n'));
+ }
+-- 
+2.43.0
+

@@ -1,0 +1,89 @@
+From b56ac5986802850569b51cfbad868520479e7c5a Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 02:50:18 +0000
+Subject: [PATCH] =?UTF-8?q?=EC=83=81=EC=A0=90=20=EC=84=A4=EC=A0=95(?=
+ =?UTF-8?q?=ED=8F=B0):=20=E3=80=8C=EC=9D=B8=ED=84=B0=EB=84=B7=20=EC=A0=91?=
+ =?UTF-8?q?=EC=86=8D=E3=80=8D=20=EA=B3=A0=EB=A5=B4=EA=B8=B0=EB=A5=BC=20?=
+ =?UTF-8?q?=EB=91=90=20=EC=A4=84=20=EB=8C=80=EC=8B=A0=20=EB=86=92=EC=9D=B4?=
+ =?UTF-8?q?=2034=20=ED=95=9C=20=EC=A4=84=EB=A1=9C=20=EC=B9=B4=EB=93=9C=20?=
+ =?UTF-8?q?=EC=95=88=EC=97=90,=20=EC=82=AC=EC=9A=A9=20=EC=B9=A9=20?=
+ =?UTF-8?q?=EC=8B=9C=ED=97=98=EC=9D=84=20=E3=80=8C=EB=B3=B4=EB=82=B4?=
+ =?UTF-8?q?=EB=8A=94=20=EC=A4=91=E3=80=8D=20=EC=9D=B4=EB=A6=84=ED=91=9C?=
+ =?UTF-8?q?=EC=97=90=20=EB=A7=9E=EC=B6=A4?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ src/ui/style.css         | 6 ++++--
+ tests/usebar-browser.mjs | 9 +++++----
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/src/ui/style.css b/src/ui/style.css
+index 2fbc31e123..a815811272 100644
+--- a/src/ui/style.css
++++ b/src/ui/style.css
+@@ -4870,8 +4870,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
+ .ms-fx-head .ms-num { width: 64px; }
+ .ms-fx-wide { flex: 1; min-width: 0; }
+ .ms-fx-wide > input { flex: 1; min-width: 0; }
+-/* 폰에서 「인터넷 접속」 고르기가 카드 밖으로 나가 마지막 칸이 잘렸다 → 넘치면 두 줄로 (전수검사 11-13) */
+-.gw .ms-fx .ph-inline > .gx-segs { flex-wrap: wrap; height: auto; max-height: none; max-width: 100%; }
++/* 폰에서 「인터넷 접속」 고르기가 카드 밖으로 나가 마지막 칸이 잘렸다 → 높이 34 규격은 그대로, 폰에서만 칸 안 여백을 줄여 한 줄로 카드 안에 (390·360 폭 확인, 전수검사 11-13) */
++@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
++  .gw .ms-fx .ph-inline > .gx-segs > .gx-seg { padding: 0 4px; }
++}
+ /* 칸 입력 표 (값 등급·상담사 주사위 칸·그림 대체 말, 2026-11-12 사용자: 글 상자에 줄을 치게 하지 말고 칸으로) — 조작은 전부 공통 규격 그대로(.gx-search·.ms-num·.st-step·.gx-mini), 배치만 여기서 */
+ .gw .ps-row.ms-wide > .ps-ctl { display: block; }
+ .ms-tb { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+diff --git a/tests/usebar-browser.mjs b/tests/usebar-browser.mjs
+index d929f33c15..54fa14ca22 100644
+--- a/tests/usebar-browser.mjs
++++ b/tests/usebar-browser.mjs
+@@ -1,5 +1,5 @@
+ // 「다음 메시지에 사용」 칩 (host/usebox.ts) — 2026-11-12 사용자: 「채팅 보냈는데 왜 안 없어져」
+-// 보는 것: 놓으면 마지막 메시지 아래에 보임 → 보내면(요청 조립) 바로 숨음, 요청에는 한 번만 실림 → 응답이 붙어도 숨은 채 기록만 남음 → 다음 턴엔 안 실림
++// 보는 것: 놓으면 마지막 메시지 아래에 보임 → 보내면(요청 조립) 이름표가 「보내는 중」(전수검사 11-13), 요청에는 한 번만 실림 → 응답이 붙으면 숨고 기록만 남음 → 다음 턴엔 안 실림
+ //         빈 입력 이어 쓰기 · 다시 굴리기 · 요청 실패(기다림 시간 초과) · 새로 고침.
+ // 사용법: node tests/usebar-browser.mjs [out-dir]   (out-dir 을 주면 PC·폰 사진을 남긴다)
+ import { mkdirSync } from 'node:fs';
+@@ -78,6 +78,7 @@ for (const vp of ['pc', 'phone']) {
+     const card = on[0];
+     return {
+       shown: on.length,
++      label: card ? getComputedStyle(card.querySelector('[data-gu-label]'), '::before').content.replace(/^"|"$/g, '') : '',
+       under: card ? card.closest('.chat-message-container').dataset.role : '',
+       last: card ? card.closest('.chat-message-container') === list.firstElementChild : false,
+       names: card ? [...card.querySelectorAll('[data-gu]')].filter(vis).map((e) => getComputedStyle(e, '::before').content.replace(/^"|"$/g, '')) : [],
+@@ -115,7 +116,7 @@ for (const vp of ['pc', 'phone']) {
+   if (r.uses.length !== 1 || !/소형 손전등/.test(r.uses[0]) || !/딸기맛 막대사탕/.test(r.uses[0])) bad(`요청에 uses 줄이 한 번 실려야 한다: ${JSON.stringify(r.uses)}`);
+   s = await bar();
+   console.log(vp, '1 sent', JSON.stringify(s), JSON.stringify(r.uses));
+-  if (s.shown !== 0) bad(`보낸 뒤(응답 전) 칩이 남아 있다: ${JSON.stringify(s)}`);
++  if (s.shown !== 1 || s.label !== '보내는 중' || s.names.length !== 2) bad(`보낸 뒤(응답 전) 칩은 이름표 「보내는 중」으로 남아야 한다: ${JSON.stringify(s)}`);
+   await shot('2_sent_waiting');
+   await respond();
+   s = await bar();
+@@ -134,7 +135,7 @@ for (const vp of ['pc', 'phone']) {
+   await reset(); await queue();
+   r = await send(null);
+   s = await bar();
+-  if (r.uses.length !== 1 || s.shown) bad(`빈 입력 이어 쓰기: 요청에 한 번 실리고 칩은 숨어야 한다: ${JSON.stringify(r.uses)} ${JSON.stringify(s)}`);
++  if (r.uses.length !== 1 || s.shown !== 1 || s.label !== '보내는 중') bad(`빈 입력 이어 쓰기: 요청에 한 번 실리고 칩은 「보내는 중」이어야 한다: ${JSON.stringify(r.uses)} ${JSON.stringify(s)}`);
+   await respond();
+   v = await vars(); s = await bar();
+   console.log(vp, '2 continue', JSON.stringify(v));
+@@ -167,7 +168,7 @@ for (const vp of ['pc', 'phone']) {
+   await queue();
+   await send('쓴다');
+   s = await bar();
+-  if (s.shown) bad(`실패 시험: 보낸 직후엔 숨어야 한다: ${JSON.stringify(s)}`);
++  if (s.shown !== 1 || s.label !== '보내는 중') bad(`실패 시험: 보낸 직후엔 이름표가 「보내는 중」이어야 한다: ${JSON.stringify(s)}`);
+   await page.clock.fastForward(181_000);
+   await sleep(400);
+   s = await bar();
+-- 
+2.43.0
+

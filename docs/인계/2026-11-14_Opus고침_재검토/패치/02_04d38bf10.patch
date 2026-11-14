@@ -1,0 +1,235 @@
+From 04d38bf10b54fe3828b33788ef3218887e11d449 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 23:27:58 +0000
+Subject: [PATCH] =?UTF-8?q?=EC=A0=84=EC=88=98=EA=B2=80=EC=82=AC=20?=
+ =?UTF-8?q?=EA=B3=A0=EC=B9=A8=202:=20=EA=B4=B4=EB=8B=B4=ED=86=A1=20?=
+ =?UTF-8?q?=EC=9D=B8=EB=AC=BC=20=EB=A1=9C=EC=96=B4=20=EB=91=90=20=EB=B2=88?=
+ =?UTF-8?q?=20=EC=8B=A3=EA=B8=B0,=20=EC=86=8D=EC=83=9D=EA=B0=81=20?=
+ =?UTF-8?q?=EB=B8=94=EB=A1=9D=20=EC=9D=BD=EA=B8=B0=20=EC=A0=9C=EC=99=B8,?=
+ =?UTF-8?q?=20=EC=9E=90=EB=8F=99=20=EC=9E=AC=EC=8B=9C=EB=8F=84=20=EB=95=8C?=
+ =?UTF-8?q?=20=EB=8B=A4=EC=8B=9C=20=EC=A1=B0=EB=A6=BD=20=EC=95=88=20?=
+ =?UTF-8?q?=ED=95=A8,=20=EC=9D=B8=EB=AC=BC=20=EB=B8=94=EB=A1=9D=20?=
+ =?UTF-8?q?=EC=9D=B8=EB=AC=BC=20=EB=8B=A8=EC=9C=84=EB=A1=9C=20=EB=A7=9E?=
+ =?UTF-8?q?=EC=B6=A4?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ src/body.ts                |  8 ++++++++
+ src/core/asset.ts          |  2 +-
+ src/core/people/inject.ts  |  7 +++----
+ src/core/people/request.ts | 16 +++++++++++++---
+ src/core/phonePrompt.ts    |  3 +++
+ src/core/refs.ts           |  3 ++-
+ src/core/thoughts.ts       | 13 +++++++++++++
+ src/core/world/output.ts   |  9 ++++++---
+ 8 files changed, 49 insertions(+), 12 deletions(-)
+ create mode 100644 src/core/thoughts.ts
+
+diff --git a/src/body.ts b/src/body.ts
+index 92eb5ca806..a387b7655c 100644
+--- a/src/body.ts
++++ b/src/body.ts
+@@ -111,9 +111,16 @@ const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
+  * 맨 끝의 정리 단계(core/sanitize.ts stripMarkers)가 플러그인 표식을 한 번 더 지워 모델이 표식 글자를 보지 않게 한다.
+  * 실패한 단계는 모아 한 줄 로그 `[goei] 요청 조립 실패: 단계 …` 로 남긴다. 이 함수는 던지지 않는다 (던지면 시작기 main.ts 가 sanitize 로 같은 처리)
+  */
++/** 직전 조립이 새로 끼운 system 글들. Risu 는 요청이 실패하면 앞 회차 결과에 replacer 를 다시 돌린다 (자동 재시도) — 그때 다시 조립하지 않는다 */
++let lastAdded = new Set<string>();
++const sysTexts = (ms: PromptMessage[]): string[] => ms.filter((m) => m?.role === 'system' && typeof m.content === 'string').map((m) => m.content as string);
++
+ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
+   if (type !== 'model' || !Array.isArray(messages)) return messages;
+   if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
++  // 자동 재시도: 이미 조립한 요청이 다시 들어왔다. 참고 기록·인물 기록이 두 번 끼고 호출 기록 턴이 새로 열리지 않게 그대로 보낸다 (전수검사 11-13)
++  if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
++  const input0 = new Set(sysTexts(messages));
+   const failed: string[] = [];
+   /** 한 단계: 던지면 이름·까닭을 모으고 fallback(= 그 단계 이전 모양) */
+   const step = <T>(name: string, run: () => T, fallback: T): T => {
+@@ -200,6 +207,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
+   // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
+   const out = sanitize(messages);
+   if (liteNow) step('호출 기록', () => traceMain(out, failed), undefined);
++  lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
+   return out;
+ }
+ 
+diff --git a/src/core/asset.ts b/src/core/asset.ts
+index 01aaee6141..ea0e49f9ee 100644
+--- a/src/core/asset.ts
++++ b/src/core/asset.ts
+@@ -82,7 +82,7 @@ export function splitNarrative(content: string): { narrative: string; trailing:
+   const narrative = at >= 0 ? content.slice(0, at) : content;
+   const trailing = at >= 0 ? content.slice(at) : '';
+   return {
+-    narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, '').replace(/<!--[\s\S]*?-->/g, '')).trim(),
++    narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/gi, '').replace(/<!--[\s\S]*?-->/g, '')).trim(),
+     trailing,
+   };
+ }
+diff --git a/src/core/people/inject.ts b/src/core/people/inject.ts
+index 6f2d1efd1c..d5f5d89a50 100644
+--- a/src/core/people/inject.ts
++++ b/src/core/people/inject.ts
+@@ -173,11 +173,10 @@ export const PEOPLE_RULE =
+ export const knowledgeRule = (): string => guideOr('Main', 'PEOPLE.KNOWLEDGE_RULE', KNOWLEDGE_RULE);
+ export const peopleRule = (): string => guideOr('Main', 'PEOPLE.RULE', () => PEOPLE_RULE.replace(KNOWLEDGE_RULE, () => knowledgeRule()), { knowledge_rule: knowledgeRule() });
+ 
+-/** 여러 인물의 블록을 한 덩어리로 */
+-export function peopleBlock(blocks: string[], maxChars = 16000): string {
++/** 여러 인물의 블록을 한 덩어리로. 상한 맞추기는 부르는 쪽(request.ts peopleBlockFor)이 인물 단위로 한다 (글 중간에서 자르지 않는다) */
++export function peopleBlock(blocks: string[]): string {
+   if (!blocks.length) return '';
+-  let body = blocks.join('\n\n');
+-  if (body.length > maxChars) body = body.slice(0, maxChars - 1) + '…';
++  const body = blocks.join('\n\n');
+   return `${PEOPLE_HEAD}\n${peopleRule()}\n\n${body}`;
+ }
+ 
+diff --git a/src/core/people/request.ts b/src/core/people/request.ts
+index b13b8d23bf..e6780de557 100644
+--- a/src/core/people/request.ts
++++ b/src/core/people/request.ts
+@@ -9,6 +9,7 @@ import { latestNote } from './updater';
+ import { rhythmClock, rhythmClockLines } from './rhythm';
+ import { factionNow, factionsBlock, sceneFactionCodes, userFactionOf } from './faction';
+ import { messageText } from '../refs';
++import { fixedSections } from './seed';
+ import type { PeopleSettings } from './settings';
+ import type { PeopleStore, Temper } from './types';
+ 
+@@ -49,11 +50,13 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
+   const live: Liveness = liveness(chat);
+   const changes = liveChanges(o.store, live);
+   const blocks: string[] = [];
+-  const sheets: string[] = [];
++  /** 인물마다: 시트 원문(요청에서 뺄 것)과 상한 밖 길이(시트 고정 절) */
++  const own: { sheet: string | null; exempt: number }[] = [];
+   for (const n of people) {
+     const p = o.store.people[n];
+     const sheet = o.sheetOf(n);
+-    if (sheet) sheets.push(sheet);
++    const exempt = !sheet ? 0 : o.settings.inject === 'split' ? fixedSections(sheet).reduce((s, x) => s + x.name.length + x.body.length + 2, 0) : o.settings.inject === 'append' ? sheet.trim().length : 0;
++    own.push({ sheet: sheet || null, exempt });
+     const note = o.settings.director === 'note' ? latestNote(o.store, n, live) : null;
+     blocks.push(
+       personBlock(p, o.store, live, changes, {
+@@ -77,6 +80,13 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
+       }),
+     );
+   }
++  // 상한(본문 전체 글자 수)은 기록에만 건다 (고정 절 원문은 상한 밖). 넘치면 글 중간에서 자르지 않고 뒤 인물부터 통째로 뺀다 (모델이 고른 인물 → 글에 나온 인물, 항상 포함은 끝까지).
++  // 뺀 인물의 원래 시트는 요청에 남긴다 (전수검사 11-13: 4명부터 뒤 인물이 블록에서도 시트에서도 사라졌다)
++  let keep = blocks.length;
++  const sizeOf = (k: number) => blocks.slice(0, k).reduce((s, b) => s + b.length + 2, 0) - own.slice(0, k).reduce((s, x) => s + x.exempt, 0);
++  while (keep > 1 && sizeOf(keep) > o.settings.blockCap) keep--;
++  blocks.length = keep;
++  const sheets = own.slice(0, keep).map((x) => x.sheet).filter((x): x is string => !!x);
+   // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
+   if (o.settings.features.has('rhythm')) {
+     const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
+@@ -93,7 +103,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
+     const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
+     if (fb) blocks.push(fb);
+   }
+-  return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
++  return { text: peopleBlock(blocks), people, sheets };
+ }
+ 
+ const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
+diff --git a/src/core/phonePrompt.ts b/src/core/phonePrompt.ts
+index 8bad61cef9..c959803221 100644
+--- a/src/core/phonePrompt.ts
++++ b/src/core/phonePrompt.ts
+@@ -301,6 +301,9 @@ function contactSources(body: Body): NonNullable<Body['recipientEvidenceSources'
+ }
+ 
+ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Record<string, string>): PhonePrompt {
++  // 인물 로어북이 participants[].lore 와 universe.activeLoreBooks 에 똑같이 두 번 실리지 않게 참여자 쪽만 남긴다 (전수검사 11-13, 확인 1회 약 1.7만 토큰)
++  const ownLore = body.participants.map((p) => p.lore).filter((l): l is string => typeof l === 'string' && !!l);
++  if (ownLore.length) body.narratorOnly.universe.activeLoreBooks = body.narratorOnly.universe.activeLoreBooks.filter((b) => !ownLore.some((l) => l.includes(b.content)));
+   const contactMode = body.participants.some((p) => p.manuallySavedContact);
+   if (contactMode) {
+     body.recipientEvidenceSources = contactSources(body);
+diff --git a/src/core/refs.ts b/src/core/refs.ts
+index 7ac6cc896e..fb505b4f31 100644
+--- a/src/core/refs.ts
++++ b/src/core/refs.ts
+@@ -8,6 +8,7 @@ import { hasCall, stripCall } from './phone';
+ import type { Chat, LoreEntry } from './types';
+ import { cleanOutput, hasWorldTags } from './world/tags';
+ import { buildRegistry, referenceEntries, type Registry } from './world/registry';
++import { stripThoughts } from './thoughts';
+ 
+ export type RefKind = 'base' | 'primary' | 'active' | 'direct' | 'secondary';
+ 
+@@ -222,7 +223,7 @@ export interface Turn {
+ }
+ 
+ export function messageText(data: string): string {
+-  let t = stripStartCard(stripUnsentMark(String(data ?? '')));
++  let t = stripThoughts(stripStartCard(stripUnsentMark(String(data ?? ''))));
+   if (t.includes('%%SCENE_CARD:')) {
+     const s = readScene(t);
+     t = s ? `[이동] 목표: ${s.target} / 투입: ${s.party}` : stripSceneCard(t);
+diff --git a/src/core/thoughts.ts b/src/core/thoughts.ts
+new file mode 100644
+index 0000000000..74230a5965
+--- /dev/null
++++ b/src/core/thoughts.ts
+@@ -0,0 +1,13 @@
++// 생각 모델의 속생각 블록 (전수검사 11-13)
++/** Risu 가 생각 모델의 속생각을 응답 앞에 붙여 저장한 블록 (<Thoughts>…</Thoughts>). 저장 본문에서는 지우지 않고 읽을 때만 뗀다.
++ *  닫히지 않은 블록은 글 맨 앞에서 시작할 때만 통째로 생각으로 본다 (전수검사 11-13) */
++export function stripThoughts(text: string): string {
++  const t = text.replace(/<Thoughts>[\s\S]*?<\/Thoughts>\s*/gi, '');
++  return /^\s*<Thoughts>/i.test(t) ? '' : t;
++}
++
++/** 응답 맨 앞의 생각 블록과 나머지로 나눈다 (상황판 태그 처리는 나머지에만, 저장할 때 다시 붙인다) */
++export function splitThoughts(text: string): { head: string; body: string } {
++  const m = /^\s*<Thoughts>[\s\S]*?<\/Thoughts>\s*/i.exec(text);
++  return m ? { head: m[0], body: text.slice(m[0].length) } : { head: '', body: text };
++}
+diff --git a/src/core/world/output.ts b/src/core/world/output.ts
+index 5798b864eb..ac260bb1d4 100644
+--- a/src/core/world/output.ts
++++ b/src/core/world/output.ts
+@@ -7,6 +7,7 @@ import type { Chat, ScriptState } from '../types';
+ import type { Catalog } from './catalog';
+ import { applyOutput, bootstrap, parseWorld, reports, serializeWorld, type Rng, type WorldSettings, type WorldState } from './engine';
+ import { cleanOutput, hasWorldTags } from './tags';
++import { splitThoughts } from '../thoughts';
+ 
+ export const WORLD_KEY = '$goei_world';
+ const LAST_KEY = '$goei_last';
+@@ -90,9 +91,11 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c:
+   if (!msg || msg.role !== 'char') return null;
+ 
+   const state = chat.scriptstate ?? {};
+-  const clean = cleanOutput(raw);
++  // 생각 모델의 속생각(<Thoughts>) 안 태그 초안은 읽지 않는다. 블록은 저장 본문 앞에 그대로 둔다 (전수검사 11-13)
++  const th = splitThoughts(raw);
++  const clean = th.head + cleanOutput(th.body);
+   // 이미 처리한 응답에 리스너가 다시 불린 경우 (태그도 없고 지문도 같음)
+-  if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean)) return null;
++  if (!hasWorldTags(th.body) && state[LAST_KEY] === fingerprint(index, clean)) return null;
+ 
+   // 리롤·다시 생성: 같은 자리의 이전 응답이 반영되기 전 상태로 돌아가서 이번 응답만 반영한다.
+   // 「같은 자리」 = 같은 번호 + 바로 앞 메시지가 같은 것(열쇠). Risu 는 리롤 때 새 chatId 를 주므로 응답 자체는 비교할 수 없고,
+@@ -112,7 +115,7 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c:
+       };
+   const faction = before.faction;
+   const base = parseWorld(before.world);
+-  const result = applyOutput(base, c, s, faction, raw, rng);
++  const result = applyOutput(base, c, s, faction, th.body, rng);
+   const now = result.faction ?? faction;
+   // 이번 응답에서 활성이 된 항목에 시작 메시지 열쇠를 적는다 (엔진은 메시지 번호를 모른다). 옛 저장의 진행 중 항목은 비워 두고 since 로 기간을 잡는다 (journal/mine.ts)
+   markStart(base, result.world, messageKey(msg, index));
+-- 
+2.43.0
+

@@ -1,0 +1,682 @@
+From b24759951aa3f3c80c19197ac4c24a8950394b71 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 14 Nov 2026 04:58:02 +0000
+Subject: [PATCH] =?UTF-8?q?=EC=86=8C=EC=A7=80=ED=92=88:=20=EB=AC=B4?=
+ =?UTF-8?q?=EA=B8=B0=20=EC=B9=B8=20=E2=86=92=20=EC=86=90=20=EC=B9=B8(?=
+ =?UTF-8?q?=EC=86=90=EC=97=90=20=EB=93=9C=EB=8A=94=20=EA=B2=83),=20?=
+ =?UTF-8?q?=ED=8C=90=EC=A0=95=20=ED=91=9C=20=EA=B8=B0=EB=B3=B8=EA=B0=92=20?=
+ =?UTF-8?q?=EB=B9=84=EC=9B=80,=20=EC=A7=80=EC=B9=A8=20=EC=86=90/=EC=9E=A5?=
+ =?UTF-8?q?=EB=B9=84=20=EA=B8=B0=EC=A4=80?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+망치·손전등처럼 손에 드는 것은 손 칸. 모델 지침(상점·갱신기)에 hand 정의,
+items_now 도 hand 로 보냄. 화면: 손 빈 칸 그림, 들기/내려놓기.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ src/core/itemrules.ts                |  7 ++++---
+ src/core/items.ts                    |  6 +++---
+ src/core/itemtraits.ts               |  9 +++++----
+ src/core/people/updater.ts           |  4 ++--
+ src/core/setdef/settings.ts          |  4 ++--
+ src/core/shop.ts                     |  4 ++--
+ src/core/start.ts                    |  2 +-
+ src/core/startitems.ts               |  6 +++---
+ src/data/guides/shop.txt             |  2 +-
+ src/data/guides/updater-compact.txt  |  4 ++--
+ src/data/guides/updater-detailed.txt |  8 ++++----
+ src/ui/directory.ts                  |  2 +-
+ src/ui/icons.ts                      |  3 ++-
+ src/ui/items.ts                      | 17 +++++++++--------
+ src/ui/settings.ts                   |  2 +-
+ src/ui/shop.ts                       |  2 +-
+ src/ui/style.css                     |  2 +-
+ tests/equip8-browser.mjs             |  4 ++--
+ tests/guide-out.test.mjs             |  2 ++
+ tests/items-browser.mjs              |  2 +-
+ tests/items.test.mjs                 | 20 +++++++++++++++++---
+ tests/itemstate-browser.mjs          | 25 ++++++++++++++-----------
+ tests/itemstate.test.mjs             | 20 ++++++++++++++++----
+ tests/people-items.test.mjs          |  2 +-
+ tests/shop-browser.mjs               |  4 ++--
+ 25 files changed, 99 insertions(+), 64 deletions(-)
+
+diff --git a/src/core/itemrules.ts b/src/core/itemrules.ts
+index cd5054aadc..6e2c7da413 100644
+--- a/src/core/itemrules.ts
++++ b/src/core/itemrules.ts
+@@ -1,5 +1,5 @@
+ // 소지품 규칙 표 (2026-11-12 사용자: 「하나만 땜빵하지 말고 전체적으로」, 기계 일은 코드가):
+-//  ① 판정 표 — 물건의 갈래(무기·장비·사용·소모N)는 모델 깃발을 그대로 믿지 않고 「종류 또는 물건말 → 갈래」 표로 코드가 정한다
++//  ① 판정 표 — 물건의 갈래(손·장비·사용·소모N)를 「종류 또는 물건말 → 갈래」 표로 코드가 정한다. 기본 표는 비었다: 표에 적은 것만 표대로, 나머지는 모델이 지침대로 (사용자 2026-11-14)
+ //  ② 「두고 옴」 말 · 「벗음」 말 — 갱신기가 설명만 고쳐 보냈을 때 코드가 잡는 안전망 (core/items.ts applyItemChanges)
+ //  ③ 등급 말 — 갱신기가 이름·설명에 본문에 없는 등급 말을 넣으면 뺀다 (등급은 본문이 정한다. 코드도 갱신기도 짐작하지 않는다)
+ // 표·낱말은 모두 설정에서 고친다 (채팅 변수 $it_*; 비우면 아래 기본값). 지금 채팅의 표는 host/risu.ts loadContext 가 올린다 (그림 대체 말과 같은 방식).
+@@ -10,8 +10,9 @@ export const ITEM_RULES_VAR = '$it_rules';
+ export const ITEM_LEFT_WORDS_VAR = '$it_left_words';
+ export const ITEM_OFF_WORDS_VAR = '$it_off_words';
+ 
+-/** 기본 판정 표: 한 줄 「종류 또는 물건말 → 갈래」. 갈래 말은 쓰임 글과 같다 (무기·장비·사용·소모N, 없으면 -). 물건말 줄이 종류 줄보다 먼저 본다 */
+-export const ITEM_RULES_DEFAULT = ['옷 → 장비', '무기 → 무기', '음식 → 소모1', '의료 → 소모1', '소모품 → 소모1', '열쇠 → 사용', '부적 → 사용', '봉인 → 사용', '서류 → -', '귀중품 → -', '잡동사니 → -', '괴이 → -', '도구 → 사용', '기기 → 사용'].join('\n');
++/** 기본 판정 표: 비었다 — 모델이 지침대로 정한다. 사용자가 예외 줄(「망치 → 손」)만 적는다 (사용자 2026-11-14).
++ *  한 줄 「종류 또는 물건말 → 갈래」. 갈래 말은 쓰임 글과 같다 (손·장비·사용·소모N, 옛 「무기」도 손, 없으면 -). 물건말 줄이 종류 줄보다 먼저 본다 */
++export const ITEM_RULES_DEFAULT = '';
+ /** 「두고 옴」 말: 갱신기가 update 의 설명에 이런 말을 적으면 지닌 목록에서 뺀다 */
+ export const ITEM_LEFT_WORDS_DEFAULT = '두고, 놓고, 보관해, 맡겨, 반납, 압수, 버리고, 잃어';
+ /** 「벗음」 말: 이런 말만 있으면 장착만 푼다 */
+diff --git a/src/core/items.ts b/src/core/items.ts
+index 73f0101dc2..f85747b8ff 100644
+--- a/src/core/items.ts
++++ b/src/core/items.ts
+@@ -2,7 +2,7 @@
+ // 목표는 본편 모델이 지금 상황(무엇을 갖고 있는지·한계·이번 턴 사건)을 알고 응답에 반영하는 것. 화면·목록은 그 보조.
+ // 플러그인은 막지도 경고하지도 않는다: 칸이 넘쳐도 그냥 넣고 「17/16」로 보여 주며, 푸는 건 본편 응답.
+ // 저장은 채팅 변수 `$st_items` (JSON). 물건 줄은 기준 메시지(anchor)가 채팅에 남아 있을 때만 산다 (가계부 `$st_wallet` 와 같은 방식).
+-// 종류 14개는 없앴다 (2026-11-07 밤 사용자). 물건마다 판정: 사용 가능 · 소모성(남은 횟수 숫자 하나, 사용마다 1 빼고 0이면 없어짐) · 장착(무기·장비).
++// 종류 14개는 없앴다 (2026-11-07 밤 사용자). 물건마다 판정: 사용 가능 · 소모성(남은 횟수 숫자 하나, 사용마다 1 빼고 0이면 없어짐) · 장착(손·장비, 사용자 2026-11-14 무기 → 손).
+ // 비소모 물건은 숫자 없이 상태만 설명 글로. 상태 4단계(멀쩡·손상·고장·파괴)는 보조 모델만 본문을 보고 바꾼다 (memory goei-equip-design).
+ import type { Chat } from './types';
+ import { guideOr } from './guides';
+@@ -574,7 +574,7 @@ export const resumedEvent = (): string => guideOr('Main', 'INVENTORY.RESUMED', R
+ export const itemPushOn = (vars: Record<string, unknown> | undefined) => invOn(vars);
+ /** 보조 모델이 본문을 읽어 목록을 맞추기 (기본 켬, '0' 이면 끔) */
+ export const itemAutoOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_AUTO_VAR] !== '0';
+-/** 시작 소지품 (기본 켬): 고유 인물로 시작할 때 명부의 시작 소지품을 넣고 무기·장비를 장착 */
++/** 시작 소지품 (기본 켬): 고유 인물로 시작할 때 명부의 시작 소지품을 넣고 손에 드는 것은 손 칸, 장비는 장착 (사용자 2026-11-14) */
+ export const ITEM_START_VAR = '$it_start';
+ /** 다 쓴 물건: remove(기본, 남은 0 이면 목록에서 빠짐) · keep(「다 씀」으로 남겨 둠) */
+ export const ITEM_SPENT_VAR = '$it_spent';
+@@ -711,7 +711,7 @@ export const boughtLine = (e: Item): string => (e.paidWith ? `${e.name} (paid wi
+ /** 본편에 넘기는 물건 한 줄: 이름 — 설명 (효과) [장착] [남은 횟수] [상태] */
+ export function itemLine(e: Item, left: number | undefined, equipped: boolean, detail: ItemDetail = 'full'): string {
+   const tags = detail === 'name' ? [] : [
+-    equipped ? `equipped ${e.equip === 'weapon' ? 'weapon' : 'gear'}` : '',
++    equipped ? (e.equip === 'weapon' ? 'in hand' : 'worn') : '', // 손 칸 = in hand, 장비 칸 = worn (사용자 2026-11-14)
+     left === 0 ? 'used up' : left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
+     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
+   ].filter(Boolean);
+diff --git a/src/core/itemtraits.ts b/src/core/itemtraits.ts
+index 0143e82f80..e0735ee16f 100644
+--- a/src/core/itemtraits.ts
++++ b/src/core/itemtraits.ts
+@@ -1,9 +1,10 @@
+ // 소지품 판정 칸 (장착 갈래·상태·소모 횟수·쓰임 글). 다른 데에 기대지 않는 순수 함수만 — 명부(world/directory)·시작 소지품이 소지품 전체를 끌어오지 않게 (core/items.ts 가 다시 내보냄)
+ 
+-/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 무기·무기 아닌 것 둘만). 칸: 무기 2 · 장비 6 (2026-11-12 사용자: 장비 칸 둘 더) */
++/** 장착 갈래 (2026-11-07 사용자: 부위 나누지 않고 둘만). 칸: 손 2 · 장비 6 (2026-11-12 사용자: 장비 칸 둘 더).
++ *  'weapon' = 손에 드는 것 전부(무기·도구·불빛·우산…), 'gear' = 몸에 입거나 차는 것. 저장된 채팅이 그대로 읽히게 안쪽 값은 'weapon' 그대로 (사용자 2026-11-14) */
+ export type ItemEquip = 'weapon' | 'gear';
+ export const EQUIP_SLOTS: Record<ItemEquip, number> = { weapon: 2, gear: 6 };
+-export const EQUIP_LABEL: Record<ItemEquip, string> = { weapon: '무기', gear: '장비' };
++export const EQUIP_LABEL: Record<ItemEquip, string> = { weapon: '손', gear: '장비' };
+ export const itemEquip = (v: unknown): ItemEquip | undefined => (v === 'weapon' || v === 'gear' ? v : undefined);
+ 
+ /** 상태 (파괴는 목록에서 빠지고 기록 「파괴」) */
+@@ -38,7 +39,7 @@ export interface ItemTraits {
+   weight?: number;
+ }
+ 
+-/** 「쓰임」 칸 글 → 판정: 무기·장비·사용·소모N (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
++/** 「쓰임」 칸 글 → 판정: 손·장비·사용·소모N (옛 글의 「무기」도 손으로 읽는다, 사용자 2026-11-14) (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
+ export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> {
+   const out: Omit<ItemTraits, 'icon' | 'weight'> = { use: false };
+   // 「소모 3」「소모3회」「소모(3)」「소모 x3」은 쪼개기 전에 「소모3」으로 붙인다: 띄우면 1회로, 글자가 붙으면 소모가 빠졌다 (전수검사 11-13)
+@@ -46,7 +47,7 @@ export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'>
+   for (const t0 of src.split(/[\s,，/·+]+/)) {
+     const t = t0.trim().toLowerCase();
+     if (!t) continue;
+-    if (/^(무기|weapon)$/.test(t)) out.equip = 'weapon';
++    if (/^(손|hand|held|무기|weapon)$/.test(t)) out.equip = 'weapon';
+     else if (/^(장비|gear|wear)$/.test(t)) out.equip = out.equip ?? 'gear';
+     else if (/^(사용|use|usable)$/.test(t)) out.use = true;
+     else {
+diff --git a/src/core/people/updater.ts b/src/core/people/updater.ts
+index 12816a3818..5003d4419d 100644
+--- a/src/core/people/updater.ts
++++ b/src/core/people/updater.ts
+@@ -346,7 +346,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o:
+     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
+     // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
+     items_now: o.items
+-      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
++      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip === 'weapon' ? 'hand' : e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state, pictures: e.pictures?.length ? e.pictures : undefined }))
+       : undefined,
+     // 물건으로 만드는 범위·만들지 않을 것 (설정 → 소지품, core/items.ts itemsRule)
+     items_rule: o.items ? itemsRule(chat.scriptstate) : undefined,
+@@ -1376,7 +1376,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput,
+       }
+       seen.add(norm(listed ?? name));
+       const act = action === 'new' && listed ? 'update' : (action as ItemChange['action']);
+-      const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase());
++      const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase().replace(/^(hand|held|손)$/, 'weapon')); // 손 칸 = hand (옛 weapon 도 받음, 사용자 2026-11-14)
+       const uses = t.uses === undefined || t.uses === null ? undefined : str(t.uses).trim() === '0' ? 0 : itemUses(t.uses);
+       const cond = t.condition ? str(t.condition).trim().toLowerCase() : '';
+       const icon = cleanIcon(t.icon);
+diff --git a/src/core/setdef/settings.ts b/src/core/setdef/settings.ts
+index 44cc487707..adc2b42816 100644
+--- a/src/core/setdef/settings.ts
++++ b/src/core/setdef/settings.ts
+@@ -69,7 +69,7 @@ export const SETTINGS_SET: SetPage = {
+         { key: 'items-carry', label: '소지 한도', ctl: { t: 'custom' } },
+         { key: 'items-edit', label: '고치기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요.' },
+         { key: 'items-limit', label: '지닐 수 있는 한계', ctl: { t: 'custom' }, help: '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.' },
+-        { key: 'items-rules', label: '판정 표', ctl: { t: 'custom' }, help: '물건의 판정(무기·장비·사용·소모)을 모델이 적은 대로 믿지 않고 이 표로 정해요. 왼쪽은 종류(옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니)나 물건말, 오른쪽은 판정이에요(무기·장비·사용·소모N을 「·」로 잇고, 없으면 -). 물건말 줄이 종류 줄보다 먼저예요. 표에 없는 종류는 모델이 적은 대로 들어가요. 직접 넣은 물건과 시작 소지품에는 쓰지 않아요. 줄을 전부 지우면 기본 표로 돌아가요.' },
++        { key: 'items-rules', label: '판정 표', ctl: { t: 'custom' }, help: '표에 적은 종류·물건만 이 표대로 정하고, 나머지는 모델이 지침대로 정해요. 예: 망치 → 손' }, // 기본 표는 비움 (사용자 2026-11-14)
+         { key: 'items-left-words', label: '두고 옴 말', ctl: { t: 'text', ph: '', def: ITEM_LEFT_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: '갱신기가 물건을 없앴다고 알리지 않고 설명만 「…에 두고 온」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 소지품에서 빼요(기록에 남고, 본문에서 다시 얻으면 같은 물건으로 돌아와요). 쉼표로 나눠 적어요.' },
+         { key: 'items-off-words', label: '장착 풀기 말', ctl: { t: 'text', ph: '', def: ITEM_OFF_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: '갱신기가 장착한 물건의 설명을 「벗어 둔 …」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 장착만 풀어요(소지품에는 남아요). 쉼표로 나눠 적어요.' },
+         { key: 'items-alias', label: '그림 대체 말', ctl: { t: 'custom' }, help: '물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 「외투 → 코트」면 이름이 외투로 끝나는 물건을 코트 그림으로 찾아요. 줄을 전부 지우면 기본 표로 돌아가요. 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 전체에서 찾아요. 그래도 없으면 상자 그림이에요.' },
+@@ -81,7 +81,7 @@ export const SETTINGS_SET: SetPage = {
+         { key: 'items-state', label: '상태 바꾸기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 갱신기가 응답을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요.' },
+         { key: 'items-spent', label: '다 쓴 물건', ctl: { t: 'seg', opts: [['remove', '목록에서 빼기'], ['keep', '남겨 두기']] }, help: '남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 메인 요청에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼).' },
+         { key: 'items-logturns', label: '사용·처분 기록 넘기기', ctl: { t: 'custom' } },
+-        { key: 'items-start', label: '시작 소지품', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 무기·장비를 장착할지예요. 새 채팅을 시작할 때만 쓰여요.' },
++        { key: 'items-start', label: '시작 소지품', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 손에 드는 것은 손 칸, 장비는 장착할지예요. 새 채팅을 시작할 때만 쓰여요.' },
+       ],
+     },
+     {
+diff --git a/src/core/shop.ts b/src/core/shop.ts
+index d1d2548d68..88a72d223b 100644
+--- a/src/core/shop.ts
++++ b/src/core/shop.ts
+@@ -2,7 +2,7 @@
+ // - 메뉴·탭이 아니다. 본편 모델이 거래가 가능한 자리에서 응답 끝에 `[shop: 가게 이름|주인 이름]` 표식을 쓰면
+ //   플러그인이 그 응답 아래에 「상점 열기」 카드를 붙이고(표식은 화면에서 지움), 누르면 창 위에 상점 팝업이 뜬다.
+ // - 물건은 보조 모델이 맥락대로 창작한다. 첫 호출에서 진열대와 함께 가게 정체(파는 것·없는 것·값 성격 한 줄)를 받아 채팅 변수에 고정하고,
+-//   이후 호출(새로고침·주인에게 말하기)마다 정체를 넘긴다 (뜬금없는 요청에 모델이 아무거나 만들지 않게). 물건마다 판정(쓰임: 무기·장비·사용·소모N)과 그림 낱말을 받는다.
++//   이후 호출(새로고침·주인에게 말하기)마다 정체를 넘긴다 (뜬금없는 요청에 모델이 아무거나 만들지 않게). 물건마다 판정(쓰임: 손·장비·사용·소모N)과 그림 낱말을 받는다.
+ // - 주인에게 말하기(흥정·문의·요청)는 글을 그대로 넘기고, 모델이 맥락을 읽어 응답 형식 안에서 「변경 없음 / 일부 / 전체」를 고른다.
+ //   문구를 맞춰 보는 일은 없다. 흥정이 받아들여지면 그 칸 값만 바뀐다. 주인이 거래를 끊으면 진열대를 잠근다.
+ // - 구입은 플러그인이 한다: 가계부 src:'store' + 소지품 from:'store'. 다음 턴 [Inventory] 글의 This turn 에 「새로 산 것」·주인과 나눈 말이 간다.
+@@ -539,7 +539,7 @@ export function costOf(cell: string): { price: number; pay?: string } | null {
+   return pay ? { price, pay } : { price };
+ }
+ 
+-/** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게). 쓰임: 무기·장비·사용·소모N 중 맞는 것을 「·」로 (없으면 -). 그림: 그림 찾기용 영어 낱말. 무게: kg 숫자 (2026-11-08) */
++/** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게). 쓰임: 손·장비·사용·소모N 중 맞는 것을 「·」로 (없으면 -. 무기 → 손, 사용자 2026-11-14). 그림: 그림 찾기용 영어 낱말. 무게: kg 숫자 (2026-11-08) */
+ export const SHOP_LINE = '이름|값|쓰임|그림|무게|설명|효과|구분';
+ /** 진실 미리 정하기 (11-09 사용자: 「두개를 섞는게 낫지 않나」 — 기본 섞음) */
+ export type TruthMode = 'all' | 'mix' | 'none';
+diff --git a/src/core/start.ts b/src/core/start.ts
+index 6cd8a0fc4b..23fd1be64f 100644
+--- a/src/core/start.ts
++++ b/src/core/start.ts
+@@ -149,7 +149,7 @@ export function planStart(
+       $seed_lore: seed.text,
+       $seed_inputs: '0',
+       $goei_last: '',
+-      // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
++      // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 손에 드는 것은 손 칸, 장비는 장착 (모델 호출 없음, 11-07 사용자; 손 칸은 사용자 2026-11-14). 페르소나는 빈 소지품
+       ...startItemsVars(startItems && choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
+       // 소지 한도 (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」, 페르소나·값 없는 인물은 설정 값
+       ...startCarryVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.carry : undefined),
+diff --git a/src/core/startitems.ts b/src/core/startitems.ts
+index 0ea75362fc..e981555d7a 100644
+--- a/src/core/startitems.ts
++++ b/src/core/startitems.ts
+@@ -1,6 +1,6 @@
+ // 고유 인물 시작 소지품 (2026-11-07 사용자: 모델 호출 없이 미리 정해 둠).
+ // 목록은 코드에 두지 않고 명부(Directory 로어북) 요원 줄의 `start_items` 칸에 둔다. 명부 편집 화면에서 보고 고친다.
+-// 그 인물로 시작하면 소지품($st_items)에 넣고, 무기·장비는 빈 장착 칸에 차례로 끼운다 (무기 2 · 장비 6, 넘치면 소지품).
++// 그 인물로 시작하면 소지품($st_items)에 넣고, 손에 드는 것은 손 칸, 장비는 장비 칸에 차례로 끼운다 (손 2 · 장비 6, 넘치면 소지품. 사용자 2026-11-14).
+ // 소지품에 넣기(startItemsVars)는 core/items.ts 에 — 명부(world/directory)가 이 파일을 읽으므로 소지품 전체를 끌어오지 않게
+ import { itemEquip, itemUses, itemWeight, parseTraits, traitsText, type ItemEquip } from './itemtraits';
+ 
+@@ -53,13 +53,13 @@ export function readStartItems(v: unknown): StartItem[] {
+ /** 편집 칸 한 줄의 차례: 이름 | 쓰임 | 시작 자리 | 설명 | 효과 | 그림 낱말 | 무게(kg) */
+ export const START_ITEM_COLUMNS = '이름 | 쓰임 | 시작 자리 | 설명 | 효과 | 그림 낱말 | 무게(kg)';
+ 
+-const place = (e: StartItem) => (!e.equip || e.wear === false ? '소지품' : e.equip === 'weapon' ? '무기 칸' : '장비 칸');
++const place = (e: StartItem) => (!e.equip || e.wear === false ? '소지품' : e.equip === 'weapon' ? '손 칸' : '장비 칸'); // 무기 칸 → 손 칸 (사용자 2026-11-14)
+ 
+ /** 줄 → 편집 칸 글 */
+ export const startItemsText = (list: StartItem[]): string =>
+   list.map((e) => [e.name, traitsText(e), place(e), e.desc || '-', e.effect || '-', e.icon || '-', e.weight !== undefined ? String(e.weight) : '-'].join(' | ')).join('\n');
+ 
+-/** 편집 칸 글 → 줄. 「-」는 빈 칸. 쓰임은 「무기·사용」「장비」「사용」「소모 3」 (띄어 써도). 시작 자리에 「소지품」이면 장착 갈래라도 소지품에서 시작 */
++/** 편집 칸 글 → 줄. 「-」는 빈 칸. 쓰임은 「손·사용」「장비」「사용」「소모 3」 (옛 「무기」도 손, 사용자 2026-11-14) (띄어 써도). 시작 자리에 「소지품」이면 장착 갈래라도 소지품에서 시작 */
+ export function parseStartItems(text: string): StartItem[] {
+   const out: StartItem[] = [];
+   for (const line of text.split('\n')) {
+diff --git a/src/data/guides/shop.txt b/src/data/guides/shop.txt
+index ff731689fb..c9a5541d3a 100644
+--- a/src/data/guides/shop.txt
++++ b/src/data/guides/shop.txt
+@@ -5,7 +5,7 @@ You run a shop inside an ongoing Korean urban-horror roleplay (서울, 괴이).
+ @@END
+ 
+ @@SECTION SHELF
+-Shelf size: {size} items. One item per line, exactly: {line}. 값: the price in won as a plain integer; if this shop is not paid in money (the reference material says what it takes), write its own payment in short Korean words instead; both may be joined with +. 쓰임: how the item is handled, using only these words joined with 「·」 — 무기 (held and fought with), 장비 (worn or strapped on the body: clothes, armor, bags, accessories; not something merely kept in a pocket or bag), 사용 (operated or applied for an effect and kept afterwards; something merely worn is 장비 only, not 사용), 소모N (anything spent by using it — medicine, dressings, food and drink, ammunition, tape, batteries, single-use talismans — must be 소모N; N is how many uses this one item holds, counting everything in a set or pack, judged from what it is and how it is sold); write - when none fits. 그림: for picture lookup, `종류/물건말/english` — 종류 is exactly one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 (what the thing physically is, not what it is for: an ampoule is 의료, a spray can is 소모품, a coat is 옷, a washing machine is 기기), and 물건말 is the plain Korean common noun for the object itself in one or two words (코트, 앰플, 세탁기, 손전등) — never a brand, grade, size or the item's full name; english is that same noun in English (옷/코트/coat). 무게: how much one of it weighs in kg, a number only, judged from what it is, to the gram like a real product's listed weight (0.385, 1.24), not rounded to 0.1 or 0.5; for 소모N, one use's worth (the program multiplies by N). 설명 ≤ 60 chars (what it is, condition). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).
++Shelf size: {size} items. One item per line, exactly: {line}. 값: the price in won as a plain integer; if this shop is not paid in money (the reference material says what it takes), write its own payment in short Korean words instead; both may be joined with +. 쓰임: how the item is handled, using only these words joined with 「·」 — 손 (held in the hand to be used or fought with: weapons, tools, lights, umbrellas and anything else the protagonist holds rather than wears; the protagonist has two hands), 장비 (worn or strapped on the body: clothes, armor, bags, accessories; not something merely kept in a pocket or bag), 사용 (operated or applied for an effect and kept afterwards; something merely worn is 장비 only, not 사용), 소모N (anything spent by using it — medicine, dressings, food and drink, ammunition, tape, batteries, single-use talismans — must be 소모N; N is how many uses this one item holds, counting everything in a set or pack, judged from what it is and how it is sold); write - when none fits. 그림: for picture lookup, `종류/물건말/english` — 종류 is exactly one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 (what the thing physically is, not what it is for: an ampoule is 의료, a spray can is 소모품, a coat is 옷, a washing machine is 기기), and 물건말 is the plain Korean common noun for the object itself in one or two words (코트, 앰플, 세탁기, 손전등) — never a brand, grade, size or the item's full name; english is that same noun in English (옷/코트/coat). 무게: how much one of it weighs in kg, a number only, judged from what it is, to the gram like a real product's listed weight (0.385, 1.24), not rounded to 0.1 or 0.5; for 소모N, one use's worth (the program multiplies by N). 설명 ≤ 60 chars (what it is, condition). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).
+ @@END
+ 
+ @@SECTION SHELF_SECRET
+diff --git a/src/data/guides/updater-compact.txt b/src/data/guides/updater-compact.txt
+index 28f057c098..457e0c3803 100644
+--- a/src/data/guides/updater-compact.txt
++++ b/src/data/guides/updater-compact.txt
+@@ -290,7 +290,7 @@ Exception for this chat: also return a transaction when money clearly changed ha
+ <<END:points>>
+ <<SECTION:items>>
+ ## 15d. Items
+-The program keeps the user's character's inventory (`items_now` = what they carry now: name, desc, usable, uses_left, weight_kg for one, equip, equipped, condition, `pictures` when it has several state pictures) and counts consumable uses itself. `items_rule` (when present) is the user's limit on what may be reported as `new`; follow it. Return `items` only for a change the confirmed span states plainly, about the user's character: `new` when they obtain, buy, pick up, or are handed something they keep (not a glance at an object, not someone else's thing, not clothes already worn or everyday things merely mentioned) — judge `usable` (operated, applied, or consumed for an effect; false for things only worn or carried — clothes, masks, armor, bags are `equip`, not use), `uses` (anything spent by using it — medicine, dressings and gauze, food and drink, ammunition, tape, batteries, single-use talismans — must get a number: how many uses this one item holds, counting everything in a set or pack; null only for things that remain after use: tools, devices, keys, weapons), `equip` (weapon = held and fought with / gear = worn or strapped on the body: clothes, armor, bags, accessories / none = everything else, including things merely kept in a pocket or bag) `icon` (`종류/물건말/english`: 종류 one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 = what the thing physically is, 물건말 = the plain Korean common noun for the object in one or two words, english = that same noun in English, e.g. `옷/코트/coat`, `의료/앰플/ampoule`, `기기/손전등/flashlight`) and `weight` (kg one of it weighs, judged from what it is, to the gram like a real product's listed weight (0.385, 1.24), not rounded to 0.1 or 0.5; for a consumable one use's worth, the program multiplies by uses left); `update` when a listed item's condition (`ok`/`damaged`/`broken`), state, stated uses left (`uses`), or weight (`weight` for one, when that changed) changes — if it lists `pictures` and its state changed, set `icon` to the listed picture name that fits (a picture choice only), never write a grade into `name`/`desc` unless the quote states it, and never give where it is, `usable` or `equip`; `unequip` when a listed `equipped` item is taken off or put down and still carried; `left` when a listed item is put somewhere and the user's character goes on without it (`place` Korean ≤30); `gone` when a listed item is used up, lost, given away, thrown away, taken away, handed in, stolen, or sold in the story; `destroyed` when it is destroyed beyond use. Not mentioned, merely planned, or someone else's is no change; an item left earlier (`items_away` lists them) and taken back is `new` under that exact name. `name` Korean ≤30 — for every action but `new` copy the listed name exactly; `desc` Korean ≤80 states condition in words (never a count like ×3); `effect` Korean ≤60 only when the text says what it does; `m`, verbatim `quote`. ≤4 items; never invent one. `used_now` lists items used this turn through the inventory; the program already counted consumable uses, so report one only when the text shows damage, breaking, destruction, or a different amount left. Cash, bills, coins, cheques and account money are never items — the ledger (`transactions`) handles money.
++The program keeps the user's character's inventory (`items_now` = what they carry now: name, desc, usable, uses_left, weight_kg for one, equip, equipped, condition, `pictures` when it has several state pictures) and counts consumable uses itself. `items_rule` (when present) is the user's limit on what may be reported as `new`; follow it. Return `items` only for a change the confirmed span states plainly, about the user's character: `new` when they obtain, buy, pick up, or are handed something they keep (not a glance at an object, not someone else's thing, not clothes already worn or everyday things merely mentioned) — judge `usable` (operated, applied, or consumed for an effect; false for things only worn or carried — clothes, masks, armor, bags are `equip`, not use), `uses` (anything spent by using it — medicine, dressings and gauze, food and drink, ammunition, tape, batteries, single-use talismans — must get a number: how many uses this one item holds, counting everything in a set or pack; null only for things that remain after use: tools, devices, keys, weapons), `equip` (hand = held in the hand to be used or fought with: weapons, tools, lights, umbrellas / gear = only worn or strapped on the body: clothes, armor, bags, accessories / none = only kept in a pocket or bag: papers, keys, valuables) `icon` (`종류/물건말/english`: 종류 one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 = what the thing physically is, 물건말 = the plain Korean common noun for the object in one or two words, english = that same noun in English, e.g. `옷/코트/coat`, `의료/앰플/ampoule`, `기기/손전등/flashlight`) and `weight` (kg one of it weighs, judged from what it is, to the gram like a real product's listed weight (0.385, 1.24), not rounded to 0.1 or 0.5; for a consumable one use's worth, the program multiplies by uses left); `update` when a listed item's condition (`ok`/`damaged`/`broken`), state, stated uses left (`uses`), or weight (`weight` for one, when that changed) changes — if it lists `pictures` and its state changed, set `icon` to the listed picture name that fits (a picture choice only), never write a grade into `name`/`desc` unless the quote states it, and never give where it is, `usable` or `equip`; `unequip` when a listed `equipped` item is taken off or put down and still carried; `left` when a listed item is put somewhere and the user's character goes on without it (`place` Korean ≤30); `gone` when a listed item is used up, lost, given away, thrown away, taken away, handed in, stolen, or sold in the story; `destroyed` when it is destroyed beyond use. Not mentioned, merely planned, or someone else's is no change; an item left earlier (`items_away` lists them) and taken back is `new` under that exact name. `name` Korean ≤30 — for every action but `new` copy the listed name exactly; `desc` Korean ≤80 states condition in words (never a count like ×3); `effect` Korean ≤60 only when the text says what it does; `m`, verbatim `quote`. ≤4 items; never invent one. `used_now` lists items used this turn through the inventory; the program already counted consumable uses, so report one only when the text shows damage, breaking, destruction, or a different amount left. Cash, bills, coins, cheques and account money are never items — the ledger (`transactions`) handles money.
+ <<END:items>>
+ <<SECTION:shop>>
+ ## 15e. Shop
+@@ -398,7 +398,7 @@ Every key below is present.
+  "point_transactions":[{"amount":500,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],
+ <<END:points>>
+ <<SECTION:items>>
+- "items":[{"name":"<Korean ≤30 chars>","action":"new|update|unequip|left|gone|destroyed","desc":"<Korean ≤80 chars>","usable":<true|false>,"uses":"<integer or null>","equip":"weapon|gear|none","condition":"ok|damaged|broken","icon":"<종류/물건말/english>","weight":"<kg number>","place":"<Korean ≤30 chars, left only>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],
++ "items":[{"name":"<Korean ≤30 chars>","action":"new|update|unequip|left|gone|destroyed","desc":"<Korean ≤80 chars>","usable":<true|false>,"uses":"<integer or null>","equip":"hand|gear|none","condition":"ok|damaged|broken","icon":"<종류/물건말/english>","weight":"<kg number>","place":"<Korean ≤30 chars, left only>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],
+ <<END:items>>
+ <<SECTION:shop>>
+  "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"m2"},
+diff --git a/src/data/guides/updater-detailed.txt b/src/data/guides/updater-detailed.txt
+index a5e11eb32f..e476b13c07 100644
+--- a/src/data/guides/updater-detailed.txt
++++ b/src/data/guides/updater-detailed.txt
+@@ -433,10 +433,10 @@ The chat keeps a ledger of the user's character's cash; `wallet_now` gives the c
+ <<SECTION:items>>
+ ## 15d. Items — what the user's character carries
+ 
+-The chat keeps the user's character's inventory; `items_now` lists what they carry now (name, desc, `usable`, `uses_left` for a consumable, `weight_kg` for one of it, `equip` weapon/gear, `equipped`, `condition` when not intact, `pictures` when the item has several pictures for its states). The program owns the list and counts consumable uses itself; you report only changes stated plainly in the confirmed span.
+-- `new`: the user's character obtains, buys, picks up, is handed, or takes something and keeps it. Not an object merely seen or described, not another person's belongings, not clothes already worn or everyday things only mentioned in passing. Judge it once: `usable` (true only when it is operated, applied, or consumed to make something happen — a tool, device, medicine, key, talisman; false when it only works by being worn or carried, such as clothes, masks, armor, bags — that is `equip`, not use), `uses` (anything spent by using it — medicine, dressings and gauze, food and drink, ammunition, tape, batteries, single-use talismans — must get a number: how many uses this one item holds, counting everything in a set or pack; null only for things that remain after use, such as tools, devices, keys and weapons), `equip` (`weapon` when held and fought with, `gear` only when worn or strapped on the body — clothes, armor, bags, accessories; `none` for everything else, including things merely kept in a pocket or bag), `icon` (for picture lookup, `종류/물건말/english`: 종류 exactly one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 = what the thing physically is, 물건말 = the plain Korean common noun for the object in one or two words, english = that same noun in English, e.g. `옷/코트/coat`, `의료/앰플/ampoule`, `기기/손전등/flashlight`), `weight` (how much one of it weighs in kg, judged from what it is, to the gram like a real product's listed weight (0.385, 1.24), not rounded to 0.1 or 0.5; for a consumable, one use's worth — the program multiplies it by the uses left).
++The chat keeps the user's character's inventory; `items_now` lists what they carry now (name, desc, `usable`, `uses_left` for a consumable, `weight_kg` for one of it, `equip` hand/gear, `equipped`, `condition` when not intact, `pictures` when the item has several pictures for its states). The program owns the list and counts consumable uses itself; you report only changes stated plainly in the confirmed span.
++- `new`: the user's character obtains, buys, picks up, is handed, or takes something and keeps it. Not an object merely seen or described, not another person's belongings, not clothes already worn or everyday things only mentioned in passing. Judge it once: `usable` (true only when it is operated, applied, or consumed to make something happen — a tool, device, medicine, key, talisman; false when it only works by being worn or carried, such as clothes, masks, armor, bags — that is `equip`, not use), `uses` (anything spent by using it — medicine, dressings and gauze, food and drink, ammunition, tape, batteries, single-use talismans — must get a number: how many uses this one item holds, counting everything in a set or pack; null only for things that remain after use, such as tools, devices, keys and weapons), `equip` (`hand` when it is held in the hand to be used or fought with — weapons, tools, lights, umbrellas; `gear` only when worn or strapped on the body — clothes, armor, bags, accessories; `none` for things only kept in a pocket or bag, such as papers, keys or valuables), `icon` (for picture lookup, `종류/물건말/english`: 종류 exactly one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 = what the thing physically is, 물건말 = the plain Korean common noun for the object in one or two words, english = that same noun in English, e.g. `옷/코트/coat`, `의료/앰플/ampoule`, `기기/손전등/flashlight`), `weight` (how much one of it weighs in kg, judged from what it is, to the gram like a real product's listed weight (0.385, 1.24), not rounded to 0.1 or 0.5; for a consumable, one use's worth — the program multiplies it by the uses left).
+ - `update`: a listed item itself changes in a way the text states — its condition (`condition`: `ok` / `damaged` / `broken`; broken means it no longer works), what it is like now (`desc`), or, for a consumable, how many uses are left when the text says so (`uses` = uses left now), or its weight when what one of it weighs changed (`weight` in kg for one). When the item lists `pictures` and its state changed, also set `icon` to the one listed picture name that fits how the text now shows it; this only chooses a picture. Never write a grade into `name` or `desc` unless the quoted text states that grade. `update` never says where an item is and never takes `usable` or `equip`. Copy the listed `name` exactly.
+-- `unequip`: a listed item with `equipped: true` is taken off, put down or put away and the user's character still has it (in a bag, in hand, in a pocket).
++- `unequip`: a listed item with `equipped: true` is taken off, put down or put away and the user's character still has it (in a bag, in a pocket, carried along).
+ - `left`: a listed item, equipped or not, is put somewhere and the user's character goes on without it — a locker, a room, a vehicle, another person keeping it. Give `place` (Korean ≤30): where it is now.
+ - `gone`: a listed item is used up, lost, given away, thrown away, taken away, handed in, stolen, or sold in the story. `destroyed`: a listed item is destroyed beyond use (smashed, burnt up, torn apart).
+ - For `unequip` / `left` / `gone` / `destroyed` copy the listed `name` exactly. Not a change: an item merely not mentioned, an intention or plan to leave it, someone else's item. An item left or thrown away earlier (`items_away`, when present, lists them with where they were left) and taken back in the confirmed span is `new` under that exact name.
+@@ -567,7 +567,7 @@ The object has these keys. Every key listed here is present.
+  "point_transactions":[{"amount":500,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],
+ <<END:points>>
+ <<SECTION:items>>
+- "items":[{"name":"<Korean ≤30 chars>","action":"new|update|unequip|left|gone|destroyed","desc":"<Korean ≤80 chars>","usable":<true|false>,"uses":"<integer or null>","equip":"weapon|gear|none","condition":"ok|damaged|broken","icon":"<종류/물건말/english>","weight":"<kg number>","place":"<Korean ≤30 chars, left only>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],
++ "items":[{"name":"<Korean ≤30 chars>","action":"new|update|unequip|left|gone|destroyed","desc":"<Korean ≤80 chars>","usable":<true|false>,"uses":"<integer or null>","equip":"hand|gear|none","condition":"ok|damaged|broken","icon":"<종류/물건말/english>","weight":"<kg number>","place":"<Korean ≤30 chars, left only>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],
+ <<END:items>>
+ <<SECTION:shop>>
+  "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"m2"},
+diff --git a/src/ui/directory.ts b/src/ui/directory.ts
+index 2308b6ba4d..7a3b9677fd 100644
+--- a/src/ui/directory.ts
++++ b/src/ui/directory.ts
+@@ -395,7 +395,7 @@ export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string
+     ${photoBlock(a.lore, ctx)}
+     ${input(k('aliases'), a.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
+     ${input(k('carry'), a.carry ? String(a.carry) : '', '소지 한도(kg)', '이 인물로 시작하면 이 무게가 소지 한도예요. 비우면 설정 「소지 한도」를 써요')}
+-    ${area(k('items'), startItemsText(a.startItems ?? []), '시작 소지품', `이 인물로 시작하면 소지품에 넣고 무기·장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
++    ${area(k('items'), startItemsText(a.startItems ?? []), '시작 소지품', `이 인물로 시작하면 소지품에 넣고 손에 드는 것은 손 칸, 장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
+     <p class="gx-muted">로어북: ${esc(a.lore)} · ID ${esc(a.id)}${a.inFolder ? '' : ' (폴더 밖)'}</p>
+   </div>`;
+ }
+diff --git a/src/ui/icons.ts b/src/ui/icons.ts
+index 39f4e8cd84..46fe271007 100644
+--- a/src/ui/icons.ts
++++ b/src/ui/icons.ts
+@@ -51,7 +51,8 @@ export const ICONS = {
+   siren: stroke('<path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5"/><path d="M4 17.5h16V21H4z"/><path d="M12 2v2.5M3.5 5.5l1.8 1.8M20.5 5.5l-1.8 1.8M12 10.5v3.5"/>'),
+   spook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5v10.6c0 .8.9 1.2 1.5.7l1.5-1.2 1.7 1.4c.4.3.9.3 1.3 0l1.5-1.4 1.5 1.4c.4.3.9.3 1.3 0l1.7-1.4 1.5 1.2c.6.5 1.5.1 1.5-.7V10A7.5 7.5 0 0 0 12 2.5ZM9.3 8.4a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Zm5.4 0a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Z"/></svg>',
+   expand: stroke('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+-  /** 장착 빈 칸 기호: 무기(칼) · 장비(방패) */
++  /** 장착 빈 칸 기호: 손(손바닥) · 장비(방패). weapon(칼)은 옛 기호로 남김 (사용자 2026-11-14) */
++  hand: stroke('<path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.3l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/>'),
+   weapon: stroke('<path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/>'),
+   gear: stroke('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>'),
+   close: stroke('<path d="M6 6l12 12M18 6 6 18"/>'),
+diff --git a/src/ui/items.ts b/src/ui/items.ts
+index 451034256e..d741cd9844 100644
+--- a/src/ui/items.ts
++++ b/src/ui/items.ts
+@@ -1,7 +1,7 @@
+ // 소지품 메뉴 (2026-11-07 사용자 설계, docs/인계/소지품_1107/초안/mock2.mjs 가 그림 초안):
+ // 하위 탭 [가계부 | 소지품]. 가계부는 기록 메뉴에서 여기로 옮겨 왔다 (ui/wallet.ts 그대로).
+ // 소지품: 도구 줄(칸 수 알약 · 넘침 배지 · 물건|기록 토글 · PC는 직접 넣기·합치기 · 찾기) + 세 상자 (2026-11-07 밤 사용자, memory goei-equip-design):
+-//   「장착」(왼쪽 아바타 + 무기 2 · 장비 4) → 소지품 격자(8열) → 「사용」(놓는 만큼 늘어남). 버리기는 끄는 동안만 붉은 띠로.
++//   「장착」(왼쪽 아바타 + 손 2 · 장비 6, 사용자 2026-11-14) → 소지품 격자(8열) → 「사용」(놓는 만큼 늘어남). 버리기는 끄는 동안만 붉은 띠로.
+ // 끌어다 놓기(PC): 격자 → 장착 칸(장착) · 사용 상자(×n) · 버리기(한 번 확인), 장착 칸 → 격자(풀기). 팝업 단추(사용·장착·버리기)는 폰용으로 남김.
+ // 칸을 올리면 설명 말풍선(PC), 누르면 팝업. 폰은 직접 넣기·합치기가 아래 도구 줄에.
+ // 플러그인은 막지도 경고하지도 않는다: 칸이 넘치면 넘친 칸을 붉은 테두리로 보여 줄 뿐, 푸는 건 본편 응답 (core/items.ts).
+@@ -78,7 +78,7 @@ export function itemPic(it: { name: string; icon?: string; id?: string; desc?: s
+   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
+ }
+ 
+-/** 판정 글: 「무기 · 사용 · 남은 3 · 1.2kg · 손상」 */
++/** 판정 글: 「손 · 사용 · 남은 3 · 1.2kg · 손상」 */
+ export function traitsLine(it: Item, left: number | undefined): string {
+   return [it.equip ? EQUIP_LABEL[it.equip] : '', left !== undefined ? `남은 ${left}` : it.use ? '사용' : '', it.weight !== undefined ? (it.uses !== undefined ? `${weightText(lineWeight(it, left)!)} (1개 ${weightText(it.weight)})` : weightText(it.weight)) : '', it.state !== 'ok' ? STATE_LABEL[it.state] : ''].filter(Boolean).join(' · ');
+ }
+@@ -198,8 +198,9 @@ export function setAvatarHtml(fn: (ctx: ChatContext) => string): void {
+ }
+ 
+ /**
+- * 「장착」 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 | 장착 칸 | 사용칸].
+- * 장착 칸 차례는 무기 2 → 장비 6 (2026-11-12 사용자) — PC 4열(무기·무기·장비·장비 / 장비 4), 폰 2열 4줄(무기·무기 / 장비·장비 ×3). 무기 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
++ * 「장착」 띠 (2026-11-08 사용자): 제목·「손/장비」 글자 없이 [아바타 전신 | 장착 칸 | 사용칸].
++ * 장착 칸 차례는 손 2 → 장비 6 (2026-11-12 사용자) — PC 4열(손·손·장비·장비 / 장비 4), 폰 2열 4줄(손·손 / 장비·장비 ×3). 손 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
++ * 손 칸 = 손에 드는 것 전부(무기·도구·불빛·우산…), 장비 칸 = 몸에 걸치거나 매는 것. 안쪽 값은 옛 채팅 때문에 'weapon' 그대로 (사용자 2026-11-14)
+  * PC: 아바타 자리와 장착 칸 묶음은 data-drop="auto" — 물건을 놓으면 장착 물건은 맞는 갈래 빈 칸으로, 쓰는 물건은 사용 예정으로 (itemsAction items-dnd). 칸에 직접 놓기는 그대로.
+  * 폰: 사용칸을 그리지 않는다 (끌기가 없다). 물건 팝업의 「사용」「사용 취소」와 칸의 「사용 예정」 딱지로 한다.
+  * where = 'items'(끌어다 놓기·누르면 팝업, 오른쪽에 사용칸) · 'sell'(상점 팔기: 아바타·사용칸 없이 칸만, 누르면 그 물건을 팔 물건으로)
+@@ -212,7 +213,7 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
+   return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av" data-drop="auto">${av}</div>` : ''}<div class="it-eqcol" data-drop="auto">${statsRow(ctx, liveOf(ctx))}${slots}</div>${isPhone() ? '' : useBox(ctx)}</div></section>`;
+ }
+ 
+-/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 6) */
++/** 장착 띠 조각: 아바타 · 장착 칸(손 2 → 장비 6) */
+ export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''): { av: string; slots: string } {
+   // 소지품·살아 있는 메시지·RP 때는 한 번만 구한다 (전수검사 11-13: 장착 칸마다 다시 구했다)
+   const items = itemsOf(ctx);
+@@ -222,7 +223,7 @@ export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''):
+   let when: When | undefined;
+   const slot = (k: ItemEquip, i: number) => {
+     const it = eq[k][i];
+-    if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
++    if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${k === 'weapon' ? ICONS.hand : ICONS.gear}</span></div>`; // 손 칸은 손 기호 (사용자 2026-11-14)
+     const act = where === 'sell' ? 'shop-sell-pick' : 'items-open';
+     const left = itemLeft(items, it, alive);
+     when ??= whenOf(ctx);
+@@ -359,7 +360,7 @@ function popup(ctx: ChatContext): string {
+       ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
+       ${queued ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
+       ${boxButton(ctx, it.id)}
+-      ${it.equip ? `<button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}">${equipped ? '장착 풀기' : '장착'}</button>` : ''}
++      ${it.equip ? `<button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}">${it.equip === 'weapon' ? (equipped ? '내려놓기' : '들기') : equipped ? '장착 풀기' : '장착'}</button>` : ''}
+       ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
+       ${it.uses !== undefined ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx, it).length ? '' : 'disabled'} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ''}
+       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc(it.id)}">버리기</button>
+@@ -382,7 +383,7 @@ function form(it: Item | null, left?: number): string {
+     <label><span>이름</span><input name="name" maxlength="30" required value="${esc(it?.name ?? '')}" placeholder="예: 소금 봉지"></label>
+     <label><span>설명</span><input name="desc" maxlength="80" value="${esc(it?.desc ?? '')}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
+     <label><span>효과</span><input name="effect" maxlength="60" value="${esc(it?.effect ?? '')}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
+-    <label><span>장착</span><select name="equip">${opt('', '없음')}${opt('weapon', '무기')}${opt('gear', '장비')}</select></label>
++    <label><span>장착</span><select name="equip">${opt('', '없음')}${opt('weapon', '손')}${opt('gear', '장비')}</select></label>
+     <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? ' checked' : ''}> 쓸 수 있음</span></label>
+     <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ''}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
+     <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ''}" placeholder="kg"></label>
+diff --git a/src/ui/settings.ts b/src/ui/settings.ts
+index 133a800cc2..fe62155716 100644
+--- a/src/ui/settings.ts
++++ b/src/ui/settings.ts
+@@ -144,7 +144,7 @@ function rulesBlock(stored: unknown, busy: boolean): string {
+     const key = normIcon(r.a).replace(/ /g, '');
+     const kindKey = Object.entries(ICON_KIND_LABEL).find(([, v]) => v === r.a.trim())?.[0];
+     const ok = kindKey ? used.kinds.has(kindKey) : used.words.has(key);
+-    const bad = (r.a || r.b) && !ok ? (!r.a ? '종류·물건말이 비어 있어 이 줄은 안 쓰여요.' : !r.b ? '판정이 비어 있어 이 줄은 안 쓰여요.' : '판정은 무기·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요.') : '';
++    const bad = (r.a || r.b) && !ok ? (!r.a ? '종류·물건말이 비어 있어 이 줄은 안 쓰여요.' : !r.b ? '판정이 비어 있어 이 줄은 안 쓰여요.' : '판정은 손·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요.') : '';
+     return `<div class="ms-tb-r${bad ? ' bad' : ''}">
+       <label class="ms-tb-c n"><span>종류·물건말</span><input class="gx-search" data-change="set-items-rules-cell" data-key="${i}:a" value="${esc(r.a)}" maxlength="${ALIAS_WORD_MAX}" aria-label="종류·물건말"${dis}></label>
+       <i class="ms-arrow" aria-hidden="true">→</i>
+diff --git a/src/ui/shop.ts b/src/ui/shop.ts
+index 4b410726f4..6ef13e3fa0 100644
+--- a/src/ui/shop.ts
++++ b/src/ui/shop.ts
+@@ -41,7 +41,7 @@ const liveShop = (chat: ChatContext['chat']): ShopState | null => {
+ };
+ /** 상품 그림: 소지품과 같은 PixelLab 그림 팩에서 그림 낱말·이름으로 (ui/items.ts itemPic, 표시 전용) */
+ const pic = (name: string, icon?: string): string => itemPic({ name, icon });
+-/** 판정 글: 「무기 · 소모 3」 · 「사용」 (상점 물건·팔 물건) */
++/** 판정 글: 「손 · 소모 3」 · 「사용」 (상점 물건·팔 물건) */
+ const traitsOf = (x: { use: boolean; uses?: number; equip?: 'weapon' | 'gear' }) => [x.equip ? EQUIP_LABEL[x.equip] : '', x.uses ? `소모 ${x.uses}` : x.use ? '사용' : ''].filter(Boolean).join(' · ');
+ import { isPhone } from './media';
+ import { toast } from './toast';
+diff --git a/src/ui/style.css b/src/ui/style.css
+index a815811272..b08cac0a05 100644
+--- a/src/ui/style.css
++++ b/src/ui/style.css
+@@ -3273,7 +3273,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
+ .it-slot .it-ic { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
+ .it-slot .it-ic svg { width: 56%; height: 56%; }
+ .it-slot .it-ic img { width: min(85px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; }
+-/* 무기 칸만 색이 다름 (호박색), 빈 칸은 기호(칼·방패)로 갈래 */
++/* 손 칸만 색이 다름 (호박색), 빈 칸은 기호(손·방패)로 갈래 (사용자 2026-11-14: 무기 칸 → 손 칸) */
+ .it-slot.it-s-weapon { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 7%, var(--panel)); }
+ .it-slot.it-s-weapon .it-ic { background: color-mix(in srgb, var(--amber) 6%, color-mix(in srgb, var(--void) 60%, var(--panel))); }
+ .it-slot.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
+diff --git a/tests/equip8-browser.mjs b/tests/equip8-browser.mjs
+index 7b6df885a2..3b1aeae47a 100644
+--- a/tests/equip8-browser.mjs
++++ b/tests/equip8-browser.mjs
+@@ -1,4 +1,4 @@
+-// 소지품 위쪽 띠 (2026-11-12 사용자): 장착 8칸(무기 2 · 장비 6), PC [아바타 256 | 장착 4열×2줄 칸 97 | 사용 칸], 아바타·장착 묶음에 끌어 놓기,
++// 소지품 위쪽 띠 (2026-11-12 사용자): 장착 8칸(손 2 · 장비 6, 사용자 2026-11-14: 무기 칸 → 손 칸), PC [아바타 256 | 장착 4열×2줄 칸 97 | 사용 칸], 아바타·장착 묶음에 끌어 놓기,
+ // 폰 [아바타 | 장착 2열×4줄 칸 59] · 사용 칸 없음 · 장착 칸 무게 글자 숨김 · 누르면 「사용」/「사용 취소」, 상점 팔기 화면의 8칸.
+ // 사용법: node tests/equip8-browser.mjs [out-dir]   (PART=layout,drag,phone,sell 로 절 고르기)
+ import { mkdirSync } from 'node:fs';
+@@ -134,7 +134,7 @@ if (PART.includes('drag')) {
+   await drag(cell('i_boot'), '[data-drop="equip:gear:4"]');
+   const s5 = await stateOf(page);
+   if (s5.slots.i_boot !== 'gear:4') bad(`[drag] 칸에 직접 놓기(장비 5번째 칸): ${JSON.stringify(s5.slots)}`);
+-  // 쓰는 물건(장착 아님)을 빈 무기 칸 위에 놓으면 = 장착 묶음에 놓은 것 → 사용 예정
++  // 쓰는 물건(장착 아님)을 빈 손 칸 위에 놓으면 = 장착 묶음에 놓은 것 → 사용 예정
+   await drag(cell('i_light'), '[data-drop="equip:weapon:1"]');
+   const s6 = await stateOf(page);
+   if (!s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 쓰는 물건을 칸 위에: ${JSON.stringify(s6.use)}`);
+diff --git a/tests/guide-out.test.mjs b/tests/guide-out.test.mjs
+index b9b8760c48..889b4e3184 100644
+--- a/tests/guide-out.test.mjs
++++ b/tests/guide-out.test.mjs
+@@ -96,6 +96,8 @@ test('기본 지침으로 만든 요청문 = 옮기기 전 코드가 만들던 
+     ['\\nPrices should feel like real Korean prices for that kind of shop.', ''],
+     ['not story readers or game players.\\n\\n### Tone and manner\\n\\nDefault to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', 'not story readers or game players.\\n\\n### Tone and manner\\n\\n'],
+     ['\nFactions: 1 Management Bureau · 2 Fake Management Bureau · 3 Baekilmong · 4 Civilian · 5 Freelancer\n', '\n'],
++    // 사용자 2026-11-14: 「무기」 칸 → 「손」 칸 (손에 드는 것 전부)
++    ['무기 (held and fought with)', '손 (held in the hand to be used or fought with: weapons, tools, lights, umbrellas and anything else the protagonist holds rather than wears; the protagonist has two hands)'],
+   ];
+   const later = (t) => LATER.reduce((x, [a, b]) => x.split(a).join(b), t);
+   for (const k of names) assert.equal(BASE[k], later(OLD.calls[k]), k);
+diff --git a/tests/items-browser.mjs b/tests/items-browser.mjs
+index 9e2c381a2b..d46ef749f8 100644
+--- a/tests/items-browser.mjs
++++ b/tests/items-browser.mjs
+@@ -28,7 +28,7 @@ for (const vp of ['pc', 'phone']) {
+   if (vp === 'pc') {
+     await page.hover('.it-c[data-value="i_소금 봉지"]');
+     await shot('grid');
+-    // 끌어다 놓기: 권총 → 무기 둘째 칸, 진통제 → 사용 두 번(×2), 손전등 → 사용, 끄는 동안 버리기 띠
++    // 끌어다 놓기: 권총 → 손 둘째 칸, 진통제 → 사용 두 번(×2), 손전등 → 사용, 끄는 동안 버리기 띠
+     const drag = async (from, to) => { await page.dragAndDrop(from, to); await sleep(350); };
+     await drag('.it-c[data-value="i_권총"]', '[data-drop="equip:weapon:1"]');
+     await drag('.it-c[data-value="i_진통제"]', '[data-drop="use"]');
+diff --git a/tests/items.test.mjs b/tests/items.test.mjs
+index f3c4f436d0..717644e899 100644
+--- a/tests/items.test.mjs
++++ b/tests/items.test.mjs
+@@ -3,7 +3,7 @@ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+ import {
+   addItem, addUse, equipItem, equippedOf, gridItems, itemLeft, itemsBlock, liveItems, mergeItems, parseTraits, readItemUse, readItems, removeItem, itemSlots, itemUseVars, itemsVars, searchItems,
+-  setItemLeft, traitsText, unequipItem, updateItem, ITEM_SLOTS_DEFAULT,
++  setItemLeft, traitsText, unequipItem, updateItem, ITEM_SLOTS_DEFAULT, itemLine, setItemRules, ITEM_RULES_DEFAULT,
+   canMerge, mergedNow, itemWeight, weightText, totalWeight, itemCarry, itemEditOn, ITEM_CARRY_DEFAULT,
+ } from '../dist-test/core.mjs';
+ 
+@@ -43,10 +43,24 @@ test('쓰임 글 읽기·쓰기', () => {
+   assert.deepEqual(parseTraits('소모3'), { use: true, uses: 3 });
+   assert.deepEqual(parseTraits('무기, 소모'), { use: true, uses: 1, equip: 'weapon' }, '숫자 없는 소모는 1');
+   assert.deepEqual(parseTraits('-'), { use: false });
+-  assert.equal(traitsText({ use: true, uses: 3, equip: 'weapon' }), '무기·소모3');
++  assert.equal(traitsText({ use: true, uses: 3, equip: 'weapon' }), '손·소모3', '손 칸은 「손」으로 쓴다 (사용자 2026-11-14)');
+   assert.equal(traitsText({ use: false }), '-');
+ });
+ 
++test('손 칸 (사용자 2026-11-14): 「손」 글은 손 칸, 기본 판정 표는 비어 모델이 손으로 정한 망치가 그대로, 본편 글은 in hand·worn', () => {
++  assert.deepEqual(parseTraits('손'), { use: false, equip: 'weapon' });
++  assert.deepEqual(parseTraits('hand·사용'), { use: true, equip: 'weapon' });
++  assert.deepEqual(parseTraits('무기'), { use: false, equip: 'weapon' }, '옛 글 「무기」도 손 칸');
++  assert.equal(ITEM_RULES_DEFAULT, '');
++  setItemRules(undefined);
++  const s = addItem(empty, alive, { name: '망치', use: true, equip: 'weapon', icon: '도구/망치/hammer', from: 'story', anchor: 'c1' });
++  assert.deepEqual([s.list[0].use, s.list[0].equip], [true, 'weapon'], '도구라도 모델이 손이라 하면 손');
++  const hand = { ...s.list[0], state: 'ok' };
++  assert.equal(itemLine(hand, undefined, true), '- 망치 [in hand]');
++  assert.equal(itemLine({ ...hand, name: '코트', equip: 'gear' }, undefined, true), '- 코트 [worn]');
++  assert.equal(itemLine(hand, undefined, false), '- 망치', '장착 안 했으면 표시 없음');
++});
++
+ test('소모성: 사용 기록만큼 남은 횟수가 줄고 0이면 목록에서 빠진다. 기준 응답이 지워지면 돌아온다', () => {
+   let it = addItem(empty, alive, { name: '진통제', uses: 2, from: 'manual', anchor: '' });
+   const id = it.list[0].id;
+@@ -172,7 +186,7 @@ test('본편 글: 목록 전부(장착·남은 횟수·상태)·한계·이번 
+   it = addItem(it, alive, { name: '권총', equip: 'weapon', use: true, from: 'manual', anchor: '', wear: true });
+   const text = itemsBlock(it.list, { slots: 1, limit: '가방 하나', left: (e) => itemLeft(it, e, alive), use: [{ name: '소금 봉지', n: 2, after: 1 }], bought: ['손전등'] });
+   assert.equal(text, [
+-    '[Inventory] 2/1 (over the limit)', '- 소금 봉지 — 두 봉지 (괴이를 늦춤) [3 uses left]', '- 손전등 [broken, cannot be used]', '- 권총 [equipped weapon]',
++    '[Inventory] 2/1 (over the limit)', '- 소금 봉지 — 두 봉지 (괴이를 늦춤) [3 uses left]', '- 손전등 [broken, cannot be used]', '- 권총 [in hand]',
+     'Carry limit: 가방 하나', 'This turn: uses 소금 봉지 ×2 (1 left after this); just bought 손전등; carrying more than the limit',
+   ].join('\n'));
+ });
+diff --git a/tests/itemstate-browser.mjs b/tests/itemstate-browser.mjs
+index 56444c2f5d..35161e1ccb 100644
+--- a/tests/itemstate-browser.mjs
++++ b/tests/itemstate-browser.mjs
+@@ -126,20 +126,23 @@ for (const vp of ['pc', 'phone']) {
+     assert.equal((await ss()).$it_left_words, '두고, 놓고, 보관해, 맡겨, 반납, 압수, 버리고, 잃어, 맡기고');
+     await setInput(page, L, ''); await sleep(400);
+     assert.ok(!(await ss()).$it_left_words, '비우면 기본값'); assert.equal(await val(L), '두고, 놓고, 보관해, 맡겨, 반납, 압수, 버리고, 잃어');
+-    // 판정 표: 접혀 있다 → 펴서 한 칸 고침 → 저장 → 기본값으로
++    // 판정 표: 접혀 있다 → 기본 표는 비었다(모델이 지침대로, 사용자 2026-11-14) → 펴서 예외 줄 하나 추가 → 저장 → 기본값으로
+     assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"]')?.open), false, '판정 표는 접혀 있다');
+-    assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"] .adv-count')?.textContent), '14줄');
++    assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"] .adv-count')?.textContent), '0줄', '기본 판정 표는 비었다');
+     await page.evaluate(() => { const d = document.querySelector('.gw details[data-keep="items-rules"]'); d.open = true; d.dispatchEvent(new Event('toggle')); d.scrollIntoView({ block: 'start' }); }); await sleep(300);
+     await page.screenshot({ path: `${out}/${vp}_9_설정_판정표.png` });
+     const cell = (k) => `.gw [data-change="set-items-rules-cell"][data-key="${k}"]`;
+-    assert.deepEqual([await val(cell('12:a')), await val(cell('12:b'))], ['도구', '사용']);
+-    await setInput(page, cell('12:b'), '장비·사용'); await sleep(400);
+-    assert.ok(String((await ss()).$it_rules).includes('도구 → 장비·사용'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
++    await page.evaluate(() => document.querySelector('.gw [data-action="set-items-rules-add"]')?.click()); await sleep(400);
++    await setInput(page, cell('0:a'), '망치'); await sleep(400);
++    await setInput(page, cell('0:b'), '손'); await sleep(400);
++    assert.deepEqual([await val(cell('0:a')), await val(cell('0:b'))], ['망치', '손']);
++    assert.ok(String((await ss()).$it_rules).includes('망치 → 손'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
++    assert.equal(await page.evaluate(() => document.querySelector('.gw details[data-keep="items-rules"] .ms-tb-r.bad')), null, `[${vp}] 「손」 줄은 쓰이는 줄`);
++    // 조작 높이 34px (예외 줄 하나가 있을 때: 말 칸 2 · 표 칸 2 · 지우기 · 추가 · 기본값으로) · 가로 넘침 없음
++    const hs = await page.evaluate(() => [...document.querySelectorAll('.gw [data-change="set-items-left-words"], .gw [data-change="set-items-off-words"], .gw details[data-keep="items-rules"] input, .gw details[data-keep="items-rules"] .gx-mini')].map((e) => Math.round(e.getBoundingClientRect().height * 10) / 10).filter((h) => h > 0));
++    assert.ok(hs.length >= 7 && hs.every((h) => Math.abs(h - 34) <= 0.6), `[${vp}] 조작 높이: ${[...new Set(hs)]}`);
+     await page.evaluate(() => document.querySelector('.gw [data-action="set-items-rules-reset"]')?.click()); await sleep(400);
+     assert.ok(!(await ss()).$it_rules, '기본값으로');
+-    // 조작 높이 34px · 가로 넘침 없음
+-    const hs = await page.evaluate(() => [...document.querySelectorAll('.gw [data-change="set-items-left-words"], .gw [data-change="set-items-off-words"], .gw details[data-keep="items-rules"] input, .gw details[data-keep="items-rules"] .gx-mini')].map((e) => Math.round(e.getBoundingClientRect().height * 10) / 10).filter((h) => h > 0));
+-    assert.ok(hs.length > 10 && hs.every((h) => Math.abs(h - 34) <= 0.6), `[${vp}] 조작 높이: ${[...new Set(hs)]}`);
+     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, '가로 넘침 없음');
+     await page.evaluate(() => document.querySelector('.gw [data-change="set-items-left-words"]')?.scrollIntoView({ block: 'center' })); await sleep(300);
+     await page.screenshot({ path: `${out}/${vp}_10_설정_말.png` });
+@@ -150,8 +153,8 @@ for (const vp of ['pc', 'phone']) {
+   if (before) continue;
+   const P = JSON.parse(distPack('goei-data-items'));
+   const fileOf = (name) => P.table.find((r) => r.k[0] === name)?.f;
+-  // 손전등 갈래: 기기 → 사용 (전수검사 11-13 승인: 도구·기기는 사용만)
+-  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
++  // 손전등 갈래: 기본 표는 비어 모델 값(usable, equip 없음) 그대로 → 사용만 (사용자 2026-11-14)
++  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착') && !torch.btns.includes('들기'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
+   // 정장 사례: 격자·장착 칸에서 빠지고 무게가 줄고, 기록에 「없어짐 · 두고 옴」
+   assert.ok(v1.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 처음엔 장착 칸에`);
+   assert.ok(!v2.grid.includes('사내용 정장 세트') && !v2.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 정장이 소지품에서 빠짐: ${JSON.stringify(v2)}`);
+@@ -165,7 +168,7 @@ for (const vp of ['pc', 'phone']) {
+   assert.ok(!v3.grid.includes('손전등'), `[${vp}] 버린 뒤 격자: ${v3.grid}`);
+   assert.deepEqual(result[vp].same.includes('손전등'), false, `[${vp}] 같은 응답 근거로는 안 되살아남`);
+   assert.ok(v4.grid.includes('손전등'), `[${vp}] 다시 주움: ${v4.grid}`);
+-  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
++  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착') && !torch2.btns.includes('들기'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
+   assert.equal(again.list.filter((e) => e.name === '손전등').length, 1, '새 줄이 생기지 않음');
+   assert.equal(await Promise.resolve(errorsAll.length), 0, errorsAll.join('\n'));
+ }
+diff --git a/tests/itemstate.test.mjs b/tests/itemstate.test.mjs
+index 8cae146a42..e6b5fa30b8 100644
+--- a/tests/itemstate.test.mjs
++++ b/tests/itemstate.test.mjs
+@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
+ import { readFileSync } from 'node:fs';
+ import {
+   addItem, applyItemChanges, applyItemsPack, equipItem, equippedOf, gradeHits, gradeInQuote, inventoryText, isEquipped, itemLine, itemsBlock, itemsAwayOf, itemsNowOf, itemsVars, liveItems, matchItemIcon, movedNow, outItems,
+-  parseItemRules, readItems, removeItem, setItemRules, stripGrades, totalWeight, traitsFor, itemPictureNames, formFamilies, ITEM_FORM_DEFAULT, ITEM_RULES_VAR, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_VAR,
++  parseItemRules, readItems, removeItem, setItemRules, stripGrades, totalWeight, traitsFor, itemPictureNames, formFamilies, ITEM_FORM_DEFAULT, ITEM_RULES_DEFAULT, ITEM_RULES_VAR, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_VAR,
+ } from '../dist-test/core.mjs';
+ import { itemsPackText } from '../scripts/data-pack.mjs';
+ 
+@@ -127,9 +127,17 @@ test('다 쓴 소모품·상점 맞교환은 지금처럼 줄을 지운다', ()
+   assert.equal(removeItem(s, s.list[0].id, 'sell', 'store').list.length, 0);
+ });
+ 
+-test('갈래 표: 종류 → 판정. 손전등(기기)은 사용, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
++test('갈래 표: 기본 표는 비어 모델 값 그대로. 사용자가 적은 표는 종류 → 판정, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
+   setItemRules(undefined);
+   const t = (icon, name, model = {}) => traitsFor(icon.split('/')[0] && { 옷: 'wear', 음식: 'food', 도구: 'tool', 기기: 'device', 의료: 'medical', 소모품: 'consumable', 부적: 'charm', 무기: 'weapon', 서류: 'paper', 귀중품: 'valuable', 열쇠: 'key', 봉인: 'seal', 괴이: 'anomaly', 잡동사니: 'misc', 성인: 'adult' }[icon.split('/')[0]], icon, name, model);
++  // 기본 표는 비었다: 어느 종류든 모델 값 (사용자 2026-11-14)
++  assert.equal(ITEM_RULES_DEFAULT, '');
++  assert.equal(t('기기/손전등/flashlight', '손전등', { use: true, equip: 'weapon' }), undefined, '기본 표 → 모델 값');
++  assert.equal(t('도구/망치/hammer', '망치', { use: true, equip: 'weapon' }), undefined);
++  assert.equal(t('옷/정장/suit', '정장', { use: true }), undefined);
++  // 사용자가 적은 표 (옛 기본 줄을 예외 줄로 적은 경우): 표대로
++  const OLD = ['옷 → 장비', '무기 → 손', '음식 → 소모1', '의료 → 소모1', '소모품 → 소모1', '열쇠 → 사용', '부적 → 사용', '봉인 → 사용', '서류 → -', '귀중품 → -', '잡동사니 → -', '괴이 → -', '도구 → 사용', '기기 → 사용'].join('\n');
++  setItemRules({ [ITEM_RULES_VAR]: OLD });
+   assert.deepEqual(t('기기/손전등/flashlight', '손전등', { use: true }), { use: true });
+   assert.deepEqual(t('도구/라이터/lighter', '라이터', { use: true }), { use: true });
+   assert.deepEqual(t('기기/무전기/radio', '무전기'), { use: true });
+@@ -146,20 +154,24 @@ test('갈래 표: 종류 → 판정. 손전등(기기)은 사용, 물건말 줄
+   assert.equal(t('성인/콘돔/condom', '콘돔', { use: true }), undefined, '표에 없는 종류 → 모델 값');
+   assert.equal(traitsFor('', undefined, '녹음기', { use: true }), undefined, '종류를 모르면 모델 값');
+   // 설정으로 고침: 물건말 줄
+-  setItemRules({ [ITEM_RULES_VAR]: '기기 → 사용\n배터리 → 소모2\n우산 → 장비' });
++  setItemRules({ [ITEM_RULES_VAR]: '기기 → 사용\n배터리 → 소모2\n우산 → 장비\n망치 → 손' });
++  assert.deepEqual(t('도구/망치/hammer', '쇠 망치'), { use: false, equip: 'weapon' }, '오른쪽 「손」 = 손 칸');
+   assert.deepEqual(t('기기/손전등/flashlight', '손전등'), { use: true });
+   assert.deepEqual(t('기기/배터리/battery', 'AA 배터리'), { use: true, uses: 2 });
+   assert.deepEqual(t('잡동사니/우산/umbrella', '검은 우산'), { use: false, equip: 'gear' });
+   assert.equal(t('옷/정장/suit', '정장'), undefined, '고친 표에 없는 종류');
+   setItemRules(undefined);
+   assert.equal(parseItemRules('도구 → 뭐지\n → 장비\n칼 → 무기').words.size, 1, '판정 말이 없는 줄·빈 줄은 안 쓴다');
+-  // 들어올 때: 본문·상점은 표, 직접은 적힌 대로
++  assert.deepEqual(parseItemRules('칼 → 손').words.get('칼'), { use: false, equip: 'weapon' }, '오른쪽 「손」도 손 칸');
++  // 들어올 때: 본문·상점은 표, 직접은 적힌 대로 (사용자가 적은 표)
++  setItemRules({ [ITEM_RULES_VAR]: OLD });
+   let s = addItem(empty, alive, { name: '손전등', use: true, equip: undefined, icon: '기기/손전등/flashlight', from: 'story', anchor: 'c1' });
+   assert.deepEqual([s.list[0].use, s.list[0].equip, s.list[0].kind], [true, undefined, 'device']);
+   s = addItem(empty, alive, { name: '손전등', use: true, icon: '기기/손전등/flashlight', from: 'manual', anchor: '' });
+   assert.deepEqual([s.list[0].use, s.list[0].equip], [true, undefined]);
+   s = addItem(empty, alive, { name: '낡은 코트', use: true, equip: '', icon: '옷/코트/coat', from: 'store', anchor: 'c1' });
+   assert.deepEqual([s.list[0].use, s.list[0].equip], [false, 'gear']);
++  setItemRules(undefined);
+ });
+ 
+ // ── 상태 그림 ──
+diff --git a/tests/people-items.test.mjs b/tests/people-items.test.mjs
+index e7be712f88..7a396ecd10 100644
+--- a/tests/people-items.test.mjs
++++ b/tests/people-items.test.mjs
+@@ -35,7 +35,7 @@ test('자료·절: 켜면 items_now(판정·상태)와 소지품 절, 끄면 둘
+   const store = T.emptyStore();
+   store.people.쟈알디 = person('쟈알디');
+   const on = U.buildUpdate(c, store, [3], { settings: s, system: 'S', values: {}, names, items: itemsNow });
+-  assert.deepEqual(JSON.parse(JSON.stringify(on.data.items_now)), [{ name: '소금 봉지', desc: '두 봉지', usable: true, uses_left: 2 }, { name: '부적', usable: true, condition: 'damaged' }, { name: '권총', usable: true, equip: 'weapon', equipped: true }]);
++  assert.deepEqual(JSON.parse(JSON.stringify(on.data.items_now)), [{ name: '소금 봉지', desc: '두 봉지', usable: true, uses_left: 2 }, { name: '부적', usable: true, condition: 'damaged' }, { name: '권총', usable: true, equip: 'hand', equipped: true }]);
+   assert.equal(on.data.item_kinds, undefined, '종류 표는 없앰');
+   assert.deepEqual(on.items, ['소금 봉지', '부적', '권총']);
+   assert.equal(on.data.want.items, true);
+diff --git a/tests/shop-browser.mjs b/tests/shop-browser.mjs
+index 043c2af165..ff3af84d47 100644
+--- a/tests/shop-browser.mjs
++++ b/tests/shop-browser.mjs
+@@ -19,11 +19,11 @@ price_range: 1000~200000
+ <shelf>
+ 손전등|18000|사용|flashlight|LED 손전등, 건전지 별매|어두운 곳을 비춘다
+ 공구 가방|42000|장비|tool bag|튼튼한 캔버스 가방, 주머니 여섯|
+-쇠파이프|7000|무기·사용|iron pipe|1m 길이, 끝이 거칠다|둔기로 쓸 수 있다
++쇠파이프|7000|손·사용|iron pipe|1m 길이, 끝이 거칠다|둔기로 쓸 수 있다
+ 호신용 최루 스프레이 (대용량)|15000|소모5|pepper spray|경찰 납품용이라고 적혀 있다|사람·짐승을 잠시 멈춘다
+ 건전지 AA 8개|6000|소모8|batteries|유통기한 넉넉|
+ 작업용 장갑|9000|장비|work gloves|가죽 보강, 미끄럼 방지|
+-전기충격기|65000|무기·사용|stun gun|허가 번호 흐릿함|
++전기충격기|65000|손·사용|stun gun|허가 번호 흐릿함|
+ 철제 봉인 상자|왼손 새끼손가락|-|metal box|자물쇠 둘, 값은 몸으로|
+ </shelf>`;
+ const TALK_REPRICE = `<owner>건전지는 따로야. 둘이 같이 가져가면 손전등은 천 원 빼 주지.</owner>
+-- 
+2.43.0
+

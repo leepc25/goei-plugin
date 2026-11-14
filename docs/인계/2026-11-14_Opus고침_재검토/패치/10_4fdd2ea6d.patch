@@ -1,0 +1,241 @@
+From 4fdd2ea6d4bceadcd4fb7dc4c7da5de02ce19f88 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 01:28:10 +0000
+Subject: [PATCH] =?UTF-8?q?=ED=99=94=EB=A9=B4=20=EC=8B=9C=ED=97=98=207?=
+ =?UTF-8?q?=EA=B0=9C=20=EC=8B=A4=ED=8C=A8=20=EC=A7=84=EB=8B=A8:=20?=
+ =?UTF-8?q?=EB=B0=94=EB=80=90=20=ED=99=94=EB=A9=B4=EC=97=90=20=EB=A7=9E?=
+ =?UTF-8?q?=EC=B6=B0=20=EB=82=A1=EC=9D=80=20=EC=8B=9C=ED=97=98=205?=
+ =?UTF-8?q?=EA=B0=9C=20=EA=B3=A0=EC=B9=A8=20(=ED=94=8C=EB=9F=AC=EA=B7=B8?=
+ =?UTF-8?q?=EC=9D=B8=20=EA=B3=A0=EC=B9=A8=20=EC=97=86=EC=9D=8C)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ tests/flow-consult-browser.mjs      |  9 ++++++-
+ tests/qc-settings-pages-browser.mjs |  8 +++---
+ tests/shop-judge-browser.mjs        | 19 ++++++++-------
+ tests/shopctx-browser.mjs           | 38 +++++++++++++++++------------
+ tests/spec-browser.mjs              | 15 ++++++++----
+ 5 files changed, 54 insertions(+), 35 deletions(-)
+
+diff --git a/tests/flow-consult-browser.mjs b/tests/flow-consult-browser.mjs
+index a50fa41880..87d7a6185e 100644
+--- a/tests/flow-consult-browser.mjs
++++ b/tests/flow-consult-browser.mjs
+@@ -65,7 +65,14 @@ if (!process.env.CONSULT_ONLY) {
+   const n = await clickAll(page, () => 'chat');
+   ok(n >= 85, `조작 ${n}개를 눌렀다`);
+   // 맨 위 띠와 줄의 호출 글이 바로 바뀐다
+-  const say = (row) => page.evaluate((row) => [...document.querySelectorAll('.gw .fl-pc .fl-line')].find((l) => l.querySelector('.fl-name')?.textContent === row)?.querySelector('.fl-said')?.textContent ?? '', row);
++  // 호출 칸은 횟수(<b>)와 조건(<small>)으로 나뉜다 (c3464c79b). 시험은 「횟수 (조건)」으로 다시 붙여 읽는다
++  const say = (row) => page.evaluate((row) => {
++    const s = [...document.querySelectorAll('.gw .fl-pc .fl-line')].find((l) => l.querySelector('.fl-name')?.textContent === row)?.querySelector('.fl-said');
++    if (!s) return '';
++    const main = s.querySelector('b')?.textContent ?? s.textContent ?? '';
++    const note = s.querySelector('small')?.textContent ?? '';
++    return note ? `${main} (${note})` : main;
++  }, row);
+   const before = await bar(page);
+   const routerTo = (await say('Router')) === '1회' ? 'code' : 'model';
+   await clickSel(page, `${DO}[data-value="pp-set|router=${routerTo}"]`);
+diff --git a/tests/qc-settings-pages-browser.mjs b/tests/qc-settings-pages-browser.mjs
+index 03a611743a..f094a71686 100644
+--- a/tests/qc-settings-pages-browser.mjs
++++ b/tests/qc-settings-pages-browser.mjs
+@@ -306,10 +306,10 @@ for (const vp of vps) {
+       const heads = await page.evaluate((t) => [...document.querySelectorAll(`.gw ${t}`)].filter((g) => g.querySelector('h3')?.textContent === '넘길 내용').map((g) => [...g.querySelectorAll('.ck-h2 > span')].slice(1).map((s) => s.textContent)), twin);
+       assert.deepEqual(heads, Array(2).fill(['봇 설명', '작가 노트', '페르소나', '상시 로어북', '관련 로어북', '2차 참조', '맥락 반영']), `[${vp}] 「넘길 내용」 격자 둘의 칸 이름`);
+       // 가게 표: 기본값 (봇 설명·상시·관련·맥락 켬, 작가 노트·페르소나·2차 끔) → 우주 쇼핑몰의 작가 노트만 켠다
+-      for (const shop of ['shop', 'cos', 'bm']) {
++      for (const shop of ['shop', 'cos', 'bm', 'hs']) { // 망상홈쇼핑도 가게 표에 제 줄 (2026-11-13, src/core/shopfn.ts GIVE_SHOPS)
+         assert.deepEqual(await Promise.all(['give_desc', 'give_authors', 'give_persona', 'give_active', 'give_related', 'give_secondary', 'ctx'].map((k) => pressed(`s:${shop}:${k}`))), ['true', 'false', 'false', 'true', 'true', 'false', 'true'], `[${vp}] 가게 표 기본값 ${shop}`);
+       }
+-      assert.equal(await page.$(cell('s:hs:give_desc')), null, '망상홈쇼핑 줄은 없다');
++      assert.equal(!!(await page.$(cell('s:hs:give_desc'))), true, '망상홈쇼핑 줄이 있다 (2026-11-13: 가게 표·기능 표 「채팅 반응」에 연결)'); // ElementHandle 을 assert 에 그대로 넘기면 실패 때 비교 출력이 메모리를 다 먹는다
+       await tap('s:cos:give_authors');
+       assert.equal((await ss()).$cos_sh_give_authors, '1');
+       assert.equal(await pressed('s:cos:give_authors'), 'true', '다시 그린 칸이 켜져 있다');
+@@ -319,8 +319,8 @@ for (const vp of vps) {
+       assert.equal((await ss()).$bm_sh_ctx, '0');
+       assert.deepEqual([await pressed('s:bm:ctx'), await pressed('s:cos:ctx'), await pressed('s:shop:ctx')], ['false', 'true', 'true']);
+       // 기능 표: 세 가게가 같이 쓰는 한 값. 1:1 상담의 맥락 반영은 없는 칸(「–」)
+-      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'true', 'true']);
+-      assert.equal(await page.$(cell('s:shop:fn_desk_ctx')), null, '1:1 상담 · 맥락 반영 칸은 조작이 없다');
++      assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk', 'say'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'true', 'true', 'true']);
++      assert.equal(!!(await page.$(cell('s:shop:fn_desk_ctx'))), false, '1:1 상담 · 맥락 반영 칸은 조작이 없다');
+       await tap('s:shop:fn_talk_persona');
+       assert.equal((await ss()).$sh_fn_talk_persona, '0');
+       assert.deepEqual(await Promise.all(['shelf', 'talk', 'desk'].map((f) => pressed(`s:shop:fn_${f}_persona`))), ['true', 'false', 'true'], '그 기능의 줄만 꺼진다');
+diff --git a/tests/shop-judge-browser.mjs b/tests/shop-judge-browser.mjs
+index 7c5b3f5780..aea8653f73 100644
+--- a/tests/shop-judge-browser.mjs
++++ b/tests/shop-judge-browser.mjs
+@@ -41,25 +41,26 @@ for (const vp of ['pc', 'phone']) {
+   await closeWin(page); await sleep(200);
+   await openWin(page); await sleep(300);
+   if (!(await page.evaluate(() => [...document.querySelectorAll('.gx-tabs, .gx-nav')].some((e) => e.offsetParent)))) errorsAll.push(`[${vp}] solo stuck after close`);
+-  // 3. 설정 → 상점: 상점 판단(대신 안내)·고유 상점 표, 줄 더하고 이름 적기
+-  await openEditor(page, 'set:items'); await sleep(300);
++  // 3. 설정 → 상점: 판단(대신 안내)·고유 상점 표, 줄 더하고 이름 적기 (v0.21.10 설정창 개편: 상점은 따로 쪽, 줄 이름 「판단」)
++  await openEditor(page, 'set:shop'); await sleep(300);
+   const row = await page.evaluate(() => {
+     const rows = [...document.querySelectorAll('.gw .ps-row')];
+-    const j = rows.find((r) => r.querySelector('.ps-label b')?.textContent?.startsWith('상점 판단'));
++    const j = rows.find((r) => r.querySelector('.ps-label b')?.textContent?.trim() === '판단');
+     j?.scrollIntoView({ block: 'start' });
+     return { judge: j?.querySelector('small')?.textContent ?? '', own: document.querySelectorAll('.gw [data-key$=":name"][data-change="set-own"]').length };
+   });
+-  if (!row.judge.includes('메인 모델로 대신합니다') || row.own !== 2) errorsAll.push(`[${vp}] settings: ${JSON.stringify(row)}`);
++  if (!row.judge.includes('메인 모델로 대신합니다') || row.own !== 3) errorsAll.push(`[${vp}] settings: ${JSON.stringify(row)}`);
+   await shot('settings-judge');
++  // 기본 표는 우주 쇼핑몰·백일몽 포인트몰·망상홈쇼핑 세 줄 (v0.21.6에서 망상홈쇼핑 더함) → 네 번째 줄을 더해 이름 적기
+   await page.evaluate(() => document.querySelector('.gw [data-action="set-own-add"]').click()); await sleep(400);
+-  const inp = page.locator('.gw [data-change="set-own"][data-key$=":name"]').nth(2);
+-  await inp.fill('망상홈쇼핑'); await inp.blur(); await sleep(600);
++  const inp = page.locator('.gw [data-change="set-own"][data-key$=":name"]').nth(3);
++  await inp.fill('심야편의점'); await inp.blur(); await sleep(600);
+   const own = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$sh_own || '[]').map((o) => `${o.name}|${o.web}|${o.visit}`));
+-  if (own.length !== 3 || own[2] !== '망상홈쇼핑||shop') errorsAll.push(`[${vp}] own add: ${JSON.stringify(own)}`);
++  if (own.length !== 4 || own[3] !== '심야편의점||shop') errorsAll.push(`[${vp}] own add: ${JSON.stringify(own)}`);
+   await sleep(500);
+   const shown = await page.evaluate(() => [...document.querySelectorAll('.gw [data-change="set-own"][data-key$=":name"]')].map((e) => e.value));
+-  if (shown[2] !== '망상홈쇼핑') errorsAll.push(`[${vp}] own shown: ${JSON.stringify(shown)}`);
+-  await page.evaluate(() => document.querySelectorAll('.gw .ms-fx')[2]?.scrollIntoView({ block: 'center' })); await sleep(200);
++  if (shown[3] !== '심야편의점') errorsAll.push(`[${vp}] own shown: ${JSON.stringify(shown)}`);
++  await page.evaluate(() => document.querySelectorAll('.gw .ms-fx')[3]?.scrollIntoView({ block: 'center' })); await sleep(200);
+   await shot('settings-own');
+   await closeEditor(page, true);
+   await closeWin(page);
+diff --git a/tests/shopctx-browser.mjs b/tests/shopctx-browser.mjs
+index 5a9b0014db..30bcedfe89 100644
+--- a/tests/shopctx-browser.mjs
++++ b/tests/shopctx-browser.mjs
+@@ -1,5 +1,6 @@
+ // 상점 「메인 요청에 붙이는 것」 격자 (2026-11-12 사용자: 「각 기능들 컨텍 포함 선택이 어디있지? 상점 관련된거 없는거 같은데」 → 가게마다 다른 격자).
+-// 설정 → 상점: 줄 = 기본 상점·우주 쇼핑몰·백일몽 포인트몰, 칸 = 컨텍스트 포함 · 구매 · 팔기 · 문의 · 맞춤 주문 · 1:1 상담, 없는 것은 빈 칸(–). 그 아래 「최대 양」.
++// 설정 → 상점: 줄 = 기본 상점·우주 쇼핑몰·백일몽 포인트몰·망상홈쇼핑, 칸 = 컨텍스트 포함 · 구매 · 팔기 · 문의 · 맞춤 주문 · 1:1 상담 · 방송 내용 · 시청자 채팅 · 내 채팅, 없는 것은 빈 칸(–). 그 아래 「최대 양」.
++// (망상홈쇼핑 줄·칸 셋은 1d2a285cc 「상점 「메인 요청에 붙이는 것」에 망상홈쇼핑 줄」에서 더함. 그 줄 값은 $hs_main · $hs_main_kinds(이름 목록 하나))
+ // ① 격자 모양(줄·칸·빈 칸·기본값 전부 켬) ② 같은 페이지 「호출」 격자와 같은 치수·선·제목 ③ 칸마다 누르면 그 변수만 바뀌고 다시 누르면 돌아온다
+ // ④ 「컨텍스트 포함」을 끄면 그 줄 나머지가 잠기고 값은 남는다 ⑤ 「최대 양」 수 상자(공통 규격, 큰 것) ⑥ 닫았다 열어도 같다 ⑦ 가로 넘침 없음 ⑧ 시작 전(새 채팅 기본값).
+ // 사용: node tests/shopctx-browser.mjs <fixture.json> [사진 폴더]
+@@ -21,13 +22,18 @@ const eq = (a, b, m) => { assert.deepEqual(a, b, m); checks++; };
+ const ok = (v, m) => { assert.ok(v, m); checks++; };
+ 
+ const TITLE = '메인 요청에 붙이는 것';
+-const ROWS = ['기본 상점', '우주 쇼핑몰', '백일몽 포인트몰'];
+-const IDS = ['shop', 'cos', 'bm'];
+-const COLS = ['컨텍스트 포함', '구매', '팔기', '문의', '맞춤 주문', '1:1 상담'];
+-const KEYS = ['', 'buy', 'sell', 'ask', 'order', 'desk'];
++const ROWS = ['기본 상점', '우주 쇼핑몰', '백일몽 포인트몰', '망상홈쇼핑'];
++const IDS = ['shop', 'cos', 'bm', 'hs'];
++const COLS = ['컨텍스트 포함', '구매', '팔기', '문의', '맞춤 주문', '1:1 상담', '방송 내용', '시청자 채팅', '내 채팅'];
++const KEYS = ['', 'buy', 'sell', 'ask', 'order', 'desk', 'show', 'chat', 'say'];
+ /** 가게마다 있는 칸 (1 = 체크, – = 빈 칸) */
+-const SHAPE = ['1 1 1 1 – –', '1 1 – 1 1 –', '1 1 – – – 1'];
+-const varOf = (r, c) => `${IDS[r] === 'shop' ? '$sh_main' : `$${IDS[r]}_sh_main`}${KEYS[c] ? `_${KEYS[c]}` : ''}`;
++const SHAPE = ['1 1 1 1 – – – – –', '1 1 – 1 1 – – – –', '1 1 – – – 1 – – –', '1 1 – – – – 1 1 1'];
++const HS_ALL = ['show', 'chat', 'say', 'buy'];
++/** 망상홈쇼핑 줄: 맨 앞 칸은 $hs_main, 나머지는 $hs_main_kinds(켠 것 이름 목록) */
++const varOf = (r, c) => (IDS[r] === 'hs' ? (c ? '$hs_main_kinds' : '$hs_main') : `${IDS[r] === 'shop' ? '$sh_main' : `$${IDS[r]}_sh_main`}${KEYS[c] ? `_${KEYS[c]}` : ''}`);
++/** 칸 하나를 껐을 때 / 켰을 때의 값 */
++const offOf = (r, c) => (IDS[r] === 'hs' && c ? HS_ALL.filter((k) => k !== KEYS[c]).join(',') : '0');
++const onOf = (r, c) => (IDS[r] === 'hs' && c ? HS_ALL.join(',') : '1');
+ 
+ /** 보이는 격자 하나를 읽는다 (PC·폰 쌍둥이 가운데 보이는 것) */
+ const readGrid = (page, title) => page.evaluate((title) => {
+@@ -87,9 +93,9 @@ async function run(vp, size, chat, fresh) {
+   ok(g.cls.includes(vp === 'pc' ? 'ck-pc' : 'ck-ph'), `${tag} ${vp === 'pc' ? 'PC' : '폰'} 격자`);
+   eq(g.h1, ['메인 요청', '붙일 것'], `${tag} 칸 묶음`);
+   eq(g.h2, COLS, `${tag} 칸 이름`);
+-  eq(g.names, ROWS, `${tag} 줄 = 세 가게 (망상홈쇼핑 줄 없음)`);
++  eq(g.names, ROWS, `${tag} 줄 = 네 가게 (망상홈쇼핑 줄 포함)`);
+   eq(g.cells, SHAPE, `${tag} 기본값: 있는 칸은 전부 켬, 없는 칸은 –`);
+-  eq(g.cells.join(' ').split(' ').filter((x) => x === '–').length, 7, `${tag} 빈 칸 7개`);
++  eq(g.cells.join(' ').split(' ').filter((x) => x === '–').length, 20, `${tag} 빈 칸 20개`);
+   ok(g.foot.startsWith('켜면 '), `${tag} 설명 첫 문장 「켜면 …」: ${g.foot.slice(0, 40)}`);
+   ok(g.foot.includes('「맥락 반영」과는 방향이 반대'), `${tag} 방향 설명`);
+   eq(g.clip, [], `${tag} 잘린 글 없음`);
+@@ -106,40 +112,40 @@ async function run(vp, size, chat, fresh) {
+   const sizes = { nameW: g.nameW, rowH: g.rowH, btn: g.btn, colW: g.colW, gridW: g.w, line: g.line, colLine: g.first, h3: g.h3, h1: g.h1s, h2: g.h2s, name: g.names_ };
+ 
+   /* ③ 칸마다: 누르면 그 변수만 0, 다시 누르면 1 */
+-  for (let r = 0; r < 3; r++) for (let c = 1; c < 6; c++) {
++  for (let r = 0; r < ROWS.length; r++) for (let c = 1; c < COLS.length; c++) {
+     const has = SHAPE[r].split(' ')[c] === '1';
+     const before = await where();
+     const done = await cell(r, c);
+     eq(done, has, `${tag} ${ROWS[r]}·${COLS[c]}: ${has ? '누를 수 있다' : '빈 칸은 못 누른다'}`);
+     if (!has) { eq(await where(), before, `${tag} 빈 칸: 아무것도 안 바뀜`); continue; }
+-    eq(await val(varOf(r, c)), '0', `${tag} ${ROWS[r]}·${COLS[c]} 끔 → ${varOf(r, c)}=0`);
++    eq(await val(varOf(r, c)), offOf(r, c), `${tag} ${ROWS[r]}·${COLS[c]} 끔 → ${varOf(r, c)}=${offOf(r, c)}`);
+     const now = (await readGrid(page, TITLE)).cells;
+     eq(now.map((x, i) => (i === r ? x.split(' ').map((y, j) => (j === c ? '1' : y)).join(' ') : x)), SHAPE, `${tag} 그 칸만 꺼짐`);
+     const after = await where();
+     const changed = [...new Set([...Object.keys(after.chat), ...Object.keys(before.chat)])].filter((k) => after.chat[k] !== before.chat[k]).concat([...new Set([...Object.keys(after.prefs), ...Object.keys(before.prefs)])].filter((k) => after.prefs[k] !== before.prefs[k]));
+     eq(changed, [varOf(r, c)], `${tag} 바뀐 변수는 하나`);
+     await cell(r, c);
+-    eq(await val(varOf(r, c)), '1', `${tag} 다시 켬`);
++    eq(await val(varOf(r, c)), onOf(r, c), `${tag} 다시 켬`);
+   }
+   eq((await readGrid(page, TITLE)).cells, SHAPE, `${tag} 전부 되돌림`);
+ 
+   /* ④ 컨텍스트 포함: 끄면 그 줄 나머지는 잠기고 값은 남는다 */
+   await cell(1, 3); // 우주 쇼핑몰 문의 끔
+-  for (let r = 0; r < 3; r++) {
++  for (let r = 0; r < ROWS.length; r++) {
+     await cell(r, 0);
+     eq(await val(varOf(r, 0)), '0', `${tag} ${ROWS[r]} 컨텍스트 포함 끔`);
+     const row = (await readGrid(page, TITLE)).cells[r].split(' ');
+     eq(row[0], '0', `${tag} 맨 앞 칸 꺼짐`);
+     ok(row.slice(1).every((x) => x === '–' || x.startsWith('L')), `${tag} ${ROWS[r]} 나머지 칸 잠김: ${row.join(' ')}`);
+-    if (r === 1) eq(row.join(' '), '0 L1 – L0 L1 –', `${tag} 잠겨도 켜 둔 값·꺼 둔 값이 그대로 보인다`);
++    if (r === 1) eq(row.join(' '), '0 L1 – L0 L1 – – – –', `${tag} 잠겨도 켜 둔 값·꺼 둔 값이 그대로 보인다`);
+     eq(await cell(r, 1), false, `${tag} 잠긴 칸은 못 누른다`);
+   }
+   await shot('master-off');
+   await noOverflow('잠김');
+   /* ⑥ 닫았다 열어도 같다 */
+   await closeEditor(page, true); await openEditor(page, 'set:shop'); await sleep(400);
+-  eq((await readGrid(page, TITLE)).cells, ['0 L1 L1 L1 – –', '0 L1 – L0 L1 –', '0 L1 – – – L1'], `${tag} 다시 열어도 같은 값`);
+-  for (let r = 0; r < 3; r++) await cell(r, 0);
++  eq((await readGrid(page, TITLE)).cells, ['0 L1 L1 L1 – – – – –', '0 L1 – L0 L1 – – – –', '0 L1 – – – L1 – – –', '0 L1 – – – – L1 L1 L1'], `${tag} 다시 열어도 같은 값`);
++  for (let r = 0; r < ROWS.length; r++) await cell(r, 0);
+   await cell(1, 3);
+   eq((await readGrid(page, TITLE)).cells, SHAPE, `${tag} 다시 켜면 돌아온다`);
+ 
+diff --git a/tests/spec-browser.mjs b/tests/spec-browser.mjs
+index 5ac71f6725..f8fdafc81c 100644
+--- a/tests/spec-browser.mjs
++++ b/tests/spec-browser.mjs
+@@ -101,15 +101,20 @@ const probe = () => {
+     if (l.querySelector('.fl-pair')) add('ctl', L(l.querySelector('.fl-pair')), row);
+     if (l.querySelector('.ck-cell')) add('gridCell', L(l.querySelector('.ck-cell')), row);
+     for (const lab of l.querySelectorAll('.fl-l')) add('label', L(lab), row);
+-    const said = l.querySelector('.fl-said'); if (said && said.textContent.trim()) add('said', tx(said), row);
++    // 호출 칸은 오른쪽 맞춤(횟수 크게 + 조건 작은 글, 2026-11-12 c3464c79b·3136c5a28): 자리는 횟수 글의 오른쪽 끝으로 잰다
++    const said = l.querySelector('.fl-said'); if (said && said.textContent.trim()) add('said', Rr(said.querySelector(':scope > b') ?? said), row);
+     // 호출 글은 한 줄: 두 줄로 꺾이거나 칸을 넘치면 안 된다 (2026-11-12 사용자)
+     if (said && said.textContent.trim()) {
+-      const rg = document.createRange(); rg.selectNodeContents(said);
+-      const tops = new Set([...rg.getClientRects()].map((c) => Math.round(c.top)));
++      // 횟수(b)는 한 줄, 조건(small)은 좁은 호출 칸 안에서 꺾여도 된다(3136c5a28 「호출 칸 좁게」, small white-space: normal). 둘 다 옆 칸을 넘치면 안 된다
+       const go = l.querySelector('.fl-go'); const st0 = [...l.querySelectorAll('.fl-st')].find(vis);
+       const limit = (st0 ?? go)?.getBoundingClientRect().left ?? Infinity;
+-      if (tops.size > 1) out.clip.push(`호출 글 두 줄: ${row} 「${said.textContent.trim()}」`);
+-      else if (rg.getBoundingClientRect().right > limit + 0.5) out.clip.push(`호출 글이 옆 칸을 넘음: ${row} 「${said.textContent.trim()}」 ${R(rg.getBoundingClientRect().right)} > ${R(limit)}`);
++      for (const part of (said.querySelector(':scope > b, :scope > small') ? said.querySelectorAll(':scope > b, :scope > small') : [said])) {
++        if (!part.textContent.trim()) continue;
++        const rg = document.createRange(); rg.selectNodeContents(part);
++        const tops = new Set([...rg.getClientRects()].map((c) => Math.round(c.top)));
++        if (tops.size > 1 && part.tagName !== 'SMALL') out.clip.push(`호출 글 두 줄: ${row} 「${part.textContent.trim()}」`);
++        if (rg.getBoundingClientRect().right > limit + 0.5) out.clip.push(`호출 글이 옆 칸을 넘음: ${row} 「${part.textContent.trim()}」 ${R(rg.getBoundingClientRect().right)} > ${R(limit)}`);
++      }
+     }
+     const help = l.querySelector('.fl-help'); if (help) add('help', tx(help), row);
+     const st = l.querySelectorAll('.fl-st'); add('st1', L(st[0]), row); add('st2', L(st[1]), row);
+-- 
+2.43.0
+
