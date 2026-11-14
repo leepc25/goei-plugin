@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  addItem, addUse, equipItem, equippedOf, gridItems, itemLeft, itemsBlock, liveItems, mergeItems, parseTraits, readItemUse, readItems, removeItem, itemSlots, itemUseVars, itemsVars, searchItems,
+  addItem, addUse, equipItem, equippedOf, isEquipped, gridItems, itemLeft, itemsBlock, liveItems, mergeItems, parseTraits, readItemUse, readItems, removeItem, itemSlots, itemUseVars, itemsVars, searchItems,
   setItemLeft, traitsText, unequipItem, updateItem, ITEM_SLOTS_DEFAULT, itemLine, setItemRules, ITEM_RULES_DEFAULT,
   canMerge, mergedNow, itemWeight, weightText, totalWeight, itemCarry, itemEditOn, ITEM_CARRY_DEFAULT,
 } from '../dist-test/core.mjs';
@@ -97,7 +97,12 @@ test('장착: 빈 칸 첫 번째로, 칸을 주면 그 칸(있던 것은 격자�
   it = addItem(it, alive, { name: '열쇠', from: 'manual', anchor: '' });
   const [gun, knife] = it.list;
   assert.equal(gun.slot, 0);
-  assert.equal(equipItem(it, alive, it.list[3].id), it, '장착 갈래 없는 물건');
+  // 갈래 없는 물건도 손 칸에 든다 (held), 장비 칸에는 못 넣는다 (사용자 2026-11-14)
+  const keyHeld = equipItem(it, alive, it.list[3].id);
+  assert.deepEqual([keyHeld.list[3].slot, keyHeld.list[3].held, isEquipped(keyHeld.list[3], keyHeld.list)], [1, true, true], '열쇠 → 손 둘째 칸');
+  assert.equal(itemLine(keyHeld.list[3], undefined, true), '- 열쇠 [in hand]');
+  assert.equal(unequipItem(keyHeld, it.list[3].id).list[3].held, undefined, '해제하면 held 도 빠짐');
+  assert.equal(equipItem(it, alive, it.list[3].id, 0, 'gear'), it, '장비 아닌 물건은 장비 칸에 안 들어감');
   it = equipItem(it, alive, knife.id, 0);
   const eq = equippedOf(liveItems(it, alive));
   assert.equal(eq.weapon[0].name, '칼');

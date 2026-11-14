@@ -70,6 +70,8 @@ export interface Item {
   equip?: ItemEquip;
   /** 장착 칸 번호 (0부터). 없으면 소지품 격자 */
   slot?: number;
+  /** 손 칸에 든 물건인데 갈래가 손이 아닌 것 (사용자 2026-11-14: 손 칸에는 아무 물건이나 든다). slot 은 손 칸 번호 */
+  held?: boolean;
   state: ItemState;
   /** 그림 찾기용 낱말 */
   icon?: string;
@@ -147,15 +149,17 @@ const isLog = (e: unknown): e is ItemLog => {
 const clean = (s: unknown, max: number) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 
 function normItem(x: Item): Item {
-  const { uses: u0, equip: e0, slot: s0, icon: i0, weight: w0, ...rest } = x;
+  const { uses: u0, equip: e0, slot: s0, held: h0, icon: i0, weight: w0, ...rest } = x;
   const uses = itemUses(u0);
   const weight = itemWeight(w0);
   const equip = itemEquip(e0);
-  const slot = equip && Number.isSafeInteger(s0) && (s0 as number) >= 0 && (s0 as number) < EQUIP_SLOTS[equip] ? s0 : undefined;
+  const kind: ItemEquip | undefined = h0 === true ? 'weapon' : equip;
+  const slot = kind && Number.isSafeInteger(s0) && (s0 as number) >= 0 && (s0 as number) < EQUIP_SLOTS[kind] ? s0 : undefined;
+  const held = h0 === true && slot !== undefined;
   const icon = cleanIcon(i0);
   return {
     ...rest, desc: clean(x.desc, 80), effect: clean(x.effect, 60), use: x.use === true || !!uses, state: itemState(x.state),
-    ...(uses ? { uses } : {}), ...(equip ? { equip } : {}), ...(slot !== undefined ? { slot } : {}), ...(icon ? { icon } : {}), ...(weight !== undefined ? { weight } : {}),
+    ...(uses ? { uses } : {}), ...(equip ? { equip } : {}), ...(slot !== undefined ? { slot } : {}), ...(held ? { held } : {}), ...(icon ? { icon } : {}), ...(weight !== undefined ? { weight } : {}),
   };
 }
 
@@ -204,29 +208,44 @@ export const outItems = (it: Items, alive: Set<string>): Item[] => it.list.filte
 /** 장착 칸 차지: 갈래별 칸 번호 → 물건 (같은 칸에 둘이면 앞의 것) */
 export function equippedOf(list: Item[]): Record<ItemEquip, (Item | undefined)[]> {
   const out: Record<ItemEquip, (Item | undefined)[]> = { weapon: Array(EQUIP_SLOTS.weapon).fill(undefined), gear: Array(EQUIP_SLOTS.gear).fill(undefined) };
-  for (const e of list) if (e.equip && e.slot !== undefined && !out[e.equip][e.slot]) out[e.equip][e.slot] = e;
+  for (const e of list) {
+    const k = slotKind(e);
+    if (k && e.slot !== undefined && !out[k][e.slot]) out[k][e.slot] = e;
+  }
   return out;
 }
+/** 물건이 놓이는 장착 칸 갈래: 손에 든(held) 것은 손, 아니면 제 갈래 */
+export const slotKind = (e: Item): ItemEquip | undefined => (e.held ? 'weapon' : e.equip);
 /** 장착 칸에 실제로 놓인 물건인가 */
-export const isEquipped = (e: Item, list: Item[]): boolean => !!e.equip && e.slot !== undefined && equippedOf(list)[e.equip][e.slot]?.id === e.id;
+export const isEquipped = (e: Item, list: Item[]): boolean => {
+  const k = slotKind(e);
+  return !!k && e.slot !== undefined && equippedOf(list)[k][e.slot]?.id === e.id;
+};
 /** 소지품 격자에 있는 것 (장착 칸에 놓인 것 빼고) */
 export const gridItems = (list: Item[]): Item[] => list.filter((e) => !isEquipped(e, list));
 
-/** 장착: slot 을 안 주면 빈 칸 첫 번째(없으면 그대로). 그 칸에 다른 물건이 있으면 그 물건은 격자로 */
-export function equipItem(it: Items, alive: Set<string>, id: string, slot?: number): Items {
+/** 장착: slot 을 안 주면 빈 칸 첫 번째(없으면 그대로). 그 칸에 다른 물건이 있으면 그 물건은 격자로.
+ *  kind 를 안 주면 제 갈래 칸, 갈래가 없으면 손 칸. 손 칸에는 아무 물건이나, 장비 칸에는 장비만 (사용자 2026-11-14) */
+export function equipItem(it: Items, alive: Set<string>, id: string, slot?: number, kind?: ItemEquip): Items {
   const live = liveItems(it, alive);
   const cur = live.find((x) => x.id === id);
-  if (!cur?.equip) return it;
-  const occ = equippedOf(live)[cur.equip];
-  const at = slot ?? occ.findIndex((x) => !x);
-  if (!Number.isSafeInteger(at) || at < 0 || at >= EQUIP_SLOTS[cur.equip]) return it;
+  if (!cur) return it;
+  const k: ItemEquip = kind ?? cur.equip ?? 'weapon';
+  if (k === 'gear' && cur.equip !== 'gear') return it;
+  const occ = equippedOf(live)[k];
+  const at = slot ?? occ.findIndex((x) => !x || x.id === id);
+  if (!Number.isSafeInteger(at) || at < 0 || at >= EQUIP_SLOTS[k]) return it;
   const other = occ[at];
+  const held = k === 'weapon' && cur.equip !== 'weapon';
   return {
     ...it,
     list: it.list.map((x) => {
-      if (x.id === id) return { ...x, slot: at };
+      if (x.id === id) {
+        const { held: _h, ...base } = x;
+        return { ...base, slot: at, ...(held ? { held: true } : {}) };
+      }
       if (other && x.id === other.id && other.id !== id) {
-        const { slot: _s, ...rest } = x;
+        const { slot: _s, held: _h, ...rest } = x;
         return rest;
       }
       return x;
@@ -237,7 +256,7 @@ export function equipItem(it: Items, alive: Set<string>, id: string, slot?: numb
 export function unequipItem(it: Items, id: string): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur || cur.slot === undefined) return it;
-  const { slot: _s, ...rest } = cur;
+  const { slot: _s, held: _h, ...rest } = cur;
   return { ...it, list: it.list.map((x) => (x.id === id ? rest : x)) };
 }
 export const liveItemsOf = (it: Items, chat: Chat): Item[] => liveItems(it, aliveAnchors(chat));
@@ -296,7 +315,7 @@ function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unkno
   if (next.uses) next.use = true;
   if (p.equip !== undefined) {
     const eq = itemEquip(p.equip);
-    if (eq !== next.equip) delete next.slot;
+    if (eq !== next.equip && !next.held) delete next.slot;
     if (eq) next.equip = eq;
     else delete next.equip;
   }
@@ -479,7 +498,7 @@ export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLog
   const note = what === 'left' ? [`두고 옴${place ? `: ${place}` : ''}`, logExtra.note].filter(Boolean).join(' · ') : logExtra.note;
   const log = { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what, by, anchor, ...(logExtra.quote ? { quote: logExtra.quote } : {}), ...(note ? { note } : {}) };
   if (!how) return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, log);
-  const { slot: _s, backAt: _b, place: _p, outKey: _k, ...rest } = cur;
+  const { slot: _s, held: _h, backAt: _b, place: _p, outKey: _k, ...rest } = cur;
   const out: Item = { ...rest, outHow: how, outAt: anchor, ...(place ? { place } : {}), ...(key ? { outKey: key } : {}) };
   return addItemLog({ ...it, list: it.list.map((x) => (x.id === id ? out : x)) }, log);
 }
@@ -496,7 +515,7 @@ export function purgeItem(it: Items, id: string): Items {
 export function sellItem(it: Items, id: string, anchor: string, note?: string): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur || !anchor) return it;
-  const { slot: _slot, ...rest } = cur;
+  const { slot: _slot, held: _held, ...rest } = cur;
   return addItemLog({ ...it, list: it.list.map((x) => (x.id === id ? { ...rest, soldAt: anchor } : x)) }, { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'sell', by: 'manual', anchor, ...(note ? { note } : {}) });
 }
 
@@ -711,7 +730,7 @@ export const boughtLine = (e: Item): string => (e.paidWith ? `${e.name} (paid wi
 /** 본편에 넘기는 물건 한 줄: 이름 — 설명 (효과) [장착] [남은 횟수] [상태] */
 export function itemLine(e: Item, left: number | undefined, equipped: boolean, detail: ItemDetail = 'full'): string {
   const tags = detail === 'name' ? [] : [
-    equipped ? (e.equip === 'weapon' ? 'in hand' : 'worn') : '', // 손 칸 = in hand, 장비 칸 = worn (사용자 2026-11-14)
+    equipped ? (slotKind(e) === 'weapon' ? 'in hand' : 'worn') : '', // 손 칸 = in hand, 장비 칸 = worn (사용자 2026-11-14)
     left === 0 ? 'used up' : left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
@@ -951,7 +970,7 @@ export function itemsNowOf(chat: Chat, pictures?: (name: string, icon?: string) 
   const live = liveItems(it, alive);
   return live.map((e) => {
     const left = itemLeft(it, e, alive);
-    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.weight !== undefined ? { weight: e.weight } : {}), ...(e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}), ...(pictures?.(e.name, e.icon)?.length ? { pictures: pictures(e.name, e.icon)! } : {}) };
+    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.weight !== undefined ? { weight: e.weight } : {}), ...(slotKind(e) ? { equip: isEquipped(e, live) ? slotKind(e) : e.equip, equipped: isEquipped(e, live) } : {}), ...(pictures?.(e.name, e.icon)?.length ? { pictures: pictures(e.name, e.icon)! } : {}) };
   });
 }
 
