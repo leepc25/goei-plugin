@@ -1,0 +1,187 @@
+From f55d69cc3751d10f98337d703a7ebcc1f6ee40f2 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 02:44:23 +0000
+Subject: [PATCH] =?UTF-8?q?=ED=99=94=EB=A9=B4=20=EC=8B=9C=ED=97=98:=20?=
+ =?UTF-8?q?=EC=A0=84=EC=88=98=EA=B2=80=EC=82=AC=EC=97=90=EC=84=9C=20?=
+ =?UTF-8?q?=EA=B3=A0=EC=B9=9C=20=EB=8F=99=EC=9E=91=EC=97=90=20=EB=A7=9E?=
+ =?UTF-8?q?=EC=B6=A4=20(=ED=94=84=EB=A6=AC=EC=85=8B=20=EB=81=9D=20?=
+ =?UTF-8?q?=EA=B8=80,=20=EC=9C=84=ED=82=A4=20=EB=A8=B8=EB=A6=AC=EB=A7=90,?=
+ =?UTF-8?q?=20=EB=B6=80=EB=A1=9D=20=EC=88=98,=20=EC=9D=B4=EB=AF=B8?=
+ =?UTF-8?q?=EC=A7=80=20=EC=A7=80=EC=B9=A8=20=EC=9D=B4=EB=A6=84=C2=B7?=
+ =?UTF-8?q?=EC=9E=90=EB=A6=AC,=20=EC=9D=B8=EB=AC=BC=20=EC=8B=9C=ED=8A=B8,?=
+ =?UTF-8?q?=20=EC=83=81=EC=A0=90=20=EC=A7=80=EC=B9=A8,=20=EC=86=90?=
+ =?UTF-8?q?=EC=A0=84=EB=93=B1=20=ED=8C=90=EC=A0=95)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ tests/browser.mjs                    | 30 +++++++++++++++++++++++-----
+ tests/itemstate-browser.mjs          |  6 +++---
+ tests/qc-modules-browser.mjs         |  4 ++--
+ tests/qc-pipeline-browser.mjs        |  8 ++++----
+ tests/qc-settings-guides-browser.mjs |  3 ++-
+ 5 files changed, 36 insertions(+), 15 deletions(-)
+
+diff --git a/tests/browser.mjs b/tests/browser.mjs
+index 6937dd31e3..4d4cb5d41b 100644
+--- a/tests/browser.mjs
++++ b/tests/browser.mjs
+@@ -933,7 +933,19 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
+   const users = (r) => r.filter((m) => m.role === 'user');
+   assert.equal(users(req).length, 1);
+   assert.ok(!users(req)[0].content.includes('SCENE_CARD') && users(req)[0].content.endsWith('Situation:\n조용히 진입한다'), users(req)[0].content);
+-  const req2 = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '그리고 문을 연다' }], 'model'), rec.data);
++  // 카드가 채팅의 마지막이면 뒤의 user 글은 프리셋 글이라 합치지 않는다 (전수검사 11-13 pipeline#7)
++  const preset2 = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '<프리셋 끝 지시>' }], 'model'), rec.data);
++  assert.equal(users(preset2).length, 2);
++  assert.ok(users(preset2)[0].content.endsWith('Situation:\n조용히 진입한다') && users(preset2)[1].content === '<프리셋 끝 지시>', JSON.stringify(users(preset2)));
++  // 채팅에 실제로 덧붙여 보낸 글이면 합친다
++  const req2 = await page.evaluate(async (t) => {
++    window.__chat.message.push({ role: 'user', data: '그리고 문을 연다' });
++    try {
++      return await window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '그리고 문을 연다' }], 'model');
++    } finally {
++      if (window.__chat.message.at(-1)?.data === '그리고 문을 연다') window.__chat.message.pop();
++    }
++  }, rec.data);
+   assert.equal(users(req2).length, 1);
+   assert.ok(users(req2)[0].content.endsWith('Situation:\n조용히 진입한다\n\n그리고 문을 연다'), users(req2)[0].content);
+   // 장소 자체 선택: 아직 안 보낸 카드는 바꿔 끼운다
+@@ -1248,7 +1260,7 @@ if (fixture.globalLore.some(packed)) {
+   assert.equal(call.messages.length, 2);
+   assert.ok(call.messages[1].content.startsWith('문서 제목: 소라 랜드\n\n[참고 자료]'), call.messages[1].content.slice(0, 200));
+   assert.ok(call.messages[1].content.includes('[주제 원본: 소라 랜드]'));
+-  assert.ok(call.messages[1].content.endsWith('이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n폐장 이유 위주로'), '이 문서 지침');
++  assert.ok(call.messages[1].content.endsWith('[사용자 작성 지침: 이 문서만]\n폐장 이유 위주로'), '이 문서 지침');
+   const lore = await page.evaluate(() => window.__chat.localLore);
+   assert.equal(lore.length, 1);
+   assert.equal(lore[0].comment, 'WIKI｜소라 랜드');
+@@ -1671,7 +1683,15 @@ if (fixture.globalLore.some(packed)) {
+   const rec = await page.evaluate(() => window.__chat.message.at(-1).data);
+   const card = await page.evaluate((r) => window.__calls.handlers.display(r), rec);
+   assert.ok(card.includes('쟈알디') && card.includes('전화를 걸었다') && !card.includes('현장 상황 보고'));
+-  const req = await page.evaluate(async (r) => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model')), rec);
++  // 전화 기록 뒤 user 글은 채팅에 실제로 덧붙인 글일 때만 통화 내용으로 합친다 (전수검사 11-13 pipeline#7: 기록이 채팅 마지막이면 뒤 글은 프리셋)
++  const req = await page.evaluate(async (r) => {
++    window.__chat.message.push({ role: 'user', data: '빨리 받아' });
++    try {
++      return window.__core(await window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model'));
++    } finally {
++      if (window.__chat.message.at(-1)?.data === '빨리 받아') window.__chat.message.pop();
++    }
++  }, rec);
+   assert.equal(req[req.length - 1].content, '{{user}} places a phone call to 쟈알디.\n\n현장 상황 보고\n\n빨리 받아');
+   // 본편 반영: 대화·공지가 마지막 사용자 메시지 바로 앞 system 메시지로
+   // 사용자 메시지 앞 system 들 가운데 (소지품 [Inventory] 등 다른 기능 글도 붙는다, 11-07)
+@@ -1922,11 +1942,11 @@ if (fixture.globalLore.some(packed)) {
+   // 종류별 개수: 명부 탭 머리(.dir-kinds) 대신 왼쪽 목록의 개수.
+   // 조직은 명부 17 + 세계 기록에만 있는 조직까지 센다(record.ts recordCount: 명부 줄 ∪ 세계 기록) → 18
+   const treeN = (k) => page.textContent(`.gw .gw-tree-item[data-value="${k}"] em`).then(Number);
+-  assert.deepEqual([await treeN('anomaly'), await treeN('agent'), await treeN('org'), await treeN('appendix')], [63, 55, 17, 4]);
++  assert.deepEqual([await treeN('anomaly'), await treeN('agent'), await treeN('org'), await treeN('appendix')], [63, 55, 17, 6]);
+   // 부록: 펼치면 본 항목·조건·해금 (해금은 이 채팅에 바로 적는다). 모두 본 항목을 찾음 (못 찾으면 기본 정보에 「본 항목을 찾지 못했어요」)
+   await edGo(page, 'appendix');
+   const apps = await page.$$eval('.gw .gw-list .gw-row', (rows) => rows.map((r) => r.dataset.value));
+-  assert.equal(apps.length, 4);
++  assert.equal(apps.length, 6);
+   for (const name of apps) {
+     await page.click(`.gw .gw-row[data-value="${name}"]`);
+     await page.waitForFunction((n) => document.querySelector('.gw .gw-detail h2')?.textContent?.includes(n), name);
+diff --git a/tests/itemstate-browser.mjs b/tests/itemstate-browser.mjs
+index 75de3b812e..56444c2f5d 100644
+--- a/tests/itemstate-browser.mjs
++++ b/tests/itemstate-browser.mjs
+@@ -150,8 +150,8 @@ for (const vp of ['pc', 'phone']) {
+   if (before) continue;
+   const P = JSON.parse(distPack('goei-data-items'));
+   const fileOf = (name) => P.table.find((r) => r.k[0] === name)?.f;
+-  // 손전등 갈래: 「사용」뿐이던 것이 장착도
+-  assert.ok(torch.btns.includes('사용') && torch.btns.includes('장착'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
++  // 손전등 갈래: 기기 → 사용 (전수검사 11-13 승인: 도구·기기는 사용만)
++  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
+   // 정장 사례: 격자·장착 칸에서 빠지고 무게가 줄고, 기록에 「없어짐 · 두고 옴」
+   assert.ok(v1.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 처음엔 장착 칸에`);
+   assert.ok(!v2.grid.includes('사내용 정장 세트') && !v2.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 정장이 소지품에서 빠짐: ${JSON.stringify(v2)}`);
+@@ -165,7 +165,7 @@ for (const vp of ['pc', 'phone']) {
+   assert.ok(!v3.grid.includes('손전등'), `[${vp}] 버린 뒤 격자: ${v3.grid}`);
+   assert.deepEqual(result[vp].same.includes('손전등'), false, `[${vp}] 같은 응답 근거로는 안 되살아남`);
+   assert.ok(v4.grid.includes('손전등'), `[${vp}] 다시 주움: ${v4.grid}`);
+-  assert.ok(torch2.btns.includes('사용') && torch2.btns.includes('장착'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
++  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
+   assert.equal(again.list.filter((e) => e.name === '손전등').length, 1, '새 줄이 생기지 않음');
+   assert.equal(await Promise.resolve(errorsAll.length), 0, errorsAll.join('\n'));
+ }
+diff --git a/tests/qc-modules-browser.mjs b/tests/qc-modules-browser.mjs
+index e147140980..74fcee0566 100644
+--- a/tests/qc-modules-browser.mjs
++++ b/tests/qc-modules-browser.mjs
+@@ -957,8 +957,8 @@ if (want('W1')) {
+   assert.equal(call.mode, 'submodel');
+   assert.ok(call.messages[0].content.includes('SELECTED LENGTH: SHORT'), '길이 짧게');
+   assert.ok(!call.messages[0].content.includes('SELECTED LENGTH: DETAILED'));
+-  assert.ok(call.messages[1].content.includes('[사용자 작성 지침 — 모든 문서 공통]\n존댓말로 쓸 것'));
+-  assert.ok(call.messages[1].content.includes('[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n출구를 자세히'));
++  assert.ok(call.messages[1].content.includes('[사용자 작성 지침: 모든 문서 공통]\n존댓말로 쓸 것'));
++  assert.ok(call.messages[1].content.includes('[사용자 작성 지침: 이 문서만]\n출구를 자세히'));
+   assert.ok(call.messages[1].content.includes('[최근 챗로그]'));
+   assert.ok(!call.messages[1].content.includes('[이전 위키'), '처음 쓸 땐 이전 문서 없음');
+   // 성공: 확장 모드로 바꾸고 생성 → 저장 → 문서 화면 (XSS 포함)
+diff --git a/tests/qc-pipeline-browser.mjs b/tests/qc-pipeline-browser.mjs
+index 2049a7c1a5..032a6c30eb 100644
+--- a/tests/qc-pipeline-browser.mjs
++++ b/tests/qc-pipeline-browser.mjs
+@@ -265,14 +265,14 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
+ 
+   await R.section('3-1 에셋 on/off × main/aux × 주인공 에셋 × 캐릭터로 플레이 → 이미지 지침', async () => {
+     let out = await request(page, base());
+-    assert.ok(imgPrompt(out)?.includes('Do not create tags for {{user}}'), '기본: main·주인공 OFF');
++    assert.ok(imgPrompt(out)?.includes('Do not create tags for Tester.'), '기본: main·주인공 OFF (지침 속 {{user}}는 유저 이름으로 푼다, 전수검사 11-13)');
+     await setVars(page, { $st_asset_on: '0' });
+     assert.equal(imgPrompt(await request(page, base())), null, '에셋 끔');
+     await setVars(page, { $st_asset_on: '1', $st_asset_model: 'aux' });
+     assert.equal(imgPrompt(await request(page, base())), null, '보조 모델이면 메인 지침 없음');
+     await setVars(page, { $st_asset_model: 'main', $st_asset_player: '1' });
+     out = await request(page, base());
+-    assert.ok(!imgPrompt(out).includes('Do not create tags for {{user}}') && imgPrompt(out).includes('Tester'), '주인공 ON: 페르소나 이름이 명단에');
++    assert.ok(!imgPrompt(out).includes('Do not create tags for') && imgPrompt(out).includes('Tester'), '주인공 ON: 페르소나 이름이 명단에');
+     // 옛 카드의 Asset 로어북 본문이 요청에 남아 있으면 지운다
+     out = await request(page, [sys('## Inserting Character Visual Images\n옛 본문\nOnly use those provided.\n---'), ...base()]);
+     assert.equal(out.filter((m) => m.content.includes('## Inserting Character Visual Images')).length, 1, '옛 Asset 본문 제거');
+@@ -286,7 +286,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
+     // 11-07 사용자: 페르소나 자리에는 그 요원 로어북만 (틀 지침 「대사·행동을 쓰지 마라」 없음, core/player.ts playerBlock)
+     assert.ok(s0.includes('### Character - Jyaldi') && !s0.includes('## Player Character') && !s0.includes('The user plays') && !s0.includes('loves coffee'), `페르소나 자리에 요원 로어북만: ${s0.slice(0, 120)}`);
+     assert.ok(!out.some((m) => /\bTester\b/.test(m.content)), '페르소나 이름 → 요원 이름');
+-    assert.ok(out.at(-2).content.includes('쟈알디가 웃었다'));
++    assert.ok(out.at(-1).content.includes('쟈알디가 웃었다'), '끝 assistant(프리필)는 이미지 지침 뒤에 그대로 마지막 (전수검사 11-13)');
+     assert.ok(!imgPrompt(out).includes('Jyaldi'), '주인공 OFF: 주인공 요원은 이미지 명단에서 뺌');
+     assert.ok(!loreOf(out).content.includes('### Character - Jyaldi'), '주인공 요원 로어는 고르지 않음 (주인공 글로 대신)');
+     await setVars(page, { $st_asset_player: '1' });
+@@ -314,7 +314,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
+       assert.equal(out.indexOf(b), out.length - 3, `${inject}: 마지막 사용자 앞 (이미지 지침은 맨 끝)`);
+       const lore = loreOf(out).content;
+       if (inject === 'split' || inject === 'record') assert.ok(!lore.includes('### Character - Jyaldi'), `${inject}: 시트 원문은 요청에서 뺀다`);
+-      else assert.ok(lore.includes('### Character - Jyaldi'), 'append: 시트 그대로');
++      else assert.ok(!lore.includes('### Character - Jyaldi') && b.content.includes('### Character - Jyaldi'), 'append: 시트는 원래 자리에서 빼고 기록 블록 안에 한 번 (전수검사 11-13)');
+     }
+     // 「컨텍스트 포함」 끔은 「사용」과 합쳐졌다 (2026-11-11 설정 개편 3단계): 인물 기록을 끄면 블록이 없다
+     await setVars(page, { $pp_on: '0' });
+diff --git a/tests/qc-settings-guides-browser.mjs b/tests/qc-settings-guides-browser.mjs
+index 4cfd86e8ae..a1c21f9918 100644
+--- a/tests/qc-settings-guides-browser.mjs
++++ b/tests/qc-settings-guides-browser.mjs
+@@ -25,7 +25,8 @@ const defaults = {
+   Directive: readFileSync(new URL('../src/data/guides/directive.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+   RP: readFileSync(new URL('../src/data/guides/rp.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+   Tag: readFileSync(new URL('../src/data/guides/tag.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+-  Shop: readFileSync(new URL('../src/data/guides/shop.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
++  // 상점 지침은 우주몰 전용 절을 뺀 글 (전수검사 11-13 guides#4: core/guides.ts dropSections(shop, MALL_ONLY))
++  Shop: (await import('../dist-test/core.mjs')).guideDefault('Shop'),
+   Updater: readFileSync(new URL('../src/data/guides/updater-detailed.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+   UpdaterCompact: readFileSync(new URL('../src/data/guides/updater-compact.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+ };
+-- 
+2.43.0
+

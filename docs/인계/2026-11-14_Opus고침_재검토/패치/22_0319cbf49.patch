@@ -1,0 +1,57 @@
+From 0319cbf4929b31f3e5bf193aaed588fdef99950c Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 14 Nov 2026 05:41:02 +0000
+Subject: [PATCH] =?UTF-8?q?v0.21.13:=20=EC=86=90=20=EC=B9=B8(=EC=95=84?=
+ =?UTF-8?q?=EB=AC=B4=20=EB=AC=BC=EA=B1=B4=EC=9D=B4=EB=82=98=C2=B7=EB=93=A4?=
+ =?UTF-8?q?=EA=B8=B0/=EB=84=A3=EA=B8=B0),=20=EC=9E=A5=EB=B9=84=EB=8A=94=20?=
+ =?UTF-8?q?=EC=9E=A5=EC=B0=A9=ED=95=B4=EC=95=BC=20=EC=82=AC=EC=9A=A9,=20?=
+ =?UTF-8?q?=EC=9C=84=ED=82=A4=20=EB=B8=94=EB=9D=BC=EB=A0=9B=20=ED=98=88?=
+ =?UTF-8?q?=ED=86=B5=20=EC=88=A8=EA=B9=80,=20=EC=97=B0=EC=96=B4=20?=
+ =?UTF-8?q?=EB=A7=88=EC=BC=93=C2=B7Faction=20=EC=A7=80=EC=B9=A8=20?=
+ =?UTF-8?q?=EC=A4=84=20=EC=A0=95=EB=A6=AC,=20=EC=A7=81=EC=A0=91=20?=
+ =?UTF-8?q?=EB=B2=84=EB=A6=B0=20=EB=AC=BC=EA=B1=B4=20=EC=95=8C=EB=A6=BC?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ package.json             | 2 +-
+ tests/equip8-browser.mjs | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/package.json b/package.json
+index 654622bbef..9a4be4f8c0 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "goei-plugin",
+-  "version": "0.21.12",
++  "version": "0.21.13",
+   "private": true,
+   "type": "module",
+   "scripts": {
+diff --git a/tests/equip8-browser.mjs b/tests/equip8-browser.mjs
+index 3b1aeae47a..ae842b6214 100644
+--- a/tests/equip8-browser.mjs
++++ b/tests/equip8-browser.mjs
+@@ -134,11 +134,11 @@ if (PART.includes('drag')) {
+   await drag(cell('i_boot'), '[data-drop="equip:gear:4"]');
+   const s5 = await stateOf(page);
+   if (s5.slots.i_boot !== 'gear:4') bad(`[drag] 칸에 직접 놓기(장비 5번째 칸): ${JSON.stringify(s5.slots)}`);
+-  // 쓰는 물건(장착 아님)을 빈 손 칸 위에 놓으면 = 장착 묶음에 놓은 것 → 사용 예정
++  // 손 칸에는 아무 물건이나 (사용자 2026-11-14): 쓰는 물건(장착 갈래 없음)을 빈 손 칸 위에 놓으면 그 손 칸에 든다. 사용 예정에는 안 들어간다
+   await drag(cell('i_light'), '[data-drop="equip:weapon:1"]');
+   const s6 = await stateOf(page);
+-  if (!s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 쓰는 물건을 칸 위에: ${JSON.stringify(s6.use)}`);
+-  if (JSON.stringify(s6.slots) !== JSON.stringify(s5.slots)) bad(`[drag] 쓰는 물건이 칸에 들어감 ${JSON.stringify(s6.slots)}`);
++  if (s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 손 칸에 놓은 물건이 사용 예정에: ${JSON.stringify(s6.use)}`);
++  if (!String(s6.slots.i_light ?? '').endsWith(':1')) bad(`[drag] 손 칸에 안 들어감 ${JSON.stringify(s6.slots)}`);
+   // 쓰지도 장착하지도 않는 물건 → 아바타 = 아무 일 없음
+   await drag(cell('i_pouch'), '.gx-items .it-av');
+   const s7 = await stateOf(page);
+-- 
+2.43.0
+

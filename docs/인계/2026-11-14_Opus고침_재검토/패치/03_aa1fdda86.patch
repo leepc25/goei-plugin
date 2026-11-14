@@ -1,0 +1,119 @@
+From aa1fdda8662fad455b6b3061a910589a347279ff Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 23:28:44 +0000
+Subject: [PATCH] =?UTF-8?q?=EC=A0=84=EC=88=98=EA=B2=80=EC=82=AC=20?=
+ =?UTF-8?q?=EA=B3=A0=EC=B9=A8=203:=20=ED=83=90=EC=82=AC=20=EC=A4=91=20?=
+ =?UTF-8?q?=ED=95=B4=EC=A0=9C(=EB=AA=A9=ED=91=9C=20=EC=B9=B8=20=EC=97=86?=
+ =?UTF-8?q?=EC=9D=8C),=20=EA=B4=B4=EB=8B=B4=EA=B0=A4=20=EB=93=B1=20?=
+ =?UTF-8?q?=EC=9E=90=EB=8F=99=20=EC=83=88=EB=A1=9C=EA=B3=A0=EC=B9=A8=20?=
+ =?UTF-8?q?=ED=99=94=EB=A9=B4=20=EB=B0=98=EC=98=81,=20=EB=A7=9D=EC=83=81?=
+ =?UTF-8?q?=ED=99=88=EC=87=BC=ED=95=91=20=EC=B2=AB=20=ED=8E=B8=EC=84=B1=20?=
+ =?UTF-8?q?=ED=91=9C=EC=A0=95=20=EB=AA=A9=EB=A1=9D?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ src/core/world/status.ts | 9 ++++++---
+ src/core/world/tags.ts   | 2 +-
+ src/ui/gnet.ts           | 2 +-
+ src/ui/homeshop.ts       | 5 ++++-
+ 4 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/src/core/world/status.ts b/src/core/world/status.ts
+index 7dd74e6e0d..a0a9859953 100644
+--- a/src/core/world/status.ts
++++ b/src/core/world/status.ts
+@@ -13,6 +13,8 @@ export interface StatusTag {
+   place: string;
+   /** '없음'이면 빈 문자열 */
+   target: string;
++  /** 이 줄에 목표 칸이 있었는가 (값이 없음이어도 true. 목표 칸을 끈 구성이거나 칸이 모자라면 false) */
++  hasTarget: boolean;
+   /** 지금 주인공과 같이 있는 이름 있는 인물들 (8칸 상태창의 동행 칸. 칸이 없거나 없음이면 빈 목록) */
+   companions: string[];
+   /** 투입 칸: 투입이면 true, 없음이면 false, 칸이 없는 옛 6칸 상태창이면 null */
+@@ -52,11 +54,11 @@ function extras(x: string[]): { companions: string[]; deployed: boolean | null;
+ }
+ 
+ /** 위치 뒤 칸들: 목표(괴이), 동행, 투입, 신분, 잔고. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
+-function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
++function tail(rest: string[]): { target: string; hasTarget: boolean; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
+   const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
+   const after = rest.slice(1);
+-  if (after.length <= 1) return { target: clean(after[0] ?? ''), ...extras([]) };
+-  return { target: clean(after[0]), ...extras(after.slice(1, 6)) };
++  if (after.length <= 1) return { target: clean(after[0] ?? ''), hasTarget: after.length >= 1, ...extras([]) };
++  return { target: clean(after[0]), hasTarget: true, ...extras(after.slice(1, 6)) };
+ }
+ 
+ /** 칸 구성대로 이름 붙이기 (구성에 없는 칸은 빈 값, 투입 칸이 없으면 null) */
+@@ -68,6 +70,7 @@ function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
+   };
+   const d = get('deployed');
+   return {
++    hasTarget: shape.includes('target'),
+     date: get('date'),
+     time: get('time'),
+     weather: clean(get('weather')),
+diff --git a/src/core/world/tags.ts b/src/core/world/tags.ts
+index a327279649..426e94d886 100644
+--- a/src/core/world/tags.ts
++++ b/src/core/world/tags.ts
+@@ -154,7 +154,7 @@ export function scanStatus(text: string): StatusLine {
+   const tags = findStatusTags(text);
+   const first = tags[0];
+   const minute = first ? statusMinute(first.date, first.time) : null;
+-  const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
++  const target = tags.length === 1 && (first.target || first.hasTarget) ? first.target : null;
+   return { minute, target };
+ }
+ 
+diff --git a/src/ui/gnet.ts b/src/ui/gnet.ts
+index bbb550c133..b76fb26e80 100644
+--- a/src/ui/gnet.ts
++++ b/src/ui/gnet.ts
+@@ -1023,7 +1023,7 @@ export async function autoRefreshGnet(base: ChatContext, messageIndex: number, o
+   const env = liveEnv ?? quietEnv;
+   const showing = env.current();
+   // 창이 다른 채팅을 보고 있으면 그 화면의 알림은 건드리지 않는다
+-  const target = showing && chatKey(showing) === chatKey(ctx) ? env : { ...quietEnv };
++  const target = showing && showing.charIndex === ctx.charIndex && showing.chatIndex === ctx.chatIndex ? env : { ...quietEnv }; // 사이트는 비교하지 않는다 (전수검사 11-13: 괴담갤·세정게·연어 마켓 자동 새로고침이 화면에 안 나왔다)
+   const notice = gnet.notice;
+   await refreshBoard({ ...ctx, chat: saved }, target, true, joint);
+   if (target !== env) gnet.notice = notice;
+diff --git a/src/ui/homeshop.ts b/src/ui/homeshop.ts
+index 4291f60b18..484e816449 100644
+--- a/src/ui/homeshop.ts
++++ b/src/ui/homeshop.ts
+@@ -18,7 +18,7 @@ import { userInfo } from '../host/user';
+ import { fillGuide, guideSections } from '../core/guides';
+ import { defStored } from '../core/deftext';
+ import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
+-import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
++import { ensureHomeshop, homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
+ import { mountPlayer, playerCut, playerHold, playerRecentChat, playerSay, playerState, playerTake, setPlayerFeed, stopPlayer } from './hsplayer';
+ import { shopSource } from './shop';
+ import { itemPic } from './items';
+@@ -123,6 +123,8 @@ async function ask(ctx: ChatContext, env: HsEnv): Promise<void> {
+   env.render();
+   let failed = false;
+   try {
++    // 그림 팩을 아직 안 받았으면 기다린다: 없으면 표정 목록이 talk 하나로 나간다 (전수검사 11-13)
++    if (!homeshopArt() && !homeshopStatus().failed) await ensureHomeshop();
+     const show = readShow(ctx.chat.scriptstate);
+     const g = genSettings(ctx.chat.scriptstate);
+     const moods = moodMap(homeshopArt()?.pack ?? null);
+@@ -377,6 +379,7 @@ async function say(ctx: ChatContext, env: HsEnv, text: string): Promise<void> {
+   playerSay(nick, text.slice(0, 80), 'me');
+   env.render();
+   try {
++    if (!homeshopArt() && !homeshopStatus().failed) await ensureHomeshop();
+     const art = homeshopArt();
+     const g = guideSections('Hs');
+     const w = cueWords();
+-- 
+2.43.0
+

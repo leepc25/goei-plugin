@@ -1,0 +1,521 @@
+From ef5589ee8138bec60ff50a197df6ff8d94c794ee Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 02:18:55 +0000
+Subject: [PATCH] =?UTF-8?q?=EC=A0=84=EC=88=98=EA=B2=80=EC=82=AC=20?=
+ =?UTF-8?q?=EA=B3=A0=EC=B9=A8=209:=20=EA=B3=A0=EC=B9=9C=20=EC=BD=94?=
+ =?UTF-8?q?=EB=93=9C=C2=B7=EC=8A=B9=EC=9D=B8=EB=B0=9B=EC=9D=80=20=EA=B8=80?=
+ =?UTF-8?q?=EC=97=90=20=EB=A7=9E=EA=B2=8C=20=EB=8B=A8=EC=9C=84=20=EC=8B=9C?=
+ =?UTF-8?q?=ED=97=98=20=EC=86=90=EB=B4=84,=20=ED=98=84=EC=9E=A5=20?=
+ =?UTF-8?q?=EA=B1=B0=EB=9E=98=20=EA=B0=80=EA=B3=84=EB=B6=80=EC=97=90?=
+ =?UTF-8?q?=EB=8F=84=20=EC=82=B4=EC=95=84=20=EC=9E=88=EB=8A=94=20=EC=A4=84?=
+ =?UTF-8?q?=20=ED=91=9C=EC=8B=9C?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01MHVZo54VPLZLW1Z6sEk3vX
+---
+ src/core/wallet.ts                  |  6 ++--
+ tests/fix2-pipe.test.mjs            | 17 +++++++++++
+ tests/fix3-misc.test.mjs            |  8 ++++--
+ tests/fix3-text.test.mjs            |  4 ++-
+ tests/fixtures/guide-out-old.json   | 14 ++++-----
+ tests/gnet.test.mjs                 |  2 +-
+ tests/guide-out.test.mjs            | 44 +++++++++++++++++++++++++++--
+ tests/items-truth.test.mjs          |  4 ++-
+ tests/items.test.mjs                |  6 +++-
+ tests/itemstate-browser.mjs         |  6 ++--
+ tests/itemstate.test.mjs            | 14 ++++-----
+ tests/people-qual.test.mjs          |  3 +-
+ tests/people-sexual.test.mjs        |  2 +-
+ tests/people-updater.test.mjs       |  4 +--
+ tests/phone.test.mjs                |  2 +-
+ tests/qc-settings-world-browser.mjs | 16 +++++++++--
+ tests/wiki.test.mjs                 |  2 +-
+ tests/world-data.test.mjs           |  4 +--
+ 18 files changed, 120 insertions(+), 38 deletions(-)
+
+diff --git a/src/core/wallet.ts b/src/core/wallet.ts
+index 1925b328a6..fe620cbed2 100644
+--- a/src/core/wallet.ts
++++ b/src/core/wallet.ts
+@@ -150,11 +150,11 @@ export function addWalletEntry(w: Wallet, e: Omit<WalletEntry, 'id' | 'at'> & {
+ }
+ 
+ /** 필드 거래 (게임 다리, 출처 field). 기준 메시지는 필드 사건·막간과 같은 자리(들어갈 때의 마지막 메시지)라 그 메시지를 다시 굴리면 같이 빠진다.
+- * 같은 물건을 두 번 사도 따로 적히게 id 는 부르는 쪽이 매번 새로 준다 */
+-export function withFieldTrade(w: Wallet, anchor: string, amount: number, memo: string, id: string, where: { place?: string; time?: string } = {}): Wallet {
++ * 같은 물건을 두 번 사도 따로 적히게 id 는 부르는 쪽이 매번 새로 준다. alive(살아 있는 응답 키)를 주면 addWalletEntry 처럼 400줄을 넘을 때 정리한다 (전수검사 11-13) */
++export function withFieldTrade(w: Wallet, anchor: string, amount: number, memo: string, id: string, where: { place?: string; time?: string } = {}, alive?: Set<string>): Wallet {
+   const place = typeof where.place === 'string' ? where.place.trim().slice(0, 30) : '';
+   const time = typeof where.time === 'string' ? where.time.trim().slice(0, 10) : '';
+-  return addWalletEntry(w, { anchor, amount: Math.trunc(amount), memo: memo.trim() || '필드 거래', src: 'field', id, ...(place ? { place } : {}), ...(time ? { time } : {}) });
++  return addWalletEntry(w, { anchor, amount: Math.trunc(amount), memo: memo.trim() || '필드 거래', src: 'field', id, ...(place ? { place } : {}), ...(time ? { time } : {}) }, alive);
+ }
+ 
+ export function removeWalletEntry(w: Wallet, id: string): Wallet {
+diff --git a/tests/fix2-pipe.test.mjs b/tests/fix2-pipe.test.mjs
+index 0948d6a535..59de5c1f78 100644
+--- a/tests/fix2-pipe.test.mjs
++++ b/tests/fix2-pipe.test.mjs
+@@ -114,3 +114,20 @@ test('호출 기록: 턴마다 따로 저장하고 다시 읽으면 같다', asy
+   assert.equal(store.get('goei-trace'), '[]');
+   assert.ok(![...store.keys()].some((k) => k.startsWith('goei-trace:')));
+ });
++
++test('호출 기록: 본편에 덧붙인 글의 토큰 수를 main.added 에 남긴다 (pipeline#10)', async () => {
++  const P = await import(`${url}?v=4`);
++  await P.traceBegin();
++  P.traceMain([{ role: 'user', content: '안녕하세요' }], [], ['abc']);
++  await new Promise((r) => setTimeout(r, 20)); // 토큰 수는 보낸 뒤에 센다
++  const t = (await P.loadTrace()).at(-1);
++  assert.equal(typeof t.main.added, 'number');
++  assert.ok(t.main.added > 0, `added=${t.main.added}`);
++  // 덧붙인 글이 없으면 칸도 없다
++  await P.traceBegin();
++  P.traceMain([{ role: 'user', content: '안녕하세요' }], []);
++  await new Promise((r) => setTimeout(r, 20));
++  assert.equal((await P.loadTrace()).at(-1).main.added, undefined);
++  await new Promise((r) => setTimeout(r, 1700)); // 모아 쓰기가 끝난 뒤 정리
++  await P.clearTrace();
++});
+diff --git a/tests/fix3-misc.test.mjs b/tests/fix3-misc.test.mjs
+index 1e3db8c0ae..acd0a8f80e 100644
+--- a/tests/fix3-misc.test.mjs
++++ b/tests/fix3-misc.test.mjs
+@@ -80,8 +80,12 @@ test('폰 「인터넷 접속」 고르기는 넘치면 접힌다 (css#5)', asyn
+ test('실패 기록의 게시판 이름은 보고 있는 사이트 (wording#1)', async () => {
+   const src = await read('src/ui/editor/manage.ts');
+   assert.doesNotMatch(src, /fail\('괴담넷', gnet\.failure\)/);
+-  assert.match(src, /fail\(BOARD_NAME\[boardSiteNow\(\)\], gnet\.failure\)/);
+-  assert.match(src, /\$\{BOARD_NAME\[boardSiteNow\(\)\]\}: \$\{gnet\.failure\.reason\}/);
++  // 네 게시판 실패를 모두, 각 사이트 이름으로 (전수검사 11-13: boardFailures)
++  assert.match(src, /boardFailures\(\)\.map\(\(f\) => fail\(f\.name, f\)\)\.join\(''\)/);
++  assert.match(src, /boardFailures\(\)\.map\(\(f\) => `\$\{f\.name\}: \$\{f\.reason\}`\)/);
++  assert.match(src, /clearBoardFailures\(\);/);
++  const g = await read('src/ui/gnet.ts');
++  assert.match(g, /if \(u\?\.failure\) out\.push\(\{ site: s, name: BOARD_NAME\[s\]/);
+ });
+ 
+ test('기록 있는 홈쇼핑 탭으로 돌아오면 다시 그린다 (wiki#4)', async () => {
+diff --git a/tests/fix3-text.test.mjs b/tests/fix3-text.test.mjs
+index aac9517fdb..aea8285288 100644
+--- a/tests/fix3-text.test.mjs
++++ b/tests/fix3-text.test.mjs
+@@ -75,7 +75,9 @@ test('우주 쇼핑몰만 흥정 문장이 없다 (gshop#6 = 사용자 승인 
+   const bm = G.guideDefault('Bm');
+   assert.match(shop, / Haggling: the owner may refuse/);
+   assert.doesNotMatch(cos, /Haggling:/);
+-  assert.match(bm, /Haggling:/);
++  // 포인트몰은 주인 대화가 1:1 상담(BmDesk)으로 가서 TALK 절 자체가 빠졌다 (나-52 사용자 승인)
++  assert.doesNotMatch(bm, /@@SECTION TALK\n/);
++  assert.doesNotMatch(bm, /Haggling:/);
+ });
+ 
+ test('로어 원문 첫 줄의 @@dont_activate 는 떼고 보낸다 (ggnet#13)', () => {
+diff --git a/tests/fixtures/guide-out-old.json b/tests/fixtures/guide-out-old.json
+index 0266278a5d..181fa39ab7 100644
+--- a/tests/fixtures/guide-out-old.json
++++ b/tests/fixtures/guide-out-old.json
+@@ -220,7 +220,7 @@
+    ],
+    [
+     "MAIN_NOTE",
+-    "Reference for {user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. {knowledge_rule} Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim."
++    "Reference for {user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim."
+    ]
+   ],
+   "UpdaterExtra": [
+@@ -266,7 +266,7 @@
+    ],
+    [
+     "SEXUAL.PROMPT_RULES",
+-    "Sexual desire is a concrete list of what this adult character likes in bed: favorite positions and poses, favorite kinds of play, preferred pace and roughness, whether they lead or follow, spots and touches that work, and what kills the mood. Write 3 to 5 short direct Korean sentences, each naming something specific. {style} Paraphilia is chosen from this closed list of adult-consensual types: fetishism focused on a body part, object, or material; sadism; masochism; exhibitionism; voyeurism; cross-dressing fixation; frotteuristic roleplay; fixation on a specific fluid or smell; fixation on body modification or scars; humiliation or submission dependency; and comparable named types. Judge in order: explicit statements, sexual history or reactions, the supplied openness lewdness value and stage, then personality traits such as control, submission, shame, exposure, possessiveness, or fixation. Use exact prefix \"<추정>\" for a plausible inference supported by weak or indirect evidence instead of returning \"미확인\". Return exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or when the data truly offers no basis at all. Never fabricate a concrete history; every inferred inclination must use that inference prefix and name its basis."
++    "Sexual desire is a concrete list of what this adult character likes in bed: favorite positions and poses, favorite kinds of play, preferred pace and roughness, whether they lead or follow, spots and touches that work, and what kills the mood. Write 3 to 5 short direct Korean sentences, each naming something specific. Paraphilia is chosen from this closed list of adult-consensual types: fetishism focused on a body part, object, or material; sadism; masochism; exhibitionism; voyeurism; cross-dressing fixation; frotteuristic roleplay; fixation on a specific fluid or smell; fixation on body modification or scars; humiliation or submission dependency; and comparable named types. Judge in order: explicit statements, sexual history or reactions, the supplied openness lewdness value and stage, then personality traits such as control, submission, shame, exposure, possessiveness, or fixation. Use exact prefix \"<추정>\" for a plausible inference supported by weak or indirect evidence instead of returning \"미확인\". Return exact text \"미확인\" only for a minor or ambiguous age, an inference requiring non-consent, or when the data truly offers no basis at all. Never fabricate a concrete history; every inferred inclination must use that inference prefix and name its basis."
+    ],
+    [
+     "SEXUAL.INIT_DESIRE",
+@@ -316,7 +316,7 @@
+    ],
+    [
+     "STATUS.RULE.POINTS",
+-    "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted."
++    "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert. Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted."
+    ],
+    [
+     "STATUS.RULE.WALLET",
+@@ -324,7 +324,7 @@
+    ],
+    [
+     "STATUS.RULE.ONE_LINE",
+-    "- Output exactly one [▣] at the very end of every response, as the final line."
++    "- Output exactly one [▣] at the very end of every response."
+    ],
+    [
+     "STATUS.RULE.FIELDS",
+@@ -336,7 +336,7 @@
+    ],
+    [
+     "INVENTORY.NOTE",
+-    "What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when \"This turn\" lists an event, handle it in this response: describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. If a \"Really\" list follows, those items' real effects differ from or go beyond their labels: what happens follows the Really line, nobody knew it beforehand, and the protagonist learns it only through what happens. Never print this list back."
++    "What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when \"This turn\" lists an event, handle it in this response: describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. Never print this list back."
+    ],
+    [
+     "INVENTORY.RESUMED",
+@@ -352,7 +352,7 @@
+    ],
+    [
+     "LORE.LOCKED",
+-    "[Locked appendix: 「{name}」] Hidden information about {parent} that no character knows yet. Unlock it when this happens in the story: {when}\nDo not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|{name}] on its own line at the very end."
++    "[Locked appendix: 「{name}」] Hidden information about {parent} that no character knows yet. Unlock it when this happens in the story: {when}\nDo not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|{name}] on its own line after the prose."
+    ],
+    [
+     "PEOPLE.KNOWLEDGE_RULE",
+@@ -382,7 +382,7 @@
+   "Asset": [
+    [
+     "PROMPT",
+-    "# Insert <img> tags into a finished narrative.\n\nOutput ONLY a JSON array. No text. No explanation. No code fence.\n\n## Format\n[{\"line\":N,\"tag\":\"<img=\\\"Character_keyword\\\">\"}]\n\n- `line`: 1-based paragraph number from the numbered narrative below. The tag is inserted AFTER that paragraph (the tag represents that paragraph's character).\n- `tag`: full `<img=\"Name_keyword\">` string with Name and keyword from the allowed lists.\n- If no listed character appears in the narrative, output `[]`.\n\n## Rules\n- ONE tag per paragraph maximum. If multiple listed characters appear in the same paragraph, choose the one who is the FOCUS of that paragraph.\n- EVIDENCE-BASED: a character MUST be explicitly mentioned by name (English prefix OR Korean alias) in that paragraph's text to be tagged.\n- FORBIDDEN: tagging characters not present in the narrative. Absence in narrative = NO TAG.\n- MUST tag every visible listed character at least ONCE when they appear and are the focus.\n- Tag at first appearance AND when emotion changes SIGNIFICANTLY (smile → cry, calm → angry, neutral → shocked).\n- DO NOT tag minor variations (smile → bigger smile = SAME tag, skip).\n{no_tag_rule}\n- DO NOT invent character names or keywords. Use only the lists below.\n\n## HARD LIMIT (per-character, independent count)\n- Each listed character has their OWN independent counter for tags. The limit is {limit} tag{plural} PER character, NOT a total for the whole response.\n- Character A may receive up to {limit} tag(s). Character B may ALSO receive up to {limit} tag(s). They do not share a budget.\n- If 3 characters appear and each is the focus of separate paragraphs, you may output up to {limit_x3} tags total (3 characters × {limit} each).\n- Per-character priority when over the limit: KEEP the most significant emotion moments, SKIP the rest.\n- This per-character limit is absolute — exceeding it for any single character is a hard error. Under-using it (when more legitimate tags exist for that character) wastes the budget.\n\n## Allowed Character Names (use exactly as written)\n{names}\n\n{aliases}## Allowed Keywords (use exactly as written)\nSFW: {keywords}\n\n## Examples\n\n### NEGATIVE (do not do this)\nNarrative:\n[1] The room is empty.\n[2] Wind blows through the window.\n\nWrong output:\n[{\"line\":1,\"tag\":\"<img=\\\"{first}_neutral\\\">\"}]   <- no listed character present\n\nCorrect output:\n[]\n\n### POSITIVE (do this)\nNarrative:\n[1] {first} walked into the room with a quiet smile.\n[2] She glanced at the figure standing by the desk, her expression hardening into something sharper.\n\nCorrect output:\n[{\"line\":1,\"tag\":\"<img=\\\"{first}_default\\\">\"},{\"line\":2,\"tag\":\"<img=\\\"{first}_serious\\\">\"}]\n\n## Narrative (numbered by paragraph)\n\n{narrative}\n\n# Reminder: Output ONLY the JSON array. No prose. No explanation. If no listed character appears, output []."
++    "# Insert <img> tags into a finished narrative.\n\nOutput ONLY a JSON array. No text. No explanation. No code fence.\n\n## Format\n[{\"line\":N,\"tag\":\"<img=\\\"Character_keyword\\\">\"}]\n\n- `line`: 1-based paragraph number from the numbered narrative below. The tag is inserted AFTER that paragraph (the tag represents that paragraph's character).\n- `tag`: full `<img=\"Name_keyword\">` string with Name and keyword from the allowed lists.\n- If no listed character appears in the narrative, output `[]`.\n\n## Rules\n- ONE tag per paragraph maximum. If multiple listed characters appear in the same paragraph, choose the one who is the FOCUS of that paragraph.\n- EVIDENCE-BASED: a character MUST be explicitly mentioned by name (English prefix OR Korean alias) in that paragraph's text to be tagged.\n- FORBIDDEN: tagging characters not present in the narrative. Absence in narrative = NO TAG.\n- MUST tag every visible listed character at least ONCE when they appear and are the focus.\n- Tag at first appearance AND when emotion changes SIGNIFICANTLY (smile → cry, calm → angry, neutral → shocked).\n- DO NOT tag minor variations (smile → bigger smile = SAME tag, skip).\n{no_tag_rule}\n- DO NOT invent character names or keywords. Use only the lists below.\n\n## HARD LIMIT (per-character, independent count)\n- Each listed character has their OWN independent counter for tags. The limit is {limit} tag{plural} PER character, NOT a total for the whole response.\n- Character A may receive up to {limit} tag(s). Character B may ALSO receive up to {limit} tag(s). They do not share a budget.\n- If 3 characters appear and each is the focus of separate paragraphs, you may output up to {limit_x3} tags total (3 characters × {limit} each).\n- Per-character priority when over the limit: KEEP the most significant emotion moments, SKIP the rest.\n- This per-character limit is absolute — exceeding it for any single character is a hard error. Under-using it (when more legitimate tags exist for that character) wastes the budget.\n\n## Allowed Character Names (use exactly as written)\n{names}\n\n{aliases}## Allowed Keywords (use exactly as written)\nSFW: {keywords}\n\n## Examples\n\n### NEGATIVE (do not do this)\nNarrative:\n[1] The room is empty.\n[2] Wind blows through the window.\n\nWrong output:\n[{\"line\":1,\"tag\":\"<img=\\\"{first}_neutral\\\">\"}]   <- no listed character present\n\nCorrect output:\n[]\n\n### POSITIVE (do this)\nNarrative:\n[1] {first} walked into the room with a quiet smile.\n[2] {first} glanced at the figure standing by the desk, her expression hardening into something sharper.\n\nCorrect output:\n[{\"line\":1,\"tag\":\"<img=\\\"{first}_default\\\">\"},{\"line\":2,\"tag\":\"<img=\\\"{first}_serious\\\">\"}]\n\n## Narrative (numbered by paragraph)\n\n{narrative}\n\n# Reminder: Output ONLY the JSON array. No prose. No explanation. If no listed character appears, output []."
+    ],
+    [
+     "NO_TAG",
+diff --git a/tests/gnet.test.mjs b/tests/gnet.test.mjs
+index ea297cd43a..5aa57e0b0a 100644
+--- a/tests/gnet.test.mjs
++++ b/tests/gnet.test.mjs
+@@ -163,7 +163,7 @@ test('prompts from the real card: frame, CBS settled, privacy branch, references
+   assert.equal(r.messages.length, 2);
+   const [sys, user] = r.messages.map((m) => m.content);
+   assert.ok(!sys.includes('{{') && !user.includes('{{'), 'CBS가 남지 않음');
+-  assert.ok(sys.includes('## User-controlled protagonist (narrator reference only)'));
++  assert.ok(!sys.includes('## User-controlled protagonist') && !sys.includes('End of the log'), '주인공 머리말·로그 끝 문장은 지침에서 빠짐 (ggnet#10)');
+   assert.ok(sys.includes('조용한 아저씨 말투'));
+   assert.ok(sys.includes('Do not discuss the protagonist or partners themselves'), '사생활 4단계 문장');
+   assert.ok(!sys.includes('Users may discuss the protagonist'), '다른 단계 문장은 빠짐');
+diff --git a/tests/guide-out.test.mjs b/tests/guide-out.test.mjs
+index d2694969c8..f9a6dc927b 100644
+--- a/tests/guide-out.test.mjs
++++ b/tests/guide-out.test.mjs
+@@ -14,12 +14,15 @@ const G = M.G;
+ const reset = () => { for (const n of G.GUIDE_NAMES) G.setGuideOverride(n, ''); };
+ const sectionsOf = (name) => Object.fromEntries([...G.guideDefault(name).matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)].map((m) => [m[1].trim(), m[2]]));
+ const BASE = calls(M);
++// 상점 파일의 절 가운데 몇은 그 몰 지침에만 있다 (전수검사 11-13: 상점 지침은 몰 전용 절을, 우주몰·백일몽몰은 상점 전용 절을 뺌)
++const IN = { TRUTH_ALL: ['Cos'], TRUTH_MIX: ['Cos'], TRUTH_NONE: ['Cos'], SECRET_NOTE: ['Cos'], WHERE_ANY: ['Shop'], WHERE_SHOP: ['Shop'], ASSIGN_ROLE_USEFUL: ['Cos', 'Bm'], ASSIGN_ROLE_BROAD: ['Cos', 'Bm'], ASSIGN_RULE: ['Cos', 'Bm'] };
++const guidesOf = (file, name) => (file === 'Shop' && IN[name]) || GUIDES_OF[file];
+ const moved = Object.entries(OLD.sections).flatMap(([file, list]) => list.map(([name, body]) => ({ file, name, body })));
+ 
+ test('옮긴 절: 기본 지침의 글이 옛 소스 글자와 같다', () => {
+   assert.equal(moved.length, 95);
+   for (const { file, name, body } of moved) {
+-    for (const guide of GUIDES_OF[file]) assert.equal(sectionsOf(guide)[name], body, `${guide} / ${name}`);
++    for (const guide of guidesOf(file, name)) assert.equal(sectionsOf(guide)[name], body, `${guide} / ${name}`);
+   }
+ });
+ 
+@@ -36,6 +39,11 @@ test('기본 지침으로 만든 요청문 = 옮기기 전 코드가 만들던 
+   reset();
+   const names = Object.keys(OLD.calls);
+   assert.equal(names.length, 56);
++  // 옛 요청문에서 옮겨 쓰는 글: 활발한 게시판 문단, 괴담넷 소개 문단, 진열대용 구분 규칙, 우주몰 SHELF_SECRET 문단(진실 섞음)
++  const ACTIVE = 'This is an active public community with many silent readers, not a nearly empty board. Typical new board entries have roughly 500–8,000 views and 20–300 upvotes; widely shared or older popular topics can reach tens of thousands of views and hundreds of upvotes. These are scale guides, not fixed floors or matched ratios: vary irregularly by age, topic and popularity, with upvotes below views. Spread posting times plausibly before narrative time so readership can accumulate; do not make every post seconds old with single-digit votes and tens of views. Existing counts never decrease and may grow with elapsed time and continued discussion.';
++  const ABOUT = OLD.calls['gnet.refresh.gn'].match(/## About the board\\n.*?(?=\\n)/)[0];
++  const TAGS = OLD.calls['shop.talk.cos.secret'].match(/\\n구분: leave empty.*?(?=\\n)/)[0];
++  const SECRET = OLD.calls['shop.shelf.cos.mix'].match(/\\nFor this mall the 설명 column.*?(?=\\n)/)[0];
+   // 옮긴 뒤 사용자 지시로 고친 지침 문장 (2026-11-13 소모·장착 판정): 옛 요청문에 같은 고침을 입혀 견준다. 그 밖의 글자는 그대로여야 한다
+   const LATER = [
+     ['장비 (worn or carried on the body: clothes, armor, bags, accessories)', '장비 (worn or strapped on the body: clothes, armor, bags, accessories; not something merely kept in a pocket or bag)'],
+@@ -52,6 +60,38 @@ test('기본 지침으로 만든 요청문 = 옮기기 전 코드가 만들던 
+     ["{\\\"posts\\\":[{\\\"author\\\":\\\"abc92\\\",\\\"id\\\":1846002,\\\"title\\\":\\\"폐건물 체험 업체 사진 재탕 아님?\\\",\\\"time\\\":\\\"14:27\\\",\\\"date\\\":\\\"2025.05.13 14:27\\\",\\\"views\\\":4237,\\\"upvotes\\\":113,\\\"content\\\":\\\"어제 찍었다는 인증사진이 작년 후기랑 똑같음\\\\n창문에 걸린 비닐 모양까지 같은데 이걸 돈 받고 파네\\\",\\\"mine\\\":false,\\\"comments\\\":[{\\\"author\\\":\\\"ㅇㅇ(118.235)\\\",\\\"content\\\":\\\"작년 사진 주소도 올려봐 사진만 같으면 광고용일 수도 있지\\\",\\\"parent\\\":0,\\\"mine\\\":false},{\\\"author\\\":\\\"abc92\\\",\\\"content\\\":\\\"후기 게시판 8월 글 봐 거기선 참가자가 직접 찍었다고 함\\\",\\\"parent\\\":1,\\\"mine\\\":false},{\\\"author\\\":\\\"감자\\\",\\\"content\\\":\\\"나 저기 예약했는데 확인부터 해야겠네\\\",\\\"parent\\\":0,\\\"mine\\\":false},{\\\"author\\\":\\\"ㅁㄴㅇㄹ\\\",\\\"content\\\":\\\"귀신보다 환불이 더 무섭겠노 ㅋㅋ\\\",\\\"parent\\\":3,\\\"mine\\\":false}]},{\\\"author\\\":\\\"아직안잠\\\",\\\"id\\\":1846001,\\\"title\\\":\\\"야간 편의점 앞 고양이 오늘도 출근함\\\",\\\"time\\\":\\\"14:20\\\",\\\"date\\\":\\\"2025.05.13 14:20\\\",\\\"views\\\":941,\\\"upvotes\\\":27,\\\"content\\\":\\\"내 교대시간보다 정확하다\\\\n사료 없으니까 쳐다도 안 봄\\\",\\\"mine\\\":false,\\\"comments\\\":[{\\\"author\\\":\\\"ㅇㅇ(211.36)\\\",\\\"content\\\":\\\"걔 입장에선 니가 사료 늦게 주는 알바임\\\",\\\"parent\\\":0,\\\"mine\\\":false}]}],\\\"incoming\\\":[]}", "{\\\"posts\\\":[{\\\"author\\\":\\\"handle\\\",\\\"id\\\":1846002,\\\"title\\\":\\\"title\\\",\\\"time\\\":\\\"14:27\\\",\\\"date\\\":\\\"2025.05.13 14:27\\\",\\\"views\\\":4237,\\\"upvotes\\\":113,\\\"content\\\":\\\"body line\\\\nbody line\\\",\\\"mine\\\":false,\\\"comments\\\":[{\\\"author\\\":\\\"handle\\\",\\\"content\\\":\\\"comment\\\",\\\"parent\\\":0,\\\"mine\\\":false},{\\\"author\\\":\\\"handle\\\",\\\"content\\\":\\\"reply to comment 1\\\",\\\"parent\\\":1,\\\"mine\\\":false},{\\\"author\\\":\\\"handle\\\",\\\"content\\\":\\\"comment\\\",\\\"parent\\\":0,\\\"mine\\\":false},{\\\"author\\\":\\\"handle\\\",\\\"content\\\":\\\"reply to comment 3\\\",\\\"parent\\\":3,\\\"mine\\\":false}]},{\\\"author\\\":\\\"handle\\\",\\\"id\\\":1846001,\\\"title\\\":\\\"title\\\",\\\"time\\\":\\\"14:20\\\",\\\"date\\\":\\\"2025.05.13 14:20\\\",\\\"views\\\":941,\\\"upvotes\\\":27,\\\"content\\\":\\\"body line\\\\nbody line\\\",\\\"mine\\\":false,\\\"comments\\\":[{\\\"author\\\":\\\"handle\\\",\\\"content\\\":\\\"comment\\\",\\\"parent\\\":0,\\\"mine\\\":false}]}],\\\"incoming\\\":[]}"],
+     // 전수검사 11-13 (사용자 9-1): 연어 마켓 말머리 넷
+     ["Each post is a listing: 팝니다 (selling) or 삽니다 (buying).", "Each post is a listing whose tag is exactly one of 팝니다 (selling), 삽니다 (buying), 나눔 (giving away) or 정보 (occult information)."],
++    // 전수검사 11-13 (승인 글): 괴담넷 요청문에서 로그 끝 표시·주인공 머리말을 뺌, 활발한 게시판 문단을 새 글 반응 절로 옮김, 쪽지에 게시판 소개 문단
++    ['\\nThe end of the chat log will be marked with `--- End of the log ---`. Ignore all other similar markers in the middle.', ''],
++    ['## User-controlled protagonist (narrator reference only)\\n\\n## Universe Settings\\n\\n', ''],
++    [`\\n${ACTIVE}`, ''],
++    [' There is no per-post minimum. Saved threads are not capped at six; user-action reactions follow their separate contract.', `\\n${ACTIVE}`],
++    ['Retained comment totals may exceed six; the initial', 'The initial'],
++    ['no markup, process blocks or text', 'no markup or text'],
++    ['Return only NEW comments: 0–4 per post, each', 'Return only NEW comments, each'],
++    ['instructions.\\nROLE BINDING', `instructions.\\n${ABOUT}\\n\\nROLE BINDING`],
++    // 전수검사 11-13 (승인 글): 괴담톡 보기 전용 방
++    ['recognizable character nicknames', "each character's name as written in the universe settings"],
++    [" Limit each speaker to established knowledge and keep the exchange within the narrative's current endpoint.", ''],
++    // 전수검사 11-13 (승인 글): 우주몰 예시 말·설명 칸·흥정 문장. 대화 요청은 그 몰의 줄 꼴(진실 칸)·SHELF_SECRET 절, 진열대용 구분 규칙은 뺌
++    ['Like: 「굉장하고 강한 상품, 만일 우리에게 물어보면」, 「입금 확인되면 상품 간다, 즉시」, 「환불 다음 기회」 — do not reuse these or the Waldo line.', 'Do not reuse the Waldo line.'],
++    ['효과|구분\\" to add', '효과|구분|진실\\" to add'],
++    ['(이름|값|쓰임|그림|무게|설명|효과|구분).', '(이름|값|쓰임|그림|무게|설명|효과|구분|진실).'],
++    ['exactly: 이름|값|쓰임|그림|무게|설명|효과|구분. 값', 'exactly: 이름|값|쓰임|그림|무게|설명|효과|구분|진실. 값'],
++    [`ordinary goods).${TAGS}`, `ordinary goods).${SECRET}`],
++    ['(what it is, condition, quantity).', '(what it is, condition).'],
++    ['— where it supposedly comes from and how to use it (출처·사용법), in', '— what it is and how to use it (사용법), in'],
++    [" Haggling: the owner may refuse, counter, or accept; accept only when it makes sense for this owner, and then change that item's price: a lower figure, or another payment the owner agrees to take instead, written in words.", ''],
++    // 전수검사 11-13 (승인 글): 아는 것 규칙은 메인 요청에 한 번만(인물 지침), 성 어휘 문장은 인물별 문장으로
++    ['not lines to say. Do not have a character mention or act on a secret or fact they have not witnessed, learned, or otherwise demonstrably known. Never invent how they acquired information. Keep facts, beliefs, guesses, and misunderstandings distinct. A missing record does not prove ignorance: actual evidence in the conversation may establish knowledge.', 'not lines to say.'],
++    [' Vocabulary rule, mandatory: write like adults talking dirty in private. Name body parts and acts with the crude Korean words actually used (`자지`, `보지`, `젖`, `엉덩이`, `박다`, `빨다`, `싸다` and similar), and name positions and play plainly. Euphemism, medical or academic terms, poetic wording, and softened phrasing are errors; if a sentence could appear in a romance novel, rewrite it cruder.', ''],
++    [' Use the 0.10.7 style: blunt everyday sex words and slang, crude terms included, with no euphemism, clinical vocabulary, literary wording, or psychological analysis. Keep it direct but do not force the stronger explicit vocabulary examples.', ''],
++    // 전수검사 11-13 (승인 글): 상태창·소지품·잠긴 로어·그림 요청 예시
++    ['every response, as the final line.', 'every response.'],
++    ['points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall).', 'points and won never convert.'],
++    [' If a "Really" list follows, those items\' real effects differ from or go beyond their labels: what happens follows the Really line, nobody knew it beforehand, and the protagonist learns it only through what happens.', ''],
++    ['on its own line at the very end.', 'on its own line after the prose.'],
++    ['[1] Lee Ha-neul walked into the room with a quiet smile.\n[2] She glanced', '[1] Lee Ha-neul walked into the room with a quiet smile.\n[2] Lee Ha-neul glanced'],
++    ['[1] Eileen walked into the room with a quiet smile.\n[2] She glanced', '[1] Eileen walked into the room with a quiet smile.\n[2] Eileen glanced'],
+   ];
+   const later = (t) => LATER.reduce((x, [a, b]) => x.split(a).join(b), t);
+   for (const k of names) assert.equal(BASE[k], later(OLD.calls[k]), k);
+@@ -76,7 +116,7 @@ test('새 절이 없는 지침(옛 글로 고쳐 둔 것)이면 코드에 남긴
+ test('절을 고치면 그 절이 들어가는 요청문이 바뀐다 (절마다)', () => {
+   const MARK = 'ZZ-EDITED-ZZ';
+   for (const { file, name } of moved) {
+-    for (const g of GUIDES_OF[file]) G.setGuideOverride(g, withSection(G.guideDefault(g), name, (b) => `${b} ${MARK}`));
++    for (const g of guidesOf(file, name)) G.setGuideOverride(g, withSection(G.guideDefault(g), name, (b) => `${b} ${MARK}`));
+     try {
+       const out = calls(M);
+       const hit = Object.keys(out).filter((k) => out[k] !== BASE[k]);
+diff --git a/tests/items-truth.test.mjs b/tests/items-truth.test.mjs
+index 94f0f2c8b0..78f4b76cab 100644
+--- a/tests/items-truth.test.mjs
++++ b/tests/items-truth.test.mjs
+@@ -24,7 +24,9 @@ test('truth: 안 쓰는 턴엔 Really 없음, 쓰는 턴엔 Really 에 진짜, ?
+   const used = I.itemsBlock(live, { ...base, use: [{ name: '빛의 돌', n: 1 }, { name: '돌', n: 1 }] });
+   assert.ok(used.includes('Really') && used.includes('- 빛의 돌: 쥐면 주변 전등이 전부 꺼진다 (the label says 「어둠을 밝힌다」)'), used);
+   assert.ok(used.includes('- 돌: not even its seller knows (the label says 「???」 and may be false) — decide what it really does now'), used);
+-  assert.ok(I.INVENTORY_NOTE.includes('Really'));
++  // Really 설명은 쓰는 턴의 Really 머리줄에만 (11-13 전수검사: INVENTORY_NOTE 에서 뺌)
++  assert.ok(used.includes('Really (what these actually do — decided by no one in advance'), used);
++  assert.ok(!I.INVENTORY_NOTE.includes('Really'));
+ });
+ 
+ test('쪽지 내용(text): 저장되고 본편 줄에 reads 로 간다', () => {
+diff --git a/tests/items.test.mjs b/tests/items.test.mjs
+index 6606d8c5f0..f3c4f436d0 100644
+--- a/tests/items.test.mjs
++++ b/tests/items.test.mjs
+@@ -24,13 +24,17 @@ test('더하기: 기준 메시지가 사라지면 빠지고, 직접 넣은 건 
+ 
+ test('같은 이름이 또 들어오면 새 줄 없이 갱신, 둘 다 소모성이면 횟수를 더한다', () => {
+   let it = addItem(empty, alive, { name: '소금 봉지', desc: '두 봉지', uses: 2, from: 'story', anchor: 'c1' });
+-  it = addItem(it, alive, { name: '소금봉지', desc: '새로 샀다', uses: 3, from: 'store', anchor: 'c2' });
++  it = addItem(it, alive, { name: '소금봉지', desc: '새로 샀다', uses: 3, from: 'story', anchor: 'c2' });
+   assert.equal(it.list.length, 1);
+   assert.equal(it.list[0].desc, '새로 샀다');
+   assert.equal(it.list[0].uses, 5);
+   assert.equal(it.list[0].anchor, 'c1');
+   it = addItem(it, alive, { name: '소금 봉지', from: 'story', anchor: 'c2' });
+   assert.equal(it.list[0].desc, '새로 샀다', '빈 설명은 있던 설명을 지우지 않는다');
++  // 상점·쇼핑몰에서 산 것(store)은 같은 이름이 있어도 새 줄로 (전수검사 11-13)
++  const st = addItem(it, alive, { name: '소금봉지', uses: 3, from: 'store', anchor: 'c2' });
++  assert.equal(st.list.length, 2);
++  assert.deepEqual([st.list[0].uses, st.list[1].from, st.list[1].anchor, st.list[1].uses], [5, 'store', 'c2', 3]);
+ });
+ 
+ test('쓰임 글 읽기·쓰기', () => {
+diff --git a/tests/itemstate-browser.mjs b/tests/itemstate-browser.mjs
+index 46f09328b1..75de3b812e 100644
+--- a/tests/itemstate-browser.mjs
++++ b/tests/itemstate-browser.mjs
+@@ -132,9 +132,9 @@ for (const vp of ['pc', 'phone']) {
+     await page.evaluate(() => { const d = document.querySelector('.gw details[data-keep="items-rules"]'); d.open = true; d.dispatchEvent(new Event('toggle')); d.scrollIntoView({ block: 'start' }); }); await sleep(300);
+     await page.screenshot({ path: `${out}/${vp}_9_설정_판정표.png` });
+     const cell = (k) => `.gw [data-change="set-items-rules-cell"][data-key="${k}"]`;
+-    assert.deepEqual([await val(cell('12:a')), await val(cell('12:b'))], ['도구', '장비·사용']);
+-    await setInput(page, cell('12:b'), '사용'); await sleep(400);
+-    assert.ok(String((await ss()).$it_rules).includes('도구 → 사용'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
++    assert.deepEqual([await val(cell('12:a')), await val(cell('12:b'))], ['도구', '사용']);
++    await setInput(page, cell('12:b'), '장비·사용'); await sleep(400);
++    assert.ok(String((await ss()).$it_rules).includes('도구 → 장비·사용'), `[${vp}] 판정 표 저장: ${(await ss()).$it_rules}`);
+     await page.evaluate(() => document.querySelector('.gw [data-action="set-items-rules-reset"]')?.click()); await sleep(400);
+     assert.ok(!(await ss()).$it_rules, '기본값으로');
+     // 조작 높이 34px · 가로 넘침 없음
+diff --git a/tests/itemstate.test.mjs b/tests/itemstate.test.mjs
+index b70ab9343d..8cae146a42 100644
+--- a/tests/itemstate.test.mjs
++++ b/tests/itemstate.test.mjs
+@@ -127,13 +127,13 @@ test('다 쓴 소모품·상점 맞교환은 지금처럼 줄을 지운다', ()
+   assert.equal(removeItem(s, s.list[0].id, 'sell', 'store').list.length, 0);
+ });
+ 
+-test('갈래 표: 종류 → 판정. 손전등(기기)은 장비·사용, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
++test('갈래 표: 종류 → 판정. 손전등(기기)은 사용, 물건말 줄이 종류 줄보다 먼저, 표에 없으면 모델 값, 직접 넣은 것은 적힌 대로', () => {
+   setItemRules(undefined);
+   const t = (icon, name, model = {}) => traitsFor(icon.split('/')[0] && { 옷: 'wear', 음식: 'food', 도구: 'tool', 기기: 'device', 의료: 'medical', 소모품: 'consumable', 부적: 'charm', 무기: 'weapon', 서류: 'paper', 귀중품: 'valuable', 열쇠: 'key', 봉인: 'seal', 괴이: 'anomaly', 잡동사니: 'misc', 성인: 'adult' }[icon.split('/')[0]], icon, name, model);
+-  assert.deepEqual(t('기기/손전등/flashlight', '손전등', { use: true }), { use: true, equip: 'gear' });
+-  assert.deepEqual(t('도구/라이터/lighter', '라이터', { use: true }), { use: true, equip: 'gear' });
+-  assert.deepEqual(t('기기/무전기/radio', '무전기'), { use: true, equip: 'gear' });
+-  assert.deepEqual(t('기기/카메라/camera', '카메라'), { use: true, equip: 'gear' });
++  assert.deepEqual(t('기기/손전등/flashlight', '손전등', { use: true }), { use: true });
++  assert.deepEqual(t('도구/라이터/lighter', '라이터', { use: true }), { use: true });
++  assert.deepEqual(t('기기/무전기/radio', '무전기'), { use: true });
++  assert.deepEqual(t('기기/카메라/camera', '카메라'), { use: true });
+   assert.deepEqual(t('잡동사니/우산/umbrella', '우산', { use: true }), { use: false });
+   assert.deepEqual(t('열쇠/열쇠/key', '열쇠'), { use: true });
+   assert.deepEqual(t('의료/안정제/sedative', '안정제', { uses: 3 }), { use: true, uses: 3 }, '횟수는 모델이 적은 것');
+@@ -142,7 +142,7 @@ test('갈래 표: 종류 → 판정. 손전등(기기)은 장비·사용, 물건
+   assert.deepEqual(t('무기/권총/pistol', '권총'), { use: false, equip: 'weapon' });
+   assert.deepEqual(t('부적/부적/talisman', '부적'), { use: true });
+   assert.deepEqual(t('옷/정장/suit', '정장', { use: true }), { use: false, equip: 'gear' });
+-  assert.deepEqual(t('도구/성냥/match', '성냥', { uses: 10 }), { use: true, uses: 10, equip: 'gear' }, '표에 소모가 없어도 모델이 적은 횟수는 둔다');
++  assert.deepEqual(t('도구/성냥/match', '성냥', { uses: 10 }), { use: true, uses: 10 }, '표에 소모가 없어도 모델이 적은 횟수는 둔다');
+   assert.equal(t('성인/콘돔/condom', '콘돔', { use: true }), undefined, '표에 없는 종류 → 모델 값');
+   assert.equal(traitsFor('', undefined, '녹음기', { use: true }), undefined, '종류를 모르면 모델 값');
+   // 설정으로 고침: 물건말 줄
+@@ -155,7 +155,7 @@ test('갈래 표: 종류 → 판정. 손전등(기기)은 장비·사용, 물건
+   assert.equal(parseItemRules('도구 → 뭐지\n → 장비\n칼 → 무기').words.size, 1, '판정 말이 없는 줄·빈 줄은 안 쓴다');
+   // 들어올 때: 본문·상점은 표, 직접은 적힌 대로
+   let s = addItem(empty, alive, { name: '손전등', use: true, equip: undefined, icon: '기기/손전등/flashlight', from: 'story', anchor: 'c1' });
+-  assert.deepEqual([s.list[0].use, s.list[0].equip, s.list[0].kind], [true, 'gear', 'device']);
++  assert.deepEqual([s.list[0].use, s.list[0].equip, s.list[0].kind], [true, undefined, 'device']);
+   s = addItem(empty, alive, { name: '손전등', use: true, icon: '기기/손전등/flashlight', from: 'manual', anchor: '' });
+   assert.deepEqual([s.list[0].use, s.list[0].equip], [true, undefined]);
+   s = addItem(empty, alive, { name: '낡은 코트', use: true, equip: '', icon: '옷/코트/coat', from: 'store', anchor: 'c1' });
+diff --git a/tests/people-qual.test.mjs b/tests/people-qual.test.mjs
+index 76f864fa74..0f79ecde7b 100644
+--- a/tests/people-qual.test.mjs
++++ b/tests/people-qual.test.mjs
+@@ -62,7 +62,8 @@ test('지침: 수치 절과 정성 절은 하나만 들어가고 겹친 절도 
+ });
+ 
+ test('갱신기: 정성 모드면 자료에 계기·단계·숫자가 없고, 계기는 무시되고, 정성 칸 항목은 들어간다', () => {
+-  const s = St.peopleSettings(qualState);
++  // 세력 평판 수치가 켜져 있으면 계기표가 들어가므로 (전수검사 11-13) 세력도 정성으로
++  const s = St.peopleSettings({ ...qualState, $pp_num_faction_rep: '0' });
+   const store = T.emptyStore();
+   store.people.쟈알디 = person('쟈알디');
+   const input = U.buildUpdate(c, store, [1], { settings: s, system: 'SYS', values: {}, names });
+diff --git a/tests/people-sexual.test.mjs b/tests/people-sexual.test.mjs
+index 159aa5595f..a0b38bd7c8 100644
+--- a/tests/people-sexual.test.mjs
++++ b/tests/people-sexual.test.mjs
+@@ -57,7 +57,7 @@ test('지침: 켜진 칸·발정모드에 따라 절이 조립되고, 끄면 절
+   const on = St.peopleSettings({});
+   const sec = Sx.sexualWriterSection(on);
+   assert.ok(/sexual_init/.test(sec) && /sexual_context_only/.test(sec) && /replace/.test(sec) && /six independent observations across four scenes/.test(sec));
+-  assert.ok(/자지/.test(Sx.sexualPromptRules(true)) && !/자지/.test(Sx.sexualPromptRules(false)));
++  assert.ok(!/자지/.test(Sx.sexualPromptRules(true)) && !/자지/.test(Sx.sexualPromptRules(false)) && (sec.match(/자지/g) ?? []).length === 1, '어휘 규칙은 인물별 문장에 한 번만');
+   assert.equal(Sx.sexualWriterSection(St.peopleSettings({ $pp_sexual_desire: '0', $pp_paraphilia: '0' })), '');
+   assert.ok(!/`paraphilia`/.test(Sx.sexualWriterSection(St.peopleSettings({ $pp_paraphilia: '0' })).split('\n')[1]), '이상성욕만 끄면 그 칸은 지침에서 빠짐');
+   for (const text of [PD.UPDATER_DETAILED, PC.UPDATER_COMPACT]) {
+diff --git a/tests/people-updater.test.mjs b/tests/people-updater.test.mjs
+index 316eaf82d8..778ab47add 100644
+--- a/tests/people-updater.test.mjs
++++ b/tests/people-updater.test.mjs
+@@ -179,7 +179,7 @@ test('새 인물: 2턴 규칙·역할 명사·별명 충돌·상한, 확인 모
+   assert.ok(rep.dropped.some((d) => d.reason === '턴당 2명 상한'));
+ });
+ 
+-test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 접는다', () => {
++test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 앞 항목을 남긴다', () => {
+   const { c, store, input } = setup();
+   const rep = U.applyUpdate(store, c, input, {
+     docs: [
+@@ -203,7 +203,7 @@ test('문서·의심: 종류 검사, 꺼진 기능, 의심 해소는 접는다',
+   assert.ok(rep.dropped.some((d) => d.reason === '없는 의심 종류'));
+   const live = S.liveness(c);
+   const su = S.liveEntries(store.people.데쥬레.slots.suspicion, live);
+-  assert.deepEqual(su.map((e) => e.text), ['[시작] 유저가 명단을 봤다는 말을 의심', '[해소] 오해로 밝혀짐'], '해소는 마지막 단서를 대체');
++  assert.deepEqual(su.map((e) => e.text), ['[시작] 유저가 명단을 봤다는 말을 의심', '[단서] 비밀번호를 알고 있었다', '[해소] 오해로 밝혀짐'], '해소는 앞 항목을 대체하지 않는다 (점수 유지)');
+   // 기능 끔
+   const rep2 = U.applyUpdate(store, c, input, { suspicion: [{ who: '데쥬레', target: '@user', kind: '정체', op: 'open', text: 'q', m: 'm4', quote: '팔을' }] }, { settings: settings({ features: new Set(['affinity']) }) });
+   assert.equal(rep2.applied.suspicion, 0);
+diff --git a/tests/phone.test.mjs b/tests/phone.test.mjs
+index 6723aaed59..fd3db118bf 100644
+--- a/tests/phone.test.mjs
++++ b/tests/phone.test.mjs
+@@ -99,7 +99,7 @@ test('reply prompt picks sections and carries the room packet', { skip: !realLor
+   const sys = p.messages[0].content;
+   assert.match(sys, /OUTPUT CONTRACT/);
+   assert.match(sys, /send: reply to the owner's exact text/);
+-  assert.match(sys, /### Direct rooms/);
++  assert.doesNotMatch(sys, /### Direct rooms/, '내 말에 답하는 요청엔 먼저 연락 규칙을 붙이지 않는다 (gphone#7)');
+   assert.doesNotMatch(sys, /Obey announcementCheck|When invitationCheck.allowed/);
+   const body = JSON.parse(p.messages[1].content);
+   assert.equal(body.room.messages[0].content, '팀장님 지금 어디세요?');
+diff --git a/tests/qc-settings-world-browser.mjs b/tests/qc-settings-world-browser.mjs
+index 5e972e5699..e044e67bbe 100644
+--- a/tests/qc-settings-world-browser.mjs
++++ b/tests/qc-settings-world-browser.mjs
+@@ -89,6 +89,9 @@ for (const vp of vps) {
+     assert.equal((await dirOf(page)).세계?.[kind]?.[pick], undefined, `${kind}: 원래 글 → 덧쓰기 없음`);
+     // 지우기 (기본 세계 기록) → 지움 배지 → 되살리기
+     await clickSel(page, '.gw [data-action="ed-delete"]');
++    // 한 번 더 묻는다 (전수검사 11-13): 「정말 지우기」
++    await page.waitForSelector('.gw [data-action="ed-delete-yes"]');
++    await clickSel(page, '.gw [data-action="ed-delete-yes"]');
+     await page.waitForSelector('.gw [data-action="ed-restore"]');
+     assert.ok((await page.textContent('.gw .gw-detail')).includes('지웠어요'), `${kind}: 지움 안내`);
+     await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
+@@ -112,6 +115,9 @@ for (const vp of vps) {
+     assert.ok((await dirOf(page)).세계?.[kind]?.[`새 ${kind}`], `${kind}: 새 기록 저장`);
+     // 저장 뒤 명부 줄이 생겼는지 (요원·괴이·파밍·조직·부록 모두 명부 줄은 세계 기록과 별개 — 「명부 줄이 없어요」 안내만 없으면 된다)
+     await clickSel(page, '.gw [data-action="ed-delete"]');
++    // 한 번 더 묻는다 (전수검사 11-13): 「정말 지우기」
++    await page.waitForSelector('.gw [data-action="ed-delete-yes"]');
++    await clickSel(page, '.gw [data-action="ed-delete-yes"]');
+     await page.waitForFunction((k) => !document.querySelector('.gw .gw-detail h2')?.textContent?.includes(`새 ${k}`), kind);
+     await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
+     assert.equal((await dirOf(page)).세계?.[kind]?.[`새 ${kind}`], undefined, `${kind}: 삭제 저장`);
+@@ -199,6 +205,9 @@ for (const vp of vps) {
+   assert.equal((await dirOf(page)).세계.org['극단'].variants.B00.intro, 'B00 시점 소개', '세력별 글 저장');
+   // 지우기 → 되살리기로 기본 기록으로 (칸마다 되돌리기 단추는 없음)
+   await clickSel(page, '.gw [data-action="ed-delete"]');
++  // 한 번 더 묻는다 (전수검사 11-13): 「정말 지우기」
++  await page.waitForSelector('.gw [data-action="ed-delete-yes"]');
++  await clickSel(page, '.gw [data-action="ed-delete-yes"]');
+   await page.waitForSelector('.gw [data-action="ed-restore"]');
+   await clickSel(page, '.gw [data-action="ed-restore"]');
+   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
+@@ -297,8 +306,11 @@ for (const vp of vps) {
+   await setInput(page, '.gw [name="dir-base-name"]', '시험 거점 2', 'input');
+   await clickSel(page, '.gw [data-action="dir-base-rename"]');
+   await settle();
+-  assert.ok(await page.$('.gw [data-action="dir-base-del"][data-value="시험 거점 2"]'), '이름 바꾸기');
+-  await clickSel(page, '.gw [data-action="dir-base-del"][data-value="시험 거점 2"]');
++  assert.ok(await page.$('.gw [data-action="dir-base-del"][data-value="ask|시험 거점 2"]'), '이름 바꾸기');
++  // 지우기는 한 번 더 묻는다 (전수검사 11-13): ask → yes
++  await clickSel(page, '.gw [data-action="dir-base-del"][data-value="ask|시험 거점 2"]');
++  await page.waitForSelector('.gw [data-action="dir-base-del"][data-value="yes|시험 거점 2"]');
++  await clickSel(page, '.gw [data-action="dir-base-del"][data-value="yes|시험 거점 2"]');
+   await settle();
+   assert.equal(await page.locator('.gw .gw-basepage .dir-row').count(), baseN, '지우기');
+   await revertAll(page);
+diff --git a/tests/wiki.test.mjs b/tests/wiki.test.mjs
+index 2238e28928..7c3581c9ce 100644
+--- a/tests/wiki.test.mjs
++++ b/tests/wiki.test.mjs
+@@ -190,7 +190,7 @@ test('wiki prompt from the real card: sections, references, faction names', { sk
+   assert.ok(u.startsWith('문서 제목: 소라 랜드\n\n[참고 자료]\n[공통: 봇 설명]'));
+   assert.ok(u.includes('[주제 원본: 소라 랜드]'), u.slice(0, 500));
+   assert.ok(u.includes('[활성 로어북: 📜Faction]') && u.includes('[관련 로어북: 쟈알디]'));
+-  assert.ok(u.includes('[최근 챗로그]\n[user]\n쟈알디와 소라 랜드에 간다') && u.endsWith('[사용자 작성 지침 — 모든 문서 공통]\n무섭게'));
++  assert.ok(u.includes('[최근 챗로그]\n[user]\n쟈알디와 소라 랜드에 간다') && u.endsWith('[사용자 작성 지침: 모든 문서 공통]\n무섭게'));
+   assert.ok(!u.includes('{{getvar'), 'CBS 해석됨');
+   assert.ok(!/\[A00\]/.test(u), '소속 코드는 이름으로');
+   assert.ok(p.primarySources.includes('소라 랜드'));
+diff --git a/tests/world-data.test.mjs b/tests/world-data.test.mjs
+index 268786cfca..7a47ddca2a 100644
+--- a/tests/world-data.test.mjs
++++ b/tests/world-data.test.mjs
+@@ -11,7 +11,7 @@ test('기본 세계: 카드 로어북에서 옮긴 기록 수와 칸', () => {
+   assert.equal(worldRecords('org').size, 17);
+   assert.equal(worldRecords('anomaly').size, 63);
+   assert.equal(worldRecords('site').size, 11);
+-  assert.equal(worldRecords('appendix').size, 5);
++  assert.equal(worldRecords('appendix').size, 6);
+   const j = worldRecord('agent', '쟈알디');
+   assert.equal(j.fields.age, '30s');
+   assert.match(j.fields.intro, /^\(early 30s\/F, Boo-jang\)/);
+@@ -49,7 +49,7 @@ const slots = ['Faction', 'Mystic', 'Anomaly', 'Agent'].map((n) => ({ comment: `
+ test('가상 로어북: 빈 카드에도 기본 세계가 폴더 항목으로 붙고, 저장 때는 빠진다', () => {
+   const out = withWorldLore([...slots]);
+   const virt = out.filter((e) => isVirtual(e) && e.mode !== 'folder' && !e.alwaysActive);
+-  assert.equal(virt.length, 55 + 14 + 63 + 11 + 5, '요약 전용 조직 3개는 세력 로어를 만들지 않음');
++  assert.equal(virt.length, 55 + 14 + 63 + 11 + 6, '요약 전용 조직 3개는 세력 로어를 만들지 않음');
+   assert.equal(out.filter((e) => isVirtual(e) && e.mode === 'folder').length, 6, '다섯 폴더 + 🌐세계(상시 지침)');
+   const j = virt.find((e) => e.comment === '쟈알디');
+   assert.equal(j.key, 'Jyaldi, 쟈알디', '검색 키는 원문 그대로');
+-- 
+2.43.0
+
