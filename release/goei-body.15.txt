@@ -1,4 +1,29 @@
-리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
+ray(ctx2.chat.message) ? ctx2.chat.message.length : 0, vars: chatSettingVars(ctx2.chat.scriptstate) } : null,
+      prefs: getPrefs(),
+      // 네 게시판 실패를 사이트와 함께 모두 적는다 (전수검사 11-13)
+      failures: { gnet: boardFailures().map((f) => ({ site: f.site, reason: f.reason, raw: f.raw })), phone: fail4(phone.failure), wiki: fail4(wiki.failure) },
+      peopleRuns: runs
+    }, null, 2);
+  }
+  function downloadJson(name, json) {
+    const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2e3);
+  }
+  function backupPage(ctx2, canChat) {
+    const withChat = canChat && manUi.withChat;
+    const json = exportJson(ctx2, withChat);
+    const chatN = canChat ? Object.keys(chatSettingVars(ctx2.chat.scriptstate)).length : 0;
+    const sizes = manUi.sizes;
+    const store3 = STORE.map(([key, label2, help, drop]) => {
+      const n3 = sizes?.[key] ?? 0;
+      const ctl = `<span class="gw-tokens">${sizes ? n3 ? kb(n3) : "없음" : "…"}</span>${drop && n3 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
+      return row6(label2, ctl, help);
+    }).join("");
+    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
       <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc39(manUi.importName)}</span>` : ""}</div>
       <textarea data-input="man-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc39(manUi.importText)}</textarea></div>
     <div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? "" : "disabled"}>적용</button></div>`;
@@ -3157,19 +3182,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .dir-kinds .long { display: none; }
   /* 탭 6개: 모바일은 세 개씩 두 줄 */
   .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
-  .dir-kinds .gx-seg { font-size: 13px; }
-  .dir-line > span { min-width: 0; flex-basis: 100%; }
-}
-.dir-group.warn { color: var(--amber); }
-.dir-alert { width: 100%; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); background: var(--amber-bg); color: var(--amber); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
-.dir-add, .dir-rename { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
-.dir-add input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 15px; }
-.dir-add .gx-mini, .dir-rename .gx-mini { min-height: 42px; padding: 0 14px; }
-.dir-rename .dir-in { flex: 1; min-width: 12em; }
-.dir-map { position: relative; width: 100%; max-width: 420px; margin: 4px 0 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); cursor: crosshair; user-select: none; -webkit-user-select: none; }
-.dir-map img { display: block; width: 100%; height: auto; pointer-events: none; }
-.dir-map.ph { aspect-ratio: 4 / 5; display: grid; place-items: center; color: var(--dim); font-size: 14px; cursor: default; }
-.dir-mappin { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--signal); border: 2px solid var(--void); box-shadow: 0 0 0 2px var(--signal); transform: translate(-50%, -50%); pointer-events: none; }
-.dir-panel select.gx-select { width: 100%; }
-/* 실제 사진 (v0.11.0) */
-.at-add-image { border-style: sol
+  .dir-kinds .gx

@@ -1,4 +1,18 @@
-→ ${factionStageLabel(ctx2, c.pin)}${peopleSettings(ctx2.chat.scriptstate).factionQual ? "" : ` (${c.pin})`}` : `호감 고정 ${c.pin}` : `호감 · ${c.cue ?? ""}` : c.kind === "address" ? `호칭 「${c.toUser ?? ""}」${c.register ? ` · ${c.register}` : ""}` : c.kind === "identity" ? `신분 ${[c.faction, c.rank].filter(Boolean).join(" ")}` : `메모 ${c.now ?? ""}`;
+/h4><div class="pp-card-body"><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? "+" : ""}${band}</b> ${esc35(TASTE_STAGES[band]?.ko ?? "")}`}</p></div></section>`);
+    }
+    if (f.has("openness") && peopleSettings(ctx2.chat.scriptstate).qualitative.has("openness")) {
+      out2.push('<section class="pp-card"><h4 title="정성 모드: 숫자 없이 글로만">음란도</h4><div class="pp-card-body"><p class="pp-extra"><b>정성 모드</b> — 「성적 태도」 칸의 글로만 기록해요.</p></div></section>');
+    } else if (f.has("openness")) {
+      const v = opennessOf(p2, changes);
+      const st = v === null ? null : opennessStage(v);
+      out2.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><div class="pp-card-body"><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st.label}</b> ${Math.round(v)}/300 · 피임: ${esc35(st.contraception)}`}</p></div></section>`);
+    }
+    return out2.join("");
+  }
+  function changeRow(ctx2, c, live) {
+    const alive = isAlive(c, live);
+    const no = msgNo(c.anchor, live);
+    const what = c.kind === "taste" ? `취향 띠 → ${(c.band ?? 0) > 0 ? "+" : ""}${c.band ?? 0}` : c.kind === "openness" ? typeof c.init === "number" ? `음란도 시작값 ${c.init}` : `음란도 ${(c.delta ?? 0) > 0 ? "+" : ""}${c.delta ?? 0}` : c.kind === "cue" ? c.pin !== void 0 ? c.who.startsWith("세력:") ? `평판 → ${factionStageLabel(ctx2, c.pin)}${peopleSettings(ctx2.chat.scriptstate).factionQual ? "" : ` (${c.pin})`}` : `호감 고정 ${c.pin}` : `호감 · ${c.cue ?? ""}` : c.kind === "address" ? `호칭 「${c.toUser ?? ""}」${c.register ? ` · ${c.register}` : ""}` : c.kind === "identity" ? `신분 ${[c.faction, c.rank].filter(Boolean).join(" ")}` : `메모 ${c.now ?? ""}`;
     const key = `chg|${c.id}`;
     return `<li class="pp-entry${!alive && !c.void ? " dead" : ""}${c.void ? " void" : ""}">
     <div class="pp-entry-main">${srcIcon(c.src)}<span class="pp-text"><b title="${esc35(KIND_HELP[c.kind])}">${esc35(KIND_LABEL2[c.kind])}</b> ${esc35(what)}${c.reason ? ` <small>— ${esc35(c.reason)}</small>` : ""}</span></div>
@@ -2918,29 +2932,4 @@
       card: isGoeiLore(lore) ? cardVersion(lore) : null,
       tokenizer: tokenizerName() || null,
       wikiPack: !!storedWikiPack(),
-      chat: canChat ? { messages: Array.isArray(ctx2.chat.message) ? ctx2.chat.message.length : 0, vars: chatSettingVars(ctx2.chat.scriptstate) } : null,
-      prefs: getPrefs(),
-      // 네 게시판 실패를 사이트와 함께 모두 적는다 (전수검사 11-13)
-      failures: { gnet: boardFailures().map((f) => ({ site: f.site, reason: f.reason, raw: f.raw })), phone: fail4(phone.failure), wiki: fail4(wiki.failure) },
-      peopleRuns: runs
-    }, null, 2);
-  }
-  function downloadJson(name, json) {
-    const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 2e3);
-  }
-  function backupPage(ctx2, canChat) {
-    const withChat = canChat && manUi.withChat;
-    const json = exportJson(ctx2, withChat);
-    const chatN = canChat ? Object.keys(chatSettingVars(ctx2.chat.scriptstate)).length : 0;
-    const sizes = manUi.sizes;
-    const store3 = STORE.map(([key, label2, help, drop]) => {
-      const n3 = sizes?.[key] ?? 0;
-      const ctl = `<span class="gw-tokens">${sizes ? n3 ? kb(n3) : "없음" : "…"}</span>${drop && n3 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
-      return row6(label2, ctl, help);
-    }).join("");
-    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올
+      chat: canChat ? { messages: Array.isAr

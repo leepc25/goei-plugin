@@ -1,4 +1,26 @@
-연어 마켓 본문: 구분선은 본문 칸 아래가 아니라 단추 줄 위에 전체 너비로 */
+{ grid-area: lo; }
+  .ms-tb > .ms-tb-h > :nth-child(4), .ms-tb > .ms-tb-r > .hi { grid-area: hi; }
+  .ms-tb > .ms-tb-h > :nth-child(5), .ms-tb > .ms-tb-r > .w { grid-area: w; }
+  .ms-tb > .ms-tb-h > :nth-child(6) { display: none; }
+  .ms-tb > .ms-tb-r > .ms-tb-x { grid-area: x; }
+  .ms-tb > .ms-tb-r > .ms-tb-err { grid-area: auto; grid-column: 1 / -1; }
+  .ms-tb .ph-inline { display: flex; width: 100%; gap: 3px; min-width: 0; }
+  .ms-tb .ph-inline .ms-num { width: auto; flex: 1 1 0; min-width: 0; padding-left: 7px; padding-right: 4px; }
+  .ms-tb > .ms-tb-foot { padding-top: 8px; }
+  /* 주사위 칸: 칸 이름 | 값 | × 한 줄 */
+  .ms-axs > .ms-tb-h, .ms-axs > .ms-ax { grid-template-columns: 88px minmax(0, 1fr) 34px; grid-template-areas: none; column-gap: 6px; }
+  .ms-axs > .ms-tb-h > :nth-child(n) { grid-area: auto; display: block; }
+  .ms-axs > .ms-ax { padding: 3px 0; }
+  .ms-axs > .ms-ax > .ms-tb-err { grid-column: 1 / -1; }
+}
+.ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
+.ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
+.ms-sample i { color: var(--signal); font-style: normal; }
+/* 연어 마켓 윗줄 오른쪽 묶음(찾기칸·글쓰기·내 채팅): 사이 8px, 높이 36px 로 같게 (2026-11-10 사용자: 간격이 제각각) */
+.bs-sm .hd .sr + .wr, .bs-sm .hd .wr + .ch { margin-left: -14px; }
+.bs-sm .hd .wr, .bs-sm .hd .ch { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; white-space: nowrap; box-sizing: border-box; }
+.bs-sm.bs-m .hd .sr + .wr { margin-left: 0; }
+/* 연어 마켓 본문: 구분선은 본문 칸 아래가 아니라 단추 줄 위에 전체 너비로 */
 .bs-sm .detail > .info .body { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .bs-sm .detail > .qna { border-top: 1px solid #e4ddd3; padding-top: 14px; }
 /* 연어 마켓 본문: 왼쪽 = 사진 + 판매자, 오른쪽 = 제목(크게)·값·날짜·본문 (2026-11-10 사용자: 윗부분이 어정쩡). 제목은 위 공통 초기화(.bs .gn-post-title)가 크기를 지워 본문 글씨만 했다 */
@@ -3664,12 +3686,15 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     try {
       setWaiting(true);
       setUseLockAt(null);
+      if (!liteNow) setUseLockAt({ charIndex: -1, chatIndex: -1 });
+      if (!liteNow) setUseBlind();
       setOpeningHint(null);
       let ctx2 = null;
       if (liteNow) {
         await stepAsync("호출 기록", () => traceBegin(), void 0);
         ctx2 = await stepAsync("채팅 읽기", () => loadContext(), null);
         if (ctx2) setUseLockAt(ctx2);
+        else setUseBlind();
         if (ctx2) step("진행 계획", () => progressPlan(turnPlan(ctx2.char, ctx2.chat)), void 0);
       }
       if (messages.some((m) => m?.role === "user" && (hasSceneCard(m.content) || hasCall(m.content)))) {
@@ -3697,28 +3722,4 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
           const c = ctx2;
           const pre2 = messages;
           messages = step("로어", () => fixLore(messages, c), messages);
-          messages = await stepAsync("주인공", () => withPlayer(messages, c), messages);
-          messages = step("명부 다듬기", () => trimRoster(messages), messages);
-          const mctx = step("참고 기록", () => moduleContext(sceneText2(messages), c), []);
-          if (mctx.length) {
-            const at = messages.map((m) => m?.role).lastIndexOf("user");
-            const add = mctx.map((t) => ({ role: "system", content: t }));
-            messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
-          }
-          messages = step("상태창", () => withStatusBlock(messages, step("신분", () => knownIdentity(c), ""), step("상태창 모양", () => statusShape(c), void 0)), messages);
-          messages = step("소지품", () => withInventory(messages, c.chat), messages);
-          await stepAsync("사용 상자", () => markUseSent(c.charIndex, c.chatIndex, c.chat), void 0);
-          messages = step("망상홈쇼핑", () => withHomeshop(messages, c.chat), messages);
-          messages = await stepAsync("인물 기록", () => withPeople2(messages, c), messages);
-          messages = step("이미지 지침", () => withImgPrompt(messages, c), messages);
-          added = step("더한 글", () => addedTexts(pre2, messages), void 0);
-        }
-      }
-      if (messages.some((m) => typeof m?.content === "string" && m.content.includes(SEED_OPEN))) {
-        const chat = ctx2?.chat ?? await stepAsync("시드 채팅 읽기", async () => await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex()), null);
-        if (chat) messages = step("시드", () => processRequest(messages, chat).messages, messages);
-      }
-    } catch (error) {
-      failed4.push(`전체(${reason2(error)})`);
-    }
-    if (failed4.length) con
+          messages = await stepAsync("주인공", () => withPlayer(messages, c), messa

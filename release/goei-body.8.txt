@@ -1,4 +1,16 @@
-"} title="붙여넣기(Ctrl+V)나 끌어놓기로도 올릴 수 있어요">${ICON.image}<span>사진 올리기</span></button>`;
+ height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 4 8 4a2 2 0 0 0 0 4h4Zm0 0s1.5-4 4-4a2 2 0 0 1 0 4h-4Z"/>')
+  };
+  function attachEditor(prefix, items, kinds, disabled = false, giftNote = "", showMenu = true) {
+    const rows3 = items.map(
+      (a, i) => `<div class="at-item${a.kind === "image" ? " at-item-image" : ""}">${a.kind === "image" ? `<img class="at-thumb" src="${esc6(a.preview ?? "")}" data-asset="${a.preview ? "" : esc6(a.asset ?? "")}" alt="보낼 사진">` : `<span class="at-kind">${ICON[a.kind]}${ATTACH_LABELS[a.kind]}</span>`}
+      <input class="gx-search" data-input="${prefix}-att" data-key="${i}" value="${esc6(a.content)}" placeholder="${esc6(ATTACH_HINTS[a.kind])}" maxlength="2000" aria-label="${ATTACH_LABELS[a.kind]} 내용" ${disabled ? "disabled" : ""}>
+      <button class="gx-mini" data-action="${prefix}-att-del" data-value="${i}" aria-label="${ATTACH_LABELS[a.kind]} 첨부 빼기" ${disabled ? "disabled" : ""}>✕</button></div>`
+    ).join("");
+    const full = items.length >= ATTACH_MAX;
+    const all = giftNote && !kinds.includes("gift") ? [...kinds, "gift"] : kinds;
+    const menu = all.map((k) => {
+      const blocked2 = !kinds.includes(k);
+      if (k === "image") return `<button class="at-add at-add-image" data-pick-photo="${prefix}" ${disabled || full ? "disabled" : ""} title="붙여넣기(Ctrl+V)나 끌어놓기로도 올릴 수 있어요">${ICON.image}<span>사진 올리기</span></button>`;
       const label2 = k === "photo" && kinds.includes("image") ? "사진 묘사" : ATTACH_LABELS[k];
       return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc6(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
     }).join("");
@@ -3784,19 +3796,4 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
             ctl: { t: "seg", opts: [["1", "메인 모델"], ["2", "보조 모델"]], fb: "2" },
             help: "게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 메인 응답과 같은 모델"
           },
-          { key: "context", label: "컨텍스트 포함", common: "ctx", ctl: onOff("0", "0"), help: "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요" },
-          {
-            key: "sampling",
-            label: "다양성 강화",
-            common: "sampling",
-            ctl: { t: "seg", opts: [["0", "OFF"], ["1", "ON"]], fb: "0" },
-            help: "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요"
-          }
-        ]
-      },
-      {
-        title: "게시판",
-        rows: [
-          { key: "post", label: "게시글 수", ctl: { t: "minmax", lo: COUNT_RANGE.post[0], hi: COUNT_RANGE.post[1], unit: "개" }, help: `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요` },
-          { key: "cmt", label: "새 글 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.cmt[0], hi: COUNT_RANGE.cmt[1], unit: "개" }, help: `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요` },
-          { key: "act", label: "활동 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.act[0], hi: COUNT_RANGE.act[1], unit: "개" }, help: `새 글·댓글·답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙
+          { key: "context", label: "컨텍스트 포함", common: "ctx", ctl: onOff("0", "0"), help: "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요" 

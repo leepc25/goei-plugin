@@ -1,4 +1,28 @@
-sole.log(`[goei] 요청 조립 실패: 단계 ${failed4.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
+ges);
+          messages = step("명부 다듬기", () => trimRoster(messages), messages);
+          const mctx = step("참고 기록", () => moduleContext(sceneText2(messages), c), []);
+          if (mctx.length) {
+            const at = messages.map((m) => m?.role).lastIndexOf("user");
+            const add = mctx.map((t) => ({ role: "system", content: t }));
+            messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+          }
+          messages = step("상태창", () => withStatusBlock(messages, step("신분", () => knownIdentity(c), ""), step("상태창 모양", () => statusShape(c), void 0)), messages);
+          messages = step("소지품", () => withInventory(messages, c.chat), messages);
+          await stepAsync("사용 상자", () => markUseSent(c.charIndex, c.chatIndex, c.chat), void 0);
+          messages = step("망상홈쇼핑", () => withHomeshop(messages, c.chat), messages);
+          messages = await stepAsync("인물 기록", () => withPeople2(messages, c), messages);
+          messages = step("이미지 지침", () => withImgPrompt(messages, c), messages);
+          added = step("더한 글", () => addedTexts(pre2, messages), void 0);
+        }
+      }
+      if (messages.some((m) => typeof m?.content === "string" && m.content.includes(SEED_OPEN))) {
+        const chat = ctx2?.chat ?? await stepAsync("시드 채팅 읽기", async () => await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex()), null);
+        if (chat) messages = step("시드", () => processRequest(messages, chat).messages, messages);
+      }
+    } catch (error) {
+      failed4.push(`전체(${reason2(error)})`);
+    }
+    if (failed4.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed4.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
     const out2 = sanitize(messages);
     if (liteNow) step("호출 기록", () => traceMain(out2, failed4, added), void 0);
     lastAdded = new Set(insertedSystemTexts(input0, out2));
@@ -278,9 +302,10 @@ ${texts.anomaly}`;
         }
       }
       const useSent = sentOut(arg.characterIndex, arg.chatIndex, latest ?? chat);
-      if (settleItemUse(latest ?? chat, arg.messageIndex, useSent)) {
+      const useAsked = sentReroll(arg.characterIndex, arg.chatIndex, latest ?? chat);
+      if (!useBlind() && settleItemUse(latest ?? chat, arg.messageIndex, useSent, useAsked)) {
         latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const vars = settleItemUse(cur, arg.messageIndex, useSent);
+          const vars = settleItemUse(cur, arg.messageIndex, useSent, useAsked);
           return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
         }).catch(() => null) ?? latest;
       }

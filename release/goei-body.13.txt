@@ -1,4 +1,43 @@
- (!isDirection(x.direction) || (axis === "pattern" ? !["new", "weaken"].includes(x.direction) : !["up", "down"].includes(x.direction))) {
+n(p2, f, ctx2.settings)) {
+              drop("sexual_init", { who, field: SEXUAL_AXIS_OF[f] }, "꺼진 성적 칸", who);
+              continue;
+            }
+            if (p2.sexual?.[f]?.text) {
+              drop("sexual_init", { who, field: SEXUAL_AXIS_OF[f] }, "이미 글이 있음 (변경은 관찰로)", who);
+              continue;
+            }
+            setSexualText(p2, f, t, now2, false);
+            wrote++;
+          }
+          if (wrote) report.applied.sexualInit += wrote;
+        }
+      }
+      const perWho = /* @__PURE__ */ new Map();
+      for (const x of r.observations ?? []) {
+        const who = nameOf(str9(x?.who));
+        if (!who) {
+          drop("observation", x, "명단에 없는 이름", str9(x?.who));
+          continue;
+        }
+        const axis = x.axis === "pattern" ? "pattern" : isAxis(x.axis) || isSexualAxis(x.axis) ? x.axis : null;
+        if (!axis) {
+          drop("observation", x, "없는 축", who);
+          continue;
+        }
+        if (isSexualAxis(axis)) {
+          if (!sexualFieldOn(store3.people[who], axis === "sexual_desire" ? "desire" : "paraphilia", ctx2.settings)) {
+            drop("observation", x, "꺼진 성적 칸", who);
+            continue;
+          }
+          if (x.direction !== "replace") {
+            drop("observation", x, "성적 축의 방향은 replace", who);
+            continue;
+          }
+          if (!store3.people[who].sexual?.[axis === "sexual_desire" ? "desire" : "paraphilia"]?.text) {
+            drop("observation", x, "첫 글이 없음 (sexual_init 으로)", who);
+            continue;
+          }
+        } else if (!isDirection(x.direction) || (axis === "pattern" ? !["new", "weaken"].includes(x.direction) : !["up", "down"].includes(x.direction))) {
           drop("observation", x, "방향은 축이면 up|down, pattern 이면 new|weaken", who);
           continue;
         }
@@ -2774,18 +2813,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const out2 = [];
     if (f.has("taste")) {
       const band = tasteOf(p2, changes);
-      out2.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><div class="pp-card-body"><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? "+" : ""}${band}</b> ${esc35(TASTE_STAGES[band]?.ko ?? "")}`}</p></div></section>`);
-    }
-    if (f.has("openness") && peopleSettings(ctx2.chat.scriptstate).qualitative.has("openness")) {
-      out2.push('<section class="pp-card"><h4 title="정성 모드: 숫자 없이 글로만">음란도</h4><div class="pp-card-body"><p class="pp-extra"><b>정성 모드</b> — 「성적 태도」 칸의 글로만 기록해요.</p></div></section>');
-    } else if (f.has("openness")) {
-      const v = opennessOf(p2, changes);
-      const st = v === null ? null : opennessStage(v);
-      out2.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><div class="pp-card-body"><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st.label}</b> ${Math.round(v)}/300 · 피임: ${esc35(st.contraception)}`}</p></div></section>`);
-    }
-    return out2.join("");
-  }
-  function changeRow(ctx2, c, live) {
-    const alive = isAlive(c, live);
-    const no = msgNo(c.anchor, live);
-    const what = c.kind === "taste" ? `취향 띠 → ${(c.band ?? 0) > 0 ? "+" : ""}${c.band ?? 0}` : c.kind === "openness" ? typeof c.init === "number" ? `음란도 시작값 ${c.init}` : `음란도 ${(c.delta ?? 0) > 0 ? "+" : ""}${c.delta ?? 0}` : c.kind === "cue" ? c.pin !== void 0 ? c.who.startsWith("세력:") ? `평판 
+      out2.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)<

@@ -1,4 +1,28 @@
-, last: cur };
+ITEM_ICON;
+  }
+  function traitsLine(it, left) {
+    return [it.equip ? EQUIP_LABEL[it.equip] : "", left !== void 0 ? `남은 ${left}` : it.use ? "사용" : "", it.weight !== void 0 ? it.uses !== void 0 ? `${weightText(lineWeight(it, left))} (1개 ${weightText(it.weight)})` : weightText(it.weight) : "", it.state !== "ok" ? STATE_LABEL[it.state] : ""].filter(Boolean).join(" · ");
+  }
+  var FROM_NAME = { store: "상점", story: "본문", manual: "직접" };
+  var needsEquip = (ctx2, it) => it.equip === "gear" && !isEquipped(it, liveOf(ctx2));
+  var equipLabel = (it, equipped) => (equipped ? slotKind(it) : it.equip ?? "weapon") === "weapon" ? equipped ? "넣기" : "들기" : equipped ? "해제" : "장착";
+  var fullText = (k) => `${EQUIP_LABEL[k]} 칸이 다 찼어요. ${k === "weapon" ? "손에 든 것을 먼저 넣으세요" : "칸에 있는 것을 먼저 해제하세요"}${isPhone() ? "" : " (칸으로 끌어다 바꿔도 돼요)"}.`;
+  var usableNow = (ctx2, it) => canUse(it) && !needsEquip(ctx2, it);
+  function whenOf(ctx2) {
+    const at = /* @__PURE__ */ new Map();
+    let cur = "";
+    (ctx2.chat.message ?? []).forEach((m, i) => {
+      const tags = findStatusTags(String(m.data ?? ""));
+      if (tags.length) {
+        const t = tags[tags.length - 1];
+        const d = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(t.date ?? "");
+        const date = d ? `${d[1]}.${d[2].padStart(2, "0")}.${d[3].padStart(2, "0")}` : (t.date ?? "").trim();
+        const next = [date, (t.time ?? "").trim()].filter(Boolean).join(" ");
+        if (next) cur = next;
+      }
+      at.set(messageKey(m, i), cur);
+    });
+    return { at, last: cur };
   }
   var realOf = (iso) => {
     const d = new Date(iso);
@@ -3098,62 +3122,4 @@ ${themeVars("[x-goei-prog]")}
           again = false;
           await paint().catch(() => {
           });
-        } while (again);
-      })().finally(() => {
-        painting = null;
-      });
-      await painting;
-    };
-    const onChange = () => {
-      const t = progressTurn();
-      if (t && t !== seen4) {
-        seen4 = t;
-        clearHide();
-        if (!phone2 && visible2 && !panelOpen) void setOpen(true);
-      }
-      if (t?.endAt && open3 && hideTimer === void 0) {
-        hideTimer = setTimeout(() => {
-          hideTimer = void 0;
-          void setOpen(false);
-        }, turnSummary(t).failed ? HIDE_AFTER_FAIL : HIDE_AFTER_OK);
-      }
-      void schedule2();
-    };
-    const offProgress = onProgress(onChange);
-    const rectOf = async (el) => el ? await el.getBoundingClientRect() : null;
-    let drag = null;
-    let moved = false;
-    let pending2 = null;
-    let loop = null;
-    const runDrag = async () => {
-      try {
-        while (pending2 && drag) {
-          const d = drag;
-          const p2 = pending2;
-          pending2 = null;
-          if (!await d.hit) {
-            drag = null;
-            break;
-          }
-          if (drag !== d) continue;
-          const dx = p2.x - d.x;
-          const dy = p2.y - d.y;
-          if (!moved && Math.hypot(dx, dy) < 6) continue;
-          if (!moved) {
-            moved = true;
-            await host4.setAttribute("x-goei-drag", "true");
-          }
-          pos = { right: d.start.right - dx, top: d.start.top + dy };
-          await applyPos();
-        }
-      } catch {
-        drag = null;
-      } finally {
-        loop = null;
-      }
-    };
-    const onDown = (ev) => {
-      drag = null;
-      pending2 = null;
-      moved = false;
-      if (!visible2 || phone2 
+        } while (a

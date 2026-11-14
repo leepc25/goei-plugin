@@ -1,4 +1,21 @@
-위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
+d:focus { outline: none; border-color: var(--accent-line); }
+.gw-tree-item.gw-find-hit { height: auto; min-height: var(--h); padding-top: 6px; padding-bottom: 6px; }
+.gw-find-hit > span { display: flex; flex-direction: column; gap: 1px; white-space: normal; }
+.gw-find-hit b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-find-hit small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-find-none { margin: 14px 12px; font-size: 13px; color: var(--dim); }
+.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
+@keyframes gw-find-flash { 0%, 40% { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--signal); } 100% { background: transparent; box-shadow: inset 3px 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .gw-find-flash { animation: none; background: var(--accent-bg); } }
+/* 인물 설정 전용 모델 ID 줄: 입력칸과 저장이 한 줄 (2026-11-07 사용자: 폰에서 저장이 아래로 떨어졌다) */
+.gw .ps-row > .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
+.gw .pp-mid-ctl > input { width: auto; flex: 1 1 auto; min-width: 0; }
+
+/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 상자 안 위·아래 여백 같게 */
+.gw .pp-flow-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap) 14px; padding: 12px var(--pad); }
+.gw .pp-flow-head > p { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .pp-flow-head b { color: var(--text); }
+/* 기능 설정 우하단 「맨 위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
 .gw-totop { grid-area: body; align-self: end; justify-self: end; z-index: 5; width: 42px; height: 42px; margin: 0 22px 18px 0; display: grid; place-items: center; padding: 0; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s, transform .18s; }
 .gw-totop.show { opacity: 1; pointer-events: auto; transform: none; }
 .gw-totop:hover { background: var(--accent-bg); }
@@ -2761,43 +2778,4 @@ ${rules3}`;
           for (const f of SEXUAL_FIELDS) {
             const t = str9(x[SEXUAL_AXIS_OF[f]]);
             if (!t) continue;
-            if (!sexualFieldOn(p2, f, ctx2.settings)) {
-              drop("sexual_init", { who, field: SEXUAL_AXIS_OF[f] }, "꺼진 성적 칸", who);
-              continue;
-            }
-            if (p2.sexual?.[f]?.text) {
-              drop("sexual_init", { who, field: SEXUAL_AXIS_OF[f] }, "이미 글이 있음 (변경은 관찰로)", who);
-              continue;
-            }
-            setSexualText(p2, f, t, now2, false);
-            wrote++;
-          }
-          if (wrote) report.applied.sexualInit += wrote;
-        }
-      }
-      const perWho = /* @__PURE__ */ new Map();
-      for (const x of r.observations ?? []) {
-        const who = nameOf(str9(x?.who));
-        if (!who) {
-          drop("observation", x, "명단에 없는 이름", str9(x?.who));
-          continue;
-        }
-        const axis = x.axis === "pattern" ? "pattern" : isAxis(x.axis) || isSexualAxis(x.axis) ? x.axis : null;
-        if (!axis) {
-          drop("observation", x, "없는 축", who);
-          continue;
-        }
-        if (isSexualAxis(axis)) {
-          if (!sexualFieldOn(store3.people[who], axis === "sexual_desire" ? "desire" : "paraphilia", ctx2.settings)) {
-            drop("observation", x, "꺼진 성적 칸", who);
-            continue;
-          }
-          if (x.direction !== "replace") {
-            drop("observation", x, "성적 축의 방향은 replace", who);
-            continue;
-          }
-          if (!store3.people[who].sexual?.[axis === "sexual_desire" ? "desire" : "paraphilia"]?.text) {
-            drop("observation", x, "첫 글이 없음 (sexual_init 으로)", who);
-            continue;
-          }
-        } else if
+            if (!sexualFieldO

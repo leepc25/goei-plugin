@@ -1,4 +1,19 @@
-어요` },
+},
+          {
+            key: "sampling",
+            label: "다양성 강화",
+            common: "sampling",
+            ctl: { t: "seg", opts: [["0", "OFF"], ["1", "ON"]], fb: "0" },
+            help: "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요"
+          }
+        ]
+      },
+      {
+        title: "게시판",
+        rows: [
+          { key: "post", label: "게시글 수", ctl: { t: "minmax", lo: COUNT_RANGE.post[0], hi: COUNT_RANGE.post[1], unit: "개" }, help: `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요` },
+          { key: "cmt", label: "새 글 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.cmt[0], hi: COUNT_RANGE.cmt[1], unit: "개" }, help: `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요` },
+          { key: "act", label: "활동 댓글 수", ctl: { t: "minmax", lo: COUNT_RANGE.act[0], hi: COUNT_RANGE.act[1], unit: "개" }, help: `새 글·댓글·답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요` },
           {
             key: "privacy",
             label: "사생활",
@@ -1807,12 +1822,25 @@ ${previewText(p2.body)}`;
   var lockAt = null;
   function setUseLockAt(at) {
     lockAt = at ? { charIndex: at.charIndex, chatIndex: at.chatIndex } : null;
-    if (!at) out = null;
+    if (!at) {
+      out = null;
+      blind = false;
+    }
+  }
+  var blind = false;
+  function setUseBlind() {
+    blind = true;
+  }
+  function useBlind() {
+    return blind;
   }
   var out = null;
   function sentOut(charIndex, chatIndex, chat) {
     if (!out || !chat || out.charIndex !== charIndex || out.chatIndex !== chatIndex || out.userKey !== lastUserKey(chat)) return null;
     return out.ids;
+  }
+  function sentReroll(charIndex, chatIndex, chat) {
+    return sentOut(charIndex, chatIndex, chat) ? out.reroll : null;
   }
   function useLocked(charIndex, chatIndex) {
     if (settling > 0) return true;
@@ -1837,7 +1865,7 @@ ${previewText(p2.body)}`;
   async function markUseSent(charIndex, chatIndex, chat) {
     const userKey = lastUserKey(chat);
     const ids = usesToSend(chat).map((u) => u.id);
-    out = { charIndex, chatIndex, userKey, ids: new Set(ids) };
+    out = { charIndex, chatIndex, userKey, ids: new Set(ids), reroll: useRerolling(chat) };
     if (!ids.length || chat.scriptstate?.[ITEM_USE_AT_VAR]) return;
     sent = { charIndex, chatIndex, userKey, ids: new Set(ids) };
     await refreshUseBox(charIndex, chatIndex, chat);
@@ -3512,28 +3540,4 @@ ${nick}: ${text5.slice(0, 200)}`;
   var liveOf = (ctx2) => liveItems(itemsOf(ctx2), aliveAnchors(ctx2.chat));
   function itemPic(it) {
     const u = itemIconUrl(it.name, it.icon, it.id ?? it.name, { desc: it.desc });
-    return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
-  }
-  function traitsLine(it, left) {
-    return [it.equip ? EQUIP_LABEL[it.equip] : "", left !== void 0 ? `남은 ${left}` : it.use ? "사용" : "", it.weight !== void 0 ? it.uses !== void 0 ? `${weightText(lineWeight(it, left))} (1개 ${weightText(it.weight)})` : weightText(it.weight) : "", it.state !== "ok" ? STATE_LABEL[it.state] : ""].filter(Boolean).join(" · ");
-  }
-  var FROM_NAME = { store: "상점", story: "본문", manual: "직접" };
-  var needsEquip = (ctx2, it) => it.equip === "gear" && !isEquipped(it, liveOf(ctx2));
-  var equipLabel = (it, equipped) => (equipped ? slotKind(it) : it.equip ?? "weapon") === "weapon" ? equipped ? "넣기" : "들기" : equipped ? "해제" : "장착";
-  var fullText = (k) => `${EQUIP_LABEL[k]} 칸이 다 찼어요. ${k === "weapon" ? "손에 든 것을 먼저 넣으세요" : "칸에 있는 것을 먼저 해제하세요"}${isPhone() ? "" : " (칸으로 끌어다 바꿔도 돼요)"}.`;
-  var usableNow = (ctx2, it) => canUse(it) && !needsEquip(ctx2, it);
-  function whenOf(ctx2) {
-    const at = /* @__PURE__ */ new Map();
-    let cur = "";
-    (ctx2.chat.message ?? []).forEach((m, i) => {
-      const tags = findStatusTags(String(m.data ?? ""));
-      if (tags.length) {
-        const t = tags[tags.length - 1];
-        const d = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(t.date ?? "");
-        const date = d ? `${d[1]}.${d[2].padStart(2, "0")}.${d[3].padStart(2, "0")}` : (t.date ?? "").trim();
-        const next = [date, (t.time ?? "").trim()].filter(Boolean).join(" ");
-        if (next) cur = next;
-      }
-      at.set(messageKey(m, i), cur);
-    });
-    return { at
+    return u ? `<img src="${u}" alt="" draggable="false">` : 

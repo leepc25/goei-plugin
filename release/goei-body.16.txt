@@ -1,4 +1,19 @@
-id; border-color: var(--accent-line); color: var(--signal); }
+-seg { font-size: 13px; }
+  .dir-line > span { min-width: 0; flex-basis: 100%; }
+}
+.dir-group.warn { color: var(--amber); }
+.dir-alert { width: 100%; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); background: var(--amber-bg); color: var(--amber); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
+.dir-add, .dir-rename { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.dir-add input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 15px; }
+.dir-add .gx-mini, .dir-rename .gx-mini { min-height: 42px; padding: 0 14px; }
+.dir-rename .dir-in { flex: 1; min-width: 12em; }
+.dir-map { position: relative; width: 100%; max-width: 420px; margin: 4px 0 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); cursor: crosshair; user-select: none; -webkit-user-select: none; }
+.dir-map img { display: block; width: 100%; height: auto; pointer-events: none; }
+.dir-map.ph { aspect-ratio: 4 / 5; display: grid; place-items: center; color: var(--dim); font-size: 14px; cursor: default; }
+.dir-mappin { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--signal); border: 2px solid var(--void); box-shadow: 0 0 0 2px var(--signal); transform: translate(-50%, -50%); pointer-events: none; }
+.dir-panel select.gx-select { width: 100%; }
+/* 실제 사진 (v0.11.0) */
+.at-add-image { border-style: solid; border-color: var(--accent-line); color: var(--signal); }
 .at-item-image { align-items: center; }
 .at-thumb { width: 52px; height: 52px; flex: none; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--sunk); }
 .at-card-image { display: block; padding: 0; overflow: hidden; width: fit-content; max-width: min(100%, 320px); background: var(--sunk); }
@@ -2097,18 +2112,4 @@ id; border-color: var(--accent-line); color: var(--signal); }
 .gx-wt-pen:hover { background: var(--panel2); color: var(--text); }
 .gx-wt-pen svg { width: 18px; height: 18px; }
 .gx-wt-edit { display: flex; gap: 6px; }
-.gx-wt-edit input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); color: var(--text); font: inherit; font-size: 14px; }
-.gx-wt-tools { display: flex; align-items: center; gap: 8px; }
-
-.gx-wt-q { flex: 1; max-width: 320px; min-width: 0; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); font: inherit; font-size: 13.5px; }
-.gx-wt-list { display: flex; flex-direction: column; gap: 4px; }
-.gx-wt-empty { margin: 8px 4px; color: var(--dim); font-size: 13.5px; }
-.gx-wt-day h3 { display: flex; justify-content: space-between; margin: 4px 4px 6px; font-size: 13px; font-weight: 800; color: var(--dim); }
-.gx-wt-day h3 em { font-style: normal; font-variant-numeric: tabular-nums; }
-/* 그날 합계도 줄의 금액과 같은 색 (2026-11-13 사용자) */
-.gx-wt-day h3 em.in { color: var(--signal); font-weight: 700; } .gx-wt-day h3 em.out { color: var(--danger, #FF7A6B); font-weight: 700; }
-.gx-wt-day ul { list-style: none; margin: 0; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-.gx-wt-row { display: grid; grid-template-columns: minmax(0, 1fr) 36px; align-items: center; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
-.gx-wt-row:last-child { border-bottom: 0; }
-.gx-wt-main { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-width: 0; padding: 11px 6px 11px 16px; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
-.gx-wt-ic { display: grid; place-items: center; width: 36px; height: 36px; borde
+.gx-wt-edit input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9p
