@@ -1,4 +1,8 @@
-n3 === "number" && Number.isInteger(n3) ? n3 : null;
+(v);
+  var str2 = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
+  var int = (v) => {
+    const n3 = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof n3 === "number" && Number.isInteger(n3) ? n3 : null;
   };
   var ATTACH_LABEL = /\[ATTACHMENT A\d+\]/g;
   function attachSwap(text5, mark2) {
@@ -110,7 +114,7 @@ n3 === "number" && Number.isInteger(n3) ? n3 : null;
   function acceptComments(rows3, existing, t, nick, base = t.total, cap = LIMITS.replies) {
     const list4 = Array.isArray(rows3) ? rows3.slice(0, cap) : [];
     let dropped = Array.isArray(rows3) ? Math.max(0, rows3.length - cap) : 0;
-    const out = [];
+    const out2 = [];
     const map = /* @__PURE__ */ new Map();
     const seen4 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
     list4.forEach((c, i) => {
@@ -134,10 +138,10 @@ n3 === "number" && Number.isInteger(n3) ? n3 : null;
       const sig = `${author}\0${content}`;
       if (seen4.has(sig)) return bad();
       seen4.add(sig);
-      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n3, time: str2(c.time).trim() });
-      map.set(own2, base + out.length);
+      out2.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n3, time: str2(c.time).trim() });
+      map.set(own2, base + out2.length);
     });
-    return { comments: out, dropped };
+    return { comments: out2, dropped };
   }
   function stampMinutes(stamp) {
     const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
@@ -771,25 +775,25 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
   var roomUnread = (st) => Object.values(st.rooms).some((r) => r.unread > 0);
   var unreadCount = (st) => Object.values(st.rooms).reduce((n3, r) => n3 + (r.unread || 0), 0);
   function conversationState(r) {
-    let out = { ownerHasSpoken: false, npcMessagesSinceOwner: 0, senders: [], readReceipt: "unknown" };
+    let out2 = { ownerHasSpoken: false, npcMessagesSinceOwner: 0, senders: [], readReceipt: "unknown" };
     let senders = /* @__PURE__ */ new Map();
     if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
-      out = JSON.parse(JSON.stringify(r.conversationBaseline));
-      for (const row8 of out.senders ?? []) senders.set(row8.sender, row8);
-      out.senders = [];
+      out2 = JSON.parse(JSON.stringify(r.conversationBaseline));
+      for (const row8 of out2.senders ?? []) senders.set(row8.sender, row8);
+      out2.senders = [];
     }
     for (const m of r.messages) {
       if (m.kind !== "message" || m.sender === "system") continue;
-      out.lastSender = m.sender;
-      out.lastMessageTime = m.time || "";
+      out2.lastSender = m.sender;
+      out2.lastMessageTime = m.time || "";
       if (m.sender === "me") {
-        out.ownerHasSpoken = true;
-        out.lastOwnerRecordID = m.id;
-        out.lastOwnerTime = m.time || "";
-        out.npcMessagesSinceOwner = 0;
+        out2.ownerHasSpoken = true;
+        out2.lastOwnerRecordID = m.id;
+        out2.lastOwnerTime = m.time || "";
+        out2.npcMessagesSinceOwner = 0;
         senders = /* @__PURE__ */ new Map();
       } else {
-        out.npcMessagesSinceOwner++;
+        out2.npcMessagesSinceOwner++;
         const row8 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
         row8.messagesSinceOwner++;
         row8.lastMessageTime = m.time || "";
@@ -801,12 +805,12 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
     for (const key of [...senders.keys()].sort()) {
       const row8 = senders.get(key);
       row8.lastMessageRead = rt !== void 0 && row8.lastRecordID !== void 0 ? row8.lastRecordID <= rt ? "read" : "unread" : "unknown";
-      out.senders.push(row8);
+      out2.senders.push(row8);
     }
-    out.readReceipt = rt !== void 0 ? "tracked" : "unknown";
-    out.ownerReadThroughRecordID = rt;
-    out.ownerHasNotReplied = out.npcMessagesSinceOwner > 0;
-    return out;
+    out2.readReceipt = rt !== void 0 ? "tracked" : "unknown";
+    out2.ownerReadThroughRecordID = rt;
+    out2.ownerHasNotReplied = out2.npcMessagesSinceOwner > 0;
+    return out2;
   }
   function trimRooms(st, caps = STORAGE) {
     for (const r of Object.values(st.rooms)) {
@@ -830,18 +834,18 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
     return [true, ""];
   }
   function splitRecords(text5) {
-    const out = [];
+    const out2 = [];
     let last2 = 0;
     for (const r of attachmentRecords(text5)) {
       const before = text5.slice(last2, r.start).trim();
-      if (before) out.push(before);
+      if (before) out2.push(before);
       const tag = /^\[\[ATTACH:(\w+)\]\]([\s\S]*?)\[\[\/ATTACH\]\]$/.exec(r.text);
-      out.push(tag ? `[[ATTACH:${tag[1].toLowerCase()}]]${tag[2].trim()}[[/ATTACH]]` : r.text);
+      out2.push(tag ? `[[ATTACH:${tag[1].toLowerCase()}]]${tag[2].trim()}[[/ATTACH]]` : r.text);
       last2 = r.end;
     }
     const rest = text5.slice(last2).trim();
-    if (rest) out.push(rest);
-    return out;
+    if (rest) out2.push(rest);
+    return out2;
   }
   function decodeJson(raw) {
     let text5 = stripHabits(String(raw ?? "")).replace(/^﻿/, "").trim();
@@ -915,15 +919,15 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
     }
   }
   function parseHabits(raw) {
-    const out = [];
+    const out2 = [];
     for (const m of String(raw ?? "").matchAll(HABITS_RE)) {
       try {
         const v = JSON.parse(m[1]);
-        if (Array.isArray(v)) out.push(...v);
+        if (Array.isArray(v)) out2.push(...v);
       } catch {
       }
     }
-    return out;
+    return out2;
   }
   function mergeHabits(state2, rows3, ids) {
     const list4 = readHabits(state2);
@@ -943,18 +947,18 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
   }
   function parseReactions(value) {
     if (typeof value !== "string") return [];
-    const out = [];
+    const out2 = [];
     for (const token2 of value.split(/[\s,]+/)) {
       if (!token2 || token2 === "-") continue;
       const m = /^(.*?)(\d+)$/.exec(token2);
       const emoji = (m ? m[1] : token2).trim();
       const count2 = m ? Number(m[2]) : 1;
       if (!emoji || /[\p{L}\p{N}]/u.test(emoji) || [...emoji].length > 8 || count2 < 1) continue;
-      const old = out.find((r) => r.emoji === emoji);
+      const old = out2.find((r) => r.emoji === emoji);
       if (old) old.count = Math.max(old.count, count2);
-      else out.push({ emoji, count: count2 });
+      else out2.push({ emoji, count: count2 });
     }
-    return out.slice(0, 6);
+    return out2.slice(0, 6);
   }
   function reactionCap(m) {
     return m.audience.filter((c) => c !== m.sender && c !== "me").length;
@@ -1012,21 +1016,21 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
   }
   function keepValid(events, r, dropped = [], cap = LIMITS2.events) {
     const active3 = new Set(r.members);
-    const out = [];
+    const out2 = [];
     for (const e of events) {
       const why = eventProblem(e, r, active3);
       if (why) {
         dropped.push(why);
         continue;
       }
-      if (out.length >= cap) {
+      if (out2.length >= cap) {
         dropped.push("한 번에 추가할 수 있는 말풍선 수를 넘었어요.");
         break;
       }
       if (e.type === "exit") active3.delete(e.participant);
-      out.push(e);
+      out2.push(e);
     }
-    return out;
+    return out2;
   }
   function eventProblem(e, r, active3) {
     if (e.type === "message") {
@@ -1137,14 +1141,14 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
   var CATEGORIES = /* @__PURE__ */ new Set(["공지", "업무", "시설", "인사", "안전"]);
   function validateAnnouncements(rows3, packet, dropped = []) {
     if (rows3 != null && !Array.isArray(rows3)) fail("공지 목록이 배열이 아니에요.");
-    const out = [];
+    const out2 = [];
     for (const row8 of rows3 ?? []) {
       const why = noticeProblem(row8);
       if (why) dropped.push(why);
-      else if (out.length >= (packet?.maxNew ?? 0)) dropped.push("한 번에 받을 공지 수를 넘었어요.");
-      else out.push(row8);
+      else if (out2.length >= (packet?.maxNew ?? 0)) dropped.push("한 번에 받을 공지 수를 넘었어요.");
+      else out2.push(row8);
     }
-    return out;
+    return out2;
   }
   function noticeProblem(row8) {
     if (!row8 || typeof row8.issuer !== "string" || typeof row8.category !== "string" || typeof row8.title !== "string" || typeof row8.text !== "string") return "공지 형식이 잘못됐어요.";
@@ -1181,10 +1185,10 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
     if (rows3 != null && !Array.isArray(rows3)) fail("단톡방 초대 목록이 배열이 아니에요.");
     const allowed = new Set(packet?.candidates ?? []);
     const sig = (m) => [...m].sort().join(",");
-    const out = [];
+    const out2 = [];
     const fresh3 = /* @__PURE__ */ new Set();
     for (const row8 of rows3 ?? []) {
-      if (out.length >= (packet?.maxNew ?? 0)) {
+      if (out2.length >= (packet?.maxNew ?? 0)) {
         dropped.push("한 번에 받을 단톡방 초대 수를 넘었어요.");
         continue;
       }
@@ -1207,12 +1211,12 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
         const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row8.inviter };
         room.events = eventsFromPatch(row8.patch, room, false, dropped, cap).events;
         fresh3.add(key);
-        out.push(room);
+        out2.push(room);
       } catch (error) {
         dropped.push(error.message);
       }
     }
-    return out;
+    return out2;
   }
   function commitInvitations(st, rooms, time2) {
     let received = 0;
@@ -1245,7 +1249,7 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
       const announcements = validateAnnouncements(value.announcements, announce, dropped);
       const invitations = validateInvitations(value.invitations, invite, st, dir2, dropped, cap);
       const used = /* @__PURE__ */ new Set();
-      const out = [];
+      const out2 = [];
       for (const u of updates) {
         try {
           if (!u || typeof u.room !== "string" || !selected.has(u.room) || used.has(u.room)) fail("중복되거나 허용되지 않은 대화방이에요.");
@@ -1253,14 +1257,14 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
           const r = selected.get(u.room);
           const { events } = eventsFromPatch(u.patch ?? [], r, false, dropped, cap);
           if (events.length && receive.get(u.room) === false) fail("선톡 받기 설정이나 이번 확률 검사에서 허용하지 않은 방이에요.");
-          out.push({ room: u.room, events });
+          out2.push({ room: u.room, events });
         } catch (error) {
           dropped.push(error.message);
         }
       }
-      const got = out.some((u) => u.events.length) || announcements.length || invitations.length;
+      const got = out2.some((u) => u.events.length) || announcements.length || invitations.length;
       if (dropped.length && !got) fail(dropped[0]);
-      return { updates: out, announcements, invitations };
+      return { updates: out2, announcements, invitations };
     } catch (error) {
       throw new PhoneError(error.message, raw);
     }
@@ -1394,13 +1398,13 @@ ${body5}
   var isMode = (v) => v === "on" || v === "hide" || v === "off";
   function colConfig(vars) {
     const v = vars ?? {};
-    const out = {};
+    const out2 = {};
     for (const c of STATUS_COLS) {
       const m = v[colVar(c.id)];
       const mode2 = isMode(m) ? m : c.id === "points" ? v[POINTS_ON_VAR] !== "1" ? "off" : m === AUTO_HIDE ? "hide" : "on" : "on";
-      out[c.id] = c.locked && mode2 === "off" ? "hide" : mode2;
+      out2[c.id] = c.locked && mode2 === "off" ? "hide" : mode2;
     }
-    return out;
+    return out2;
   }
   function usedCols(cfg) {
     return COL_IDS.filter((id2) => cfg[id2] !== "off");
@@ -1574,9 +1578,9 @@ ${body5}
         if (!LOOSE.includes(cur[i])) continue;
         const cand = cur.filter((_, j) => j !== i);
         if (!fits(cand) || !plausible(f, cand)) continue;
-        const out = byShape(f, cand);
-        const m = cur[i] === "temp" ? WEATHER_TEMP.exec(out.weather) : null;
-        return m && m[1] ? { ...out, weather: m[1], temp: m[2] } : out;
+        const out2 = byShape(f, cand);
+        const m = cur[i] === "temp" ? WEATHER_TEMP.exec(out2.weather) : null;
+        return m && m[1] ? { ...out2, weather: m[1], temp: m[2] } : out2;
       }
     }
     if (known) return byShape(f, known);
@@ -1737,10 +1741,10 @@ ${body5}
     return AG_ALIAS[bare] ?? null;
   }
   function fields2(text5, kind) {
-    const out = [];
+    const out2 = [];
     const re = new RegExp(`\\[${kind}\\s*\\|([^\\]\\r\\n]*)\\]`, "g");
-    for (const m of text5.matchAll(re)) out.push(m[1].split("|").map((s8) => s8.trim()));
-    return out;
+    for (const m of text5.matchAll(re)) out2.push(m[1].split("|").map((s8) => s8.trim()));
+    return out2;
   }
   var SLOT = /^<[^<>]*>$/;
   var unslot = (v) => SLOT.test(v.trim()) ? "" : v;
@@ -1806,23 +1810,23 @@ ${body5}
   var AGE_META = /\{\s*(?:\d+\s*시간\s+\d+\s*분\s*전|유지\s*기한[^}]*)\s*\}/;
   var MARKERS = ["USER 관여 상태", "RP 시간 제한", "USER 관여 상태 규칙", "USER 탐험 상태 규칙", "탐험 추적", "자동 종료"];
   function dropEmptyFences(lines3) {
-    const out = [];
+    const out2 = [];
     let open3 = -1;
     for (const l of lines3) {
       if (!/^\s*```/.test(l)) {
-        out.push(l);
+        out2.push(l);
         continue;
       }
       if (open3 < 0) {
-        open3 = out.length;
-        out.push(l);
+        open3 = out2.length;
+        out2.push(l);
       } else {
-        if (out.slice(open3 + 1).every((x) => !x.trim())) out.length = open3;
-        else out.push(l);
+        if (out2.slice(open3 + 1).every((x) => !x.trim())) out2.length = open3;
+        else out2.push(l);
         open3 = -1;
       }
     }
-    return out;
+    return out2;
   }
   function cleanOutput(text5) {
     const lines3 = text5.split("\n");
@@ -1899,14 +1903,14 @@ ${body5}
   var bookKey = (name) => name.trim().toLowerCase();
   function cleanNames(list4) {
     const seen4 = /* @__PURE__ */ new Set();
-    const out = [];
+    const out2 = [];
     for (const x of list4) {
       const name = typeof x === "string" ? x.trim() : "";
       if (!name || seen4.has(bookKey(name))) continue;
       seen4.add(bookKey(name));
-      out.push(name);
+      out2.push(name);
     }
-    return out;
+    return out2;
   }
   function activeBooks(state2) {
     const raw = state2?.[ACTIVE_BOOKS_VAR];
@@ -2002,18 +2006,18 @@ ${body5}
     return rows3;
   }
   function limitRefs(rows3, max, o) {
-    const out = rows3.slice();
-    const extra2 = () => out.filter((r) => r.kind === "direct" || r.kind === "secondary").length;
+    const out2 = rows3.slice();
+    const extra2 = () => out2.filter((r) => r.kind === "direct" || r.kind === "secondary").length;
     if (o?.hard) {
       const first = o.first ?? (() => false);
       const steps = [(r) => r.kind === "secondary", (r) => r.kind === "direct" && !first(r), (r) => r.kind === "direct"];
-      for (const hit4 of steps) for (let i = out.length - 1; i >= 0 && extra2() > max; i--) if (hit4(out[i])) out.splice(i, 1);
-      return out;
+      for (const hit4 of steps) for (let i = out2.length - 1; i >= 0 && extra2() > max; i--) if (hit4(out2[i])) out2.splice(i, 1);
+      return out2;
     }
     for (const kind of ["secondary", "direct"]) {
-      for (let i = out.length - 1; i >= 0 && extra2() > max; i--) if (out[i].kind === kind && !out[i].required) out.splice(i, 1);
+      for (let i = out2.length - 1; i >= 0 && extra2() > max; i--) if (out2[i].kind === kind && !out2[i].required) out2.splice(i, 1);
     }
-    return out;
+    return out2;
   }
   var KIND_LABEL = { base: "공통", primary: "주제 원본", active: "활성 로어북", direct: "관련 로어북", secondary: "2차 참조" };
   function refText(rows3) {
@@ -2051,10 +2055,10 @@ ${c}`)]).join("\n\n");
   }
   function policySections(lore, comment) {
     const raw = isGuideName(comment) ? guidePrompt(comment) : (lore ?? []).find((e) => e.comment === comment)?.content;
-    const out = {};
-    if (typeof raw !== "string") return out;
-    for (const m of raw.matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out[m[1].trim()] = m[2];
-    return out;
+    const out2 = {};
+    if (typeof raw !== "string") return out2;
+    for (const m of raw.matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out2[m[1].trim()] = m[2];
+    return out2;
   }
 
   // src/core/people/types.ts
@@ -2232,8 +2236,8 @@ ${c}`)]).join("\n\n");
   }
   function peopleStore(chat) {
     const raw = chat[PEOPLE_KEY];
-    const out = emptyStore();
-    if (!raw || typeof raw !== "object") return out;
+    const out2 = emptyStore();
+    if (!raw || typeof raw !== "object") return out2;
     for (const [name, p2] of Object.entries(raw.people ?? {})) {
       if (!p2 || typeof p2 !== "object" || typeof p2.name !== "string") continue;
       const slots = {};
@@ -2241,7 +2245,7 @@ ${c}`)]).join("\n\n");
         const list4 = p2.slots?.[s8];
         if (Array.isArray(list4)) slots[s8] = list4.filter(isEntry);
       }
-      out.people[name] = {
+      out2.people[name] = {
         name: p2.name,
         faction: str3(p2.faction),
         seeded: p2.seeded && typeof p2.seeded === "object" ? p2.seeded : { from: "none", at: "" },
@@ -2257,7 +2261,7 @@ ${c}`)]).join("\n\n");
         ...Number.isInteger(p2.reviewTurn) ? { reviewTurn: p2.reviewTurn } : {},
         ...p2.sexual && typeof p2.sexual === "object" ? { sexual: readSexual(p2.sexual) } : {}
       };
-      const me = out.people[name];
+      const me = out2.people[name];
       if (p2.axes && typeof p2.axes === "object") {
         for (const a of AXES) if (p2.axes[a] !== void 0) me.axes[a] = Math.max(0, Math.min(100, Math.round(Number(p2.axes[a]) || 0)));
       } else me.axes.emotionalExpressiveness = EXPRESS_TO_AXIS[me.express];
@@ -2265,21 +2269,21 @@ ${c}`)]).join("\n\n");
     }
     for (const [k, d] of Object.entries(raw.docs ?? {})) {
       if (!d || !DOC_TYPES.includes(d.type) || typeof d.key !== "string") continue;
-      out.docs[k] = { type: d.type, key: d.key, entries: Array.isArray(d.entries) ? d.entries.filter(isEntry) : [] };
+      out2.docs[k] = { type: d.type, key: d.key, entries: Array.isArray(d.entries) ? d.entries.filter(isEntry) : [] };
     }
     for (const [k, f] of Object.entries(raw.factions ?? {})) {
       if (!f || typeof f !== "object" || typeof f.code !== "string") continue;
-      out.factions[k] = { code: f.code, name: str3(f.name), seeded: f.seeded && typeof f.seeded === "object" ? f.seeded : { at: "" } };
+      out2.factions[k] = { code: f.code, name: str3(f.name), seeded: f.seeded && typeof f.seeded === "object" ? f.seeded : { at: "" } };
     }
-    out.log = Array.isArray(raw.log) ? raw.log.filter((c) => !!c && typeof c.id === "string" && typeof c.anchor === "string" && typeof c.who === "string" && typeof c.kind === "string") : [];
-    out.folded = raw.folded && typeof raw.folded === "object" ? Object.fromEntries(Object.entries(raw.folded).filter(([, v]) => typeof v === "number")) : {};
-    out.read = raw.read && typeof raw.read === "object" ? Object.fromEntries(Object.entries(raw.read).filter(([, v]) => typeof v === "string")) : {};
-    out.pending = raw.pending && typeof raw.pending === "object" ? raw.pending : {};
-    if (raw.lastRun && typeof raw.lastRun === "object" && Array.isArray(raw.lastRun.entries)) out.lastRun = raw.lastRun;
-    out.ignored = Array.isArray(raw.ignored) ? raw.ignored.filter((n3) => typeof n3 === "string") : [];
-    if (raw.identity && typeof raw.identity === "object") out.identity = raw.identity;
-    if (Array.isArray(raw.migrated)) out.migrated = raw.migrated.filter((m) => typeof m === "string");
-    return out;
+    out2.log = Array.isArray(raw.log) ? raw.log.filter((c) => !!c && typeof c.id === "string" && typeof c.anchor === "string" && typeof c.who === "string" && typeof c.kind === "string") : [];
+    out2.folded = raw.folded && typeof raw.folded === "object" ? Object.fromEntries(Object.entries(raw.folded).filter(([, v]) => typeof v === "number")) : {};
+    out2.read = raw.read && typeof raw.read === "object" ? Object.fromEntries(Object.entries(raw.read).filter(([, v]) => typeof v === "string")) : {};
+    out2.pending = raw.pending && typeof raw.pending === "object" ? raw.pending : {};
+    if (raw.lastRun && typeof raw.lastRun === "object" && Array.isArray(raw.lastRun.entries)) out2.lastRun = raw.lastRun;
+    out2.ignored = Array.isArray(raw.ignored) ? raw.ignored.filter((n3) => typeof n3 === "string") : [];
+    if (raw.identity && typeof raw.identity === "object") out2.identity = raw.identity;
+    if (Array.isArray(raw.migrated)) out2.migrated = raw.migrated.filter((m) => typeof m === "string");
+    return out2;
   }
   function readSexual(raw) {
     const rec3 = (v) => {
@@ -2289,14 +2293,14 @@ ${c}`)]).join("\n\n");
     return { desire: rec3(raw.desire), paraphilia: rec3(raw.paraphilia), desireOn: raw.desireOn !== false, paraphiliaOn: raw.paraphiliaOn !== false, explicit: raw.explicit === true ? true : raw.explicit === false ? false : null };
   }
   function readCandidates(raw) {
-    const out = {};
-    if (!raw || typeof raw !== "object") return out;
+    const out2 = {};
+    if (!raw || typeof raw !== "object") return out2;
     for (const [id2, c] of Object.entries(raw)) {
       if (!c || typeof c !== "object" || typeof c.pattern !== "string" || typeof c.axis !== "string") continue;
       const evidence = Array.isArray(c.evidence) ? c.evidence.filter((e) => e && typeof e.id === "string" && typeof e.anchor === "string").map((e) => ({ id: e.id, anchor: e.anchor, seq: Number(e.seq) || 0, quote: str3(e.quote), reason: str3(e.reason), strength: Number(e.strength) || 0, confidence: Number(e.confidence) || 0, ...e.void ? { void: true } : {} })) : [];
-      out[id2] = { id: id2, axis: c.axis, direction: ["up", "down", "new", "weaken", "replace"].includes(c.direction) ? c.direction : "up", pattern: c.pattern, evidence, status: ["collecting", "approved", "rejected", "reverted"].includes(c.status) ? c.status : "collecting", at: str3(c.at), ...c.applied && typeof c.applied === "object" ? { applied: c.applied } : {} };
+      out2[id2] = { id: id2, axis: c.axis, direction: ["up", "down", "new", "weaken", "replace"].includes(c.direction) ? c.direction : "up", pattern: c.pattern, evidence, status: ["collecting", "approved", "rejected", "reverted"].includes(c.status) ? c.status : "collecting", at: str3(c.at), ...c.applied && typeof c.applied === "object" ? { applied: c.applied } : {} };
     }
-    return out;
+    return out2;
   }
   var withPeople = (chat, store3) => ({ ...chat, [PEOPLE_KEY]: store3 });
   var msgs = (chat) => Array.isArray(chat.message) ? chat.message : [];
@@ -2346,12 +2350,12 @@ ${c}`)]).join("\n\n");
     return list4.filter((e) => alive.has(e.id) && !replaced.has(e.id));
   }
   function entryStates(list4, live) {
-    const out = /* @__PURE__ */ new Map();
-    if (!list4?.length) return out;
+    const out2 = /* @__PURE__ */ new Map();
+    if (!list4?.length) return out2;
     const alive = new Set(liveEntries(list4, live).map((e) => e.id));
     const replaced = new Set(list4.filter((e) => isAlive(e, live)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
-    for (const e of list4) out.set(e.id, alive.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
-    return out;
+    for (const e of list4) out2.set(e.id, alive.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
+    return out2;
   }
   function liveChanges(store3, live) {
     return store3.log.filter((c) => isAlive(c, live)).map((c) => ({ c, pos: live.at.get(c.anchor) ?? -1 })).sort((a, b) => a.pos - b.pos || a.c.seq - b.c.seq).map((x) => x.c);
@@ -2462,12 +2466,12 @@ ${c}`)]).join("\n\n");
     messageText(str3(m.data)).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\[\s*shop\s*[:：][^\]]*\]/giu, "").replace(/\s+/g, " ").trim()
   );
   function unreadIndexes(chat, store3) {
-    const out = [];
+    const out2 = [];
     msgs(chat).forEach((m, i) => {
       if (m.role !== "char") return;
-      if (store3.read[messageKey(m, i)] !== messageHash(m)) out.push(i);
+      if (store3.read[messageKey(m, i)] !== messageHash(m)) out2.push(i);
     });
-    return out;
+    return out2;
   }
   function splitUnread(chat, store3) {
     const all = unreadIndexes(chat, store3);
@@ -2497,7 +2501,7 @@ ${c}`)]).join("\n\n");
   var text = (m) => typeof m?.data === "string" ? m.data : "";
   var same = (a, b) => !!a && !!b && a.trim() === b.trim();
   function mineReasons(chat, from, to, s8) {
-    const out = /* @__PURE__ */ new Set();
+    const out2 = /* @__PURE__ */ new Set();
     const names4 = [s8.name, s8.presetName ?? ""].filter(Boolean);
     const hit4 = (t) => names4.some((n3) => same(t, n3));
     const list4 = msgs2(chat);
@@ -2510,18 +2514,18 @@ ${c}`)]).join("\n\n");
       const t = text(m);
       if (m.role === "user") {
         const scene2 = readScene(t);
-        if (scene2 && hit4(scene2.target)) out.add("scene");
+        if (scene2 && hit4(scene2.target)) out2.add("scene");
         continue;
       }
       if (m.role !== "char" || i < lo) continue;
       for (const tag of findStatusTags(t)) {
         if (tag.deployed !== null) hasDeployCol = true;
-        if (tag.deployed === true && hit4(tag.target)) out.add("deployed");
-        if (s8.agentNames.length && tag.companions.some((c) => s8.agentNames.some((a) => same(c, a)))) out.add("companion");
+        if (tag.deployed === true && hit4(tag.target)) out2.add("deployed");
+        if (s8.agentNames.length && tag.companions.some((c) => s8.agentNames.some((a) => same(c, a)))) out2.add("companion");
       }
     }
-    if (s8.touched && !hasDeployCol) out.add("touched");
-    return [...out];
+    if (s8.touched && !hasDeployCol) out2.add("touched");
+    return [...out2];
   }
   var isMine = (chat, from, to, s8) => mineReasons(chat, from, to, s8).length > 0;
   function periodOf(chat, index, e) {
@@ -4706,19 +4710,4 @@ ${c}`)]).join("\n\n");
         up: "과장님",
         peer: "선배님",
         down: "신입",
-        outsider: "너"
-      },
-      송진섭: {
-        level: 1,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "형",
-        down: "후배",
-        outsider: "그쪽"
-      },
-      스팡달: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부
+        outsi

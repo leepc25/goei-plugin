@@ -1,4 +1,111 @@
-e(/^﻿/, ""));
+어요` },
+          {
+            key: "privacy",
+            label: "사생활",
+            ctl: { t: "seg", opts: [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]] },
+            help: "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"
+          },
+          { key: "subject", label: "주제", ctl: { t: "text", ph: "비우면 세계관에 맞는 다양한 주제" } },
+          { key: "mood", label: "분위기·말투", ctl: { t: "text", ph: "비우면 익명 커뮤니티 말투" } },
+          { key: "protagonist", label: "보호 대상", ctl: { t: "text", ph: "비우면 주인공" }, help: "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공" },
+          { key: "keyfigures", label: "주요 인물 닉네임", ctl: { t: "seg", opts: [["1", "보존"], ["0", "안 함"]], fb: "1" }, help: "주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요" },
+          { key: "keepown", label: "새로고침 시 내 글", ctl: { t: "seg", opts: [["1", "유지"], ["0", "교체"]] }, help: "새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요" },
+          { key: "keepreplied", label: "내 댓글 있는 글", ctl: { t: "seg", opts: [["1", "유지"], ["0", "교체"]] }, help: "내가 댓글을 단 남의 글도 새로고침 때 남길지예요" }
+        ]
+      },
+      {
+        title: "쪽지",
+        rows: [
+          { key: "incoming", label: "선쪽지 받기", ctl: { t: "seg", opts: [["1", "받기"], ["0", "안 받기"]], fb: "1" }, help: "게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요" },
+          { key: "storage", label: "쪽지 자동 정리", ctl: { t: "custom" } }
+        ]
+      }
+    ]
+  };
+
+  // src/core/fetchparts.ts
+  var PART_CONCURRENCY = 4;
+  async function fetchParts(names4, get, onDone, limit = PART_CONCURRENCY) {
+    const out2 = new Array(names4.length);
+    let next = 0;
+    let done3 = 0;
+    let failed4 = false;
+    const worker = async () => {
+      while (next < names4.length && !failed4) {
+        const i = next++;
+        try {
+          out2[i] = await get(names4[i]);
+        } catch (error) {
+          failed4 = true;
+          throw error;
+        }
+        onDone?.(++done3);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(limit, names4.length) }, worker));
+    return out2.join("");
+  }
+
+  // src/core/stalever.ts
+  var VERSION = /^\d+(\.\d+)*$/;
+  function oldPluginMessage(mine3, up) {
+    if (typeof up !== "string" || !VERSION.test(up) || !VERSION.test(mine3)) return null;
+    const a = mine3.split(".").map(Number);
+    const b = up.split(".").map(Number);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      const d = (b[i] ?? 0) - (a[i] ?? 0);
+      if (d < 0) return null;
+      if (d > 0) return `플러그인이 옛 판(v${mine3})이에요. 새 판 v${up}가 나왔어요. Risu 설정 → 플러그인에서 업데이트해 주세요.`;
+    }
+    return null;
+  }
+
+  // src/host/datapack.ts
+  var WORLD_KEY2 = "goei:data-world";
+  var INSTALL_KEY = "goei:data-install";
+  var DataPackError = class extends Error {
+  };
+  var TIMEOUT_MS = 4e4;
+  function timeout(p2, name) {
+    let t;
+    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${name}을 ${TIMEOUT_MS / 1e3}초 안에 받지 못했어요.`)), TIMEOUT_MS))]).finally(() => clearTimeout(t));
+  }
+  async function getText(name) {
+    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
+        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
+      } catch {
+      }
+    }
+    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
+    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
+    return String(await timeout(res.text(), name) ?? "");
+  }
+  async function getBytes(name) {
+    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
+        const b = r?.ok ? toBytes3(r.data) : null;
+        if (b?.length) return b;
+      } catch {
+      }
+    }
+    const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
+    if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
+    return new Uint8Array(await timeout(res.arrayBuffer(), name));
+  }
+  async function fetchPack(pack4, progress4) {
+    if (!UPDATE_BASE) throw new DataPackError("받을 곳이 정해지지 않은 빌드예요.");
+    if (!pack4.expect.hash) throw new DataPackError(`이 빌드에는 ${pack4.label} 지문이 없어요.`);
+    progress4?.(`${pack4.label} 목록 받는 중…`);
+    let index = null;
+    try {
+      index = JSON.parse((await getText(`${pack4.name}.json`)).replace(/^﻿/, ""));
     } catch (error) {
       throw new DataPackError(`${pack4.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
     }
@@ -510,12 +617,12 @@ e(/^﻿/, ""));
     uiSite = site;
   }
   function boardFailures() {
-    const out = [];
+    const out2 = [];
     for (const s8 of BOARD_SITES) {
       const u = s8 === uiSite ? gnet : uiSaved.get(s8);
-      if (u?.failure) out.push({ site: s8, name: BOARD_NAME[s8], reason: u.failure.reason, raw: u.failure.raw });
+      if (u?.failure) out2.push({ site: s8, name: BOARD_NAME[s8], reason: u.failure.reason, raw: u.failure.raw });
     }
-    return out;
+    return out2;
   }
   function clearBoardFailures() {
     gnet.failure = null;
@@ -1115,7 +1222,7 @@ ${previewText(p2.body)}`;
       const parent = c.parent > 0 && c.parent <= p2.comments.length && c.parent !== i + 1 ? c.parent : 0;
       kids.set(parent, [...kids.get(parent) ?? [], i + 1]);
     });
-    const out = [];
+    const out2 = [];
     const seen4 = /* @__PURE__ */ new Set();
     const target = gnet.compose?.kind === "comment" && gnet.compose.post === p2.id ? gnet.compose.parent : 0;
     const walk = (n3, depth) => {
@@ -1134,15 +1241,15 @@ ${previewText(p2.body)}`;
         const acts = `<span class="cma"><button class="gn-reply" data-action="gn-reply" data-value="${p2.id}:${k}">답글</button>${del}</span>`;
         const cls = `cm gn-c${depth ? " re" : ""}${c.unread ? " unread" : ""}${target === k ? " target" : ""}`;
         const style = ` style="--gn-depth:${Math.min(depth, 3)}"`;
-        if (site === "gal") out.push(`<li class="${cls}"${style}><div class="ch">${re}${author}${ip}${unread}</div><div class="cb gn-c-body">${body2(c.body)}</div><small>${clock4}${acts}</small></li>`);
-        else if (site === "wpf") out.push(`<li class="${cls}"${style}>${re}${author} : <span class="gn-c-body">${body2(c.body)}</span> <small>(${clock4})</small>${unread}${acts}</li>`);
-        else out.push(`<li class="${cls}"${style}><div class="ch">${re}${author} <small>${clock4}</small>${unread}${acts}</div><div class="gn-c-body">${body2(c.body)}</div></li>`);
-        if (target === k && gnet.compose?.kind === "comment") out.push(replyBox(gnet.compose.label, busy6, depth + 1));
+        if (site === "gal") out2.push(`<li class="${cls}"${style}><div class="ch">${re}${author}${ip}${unread}</div><div class="cb gn-c-body">${body2(c.body)}</div><small>${clock4}${acts}</small></li>`);
+        else if (site === "wpf") out2.push(`<li class="${cls}"${style}>${re}${author} : <span class="gn-c-body">${body2(c.body)}</span> <small>(${clock4})</small>${unread}${acts}</li>`);
+        else out2.push(`<li class="${cls}"${style}><div class="ch">${re}${author} <small>${clock4}</small>${unread}${acts}</div><div class="gn-c-body">${body2(c.body)}</div></li>`);
+        if (target === k && gnet.compose?.kind === "comment") out2.push(replyBox(gnet.compose.label, busy6, depth + 1));
         walk(k, depth + 1);
       }
     };
     walk(0, 0);
-    return out.join("");
+    return out2.join("");
   }
   function sitePost(site, p2, busy6, now2) {
     const c = gnet.compose;
@@ -1683,14 +1790,60 @@ ${previewText(p2.body)}`;
     if (!sent || !chat || sent.charIndex !== charIndex || sent.chatIndex !== chatIndex) return false;
     return !chat.scriptstate?.[ITEM_USE_AT_VAR] && lastUserKey(chat) === sent.userKey && sent.ids.has(id2);
   }
+  var settling = 0;
+  function holdUseSettle() {
+    let done3 = false;
+    const release = () => {
+      if (done3) return;
+      done3 = true;
+      clearTimeout(timer5);
+      settling = Math.max(0, settling - 1);
+      if (!settling) sent = null;
+    };
+    settling++;
+    const timer5 = setTimeout(release, 3e4);
+    return release;
+  }
+  var lockAt = null;
+  function setUseLockAt(at) {
+    lockAt = at ? { charIndex: at.charIndex, chatIndex: at.chatIndex } : null;
+    if (!at) out = null;
+  }
+  var out = null;
+  function sentOut(charIndex, chatIndex, chat) {
+    if (!out || !chat || out.charIndex !== charIndex || out.chatIndex !== chatIndex || out.userKey !== lastUserKey(chat)) return null;
+    return out.ids;
+  }
+  function useLocked(charIndex, chatIndex) {
+    if (settling > 0) return true;
+    if (!isWaiting()) return false;
+    return !lockAt || charIndex === void 0 || chatIndex === void 0 || lockAt.charIndex === charIndex && lockAt.chatIndex === chatIndex;
+  }
+  async function risuBusy() {
+    try {
+      const screen = await (await body())?.doc.querySelector(".default-chat-screen");
+      if (!screen) return "unknown";
+      if (await screen.querySelector(".loadmove")) return "busy";
+      return await screen.querySelector(".button-icon-send") ? "idle" : "unknown";
+    } catch {
+      return "unknown";
+    }
+  }
+  async function freeUseLock() {
+    if (!isWaiting()) return;
+    if (await risuBusy() === "idle") setWaiting(false, true);
+  }
+  setWaitingProbe(async () => await risuBusy() === "busy");
   async function markUseSent(charIndex, chatIndex, chat) {
     const userKey = lastUserKey(chat);
-    const ids = pendingItemUse(chat.scriptstate, userKey).map((u) => u.id);
+    const ids = usesToSend(chat).map((u) => u.id);
+    out = { charIndex, chatIndex, userKey, ids: new Set(ids) };
     if (!ids.length || chat.scriptstate?.[ITEM_USE_AT_VAR]) return;
     sent = { charIndex, chatIndex, userKey, ids: new Set(ids) };
     await refreshUseBox(charIndex, chatIndex, chat);
   }
   onWaiting((w, late) => {
+    if (!w) lockAt = null;
     if (w || !late || !sent) return;
     const { charIndex, chatIndex } = sent;
     sent = null;
@@ -1725,7 +1878,7 @@ ${previewText(p2.body)}`;
     return { doc: doc2, style };
   }
   function dropUseUnlessSent(chat, charIndex, chatIndex, id2) {
-    if (sentUseIds(chat, charIndex, chatIndex)?.has(id2)) return null;
+    if (useLocked(charIndex, chatIndex) || sentUseIds(chat, charIndex, chatIndex)?.has(id2)) return null;
     const next = dropUse(readItemUse(chat.scriptstate), id2);
     return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemUseVars(next) } };
   }
@@ -1740,6 +1893,7 @@ ${previewText(p2.body)}`;
       busy3 = true;
       try {
         const { charIndex, chatIndex } = where;
+        await freeUseLock();
         await updateChat(charIndex, chatIndex, (chat) => dropUseUnlessSent(chat, charIndex, chatIndex, id2));
         await refreshUseBox(charIndex, chatIndex);
       } catch (error) {
@@ -1845,9 +1999,9 @@ ${previewText(p2.body)}`;
     return { toggles, context: shopGiveOn(vars, shop, "ctx") && shopFnOn(vars, fn2, "ctx"), turns: shopFnNum(vars, fn2, "turns"), refs: shopFnNum(vars, fn2, "refs") };
   }
   function matchedBooks(registry2, text5) {
-    const out = /* @__PURE__ */ new Set();
-    for (const e of referenceEntries(registry2, text5)) if (e.lore) out.add(e.lore.trim().toLowerCase());
-    return out;
+    const out2 = /* @__PURE__ */ new Set();
+    for (const e of referenceEntries(registry2, text5)) if (e.lore) out2.add(e.lore.trim().toLowerCase());
+    return out2;
   }
 
   // src/core/statusctx.ts
@@ -1926,8 +2080,8 @@ ${first}` };
       return at2 < 0 ? [...messages, block6] : [...messages.slice(0, at2), block6, ...messages.slice(at2)];
     }
     const line2 = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet, points: shape.points }) : withIdentity(line0, identity);
-    const out = stripStatusLines(messages);
-    const at = out.map((m) => m?.role).lastIndexOf("user");
+    const out2 = stripStatusLines(messages);
+    const at = out2.map((m) => m?.role).lastIndexOf("user");
     const recent = (shape?.recent ?? []).filter(Boolean);
     const recentP = (shape?.recentPoints ?? []).filter(Boolean);
     const cash = recent.length ? `
@@ -1935,7 +2089,7 @@ ${guideOr("Main", "STATUS.RECENT_CASH", () => `Recent cash transactions (oldest 
     const points = recentP.length ? `
 ${guideOr("Main", "STATUS.RECENT_POINT", () => `Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}`, { list: recentP.join("; ") })}` : "";
     const block5 = { role: "system", content: `${statusBlock(line2, shape?.cols)}${cash}${points}` };
-    return at < 0 ? [...out, block5] : [...out.slice(0, at), block5, ...out.slice(at)];
+    return at < 0 ? [...out2, block5] : [...out2.slice(0, at), block5, ...out2.slice(at)];
   }
 
   // src/ui/itemIcons.ts
@@ -1949,15 +2103,15 @@ ${guideOr("Main", "STATUS.RECENT_POINT", () => `Recent Baekilmong point transact
   function cutGroups(groups, count2) {
     const total = groups.reduce((n3, g2) => n3 + g2.rows.length, 0);
     let left = Math.max(0, Math.trunc(count2) || 0);
-    const out = [];
+    const out2 = [];
     for (const g2 of groups) {
       if (left <= 0) break;
       const shown5 = g2.rows.slice(0, left);
       left -= shown5.length;
-      if (shown5.length) out.push({ ...g2, shown: shown5 });
+      if (shown5.length) out2.push({ ...g2, shown: shown5 });
     }
-    const shownN = out.reduce((n3, g2) => n3 + g2.shown.length, 0);
-    return { groups: out, total, rest: total - shownN };
+    const shownN = out2.reduce((n3, g2) => n3 + g2.shown.length, 0);
+    return { groups: out2, total, rest: total - shownN };
   }
 
   // src/ui/more.ts
@@ -2037,8 +2191,8 @@ ${guideOr("Main", "STATUS.RECENT_POINT", () => `Recent Baekilmong point transact
   function monthLine(month, rows3) {
     const list4 = rows3.filter((r) => r.e.src !== "manual" && monthOf(r.date) === month);
     const inc = list4.filter((r) => r.e.amount > 0).reduce((n3, r) => n3 + r.e.amount, 0);
-    const out = -list4.filter((r) => r.e.amount < 0).reduce((n3, r) => n3 + r.e.amount, 0);
-    return `<div class="gx-wt-month"><b>${esc14(month)}</b><span>수입 <em class="in">+${esc14(inc.toLocaleString("en-US"))}</em></span><span>지출 <em class="out">−${esc14(out.toLocaleString("en-US"))}</em></span></div>`;
+    const out2 = -list4.filter((r) => r.e.amount < 0).reduce((n3, r) => n3 + r.e.amount, 0);
+    return `<div class="gx-wt-month"><b>${esc14(month)}</b><span>수입 <em class="in">+${esc14(inc.toLocaleString("en-US"))}</em></span><span>지출 <em class="out">−${esc14(out2.toLocaleString("en-US"))}</em></span></div>`;
   }
   function rowsOf(ctx2) {
     const w = ledgerOf(ctx2);
@@ -2255,9 +2409,9 @@ ${guideOr("Main", "STATUS.RECENT_POINT", () => `Recent Baekilmong point transact
   var homeshopStatus = () => ({ ready: !!art, loading: !!loading4, progress: progress2, failed: failed2 });
   function bytesOf(b64) {
     const bin = atob(b64);
-    const out = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-    return out;
+    const out2 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out2[i] = bin.charCodeAt(i);
+    return out2;
   }
   function load3(b64) {
     return new Promise((res, rej) => {
@@ -3382,91 +3536,4 @@ ${nick}: ${text5.slice(0, 200)}`;
       }
       at.set(messageKey(m, i), cur);
     });
-    return { at, last: cur };
-  }
-  var realOf = (iso) => {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "";
-    const p2 = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(d);
-    const g2 = (t) => p2.find((x) => x.type === t)?.value ?? "";
-    return `${g2("year")}.${g2("month")}.${g2("day")} ${g2("hour")}:${g2("minute")}`;
-  };
-  var whenLabel = (w, anchor, iso) => (anchor ? w.at.get(anchor) : "") || w.last || realOf(iso);
-  var sourceLine = (it, w) => [FROM_NAME[it.from], whenLabel(w, it.anchor, it.at), Number.isSafeInteger(it.price) ? `₩ ${it.price.toLocaleString("en-US")}` : ""].filter(Boolean).join(" · ");
-  function useQueue(ctx2) {
-    return ctx2.chat.scriptstate?.[ITEM_USE_AT_VAR] ? [] : readItemUse(ctx2.chat.scriptstate);
-  }
-  var leftOf = (ctx2, it) => itemLeft(itemsOf(ctx2), it, aliveAnchors(ctx2.chat));
-  function itemsTab(ctx2) {
-    const SUBS2 = [["wallet", "가계부"], ["points", "포인트"], ["items", "소지품"]].filter(([v]) => v === "wallet" ? walletOn(ctx2) : v === "points" ? pointsOn(ctx2.chat) : invOn(ctx2.chat.scriptstate));
-    if (SUBS2.length && !SUBS2.some(([v]) => v === itemsUi.sub)) itemsUi.sub = SUBS2[0][0];
-    const tabs2 = `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist">${SUBS2.map(([v, l]) => `<button role="tab" class="ph-sub${itemsUi.sub === v ? " on" : ""}" data-action="items-sub" data-value="${v}" aria-selected="${itemsUi.sub === v}" aria-pressed="${itemsUi.sub === v}">${l}</button>`).join("")}</div>`;
-    const note2 = toast("items", itemsUi.info, (t) => {
-      if (itemsUi.info === t) itemsUi.info = "";
-    });
-    if (itemsUi.sub === "wallet" || itemsUi.sub === "points") {
-      const kind = itemsUi.sub === "points" ? "p" : "won";
-      walletUi.kind = kind;
-      const drawer2 = isPhone() && (kind === "p" || walletOn(ctx2)) ? drawerBox(walletTools(ctx2), "gx-rdrawer") : "";
-      return `<main class="gx-body gx-records gx-items">${tabs2}${walletPane(ctx2, kind)}${note2}</main>${drawer2}`;
-    }
-    const notice2 = itemsUi.notice ? `<div class="gx-err" role="alert">${esc17(itemsUi.notice)}</div>` : "";
-    const drawer = isPhone() ? drawerHtml(`${addButton("ph-tool")}${mergeButton(ctx2, "ph-tool")}`, "", "gx-idrawer") : "";
-    const fix = !isPhone() && itemsUi.view === "grid" ? " it-fix" : "";
-    return `<main class="gx-body gx-records gx-items${fix}">${tabs2}${notice2}${itemsPane(ctx2)}${note2}</main>${popup(ctx2)}${drawer}`;
-  }
-  var addButton = (cls) => `<button class="${cls} it-add" data-action="items-add" aria-label="직접 넣기">${ICONS.plus}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">직접 넣기</span></button>`;
-  var mergeMates = (ctx2, it) => liveOf(ctx2).filter((o) => canMerge(it, o));
-  function mergeButton(ctx2, cls) {
-    const live = liveOf(ctx2);
-    const any2 = live.some((a) => live.some((b) => canMerge(a, b)));
-    return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any2 ? "" : "disabled"}>${ICONS.refresh}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">합치기</span></button>`;
-  }
-  function statsRow(ctx2, live) {
-    const carried = gridItems(live).length;
-    const slots = itemSlots(ctx2.chat.scriptstate);
-    const over = Math.max(0, carried - slots);
-    return `<div class="it-stats"><span class="it-stat${over ? " over" : ""}" title="칸 ${carried} / ${slots}${over ? ` (${over}칸 넘침)` : ""}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small>${over ? `<em>+${over}</em>` : ""}</span>${weightPill(ctx2, live)}</div>`;
-  }
-  function itemsPane(ctx2) {
-    const seg6 = (v, label2) => `<button class="gx-seg${itemsUi.view === v ? " on" : ""}" data-action="items-view" data-value="${v}" aria-pressed="${itemsUi.view === v}">${label2}</button>`;
-    const tools = `<div class="gx-rec-tools gx-wt-tools it-tools">
-    <div class="gx-segs gx-segs-sm it-segs">${seg6("grid", "물건")}${seg6("log", "기록")}</div>
-    <span class="it-right">${isPhone() ? "" : `${addButton("it-act")}${mergeButton(ctx2, "it-act")}`}<input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc17(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기"></span>
-  </div>`;
-    const st = itemIconStatus();
-    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc17(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 기본 아이콘으로 보여요. (${esc17(st.failed)})</p>` : "";
-    if (itemsUi.view === "log") return `${tools}${picNote}<div class="it-body">${logList(ctx2)}</div>`;
-    return `${tools}${picNote}${equipBox(ctx2, "items")}<div class="it-scrollwrap"><div class="it-body it-scroll">${gridHtml(ctx2)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div></div>`;
-  }
-  function weightPill(ctx2, live) {
-    const items = itemsOf(ctx2);
-    const alive = aliveAnchors(ctx2.chat);
-    const w = totalWeight(live, (e) => itemLeft(items, e, alive));
-    const cap = itemCarry(ctx2.chat.scriptstate);
-    const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
-    const num8 = (n3) => String(Number(n3.toFixed(1)));
-    return `<span class="it-stat it-wgt${w > cap ? " over" : ""}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ""} title="무게 ${num8(w)}kg / 소지 한도 ${num8(cap)}kg${w > cap ? ` (${num8(w - cap)}kg 넘음)` : ""}">${ICONS.weight}<b>${num8(w)}</b><small>/ ${num8(cap)}kg</small></span>`;
-  }
-  var avatarHtml = () => "";
-  function setAvatarHtml(fn2) {
-    avatarHtml = fn2;
-  }
-  function equipBox(ctx2, where2, sel = "") {
-    const { av, slots } = equipParts(ctx2, where2, sel);
-    if (where2 === "sell") return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ""}${slots}</div></section>`;
-    return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av" data-drop="auto">${av}</div>` : ""}<div class="it-eqcol" data-drop="auto">${statsRow(ctx2, liveOf(ctx2))}${slots}</div>${isPhone() ? "" : useBox(ctx2)}</div></section>`;
-  }
-  function equipParts(ctx2, where2, sel = "") {
-    const items = itemsOf(ctx2);
-    const alive = aliveAnchors(ctx2.chat);
-    const live = liveItems(items, alive);
-    const eq = equippedOf(live);
-    let when3;
-    const slot = (k, i) => {
-      const it = eq[k][i];
-      if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${k === "weapon" ? ICONS.hand : ICONS.gear}</span></div>`;
-      const act2 = where2 === "sell" ? "shop-sell-pick" : "items-open";
-      const left = itemLeft(items, it, alive);
-      when3 ??= whenOf(ctx2);
-      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc17(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhon
+    return { at

@@ -1,4 +1,93 @@
- .hs-l3 .nm { padding-top: 14px; }
+연어 마켓 본문: 구분선은 본문 칸 아래가 아니라 단추 줄 위에 전체 너비로 */
+.bs-sm .detail > .info .body { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.bs-sm .detail > .qna { border-top: 1px solid #e4ddd3; padding-top: 14px; }
+/* 연어 마켓 본문: 왼쪽 = 사진 + 판매자, 오른쪽 = 제목(크게)·값·날짜·본문 (2026-11-10 사용자: 윗부분이 어정쩡). 제목은 위 공통 초기화(.bs .gn-post-title)가 크기를 지워 본문 글씨만 했다 */
+.bs-sm .detail > .side { min-width: 0; }
+.bs-sm .detail > .side .seller { margin-top: 10px; padding: 10px 12px; border: 1px solid #e4ddd3; border-radius: 8px; background: #fbf9f5; }
+.bs-sm .detail > .side .seller small { margin-top: 2px; }
+.bs-sm .detail > .qna > .act { margin-top: 0; }
+.bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight: 800; line-height: 1.35; letter-spacing: -.5px; }
+.bs-sm .detail .price { margin: 0 0 6px; font-size: 19px; }
+.bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
+
+/* ── 망상홈쇼핑 (2026-11-11). 사이트 틀은 목업 기획 C안 바탕(빨간 머리띠·방송 칸+채팅·상품 칸·주문 단추·그림 든 편성 카드), 방송 칸 안 글자만 도트. 방송 칸은 ui/hsplayer.ts 가 꽂는다 ── */
+.hs { --hs-ink: #0b0513; --hs-night: #151320; --hs-iron: #3a3842; --hs-wine: #60131b; --hs-red: #b33031; --hs-hot: #d35544; --hs-gold: #eeb76c; --hs-cream: #f4e6c8; --hs-brown: #311d24; --hs-yel: #ffd23e; --hs-dim: #8a7f88;
+  --bg: #120a0c; --card: #1c1114; --card2: #24161a; --line: #3d1f25; --line2: #5a2a30; --r1: #d4142f; --r2: #8a0a1f; --y: #ffd400; --tx: #f3eaea; --sub: #b9a3a7; --pink: #ff9aa5;
+  position: relative; background: var(--bg); color: var(--tx); min-height: 100%; font-size: 14px; line-height: 1.5; }
+.hs *, .hs *::before, .hs *::after { box-sizing: border-box; }
+.hs img, .hs canvas { image-rendering: pixelated; }
+.hs button:disabled { opacity: .45; cursor: default; }
+/* 머리띠 */
+.hs .hs-gnb { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 22px; height: 58px; padding: 0 22px; background: linear-gradient(180deg, var(--r1), var(--r2)); border-bottom: 1px solid #4a0612; box-shadow: 0 1px 0 #ffd40055 inset, 0 6px 18px #0008; }
+.hs .hs-logo { font-weight: 900; font-size: 24px; letter-spacing: -1.2px; color: #fff; white-space: nowrap; text-shadow: 0 2px 0 #5a0613; }
+.hs .hs-logo i { font-style: normal; color: var(--y); }
+.hs .hs-menu { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+.hs .hs-menu button { position: relative; padding: 0 12px; color: #ffe9ec; font-weight: 700; font-size: 14.5px; white-space: nowrap; }
+.hs .hs-menu button:hover { color: #fff; }
+.hs .hs-menu button.on { color: #fff; }
+.hs .hs-menu button.on::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 0; height: 4px; background: var(--y); border-radius: 2px 2px 0 0; }
+.hs .hs-tel { display: grid; justify-items: end; line-height: 1.15; font-weight: 800; font-size: 18px; letter-spacing: .3px; color: var(--y); white-space: nowrap; }
+.hs .hs-tel small { font-weight: 600; font-size: 10.5px; color: #ffd9dd; letter-spacing: .5px; }
+.hs .hs-wrap { max-width: 1060px; margin: 0 auto; padding: 16px 18px 28px; }
+.hs .hs-err, .hs .hs-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid var(--line2); border-left: 4px solid var(--r1); border-radius: 6px; background: var(--card); font-size: 13px; word-break: break-word; }
+.hs .hs-err span { flex: 1; min-width: 0; }
+.hs .hs-err button { flex: none; padding: 5px 10px; border: 1px solid var(--line2); border-radius: 4px; font-weight: 700; font-size: 12.5px; }
+.hs .hs-info { margin-top: 12px; border-left-color: var(--y); }
+/* 방송 칸 + 채팅 */
+.hs .hs-bd { display: grid; grid-template-columns: auto minmax(250px, 1fr); gap: 14px; align-items: stretch; }
+.hs .hs-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; width: min-content; }
+.hs .hs-tv { border: 1px solid var(--line2); border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 10px 30px #0009; }
+.hs .hs-bar { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; background: linear-gradient(180deg, #2a1318, #1a0c0f); border-bottom: 1px solid var(--line); font-size: 13px; }
+.hs .hs-bar b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.hs .hs-on { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 7px; border-radius: 3px; background: #e0263b; color: #fff; font: 800 11.5px ui-monospace, monospace; letter-spacing: .5px; }
+.hs .hs-on::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: hs-blink 1.2s steps(2) infinite; }
+.hs .hs-on.off { background: #3a2a2d; color: var(--sub); }
+.hs .hs-on.off::before { animation: none; background: var(--sub); }
+@keyframes hs-blink { 50% { opacity: .2; } }
+.hs .hs-pt { color: var(--y); font-weight: 800; white-space: nowrap; }
+.hs .hs-pt i { font-style: normal; font-weight: 500; color: var(--sub); }
+.hs .hs-nx { height: 26px; padding: 0 10px; border: 1px solid var(--line2); border-radius: 4px; background: var(--card); color: #eee; font-weight: 800; font-size: 12.5px; white-space: nowrap; }
+.hs .hs-nx:hover { background: var(--card2); }
+.hs:has(.hs-scr[data-wait="1"]) .hs-nx { border-color: var(--y); color: #1a0c0f; background: var(--y); animation: hs-nx 1.4s ease-in-out infinite; }
+@keyframes hs-nx { 50% { opacity: .55; } }
+.hs .hs-tv .hs-mount { display: grid; place-items: center; width: 100%; background: #000; }
+.hs .hs-scr { position: relative; overflow: hidden; background: #000; -webkit-font-smoothing: none; }
+.hs .hs-cv { display: block; width: 100%; height: 100%; }
+.hs .hs-scr.fit .hs-cv { image-rendering: auto; }
+.hs .hs-scan { position: absolute; inset: 0; background: repeating-linear-gradient(transparent 0 1px, rgba(0, 0, 0, .18) 1px 2px); pointer-events: none; }
+.hs .hs-scr.noscan .hs-scan { display: none; }
+.hs .hs-cg { position: absolute; left: 0; top: 0; transform-origin: 0 0; color: var(--hs-cream); font-size: 16px; line-height: 16px; }
+.hs .hs-cg > div { position: absolute; }
+.hs .hs-lg { left: 8px; top: 8px; display: flex; }
+.hs .hs-lg b { background: var(--hs-wine); color: var(--hs-gold); padding: 4px 6px; border: 2px solid var(--hs-gold); font-weight: normal; }
+.hs .hs-lg i { background: var(--hs-gold); color: var(--hs-ink); padding: 4px 6px; border: 2px solid var(--hs-gold); font-style: normal; }
+.hs .hs-live { right: 8px; top: 8px; background: var(--hs-red); color: #fff; padding: 4px 6px 4px 18px; border: 2px solid #fff; }
+.hs .hs-live::before { content: ""; position: absolute; left: 6px; top: 8px; width: 6px; height: 6px; background: #fff; }
+.hs .hs-soon { right: 8px; top: 40px; background: var(--hs-yel); color: var(--hs-ink); padding: 4px 6px; border: 2px solid var(--hs-ink); box-shadow: 2px 2px 0 #000; }
+.hs .hs-soon.sold { background: var(--hs-red); color: #fff; }
+.hs .hs-left { right: 8px; top: 68px; background: var(--hs-ink); color: var(--hs-yel); padding: 4px 6px; border: 2px solid var(--hs-yel); }
+.hs .hs-board { background: var(--hs-wine); border: 2px solid var(--hs-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.hs .hs-board.hs-bA { left: 177px; top: 130px; width: 160px; height: 85px; }
+.hs .hs-board.hs-bB { right: 8px; top: 100px; width: 160px; height: 85px; box-shadow: 2px 2px 0 #000; }
+.hs .hs-board .big { font-size: 32px; line-height: 32px; color: var(--hs-yel); text-shadow: 2px 2px 0 #000; }
+.hs .hs-board .sm { color: var(--hs-cream); }
+.hs .hs-call { left: 8px; top: 40px; background: var(--hs-ink); color: var(--hs-yel); padding: 4px 6px; border: 2px solid var(--hs-yel); }
+.hs .hs-note { inset: 0; display: grid; place-items: center; }
+.hs .hs-note b { background: var(--hs-ink); color: #fff; padding: 6px 10px; border: 2px solid #fff; font-weight: normal; }
+/* 아래 띠: 자막 + 상품 이름표. 바스트·전화 컷은 그림 아래 끝(y296)을 띠 바탕으로 덮는다 */
+.hs .hs-band { left: 0; right: 0; bottom: 0; padding: 8px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 6px; }
+.hs .hs-band.hs-kB, .hs .hs-band.hs-kD { min-height: 96px; background-image: repeating-conic-gradient(var(--hs-wine) 0 25%, var(--hs-brown) 0 50%); background-size: 2px 2px; border-top: 2px solid var(--hs-gold); }
+.hs .hs-band.hs-t { gap: 18px; }
+/* 와이드 컷: 자막이 진열대 위 상품을 가리지 않게 위쪽(로고 아래)으로 */
+.hs .hs-band.hs-kA { top: 0; pointer-events: none; }
+.hs .hs-band.hs-kA .hs-sub { margin-top: 28px; margin-bottom: auto; max-width: 352px; }
+/* 폰 와이드 컷: 자막은 한 줄만(끝 줄), 진행자 얼굴을 덮지 않게 */
+.hs .hs-scr.sm .hs-band.hs-kA .hs-sub { margin-top: 22px; max-width: 100%; max-height: 22px; }
+.hs .hs-sub { max-width: 100%; background: var(--hs-ink); color: #fff; padding: 4px 6px; border: 2px solid var(--hs-ink); line-height: 18px; word-break: keep-all; overflow-wrap: anywhere; visibility: hidden; }
+.hs .hs-sub.on { visibility: visible; }
+.hs .hs-l3 { align-self: stretch; display: flex; gap: 6px; align-items: flex-end; }
+.hs .hs-l3 .nm { flex: 1; min-width: 0; background: var(--hs-cream); color: var(--hs-ink); border: 2px solid var(--hs-ink); box-shadow: 2px 2px 0 #000; position: relative; padding: 6px 8px; }
+.hs .hs-band.hs-t .hs-l3 .nm { padding-top: 14px; }
 .hs .hs-l3 .tag { position: absolute; left: -2px; top: -14px; background: var(--hs-red); color: #fff; padding: 3px 6px; border: 2px solid var(--hs-ink); }
 .hs .hs-l3 .n { margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hs .hs-l3 .p2 { white-space: nowrap; overflow: hidden; }
@@ -491,13 +580,13 @@
   }
   var turn2 = (a, b) => Math.abs(Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1]) * 180 / Math.PI);
   function join2(vs) {
-    const out = [];
+    const out2 = [];
     for (const v of vs) {
-      const p2 = out[out.length - 1];
-      if (p2 && turn2(p2, v) < 40) out[out.length - 1] = [p2[0] + v[0], p2[1] + v[1]];
-      else out.push(v);
+      const p2 = out2[out2.length - 1];
+      if (p2 && turn2(p2, v) < 40) out2[out2.length - 1] = [p2[0] + v[0], p2[1] + v[1]];
+      else out2.push(v);
     }
-    return out;
+    return out2;
   }
   function readStroke(pts3) {
     if (pts3.length < 2) return null;
@@ -1857,18 +1946,18 @@ ${note2.trim()}` : card3;
   function panelInput(el) {
     if (el?.dataset?.input === "dim" && root2) {
       paintVeil(root2, Number(el.value));
-      const out = el.parentElement?.querySelector("output");
-      if (out) out.textContent = `${el.value}%`;
+      const out2 = el.parentElement?.querySelector("output");
+      if (out2) out2.textContent = `${el.value}%`;
       return;
     }
     if (el?.dataset?.input === "pp-cap") {
-      const out = el.parentElement?.querySelector("output");
-      if (out) out.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
+      const out2 = el.parentElement?.querySelector("output");
+      if (out2) out2.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
       return;
     }
     if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
-      const out = el.parentElement?.querySelector("output");
-      if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
+      const out2 = el.parentElement?.querySelector("output");
+      if (out2) out2.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
       return;
     }
     if (el?.dataset?.input === "wallet-q" && view.kind === "started") {
@@ -3414,7 +3503,7 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
   // src/core/progplan.ts
   function turnPlan(char, chat) {
     const ss = chat.scriptstate;
-    const out = [];
+    const out2 = [];
     const pp = peopleSettings(ss);
     let hasPeople = false;
     try {
@@ -3423,35 +3512,35 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
       hasPeople = false;
     }
     if (pp.on && hasPeople) {
-      if (pp.router === "model") out.push({ id: "router", label: "라우터", group: "router", match: ["라우터"] });
-      if (pp.director === "scene" || pp.director === "facts") out.push({ id: "director", label: "디렉터", group: "director", match: ["디렉터"] });
+      if (pp.router === "model") out2.push({ id: "router", label: "라우터", group: "router", match: ["라우터"] });
+      if (pp.director === "scene" || pp.director === "facts") out2.push({ id: "director", label: "디렉터", group: "director", match: ["디렉터"] });
     }
-    out.push(MAIN_STAGE);
-    if (pp.on && pp.when === "turn") out.push({ id: "update", label: "갱신기", group: "update", match: ["갱신기", "정리"] });
+    out2.push(MAIN_STAGE);
+    if (pp.on && pp.when === "turn") out2.push({ id: "update", label: "갱신기", group: "update", match: ["갱신기", "정리"] });
     const basic = basicSettings(char.globalLore, ss);
-    if (basic.assetOn && basic.assetModel === "aux") out.push({ id: "asset", label: "이미지 태그", group: "update", match: ["이미지 태그 보충"] });
-    if (wikiSettings(ss).auto === "turn") out.push({ id: "wiki", label: "위키", group: "update", match: ["위키 제목", "위키 글"] });
+    if (basic.assetOn && basic.assetModel === "aux") out2.push({ id: "asset", label: "이미지 태그", group: "update", match: ["이미지 태그 보충"] });
+    if (wikiSettings(ss).auto === "turn") out2.push({ id: "wiki", label: "위키", group: "update", match: ["위키 제목", "위키 글"] });
     const autoLabel = (k, l) => k === "phone" ? "괴담톡 확인" : l;
     for (const group4 of jointGroups(ss)) {
       const labels = group4.map((t) => JOINT_LABEL[t.kind]);
       const calls = [.../* @__PURE__ */ new Set([...group4.map((t) => autoLabel(t.kind, JOINT_LABEL[t.kind])), ...labels])];
-      if (group4.length > 1) out.push({ id: `joint:${group4.map((t) => t.kind).join("+")}`, label: "통합", group: "net", note: labels.join(" · "), match: [...jointNames(labels), ...calls] });
-      else out.push({ id: `net:${group4[0].kind}`, label: labels[0], group: "net", match: calls });
+      if (group4.length > 1) out2.push({ id: `joint:${group4.map((t) => t.kind).join("+")}`, label: "통합", group: "net", note: labels.join(" · "), match: [...jointNames(labels), ...calls] });
+      else out2.push({ id: `net:${group4[0].kind}`, label: labels[0], group: "net", match: calls });
     }
-    if (viewSettings(ss).auto === "turn") out.push({ id: "view", label: "관전", group: "net", match: ["관전"] });
+    if (viewSettings(ss).auto === "turn") out2.push({ id: "view", label: "관전", group: "net", match: ["관전"] });
     for (const site of MALL_SITES) {
-      if (mallAutoTurn(chat, site)) out.push({ id: `mall:${site}`, label: MALL_NAME[site], group: "net", match: [`${MALL_NAME[site]} 진열`] });
+      if (mallAutoTurn(chat, site)) out2.push({ id: `mall:${site}`, label: MALL_NAME[site], group: "net", match: [`${MALL_NAME[site]} 진열`] });
     }
-    return out;
+    return out2;
   }
   function jointNames(labels) {
-    const out = [];
+    const out2 = [];
     const walk = (pick4, rest) => {
-      if (pick4.length >= 2) out.push(`${pick4.join("+")} 통합`);
+      if (pick4.length >= 2) out2.push(`${pick4.join("+")} 통합`);
       rest.forEach((l, i) => walk([...pick4, l], [...rest.slice(0, i), ...rest.slice(i + 1)]));
     };
     walk([], labels);
-    return out;
+    return out2;
   }
 
   // src/core/sanitize.ts
@@ -3470,7 +3559,7 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     try {
       if (!Array.isArray(messages)) return messages;
       let changed = false;
-      const out = messages.map((m) => {
+      const out2 = messages.map((m) => {
         try {
           const c = m?.content;
           if (typeof c !== "string") return m;
@@ -3487,7 +3576,7 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
           return m;
         }
       });
-      return changed ? out : messages;
+      return changed ? out2 : messages;
     } catch {
       return messages;
     }
@@ -3510,7 +3599,7 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     for (const m of before) left.set(str10(m), (left.get(str10(m)) ?? 0) + 1);
     const rest = before.filter((m) => !after.some((a) => str10(a) === str10(m)));
     const used = /* @__PURE__ */ new Set();
-    const out = [];
+    const out2 = [];
     for (const m of after) {
       const t = str10(m);
       const n3 = left.get(t) ?? 0;
@@ -3539,15 +3628,18 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
       if (best >= 0 && score2 >= 20) {
         used.add(best);
         const mid = t.slice(cut3[0], t.length - cut3[1]);
-        if (mid) out.push(mid);
-      } else out.push(t);
+        if (mid) out2.push(mid);
+      } else out2.push(t);
     }
-    return out;
+    return out2;
   }
   async function onBeforeRequest(messages, type) {
     if (type !== "model" || !Array.isArray(messages)) return messages;
     if (faultOn("beforeRequest")) throw new Error("시험용 예외 주입(beforeRequest)");
-    if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
+    if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) {
+      if (isWaiting()) setWaiting(true);
+      return sanitize(messages);
+    }
     const input0 = messages;
     const failed4 = [];
     let added;
@@ -3571,11 +3663,13 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     };
     try {
       setWaiting(true);
+      setUseLockAt(null);
       setOpeningHint(null);
       let ctx2 = null;
       if (liteNow) {
         await stepAsync("호출 기록", () => traceBegin(), void 0);
         ctx2 = await stepAsync("채팅 읽기", () => loadContext(), null);
+        if (ctx2) setUseLockAt(ctx2);
         if (ctx2) step("진행 계획", () => progressPlan(turnPlan(ctx2.char, ctx2.chat)), void 0);
       }
       if (messages.some((m) => m?.role === "user" && (hasSceneCard(m.content) || hasCall(m.content)))) {
@@ -3627,173 +3721,4 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     } catch (error) {
       failed4.push(`전체(${reason2(error)})`);
     }
-    if (failed4.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed4.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
-    const out = sanitize(messages);
-    if (liteNow) step("호출 기록", () => traceMain(out, failed4, added), void 0);
-    lastAdded = new Set(insertedSystemTexts(input0, out));
-    return out;
-  }
-  function stripAllImgTags(messages) {
-    let changed = false;
-    const out = messages.map((m) => {
-      if (!m || m.role === "system" || typeof m.content !== "string" || !m.content.includes("<img=")) return m;
-      changed = true;
-      return { ...m, content: m.content.replace(/<img=.*?>/g, "") };
-    });
-    return changed ? out : messages;
-  }
-  function sanitize(messages) {
-    return stripMarkers(messages, { worldTags: liteNow });
-  }
-  var userOrTag = () => userInfo().name || void 0;
-  function loreFor(char, chat0, input3) {
-    const chat = chat0.message?.some((m) => isSceneMessage(m.data)) ? { ...chat0, message: chat0.message.filter((m) => !isSceneMessage(m.data)) } : chat0;
-    const mode2 = advValue(chat.scriptstate, "gen", "lore_mode");
-    const player = playerAgent(char.globalLore, chat.scriptstate);
-    return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode2, userOrTag()), input: input3, ...player ? { exclude: [player.lore] } : {} });
-  }
-  async function storeLore(charIndex, chatIndex, input3, known) {
-    let char = known?.char ?? await getChar(charIndex);
-    if (!char || !isGoeiLore(char.globalLore)) return;
-    const cur0 = known?.chat ?? await risuai.getChatFromIndex(charIndex, chatIndex);
-    const mode2 = advValue(cur0?.scriptstate, "gen", "lore_mode");
-    if (syncDecorators(char.globalLore, mode2)) {
-      await updateCharacterLore(charIndex, (lore) => {
-        const next = syncDecorators(withWorldLore(lore), mode2);
-        return next ? stripVirtual(next) : null;
-      });
-      char = await getChar(charIndex) ?? char;
-    }
-    if (!hasSlots(stripVirtual(char.globalLore ?? []))) return;
-    const c = char;
-    await updateChat(charIndex, chatIndex, (cur) => {
-      const got = loreFor(c, cur, input3);
-      if (!got || sameVars(cur.scriptstate, got.vars)) return null;
-      return { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...got.vars } };
-    });
-  }
-  async function onInput(text5) {
-    if (!liteNow || typeof text5 !== "string") return text5;
-    try {
-      await storeLore(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex(), text5);
-    } catch (error) {
-      console.log(`[goei] 로어북 고르기 실패: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    return text5;
-  }
-  function greetingOf(char, chat) {
-    const first = chat.message?.[0];
-    if (first?.role === "char" && isSceneMessage(first.data)) return stripSceneMark(String(first.data));
-    const fm = Number(chat.fmIndex);
-    const alt = char.alternateGreetings;
-    const text5 = Number.isInteger(fm) && fm >= 0 ? alt?.[fm] : typeof char.firstMessage === "string" ? char.firstMessage : void 0;
-    return typeof text5 === "string" ? text5 : "";
-  }
-  function fixLore(messages, { char, chat }) {
-    const got = loreFor(char, chat);
-    const real2 = stripVirtual(char.globalLore ?? []);
-    if (hasSlots(real2)) {
-      if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
-      return patchSlots(messages, chat.scriptstate, got.vars).messages;
-    }
-    const parts = [];
-    const env3 = { vars: chat.scriptstate ?? {}, char: char.name, user: userOrTag() };
-    const cols = usedCols(colConfig(chat.scriptstate));
-    for (const b of ALWAYS_BOOKS) {
-      const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
-      if (e && typeof e.content === "string") parts.push({ order: b.order, text: evaluate(b.kind === "tag" ? fillStatusSection(e.content, cols) : e.content, env3) });
-    }
-    const seedRaw = String(chat.scriptstate?.["$seed_lore"] ?? "");
-    let seed2 = seedRaw && shouldKeepSeed(chat) && !real2.some((e) => e.comment === "📕Start Lore") ? seedBody(seedRaw, env3) : "";
-    const me = playerAgent(char.globalLore, chat.scriptstate);
-    const mine3 = me ? (char.globalLore ?? []).find((e) => e.mode !== "folder" && e.comment === me.lore) : void 0;
-    if (seed2 && mine3 && typeof mine3.content === "string") {
-      const text5 = stripDecorators(evaluate(mine3.content, env3)).trim();
-      if (text5) seed2 = seed2.split(text5).join("").replace(/\n{3,}/g, "\n\n").trim();
-    }
-    if (seed2) parts.push({ order: 399, text: `${SEED_OPEN}
-${seed2}
-${SEED_CLOSE}` });
-    if (got) {
-      const picks = seed2 ? got.picks.filter((p2) => !seed2.includes(stripDecorators(evaluate(p2.entry.content, env3)).trim())) : got.picks;
-      const texts = picks.length === got.picks.length ? Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ""])) : slotTexts(picks, env3);
-      const note2 = activeAnomalyNote().trim();
-      if (note2 && texts.anomaly?.trim() && !texts.anomaly.includes(note2)) texts.anomaly = `${note2}
-
-${texts.anomaly}`;
-      parts.push(...slotParts(texts));
-    }
-    if (!messages.some((m) => typeof m?.content === "string" && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guidePrompt("RP") });
-    const first = chat.message?.find((m) => typeof m.data === "string" && m.data.trim())?.data;
-    return insertLoreBlock(messages, joinLoreBlock(parts), [greetingOf(char, chat), first ? messageText(first) : ""]);
-  }
-  async function withPlayer(messages, { char, chat }) {
-    const agent = playerAgent(char.globalLore, chat.scriptstate);
-    if (!agent) return messages;
-    const env3 = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
-    const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env3), await readPersona(), userInfo().name, agent.name);
-    return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
-  }
-  function statusShape({ chat }) {
-    const vars = chat.scriptstate ?? {};
-    const cfg = colConfig(vars);
-    const w = cfg.wallet !== "off" ? readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT) : null;
-    const alive = aliveAnchors(chat);
-    const p2 = cfg.points !== "off" ? readPoints(vars) : null;
-    return {
-      cols: usedCols(cfg),
-      wallet: w ? walletBalance(w, alive) : null,
-      ...w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {},
-      ...p2 ? { points: walletBalance(p2, alive), recentPoints: recentPointLines(p2, alive, walletRecentN(vars)) } : {}
-    };
-  }
-  function knownIdentity({ chat }) {
-    if (!peopleSettings(chat.scriptstate).on) return "";
-    return identityText(peopleStore(chat).identity);
-  }
-  async function withPeople2(messages, { char, chat }) {
-    const settings = peopleSettings(chat.scriptstate);
-    if (!settings.on) return messages;
-    const store3 = peopleStore(chat);
-    if (!Object.keys(store3.people).length) return messages;
-    const me = playerAgent(char.globalLore, chat.scriptstate);
-    const lastUser = [...messages].reverse().find((m) => m?.role === "user");
-    const input3 = typeof lastUser?.content === "string" ? lastUser.content : "";
-    const user = me?.name || userInfo().name || "주인공";
-    const env3 = { vars: chat.scriptstate ?? {}, char: char.name, user: userOrTag() };
-    const sheetOf2 = (name) => {
-      const e = (char.globalLore ?? []).find((x) => x.mode !== "folder" && x.comment === name && typeof x.content === "string");
-      const text5 = e ? stripDecorators(evaluate(e.content, env3)).trim() : "";
-      return text5 || bookText({ char, chat }, name) || null;
-    };
-    const routed = await routerPeople(chat, store3, input3, settings, me?.name ? [me.name] : [], sheetOf2).catch(() => null);
-    const opts = { settings, store: store3, sheetOf: sheetOf2, temperOf, extraNames: extraNames2(), input: input3, user, factionNames: factionNamesOf(char.globalLore), ...routed ? { people: routed } : {} };
-    let out = withPeopleBlock(messages, chat, opts);
-    if (settings.director === "scene" || settings.director === "facts") {
-      const { people } = peopleBlockFor(chat, opts);
-      const note2 = await directorNoteText(chat, store3, people, input3, settings, user, char.globalLore, char).catch(() => "");
-      if (note2) out = insertBlock(out, note2);
-    }
-    return out;
-  }
-  function appendImgPrompt(messages, text5) {
-    let end = messages.length;
-    while (end > 0 && messages[end - 1]?.role === "assistant") end--;
-    const add = { role: "system", content: text5 };
-    return end === messages.length || end === 0 ? [...messages, add] : [...messages.slice(0, end), add, ...messages.slice(end)];
-  }
-  function withImgPrompt(messages, { char, chat }) {
-    const s8 = basicSettings(char.globalLore, chat.scriptstate);
-    const out = stripImgLore(messages);
-    if (!s8.assetOn || s8.assetModel !== "main") return out;
-    const cfg = imgPromptConfig(getPrefs());
-    const me = playerAgent(char.globalLore, chat.scriptstate);
-    const names4 = imgCharacters(char.globalLore, cfg, { assetPlayer: s8.assetPlayer, playerEnglish: me?.english || void 0, userName: userInfo().name });
-    if (!names4.length) return out;
-    return appendImgPrompt(out, evaluate(buildImgPrompt(cfg, names4, s8.assetPlayer), { vars: chat.scriptstate ?? {}, char: char.name, user: me?.name || userOrTag() }));
-  }
-  function moduleContext(scene2, { char, chat }) {
-    const ss = chat.scriptstate;
-    const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view: view2 }) => !!view2.scriptstate?.[GN_RAW] && gnetSettings(view2.scriptstate).context);
-    const wantGnet = boardsOn.length > 0;
-    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS
+    if (failed4.length) con

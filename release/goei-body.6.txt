@@ -1,4 +1,17 @@
-eof Error ? error.message : String(error)}`);
+lientY ?? -1)), { passive: true });
+    } catch {
+      listening = false;
+    }
+  }
+  async function dispatch(doc2, x, y) {
+    for (const h of handlers.values()) {
+      if (!h.armed) continue;
+      try {
+        const r = await h.run(doc2, x, y);
+        if (r === "idle") h.armed = false;
+        else if (r) return;
+      } catch (error) {
+        console.log(`[goei] 채팅 클릭 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   }
@@ -8,9 +21,9 @@ eof Error ? error.message : String(error)}`);
     const sa = got;
     if (!sa || typeof sa.length !== "function" || typeof sa.at !== "function") return [];
     const n3 = await sa.length();
-    const out = [];
-    for (let i = 0; i < n3; i++) out.push(await sa.at(i));
-    return out;
+    const out2 = [];
+    for (let i = 0; i < n3; i++) out2.push(await sa.at(i));
+    return out2;
   }
   async function hit2(el, x, y) {
     const r = await el.getBoundingClientRect().catch(() => null);
@@ -60,15 +73,15 @@ eof Error ? error.message : String(error)}`);
     return { kind: "", ...words(raw) };
   }
   function parseIconAliases(text5) {
-    const out = {};
+    const out2 = {};
     for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const m = /^\s*([^→=:>]+?)\s*(?:→|=>|->|=|:)\s*(.+?)\s*$/.exec(line2);
       if (!m) continue;
       const a = normIcon(m[1]);
       const b = normIcon(m[2]);
-      if (a && b && a !== b) out[a] = b;
+      if (a && b && a !== b) out2[a] = b;
     }
-    return out;
+    return out2;
   }
   var ICON_ALIAS_DEFAULT = ["외투 → 코트", "점퍼 → 재킷", "안정수 → 안정제", "캡슐 → 알약", "영양 바 → 에너지바", "영양바 → 에너지바", "숙취해소제 → 숙취 음료", "택배 → 택배 상자", "소설책 → 책", "알 → 계란", "하이라이터 → 형광펜", "다마고치 → 게임기", "인라인 → 인라인 스케이트", "선스틱 → 선크림", "곱창밴드 → 머리끈", "렌즈케이스 → 콘택트렌즈 통", "콘택트렌즈 → 콘택트렌즈 통", "약상자 → 구급상자", "나이프 → 칼", "정원가위 → 원예 가위", "전지가위 → 원예 가위", "간식 → 과자", "온수매트 → 전기장판", "종이가방 → 쇼핑백", "여행가방 → 캐리어", "햇반 → 즉석밥", "링거팩 → 링거", "인슐린 → 인슐린 펜", "DVD → CD", "바 → 에너지바", "속옷 → 팬티", "내의 → 팬티"].join("\n");
   var aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
@@ -116,8 +129,8 @@ eof Error ? error.message : String(error)}`);
   var TAIL = 0.15;
   var MOD_W = 0.5;
   function iconFrags(s8) {
-    const out = /* @__PURE__ */ new Map();
-    const put = (f, m) => out.set(f, Math.max(out.get(f) ?? 0, m));
+    const out2 = /* @__PURE__ */ new Map();
+    const put = (f, m) => out2.set(f, Math.max(out2.get(f) ?? 0, m));
     let tail2 = "";
     let last2 = "";
     for (const p2 of normIcon(s8).match(/[가-힣]+(?: +[가-힣]+)*|[0-9a-z]+/g) ?? []) {
@@ -142,7 +155,7 @@ eof Error ? error.message : String(error)}`);
         last2 = w;
       }
     }
-    return { set: out, tail: tail2, last: last2 };
+    return { set: out2, tail: tail2, last: last2 };
   }
   function makeFragIndex(rows3, reps, min = ICON_MIN) {
     const df = /* @__PURE__ */ new Map();
@@ -770,7 +783,7 @@ eof Error ? error.message : String(error)}`);
     return messages.map((m, j) => j === i ? { ...m, content: edit(m.content) } : m);
   }
   function craftMessages(messages, s8, texts) {
-    let out = messages;
+    let out2 = messages;
     const steps = texts.thoughts?.trim();
     if (steps && s8.thoughts !== "off") {
       const block5 = s8.thoughts === "note" ? `# Thoughts
@@ -782,24 +795,24 @@ ${guideOr("Common", "THOUGHTS.NOTE_TAIL", NOTE_TAIL)}` : `# Thoughts Guideline
 ${guideOr("Common", "THOUGHTS.INNER_HEAD", INNER_HEAD)}
 
 ${steps}`;
-      out = editSystem(out, (sys) => `${sys}
+      out2 = editSystem(out2, (sys) => `${sys}
 
 ${block5}`);
     }
     const memo2 = texts.memo;
     if (s8.memo && memo2 && memo2.persona.trim()) {
-      out = editSystem(out, (sys) => `${memo2.persona.trim()}
+      out2 = editSystem(out2, (sys) => `${memo2.persona.trim()}
 
 ${memo2.job.trim() ? `# Job Note
 ${memo2.job.trim()}
 
 ` : ""}${sys}`);
       if (memo2.prefill.trim()) {
-        out = [...out, { role: "assistant", content: memo2.prefill.trim() }];
-        if (memo2.prefillUser.trim()) out = [...out, { role: "user", content: memo2.prefillUser.trim() }];
+        out2 = [...out2, { role: "assistant", content: memo2.prefill.trim() }];
+        if (memo2.prefillUser.trim()) out2 = [...out2, { role: "user", content: memo2.prefillUser.trim() }];
       }
     }
-    return out;
+    return out2;
   }
   function memoTexts(read) {
     return { persona: read("MEMO.PERSONA"), job: read("MEMO.JOB"), prefill: read("MEMO.PREFILL"), prefillUser: read("MEMO.PREFILL_USER") };
@@ -935,12 +948,12 @@ ${memo2.job.trim()}
   var hasShopTag = (text5) => typeof text5 === "string" && /\[\s*shop\s*[:：]/iu.test(text5);
   function findShopTag(text5) {
     if (!hasShopTag(text5)) return null;
-    let out = null;
+    let out2 = null;
     for (const m of text5.matchAll(TAG3)) {
       const shop = clean2(m[1], 30);
-      if (shop) out = { raw: m[0], shop, owner: clean2(m[2], 30) };
+      if (shop) out2 = { raw: m[0], shop, owner: clean2(m[2], 30) };
     }
-    return out;
+    return out2;
   }
   function stripShopTags(text5) {
     if (!hasShopTag(text5)) return text5;
@@ -1151,17 +1164,17 @@ ${webRaw}` };
     const cost = costOf(cells2[1] ?? "");
     if (!name || !cost) return null;
     const price = cost.price;
-    const out = { name, price, ...cost.pay ? { pay: cost.pay } : {}, ...traitsOf({ ...shelfTraits(name, cells2[2], cells2[3]), icon: cells2[3], weight: cells2[4] }), desc: clean2(cells2[5], 120), effect: clean2(cells2[6], 60) };
+    const out2 = { name, price, ...cost.pay ? { pay: cost.pay } : {}, ...traitsOf({ ...shelfTraits(name, cells2[2], cells2[3]), icon: cells2[3], weight: cells2[4] }), desc: clean2(cells2[5], 120), effect: clean2(cells2[6], 60) };
     const truth = clean2(cells2[8], 60);
-    if (/^(\?+|모름|unknown|미정)$/i.test(truth)) out.truth = "?";
-    else if (truth && truth !== "-") out.truth = truth;
+    if (/^(\?+|모름|unknown|미정)$/i.test(truth)) out2.truth = "?";
+    else if (truth && truth !== "-") out2.truth = truth;
     const tag = (cells2[7] ?? "").trim();
-    if (/^(희귀|레어|rare)/i.test(tag)) out.tag = "rare";
+    if (/^(희귀|레어|rare)/i.test(tag)) out2.tag = "rare";
     else if (/^(특가|할인|세일|sale)/i.test(tag) && !cost.pay) {
       const was = priceOf(tag.replace(/^[^:：\d]*[:：]?/, ""));
-      if (was !== null && was > price) Object.assign(out, { tag: "sale", was });
+      if (was !== null && was > price) Object.assign(out2, { tag: "sale", was });
     }
-    return out;
+    return out2;
   }
   function block2(raw, tag) {
     const m = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}\\s*>`, "i").exec(raw);
@@ -1200,56 +1213,56 @@ ${webRaw}` };
     const mode2 = modeRaw.toLowerCase();
     const rest = raw.replace(/<owner\b[^>]*>[\s\S]*?<\/owner\s*>/gi, "");
     const mark2 = (tag) => new RegExp(`(?:^|<\\/\\w[\\w-]*\\s*>|\\/>)[ \\t]*<${tag}\\s*\\/?>`, "im").test(rest);
-    const out = { owner, mode: mode2, add: [], reprice: [], remove: [], all: [], closed: mark2("closed") };
+    const out2 = { owner, mode: mode2, add: [], reprice: [], remove: [], all: [], closed: mark2("closed") };
     const of = /<offer\b([^>]*)>([\s\S]*?)<\/offer\s*>|<offer\s+none\s*\/?>/i.exec(raw);
     if (of) {
       const body6 = (of[2] ?? "").trim();
-      if (of[0].toLowerCase().includes("none") || /^(none|no|x|-|거절|안)/i.test(body6)) out.offer = null;
+      if (of[0].toLowerCase().includes("none") || /^(none|no|x|-|거절|안)/i.test(body6)) out2.offer = null;
       else {
         const n3 = priceOf(body6);
-        if (n3 !== null) out.offer = n3;
+        if (n3 !== null) out2.offer = n3;
       }
     }
-    if (mark2("deal")) out.deal = true;
+    if (mark2("deal")) out2.deal = true;
     const ord = block2(raw, "order");
     if (ord) {
       const q = parseOrderLine(ord.split("\n").find((l) => l.includes("|")) ?? "");
-      if (q) out.quote = q;
+      if (q) out2.quote = q;
     }
     const inf = block2(raw, "info");
     if (inf) {
       const [title2 = "", price = "", ...rest2] = inf.split("|");
       const n3 = priceOf(price);
       const text5 = clean2(rest2.join("|"), 400);
-      if (title2.trim() && n3 !== null && n3 > 0 && text5) out.info = { title: clean2(title2, 24), price: n3, body: text5 };
+      if (title2.trim() && n3 !== null && n3 > 0 && text5) out2.info = { title: clean2(title2, 24), price: n3, body: text5 };
     }
     const body5 = m ? m[2] : "";
     if (mode2 === "all") {
-      out.all = body5.split("\n").map(parseLine).filter((x) => !!x);
-      if (!out.all.length) throw new ShopError('mode="all" 인데 물건 줄이 없어요.');
+      out2.all = body5.split("\n").map(parseLine).filter((x) => !!x);
+      if (!out2.all.length) throw new ShopError('mode="all" 인데 물건 줄이 없어요.');
     } else if (mode2 === "partial") {
       for (const line0 of body5.split("\n")) {
         const line2 = line0.trim();
         if (!line2) continue;
         if (line2.startsWith("+")) {
           const it = parseLine(line2.slice(1));
-          if (it) out.add.push(it);
+          if (it) out2.add.push(it);
         } else if (line2.startsWith("~")) {
           const [name, price] = line2.slice(1).split("|").map((c2) => c2.trim());
           const c = costOf(price ?? "");
-          if (name && c) out.reprice.push({ name: clean2(name, 30), ...c });
+          if (name && c) out2.reprice.push({ name: clean2(name, 30), ...c });
         } else if (line2.startsWith("-")) {
           const name = clean2(line2.slice(1), 30);
-          if (name) out.remove.push(name);
+          if (name) out2.remove.push(name);
         }
       }
-      if (!out.add.length && !out.reprice.length && !out.remove.length) out.mode = "none";
+      if (!out2.add.length && !out2.reprice.length && !out2.remove.length) out2.mode = "none";
     }
-    return out;
+    return out2;
   }
   var itemId = (key, name, n3) => `s_${hash3(`${key}|${normName(name)}|${n3}`)}`;
   function withIds(st, list4, exclude = []) {
-    const out = [];
+    const out2 = [];
     let rare = exclude.some((x) => x.tag === "rare" && !x.sold);
     for (const it0 of list4) {
       let it = it0;
@@ -1260,10 +1273,10 @@ ${webRaw}` };
         }
         rare = true;
       }
-      if (out.some((x) => sameShopName(x.name, it.name)) || exclude.some((x) => sameShopName(x.name, it.name))) continue;
-      out.push({ ...it, id: itemId(st.key, it.name, out.length + exclude.length) });
+      if (out2.some((x) => sameShopName(x.name, it.name)) || exclude.some((x) => sameShopName(x.name, it.name))) continue;
+      out2.push({ ...it, id: itemId(st.key, it.name, out2.length + exclude.length) });
     }
-    return out;
+    return out2;
   }
   function applyShelf(st, r, s8) {
     const base = { ...st, identity: st.loaded ? st.identity : r.identity, loaded: true };
@@ -1384,21 +1397,21 @@ ${webRaw}` };
     const live = currentShop(chat);
     const st = live ?? eventShop(chat);
     if (!st) return [];
-    const out = [];
+    const out2 = [];
     const now2 = (x) => !x.k || x.k === st.key;
     const turn3 = st.talk.filter(now2);
     const sales = live ? st.sales.filter(now2) : [];
     const lastOwner = [...turn3].reverse().find((l) => l.who === "owner");
     const spoke = turn3.some((l) => l.who === "me");
     const main = shopMain(chat.scriptstate, "shop");
-    if (main.has("sell") && sales.length) out.push(`just sold ${sales.map((x) => `${x.name} (${x.price.toLocaleString("en-US")} ${st.identity.points ? "Baekilmong points" : "won"})`).join(", ")} to the owner of ${st.shop}`);
-    if (!main.has("ask")) return out;
-    if (st.closed && lastOwner) out.push(`was refused service and sent out of ${st.shop} ("${lastOwner.text.slice(0, 80)}")`);
+    if (main.has("sell") && sales.length) out2.push(`just sold ${sales.map((x) => `${x.name} (${x.price.toLocaleString("en-US")} ${st.identity.points ? "Baekilmong points" : "won"})`).join(", ")} to the owner of ${st.shop}`);
+    if (!main.has("ask")) return out2;
+    if (st.closed && lastOwner) out2.push(`was refused service and sent out of ${st.shop} ("${lastOwner.text.slice(0, 80)}")`);
     else if (!st.closed && spoke && lastOwner) {
       const tail2 = capLines(turn3, shopMainLines(chat.scriptstate)).map((l) => `${l.who === "me" ? "protagonist" : "owner"}: "${l.text}"`).join(" / ");
-      out.push(`talked with the owner of ${st.shop} — ${tail2}`);
+      out2.push(`talked with the owner of ${st.shop} — ${tail2}`);
     }
-    return out;
+    return out2;
   }
   var G = (name = "Shop") => guideSections(name);
   var SHELF_RULES = (g2, s8, st, guide = "Shop", truthMode = "mix", talk = false) => {
@@ -1540,8 +1553,8 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     if (shopJudgeBy(vars).by !== "main") return "";
     const tag = G().MAIN_TAG ?? guideSectionDefault("MAIN_TAG");
     const rule = shopRule(vars);
-    const out = fillGuide(tag, { where: whereLine(shopSettings(vars).where), rule });
-    return tag.includes("{rule}") ? out : `${out}
+    const out2 = fillGuide(tag, { where: whereLine(shopSettings(vars).where), rule });
+    return tag.includes("{rule}") ? out2 : `${out2}
 ${rule}`.trim();
   }
   function shopJudgeBy(vars) {
@@ -1586,13 +1599,13 @@ ${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ""}`, "Hs");
   }
   var liveOrders = (vars, alive) => readOrders(vars).map((o) => o.taken && o.takenKey && !alive.has(o.takenKey) ? { ...o, taken: false, takenKey: void 0 } : o).filter((o) => o.taken || !o.anchor || alive.has(o.anchor));
   function pruneOrders(list4) {
-    const out = [...list4];
-    while (out.length > COS_ORDERS_MAX) {
-      const i = out.findIndex((o) => o.taken);
+    const out2 = [...list4];
+    while (out2.length > COS_ORDERS_MAX) {
+      const i = out2.findIndex((o) => o.taken);
       if (i < 0) break;
-      out.splice(i, 1);
+      out2.splice(i, 1);
     }
-    return out;
+    return out2;
   }
   var ordersVars = (list4) => ({ [COS_ORDERS_KEY]: list4.length ? JSON.stringify(pruneOrders(list4)) : "" });
   function worldMinute(chat) {
@@ -1633,12 +1646,12 @@ ${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ""}`, "Hs");
   var hasReadyTag = (text5) => typeof text5 === "string" && /\[\s*shop-ready\s*[:：]/iu.test(text5);
   function findReadyTag(text5) {
     if (!hasReadyTag(text5)) return null;
-    let out = null;
+    let out2 = null;
     for (const m of text5.matchAll(READY_TAG)) {
       const names4 = m[2].split(READY_SEP).map((n3) => n3.trim()).filter(Boolean);
-      if (m[1] && names4.length) out = { raw: m[0], site: m[1], names: names4 };
+      if (m[1] && names4.length) out2 = { raw: m[0], site: m[1], names: names4 };
     }
-    return out;
+    return out2;
   }
   function stripReadyTags(text5) {
     if (!hasReadyTag(text5)) return text5;
@@ -1647,11 +1660,11 @@ ${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ""}`, "Hs");
   var tagName2 = (s8) => s8.replace(/[\[\]|｜\r\n]/g, " ").replace(/;;+/g, ";").replace(/\s+/g, " ").trim();
   var readyTag = (site, orders) => `[shop-ready: ${site}|${orders.map((o) => tagName2(o.item.name)).filter(Boolean).join(READY_SEP)}]`;
   function readyNotes(chat) {
-    const out = /* @__PURE__ */ new Map();
+    const out2 = /* @__PURE__ */ new Map();
     const list4 = chat.message ?? [];
     const keys = list4.map((m, i) => messageKey(m, i));
     const pending2 = liveOrders(chat.scriptstate, new Set(keys)).filter((o) => !o.taken);
-    if (!pending2.length) return out;
+    if (!pending2.length) return out2;
     let now2 = null;
     const rows3 = list4.map((m, i) => {
       if (m.role !== "char" || typeof m.data !== "string") return null;
@@ -1664,11 +1677,11 @@ ${src.st.shop}${src.st.owner ? ` / 진행자: ${src.st.owner}` : ""}`, "Hs");
       const from = Math.max(keys.indexOf(o.anchor), keys.indexOf(o.orderedKey));
       const hit4 = rows3.find((r) => r && r.i > from && orderReady(o, r.now, r.key));
       if (!hit4) continue;
-      const cur = out.get(hit4.i);
+      const cur = out2.get(hit4.i);
       if (cur) cur.push(o);
-      else out.set(hit4.i, [o]);
+      else out2.set(hit4.i, [o]);
     }
-    return out;
+    return out2;
   }
   function settleReady(chat, on3, site = "cos") {
     const list4 = chat.message ?? [];
@@ -1706,15 +1719,15 @@ ${tag}` : body5;
     "성격: 수다스러움, 무뚝뚝함, 소심함, 능글맞음, 깐깐함, 덤벙댐, 다정함, 냉소적임"
   ].join("\n");
   function parseAxes(text5) {
-    const out = [];
+    const out2 = [];
     for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const i = line2.indexOf(":");
       if (i <= 0) continue;
       const name = line2.slice(0, i).trim().slice(0, 20);
       const values = line2.slice(i + 1).split(/[,，]/).map((x) => x.trim().slice(0, 60)).filter(Boolean);
-      if (name && values.length) out.push({ name, values });
+      if (name && values.length) out2.push({ name, values });
     }
-    return out;
+    return out2;
   }
   function deskSettings(vars) {
     const axesText = String(vars?.[DESK_KEY.axes] ?? "");
@@ -2119,19 +2132,19 @@ ${SEED_CLOSE}` : "", missing };
     if (!curKey || !inKey || curKey === inKey) return incoming;
     const manifest = manifestEntry(incoming);
     return incoming.map((e) => {
-      let out = e;
-      if (e.mode === "folder" && e.key === inKey) out = { ...out, key: curKey };
-      if (e.folder === inKey) out = { ...out, folder: curKey };
+      let out2 = e;
+      if (e.mode === "folder" && e.key === inKey) out2 = { ...out2, key: curKey };
+      if (e.folder === inKey) out2 = { ...out2, folder: curKey };
       if (e === manifest) {
         try {
           const m = JSON.parse(String(e.content ?? ""));
           if (m && typeof m === "object" && m.keys && typeof m.keys === "object" && m.keys.settings === inKey) {
-            out = { ...out, content: JSON.stringify({ ...m, keys: { ...m.keys, settings: curKey } }) };
+            out2 = { ...out2, content: JSON.stringify({ ...m, keys: { ...m.keys, settings: curKey } }) };
           }
         } catch {
         }
       }
-      return out;
+      return out2;
     });
   }
   function keepOneDirectory(current5, lore) {
@@ -2206,7 +2219,7 @@ ${SEED_CLOSE}` : "", missing };
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.15" : "0";
+  var PLUGIN_VERSION = true ? "0.21.16" : "0";
 
   // src/core/lore.ts
   var LORE_KINDS = ["org", "site", "anomaly", "agent"];
@@ -2448,7 +2461,7 @@ ${content}` };
     for (const r of dir2.agents) called.set(`agent:${r.lore}`, [r.name, r.english, ...r.aliases]);
     for (const r of dir2.anomalies) called.set(`anomaly:${r.lore}`, [r.english, ...r.aliases]);
     for (const r of dir2.sites) called.set(`site:${r.lore}`, [r.english, ...r.aliases]);
-    const out = [];
+    const out2 = [];
     books.forEach((e, index) => {
       const folderKind = kinds.get(str5(e.folder));
       const content = str5(e.content);
@@ -2483,10 +2496,10 @@ ${content}` };
         const alias = kind === "agent" && !en2 && syllables(text5) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text5));
         keys.push({ text: text5, en: en2, rule: CONFIRM_KEYS.has(text5) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str5(e.comment), order: order2, index, content, keys, rawKeys: raw, groups: groups.get(str5(e.comment)) ?? [], rank: rank3, ...appendix ? { appendix } : {} });
+      out2.push({ kind, name: str5(e.comment), order: order2, index, content, keys, rawKeys: raw, groups: groups.get(str5(e.comment)) ?? [], rank: rank3, ...appendix ? { appendix } : {} });
     });
-    cache5.set(books, out);
-    return out;
+    cache5.set(books, out2);
+    return out2;
   }
   function around(text5, start3, end) {
     let a = start3;
@@ -2624,13 +2637,21 @@ ${content}` };
     entries2.forEach((e, i) => {
       const a = e.appendix;
       if (!a) return;
-      if (a.when.target && state2.target && a.parentNames.some((n3) => sameName(n3, state2.target))) add(i, "status", state2.target, state2.target, 100);
+      const hit4 = a.when.target && state2.target && (a.parentNames.some((n3) => sameName(n3, state2.target)) || names(e, state2.target) || a.when.places.some((x) => sameName(x, state2.target)));
+      if (hit4) add(i, "status", state2.target, state2.target, 100);
       const w = place3 ? a.when.places.find((x) => squash2(x) && place3.includes(squash2(x))) : void 0;
       if (w) add(i, "place", w, state2.place ?? "", 40);
       for (const group4 of a.agentNames) {
         const who = present.find((p2) => group4.some((n3) => sameName(n3, p2)));
         if (who) add(i, "agent", group4[0], who, 20);
       }
+    });
+    const mains = [...picks.values()].filter((p2) => !p2.entry.appendix).map((p2) => ({ name: p2.entry.name, said: p2.reasons.some((r) => r.why !== "status") }));
+    entries2.forEach((e, i) => {
+      const a = e.appendix;
+      if (!a || picks.has(i)) return;
+      const m = mains.find((x) => (x.said || a.when.target) && e.rawKeys.some((k) => sameName(k, x.name)));
+      if (m) add(i, "parent", m.name, m.name, 10);
     });
     const on3 = new Set([...picks.values()].map((p2) => p2.entry.name));
     entries2.forEach((e, i) => {
@@ -2657,7 +2678,7 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
   function pickLoreRisu(entries2, messages, depth) {
     const squash5 = (s8) => s8.toLowerCase().replace(/\s+/g, "");
     const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash5(m.data) }));
-    const out = [];
+    const out2 = [];
     for (const entry3 of entries2) {
       const reasons = [];
       for (const k of entry3.rawKeys) {
@@ -2665,17 +2686,17 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
         const at = key ? window2.find((w) => w.flat.includes(key)) : void 0;
         if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
       }
-      if (reasons.length) out.push({ entry: entry3, score: 0, reasons });
+      if (reasons.length) out2.push({ entry: entry3, score: 0, reasons });
     }
-    return sortPicks(out);
+    return sortPicks(out2);
   }
   function slotTexts(picks, env3) {
-    const out = { org: [], site: [], anomaly: [], agent: [] };
+    const out2 = { org: [], site: [], anomaly: [], agent: [] };
     for (const p2 of picks) {
       const text5 = stripDecorators(evaluate(p2.entry.content, env3)).trim();
-      if (text5) out[p2.entry.kind].push(text5);
+      if (text5) out2[p2.entry.kind].push(text5);
     }
-    return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
+    return Object.fromEntries(LORE_KINDS.map((k) => [k, out2[k].join("\n\n")]));
   }
   function loreMessages(chat, input3, raw = false) {
     const msgs4 = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str5(m.data) : messageText(str5(m.data)) }));
@@ -2709,12 +2730,12 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
   }
   function patchSlots(messages, old, next) {
     let changed = 0;
-    let out = messages;
+    let out2 = messages;
     const vars = LORE_KINDS.map(slotVar);
     const cur = vars.map((k) => String(old?.[k] ?? ""));
-    const find = (text5) => text5 ? out.findIndex((m) => typeof m?.content === "string" && m.content.includes(text5)) : -1;
+    const find = (text5) => text5 ? out2.findIndex((m) => typeof m?.content === "string" && m.content.includes(text5)) : -1;
     const swap = (at, from, to) => {
-      out = out.map((m, i) => i === at ? { ...m, content: m.content.replace(from, () => to) } : m);
+      out2 = out2.map((m, i) => i === at ? { ...m, content: m.content.replace(from, () => to) } : m);
     };
     vars.forEach((k, i) => {
       if (!(k in next)) return;
@@ -2739,7 +2760,7 @@ ${after}`);
       cur[i] = v;
       changed++;
     });
-    return { messages: out, changed };
+    return { messages: out2, changed };
   }
   function trimRoster(messages) {
     const names4 = /* @__PURE__ */ new Set();
@@ -2885,10 +2906,10 @@ ${block5.trim()}` };
   }
   var uuid = () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
   function plantGreetings(existing) {
-    const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
+    const out2 = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
     const index = {};
     const at = /* @__PURE__ */ new Map();
-    out.forEach((g2, n3) => {
+    out2.forEach((g2, n3) => {
       if (!at.has(g2)) at.set(g2, n3);
     });
     const inst = installData();
@@ -2896,13 +2917,13 @@ ${block5.trim()}` };
       const text5 = inst.greetings.texts[n3] ?? "";
       let hit4 = at.get(text5);
       if (hit4 === void 0) {
-        hit4 = out.length;
-        out.push(text5);
+        hit4 = out2.length;
+        out2.push(text5);
         at.set(text5, hit4);
       }
       index[key] = hit4;
     }
-    return { greetings: out, index };
+    return { greetings: out2, index };
   }
   function buildManifest(o) {
     const prev = o.prev ?? {};
@@ -2943,7 +2964,7 @@ ${block5.trim()}` };
   var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
   var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
   function fillDirectory(cur, def) {
-    const out = { ...cur };
+    const out2 = { ...cur };
     let gaps = 0;
     const removedOf = (k) => {
       const r = isObj2(cur._removed) ? cur._removed[k] : void 0;
@@ -2952,15 +2973,15 @@ ${block5.trim()}` };
     const bare = empty(cur.거점) && !removedOf("거점").size;
     for (const [k, dv] of Object.entries(def)) {
       if (k === "_help" || k === "_removed") continue;
-      const cv = out[k];
+      const cv = out2[k];
       const removed = removedOf(k);
       if (empty(cv)) {
         const fill3 = removed.size && isObj2(dv) ? Object.fromEntries(Object.entries(dv).filter(([name]) => !removed.has(name))) : dv;
-        if (!empty(fill3)) out[k] = fill3, gaps++;
+        if (!empty(fill3)) out2[k] = fill3, gaps++;
         continue;
       }
       if (k === "괴담톡 탭") {
-        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
+        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out2[k] = dv, gaps++;
         continue;
       }
       if (!isObj2(cv) || !isObj2(dv)) continue;
@@ -2977,9 +2998,9 @@ ${block5.trim()}` };
           sec2[name] = row8;
         }
       }
-      out[k] = sec2;
+      out2[k] = sec2;
     }
-    return { data: out, gaps };
+    return { data: out2, gaps };
   }
   function directoryGapCount(lore) {
     const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
@@ -2989,53 +3010,53 @@ ${block5.trim()}` };
     return data2 ? fillDirectory(cur, installData().directory).gaps : 0;
   }
   function installLore(lore, greetings) {
-    const out = [...lore ?? []];
-    let settings = findFolder(out);
+    const out2 = [...lore ?? []];
+    let settings = findFolder(out2);
     if (!settings) {
       settings = folderEntry(SETTINGS_FOLDER_NAME, `${FOLDER_PREFIX}${uuid()}`);
-      out.push(settings);
+      out2.push(settings);
     }
     const settingsKey = str6(settings.key);
-    const dir2 = directoryEntries(out).filter((e) => typeof e.content === "string" && e.content.trim());
-    const cur = dir2.length ? readDirectoryData(out) : null;
+    const dir2 = directoryEntries(out2).filter((e) => typeof e.content === "string" && e.content.trim());
+    const cur = dir2.length ? readDirectoryData(out2) : null;
     if (!dir2.length || !cur) {
       for (const e of dir2) e.comment = `${String(e.comment)} (읽을 수 없어 보관)`;
-      const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
+      const stale = out2.findIndex((e) => e.comment === DIRECTORY_COMMENT);
       const fresh4 = entry2(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
-      if (stale >= 0) out[stale] = fresh4;
-      else out.push(fresh4);
+      if (stale >= 0) out2[stale] = fresh4;
+      else out2.push(fresh4);
     } else {
       for (const e of dir2) if (!e.folder) e.folder = settingsKey;
       const filled = fillDirectory(cur, installData().directory);
       if (filled.gaps) {
-        const first = out.indexOf(dir2[0]);
-        out[first] = { ...dir2[0], comment: DIRECTORY_COMMENT, content: JSON.stringify(filled.data) };
-        for (let i = out.length - 1; i >= 0; i--) if (i !== first && dir2.includes(out[i])) out.splice(i, 1);
+        const first = out2.indexOf(dir2[0]);
+        out2[first] = { ...dir2[0], comment: DIRECTORY_COMMENT, content: JSON.stringify(filled.data) };
+        for (let i = out2.length - 1; i >= 0; i--) if (i !== first && dir2.includes(out2[i])) out2.splice(i, 1);
       }
     }
-    const prev = readManifest(out);
+    const prev = readManifest(out2);
     const manifest = buildManifest({ greetings, settingsKey, prev });
-    const old = manifestEntry(out);
+    const old = manifestEntry(out2);
     const fresh3 = entry2(MANIFEST_COMMENT, JSON.stringify(manifest), settingsKey);
     if (old) {
-      const at = out.indexOf(old);
-      out[at] = { ...old, content: fresh3.content, folder: old.folder || settingsKey };
-    } else out.push(fresh3);
-    return out;
+      const at = out2.indexOf(old);
+      out2[at] = { ...old, content: fresh3.content, folder: old.folder || settingsKey };
+    } else out2.push(fresh3);
+    return out2;
   }
   function installSummary(s8) {
-    const out = [];
-    if (!s8.settingsFolder) out.push("⚙️설정 폴더 없음");
-    if (!s8.directory) out.push(s8.directoryGaps < 0 ? "명부(Directory)를 읽을 수 없음" : "명부(Directory) 없음");
-    else if (s8.directoryGaps > 0) out.push(`명부에 빠진 칸 ${s8.directoryGaps}개`);
-    if (!s8.manifest) out.push("Plugin manifest 없음");
-    if (!s8.firstMessage) out.push("첫 메시지(시작 안내) 없음");
-    if (!s8.loreSettings) out.push("로어북 설정 없음");
-    if (!s8.greetings.ok) out.push(`인사말 ${s8.greetings.missing.length}/${s8.greetings.total}개 없음`);
-    if (s8.pictures.missing.length) out.push(`카드 사진 ${s8.pictures.missing.length}/${s8.pictures.total}장 없음`);
-    if (!s8.wikiPack) out.push("위키 기본 문서 없음");
-    if (!s8.tokenizer) out.push("토크나이저 없음");
-    return out;
+    const out2 = [];
+    if (!s8.settingsFolder) out2.push("⚙️설정 폴더 없음");
+    if (!s8.directory) out2.push(s8.directoryGaps < 0 ? "명부(Directory)를 읽을 수 없음" : "명부(Directory) 없음");
+    else if (s8.directoryGaps > 0) out2.push(`명부에 빠진 칸 ${s8.directoryGaps}개`);
+    if (!s8.manifest) out2.push("Plugin manifest 없음");
+    if (!s8.firstMessage) out2.push("첫 메시지(시작 안내) 없음");
+    if (!s8.loreSettings) out2.push("로어북 설정 없음");
+    if (!s8.greetings.ok) out2.push(`인사말 ${s8.greetings.missing.length}/${s8.greetings.total}개 없음`);
+    if (s8.pictures.missing.length) out2.push(`카드 사진 ${s8.pictures.missing.length}/${s8.pictures.total}장 없음`);
+    if (!s8.wikiPack) out2.push("위키 기본 문서 없음");
+    if (!s8.tokenizer) out2.push("토크나이저 없음");
+    return out2;
   }
 
   // src/core/itemrules.ts
@@ -3072,15 +3093,15 @@ ${block5.trim()}` };
   }
   var parseWords = (text5) => [...new Set(String(text5 ?? "").split(/[,，\n]/).map((w) => w.replace(/\s+/g, " ").trim()).filter(Boolean))];
   function parseGradeWords(text5) {
-    const out = [];
+    const out2 = [];
     for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const m = SEP.exec(line2);
       if (!m) continue;
       const a = line2.slice(0, m.index).trim();
       const g2 = line2.slice(m.index + m[0].length).trim().toUpperCase();
-      if (a && isGrade(g2)) out.push([a, g2]);
+      if (a && isGrade(g2)) out2.push([a, g2]);
     }
-    return out;
+    return out2;
   }
   var build = (vars) => {
     const txt2 = (k, def) => {
@@ -3145,16 +3166,16 @@ ${block5.trim()}` };
   function stripGrades(text0, quote) {
     const text5 = String(text0 ?? "");
     const cut3 = [];
-    let out = "";
+    let out2 = "";
     let pos = 0;
     for (const h of gradeHits(text5)) {
       if (h.at < pos || gradeInQuote(quote, h.g)) continue;
-      out += text5.slice(pos, h.at);
+      out2 += text5.slice(pos, h.at);
       cut3.push(text5.slice(h.at, h.end));
       pos = h.end;
     }
-    out += text5.slice(pos);
-    return cut3.length ? { text: out.replace(/\(\s*\)/g, " ").replace(/\s+/g, " ").replace(/^[\s·,의]+|[\s·,]+$/g, "").trim(), cut: cut3 } : { text: text5, cut: cut3 };
+    out2 += text5.slice(pos);
+    return cut3.length ? { text: out2.replace(/\(\s*\)/g, " ").replace(/\s+/g, " ").replace(/^[\s·,의]+|[\s·,]+$/g, "").trim(), cut: cut3 } : { text: text5, cut: cut3 };
   }
 
   // src/core/texthash.ts
@@ -3183,8 +3204,8 @@ ${block5.trim()}` };
     }
     return { hash: "", sha256: "", length: 0 };
   }
-  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"968c59a6","sha256":"dc4412b8d69e2d3f2e752a0810a6e7c8ab3a8d5e6ca211bf0a65298c1bb15e6b","length":1236664}' : void 0) };
-  var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"9d7e9312","sha256":"d1c66d1c390e52f29e8230ccb03fdb45c579bccee60e666590b350899969e51c","length":168918}' : void 0) };
+  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"cf84571a","sha256":"0aec65102dd1c154a2dca9440ce96c0a5313ae7fa173d539ec3f050c9c168b3d","length":1236748}' : void 0) };
+  var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"c9cca902","sha256":"6a01515d25f1d753c09ccd541c13220660854c9073a3526cf9db9a97ef997c83","length":168935}' : void 0) };
   var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"b73111c1","sha256":"66fdcfb848380c72603a9ae3e5f6a5fd89aab8138d5daab8f09e9f7dbeb68c11","length":8474920}' : void 0) };
   function packMatches(text5, expect) {
     return !!expect.hash && text5.length === expect.length && textHash(text5) === expect.hash;
@@ -3383,12 +3404,12 @@ ${block5.trim()}` };
   function processRequest(messages, chat) {
     const keep2 = shouldKeepSeed(chat);
     let changed = false;
-    const out = messages.map((m) => {
+    const out2 = messages.map((m) => {
       if (typeof m.content !== "string" || !m.content.includes(SEED_OPEN)) return m;
       changed = true;
       return { ...m, content: applySeedLifetime(m.content, keep2) };
     });
-    return { messages: out, changed };
+    return { messages: out2, changed };
   }
   function unwrapScenes(messages, o) {
     if (!messages.some((m) => m?.role === "user" && hasSceneCard(m.content))) return { messages, changed: false };
@@ -3405,11 +3426,11 @@ ${block5.trim()}` };
       }
       return directive;
     };
-    const out = [];
+    const out2 = [];
     for (let i = 0; i < messages.length; i++) {
       const m = messages[i];
       if (m?.role !== "user" || !hasSceneCard(m.content)) {
-        out.push(m);
+        out2.push(m);
         continue;
       }
       const END = "%%/SCENE_CARD%%";
@@ -3427,18 +3448,18 @@ ${block5.trim()}` };
         i++;
       }
       if (extra2.length) content = withUserInput(readDirective(), content, extra2.join("\n\n"));
-      out.push({ ...m, content });
+      out2.push({ ...m, content });
     }
-    return { messages: out, changed: true };
+    return { messages: out2, changed: true };
   }
   function unwrapCalls(messages, o) {
     if (!messages.some((m) => m?.role === "user" && hasCall(m.content))) return { messages, changed: false };
     const lastCall = o?.callIsLast ? messages.map((m) => m?.role === "user" && hasCall(m.content)).lastIndexOf(true) : -1;
-    const out = [];
+    const out2 = [];
     for (let i = 0; i < messages.length; i++) {
       const m = messages[i];
       if (m?.role !== "user" || !hasCall(m.content)) {
-        out.push(m);
+        out2.push(m);
         continue;
       }
       let content = stripCall(m.content);
@@ -3449,9 +3470,9 @@ ${block5.trim()}` };
 ${next.content.trim()}`;
         i++;
       }
-      out.push({ ...m, content });
+      out2.push({ ...m, content });
     }
-    return { messages: out, changed: true };
+    return { messages: out2, changed: true };
   }
   function insertedSystemTexts(before, after) {
     const key = (m2) => `${String(m2?.role)}\0${typeof m2?.content === "string" ? m2.content : ""}`;
@@ -3472,7 +3493,7 @@ ${next.content.trim()}`;
       }
     }
     const had = new Set(before.filter(isSys).map((x) => x.content));
-    const out = [];
+    const out2 = [];
     let gone = [];
     let fresh3 = [];
     const flush = () => {
@@ -3495,7 +3516,7 @@ ${next.content.trim()}`;
         if (best >= 0) edited.add(best);
       }
       fresh3.forEach((t, i2) => {
-        if (!edited.has(i2) && !had.has(t)) out.push(t);
+        if (!edited.has(i2) && !had.has(t)) out2.push(t);
       });
       gone = [];
       fresh3 = [];
@@ -3516,7 +3537,7 @@ ${next.content.trim()}`;
       }
     }
     flush();
-    return out;
+    return out2;
   }
 
   // src/core/homeshop.ts
@@ -3565,15 +3586,15 @@ ${next.content.trim()}`;
   }
   var hsKey = (shKey) => `$hs_${shKey.slice(1)}`;
   function hsVars(vars) {
-    const out = {};
-    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_") || SHOP_SHARED_VARS.includes(k)) out[k] = v;
+    const out2 = {};
+    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_") || SHOP_SHARED_VARS.includes(k)) out2[k] = v;
     for (const [k, v] of Object.entries(vars ?? {})) {
       if (!k.startsWith("$hs_sh_")) continue;
       const sh = `$sh_${k.slice(7)}`;
       if (sh === SHOP_CTX_VAR ? v !== "1" && v !== "0" : SHOP_SHARED_VARS.includes(sh)) continue;
-      out[sh] = v;
+      out2[sh] = v;
     }
-    return out;
+    return out2;
   }
   var HS_KEY = {
     on: "$hs_on",
@@ -3661,14 +3682,14 @@ ${next.content.trim()}`;
     const d = HS_NUM[k];
     if (!d || !Number.isFinite(raw)) return {};
     const v = Math.max(d.lo, Math.min(d.hi, Math.round(raw)));
-    const out = { [d.key]: String(v) };
-    if (!pair2 || !pair2.includes(k)) return out;
+    const out2 = { [d.key]: String(v) };
+    if (!pair2 || !pair2.includes(k)) return out2;
     const [a, b] = pair2;
     const other = HS_NUM[k === a ? b : a];
-    if (!other) return out;
+    if (!other) return out2;
     const cur = numIn2(vars?.[other.key], other.def, other.lo, other.hi);
-    if (k === a && v > cur || k === b && v < cur) out[other.key] = String(v);
-    return out;
+    if (k === a && v > cur || k === b && v < cur) out2[other.key] = String(v);
+    return out2;
   }
   var n = (vars, k) => numIn2(vars?.[HS_NUM[k].key], HS_NUM[k].def, HS_NUM[k].lo, HS_NUM[k].hi);
   var scaleOf = (v, def) => v === "0.5" || v === "1" || v === "2" || v === "auto" || v === "fit" ? v : def;
@@ -3716,13 +3737,13 @@ ${next.content.trim()}`;
   }
   var GROUP_WORD = { base: "base", 기본: "base", filler: "filler", 가끔: "filler", event: "event", 대사: "event", 사건: "event", rare: "rare", 드물게: "rare", off: "off", 안씀: "off" };
   function parseClipGroups(text5) {
-    const out = {};
+    const out2 = {};
     for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const m = /^\s*([AB])\s*[:：]\s*([^=＝]+?)\s*[=＝]\s*(\S+)\s*$/i.exec(line2);
       const g2 = m ? GROUP_WORD[m[3].replace(/\s/g, "").toLowerCase()] : void 0;
-      if (m && g2) out[`${m[1].toUpperCase()}:${m[2].trim().toLowerCase()}`] = g2;
+      if (m && g2) out2[`${m[1].toUpperCase()}:${m[2].trim().toLowerCase()}`] = g2;
     }
-    return out;
+    return out2;
   }
   function clipsOf(art2, cut3, over) {
     return art2.clips.map((c) => ({ ...c, group: over[`${cut3}:${c.name.toLowerCase()}`] ?? over[`${cut3}:${c.ko.toLowerCase()}`] ?? c.group }));
@@ -3939,15 +3960,15 @@ ${next.content.trim()}`;
   var orderOpened = (o, alive) => o.openKey !== void 0 && (!o.openKey || alive.has(o.openKey));
   function scheduleDues(taken, turn3, n3, gap, rnd = Math.random) {
     const used = new Set(taken);
-    const out = [];
+    const out2 = [];
     let t = turn3;
     for (let i = 0; i < n3; i++) {
       t += gap[0] + Math.floor(rnd() * (gap[1] - gap[0] + 1));
       while (used.has(t)) t++;
       used.add(t);
-      out.push(t);
+      out2.push(t);
     }
-    return out;
+    return out2;
   }
   var boxName = (name) => `택배 상자(미개봉) · ${name}`.slice(0, 30);
   function newOrder(chat, item2, s8, barter = "", rnd = Math.random) {
@@ -4027,22 +4048,4 @@ ${lines3.join("\n")}` : "";
     try {
       const j = JSON.parse(raw);
       if (!j || typeof j !== "object" || !Array.isArray(j.entries)) return emptyLog();
-      const items = {};
-      for (const [p2, it] of Object.entries(j.items && typeof j.items === "object" ? j.items : {})) {
-        if (it && typeof it === "object" && typeof it.name === "string") items[p2] = { name: it.name, pay: String(it.pay ?? ""), desc: String(it.desc ?? "") };
-      }
-      return { key: String(j.key ?? ""), pid: String(j.pid ?? ""), title: String(j.title ?? ""), items, entries: j.entries.map(entryOf).filter((e) => !!e) };
-    } catch {
-      return emptyLog();
-    }
-  }
-  var logVars = (log) => ({ [HS_LOG_VAR]: log.entries.length ? JSON.stringify(log) : "" });
-  var showPid = (show) => String(show.parts[0]?.item.id ?? "");
-  var sameProgram = (a, b) => a.key === b.key && showPid(a) === showPid(b);
-  var mine = (e) => e.k === "buy" || e.k === "say" && !!e.me;
-  function appendLog(vars, show, entries2) {
-    const add = entries2.map(entryOf).filter((e) => !!e);
-    if (!add.length) return {};
-    const old = readLog(vars);
-    const same4 = old.key === show.key && old.pid === showPid(show);
-    const log = same4 ? { ...old, title: clean5(show.title, 60), items: { ...old.items }, entries: [...old.entries] } : {
+      const items 

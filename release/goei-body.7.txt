@@ -1,4 +1,22 @@
- key: show.key, pid: showPid(show), title: clean5(show.title, 60), items: {}, entries: [] };
+= {};
+      for (const [p2, it] of Object.entries(j.items && typeof j.items === "object" ? j.items : {})) {
+        if (it && typeof it === "object" && typeof it.name === "string") items[p2] = { name: it.name, pay: String(it.pay ?? ""), desc: String(it.desc ?? "") };
+      }
+      return { key: String(j.key ?? ""), pid: String(j.pid ?? ""), title: String(j.title ?? ""), items, entries: j.entries.map(entryOf).filter((e) => !!e) };
+    } catch {
+      return emptyLog();
+    }
+  }
+  var logVars = (log) => ({ [HS_LOG_VAR]: log.entries.length ? JSON.stringify(log) : "" });
+  var showPid = (show) => String(show.parts[0]?.item.id ?? "");
+  var sameProgram = (a, b) => a.key === b.key && showPid(a) === showPid(b);
+  var mine = (e) => e.k === "buy" || e.k === "say" && !!e.me;
+  function appendLog(vars, show, entries2) {
+    const add = entries2.map(entryOf).filter((e) => !!e);
+    if (!add.length) return {};
+    const old = readLog(vars);
+    const same4 = old.key === show.key && old.pid === showPid(show);
+    const log = same4 ? { ...old, title: clean5(show.title, 60), items: { ...old.items }, entries: [...old.entries] } : { key: show.key, pid: showPid(show), title: clean5(show.title, 60), items: {}, entries: [] };
     const id2 = (e) => `${e.k}${e.p}${e.who}${e.text}`;
     const seen4 = new Set(log.entries.filter((e) => e.k === "show" || e.k === "chat").map(id2));
     let changed = !same4;
@@ -114,16 +132,16 @@ ${JSON.stringify({ feature: "homeshop", ...withShow && log.title ? { program: lo
   var mallKey = (shKey, site) => `$${site}_${shKey.slice(1)}`;
   var mallAutoKey = (site) => `$${site}_sh_auto`;
   function mallVars(vars, site) {
-    const out = {};
-    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_") || SHOP_SHARED_VARS.includes(k)) out[k] = v;
+    const out2 = {};
+    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_") || SHOP_SHARED_VARS.includes(k)) out2[k] = v;
     const pre2 = `$${site}_sh_`;
     for (const [k, v] of Object.entries(vars ?? {})) {
       if (!k.startsWith(pre2)) continue;
       const sh = `$sh_${k.slice(pre2.length)}`;
       if (sh === SHOP_CTX_VAR ? v !== "1" && v !== "0" : SHOP_SHARED_VARS.includes(sh)) continue;
-      out[sh] = v;
+      out2[sh] = v;
     }
-    return out;
+    return out2;
   }
   function mallSettings(vars, site) {
     const s8 = shopSettings(mallVars(vars, site));
@@ -182,16 +200,16 @@ ${JSON.stringify({ feature: "homeshop", ...withShow && log.title ? { program: lo
   var rollDefaults = (site) => site === "cos" ? { genres: COS_GENRES_DEFAULT, tiers: COS_TIERS_DEFAULT } : { genres: BM_GENRES_DEFAULT, tiers: BM_TIERS_DEFAULT };
   var tiersText = (t) => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join("\n");
   function parseTiers(text5) {
-    const out = [];
+    const out2 = [];
     for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const [name = "", desc = "", lo = "", hi = "", w = ""] = line2.split("|").map((x) => x.trim());
       const a = Number(lo.replace(/[^\d]/g, ""));
       const b = Number(hi.replace(/[^\d]/g, ""));
       if (!name || !Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b < a) continue;
       const wn = Number(w);
-      out.push({ name: name.slice(0, 20), desc: desc.slice(0, 120), lo: a, hi: b, w: w === "" || !Number.isFinite(wn) || wn < 0 ? 1 : Math.min(99, wn) });
+      out2.push({ name: name.slice(0, 20), desc: desc.slice(0, 120), lo: a, hi: b, w: w === "" || !Number.isFinite(wn) || wn < 0 ? 1 : Math.min(99, wn) });
     }
-    return out;
+    return out2;
   }
   var genresText = (g2) => g2.join(", ");
   var parseGenres = (text5) => [...new Set(String(text5 ?? "").split(/[,\n]/).map((x) => x.trim().slice(0, 40)).filter(Boolean))];
@@ -310,24 +328,24 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     const key = lastBot(chat)?.key ?? "";
     if (!key) return [];
     const vars = chat.scriptstate;
-    const out = [];
+    const out2 = [];
     const cosMain = shopMain(vars, "cos");
     const lines3 = shopMainLines(vars);
     const cos = readMall(vars, "cos").talk.filter((l) => l.k === key);
-    if (cosMain.has("ask") && cos.some((l) => l.who === "me")) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${capLines(cos, lines3).map((l) => `${l.who === "me" ? "protagonist" : "operator"}: "${l.text}"`).join(" / ")}`);
+    if (cosMain.has("ask") && cos.some((l) => l.who === "me")) out2.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${capLines(cos, lines3).map((l) => `${l.who === "me" ? "protagonist" : "operator"}: "${l.text}"`).join(" / ")}`);
     if (cosMain.has("order")) {
       for (const o of liveOrders(vars, aliveAnchors(chat))) {
-        if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString("en-US")} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
+        if (o.anchor === key && !o.taken) out2.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString("en-US")} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
       }
       if (cosReadyMode(vars) === "both") {
         const at = lastBot(chat).index;
-        for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
+        for (const o of readyNotes(chat).get(at) ?? []) out2.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
       }
     }
     const desk = readDesk(vars);
     const dl = desk.talk.filter((l) => l.who !== "sys" && (l.k ?? desk.anchor) === key);
-    if (shopMain(vars, "bm").has("desk") && dl.some((l) => l.who === "me")) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${capLines(dl, lines3).map((l) => `${l.who === "me" ? "protagonist" : "counselor"}: "${l.text}"`).join(" / ")}`);
-    return out;
+    if (shopMain(vars, "bm").has("desk") && dl.some((l) => l.who === "me")) out2.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${capLines(dl, lines3).map((l) => `${l.who === "me" ? "protagonist" : "counselor"}: "${l.text}"`).join(" / ")}`);
+    return out2;
   }
   function soldPasses(vars, place3, plain2) {
     if (!plain2) return place3.startsWith("망상홈쇼핑") ? hsBuyPasses(vars) : true;
@@ -344,6 +362,7 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   var ITEMS_VAR = "$st_items";
   var ITEM_USE_VAR = "$st_item_use";
   var ITEM_USE_AT_VAR = "$st_item_use_at";
+  var ITEM_USE_PREV_VAR = "$st_item_use_prev";
   var ITEM_SLOTS_VAR = "$it_slots";
   var ITEM_LIMIT_VAR = "$it_limit";
   var ITEM_ICON_ALIAS_VAR = "$it_icon_alias";
@@ -425,12 +444,12 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   }
   var outItems = (it, alive) => it.list.filter((e) => isOut(e, alive) && (!e.anchor || alive.has(e.anchor)));
   function equippedOf(list4) {
-    const out = { weapon: Array(EQUIP_SLOTS.weapon).fill(void 0), gear: Array(EQUIP_SLOTS.gear).fill(void 0) };
+    const out2 = { weapon: Array(EQUIP_SLOTS.weapon).fill(void 0), gear: Array(EQUIP_SLOTS.gear).fill(void 0) };
     for (const e of list4) {
       const k = slotKind(e);
-      if (k && e.slot !== void 0 && !out[k][e.slot]) out[k][e.slot] = e;
+      if (k && e.slot !== void 0 && !out2[k][e.slot]) out2[k][e.slot] = e;
     }
-    return out;
+    return out2;
   }
   var slotKind = (e) => e.held ? "weapon" : e.equip;
   var isEquipped = (e, list4) => {
@@ -579,8 +598,8 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
       ...kind ? { kind } : {}
     }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
     const got = addItemLog(it, { name, item: id2, ...row8.icon ? { icon: row8.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...paidNote(e) ? { note: paidNote(e) } : {}, at: row8.at }, alive);
-    const out = compactList({ ...got, list: [...got.list, row8] }, withAnchor(alive, e.anchor));
-    return e.wear && row8.equip ? equipItem(out, alive, id2) : out;
+    const out2 = compactList({ ...got, list: [...got.list, row8] }, withAnchor(alive, e.anchor));
+    return e.wear && row8.equip ? equipItem(out2, alive, id2) : out2;
   }
   function updateItem(it, id2, patch) {
     const cur = it.list.find((x) => x.id === id2);
@@ -666,8 +685,8 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     const log = { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what, by, anchor, ...logExtra.quote ? { quote: logExtra.quote } : {}, ...note2 ? { note: note2 } : {} };
     if (!how) return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id2) }, log);
     const { slot: _s, held: _h, backAt: _b, place: _p, outKey: _k, ...rest } = cur;
-    const out = { ...rest, outHow: how, outAt: anchor, ...place3 ? { place: place3 } : {}, ...key ? { outKey: key } : {} };
-    return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? out : x) }, log);
+    const out2 = { ...rest, outHow: how, outAt: anchor, ...place3 ? { place: place3 } : {}, ...key ? { outKey: key } : {} };
+    return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? out2 : x) }, log);
   }
   function purgeItem(it, id2) {
     if (!it.list.some((x) => x.id === id2)) return it;
@@ -750,8 +769,8 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   var itemSkip = (vars) => clean6(vars?.[ITEM_SKIP_VAR], ITEM_SKIP_MAX);
   function itemsRule(vars) {
     const skip = itemSkip(vars);
-    const out = [ITEM_SCOPE_RULE[itemScope(vars)], skip ? `Never report as \`new\`: ${skip}` : ""].filter(Boolean).join(" ");
-    return out || void 0;
+    const out2 = [ITEM_SCOPE_RULE[itemScope(vars)], skip ? `Never report as \`new\`: ${skip}` : ""].filter(Boolean).join(" ");
+    return out2 || void 0;
   }
   var ITEM_DETAIL_VAR = "$it_detail";
   var itemDetail = (vars) => vars?.[ITEM_DETAIL_VAR] === "state" || vars?.[ITEM_DETAIL_VAR] === "name" ? vars[ITEM_DETAIL_VAR] : "full";
@@ -769,19 +788,21 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     const raw = vars?.[ITEM_USE_VAR];
     if (typeof raw !== "string" || !raw.trim()) return [];
     try {
-      const a = JSON.parse(raw);
-      if (!Array.isArray(a)) return [];
-      const out = [];
-      for (const x of a) {
-        const id2 = typeof x?.id === "string" ? x.id : "";
-        const n3 = Number(x?.n ?? 1);
-        if (!id2 || !Number.isSafeInteger(n3) || n3 < 1 || out.some((u) => u.id === id2)) continue;
-        out.push({ id: id2, n: Math.min(99, n3) });
-      }
-      return out.slice(0, 40);
+      return useList(JSON.parse(raw));
     } catch {
       return [];
     }
+  }
+  function useList(a) {
+    if (!Array.isArray(a)) return [];
+    const out2 = [];
+    for (const x of a) {
+      const id2 = typeof x?.id === "string" ? x.id : "";
+      const n3 = Number(x?.n ?? 1);
+      if (!id2 || !Number.isSafeInteger(n3) || n3 < 1 || out2.some((u) => u.id === id2)) continue;
+      out2.push({ id: id2, n: Math.min(99, n3) });
+    }
+    return out2.slice(0, 40);
   }
   var itemUseVars = (list4) => ({ [ITEM_USE_VAR]: list4.length ? JSON.stringify(list4.slice(0, 40)) : "" });
   var canUse = (e) => e.use && e.state !== "broken";
@@ -794,6 +815,27 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     return cur ? list4.map((u) => u.id === e.id ? { ...u, n: n3 } : u) : [...list4, { id: e.id, n: 1 }];
   }
   var dropUse = (list4, id2) => list4.filter((u) => u.id !== id2);
+  function mergeUse(list4, keepId, otherId) {
+    const other = list4.find((u) => u.id === otherId);
+    if (!other || keepId === otherId) return list4;
+    const n3 = Math.min(99, other.n + (list4.find((u) => u.id === keepId)?.n ?? 0));
+    const has3 = list4.some((u) => u.id === keepId);
+    return list4.flatMap((u) => u.id === otherId ? has3 ? [] : [{ id: keepId, n: n3 }] : u.id === keepId ? [{ id: keepId, n: n3 }] : [u]);
+  }
+  function readUsePrev(vars) {
+    const raw = vars?.[ITEM_USE_PREV_VAR];
+    if (typeof raw !== "string" || !raw.trim()) return null;
+    try {
+      const p2 = JSON.parse(raw);
+      const at = typeof p2?.at === "string" ? p2.at : "";
+      const from = typeof p2?.from === "string" ? p2.from : "";
+      if (!at || !from) return null;
+      return { at, from, q: useList(p2.q), ...typeof p2.after === "string" && p2.after ? { after: p2.after } : {} };
+    } catch {
+      return null;
+    }
+  }
+  var usePrevVars = (p2) => ({ [ITEM_USE_PREV_VAR]: p2 ? JSON.stringify(p2) : "" });
   function mergedNow(it, lastAnchor) {
     if (!lastAnchor) return [];
     return it.log.filter((l) => l.what === "merge" && l.anchor === lastAnchor).map((l) => `combined ${l.name} into ${String(l.note ?? "").replace(/와 합침$/, "")}`);
@@ -846,26 +888,26 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     const extra2 = (opts.events ?? []).filter(Boolean);
     if (!lines3.length && !use.length && !bought.length && !extra2.length && !opts.always) return "";
     const carried = gridItems(list4).length;
-    const out = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? " (over the limit)" : ""}`, ...lines3.length ? lines3 : ["- (nothing)"]];
+    const out2 = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? " (over the limit)" : ""}`, ...lines3.length ? lines3 : ["- (nothing)"]];
     if (opts.carry) {
       const w = totalWeight(list4, opts.left);
-      out.push(`Weight: ${kgText(w)} / ${kgText(opts.carry)}${w > opts.carry ? ` (${kgText(w - opts.carry)} over)` : ""}`);
+      out2.push(`Weight: ${kgText(w)} / ${kgText(opts.carry)}${w > opts.carry ? ` (${kgText(w - opts.carry)} over)` : ""}`);
     }
-    out.push(`Carry limit: ${opts.limit}`);
+    out2.push(`Carry limit: ${opts.limit}`);
     const recent = (opts.recent ?? []).filter(Boolean);
-    if (recent.length) out.push(`Recently: ${recent.join("; ")}`);
+    if (recent.length) out2.push(`Recently: ${recent.join("; ")}`);
     const events = [];
     if (use.length) events.push(`uses ${use.map((u) => `${u.name}${u.n > 1 ? ` ×${u.n}` : ""}${u.after === 0 ? " (used up after this)" : u.after !== void 0 ? ` (${u.after} left after this)` : ""}`).join(", ")}`);
     if (bought.length) events.push(`just bought ${bought.join(", ")}`);
     events.push(...extra2);
     if (carried > opts.slots) events.push("carrying more than the limit");
-    if (events.length) out.push(`This turn: ${events.join("; ")}`);
+    if (events.length) out2.push(`This turn: ${events.join("; ")}`);
     const reveal = list4.filter((e) => e.truth && (use.some((u) => u.name === e.name) || isEquipped(e, list4)));
     if (reveal.length) {
-      out.push(guideOr("Main", "INVENTORY.REALLY", "Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):"));
-      for (const e of reveal) out.push(e.truth === "?" ? guideOr("Main", "INVENTORY.REALLY_UNKNOWN", () => `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ""} — decide what it really does now, then keep it the same from here on.`, { name: e.name, label_note: e.effect ? ` (the label says 「${e.effect}」 and may be false)` : "" }) : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ""}`);
+      out2.push(guideOr("Main", "INVENTORY.REALLY", "Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):"));
+      for (const e of reveal) out2.push(e.truth === "?" ? guideOr("Main", "INVENTORY.REALLY_UNKNOWN", () => `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ""} — decide what it really does now, then keep it the same from here on.`, { name: e.name, label_note: e.effect ? ` (the label says 「${e.effect}」 and may be false)` : "" }) : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ""}`);
     }
-    return out.join("\n");
+    return out2.join("\n");
   }
   function searchItems(it, alive, q) {
     const k = q.trim().toLowerCase();
@@ -910,9 +952,9 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
   }
   function keysAfterLastBot(chat) {
     const list4 = chat.message ?? [];
-    const out = [];
-    for (let i = list4.length - 1; i >= 0 && list4[i].role !== "char"; i--) out.push(messageKey(list4[i], i));
-    return out;
+    const out2 = [];
+    for (let i = list4.length - 1; i >= 0 && list4[i].role !== "char"; i--) out2.push(messageKey(list4[i], i));
+    return out2;
   }
   function usedItemsAt(it, anchors, alive) {
     const set2 = new Set(anchors.filter(Boolean));
@@ -926,6 +968,47 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
     const at = typeof vars?.[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
     return !at || at === userKey ? readItemUse(vars) : [];
   }
+  function useTurn(chat, userKey, anchor = "") {
+    const prev = userKey ? readUsePrev(chat.scriptstate) : null;
+    const mine3 = prev && prev.at === userKey ? prev : null;
+    const keys = aliveAnchors(chat);
+    const there = (k) => k && keys.has(k) ? k : "";
+    if (mine3 && (!keys.has(mine3.from) || mine3.from === anchor)) return { reroll: true, queue: mine3.q, after: there(mine3.after) };
+    return { reroll: false, queue: pendingItemUse(chat.scriptstate, userKey), after: there(mine3?.from) };
+  }
+  var usedThisTurn = (chat, it, id2, userKey, alive, after, skip = "") => it.log.some((l) => l.what === "use" && l.by === "use" && l.item === id2 && l.anchor !== skip && alive.has(l.anchor) && keyAfter(chat, l.anchor, userKey) && (!after || keyAfter(chat, l.anchor, after)));
+  function useCarried(chat, it, id2, userKey = lastUserKey(chat), alive = aliveAnchors(chat)) {
+    if (!userKey) return false;
+    const t = useTurn(chat, userKey);
+    if (!t.reroll && chat.scriptstate?.[ITEM_USE_AT_VAR] !== userKey) return false;
+    return usedThisTurn(chat, it, id2, userKey, alive, t.after);
+  }
+  function usesToSend(chat, it = readItems(chat.scriptstate), alive = aliveAnchors(chat)) {
+    const userKey = lastUserKey(chat);
+    const live = liveItems(it, alive);
+    return useTurn(chat, userKey).queue.flatMap((u) => {
+      if (useCarried(chat, it, u.id, userKey, alive)) return [];
+      const e = live.find((x) => x.id === u.id);
+      if (!e || !canUse(e)) return [];
+      const l = itemLeft(it, e, alive);
+      const n3 = l !== void 0 ? Math.min(u.n, l) : 1;
+      return n3 > 0 ? [{ id: e.id, name: e.name, n: n3, ...l !== void 0 ? { after: l - n3 } : {} }] : [];
+    });
+  }
+  function queueUseVars(chat, fn2) {
+    const vars = chat.scriptstate;
+    const at = typeof vars?.[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
+    const old = readItemUse(vars);
+    const done3 = !!at && !keysAfterLastBot(chat).includes(at);
+    const cur = done3 ? [] : old;
+    const next = fn2(cur);
+    if (JSON.stringify(next) === JSON.stringify(cur)) return null;
+    if (!done3) return { ...itemUseVars(next), [ITEM_USE_AT_VAR]: "" };
+    const was = readUsePrev(vars);
+    const from = lastBotKey(chat);
+    const prev = at === lastUserKey(chat) && from && old.length ? { at, from, q: old, ...was?.at === at ? { after: was.from } : {} } : null;
+    return { ...itemUseVars(next), [ITEM_USE_AT_VAR]: "", ...usePrevVars(prev) };
+  }
   function inventoryText(chat) {
     const vars = chat.scriptstate;
     if (!itemPushOn(vars)) {
@@ -933,20 +1016,11 @@ ${guideOr(guide, "ASSIGN_RULE", () => `Build each item to its assigned ${G3} and
       return soldOff2.length ? [SHOP_HEAD, `This turn: ${soldOff2.join("; ")}`].join("\n") : "";
     }
     const it = readItems(vars);
-    const userKey = lastUserKey(chat);
     const alive = aliveAnchors(chat);
-    const reroll = typeof vars?.[ITEM_USE_AT_VAR] === "string" && vars[ITEM_USE_AT_VAR] === userKey && userKey;
-    const after = reroll ? new Set([...alive].filter((k) => !it.log.some((l) => l.what === "use" && l.by === "use" && l.anchor === k && keyAfter(chat, k, userKey)))) : alive;
-    const live = liveItems(it, after);
-    const left = (e) => itemLeft(it, e, after);
+    const live = liveItems(it, alive);
+    const left = (e) => itemLeft(it, e, alive);
     const shop = shopOn(vars);
-    const use = pendingItemUse(vars, userKey).flatMap((u) => {
-      const e = live.find((x) => x.id === u.id);
-      if (!e || !canUse(e)) return [];
-      const l = left(e);
-      const n3 = l !== void 0 ? Math.min(u.n, l) : 1;
-      return n3 > 0 ? [{ name: e.name, n: n3, ...l !== void 0 ? { after: l - n3 } : {} }] : [];
-    });
+    const use = usesToSend(chat, it, alive).map(({ id: _id, ...u }) => u);
     const resumed = invJustResumed(chat);
     const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop, (place3, plain2) => soldPasses(vars, place3, plain2)), ...mallEvents(chat)];
     const text5 = itemsBlock(live, {
@@ -984,32 +1058,48 @@ ${guide}` : ""}` : "";
     const block5 = { role: "system", content: text5 };
     return at < 0 ? [...messages, block5] : [...messages.slice(0, at), block5, ...messages.slice(at)];
   }
-  function settleItemUse(chat, responseIndex) {
+  function settleItemUse(chat, responseIndex, sent2) {
     const vars = chat.scriptstate ?? {};
     const queue = readItemUse(vars);
     const at = typeof vars[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
-    if (!queue.length && !at) return null;
+    const prev = readUsePrev(vars);
+    if (!queue.length && !at && !prev) return null;
     const userKey = lastUserKey(chat);
-    if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: "" };
-    if (!queue.length) return { [ITEM_USE_AT_VAR]: "" };
     const m = chat.message?.[responseIndex];
-    if (!m || m.role !== "char") return null;
-    const anchor = messageKey(m, responseIndex);
+    const anchor = m && m.role === "char" ? messageKey(m, responseIndex) : "";
+    const turn3 = useTurn(chat, userKey, anchor);
     const it0 = readItems(vars);
     let it = it0;
     const alive = new Set([...aliveAnchors(chat)].filter((k) => k !== anchor));
-    for (const u of queue) {
-      if (it.log.some((l) => l.what === "use" && l.by === "use" && l.anchor === anchor && l.item === u.id)) continue;
-      if (it.log.some((l) => l.what === "use" && l.by === "use" && l.item === u.id && l.anchor !== anchor && alive.has(l.anchor) && keyAfter(chat, l.anchor, userKey))) continue;
-      const item2 = liveItems(it0, alive).find((e) => e.id === u.id);
-      if (!item2 || !canUse(item2)) continue;
-      const left = itemLeft(it0, item2, alive);
-      const n3 = left !== void 0 ? Math.min(u.n, left) : 1;
-      if (n3 < 1) continue;
-      it = addItemLog(it, { name: item2.name, item: item2.id, n: n3, ...item2.icon ? { icon: item2.icon } : {}, what: "use", by: "use", anchor, ...left !== void 0 && left - n3 <= 0 ? { note: "다 씀" } : {} }, alive);
+    const log = (list4, carried) => {
+      for (const u of list4) {
+        if (it.log.some((l) => l.what === "use" && l.by === "use" && l.anchor === anchor && l.item === u.id)) continue;
+        if (sent2 && !sent2.has(u.id)) continue;
+        if (carried && usedThisTurn(chat, it, u.id, userKey, alive, turn3.after, anchor)) continue;
+        const item2 = liveItems(it0, alive).find((e) => e.id === u.id) ?? (sent2?.has(u.id) ? it0.list.find((e) => e.id === u.id && (!e.anchor || alive.has(e.anchor))) : void 0);
+        if (!item2 || !canUse(item2)) continue;
+        const left = itemLeft(it0, item2, alive);
+        const n3 = left !== void 0 ? Math.min(u.n, left) : 1;
+        if (n3 < 1) continue;
+        it = addItemLog(it, { name: item2.name, item: item2.id, n: n3, ...item2.icon ? { icon: item2.icon } : {}, what: "use", by: "use", anchor, ...left !== void 0 && left - n3 <= 0 ? { note: "다 씀" } : {} }, alive);
+      }
+    };
+    if (turn3.reroll && prev) {
+      if (!anchor) return null;
+      log(turn3.queue, true);
+      const stale = at && at !== userKey ? { ...itemUseVars([]), [ITEM_USE_AT_VAR]: "" } : {};
+      const keep2 = at === userKey ? null : { ...prev, from: anchor };
+      if (it === it0 && !at && keep2?.from === prev.from) return null;
+      return { ...it === it0 ? {} : itemsVars(it), ...stale, ...usePrevVars(keep2) };
     }
+    const drop = prev && prev.at !== userKey ? usePrevVars(null) : {};
+    if (!queue.length && !at) return prev && prev.at !== userKey ? drop : null;
+    if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: "", ...drop };
+    if (!queue.length) return { [ITEM_USE_AT_VAR]: "", ...drop };
+    if (!anchor) return null;
+    log(queue, at === userKey);
     if (it === it0 && at === userKey) return null;
-    return { ...it === it0 ? {} : itemsVars(it), [ITEM_USE_AT_VAR]: userKey };
+    return { ...it === it0 ? {} : itemsVars(it), [ITEM_USE_AT_VAR]: userKey, ...drop };
   }
   function itemsNowOf(chat, pictures2) {
     const it = readItems(chat.scriptstate);
@@ -1175,9 +1265,33 @@ ${guide}` : ""}` : "";
   var on = false;
   var timer;
   var subs = /* @__PURE__ */ new Set();
+  var probe = null;
+  function setWaitingProbe(fn2) {
+    probe = fn2;
+  }
+  var WAIT_MS = 18e4;
+  var WAIT_AGAIN_MS = 3e4;
+  async function expire2(mine3) {
+    let busy6 = false;
+    try {
+      busy6 = !!probe && await probe();
+    } catch {
+    }
+    if (timer !== mine3 || !on) return;
+    if (busy6) {
+      const t = setTimeout(() => void expire2(t), WAIT_AGAIN_MS);
+      timer = t;
+      return;
+    }
+    setWaiting(false, true);
+  }
   function setWaiting(w, late = false) {
     clearTimeout(timer);
-    if (w) timer = setTimeout(() => setWaiting(false, true), 18e4);
+    timer = void 0;
+    if (w) {
+      const t = setTimeout(() => void expire2(t), WAIT_MS);
+      timer = t;
+    }
     if (w === on) return;
     on = w;
     for (const f of subs) f(w, late);
@@ -1417,7 +1531,7 @@ ${guide}` : ""}` : "";
     return { title: title2, meta, body: body5 };
   }
   function docsIn(entries2) {
-    const out = [];
+    const out2 = [];
     const seen4 = /* @__PURE__ */ new Set();
     for (const e of entries2) {
       const name = String(e.comment ?? "");
@@ -1427,10 +1541,10 @@ ${guide}` : ""}` : "";
       const doc2 = parseDocContent(title2, String(e.content ?? ""));
       if (doc2) {
         seen4.add(title2);
-        out.push(doc2);
+        out2.push(doc2);
       }
     }
-    return out;
+    return out2;
   }
   var WIKI_PACK_HEAD = "GOEIWIKI1:";
   var pack = null;
@@ -1633,24 +1747,24 @@ ${req.docRequest.trim()}`;
   var esc2 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var escText = (s8) => esc2(s8.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
   function attrs(open3) {
-    const out = {};
-    for (const m of open3.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
-    return out;
+    const out2 = {};
+    for (const m of open3.matchAll(/([\w]+)="([^"]*)"/g)) out2[m[1]] = m[2].replace(/&quot;/g, '"');
+    return out2;
   }
   function splitFields(s8, sep = "|") {
-    const out = [];
+    const out2 = [];
     let depth = 0;
     let cur = "";
     for (const ch of s8) {
       if (ch === "{") depth++;
       if (ch === "}") depth = Math.max(0, depth - 1);
       if (ch === sep && depth === 0) {
-        out.push(cur);
+        out2.push(cur);
         cur = "";
       } else cur += ch;
     }
-    out.push(cur);
-    return out;
+    out2.push(cur);
+    return out2;
   }
   function field(f) {
     const i = f.indexOf(":");
@@ -1694,17 +1808,17 @@ ${line2}`;
     }
     let hi = 0;
     let list4 = [];
-    const out = [];
+    const out2 = [];
     const flushList = () => {
-      if (list4.length) out.push(`<ul class="nw-list">${list4.map((x) => `<li>${x}</li>`).join("")}</ul>`);
+      if (list4.length) out2.push(`<ul class="nw-list">${list4.map((x) => `<li>${x}</li>`).join("")}</ul>`);
       list4 = [];
     };
     let spoil = null;
     const hidden = /* @__PURE__ */ new Set();
     const closeSpoil = () => {
       if (!spoil) return;
-      const inner = out.splice(spoil.at).join("");
-      if (inner) out.push(`<details class="nw-spoil"><summary>스포일러 · 눌러서 보기</summary><div class="nw-spoil-in">${inner}</div></details>`);
+      const inner = out2.splice(spoil.at).join("");
+      if (inner) out2.push(`<details class="nw-spoil"><summary>스포일러 · 눌러서 보기</summary><div class="nw-spoil-in">${inner}</div></details>`);
       spoil = null;
     };
     for (const b of blocks) {
@@ -1716,16 +1830,16 @@ ${line2}`;
           const fields3 = splitFields(b.text).map(field);
           const head3 = fields3.find(([k]) => k === "Title")?.[1] ?? a.doc_title ?? "";
           const rows3 = fields3.filter(([k]) => k !== "Title" && k);
-          out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head3)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc2(o.photo)}" alt=""></td></tr>` : ""}${rows3.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join("")}</table>`);
+          out2.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head3)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc2(o.photo)}" alt=""></td></tr>` : ""}${rows3.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join("")}</table>`);
           break;
         }
         case "Toc":
-          if (headings.length) out.push(`<nav class="nw-toc"><b>목차</b>${headings.map((h) => `<a class="l${h.level}" data-action="wiki-jump" data-value="nw-h-${h.id}"><span class="no">${h.id}.</span> ${inline(h.title)}</a>`).join("")}</nav>`);
+          if (headings.length) out2.push(`<nav class="nw-toc"><b>목차</b>${headings.map((h) => `<a class="l${h.level}" data-action="wiki-jump" data-value="nw-h-${h.id}"><span class="no">${h.id}.</span> ${inline(h.title)}</a>`).join("")}</nav>`);
           break;
         case "Heading": {
           const h = headings[hi++];
-          if (h) out.push(`<h${h.level + 2} class="nw-h" id="nw-h-${h.id}" style="--nw:${color}"><span>${h.id}.</span> ${inline(h.title)}</h${h.level + 2}>`);
-          if (h && o.fold && !spoil && SPOILER_HEADING.test(h.title)) spoil = { level: h.level, at: out.length };
+          if (h) out2.push(`<h${h.level + 2} class="nw-h" id="nw-h-${h.id}" style="--nw:${color}"><span>${h.id}.</span> ${inline(h.title)}</h${h.level + 2}>`);
+          if (h && o.fold && !spoil && SPOILER_HEADING.test(h.title)) spoil = { level: h.level, at: out2.length };
           break;
         }
         case "List":
@@ -1734,13 +1848,13 @@ ${line2}`;
         case "Image": {
           const f = Object.fromEntries(splitFields(b.text).map(field));
           const url = f.Name && o.image ? o.image(f.Name.trim()) : null;
-          if (url) out.push(`<figure class="nw-fig"><img src="${esc2(url)}" alt="${esc2(f.Caption ?? "")}" loading="lazy">${f.Caption ? `<figcaption>${inline(f.Caption)}</figcaption>` : ""}</figure>`);
+          if (url) out2.push(`<figure class="nw-fig"><img src="${esc2(url)}" alt="${esc2(f.Caption ?? "")}" loading="lazy">${f.Caption ? `<figcaption>${inline(f.Caption)}</figcaption>` : ""}</figure>`);
           break;
         }
         case "Quote": {
           const parts = splitFields(b.text);
           const src = parts.slice(1).map(field).find(([k]) => k === "Source")?.[1];
-          out.push(`<blockquote class="nw-quote">${inline(parts[0])}${src ? `<cite>— ${inline(src)}</cite>` : ""}</blockquote>`);
+          out2.push(`<blockquote class="nw-quote">${inline(parts[0])}${src ? `<cite>— ${inline(src)}</cite>` : ""}</blockquote>`);
           break;
         }
         case "Table":
@@ -1756,19 +1870,19 @@ ${line2}`;
             const t = i ? "td" : "th";
             return `<${t}>${inline(x.trim())}</${t}>`;
           }).join("");
-          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells2(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${k === "RowHead" ? rowHead(v) : cells2(v, "td")}</tr>`).join("")}</table>`);
+          out2.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells2(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${k === "RowHead" ? rowHead(v) : cells2(v, "td")}</tr>`).join("")}</table>`);
           break;
         }
         default:
-          if (b.text.trim()) out.push(`<p class="nw-p">${inline(b.text.trim()).replace(/\n/g, "<br>")}</p>`);
+          if (b.text.trim()) out2.push(`<p class="nw-p">${inline(b.text.trim()).replace(/\n/g, "<br>")}</p>`);
       }
       if (spoil) for (let i = n0; i < notes.length; i++) hidden.add(i);
     }
     flushList();
     closeSpoil();
-    if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n3, i) => `<li data-fn="${i + 1}">${hidden.has(i) ? `<details class="nw-spoil fn"><summary>스포일러</summary><span class="nw-fn-t">${n3}</span></details>` : n3}</li>`).join("")}</ol>`);
+    if (notes.length) out2.push(`<ol class="nw-notes">${notes.map((n3, i) => `<li data-fn="${i + 1}">${hidden.has(i) ? `<details class="nw-spoil fn"><summary>스포일러</summary><span class="nw-fn-t">${n3}</span></details>` : n3}</li>`).join("")}</ol>`);
     const links = (keys) => keys.map((k) => a[k]).filter((t) => !!t && validTitle(t)).map((t) => o.canon(t));
-    return { html: out.join(""), title: a.doc_title || "", related: links(["related1", "related2", "related3"]), recent: links(["recent1", "recent2", "recent3"]), headings: headings.map((h) => h.title) };
+    return { html: out2.join(""), title: a.doc_title || "", related: links(["related1", "related2", "related3"]), recent: links(["recent1", "recent2", "recent3"]), headings: headings.map((h) => h.title) };
   }
   var NW_CONTEXT = "$nw_context";
   var WIKI_CTX_MIN_TRIM = 500;
@@ -1903,9 +2017,9 @@ ${story}`;
     return map;
   }
   function chatCardsAt(chat, index) {
-    const out = [];
-    for (const list4 of collectCards(chat).values()) for (const r of list4) if (r.idx === index) out.push(r);
-    return out;
+    const out2 = [];
+    for (const list4 of collectCards(chat).values()) for (const r of list4) if (r.idx === index) out2.push(r);
+    return out2;
   }
   async function refreshStatusContext(charIndex, chatIndex, known) {
     if (charIndex < 0 || chatIndex < 0) return;
@@ -1933,7 +2047,7 @@ ${story}`;
     const tags = findStatusTags(text5);
     if (!tags.length) return text5;
     armChatClick("status");
-    let out = text5;
+    let out2 = text5;
     for (const t of tags) {
       const list4 = cards.get(t.raw.trim());
       let extra2 = "";
@@ -1942,9 +2056,9 @@ ${story}`;
         const p2 = cardPalette(currentTheme());
         extra2 = list4.map((r) => reportCardHtml(r, p2)).join("");
       }
-      out = out.replace(t.raw, () => statusHtml(t, ctx) + extra2);
+      out2 = out2.replace(t.raw, () => statusHtml(t, ctx) + extra2);
     }
-    return out;
+    return out2;
   }
   onChatClick("status", async (doc2, x, y) => {
     const boxes = await elements(doc2, "[data-goei-status]");
@@ -2113,9 +2227,9 @@ ${story}`;
       ...dir2.sites.map((p2) => placePic(char, p2))
     ].filter((x) => !!x && !!x.name);
     const seen4 = /* @__PURE__ */ new Set();
-    const out = list4.filter((p2) => seen4.has(p2.name) ? false : (seen4.add(p2.name), true));
-    cache6 = { lore: char.globalLore, list: out };
-    return out;
+    const out2 = list4.filter((p2) => seen4.has(p2.name) ? false : (seen4.add(p2.name), true));
+    cache6 = { lore: char.globalLore, list: out2 };
+    return out2;
   }
   function sitePicList(char, sec2, within) {
     const low2 = within?.toLowerCase();
@@ -2174,15 +2288,15 @@ ${story}`;
   }
   var TOGGLE = { desc: "description", authors: "authors", persona: "persona", active: "active", related: "related", secondary: "secondary" };
   function fnRefToggles(state2, f, fn2) {
-    const out = { ...refToggles(state2, f) };
-    for (const chip3 of REF_CHIP_KEYS) out[TOGGLE[chip3]] = out[TOGGLE[chip3]] && fnChipOn(state2, f, fn2, chip3);
-    return out;
+    const out2 = { ...refToggles(state2, f) };
+    for (const chip3 of REF_CHIP_KEYS) out2[TOGGLE[chip3]] = out2[TOGGLE[chip3]] && fnChipOn(state2, f, fn2, chip3);
+    return out2;
   }
   function fnRefs(state2, f, fn2) {
     if (f !== "ph") return fnRefToggles(state2, f, fn2);
-    const out = {};
-    for (const chip3 of REF_CHIP_KEYS) out[TOGGLE[chip3]] = fnChipOn(state2, f, fn2, chip3);
-    return out;
+    const out2 = {};
+    for (const chip3 of REF_CHIP_KEYS) out2[TOGGLE[chip3]] = fnChipOn(state2, f, fn2, chip3);
+    return out2;
   }
   var FN_AMOUNTS = {
     turns: { label: "챗로그", min: 0, max: 200, unit: "턴", zero: "안 봄" },
@@ -2731,34 +2845,34 @@ ${retryAnalyze()}
   }
   function applyPlayer(messages, block5, persona2, userName, agentName) {
     if (!block5) return messages;
-    let out = messages;
+    let out2 = messages;
     const p2 = persona2.trim();
     let placed = false;
     if (p2.length >= 8) {
-      out = out.map((m) => {
+      out2 = out2.map((m) => {
         if (typeof m?.content !== "string" || !m.content.includes(p2)) return m;
         const content = placed ? m.content.split(p2).join("") : m.content.replace(p2, () => block5);
         placed = true;
         return { ...m, content };
       });
     }
-    if (!placed && !out.some((m) => typeof m?.content === "string" && m.content.includes(block5))) {
-      const at = out.findIndex((m) => m?.role === "system");
+    if (!placed && !out2.some((m) => typeof m?.content === "string" && m.content.includes(block5))) {
+      const at = out2.findIndex((m) => m?.role === "system");
       const add = { role: "system", content: block5 };
-      out = at < 0 ? [add, ...out] : [...out.slice(0, at + 1), add, ...out.slice(at + 1)];
+      out2 = at < 0 ? [add, ...out2] : [...out2.slice(0, at + 1), add, ...out2.slice(at + 1)];
     }
     const n3 = userName.trim();
     if (n3 && agentName && n3 !== agentName && n3.length >= 2 && !/^(?:user|나|유저)$/i.test(n3)) {
       const esc47 = n3.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const re = new RegExp(/^[A-Za-z]/.test(n3) ? `\\b${esc47}\\b` : `(?<![가-힣])${esc47}(?=${HANGUL_TAIL})`, "g");
       const swap = (text5) => text5.split(block5).map((part) => part.replace(re, () => agentName)).join(block5);
-      out = out.map((m) => {
+      out2 = out2.map((m) => {
         if (typeof m?.content !== "string") return m;
         const content = swap(m.content);
         return content === m.content ? m : { ...m, content };
       });
     }
-    return out;
+    return out2;
   }
   function hidePlayerTag(messages, tagNames) {
     const drop = new Set(tagNames.filter(Boolean));
@@ -3568,9 +3682,9 @@ ${JSON.stringify(previousRoom ?? "")}`)
     return null;
   }
   function base642(b) {
-    let out = "";
-    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
-    return btoa(out);
+    let out2 = "";
+    for (let i = 0; i < b.length; i += 32768) out2 += String.fromCharCode(...b.subarray(i, i + 32768));
+    return btoa(out2);
   }
   async function savePhoto(file) {
     if (!file.type.startsWith("image/")) throw new PhotoError("사진 파일만 보낼 수 있어요.");
@@ -3648,107 +3762,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
     const all = giftNote && !kinds.includes("gift") ? [...kinds, "gift"] : kinds;
     const menu = all.map((k) => {
       const blocked2 = !kinds.includes(k);
-      if (k === "image") return `<button class="at-add at-add-image" data-pick-photo="${prefix}" ${disabled || full ? "disabled" : ""} title="붙여넣기(Ctrl+V)나 끌어놓기로도 올릴 수 있어요">${ICON.image}<span>사진 올리기</span></button>`;
-      const label2 = k === "photo" && kinds.includes("image") ? "사진 묘사" : ATTACH_LABELS[k];
-      return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc6(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
-    }).join("");
-    if (!rows3 && !showMenu) return "";
-    return `<div class="at-editor" data-drop-photo="${prefix}">${rows3}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
-  }
-  function attachInput(items, key, value) {
-    const row8 = items[Number(key)];
-    if (!row8) return false;
-    row8.content = value;
-    return true;
-  }
-  function attachAction(items, op, value, kinds) {
-    if (op === "add") {
-      if (items.length >= ATTACH_MAX || value === "image" || !kinds.includes(value)) return false;
-      items.push({ kind: value, content: "" });
-      return true;
-    }
-    const i = Number(value);
-    if (!Number.isInteger(i) || !items[i]) return false;
-    const [gone] = items.splice(i, 1);
-    if (gone.preview?.startsWith("blob:")) URL.revokeObjectURL(gone.preview);
-    return true;
-  }
-  function addPhoto(items, asset, preview) {
-    if (items.length >= ATTACH_MAX) return false;
-    items.push({ kind: "image", content: "", asset, preview });
-    if (preview.startsWith("blob:")) photos.set(asset, preview);
-    return true;
-  }
-  var emptyAttachment = (items) => items.find((a) => a.kind !== "image" && !a.content.trim());
-  var photos = /* @__PURE__ */ new Map();
-  var loading = /* @__PURE__ */ new Map();
-  function loadPhoto(asset) {
-    let p2 = loading.get(asset);
-    if (!p2) {
-      p2 = photoUrl(asset).then((url) => {
-        photos.set(asset, url);
-        return url;
-      });
-      loading.set(asset, p2);
-    }
-    return p2;
-  }
-  function hydratePhotos(scope) {
-    scope.querySelectorAll("img[data-asset]").forEach((img) => {
-      const asset = img.dataset.asset;
-      if (!asset || img.getAttribute("src")) return;
-      const fill3 = (url) => {
-        if (url) img.src = url;
-        else img.closest(".at-card-image")?.classList.add("broken");
-      };
-      if (photos.has(asset)) fill3(photos.get(asset));
-      else void loadPhoto(asset).then(fill3);
-    });
-  }
-  function zoomPhoto(src, alt) {
-    const box3 = document.createElement("div");
-    box3.className = "gx at-zoom";
-    box3.setAttribute("role", "dialog");
-    box3.setAttribute("aria-label", "사진 크게 보기");
-    box3.innerHTML = `<img src="${esc6(src)}" alt="${esc6(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
-    const close3 = () => {
-      box3.remove();
-      document.removeEventListener("keydown", key, true);
-    };
-    const key = (ev) => {
-      if (ev.key !== "Escape") return;
-      ev.stopPropagation();
-      close3();
-    };
-    box3.addEventListener("click", close3);
-    document.addEventListener("keydown", key, true);
-    document.body.appendChild(box3);
-  }
-  function card(kind, text5, asset) {
-    const label2 = ATTACH_LABELS[kind];
-    if (kind === "image") {
-      const src = asset ? photos.get(asset) : null;
-      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc6(src ?? "")}" data-asset="${esc6(asset ?? "")}" alt="${esc6(text5 || label2)}" loading="lazy"></button>
-      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text5.trim() ? `<figcaption>${esc6(text5)}</figcaption>` : ""}</figure>`;
-    }
-    if (kind === "file") {
-      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc6(text5)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
-    }
-    if (kind === "link") {
-      const url = attachUrl(text5);
-      const go3 = url ? `<a class="at-go" href="${esc6(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
-      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc6(text5)}</b>${go3}</div></div>`;
-    }
-    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc6(text5)}</b><small>선물이 도착했습니다</small></div></div>`;
-    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc6(text5).replace(/\n/g, "<br>")}</span></div></div>`;
-  }
-  var sitePic = null;
-  function setSitePicSource(fn2) {
-    sitePic = fn2;
-  }
-  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
-  var camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-  function boardCard(kind, text5, asset, url) {
-    if (kind === "image" || url) {
-      const src = url ?? (asset ? photos.get(asset) : null);
-      const data3 = url ? "" : ` data-asset="${esc6(asset
+      if (k === "image") return `<button class="at-add at-add-image" data-pick-photo="${prefix}" ${disabled || full ? "disabled" : "

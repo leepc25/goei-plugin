@@ -1,4 +1,108 @@
- 760px), (max-height: 499px) and (pointer: coarse) {
+위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
+.gw-totop { grid-area: body; align-self: end; justify-self: end; z-index: 5; width: 42px; height: 42px; margin: 0 22px 18px 0; display: grid; place-items: center; padding: 0; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s, transform .18s; }
+.gw-totop.show { opacity: 1; pointer-events: auto; transform: none; }
+.gw-totop:hover { background: var(--accent-bg); }
+.gw-totop svg { width: 20px; height: 20px; }
+/* 조작 없이 설명만 있는 줄 (2026-11-08 사용자: 소지품 「넘기는 것·남는 것」 글 위 쓸데없는 여백) — 빈 조작 칸(높이 34)을 접고 설명을 이름 옆 첫 줄부터 */
+.gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label hint'; }
+.gw .ps-row:has(> .ps-ctl:empty) > .ps-ctl { display: none; }
+.gw .ps-row:has(> .ps-ctl:empty) > .ps-label > b { min-height: 0; }
+@container (max-width: 600px) {
+  .gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label' 'hint'; }
+}
+/* 글 복사 단추 (2026-11-08 사용자): 머리 줄에서는 토큰 수와 ▲▼ 사이, 글 상자에서는 안쪽 오른쪽 위(스크롤 막대 왼쪽) */
+.gw .gw-copy.done { color: var(--signal); border-color: var(--signal); }
+.gw .gw-copybox { position: relative; }
+.gw .gw-copybox > .gw-copy { position: absolute; top: 8px; right: 18px; z-index: 1; background: var(--panel); }
+.gw .gw-copybox > .gw-preview, .gw .gw-copybox > pre, .gw .gw-copybox > textarea { padding-right: 56px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  /* 복사 단추가 늘어 폰에서 ▲▼가 다음 줄로 밀리지 않게 머리 줄 간격만 줄인다 */
+  .gw .gw-field-head { column-gap: 6px; }
+  .gw .gw-fmove .gx-mini.icon { width: 36px; }
+}
+/* 맨 위로 단추가 맨 아래 줄(예: 인물 설정 전용 모델 ID 「저장」)을 덮지 않게 끝에 단추 높이만큼 여백 (11-08 눌러 보기 점검) */
+.gw-body:has(~ .gw-totop)::after { content: ''; display: block; height: 72px; }
+/* 뒤로 단추는 어디서나 36 (11-09 점검 17: 설정 창 안만 34였다) */
+.gw .ph-room-head .ph-tool.ph-back { width: 36px; height: 36px; min-height: 36px; max-height: 36px; }
+/* 세력 관계 줄: 상세 칸이 좁아 5단계 고르기가 오른쪽 밖으로 넘쳤다 (11-09 점검 21) → 이름·설명 아래에 고르기·메모 */
+.gw .gw-rel-rows .ps-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'hint' 'ctl'; }
+.gw .gw-rel-rows .ps-row > .ps-ctl { margin-top: 4px; }
+
+/* 추가 규칙: 규칙마다 접는 칸 한 페이지 (11-09) */
+.gw-rule { margin-bottom: 8px; }
+.gw-rule > summary.ps-adv-sum .gw-state { margin-left: 8px; }
+
+/* ── 표: [이름][사이트 칸 × N] 격자, 설명은 칸들 아래 (줄 규격 [이름][조작] 을 칸 여럿으로 늘린 것. 설정 개편 4단계) ── */
+.gw .mx { display: block; }
+.gw .mx-head, .gw .mx-row { display: grid; grid-template-columns: var(--label) repeat(var(--mx-n), minmax(0, 1fr)); column-gap: 16px; }
+.gw .mx-head { position: sticky; top: 0; z-index: 3; align-items: center; margin: 0 0 12px; padding: 8px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.gw .mx-head label { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
+.gw .mx-head label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw .mx-head label svg, .gw .mx-head label img { width: 18px; height: 18px; flex: 0 0 auto; }
+.gw .mx-row { row-gap: 4px; align-items: start; padding: 10px var(--pad); border-top: 1px solid var(--gline); }
+.gw .ps-rows > .mx-row:first-child { border-top: 0; }
+.gw .mx-label { grid-column: 1; display: flex; align-items: center; min-width: 0; min-height: var(--h); font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); }
+.gw .mx-cell { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--gap); min-width: 0; min-height: var(--h); }
+.gw .mx-cell + .mx-cell { box-shadow: -9px 0 0 -8px var(--gline); }
+.gw .mx-cell .gx-chips { margin: 0; gap: 4px; }
+.gw .mx-cell .ps-text, .gw .mx-cell > input.gx-search:not(.ph-pct) { width: 100%; }
+.gw .mx-cell .ph-pct { width: 56px; }
+.gw .mx-cell .adv-val { max-width: 100%; }
+.gw .mx-site, .gw .mx-r { display: none; }
+.gw .mx-none { color: var(--dim); font-size: 13px; opacity: .65; }
+.gw .mx-all { grid-column: 2 / -1; }
+.gw .mx-shared, .gw .mx-cap { color: var(--dim); font-size: 12.5px; white-space: nowrap; }
+.gw .mx-help { grid-column: 2 / -1; display: block; margin: 0; font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--dim); }
+.gw .mx-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 20px; padding: 10px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--dim); font-size: 13px; }
+.gw .mx-note { margin: 0; padding: 10px var(--pad); border-bottom: 1px solid var(--hair); font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .ck { margin-bottom: 20px; }
+.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) var(--ck-cols, repeat(var(--ck-n), minmax(0, 1fr))); align-items: center; padding: 0 10px; }
+.gw .ck-h1 { padding-top: 8px; font-size: 13px; color: var(--text); }
+.gw .ck-h1 b { padding: 2px 4px; font-weight: 700; text-align: center; word-break: keep-all; }
+.gw .ck-h2 { padding-bottom: 6px; border-bottom: 1px solid var(--gline); font-size: 12.5px; color: var(--dim); }
+.gw .ck-h2 > span { text-align: center; line-height: 1.25; word-break: keep-all; }
+.gw .ck-row { min-height: 38px; border-top: 1px solid var(--gline); }
+.gw .ck-h2 + .ck-row { border-top: 0; }
+.gw .ck-name { min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); }
+.gw .ck-cell { display: flex; align-items: center; justify-content: center; align-self: stretch; }
+.gw .ck-first { box-shadow: inset 1px 0 0 var(--gline); }
+.gw .ck-m { width: 22px; height: 22px; padding: 0; border: 1.5px solid var(--line); background: var(--void); cursor: pointer; }
+.gw .ck-m.round { border-radius: 50%; }
+.gw .ck-m.box { border-radius: 6px; }
+.gw .ck-m.on { border-color: var(--signal); background: var(--signal); box-shadow: inset 0 0 0 4px var(--panel); }
+.gw .ck-m.box.on { box-shadow: none; background: var(--signal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%230b1f1c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.gw .ck-x { color: var(--dim); opacity: .5; }
+.gw .ck > h3 { margin-bottom: 8px; }
+.gw .ck-ph { display: none; }
+.gw .ck-band { box-shadow: inset 2px 0 0 var(--line); }
+.gw .mx-foot:has(.ck-foot1) { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 12px 28px; }
+.gw .ck-foot1 { display: block; min-width: 0; }
+.gw .ck-foot1 > b { display: block; margin-bottom: 4px; color: var(--text); font-size: 13px; font-weight: 700; }
+.gw .hl { display: block; }
+.gw .hl-h { display: block; margin-top: 6px; color: var(--text); font-size: 12.5px; font-weight: 600; opacity: .8; }
+.gw .hl-h:first-child { margin-top: 0; }
+.gw .hl-i { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); column-gap: 10px; padding: 2px 0; line-height: 1.5; }
+.gw .hl-i > b { color: var(--dim); font-weight: 700; word-break: keep-all; }
+.gw .hl-i > span:only-child { grid-column: 1 / -1; }
+.gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 12.5px; }
+.gw .ck-h2.solo { padding-top: 8px; }
+.gw .ck-h2 > span { padding: 0 3px; }
+.gw .ck-n { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--void); overflow: hidden; }
+.gw .ck-n b { min-width: 32px; padding: 0 4px; font-size: 13px; font-weight: 600; text-align: center; color: var(--text); }
+.gw .ck-s { width: 22px; height: 26px; padding: 0; border: 0; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1; cursor: pointer; }
+.gw .mx-grid { margin-bottom: 20px; --label: var(--gname, 96px); }
+/* 격자의 이름 칸은 한 페이지 안에서 모두 같은 폭 (--gname). 이름이 긴 페이지(상점)는 페이지째 넓힌다 */
+.gw .fam-wide { --gname: 136px; }
+.gw .mx-grid .mx-row, .gw .mx-grid .mx-head { padding-left: 10px; padding-right: 10px; }
+.gw .mx-grid .mx-head { position: static; margin: 0; border: 0; border-bottom: 1px solid var(--gline); border-radius: 0; background: none; }
+.gw .mx-grid .mx-head label { font-size: 12.5px; font-weight: 600; color: var(--dim); cursor: default; }
+.gw .mx-grid .mx-row { align-items: center; }
+.gw .mx-grid .ps-rows > .mx-row:nth-child(2) { border-top: 0; }
+.gw .mx-name { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.gw .mx-name svg, .gw .mx-name img { width: 18px; height: 18px; flex: 0 0 auto; }
+.gw .mx-cell .mx-sel { width: auto; min-width: 7.5em; }
+.gw .mx-foot { display: block; padding: 10px var(--pad) 12px; border-top: 1px solid var(--hair); font-size: 13px; line-height: 1.55; color: var(--dim); }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .mx-head { display: flex; gap: 4px; top: 0; margin: 0 0 10px; padding: 4px; }
   .gw .mx-head > span { display: none; }
   .gw .mx-head label { flex: 1 1 0; flex-direction: column; justify-content: center; gap: 3px; min-height: 48px; padding: 4px 2px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--dim); text-align: center; cursor: pointer; }
@@ -1142,12 +1246,12 @@ ${esc30(p2.body)}</textarea></div>`;
   var sexualFieldOn = (p2, field4, s8) => sexualGlobal(s8)[field4] && (p2.sexual?.[field4 === "desire" ? "desireOn" : "paraphiliaOn"] ?? true);
   var explicitOn = (p2, s8) => p2.sexual?.explicit === true ? true : p2.sexual?.explicit === false ? false : s8.explicitStyle;
   function sexualTexts(p2, s8) {
-    const out = {};
+    const out2 = {};
     for (const f of SEXUAL_FIELDS) {
       const t = p2.sexual?.[f]?.text?.trim();
-      if (t && sexualFieldOn(p2, f, s8)) out[f] = t;
+      if (t && sexualFieldOn(p2, f, s8)) out2[f] = t;
     }
-    return out;
+    return out2;
   }
   function setSexualText(p2, field4, text5, at, manual) {
     const sx = ensureSexual(p2);
@@ -1203,11 +1307,11 @@ ${esc30(p2.body)}</textarea></div>`;
     if (!p2.candidates || typeof p2.candidates !== "object") p2.candidates = {};
   }
   function readAxes(raw) {
-    const out = DEFAULT_AXES();
+    const out2 = DEFAULT_AXES();
     if (raw && typeof raw === "object") {
-      for (const a of AXES) if (raw[a] !== void 0) out[a] = axisValue(raw[a]);
+      for (const a of AXES) if (raw[a] !== void 0) out2[a] = axisValue(raw[a]);
     }
-    return out;
+    return out2;
   }
   function axesFromExpress(express) {
     return { ...DEFAULT_AXES(), emotionalExpressiveness: EXPRESS_TO_AXIS[express] };
@@ -1336,28 +1440,28 @@ ${esc30(p2.body)}</textarea></div>`;
   var FIXED_SECTIONS = ["Appearance", "Voice", "Background", "Abilities"];
   function parseSheet(text5) {
     const lines3 = String(text5 ?? "").replace(/\r/g, "").split("\n");
-    const out = { title: "", sections: {} };
+    const out2 = { title: "", sections: {} };
     let cur = null;
     for (const line2 of lines3) {
       const h3 = /^###\s+(.+?)\s*$/.exec(line2);
       const h4 = /^####\s+(.+?)\s*$/.exec(line2);
       if (h3 && !h4) {
-        out.title = h3[1];
+        out2.title = h3[1];
         cur = null;
         continue;
       }
       if (h4) {
         cur = h4[1];
-        out.sections[cur] = "";
+        out2.sections[cur] = "";
         continue;
       }
-      if (cur !== null) out.sections[cur] += (out.sections[cur] ? "\n" : "") + line2;
+      if (cur !== null) out2.sections[cur] += (out2.sections[cur] ? "\n" : "") + line2;
     }
-    for (const k of Object.keys(out.sections)) out.sections[k] = out.sections[k].trim();
-    return out;
+    for (const k of Object.keys(out2.sections)) out2.sections[k] = out2.sections[k].trim();
+    return out2;
   }
   function bullets(section3) {
-    const out = [];
+    const out2 = [];
     let label2 = "";
     for (const raw of section3.split("\n")) {
       const line2 = raw.trim();
@@ -1369,9 +1473,9 @@ ${esc30(p2.body)}</textarea></div>`;
       }
       const b = /^[-*•]\s+(.+)$/.exec(line2);
       const text5 = b ? b[1] : line2;
-      out.push(label2 ? `[${label2}] ${text5}` : text5);
+      out2.push(label2 ? `[${label2}] ${text5}` : text5);
     }
-    return out;
+    return out2;
   }
   function seedPerson(name, sheet, base = {}, now2 = (/* @__PURE__ */ new Date()).toISOString()) {
     const p2 = {
@@ -1567,85 +1671,85 @@ ${esc30(p2.body)}</textarea></div>`;
       for (const k of TRIM_ORDER) while (size() > o.maxChars && kept[k]?.length) kept[k].shift();
     }
     const slot = (k) => kept[k] ?? [];
-    const out = [`## ${p2.name} (living record · updated in this chat)`];
+    const out2 = [`## ${p2.name} (living record · updated in this chat)`];
     const mode2 = o.mode ?? "split";
-    if (o.sheet && mode2 === "append") out.push(o.sheet.trim());
+    if (o.sheet && mode2 === "append") out2.push(o.sheet.trim());
     const id2 = slot("identity");
-    if (id2.length) out.push("Identity:\n" + lines2(id2));
+    if (id2.length) out2.push("Identity:\n" + lines2(id2));
     const per = slot("personality");
-    if (per.length) out.push("Personality:\n" + lines2(per));
-    if (o.axes) out.push("Personality axes (baseline traits, not current feeling):\n" + axesLinesEn(p2.axes).join("\n") + (p2.patterns?.length ? "\nLong-term changes:\n" + p2.patterns.map((t) => `- ${plain(t, 300)}`).join("\n") : ""));
-    if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY}${o.sexualPolicy === false ? "" : ` — ${sexualDirectorPolicy()}`})
+    if (per.length) out2.push("Personality:\n" + lines2(per));
+    if (o.axes) out2.push("Personality axes (baseline traits, not current feeling):\n" + axesLinesEn(p2.axes).join("\n") + (p2.patterns?.length ? "\nLong-term changes:\n" + p2.patterns.map((t) => `- ${plain(t, 300)}`).join("\n") : ""));
+    if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out2.push(`Sexual profile (policy: ${SEXUAL_POLICY}${o.sexualPolicy === false ? "" : ` — ${sexualDirectorPolicy()}`})
 ` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : "", o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ""].filter(Boolean).join("\n"));
-    if (o.sheet && mode2 === "split") for (const s8 of fixedSections(o.sheet)) out.push(`${s8.name}:
+    if (o.sheet && mode2 === "split") for (const s8 of fixedSections(o.sheet)) out2.push(`${s8.name}:
 ${s8.body}`);
     const st = slot("state");
-    if (st.length) out.push("Current state:\n" + lines2(st));
+    if (st.length) out2.push("Current state:\n" + lines2(st));
     const kn = slot("knowledge");
-    if (kn.length) out.push("Knows:\n" + lines2(kn));
-    if (o.unknown?.length) out.push("Does not know (has not witnessed or been told):\n" + o.unknown.map((u) => `- ${plain(u, 120)}`).join("\n"));
+    if (kn.length) out2.push("Knows:\n" + lines2(kn));
+    if (o.unknown?.length) out2.push("Does not know (has not witnessed or been told):\n" + o.unknown.map((u) => `- ${plain(u, 120)}`).join("\n"));
     const rel = slot("relationship");
     const relUser = rel.filter((e) => !e.target || e.target === "@user");
     const relOther = rel.filter((e) => e.target && e.target !== "@user");
     const aff = affinityView(p2, changes, store3.folded[p2.name] ?? 0, o);
     const addr = addressOf(p2, changes);
     const relLine = [o.qual?.has("affinity") ? `Relationship → ${user}:` : `Relationship → ${user}: ${aff.stage.label} (${stageBehavior(aff.stage)})`, expressTail(p2.express)].filter(Boolean).join(" ");
-    out.push(relLine + (relUser.length ? "\n" + lines2(relUser) : ""));
+    out2.push(relLine + (relUser.length ? "\n" + lines2(relUser) : ""));
     if (o.taste) {
       const band = tasteOf(p2, changes);
-      if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? "+" : ""}${band} — ${tasteText(band)}. ${guideOr("Main", "PEOPLE.TASTE_NOTE", TASTE_NOTE)}`);
+      if (band !== null) out2.push(`First impression (taste) → ${user}: ${band > 0 ? "+" : ""}${band} — ${tasteText(band)}. ${guideOr("Main", "PEOPLE.TASTE_NOTE", TASTE_NOTE)}`);
     }
     if (o.openness && !o.qual?.has("openness")) {
       const v = opennessOf(p2, changes);
       if (v !== null) {
         const st2 = opennessStage(v);
-        out.push(`Openness: ${st2.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${contraceptionText(st2)}. ${guideOr("Main", "PEOPLE.OPENNESS_NOTE", OPENNESS_NOTE)}`);
+        out2.push(`Openness: ${st2.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${contraceptionText(st2)}. ${guideOr("Main", "PEOPLE.OPENNESS_NOTE", OPENNESS_NOTE)}`);
       }
     }
-    if (relOther.length) out.push("Relationships with others:\n" + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join("\n"));
-    if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? "mixed"}.`);
+    if (relOther.length) out2.push("Relationships with others:\n" + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join("\n"));
+    if (addr.toUser) out2.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? "mixed"}.`);
     const spUser = slot("speech").filter((e) => !e.target || e.target === "@user");
-    if (spUser.length) out.push(`Speech → ${user}:
+    if (spUser.length) out2.push(`Speech → ${user}:
 ` + spUser.map((e) => `- ${plain(o.speechMarks ? e.text : parseSpeechMarker(e.text).base, SPEECH_ENTRY_CHARS)}`).join("\n"));
     const enabled = new Set(slotsFor(o.features ?? /* @__PURE__ */ new Set(), o.qual));
     for (const g2 of FEATURE_GROUPS) {
       const parts = g2.slots.filter((s8) => enabled.has(s8)).map((s8) => ({ s: s8, list: slot(s8) })).filter((x) => x.list.length);
       if (!parts.length) continue;
-      out.push(`${g2.title}:
+      out2.push(`${g2.title}:
 ` + parts.map((x) => `${SLOT_EN[x.s] ?? SLOT_META[x.s].label}:
 ${targetedLines(x.list, user)}`).join("\n"));
     }
     const sp = slot("speech").filter((e) => e.target && e.target !== "@user");
-    if (sp.length) out.push("Speech toward others:\n" + sp.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join("\n"));
+    if (sp.length) out2.push("Speech toward others:\n" + sp.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join("\n"));
     const be = slot("behavior");
-    if (be.length) out.push("Behavior:\n" + lines2(be));
+    if (be.length) out2.push("Behavior:\n" + lines2(be));
     const th = slot("threads");
-    if (th.length) out.push("Open threads:\n" + lines2(th));
+    if (th.length) out2.push("Open threads:\n" + lines2(th));
     const su = o.qual?.has("suspicion") ? [] : slot("suspicion");
-    if (su.length) out.push("Suspicion:\n" + su.map((e) => `- ${e.target ? `about ${e.target === "@user" ? user : e.target}` : ""}${e.kind ? ` [${e.kind}]` : ""}: ${plain(e.text, 200)}`).join("\n"));
+    if (su.length) out2.push("Suspicion:\n" + su.map((e) => `- ${e.target ? `about ${e.target === "@user" ? user : e.target}` : ""}${e.kind ? ` [${e.kind}]` : ""}: ${plain(e.text, 200)}`).join("\n"));
     const hi = slot("history");
-    if (hi.length) out.push("Recent (this chat):\n" + lines2(hi));
+    if (hi.length) out2.push("Recent (this chat):\n" + lines2(hi));
     const sc = slot("scene");
-    if (sc.length) out.push("Now:\n" + lines2(sc));
+    if (sc.length) out2.push("Now:\n" + lines2(sc));
     if (o.note?.now || o.note?.mustNot?.length) {
-      out.push(["Director note:", o.note.now ? `- ${plain(o.note.now, 160)}` : "", ...(o.note.mustNot ?? []).map((m) => `- Must not reveal: ${plain(m, 100)}`)].filter(Boolean).join("\n"));
+      out2.push(["Director note:", o.note.now ? `- ${plain(o.note.now, 160)}` : "", ...(o.note.mustNot ?? []).map((m) => `- Must not reveal: ${plain(m, 100)}`)].filter(Boolean).join("\n"));
     }
-    return out.join("\n");
+    return out2.join("\n");
   }
   function unknownTo(p2, store3, live, max = 5) {
     const mine3 = liveEntries(p2.slots.knowledge, live).map((e) => norm(e.text));
     const seen4 = /* @__PURE__ */ new Set();
-    const out = [];
+    const out2 = [];
     for (const other of Object.values(store3.people)) {
       if (other.name === p2.name) continue;
       for (const e of liveEntries(other.slots.knowledge, live)) {
         const n3 = norm(e.text);
         if (seen4.has(n3) || mine3.some((m) => m.includes(n3) || n3.includes(m))) continue;
         seen4.add(n3);
-        out.push({ text: e.text, pos: live.at.get(e.anchor) ?? -1 });
+        out2.push({ text: e.text, pos: live.at.get(e.anchor) ?? -1 });
       }
     }
-    return out.sort((a, b) => b.pos - a.pos).slice(0, max).map((x) => x.text);
+    return out2.sort((a, b) => b.pos - a.pos).slice(0, max).map((x) => x.text);
   }
   var PEOPLE_HEAD = "[People records]";
   var KNOWLEDGE_RULE = "Do not have a character mention or act on a secret or fact they have not witnessed, learned, or otherwise demonstrably known. Never invent how they acquired information. Keep facts, beliefs, guesses, and misunderstandings distinct. A missing record does not prove ignorance: actual evidence in the conversation may establish knowledge.";
@@ -1740,14 +1844,14 @@ ${body5}`;
     return { turn: turn3, hooks: hooks2, active: active3, lastPlant, plantAllowed, plantBlocked, priority, lastMethod };
   }
   function rhythmClockLines(c) {
-    const out = [`Turn ${c.turn} (confirmed replies). Active hooks: short ${c.active.short}/${HOOK_LIMIT.short}, mid ${c.active.mid}/${HOOK_LIMIT.mid}, long ${c.active.long}/${HOOK_LIMIT.long}. New plant ${c.plantAllowed ? "allowed" : `not allowed: ${c.plantBlocked}`}.`];
-    for (const h of c.hooks) if (ACTIVE.includes(h.stage)) out.push(`- ${h.key}: ${h.stage}, ${h.tier}, planted ${h.age} turn(s) ago, last advance ${h.sinceLast} turn(s) ago, payoff window ${h.window[0]}–${h.window[1]}${h.overdue ? " — OVERDUE" : h.due ? " — in window" : ""}${h.extended ? " (extended)" : ""}`);
-    if (c.priority.length) out.push(`Priority: ${c.priority.join(" · ")}`);
+    const out2 = [`Turn ${c.turn} (confirmed replies). Active hooks: short ${c.active.short}/${HOOK_LIMIT.short}, mid ${c.active.mid}/${HOOK_LIMIT.mid}, long ${c.active.long}/${HOOK_LIMIT.long}. New plant ${c.plantAllowed ? "allowed" : `not allowed: ${c.plantBlocked}`}.`];
+    for (const h of c.hooks) if (ACTIVE.includes(h.stage)) out2.push(`- ${h.key}: ${h.stage}, ${h.tier}, planted ${h.age} turn(s) ago, last advance ${h.sinceLast} turn(s) ago, payoff window ${h.window[0]}–${h.window[1]}${h.overdue ? " — OVERDUE" : h.due ? " — in window" : ""}${h.extended ? " (extended)" : ""}`);
+    if (c.priority.length) out2.push(`Priority: ${c.priority.join(" · ")}`);
     if (c.lastMethod && c.lastMethod !== "none") {
       const method = c.lastMethod;
-      out.push(guideOr("Main", "RHYTHM.METHOD", () => `Previous staging method: ${method} — do not use the same anticipation method in consecutive turns.`, { method }));
+      out2.push(guideOr("Main", "RHYTHM.METHOD", () => `Previous staging method: ${method} — do not use the same anticipation method in consecutive turns.`, { method }));
     }
-    return out;
+    return out2;
   }
 
   // src/core/people/director.ts
@@ -1884,7 +1988,7 @@ ${guideOr("Director", "PASS2", SYSTEM_PASS2)}`, data: { ...built.data, found }, 
       if (!hasNotes) throw new Error("검색 요청이 비어 있어요");
     }
     if (!Array.isArray(v.notes)) throw new Error("notes 목록이 없어요");
-    const out = [];
+    const out2 = [];
     for (const n3 of v.notes) {
       const who = typeof n3?.who === "string" ? n3.who : "";
       if (!people.includes(who)) continue;
@@ -1893,9 +1997,9 @@ ${guideOr("Director", "PASS2", SYSTEM_PASS2)}`, data: { ...built.data, found }, 
       const mustNot = Array.isArray(n3.must_not_reveal) ? n3.must_not_reveal.map((x) => plain(x, 120)).filter(Boolean).slice(0, 8) : [];
       const uncertain = Array.isArray(n3.uncertain) ? n3.uncertain.map((x) => plain(x, 160)).filter(Boolean).slice(0, 3) : [];
       if (!now2 && !react && !mustNot.length) continue;
-      out.push({ who, now: now2, ...react ? { react } : {}, mustNot, ...uncertain.length ? { uncertain } : {} });
+      out2.push({ who, now: now2, ...react ? { react } : {}, mustNot, ...uncertain.length ? { uncertain } : {} });
     }
-    return { notes: out };
+    return { notes: out2 };
   }
   var norm2 = (t) => String(t ?? "").normalize("NFC").toLowerCase().replace(/\s+/g, " ");
   var excerpt = (text5, q, span = 200) => {
@@ -2001,15 +2105,15 @@ ${dialogues.join("\n")}` : ""}` : "";
       }
     }
     if (!state2 || typeof state2 !== "object" || Array.isArray(state2)) return [];
-    const out = [];
+    const out2 = [];
     const chunks = state2.chunks;
     for (const chunk of Array.isArray(chunks) ? chunks : []) {
       for (const node of Array.isArray(chunk?.nodes) ? chunk.nodes : []) {
         const text5 = plusNodeText(node);
-        if (text5) out.push({ source: "hypaplus", text: text5, favorite: node?.favorite === true, index: Number(node?.createdAt) || out.length + 1 });
+        if (text5) out2.push({ source: "hypaplus", text: text5, favorite: node?.favorite === true, index: Number(node?.createdAt) || out2.length + 1 });
       }
     }
-    return out;
+    return out2;
   }
   function selectHypa(items, query, o = {}) {
     const maxItems = Math.max(0, Math.min(HYPA_MAX_ITEMS, o.maxItems ?? HYPA_DEFAULT_ITEMS));
@@ -2062,9 +2166,9 @@ ${dialogues.join("\n")}` : ""}` : "";
     const list4 = Array.isArray(chat.message) ? chat.message : [];
     const recent = list4.slice(-(o.recent ?? 2)).reverse().map((m) => messageText(String(m.data ?? "")));
     if (o.input) recent.unshift(o.input);
-    const out = [];
+    const out2 = [];
     const push3 = (n3) => {
-      if (store3.people[n3] && !out.includes(n3)) out.push(n3);
+      if (store3.people[n3] && !out2.includes(n3)) out2.push(n3);
     };
     for (const t of recent) for (const n3 of match(t)) push3(n3);
     const lastBot2 = [...list4].reverse().find((m) => m.role === "char");
@@ -2072,7 +2176,7 @@ ${dialogues.join("\n")}` : ""}` : "";
       const tags = findStatusTags(String(lastBot2.data ?? ""));
       for (const c of tags.at(-1)?.companions ?? []) for (const n3 of match(c)) push3(n3);
     }
-    return out.slice(0, o.max ?? 6);
+    return out2.slice(0, o.max ?? 6);
   }
   function entriesOf(store3, extra2 = {}) {
     return Object.values(store3.people).map((p2) => ({
@@ -2087,21 +2191,21 @@ ${dialogues.join("\n")}` : ""}` : "";
   var msgs3 = (chat) => Array.isArray(chat.message) ? chat.message : [];
   function planBatches(chat, unread, spanCap, maxTurns = 6) {
     const list4 = msgs3(chat);
-    const out = [];
+    const out2 = [];
     let cur = [];
     let chars2 = 0;
     for (const i of unread) {
       const n3 = str9(list4[i]?.data).length + str9(list4[i - 1]?.data).length;
       if (cur.length && (cur.length >= maxTurns || chars2 + n3 > spanCap)) {
-        out.push(cur);
+        out2.push(cur);
         cur = [];
         chars2 = 0;
       }
       cur.push(i);
       chars2 += n3;
     }
-    if (cur.length) out.push(cur);
-    return out;
+    if (cur.length) out2.push(cur);
+    return out2;
   }
   function cleanSpan(raw, cap) {
     const t = sentText(raw).replace(/\n{3,}/g, "\n\n").trim();
@@ -2327,17 +2431,17 @@ ${tail2}`;
     if (rules3 && text5.includes("<<USER_RULES>>")) on3.add("user_rules");
     const cueTable = on3.has("cue_table") && !(on3.has("affinity") && on3.has("affinity_num")) ? `
 ${[...text5.matchAll(/<<SECTION:cue_table>>\n?([\s\S]*?)<<END:cue_table>>/g)].map((m) => m[1]).join("")}` : "";
-    let out = text5;
-    for (let prev = ""; prev !== out; ) {
-      prev = out;
-      out = out.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name, body5) => on3.has(name) ? body5 : "");
+    let out2 = text5;
+    for (let prev = ""; prev !== out2; ) {
+      prev = out2;
+      out2 = out2.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name, body5) => on3.has(name) ? body5 : "");
     }
-    out = out.replace("<<CUE_TABLE>>", () => cueTable).replace("<<SEXUAL_RULES>>", () => sexualRules.trim()).replace("<<USER_RULES>>", () => rules3).replace(/<<(?:SECTION|END):[a-z_]+>>/g, "").replace(/\n{3,}/g, "\n\n").trim();
-    if (rules3 && !text5.includes("<<USER_RULES>>")) out += `
+    out2 = out2.replace("<<CUE_TABLE>>", () => cueTable).replace("<<SEXUAL_RULES>>", () => sexualRules.trim()).replace("<<USER_RULES>>", () => rules3).replace(/<<(?:SECTION|END):[a-z_]+>>/g, "").replace(/\n{3,}/g, "\n\n").trim();
+    if (rules3 && !text5.includes("<<USER_RULES>>")) out2 += `
 
 ## User rules (appended by the user; they cannot change the output contract)
 ${rules3}`;
-    return out;
+    return out2;
   }
   function enabledSections(s8) {
     const on3 = /* @__PURE__ */ new Set();
@@ -2696,207 +2800,4 @@ ${rules3}`;
             drop("observation", x, "첫 글이 없음 (sexual_init 으로)", who);
             continue;
           }
-        } else if (!isDirection(x.direction) || (axis === "pattern" ? !["new", "weaken"].includes(x.direction) : !["up", "down"].includes(x.direction))) {
-          drop("observation", x, "방향은 축이면 up|down, pattern 이면 new|weaken", who);
-          continue;
-        }
-        const ev = evidence(x.m, x.quote);
-        if (typeof ev === "string") {
-          drop("observation", x, ev, who);
-          continue;
-        }
-        const n3 = (perWho.get(who) ?? 0) + 1;
-        if (n3 > 2) {
-          drop("observation", x, "인물당 2개 상한", who);
-          continue;
-        }
-        perWho.set(who, n3);
-        const res = observe(store3.people[who], { axis, direction: x.direction, pattern: str9(x.pattern), anchor: ev.anchor, seq: nextSeq2(ev.anchor), quote: x.quote, reason: str9(x.reason) || str9(x.pattern), strength: Number(x.strength ?? 50), confidence: Number(x.confidence ?? 50) }, now2);
-        if (!res.ok) {
-          drop("observation", x, res.reason, who);
-          continue;
-        }
-        report.applied.observations++;
-      }
-      for (const p2 of Object.values(store3.people)) pruneCandidates(p2, live);
-    }
-    if (ctx2.settings.features.has("affinity") && !ctx2.settings.qualitative.has("affinity")) {
-      const perCue = /* @__PURE__ */ new Map();
-      const changes = liveChanges(store3, live);
-      for (const c of r.cues ?? []) {
-        const who = nameOf(str9(c?.who));
-        if (!who) {
-          drop("cue", c, "명단에 없는 이름", str9(c?.who));
-          continue;
-        }
-        if (!CUES.includes(c.cue)) {
-          drop("cue", c, "표에 없는 계기", who);
-          continue;
-        }
-        const ev = evidence(c.m, c.quote);
-        if (typeof ev === "string") {
-          drop("cue", c, ev, who);
-          continue;
-        }
-        const n3 = (perCue.get(who) ?? 0) + 1;
-        if (n3 > 2) {
-          drop("cue", c, "인물당 2개 상한", who);
-          continue;
-        }
-        perCue.set(who, n3);
-        if (changes.some((x) => x.kind === "cue" && x.who === who && x.anchor === ev.anchor && x.cue === c.cue)) {
-          drop("cue", c, "같은 메시지에 같은 계기가 이미 있음", who);
-          continue;
-        }
-        const seq4 = nextSeq2(ev.anchor);
-        if (putChange(store3, { id: changeId(who, "cue", ev.anchor, seq4, c.cue), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "cue", cue: c.cue, quote: c.quote, reason: plain(c.reason, 40) || c.cue })) report.applied.cues++;
-      }
-    }
-    if (ctx2.settings.features.has("taste")) {
-      const changes = liveChanges(store3, live);
-      const seen4 = /* @__PURE__ */ new Set();
-      for (const t of r.taste ?? []) {
-        const who = nameOf(str9(t?.who));
-        if (!who) {
-          drop("taste", t, "명단에 없는 이름", str9(t?.who));
-          continue;
-        }
-        const band = Number(t.band);
-        if (!Number.isInteger(band) || band < TASTE_MIN || band > TASTE_MAX) {
-          drop("taste", t, "띠는 -3~3 정수", who);
-          continue;
-        }
-        const ev = evidence(t.m, t.quote);
-        if (typeof ev === "string") {
-          drop("taste", t, ev, who);
-          continue;
-        }
-        if (seen4.has(who)) {
-          drop("taste", t, "인물당 1개", who);
-          continue;
-        }
-        const cur = tasteOf(store3.people[who], changes);
-        if (cur !== null && band === cur) {
-          drop("taste", t, "바뀐 값이 아님", who);
-          continue;
-        }
-        if (cur !== null && band > cur + 1) {
-          drop("taste", t, "오를 땐 한 번에 한 칸", who);
-          continue;
-        }
-        seen4.add(who);
-        const seq4 = nextSeq2(ev.anchor);
-        if (putChange(store3, { id: changeId(who, "taste", ev.anchor, seq4, String(band)), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "taste", band, quote: t.quote, reason: plain(t.reason, 60) || (cur === null ? "첫인상" : `취향 ${cur} → ${band}`) })) report.applied.taste++;
-      }
-    }
-    if (ctx2.settings.features.has("openness") && !ctx2.settings.qualitative.has("openness")) {
-      const changes = liveChanges(store3, live);
-      const perWho = /* @__PURE__ */ new Map();
-      const inited = /* @__PURE__ */ new Set();
-      for (const x of r.openness ?? []) {
-        const who = nameOf(str9(x?.who));
-        if (!who) {
-          drop("openness", x, "명단에 없는 이름", str9(x?.who));
-          continue;
-        }
-        const ev = evidence(x.m, x.quote);
-        if (typeof ev === "string") {
-          drop("openness", x, ev, who);
-          continue;
-        }
-        const cur = opennessOf(store3.people[who], changes);
-        const seq4 = nextSeq2(ev.anchor);
-        if (x.op === "init") {
-          const value = Number(x.value);
-          if (cur !== null || inited.has(who)) {
-            drop("openness", x, "이미 시작값이 있음", who);
-            continue;
-          }
-          if (!OPENNESS_BASELINES.includes(value)) {
-            drop("openness", x, "시작값은 0·90·150·210·270 중 하나", who);
-            continue;
-          }
-          inited.add(who);
-          if (putChange(store3, { id: changeId(who, "openness", ev.anchor, seq4, `init${value}`), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "openness", init: value, quote: x.quote, reason: plain(x.reason, 60) || `시작값 ${value}` })) report.applied.openness++;
-          continue;
-        }
-        if (x.op !== "event") {
-          drop("openness", x, "없는 연산", who);
-          continue;
-        }
-        const delta = Number(x.delta);
-        if (!OPENNESS_DELTAS.includes(delta)) {
-          drop("openness", x, "변화량은 +1·+3·+5·+10·-2·-4·-5 중 하나", who);
-          continue;
-        }
-        if (cur === null && !inited.has(who)) {
-          drop("openness", x, "시작값이 없는 인물 (먼저 init)", who);
-          continue;
-        }
-        const n3 = (perWho.get(who) ?? 0) + 1;
-        if (n3 > 3) {
-          drop("openness", x, "인물당 3개 상한", who);
-          continue;
-        }
-        perWho.set(who, n3);
-        if (putChange(store3, { id: changeId(who, "openness", ev.anchor, seq4, `d${delta}|${plain(x.reason, 40)}`), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "openness", delta, quote: x.quote, reason: plain(x.reason, 60) })) report.applied.openness++;
-      }
-    }
-    if (ctx2.settings.features.has("register")) {
-      for (const a of r.address ?? []) {
-        const who = nameOf(str9(a?.who));
-        if (!who) {
-          drop("address", a, "명단에 없는 이름", str9(a?.who));
-          continue;
-        }
-        if (store3.people[who].address.pin) {
-          drop("address", a, "고정된 호칭", who);
-          continue;
-        }
-        const variety = speechVariety(ctx2.settings);
-        const speechNow = variety.level === "two" && variety.counted ? liveEntries(store3.people[who].slots.speech, live).find((x) => (x.target ?? "@user") === "@user") : void 0;
-        if (speechNow) {
-          const st = parseSpeechMarker(speechNow.text).state;
-          if (st !== "ready") {
-            drop("address", a, st === "pending" ? "말투 변경 승인 대기 (인물 화면에서 승인해야 바뀜)" : "말투 변화 조짐 집계 중 (변경 가능 표시 없음)", who);
-            continue;
-          }
-        }
-        const ev = evidence(a.m, a.quote);
-        if (typeof ev === "string") {
-          drop("address", a, ev, who);
-          continue;
-        }
-        const toUser = plain(a.toUser, 20);
-        const register = REGISTERS.includes(a.register) ? a.register : null;
-        if (!toUser || !register) {
-          drop("address", a, "호칭·존댓말 값이 없음", who);
-          continue;
-        }
-        const seq4 = nextSeq2(ev.anchor);
-        if (putChange(store3, { id: changeId(who, "address", ev.anchor, seq4, `${toUser}|${register}`), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "address", toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) {
-          report.applied.address++;
-          const stillReady = liveEntries(store3.people[who].slots.speech, live).find((x) => (x.target ?? "@user") === "@user" && parseSpeechMarker(x.text).state === "ready");
-          if (stillReady) {
-            const seq22 = nextSeq2(ev.anchor);
-            const base = parseSpeechMarker(stillReady.text).base || `${toUser} (${register})`;
-            putEntry(store3, who, "speech", { id: entryId(who, "speech", ev.anchor, seq22, `=${stillReady.id}`), text: base, src: "story", anchor: ev.anchor, seq: seq22, quote: a.quote, replaces: stillReady.id, target: "@user" });
-          }
-        }
-      }
-    }
-    let hookActions = 0;
-    for (const d of ctx2.only?.length ? [] : r.docs ?? []) {
-      const type = d?.type;
-      if (!DOC_TYPES.includes(type) || !ctx2.settings.features.has(docFeature(type))) {
-        drop("doc", d, "없는 문서 종류 또는 꺼진 기능");
-        continue;
-      }
-      if (type === "rhythm" && typeof d.key === "string" && d.key.startsWith("hook:") && d.op !== "remove" && input3.clock) {
-        const isNew = !store3.docs[`rhythm:${plain(d.key, 40)}`];
-        if (isNew && !input3.clock.plantAllowed) {
-          drop("doc", d, `새 훅을 심을 수 없음 (${input3.clock.plantBlocked})`, d.key);
-          continue;
-        }
-        const head3 = typeof d.text === "string" ? parseHookHead(d.text) : null;
-        const prev = input3.clock.hooks.find((h) =
+        } else if

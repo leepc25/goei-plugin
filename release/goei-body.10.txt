@@ -1,9 +1,101 @@
-e() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${it.equip ?? ""}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc17(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when3)}</button>`;
+, last: cur };
+  }
+  var realOf = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const p2 = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(d);
+    const g2 = (t) => p2.find((x) => x.type === t)?.value ?? "";
+    return `${g2("year")}.${g2("month")}.${g2("day")} ${g2("hour")}:${g2("minute")}`;
+  };
+  var whenLabel = (w, anchor, iso) => (anchor ? w.at.get(anchor) : "") || w.last || realOf(iso);
+  var sourceLine = (it, w) => [FROM_NAME[it.from], whenLabel(w, it.anchor, it.at), Number.isSafeInteger(it.price) ? `₩ ${it.price.toLocaleString("en-US")}` : ""].filter(Boolean).join(" · ");
+  function useQueue(ctx2) {
+    return ctx2.chat.scriptstate?.[ITEM_USE_AT_VAR] ? [] : readItemUse(ctx2.chat.scriptstate);
+  }
+  var leftOf = (ctx2, it) => itemLeft(itemsOf(ctx2), it, aliveAnchors(ctx2.chat));
+  function itemsTab(ctx2) {
+    const SUBS2 = [["wallet", "가계부"], ["points", "포인트"], ["items", "소지품"]].filter(([v]) => v === "wallet" ? walletOn(ctx2) : v === "points" ? pointsOn(ctx2.chat) : invOn(ctx2.chat.scriptstate));
+    if (SUBS2.length && !SUBS2.some(([v]) => v === itemsUi.sub)) itemsUi.sub = SUBS2[0][0];
+    const tabs2 = `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist">${SUBS2.map(([v, l]) => `<button role="tab" class="ph-sub${itemsUi.sub === v ? " on" : ""}" data-action="items-sub" data-value="${v}" aria-selected="${itemsUi.sub === v}" aria-pressed="${itemsUi.sub === v}">${l}</button>`).join("")}</div>`;
+    const note2 = toast("items", itemsUi.info, (t) => {
+      if (itemsUi.info === t) itemsUi.info = "";
+    });
+    if (itemsUi.sub === "wallet" || itemsUi.sub === "points") {
+      const kind = itemsUi.sub === "points" ? "p" : "won";
+      walletUi.kind = kind;
+      const drawer2 = isPhone() && (kind === "p" || walletOn(ctx2)) ? drawerBox(walletTools(ctx2), "gx-rdrawer") : "";
+      return `<main class="gx-body gx-records gx-items">${tabs2}${walletPane(ctx2, kind)}${note2}</main>${drawer2}`;
+    }
+    const notice2 = itemsUi.notice ? `<div class="gx-err" role="alert">${esc17(itemsUi.notice)}</div>` : "";
+    const drawer = isPhone() ? drawerHtml(`${addButton("ph-tool")}${mergeButton(ctx2, "ph-tool")}`, "", "gx-idrawer") : "";
+    const fix = !isPhone() && itemsUi.view === "grid" ? " it-fix" : "";
+    return `<main class="gx-body gx-records gx-items${fix}">${tabs2}${notice2}${itemsPane(ctx2)}${note2}</main>${popup(ctx2)}${drawer}`;
+  }
+  var addButton = (cls) => `<button class="${cls} it-add" data-action="items-add" aria-label="직접 넣기">${ICONS.plus}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">직접 넣기</span></button>`;
+  var mergeMates = (ctx2, it) => liveOf(ctx2).filter((o) => canMerge(it, o));
+  function mergeButton(ctx2, cls) {
+    const live = liveOf(ctx2);
+    const any2 = live.some((a) => live.some((b) => canMerge(a, b)));
+    return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any2 ? "" : "disabled"}>${ICONS.refresh}<span class="${cls === "ph-tool" ? "ph-tool-l" : ""}">합치기</span></button>`;
+  }
+  function statsRow(ctx2, live) {
+    const carried = gridItems(live).length;
+    const slots = itemSlots(ctx2.chat.scriptstate);
+    const over = Math.max(0, carried - slots);
+    return `<div class="it-stats"><span class="it-stat${over ? " over" : ""}" title="칸 ${carried} / ${slots}${over ? ` (${over}칸 넘침)` : ""}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small>${over ? `<em>+${over}</em>` : ""}</span>${weightPill(ctx2, live)}</div>`;
+  }
+  function itemsPane(ctx2) {
+    const seg6 = (v, label2) => `<button class="gx-seg${itemsUi.view === v ? " on" : ""}" data-action="items-view" data-value="${v}" aria-pressed="${itemsUi.view === v}">${label2}</button>`;
+    const tools = `<div class="gx-rec-tools gx-wt-tools it-tools">
+    <div class="gx-segs gx-segs-sm it-segs">${seg6("grid", "물건")}${seg6("log", "기록")}</div>
+    <span class="it-right">${isPhone() ? "" : `${addButton("it-act")}${mergeButton(ctx2, "it-act")}`}<input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc17(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기"></span>
+  </div>`;
+    const st = itemIconStatus();
+    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc17(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 기본 아이콘으로 보여요. (${esc17(st.failed)})</p>` : "";
+    if (itemsUi.view === "log") return `${tools}${picNote}<div class="it-body">${logList(ctx2)}</div>`;
+    return `${tools}${picNote}${equipBox(ctx2, "items")}<div class="it-scrollwrap"><div class="it-body it-scroll">${gridHtml(ctx2)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div></div>`;
+  }
+  function weightPill(ctx2, live) {
+    const items = itemsOf(ctx2);
+    const alive = aliveAnchors(ctx2.chat);
+    const w = totalWeight(live, (e) => itemLeft(items, e, alive));
+    const cap = itemCarry(ctx2.chat.scriptstate);
+    const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
+    const num8 = (n3) => String(Number(n3.toFixed(1)));
+    return `<span class="it-stat it-wgt${w > cap ? " over" : ""}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ""} title="무게 ${num8(w)}kg / 소지 한도 ${num8(cap)}kg${w > cap ? ` (${num8(w - cap)}kg 넘음)` : ""}">${ICONS.weight}<b>${num8(w)}</b><small>/ ${num8(cap)}kg</small></span>`;
+  }
+  var avatarHtml = () => "";
+  function setAvatarHtml(fn2) {
+    avatarHtml = fn2;
+  }
+  function equipBox(ctx2, where2, sel = "") {
+    const { av, slots } = equipParts(ctx2, where2, sel);
+    if (where2 === "sell") return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ""}${slots}</div></section>`;
+    return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av" data-drop="auto">${av}</div>` : ""}<div class="it-eqcol" data-drop="auto">${statsRow(ctx2, liveOf(ctx2))}${slots}</div>${isPhone() ? "" : useBox(ctx2)}</div></section>`;
+  }
+  function equipParts(ctx2, where2, sel = "") {
+    const items = itemsOf(ctx2);
+    const alive = aliveAnchors(ctx2.chat);
+    const live = liveItems(items, alive);
+    const eq = equippedOf(live);
+    let when3;
+    const slot = (k, i) => {
+      const it = eq[k][i];
+      if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${k === "weapon" ? ICONS.hand : ICONS.gear}</span></div>`;
+      const act2 = where2 === "sell" ? "shop-sell-pick" : "items-open";
+      const left = itemLeft(items, it, alive);
+      when3 ??= whenOf(ctx2);
+      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc17(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${it.equip ?? ""}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc17(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when3)}</button>`;
     };
     const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join("")}</div>`;
     return { av: avatarHtml(ctx2), slots };
   }
   var sendingUse = (ctx2, id2) => useSending(ctx2.chat, ctx2.charIndex, ctx2.chatIndex, id2);
+  var WAIT_NOTE = "답을 기다리는 중이라 지금은 사용에 넣을 수 없어요. 답이 온 뒤에 넣어 주세요.";
+  var WAIT_UNUSE_NOTE = "답을 기다리는 중이라 지금은 사용을 취소할 수 없어요. 답이 온 뒤에 해 주세요.";
+  var WAIT_MERGE_NOTE = "사용에 넣은 물건은 답이 온 뒤에 합칠 수 있어요.";
+  var lockedHere = (ctx2) => useLocked(ctx2.charIndex, ctx2.chatIndex);
+  var useNote = (why, it) => why === "wait" ? WAIT_NOTE : `「${it.name}」은 지금 보내는 중이라 답이 온 뒤에 더 쓸 수 있어요.`;
   function useBox(ctx2) {
     const live = liveOf(ctx2);
     const q = useQueue(ctx2).flatMap((u) => {
@@ -111,7 +203,7 @@ e() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${it.equip ?? "
     ${it.text ? `<div class="it-note">${esc17(it.text)}</div>` : ""}
     ${it.quote ? `<p class="qt">근거 「${esc17(it.quote)}」</p>` : ""}
     <div class="it-btns">
-      ${it.use ? `<button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc17(it.id)}" ${more || queued2 && !sending ? "" : "disabled"}${needsEquip(ctx2, it) ? ' title="장착해야 쓸 수 있어요"' : ""}>${queued2 ? more ? `한 번 더 (×${queued2 + 1})` : `사용 ×${queued2}` : "사용"}</button>` : ""}
+      ${it.use ? `<button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc17(it.id)}" ${more || queued2 ? "" : "disabled"}${needsEquip(ctx2, it) ? ' title="장착해야 쓸 수 있어요"' : ""}>${queued2 ? more ? `한 번 더 (×${queued2 + 1})` : `사용 ×${queued2}` : "사용"}</button>` : ""}
       ${queued2 && !sending ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc17(it.id)}">사용 취소</button>` : ""}
       ${boxButton(ctx2, it.id)}
       <button class="gx-chip" data-action="${equipped ? "items-unequip" : "items-equip"}" data-value="${esc17(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ""}>${equipLabel(it, equipped)}</button>
@@ -167,6 +259,7 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
       await write((x, alive) => equipItem(x, alive, it.id));
       return true;
     };
+    if (/^items-(use|unuse|dnd|drop|purge|equip|unequip|merge-to)$/.test(action)) await freeUseLock();
     switch (action) {
       case "items-sub":
         itemsUi.sub = value === "wallet" || value === "points" ? value : "items";
@@ -229,8 +322,27 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
       case "items-merge-to": {
         const keep2 = itemsUi.open;
         if (!keep2 || !value) return true;
-        const anchor = lastBotKey(ctx2.chat);
-        await write((it, alive) => mergeItems(it, alive, keep2, value, anchor));
+        let held = false;
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          const vars = chat.scriptstate;
+          const q = readItemUse(vars);
+          const busy6 = (id2) => useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2) || lockedHere(ctx2) && (q.some((u) => u.id === id2) || usesToSend(chat).some((u) => u.id === id2));
+          if (busy6(keep2) || busy6(value)) {
+            held = true;
+            return null;
+          }
+          const cur = readItems(vars);
+          const next = mergeItems(cur, aliveAnchors(chat), keep2, value, lastBotKey(chat));
+          if (next === cur) return null;
+          const use = vars?.[ITEM_USE_AT_VAR] ? {} : itemUseVars(mergeUse(q, keep2, value));
+          return { ...chat, scriptstate: { ...vars ?? {}, ...itemsVars(next), ...use } };
+        });
+        if (held) {
+          itemsUi.info = WAIT_MERGE_NOTE;
+          env3.render();
+          return true;
+        }
+        void refreshUseBox(ctx2.charIndex, ctx2.chatIndex);
         itemsUi.mode = "view";
         itemsUi.info = "합쳤어요.";
         await env3.refresh();
@@ -313,9 +425,15 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
           env3.render();
           return true;
         }
+        if (lockedHere(ctx2)) {
+          itemsUi.info = WAIT_NOTE;
+          env3.render();
+          return true;
+        }
         if (!await holdFirst(it)) return true;
-        if (!await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id)) {
-          itemsUi.info = `「${it.name}」은 지금 보내는 중이라 답이 온 뒤에 더 쓸 수 있어요.`;
+        const why = await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
+        if (why) {
+          itemsUi.info = useNote(why, it);
           env3.render();
           return true;
         }
@@ -325,7 +443,13 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
       }
       case "items-unuse": {
         if (!value) return true;
-        if (!await dropFromUse(ctx2, value)) return true;
+        if (!await dropFromUse(ctx2, value)) {
+          if (lockedHere(ctx2)) {
+            itemsUi.info = WAIT_UNUSE_NOTE;
+            env3.render();
+          }
+          return true;
+        }
         itemsUi.info = "사용을 취소했어요.";
         await env3.refresh();
         return true;
@@ -365,8 +489,14 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
           if (useNeedsSeat(it)) await dropFromUse(ctx2, id2);
         } else if (to === "auto") {
           if (isEquipped(it, liveOf(ctx2))) return true;
-          if (!it.equip && canUse(it)) await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
-          else {
+          if (!it.equip && canUse(it)) {
+            const why = await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
+            if (why) {
+              itemsUi.info = useNote(why, it);
+              env3.render();
+              return true;
+            }
+          } else {
             const k = it.equip ?? "weapon";
             if (!equippedOf(liveOf(ctx2))[k].some((x) => !x)) {
               full(k);
@@ -380,8 +510,18 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
             env3.render();
             return true;
           }
+          if (lockedHere(ctx2)) {
+            itemsUi.info = WAIT_NOTE;
+            env3.render();
+            return true;
+          }
           if (!await holdFirst(it)) return true;
-          await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
+          const why = await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)), it.id);
+          if (why) {
+            itemsUi.info = useNote(why, it);
+            env3.render();
+            return true;
+          }
         } else if (to === "drop") {
           itemsUi.open = id2;
           itemsUi.mode = "drop";
@@ -397,27 +537,22 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
     }
   }
   async function queueUse(ctx2, fn2, id2) {
-    let held = false;
+    let held = "";
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      if (useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2)) {
-        held = true;
-        return null;
-      }
-      const sent2 = !!chat.scriptstate?.[ITEM_USE_AT_VAR];
-      const cur = sent2 ? [] : readItemUse(chat.scriptstate);
-      const next = fn2(cur);
-      if (!sent2 && JSON.stringify(next) === JSON.stringify(cur)) return null;
-      return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemUseVars(next), [ITEM_USE_AT_VAR]: "" } };
+      held = lockedHere(ctx2) ? "wait" : useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2) ? "sending" : "";
+      if (held) return null;
+      const vars = queueUseVars(chat, fn2);
+      return vars ? { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } } : null;
     });
-    if (held) return false;
+    if (held) return held;
     void refreshUseBox(ctx2.charIndex, ctx2.chatIndex);
-    return true;
+    return "";
   }
   async function dropFromUse(ctx2, id2) {
     let held = false;
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       if (chat.scriptstate?.[ITEM_USE_AT_VAR]) return null;
-      if (useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2)) {
+      if (useSending(chat, ctx2.charIndex, ctx2.chatIndex, id2) || lockedHere(ctx2) && readItemUse(chat.scriptstate).some((u) => u.id === id2)) {
         held = true;
         return null;
       }
@@ -684,7 +819,7 @@ ${st.owner}`);
     const items = sellItem(it0, itemId4, now2.key, `${now2.shop}에 팖`);
     const nextShop = closeSale(now2, now2.key);
     if (!nextShop) return null;
-    const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+    const q = chat.scriptstate?.[ITEM_USE_AT_VAR] || useLocked() ? null : readItemUse(chat.scriptstate);
     const use = q && q.some((u) => u.id === itemId4) ? itemUseVars(dropUse(q, itemId4)) : {};
     return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...ledgerVars(w, p2), ...itemsVars(items), ...shopVars(nextShop), ...use } };
   }
@@ -1006,7 +1141,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     const items = sellItem(it0, itemId4, anchor, `${MALL_NAME[site]}에 팖`);
     const nextShop = closeSale(now2, anchor);
     if (!nextShop) return null;
-    const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+    const q = chat.scriptstate?.[ITEM_USE_AT_VAR] || useLocked() ? null : readItemUse(chat.scriptstate);
     const use = q && q.some((u) => u.id === itemId4) ? itemUseVars(dropUse(q, itemId4)) : {};
     return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop), ...use } };
   }
@@ -2327,17 +2462,17 @@ ${v.failRaw.slice(0, 1500)}`;
     };
   }
   function paragraphs2(text5) {
-    const out = [];
+    const out2 = [];
     let cur = [];
     for (const line2 of `${text5}
 `.split("\n").slice(0, -1)) {
       if (/^\s*$/.test(line2)) {
-        if (cur.length) out.push(cur.join("\n"));
+        if (cur.length) out2.push(cur.join("\n"));
         cur = [];
       } else cur.push(line2);
     }
-    if (cur.length) out.push(cur.join("\n"));
-    return out;
+    if (cur.length) out2.push(cur.join("\n"));
+    return out2;
   }
   function activeCharacters(narrative, d) {
     return d.characters.filter((name) => [...d.aliases].some(([alias, target]) => target === name && termPresent(narrative, alias)));
@@ -2472,13 +2607,13 @@ ${aliasLines.join("\n")}
       inserts.set(ln, `<img=${name}_${kwFix}>`);
       count2.set(name, cur + 1);
     }
-    const out = [];
+    const out2 = [];
     paras.forEach((para, i) => {
-      out.push(para);
+      out2.push(para);
       const tag = inserts.get(i + 1);
-      if (tag) out.push(tag);
+      if (tag) out2.push(tag);
     });
-    return out.join("\n\n");
+    return out2.join("\n\n");
   }
   function planAsset(content, d, limit, exclude = []) {
     const { leading, narrative, trailing } = splitNarrative(content);
@@ -2493,9 +2628,9 @@ ${aliasLines.join("\n")}
     const patches = parsePatches(response);
     if (!patches.length) return null;
     const body5 = applyPatches(job.paras, patches, limit, d);
-    const out = job.trailing ? `${body5}
+    const out2 = job.trailing ? `${body5}
 ${job.trailing}` : body5;
-    return (job.leading ?? "") + out;
+    return (job.leading ?? "") + out2;
   }
 
   // src/core/imgprompt.ts
@@ -2545,17 +2680,17 @@ Next Paragraph Text
     };
   }
   function imgCandidates(lore, cfg) {
-    const out = [];
+    const out2 = [];
     const seen4 = /* @__PURE__ */ new Set();
     const push3 = (name, korean, source4) => {
       const n3 = cleanName(name);
       if (!n3 || seen4.has(n3.toLowerCase())) return;
       seen4.add(n3.toLowerCase());
-      out.push({ name: n3, korean, source: source4 });
+      out2.push({ name: n3, korean, source: source4 });
     };
     for (const a of readDirectory(lore).agents) if (a.english) push3(a.english, a.name, "directory");
     for (const n3 of cfg.extra) push3(n3, "", "extra");
-    return out;
+    return out2;
   }
   function imgCharacters(lore, cfg, po) {
     const off = new Set(cfg.off.map((n3) => n3.toLowerCase()));
@@ -2576,12 +2711,12 @@ Next Paragraph Text
   var LORE_BLOCK = /## Inserting Character Visual Images[\s\S]*?Only use those provided\.\s*(?:---\s*)?/g;
   function stripImgLore(messages) {
     let changed = false;
-    const out = messages.map((m) => {
+    const out2 = messages.map((m) => {
       if (typeof m?.content !== "string" || !m.content.includes("## Inserting Character Visual Images")) return m;
       changed = true;
       return { ...m, content: m.content.replace(LORE_BLOCK, "").replace(/\n{3,}/g, "\n\n") };
     });
-    return changed ? out.filter((m) => !(typeof m?.content === "string" && !m.content.trim())) : messages;
+    return changed ? out2.filter((m) => !(typeof m?.content === "string" && !m.content.trim())) : messages;
   }
 
   // src/host/asset.ts
@@ -3021,289 +3156,4 @@ ${themeVars("[x-goei-prog]")}
       drag = null;
       pending2 = null;
       moved = false;
-      if (!visible2 || phone2 || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
-      if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
-      const x = ev.clientX;
-      const y = ev.clientY;
-      const grab = open3;
-      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card3.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
-    };
-    const onMove = (ev) => {
-      if (!drag || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
-      if (ev.buttons !== void 0 && ev.buttons !== 1) {
-        drag = null;
-        return;
-      }
-      pending2 = { x: ev.clientX, y: ev.clientY };
-      loop ??= runDrag();
-    };
-    const onUp = () => {
-      const d = drag;
-      void (loop ?? Promise.resolve()).then(async () => {
-        if (drag === d) drag = null;
-        if (moved) {
-          await host4.setAttribute("x-goei-drag", "false");
-          try {
-            await risuai.safeLocalStorage.setItem(POS_KEY2, JSON.stringify(pos));
-          } catch {
-          }
-        }
-      });
-    };
-    const onClick = async (ev) => {
-      if (!visible2) return;
-      await loop;
-      if (moved) return;
-      if (!open3) {
-        if (inside(await rectOf(dot2), ev.clientX, ev.clientY)) {
-          clearHide();
-          await setOpen(true);
-        }
-        return;
-      }
-      if (inside(await rectOf(await card3.querySelector("[data-grip]")), ev.clientX, ev.clientY)) {
-        clearHide();
-        await setOpen(false);
-        return;
-      }
-      if (inside(await rectOf(card3), ev.clientX, ev.clientY)) return;
-      const t = progressTurn();
-      if (!t || t.endAt || Date.now() - t.at >= WATCHDOG) {
-        clearHide();
-        await setOpen(false);
-      }
-    };
-    let ids = [];
-    const unbind = async () => {
-      const old = ids;
-      ids = [];
-      for (const { target, type, id: id2 } of old) await target.removeEventListener(type, id2).catch(() => {
-      });
-    };
-    const docTarget = typeof doc2?.addEventListener === "function" ? doc2 : host4;
-    let binding = Promise.resolve();
-    const bind = () => binding = binding.catch(() => {
-    }).then(async () => {
-      await unbind();
-      for (const [target, type, fn2] of [
-        [host4, "pointerdown", onDown],
-        [docTarget, "pointermove", onMove],
-        [docTarget, "pointerup", onUp],
-        [docTarget, "pointercancel", onUp],
-        [docTarget, "click", onClick]
-      ]) {
-        ids.push({ target, type, id: await target.addEventListener(type, fn2, { passive: true }) });
-      }
-    });
-    await bind();
-    await schedule2();
-    return {
-      async setVisible(next) {
-        const { vw } = await viewport().catch(() => ({ vw: 1024 }));
-        const ph = vw <= PHONE_MAX;
-        if (ph !== phone2) {
-          phone2 = ph;
-          await host4.setAttribute("x-goei-phone", ph ? "true" : "false");
-          if (ph) await setOpen(false);
-        }
-        if (next === visible2 && next) {
-          await applyPos();
-          return;
-        }
-        if (next && !visible2) await bind().catch(() => {
-        });
-        visible2 = next;
-        if (!next) {
-          drag = null;
-          pending2 = null;
-          clearHide();
-          await setOpen(false);
-        } else await applyPos();
-        await host4.setAttribute("x-goei-show", next ? "true" : "false");
-      },
-      async setPanel(next) {
-        if (next === panelOpen) return;
-        panelOpen = next;
-        await host4.setAttribute("x-goei-panel", next ? "true" : "false");
-      },
-      async setTheme(theme) {
-        await host4.setAttribute("x-goei-theme", theme);
-      },
-      async remove() {
-        offProgress();
-        clearHide();
-        if (tick4 !== void 0) clearInterval(tick4);
-        visible2 = false;
-        await host4.remove();
-        await unbind();
-      }
-    };
-  }
-  var progressOn = () => getPrefs().progress !== false;
-
-  // src/host/container.ts
-  var BELOW_ALERTS = "49";
-  var doc;
-  async function showWindow() {
-    if (doc === void 0) doc = await risuai.getRootDocument().catch(() => null);
-    await risuai.showContainer("fullscreen");
-    if (!doc) return;
-    try {
-      const frames = await doc.querySelectorAll("body > iframe");
-      const n3 = await frames.length();
-      for (let i = 0; i < n3; i++) {
-        const f = await frames.at(i);
-        if (!f) continue;
-        if (await f.getStyle("zIndex") === "1000" && await f.getStyle("display") !== "none") await f.setStyle("zIndex", BELOW_ALERTS);
-      }
-    } catch {
-    }
-  }
-
-  // src/core/navhist.ts
-  var LIMIT = 60;
-  var NavHistory = class {
-    list = [];
-    at = -1;
-    /** 지금 화면 상태를 적는다 (방금 적은 것과 같으면 그대로) */
-    record(state2) {
-      const key = JSON.stringify(state2);
-      if (this.list[this.at] === key) return;
-      this.list = this.list.slice(0, this.at + 1);
-      this.list.push(key);
-      if (this.list.length > LIMIT) this.list.shift();
-      this.at = this.list.length - 1;
-    }
-    can(dir2) {
-      const i = this.at + dir2;
-      return i >= 0 && i < this.list.length;
-    }
-    /** 한 칸 옮기고 그 화면 상태를 돌려준다. 갈 곳이 없으면 null */
-    go(dir2) {
-      if (!this.can(dir2)) return null;
-      this.at += dir2;
-      return JSON.parse(this.list[this.at]);
-    }
-    clear() {
-      this.list = [];
-      this.at = -1;
-    }
-  };
-
-  // src/host/picpack.ts
-  var isRow5 = (r) => Array.isArray(r) && typeof r[0] === "string" && typeof r[1] === "string";
-  var PicError = class extends Error {
-  };
-  async function digest(b) {
-    try {
-      const h = new Uint8Array(await crypto.subtle.digest("SHA-1", b));
-      return [...h].map((x) => x.toString(16).padStart(2, "0")).join("").slice(0, 12);
-    } catch {
-      return null;
-    }
-  }
-  var PIC_TIMEOUT_MS = 4e4;
-  function timeout2(p2) {
-    let t;
-    return Promise.race([p2, new Promise((_, rej) => t = setTimeout(() => rej(new Error("timeout")), PIC_TIMEOUT_MS))]).finally(() => clearTimeout(t));
-  }
-  async function fetchPicture(p2) {
-    const url = `${UPDATE_BASE}/pic/${p2[1]}.${p2[2]}`;
-    const ok = async (b) => !!b?.length && (await digest(b) ?? p2[1]) === p2[1];
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await timeout2(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }));
-        const b = r?.ok ? toBytes3(r.data) : null;
-        if (await ok(b)) return b;
-      } catch {
-      }
-    }
-    try {
-      const res = await timeout2(risuai.nativeFetch(url, { method: "GET" }));
-      if (res.ok) {
-        const b = new Uint8Array(await timeout2(res.arrayBuffer()));
-        if (await ok(b)) return b;
-      }
-    } catch {
-    }
-    throw new PicError(`사진 「${p2[0]}」을 받지 못했어요.`);
-  }
-  async function fetchPictures(assets, plan, progress4) {
-    const got = [];
-    let i = 0;
-    let failed4 = false;
-    const worker = async () => {
-      while (i < plan.get.length && !failed4) {
-        const p2 = plan.get[i++];
-        try {
-          got.push([p2, await fetchPicture(p2)]);
-        } catch (error) {
-          failed4 = true;
-          throw error;
-        }
-        progress4(got.length, "get");
-      }
-    };
-    await Promise.all([worker(), worker(), worker(), worker()]);
-    const paths = new Array(got.length);
-    let j = 0;
-    let saved = 0;
-    progress4(0, "save");
-    const saver = async () => {
-      while (j < got.length) {
-        const k = j++;
-        let path;
-        try {
-          path = await risuai.saveAsset(got[k][1]);
-        } catch (error) {
-          throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-        }
-        if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
-        paths[k] = path;
-        progress4(++saved, "save");
-      }
-    };
-    await Promise.all([saver(), saver(), saver(), saver()]);
-    return mergePictures(assets, got.map(([p2], k) => [p2, paths[k]]));
-  }
-  function mergePictures(assets, saved) {
-    const rows3 = (Array.isArray(assets) ? assets : []).map((r) => isRow5(r) ? [...r] : r);
-    const at = /* @__PURE__ */ new Map();
-    for (const r of rows3) if (isRow5(r) && !at.has(r[0])) at.set(r[0], r);
-    for (const [p2, path] of saved) {
-      const row8 = at.get(p2[0]);
-      if (row8) row8[1] = path, row8[2] = p2[2];
-      else {
-        const fresh3 = [p2[0], path, p2[2]];
-        rows3.push(fresh3);
-        at.set(p2[0], fresh3);
-      }
-    }
-    return rows3;
-  }
-
-  // src/host/install.ts
-  var WIKI_KEY = "goei:wikibase";
-  var WIKI_DIGEST_KEY = "goei:wikibase-digest";
-  var TOK_KEY = "goei:tok-o200k";
-  var ICON_KEY = "goei:icon";
-  async function loadStoredWikiPack() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(WIKI_KEY);
-      setStoredWikiPack(typeof raw === "string" && raw.startsWith(WIKI_PACK_HEAD) ? raw : null);
-    } catch {
-      setStoredWikiPack(null);
-    }
-  }
-  async function iconNotes() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(ICON_KEY);
-      const o = typeof raw === "string" ? JSON.parse(raw) : raw;
-      return o && typeof o === "object" ? o : {};
-    } catch {
-      return {};
-    }
-  }
-  var charId = (char) => String(char.chaId ?? char.name ?? "");
-  asy
+      if (!visible2 || phone2 
