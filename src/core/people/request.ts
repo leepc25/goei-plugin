@@ -2,7 +2,7 @@
 // 절 단위 혼합(split)이면 요원 자리에 들어간 그 인물의 시트 원문을 요청에서 빼고 기록 블록으로 대신한다.
 import { sexualTexts } from './sexual';
 import type { Chat } from '../types';
-import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
+import { peopleBlock, personBlock, rhythmBlock, unknownTo, TRIM_ORDER } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { liveChanges, liveEntries, liveness, type Liveness } from './store';
 import { latestNote } from './updater';
@@ -95,27 +95,34 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   const sizeOf = (k: number) => blocks.slice(0, k).reduce((s, _b, i) => s + lenOf(i), 0);
   // 넘치면 먼저 인물별 몫을 줄여 블록을 다시 만든다 (personBlock 이 지난 일부터 뺀다). 몫은 칸 글자만 세고 머리말·관계 줄·제목은 안 세므로,
   // 기록이 찬 인물이 둘만 있어도 합이 상한을 조금 넘어 마지막 인물이 통째로 빠졌다 (11-14 재검토 ①-1).
-  // 넘친 만큼을, 고른 몫(상한 ÷ 인물 수)보다 긴 인물들이 넘은 비율대로 나눠 줄인다.
-  const budget = people.map((n) => {
+  // 넘친 만큼을 지금 가장 긴 인물부터 「항목 단위」로 줄인다. 몫을 글자 수로만 깎으면 넘친 글자가 항목 하나(150~200자)보다 작을 때
+  // 블록이 그대로라 뒤 인물이 통째로 빠졌다 (11-14 재검토 ①-1 검증). 줄일 항목이 남아 있는 한 아무도 통째로 빼지 않는다.
+  /** 인물마다: 칸 글자 합(personBlock 과 같은 셈)과 줄일 수 있는 항목 길이(빼는 순서대로) */
+  const trim = people.map((n) => {
     const slots = o.store.people[n].slots;
-    const counted = Object.values(slots).reduce((s, l) => s + liveEntries(l ?? [], live).reduce((m, e) => m + e.text.length + 3, 0), 0);
-    return Math.max(1, Math.min(share, counted));
+    const sz = (l: unknown) => liveEntries((l as never) ?? [], live).reduce((m, e) => m + e.text.length + 3, 0);
+    const counted = Object.values(slots).reduce((s, l) => s + sz(l), 0);
+    const items = TRIM_ORDER.flatMap((k) => liveEntries(slots[k] ?? [], live).map((e) => e.text.length + 3));
+    // 처음 블록(몫 = share)에서 이미 빠진 항목 수
+    let left = counted;
+    let drop = 0;
+    while (left > share && drop < items.length) left -= items[drop++];
+    return { items, left, drop };
   });
-  for (let round = 0; round < 12; round++) {
+  for (;;) {
     const over = sizeOf(blocks.length) - o.settings.blockCap;
     if (over <= 0) break;
-    const excess = blocks.map((_b, i) => Math.max(0, lenOf(i) - share));
-    const sum = excess.reduce((s, x) => s + x, 0);
-    if (sum <= 0) break;
-    let changed = false;
-    for (let i = 0; i < blocks.length; i++) {
-      if (!excess[i] || budget[i] <= 1) continue;
-      budget[i] = Math.max(1, budget[i] - Math.ceil((over * excess[i]) / sum));
-      const next = make[i](budget[i]);
-      if (next !== blocks[i]) changed = true;
-      blocks[i] = next;
-    }
-    if (!changed && budget.every((x, i) => !excess[i] || x <= 1)) break;
+    const can = trim.map((t, i) => i).filter((i) => trim[i].drop < trim[i].items.length);
+    if (!can.length) break;
+    const i = can.reduce((a, c) => (lenOf(c) > lenOf(a) ? c : a));
+    const t = trim[i];
+    // 한 번에 넘친 글자를 줄일 수 있는 인물 수로 나눈 만큼(적어도 항목 하나)
+    const want = Math.ceil(over / can.length);
+    let cut = 0;
+    do cut += t.items[t.drop++];
+    while (cut < want && t.drop < t.items.length);
+    t.left -= cut;
+    blocks[i] = make[i](Math.max(1, t.left));
   }
   // 그래도 넘치면 글 중간에서 자르지 않고 뒤 인물부터 통째로 뺀다 (모델이 고른 인물 → 글에 나온 인물, 항상 포함은 끝까지).
   // 뺀 인물의 원래 시트는 요청에 남긴다 (전수검사 11-13: 4명부터 뒤 인물이 블록에서도 시트에서도 사라졌다)
