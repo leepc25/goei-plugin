@@ -105,14 +105,13 @@ B=[]
 B.append(img(cover(),'유계역','border-radius:12px;'))
 B.append(f'<div style="padding:24px 0 0 0;"><div style="font-size:34px;font-weight:900;letter-spacing:-0.8px;line-height:1.25;">괴이 ː ANOMALY</div>'
          f'<div style="margin-top:6px;font-size:16px;color:{SUB};line-height:1.6;">RisuAI용 괴담 세계관 시뮬레이션 봇</div></div>')
-B.append(para('괴이가 실제로 나타나는 한국이 무대예요. 괴이를 가두는 관리국의 요원으로, 괴이를 상품으로 만드는 백일몽의 사원으로, 또는 아무것도 모르는 민간인으로 시작해요.',20))
-B.append(para('봇 카드와 전용 플러그인이 한 벌이에요. 플러그인은 응답이 끝날 때마다 인물 기록을 고쳐 쓰고, 상황판과 괴담톡과 게시판을 채팅 뒤에서 따로 굴려요. 그렇게 생긴 내용은 다음 응답에 들어가서 이야기에 반영돼요. 어떤 기능을 켜고 어느 모델로 몇 번 부를지는 설정에서 전부 정해요.',14))
+B.append(para('괴담이 실제로 벌어지는 현대 한국을 배경으로 한 시뮬레이션 봇입니다. 봇 카드와 전용 플러그인을 함께 씁니다.',20))
 
 B.append(h('스타트 패널'))
-B.append(para('새 채팅에서 유령 단추를 누르면 열려요. 세력과 첫 장면과 언어를 정하고 출발을 누르면 그 장면이 채팅에 들어가요.'))
+B.append(para('새 채팅에서 유령 단추를 누르면 열립니다. 세력과 첫 장면, 언어를 정하고 출발을 누르면 그 장면으로 채팅이 시작됩니다.'))
 sp=save(Image.open(K+'promo/pc-start-01-open.png').convert('RGB').crop((705,95,1857,1630)).resize((691,921),Image.LANCZOS),'start.jpg',86)
 B.append(f'<div style="margin:18px 0 30px 0;max-width:420px;">{img(sp,"스타트 패널")}</div>')
-B.append(f'<div style="font-size:17px;font-weight:800;margin:0 0 6px 0;">세력</div>'+para('시작할 수 있는 자리는 다섯 세력과 이면의 주민들이에요. 세력마다 첫 장면이 따로 있고, 직접 써서 시작하거나 커스텀 임무로 시작할 수도 있어요.')+'<div style="height:22px;font-size:0;">&nbsp;</div>')
+B.append(f'<div style="font-size:17px;font-weight:800;margin:0 0 6px 0;">세력</div>'+para('세력마다 준비된 첫 장면이 있고, 장면을 직접 써서 시작하거나 커스텀 임무로 시작할 수도 있습니다.')+'<div style="height:22px;font-size:0;">&nbsp;</div>')
 P={'관리국':[('쟈알디','종합대응팀 부장'),('스팡달','종합대응팀 선임 요원'),('잼트리','종합대응팀 선임 요원'),('에일린','종합대응팀 선임 요원'),('고그니쟈','격리팀 연구 책임자'),('큐라스','진압팀 선임 요원'),('고르고디오','진압팀 선임 요원'),('데쥬레','격리팀 연구원'),('데드폴','종합대응팀 요원'),('게슈간','종합대응팀 요원'),('로제몬','종합대응팀 요원'),('콘쥬스','종합대응팀 요원')],
  '가짜 관리국':[('사장','최고 책임자'),('도필헌','국장'),('이길환','신입 교육 과장'),('이기석','신입 교육 과장'),('김조학','수석 심문관'),('이도형','검사부대 부장'),('고영훈','검사부대 차장'),('노기균','검사부대 대리'),('송주익','검사부대 대리'),('곽성주','진압부대 과장'),('조성춘','진압부대 과장'),('윤병수','신입 7팀 팀장'),('김성진','신입 7팀 사원'),('송진섭','신입 7팀 사원')],
  '백일몽 주식회사':[('청달래','개발본부 임원'),('호유원','이사'),('이병진','행정지원'),('백석주','정예 A조 조장'),('진나솔','정예 A조'),('이성해','정예 B조'),('이자헌','D조 조장'),('은하제','D조'),('박민성','D조'),('백사헌','F조'),('고영은','R조'),('강이학','I조'),('장허운','Y조'),('곽제강','연구1팀'),('이연화','연구1팀'),('제이','경비반장')]}
@@ -120,51 +119,51 @@ EN={'관리국':'Management Bureau','가짜 관리국':'Fake Management Bureau',
 F=''
 for nm in ['관리국','가짜 관리국','백일몽 주식회사','민간인','프리랜서']:
     F+=faccard(nm,EN[nm],BL[nm],SN[nm],P.get(nm),f'소속 인물 {len(P.get(nm,[]))}명')
-F+=faccard('이면의 주민들','Residents of the Hidden World','조직의 신입이 아니라 그 세계에 사는 인물 본인으로 시작해요. 열세 명에게 각자의 첫 장면이 있어요.',None,[('차여진','특별한 의뢰'),('서윤지','녹음기'),('고연지','선불입니다'),('윤지아','야간 접수'),('마덕희','도금이에요, 자기야'),('문혜란','사인 먼저, 밥은 나중에'),('신유리','십. 퍼센트. 매주.'),('블라렛','이교도와 수녀'),('살라딘','여기서 불타리라'),('아벤샤','마녀의 산책'),('세크리엠','갇힌 여자'),('탐미주의','넌 내 최고의 작품이야'),('브라우니','화요일의 즐거움, 화요일의 열기')],'인물 13명과 첫 장면')
+F+=faccard('이면의 주민들','Residents of the Hidden World','조직의 신입이 아니라 그 세계에 사는 인물 열세 명 가운데 한 사람으로 시작합니다.',None,[('차여진','특별한 의뢰'),('서윤지','녹음기'),('고연지','선불입니다'),('윤지아','야간 접수'),('마덕희','도금이에요, 자기야'),('문혜란','사인 먼저, 밥은 나중에'),('신유리','십. 퍼센트. 매주.'),('블라렛','이교도와 수녀'),('살라딘','여기서 불타리라'),('아벤샤','마녀의 산책'),('세크리엠','갇힌 여자'),('탐미주의','넌 내 최고의 작품이야'),('브라우니','화요일의 즐거움, 화요일의 열기')],'인물 13명과 첫 장면')
 B.append(F)
 
 B.append(h('괴이'))
-B.append(para('괴이 63곳이 설정 자료와 위키 문서로 들어 있어요. 플러그인이 응답마다 괴이가 발생했는지 판정해서 상황판과 지도에 올리고, 그 괴이의 자료는 필요한 때에만 요청에 넣어요.'))
+B.append(para('괴이 63곳의 설정과 위키 문서가 들어 있습니다. 진행 중에 괴이가 발생하면 상황판과 지도에 올라옵니다.'))
 top=['룩키마트','심연교통공사','한설인육공장','자정역','소라 랜드','화요퀴즈쇼']
 B.append('<div style="font-size:0;margin:20px -5px 0 -5px;">'+''.join(tile(k,600,'33.33%',150) for k in top)+'</div>')
 rest=[k for k in AN if k not in top]; G=''.join(tile(k,240,'16.66%',100) for k in rest); n=sum(1 for k in rest if anom(k,240))
 B.append(mini(f'나머지 괴이 {n}곳','<div style="font-size:0;margin:14px -5px 0 -5px;">'+G+'</div>'))
 
 B.append(h('전용 플러그인'))
-B.append(para('채팅 화면의 유령 단추를 누르면 열리는 창이에요. 메뉴는 여섯 개예요.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
+B.append(para('채팅 화면의 유령 단추를 누르면 열리는 창입니다.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
 C=(0,0,2200,1800)
-B.append(block('상황판','응답이 올 때마다 괴이와 사건과 특수 상황이 새로 생겼는지 판정해서 여기에 올려요. 요원들이 지금 대기 중인지 출동 중인지도 여기서 봐요.',screen('promo/pc-play-02-board','m_board.jpg')))
-B.append(block('임무','지도에서 상황이 벌어진 곳을 누르고 요원을 넷까지 편성해 출발해요. 원하는 전개를 적어 두면 그대로 다음 장면이 시작돼요. 상황을 직접 써서 만드는 커스텀 임무도 있어요.',screen('promo/pc-play-03-map','m_map.jpg',CB)))
-B.append(block('괴담톡','연락처에 있는 인물과 문자와 전화를 주고받아요. 답장뿐 아니라 먼저 오는 문자와 단톡방 초대, 단톡방에서 자기들끼리 떠드는 수다도 보조 모델이 만들어요. 장면과 관련된 대화는 다음 응답에 반영돼요.',screen('promo/pc-play-04-phone','m_talk.jpg',CB)))
-B.append(block('인터넷','그 세계 사람들이 쓰는 사이트를 브라우저처럼 열어요.',screen('promo/pc-play-05-net','m_net.jpg',CB),
+B.append(block('상황판','응답이 올 때마다 새로 발생한 괴이와 사건을 판정해 올리고, 요원들이 대기 중인지 출동 중인지를 함께 보여 줍니다.',screen('promo/pc-play-02-board','m_board.jpg')))
+B.append(block('임무','지도에서 상황이 벌어진 곳에 요원을 넷까지 편성해 출발하면 그 편성으로 다음 장면이 이어집니다. 상황을 직접 써서 만드는 커스텀 임무도 여기에 있습니다.',screen('promo/pc-play-03-map','m_map.jpg',CB)))
+B.append(block('괴담톡','인물들과 문자와 전화를 주고받는 메신저입니다. 인물이 먼저 문자를 보내거나 단톡방에 초대하기도 하고, 여기서 나눈 대화는 본편에 반영됩니다.',screen('promo/pc-play-04-phone','m_talk.jpg',CB)))
+B.append(block('인터넷','게시판과 상점과 위키를 브라우저처럼 여는 메뉴입니다.',screen('promo/pc-play-05-net','m_net.jpg',CB),
    mini('게시판, 상점, 위키 화면',
-   sub('게시판',[(screen('s-boards/pc-01-gn','n_gn.jpg',CB),'괴담넷'),(screen('s-boards/pc-04-gal','n_gal.jpg',CB),'괴담 갤러리'),(screen('s-boards/pc-08-wpf','n_wpf.jpg',CB),'세정게')],'게시판 세 곳에 글과 댓글과 쪽지가 생겨요. 직접 글을 올리면 답글이 달려요.')
-   +sub('상점',[(screen('s-boards/pc-09-sm','n_sm.jpg',CB),'연어 마켓'),(screen('s-malls/pc-01-cos','n_cos.jpg',CB),'우주 쇼핑몰'),(screen('s-malls/pc-08-bm','n_bm.jpg',CB),'백일몽 포인트몰')],'산 물건은 소지품에 들어오고 쓴 돈은 가계부에 남아서 다음 응답에 넘어가요. 백일몽 포인트몰은 백일몽 소속일 때 포인트로 써요.')
-   +sub('위키',[(screen('s-wiki/pc-01-home','n_wk.jpg',CB),'괴이위키')],'괴이와 인물과 조직 문서를 읽어요. 없는 문서는 요청하면 새로 써 줘요.'))))
-B.append(block('소지품','가진 물건을 기록하고 다음 응답에 넘겨요. 무기 두 칸과 장비 네 칸에 장착하고, 번 돈과 쓴 돈은 가계부에 적혀요.',screen('promo/pc-play-06-items','m_items.jpg',CB),
+   sub('게시판',[(screen('s-boards/pc-01-gn','n_gn.jpg',CB),'괴담넷'),(screen('s-boards/pc-04-gal','n_gal.jpg',CB),'괴담 갤러리'),(screen('s-boards/pc-08-wpf','n_wpf.jpg',CB),'세정게')],'게시판마다 글과 댓글이 올라오고, 직접 글을 쓰면 답글이 달립니다.')
+   +sub('상점',[(screen('s-boards/pc-09-sm','n_sm.jpg',CB),'연어 마켓'),(screen('s-malls/pc-01-cos','n_cos.jpg',CB),'우주 쇼핑몰'),(screen('s-malls/pc-08-bm','n_bm.jpg',CB),'백일몽 포인트몰')],'산 물건은 소지품에, 쓴 돈은 가계부에 남아 본편에 반영됩니다.')
+   +sub('위키',[(screen('s-wiki/pc-01-home','n_wk.jpg',CB),'괴이위키')],'괴이와 인물, 조직 문서를 읽고, 없는 문서는 새로 요청할 수 있습니다.'))))
+B.append(block('소지품','가진 물건과 장착한 무기, 장비가 기록되어 본편에 반영되고, 번 돈과 쓴 돈은 가계부에 남습니다.',screen('promo/pc-play-06-items','m_items.jpg',CB),
    mini('가계부 화면',sub('가계부',[(screen('s-chron/pc_가계부_달줄','i_led.jpg',C),'가계부')]))))
-B.append(block('기록','사건이 끝날 때마다 일지 한 줄과 보고서가 생겨요. 연대기와 만난 인물의 기록, 세력이 나를 어떻게 보는지도 여기에 쌓여요.',screen('promo/pc-play-07-records','m_rec.jpg',CB),
+B.append(block('기록','사건이 끝날 때마다 일지와 보고서가 쌓이고, 만난 인물의 기록과 세력의 평판도 여기서 봅니다.',screen('promo/pc-play-07-records','m_rec.jpg',CB),
    mini('연대기 화면',sub('연대기',[(screen('s-chron/pc_연대기','r_chron.jpg',C),'연대기')]))))
 
 B.append(h('설정'))
-B.append(para('기능을 하나씩 켜고 끄는 것에서 그치지 않고, 모델에 보내는 지침과 세계 자료까지 직접 고칠 수 있어요. 탭은 넷이에요.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
+B.append(para('기능을 켜고 끄는 것은 물론, 모델에 보내는 지침과 세계 자료까지 직접 고칠 수 있습니다.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
 FB=(552,113,1628,1040)
-g1=sub('호출',[(sset('s-set/pc_manage_flow','t_flow.jpg'),'호출 흐름'),(sset('s-set/pc_set_lore','t_lore.jpg'),'로어북 호출'),(sset('s-set/pc_set_adv','t_adv.jpg'),'생성 공통')],'한 턴에 모델을 부르는 순서와 횟수, 어떤 로어북을 요청에 넣을지를 정해요.')
-g2=sub('표시',[(sset('s-set/pc_set_screen','t_screen.jpg'),'화면'),(sset('s-set/pc_set_image','t_image.jpg'),'캐릭터 이미지'),(sset('s-set/pc_set_status','t_status.jpg'),'상태창')],'본문에 나온 인물의 표정 그림을 채팅 속에 띄우고, 응답 끝 상태창에 어떤 칸을 둘지 정해요.')
-g3=sub('기능',[(sset('s-set/pc_set_board','t_board.jpg'),'상황판'),(sset('s-set/pc_set_net','t_net.jpg'),'인터넷'),(sset('s-set/pc_set_phone','t_phone.jpg'),'괴담톡'),(sset('s-set/pc_set_wiki','t_wiki.jpg'),'위키'),(sset('s-set/pc_set_items','t_items.jpg'),'소지품'),(sset('s-set/pc_set_shop','t_shop.jpg'),'상점'),(sset('s-set/pc_set_journal','t_journal.jpg'),'일지'),(sset('s-set/pc_set_factions','t_fac.jpg'),'세력')],'기능마다 자동으로 부를지, 메인 모델과 보조 모델 중 무엇을 쓸지, 만든 내용을 본편 요청에 넣을지를 따로 정해요.')
-B.append(block('기능','화면에 보이는 것은 인물 페이지예요. 메인 응답이 끝날 때마다 보조 모델이 한 번 읽어서 인물마다 성격과 현재 상태와 인간관계와 호감과 호칭을 고쳐 쌓고, 다음 요청이 그 기록을 읽어요. 그래서 함께 임무를 치른 인물은 그 뒤로 나를 다르게 대해요. 한 턴에 모델을 몇 번 부르는지도 이 화면에서 바로 보고 바꿔요.',sset('s-set/pc_set_people','t_people.jpg',FB),mini('기능 탭의 다른 페이지',g1+g2+g3)))
-B.append(block('세계','요원 55명과 조직 17곳과 괴이 63곳의 자료를 직접 고치거나 새로 추가해요. 세력끼리의 관계와 지도 거점, 스타트 패널에 보이는 칸과 첫 장면도 여기서 바꿔요.',sset('s-set2/pc_agent_open','t_world.jpg')))
-B.append(block('지침','모델에 보내는 지침이 전부 여기에 있어요. RP 지침과 게시판, 괴담톡, 위키, 상점, 인물 기록의 지침을 절 단위로 고쳐요. 기본 지침은 그대로 두고 내 규칙만 덧붙이는 칸도 있어요.',sset('s-set2/pc_guide_RP','t_guide.jpg')))
-B.append(block('점검','설치와 업데이트를 여기서 해요. 턴마다 모델을 어떤 순서로 불렀는지가 요청 원문과 함께 호출 기록에 남아요. 설정은 파일로 내보내고 가져올 수 있어요.',sset('s-set2/pc_manage_backup','t_check.jpg')))
-B.append(para('설정 창 위쪽의 AI 상담에 겪는 증상을 적으면 맞는 설정을 찾아서 바꿔 줘요.'))
+g1=sub('호출',[(sset('s-set/pc_manage_flow','t_flow.jpg'),'호출 흐름'),(sset('s-set/pc_set_lore','t_lore.jpg'),'로어북 호출'),(sset('s-set/pc_set_adv','t_adv.jpg'),'생성 공통')],'한 턴에 모델을 부르는 순서와 횟수, 요청에 넣을 로어북을 정합니다.')
+g2=sub('표시',[(sset('s-set/pc_set_screen','t_screen.jpg'),'화면'),(sset('s-set/pc_set_image','t_image.jpg'),'캐릭터 이미지'),(sset('s-set/pc_set_status','t_status.jpg'),'상태창')],'채팅에 띄우는 인물 표정 그림과 상태창의 칸 구성을 정합니다.')
+g3=sub('기능',[(sset('s-set/pc_set_board','t_board.jpg'),'상황판'),(sset('s-set/pc_set_net','t_net.jpg'),'인터넷'),(sset('s-set/pc_set_phone','t_phone.jpg'),'괴담톡'),(sset('s-set/pc_set_wiki','t_wiki.jpg'),'위키'),(sset('s-set/pc_set_items','t_items.jpg'),'소지품'),(sset('s-set/pc_set_shop','t_shop.jpg'),'상점'),(sset('s-set/pc_set_journal','t_journal.jpg'),'일지'),(sset('s-set/pc_set_factions','t_fac.jpg'),'세력')],'기능마다 자동 호출 여부와 사용할 모델, 본편에 반영할지를 따로 정합니다.')
+B.append(block('기능','기능별 설정을 모은 탭입니다. 아래 화면은 인물 페이지로, 응답이 끝날 때마다 보조 모델이 인물별 호감과 호칭, 관계를 갱신해 다음 응답에 반영하는 기능과 그 호출 순서를 보여 줍니다.',sset('s-set/pc_set_people','t_people.jpg',FB),mini('기능 탭의 다른 페이지',g1+g2+g3)))
+B.append(block('세계','요원과 조직, 괴이의 자료를 직접 고치거나 새로 추가하는 탭입니다. 세력 관계와 지도 거점, 스타트 패널의 구성도 여기서 바꿉니다.',sset('s-set2/pc_agent_open','t_world.jpg')))
+B.append(block('지침','모델에 보내는 지침을 기능별로 모아 둔 탭입니다. 절 단위로 고칠 수 있고, 기본 지침은 그대로 둔 채 자기 규칙만 덧붙일 수도 있습니다.',sset('s-set2/pc_guide_RP','t_guide.jpg')))
+B.append(block('점검','설치와 업데이트, 호출 기록 확인, 설정 내보내기와 가져오기를 하는 탭입니다.',sset('s-set2/pc_manage_backup','t_check.jpg')))
+B.append(para('설정 창의 AI 상담에 증상을 적으면 맞는 설정을 찾아 바꿔 줍니다.'))
 
 B.append(h('받기'))
 B.append(f'<div><a href="https://github.com/leepc25/goei-plugin/releases/latest" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><span style="display:inline-block;padding:14px 34px;background:{ACC};border-radius:10px;"><span style="color:#ffffff;font-size:15px;font-weight:800;">최신 판 받기</span></span></a></div>')
 def li(i,t): return f'<div style="display:table;margin:0 0 10px 0;"><div style="display:table-cell;width:26px;font-size:15px;font-weight:800;color:{ACC};">{i}</div><div style="display:table-cell;font-size:15px;line-height:1.8;word-break:keep-all;">{t}</div></div>'
-S=(li(1,'받는 곳에서 최신 zip을 받아 풀어요.')+li(2,'Risu 설정의 플러그인 탭에서 goei-plugin.js를 가져오고, 뜨는 권한 확인 창을 모두 허용해요.')
-   +li(3,'괴이_ANOMALY.charx를 캐릭터로 가져와요. 그림이 카드에 들어 있으니 예전 에셋 모듈은 꺼요.')
-   +li(4,'카드를 처음 열면 플러그인 본체를 한 번 받아요. 받지 못하면 뜨는 창에 zip 안의 goei-body.js를 넣어요.')
-   +li(5,'채팅 화면 구석의 유령 단추를 누르면 스타트 패널이 열려요.'))
+S=(li(1,'받는 곳에서 최신 zip을 받아 풉니다.')+li(2,'Risu 설정의 플러그인 탭에서 goei-plugin.js를 가져오고, 뜨는 권한 확인 창을 모두 허용합니다.')
+   +li(3,'괴이_ANOMALY.charx를 캐릭터로 가져옵니다. 그림이 카드에 들어 있으므로 예전 에셋 모듈은 끕니다.')
+   +li(4,'카드를 처음 열면 플러그인 본체를 한 번 받습니다. 받지 못하면 뜨는 창에 zip 안의 goei-body.js를 넣습니다.')
+   +li(5,'채팅 화면 구석의 유령 단추를 누르면 스타트 패널이 열립니다.'))
 B.append('<div style="margin:30px 0 0 0;"><div style="font-size:18px;font-weight:800;margin:0 0 14px 0;">설치 순서</div>'+S+'</div>')
 
 page=f'<div style="max-width:860px;margin:0 auto;font-family:{SANS};">{"".join(B)}</div>'
