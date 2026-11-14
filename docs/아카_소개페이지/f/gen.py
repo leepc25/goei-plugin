@@ -132,29 +132,29 @@ B.append(mini(f'나머지 괴이 {n}곳','<div style="font-size:0;margin:14px -5
 B.append(h('전용 플러그인'))
 B.append(para('채팅 화면의 유령 단추를 누르면 열리는 창입니다.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
 C=(0,0,2200,1800)
-B.append(block('상황판','응답이 올 때마다 새로 발생한 괴이와 사건을 판정해 올리고, 요원들이 대기 중인지 출동 중인지를 함께 보여 줍니다.',screen('promo/pc-play-02-board','m_board.jpg')))
-B.append(block('임무','지도에서 상황이 벌어진 곳에 요원을 넷까지 편성해 출발하면 그 편성으로 다음 장면이 이어집니다. 상황을 직접 써서 만드는 커스텀 임무도 여기에 있습니다.',screen('promo/pc-play-03-map','m_map.jpg',CB)))
-B.append(block('괴담톡','인물들과 문자와 전화를 주고받는 메신저입니다. 인물이 먼저 문자를 보내거나 단톡방에 초대하기도 하고, 여기서 나눈 대화는 본편에 반영됩니다.',screen('promo/pc-play-04-phone','m_talk.jpg',CB)))
-B.append(block('인터넷','게시판과 상점과 위키를 브라우저처럼 여는 메뉴입니다.',screen('promo/pc-play-05-net','m_net.jpg',CB),
+B.append(block('상황판','채팅을 이어 가는 동안 다른 곳에서도 괴이가 터집니다. 방금 발생한 사건과 지금 출동해 있는 요원이 여기에 올라옵니다.',screen('promo/pc-play-02-board','m_board.jpg')))
+B.append(block('임무','상황판에 뜬 사건 현장으로 요원 넷을 데리고 나갑니다. 다음 장면은 그 넷과 함께 현장에 도착하는 데서 시작합니다. 원하는 상황을 직접 써서 임무로 만들 수도 있습니다.',screen('promo/pc-play-03-map','m_map.jpg',CB)))
+B.append(block('괴담톡','채팅을 하고 있으면 인물한테서 먼저 문자가 옵니다. 「부장님 지금 어디세요? 본부 4층 비었어요」 단톡방에 불려 들어가기도 하고, 여기서 나눈 이야기는 본편의 인물도 기억합니다.',screen('promo/pc-play-04-phone','m_talk.jpg',CB)))
+B.append(block('인터넷','지금 벌어지는 사건을 두고 괴담넷과 갤러리에 글과 댓글이 올라옵니다. 직접 글을 쓰면 답글이 달립니다. 상점에서 산 물건은 소지품으로 들어오고, 괴이위키에서는 마주친 괴이의 문서를 찾아봅니다.',screen('promo/pc-play-05-net','m_net.jpg',CB),
    mini('게시판, 상점, 위키 화면',
    sub('게시판',[(screen('s-boards/pc-01-gn','n_gn.jpg',CB),'괴담넷'),(screen('s-boards/pc-04-gal','n_gal.jpg',CB),'괴담 갤러리'),(screen('s-boards/pc-08-wpf','n_wpf.jpg',CB),'세정게')],'게시판마다 글과 댓글이 올라오고, 직접 글을 쓰면 답글이 달립니다.')
    +sub('상점',[(screen('s-boards/pc-09-sm','n_sm.jpg',CB),'연어 마켓'),(screen('s-malls/pc-01-cos','n_cos.jpg',CB),'우주 쇼핑몰'),(screen('s-malls/pc-08-bm','n_bm.jpg',CB),'백일몽 포인트몰')],'산 물건은 소지품에, 쓴 돈은 가계부에 남아 본편에 반영됩니다.')
    +sub('위키',[(screen('s-wiki/pc-01-home','n_wk.jpg',CB),'괴이위키')],'괴이와 인물, 조직 문서를 읽고, 없는 문서는 새로 요청할 수 있습니다.'))))
-B.append(block('소지품','가진 물건과 장착한 무기, 장비가 기록되어 본편에 반영되고, 번 돈과 쓴 돈은 가계부에 남습니다.',screen('promo/pc-play-06-items','m_items.jpg',CB),
+B.append(block('소지품','현장에서 얻은 물건과 상점에서 산 물건이 가방에 쌓입니다. 무기를 바꿔 들면 다음 장면에서도 그 무기를 들고 있습니다. 번 돈과 쓴 돈은 가계부에 적힙니다.',screen('promo/pc-play-06-items','m_items.jpg',CB),
    mini('가계부 화면',sub('가계부',[(screen('s-chron/pc_가계부_달줄','i_led.jpg',C),'가계부')]))))
-B.append(block('기록','사건이 끝날 때마다 일지와 보고서가 쌓이고, 만난 인물의 기록과 세력의 평판도 여기서 봅니다.',screen('promo/pc-play-07-records','m_rec.jpg',CB),
+B.append(block('기록','함께 임무를 치른 인물은 호감이 오르고 나를 부르는 호칭이 바뀝니다. 그렇게 달라진 관계가 인물마다 기록으로 남아 다음 장면에 이어지고, 끝난 사건은 보고서로 쌓입니다.',screen('promo/pc-play-07-records','m_rec.jpg',CB),
    mini('연대기 화면',sub('연대기',[(screen('s-chron/pc_연대기','r_chron.jpg',C),'연대기')]))))
 
 B.append(h('설정'))
-B.append(para('기능을 켜고 끄는 것은 물론, 모델에 보내는 지침과 세계 자료까지 직접 고칠 수 있습니다.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
+B.append(para('모델을 언제 몇 번 부를지, 어떤 지침을 보낼지, 인물과 괴이의 설정을 어떻게 둘지를 전부 직접 바꿉니다.')+'<div style="height:26px;font-size:0;">&nbsp;</div>')
 FB=(552,113,1628,1040)
 g1=sub('호출',[(sset('s-set/pc_manage_flow','t_flow.jpg'),'호출 흐름'),(sset('s-set/pc_set_lore','t_lore.jpg'),'로어북 호출'),(sset('s-set/pc_set_adv','t_adv.jpg'),'생성 공통')],'한 턴에 모델을 부르는 순서와 횟수, 요청에 넣을 로어북을 정합니다.')
 g2=sub('표시',[(sset('s-set/pc_set_screen','t_screen.jpg'),'화면'),(sset('s-set/pc_set_image','t_image.jpg'),'캐릭터 이미지'),(sset('s-set/pc_set_status','t_status.jpg'),'상태창')],'채팅에 띄우는 인물 표정 그림과 상태창의 칸 구성을 정합니다.')
 g3=sub('기능',[(sset('s-set/pc_set_board','t_board.jpg'),'상황판'),(sset('s-set/pc_set_net','t_net.jpg'),'인터넷'),(sset('s-set/pc_set_phone','t_phone.jpg'),'괴담톡'),(sset('s-set/pc_set_wiki','t_wiki.jpg'),'위키'),(sset('s-set/pc_set_items','t_items.jpg'),'소지품'),(sset('s-set/pc_set_shop','t_shop.jpg'),'상점'),(sset('s-set/pc_set_journal','t_journal.jpg'),'일지'),(sset('s-set/pc_set_factions','t_fac.jpg'),'세력')],'기능마다 자동 호출 여부와 사용할 모델, 본편에 반영할지를 따로 정합니다.')
-B.append(block('기능','기능별 설정을 모은 탭입니다. 아래 화면은 인물 페이지로, 응답이 끝날 때마다 보조 모델이 인물별 호감과 호칭, 관계를 갱신해 다음 응답에 반영하는 기능과 그 호출 순서를 보여 줍니다.',sset('s-set/pc_set_people','t_people.jpg',FB),mini('기능 탭의 다른 페이지',g1+g2+g3)))
-B.append(block('세계','요원과 조직, 괴이의 자료를 직접 고치거나 새로 추가하는 탭입니다. 세력 관계와 지도 거점, 스타트 패널의 구성도 여기서 바꿉니다.',sset('s-set2/pc_agent_open','t_world.jpg')))
-B.append(block('지침','모델에 보내는 지침을 기능별로 모아 둔 탭입니다. 절 단위로 고칠 수 있고, 기본 지침은 그대로 둔 채 자기 규칙만 덧붙일 수도 있습니다.',sset('s-set2/pc_guide_RP','t_guide.jpg')))
-B.append(block('점검','설치와 업데이트, 호출 기록 확인, 설정 내보내기와 가져오기를 하는 탭입니다.',sset('s-set2/pc_manage_backup','t_check.jpg')))
+B.append(block('기능','한 턴에 모델을 몇 번 부르는지가 호출 흐름 한 화면에 보입니다. 보조 모델 호출이 부담스러우면 기능마다 꺼 두거나 수동으로 돌리고, 기능마다 쓸 모델도 따로 정합니다.',sset('s-set/pc_manage_flow','t_flow0.jpg',FB),mini('기능 탭의 다른 페이지',g1+g2+g3)))
+B.append(block('세계','인물의 말투나 설정이 마음에 들지 않으면 명부에서 바로 고칩니다. 새 요원과 조직, 괴이를 직접 만들어 넣을 수도 있습니다.',sset('s-set2/pc_agent_open','t_world.jpg')))
+B.append(block('지침','모델에 보내는 지침이 전부 공개되어 있어 절 단위로 고쳐 씁니다. 기본 지침은 그대로 두고 「한 번에 세 문장 넘게 말하지 않는다」 같은 자기 규칙만 덧붙이는 방법도 있습니다.',sset('s-set2/pc_guide_RP','t_guide.jpg')))
+B.append(block('점검','응답이 이상할 때는 호출 기록에서 모델에 실제로 보낸 요청을 열어 봅니다. 맞춰 둔 설정은 파일로 내보내 다른 기기로 옮깁니다.',sset('s-set2/pc_manage_backup','t_check.jpg')))
 B.append(para('설정 창의 AI 상담에 증상을 적으면 맞는 설정을 찾아 바꿔 줍니다.'))
 
 B.append(h('받기'))
