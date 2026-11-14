@@ -1,4 +1,17 @@
-(e) => {
+  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        act2 = Math.abs(dx) > Math.abs(dy) * 1.4 ? step(dx > 0 ? -1 : 1) : null;
+        sign = dx > 0 ? 1 : -1;
+        if (!act2) return void (mode2 = "off");
+        mode2 = "back";
+        box3 = root3.querySelector(".gx-content");
+      }
+      if (box3) {
+        const d = Math.max(0, Math.min(dx * sign * 0.6, 120));
+        box3.style.transform = `translateX(${d * sign}px)`;
+        box3.style.opacity = String(1 - d / 400);
+      }
+    }, { passive: true });
+    const end = (e) => {
       if (mode2 !== "back") return void (mode2 = "off");
       mode2 = "off";
       const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
@@ -3917,17 +3930,4 @@ ${texts.anomaly}`;
   async function start2(o = {}) {
     void dropOldGame();
     const t0 = Date.now();
-    const lap = (what) => console.log(`[goei] 본체 시작 ${what}: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
-    try {
-      lap(`세계 자료 ${await loadWorldData() === "store" ? "저장소에서" : "받음"}`);
-    } catch (error) {
-      showWorldDataPanel(reason2(error), !!o.prompt);
-      throw error;
-    }
-    await loadPrefs();
-    await loadStoredWikiPack();
-    await loadStoredTokenizer();
-    lap("설정·위키·토크나이저 읽음");
-    assetsFirst = loadModuleAssets();
-    void redrawAfterLoad();
-    setWikiOpener((title2) => 
+    const lap = (

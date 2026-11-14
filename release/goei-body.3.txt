@@ -69,9 +69,10 @@ ul room for the writer."
   }
   var boardGuide = (style) => pickStyle(gnet_default.replace(/\r/g, ""), style);
   function salmonGuide() {
-    return boardGuide("gal").replace(/^괴담갤 \(괴담 갤러리\) is a completely civilian[^\n]*$/m, SALMON_ABOUT).replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS).replace("Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ", "");
+    return boardGuide("gal").replace(/^괴담갤 \(괴담 갤러리\) is a completely civilian[^\n]*$/m, SALMON_ABOUT).replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS).replace("Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ", SALMON_TONE);
   }
-  var SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services, all listed in the same plain resale tone. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
+  var SALMON_TONE = "Write like a busy neighborhood resale app used by very different people, each in their own way: terse sellers who give only the item, condition and price; chatty sellers who explain why they are selling; older users in polite full sentences; younger users in clipped casual speech; collectors precise about provenance; brokers vague about where things came from; buyers who haggle, ask to reserve, ask for more photos or never reply. Vary length, politeness, spelling care and how much each poster reveals. Keep it a trade board, not a story board. ";
+  var SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
   var SALMON_TOPICS = "Each post is a listing whose tag is exactly one of 팝니다 (selling), 삽니다 (buying), 나눔 (giving away) or 정보 (occult information). Start the title with the plain name of the one item being sold or sought (e.g. 「업소용 튀김기 팝니다」, 「방검복 구합니다」) so the app can show its picture; put district, condition and extras in the body, not the title. Give the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.";
   var dropSections = (text5, names4) => names4.reduce((t, n3) => t.replace(new RegExp(`\\n*@@SECTION ${n3}\\n[\\s\\S]*?\\n@@END(?=\\n|$)`), ""), text5);
   var SHOP_ONLY = ["SHOP_RULE", "OWN_SHOPS", "SHOP_JUDGE", "WHERE_ANY", "WHERE_SHOP"];
@@ -4240,17 +4241,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
         continue;
       }
       if (!prev && (pid === null || pid <= floor || seen4.has(pid))) pid = Math.max(st.seq, floor) + 1;
-      if (pid === null || seen4.has(pid)) continue;
-      seen4.add(pid);
-      st.seq = Math.max(st.seq, pid);
-      const comments = Array.isArray(raw.comments) ? raw.comments : [];
-      commentTotal += comments.length;
-      let date = validDate(raw.date);
-      if (!date) date = day && str2(raw.time).trim() ? `${day} ${str2(raw.time).trim()}` : o.date;
-      const q = {
-        id: pid,
-        nick: cut(author || "ㅇㅇ", 80),
-        title: str2(raw.title),
-        body: stripForged(str2(raw.content)),
-        date,
-        views: Math.max
+      if (pid

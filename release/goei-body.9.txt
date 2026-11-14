@@ -1,4 +1,21 @@
-slice(0, t.at + 1);
+OSED_MAX = 10;
+  var seq3 = 1;
+  var br = {
+    tabs: [{ id: seq3++, site: "", hist: [], at: -1 }],
+    cur: 0,
+    /** 로그인 창 열림 */
+    login: false,
+    /** 폰: 탭 목록 화면 */
+    list: false,
+    /** 닫은 탭 (최근 것이 끝, 마우스 제스처 ㄱ 으로 되살림) */
+    closed: []
+  };
+  var curTab = () => br.tabs[Math.min(br.cur, br.tabs.length - 1)];
+  function recordTab(state2) {
+    const t = curTab();
+    const key = JSON.stringify(state2);
+    if (t.hist[t.at] === key) return;
+    t.hist = t.hist.slice(0, t.at + 1);
     t.hist.push(key);
     if (t.hist.length > HIST_MAX) t.hist.shift();
     t.at = t.hist.length - 1;
@@ -3366,22 +3383,4 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
         env3.render();
         return true;
       case "items-open":
-        itemsUi.open = value ?? "";
-        itemsUi.mode = "view";
-        env3.render();
-        return true;
-      case "items-keep":
-        return true;
-      case "items-close":
-        itemsUi.open = "";
-        itemsUi.mode = "view";
-        itemsUi.dragDrop = false;
-        env3.render();
-        return true;
-      case "items-back":
-        if (itemsUi.mode === "drop" && itemsUi.dragDrop) itemsUi.open = "";
-        itemsUi.mode = "view";
-        itemsUi.dragDrop = false;
-        env3.render();
-        return true;
-      case "items-add":
+        itemsU

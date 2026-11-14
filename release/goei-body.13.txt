@@ -1,4 +1,10 @@
-lang === "en" ? " in English" : " in Korean", slot_hints: slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ") });
+lt entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.",
+    "- Slots you do not return stay as they are.",
+    "",
+    "Output exactly one JSON object, nothing else:",
+    '{"slots":{"<slot>":[{"text":"<statement>","target":"<name|@user|null>","from":["<id>"]}]}}',
+    "Slot hints: " + slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ")
+  ].join("\n"), { lang_note: lang === "en" ? " in English" : " in Korean", slot_hints: slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ") });
   var consolidateUserText = (dataText) => guideOr("UpdaterExtra", "CONSOLIDATE.USER", () => `Record to tidy:
 ${dataText}
 
@@ -2731,20 +2737,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         if (!v || peopleUi.busy || peopleStatus().busy) return true;
         peopleUi.busy = true;
         peopleUi.notice = "";
-        env3.render();
-        try {
-          const r = await consolidatePerson(v);
-          if (r.ok) peopleUi.info = r.message;
-          else peopleUi.notice = r.message;
-        } catch (error) {
-          peopleUi.notice = error instanceof Error ? error.message : String(error);
-        }
-        peopleUi.busy = false;
-        peopleUi.diag = null;
-        await env3.refresh();
-        return true;
-      }
-      case "pp-jump":
-        if (peopleUi.evOpen.has(v)) peopleUi.evOpen.delete(v);
-        else peopleUi.evOpen.add(v);
-   
+ 

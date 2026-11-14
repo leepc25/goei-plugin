@@ -1,4 +1,11 @@
-뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
+러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
+    ));
+    const cardNew = lite && L && compareVersions(L.card, cur) > 0;
+    const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
+    rows3.push(row8(
+      "카드",
+      `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc21(cur)}`}${cardNew ? ` → <b>v${esc21(L.card)}</b>` : ""}</span>`,
+      !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
     ));
     let actions = `<button class="gx-mini" data-action="upd-check" ${busy6 ? "disabled" : ""}>${busy6 && !updateUi.payload ? esc21(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
     if (cardNew && !needPlugin) {
@@ -2893,12 +2900,4 @@
   .gw .fl-pc { display: none; }
   .gw .fl-ph { display: flex; }
   /* 폰: 오른쪽 숫자 칸은 왼쪽 두 줄(메인 + 보조 = 합)에 이미 있어 숨긴다. 글이 한 줄씩 들어가게 */
-  .gw .fl-bar { position: static; grid-template-columns: minmax(0, 1fr); padding: 8px 11px; margin-bottom: 14px; }
-  .gw .fl-bar > p { font-size: 12.5px; line-height: 1.35; }
-  .gw .fl-bar > div { display: none; }
-  .gw .fl-bar > div > span { font-size: 11.5px; }
-  .gw .fl-bar > div > b { font-size: 14px; }
-  .gw .fl-bar > i { display: none; }
-  .gw .fl .ps-rows.fl-ph { background: none; border: 0; box-shadow: none; padding: 0; flex-direction: column; gap: 8px; }
-  .gw .fl .ps-rows.fl-ph > .flc { border: 1px solid var(--line); }
-  .gw .flc { display: flex; flex-direction: column; gap: 6px
+  .gw .fl-bar { position: static; grid-template-columns

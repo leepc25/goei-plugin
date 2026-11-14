@@ -1,4 +1,26 @@
-inally {
+var iconGen = () => gen;
+  function setIconPool(on3) {
+    if (poolOn === on3) return;
+    poolOn = on3;
+    gen++;
+  }
+  var iconPoolOn = () => poolOn;
+  function setIconAliases(text5) {
+    const t = text5 && text5.trim() ? text5 : ICON_ALIAS_DEFAULT;
+    if (t === aliasText) return;
+    aliasText = t;
+    aliases = parseIconAliases(t);
+    gen++;
+  }
+  var misses = [];
+  var ICON_MISS_MAX = 100;
+  var readIconMisses = () => misses.slice();
+  var quiet = 0;
+  function iconQuiet(f) {
+    quiet++;
+    try {
+      return f();
+    } finally {
       quiet--;
     }
   }
@@ -2035,7 +2057,7 @@ ${SEED_CLOSE}` : "", missing };
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.13" : "0";
+  var PLUGIN_VERSION = true ? "0.21.14" : "0";
 
   // src/core/lore.ts
   var LORE_KINDS = ["org", "site", "anomaly", "agent"];
@@ -3975,16 +3997,4 @@ ${JSON.stringify({ feature: "homeshop", ...withShow && log.title ? { program: lo
   function mallRoll(vars, site) {
     const K = rollKeys(site);
     const D = rollDefaults(site);
-    const on3 = String(vars?.[K.on] ?? "") !== "0";
-    const g2 = parseGenres(String(vars?.[K.genres] ?? ""));
-    const t = parseTiers(String(vars?.[K.tiers] ?? ""));
-    const u = String(vars?.[K.useful] ?? "");
-    const gm = String(vars?.[K.gmode] ?? "");
-    const tm = String(vars?.[K.tmode] ?? "");
-    const tiers = t.length ? t : D.tiers;
-    return {
-      on: on3,
-      genres: g2.length ? g2 : D.genres,
-      tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
-      useful: u === "0" || u === "1" || u === "2" ? u : "auto",
-      gmode: gm =
+    const on3 = String(vars?.[K.on] ?? "") !== 

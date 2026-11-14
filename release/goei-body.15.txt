@@ -1,4 +1,12 @@
-ns("round");
+ locked: false,
+            ctl: { t: "rel", action, minus: minus.dataset.value ?? "", plus: plus.dataset.value ?? "" }
+          });
+          continue;
+        }
+        if (!e.hasAttribute("aria-pressed")) continue;
+        const key = keyOf3(value);
+        const mates = els.filter((x) => x.tagName === "BUTTON" && x.hasAttribute("aria-pressed") && x.dataset.action === action && keyOf3(x.dataset.value ?? "") === key && !x.classList.contains("gx-step") && x.getAttribute("role") !== "switch");
+        const round = e.classList.contains("round");
         const [cg2, co] = cellAt(e);
         if (mates.length < 2 && !round) {
           const on3 = e.getAttribute("aria-pressed") === "true";
@@ -3016,13 +3024,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-canvas:is(.zoomed, .pan):active { cursor: grabbing; }
 .gx-mapimg { -webkit-user-drag: none; pointer-events: none; }
 .gx-zbtn.txt { font-size: 12px; font-weight: 700; letter-spacing: -.02em; }
-.gx-zoom { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
-.gx-zbtn {
-  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--void) 88%, transparent); color: var(--text);
-  font-family: inherit; font-size: 18px; font-weight: 600; line-height: 1; padding: 0; display: grid; place-items: center; cursor: pointer;
-}
-.gx-zbtn:hover { border-color: var(--signal); }
-.gx-zbtn.reset { display: none; font-size: 16px; }
-.gx-canvas.zoomed .gx-zbtn.reset { display: grid; }
-@media (max-w
+.gx-zoom { position: absolute; right: 8px; bottom: 8px; displ

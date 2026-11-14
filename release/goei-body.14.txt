@@ -1,4 +1,20 @@
-     env3.render();
+       env3.render();
+        try {
+          const r = await consolidatePerson(v);
+          if (r.ok) peopleUi.info = r.message;
+          else peopleUi.notice = r.message;
+        } catch (error) {
+          peopleUi.notice = error instanceof Error ? error.message : String(error);
+        }
+        peopleUi.busy = false;
+        peopleUi.diag = null;
+        await env3.refresh();
+        return true;
+      }
+      case "pp-jump":
+        if (peopleUi.evOpen.has(v)) peopleUi.evOpen.delete(v);
+        else peopleUi.evOpen.add(v);
+        env3.render();
         return true;
     }
     return false;
@@ -2874,12 +2890,4 @@ ${talk}` }
             ...Number(box3.dataset.step) > 1 ? { stride: Number(box3.dataset.step) } : {},
             ...minus.hasAttribute("disabled") ? { lo: n3 } : {},
             ...plus.hasAttribute("disabled") ? { hi: n3 } : {},
-            locked: false,
-            ctl: { t: "rel", action, minus: minus.dataset.value ?? "", plus: plus.dataset.value ?? "" }
-          });
-          continue;
-        }
-        if (!e.hasAttribute("aria-pressed")) continue;
-        const key = keyOf3(value);
-        const mates = els.filter((x) => x.tagName === "BUTTON" && x.hasAttribute("aria-pressed") && x.dataset.action === action && keyOf3(x.dataset.value ?? "") === key && !x.classList.contains("gx-step") && x.getAttribute("role") !== "switch");
-        const round = e.classList.contai
+           

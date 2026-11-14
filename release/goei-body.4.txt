@@ -1,4 +1,17 @@
-(0, int(raw.views) ?? 0),
+ === null || seen4.has(pid)) continue;
+      seen4.add(pid);
+      st.seq = Math.max(st.seq, pid);
+      const comments = Array.isArray(raw.comments) ? raw.comments : [];
+      commentTotal += comments.length;
+      let date = validDate(raw.date);
+      if (!date) date = day && str2(raw.time).trim() ? `${day} ${str2(raw.time).trim()}` : o.date;
+      const q = {
+        id: pid,
+        nick: cut(author || "ㅇㅇ", 80),
+        title: str2(raw.title),
+        body: stripForged(str2(raw.content)),
+        date,
+        views: Math.max(0, int(raw.views) ?? 0),
         votes: Math.max(0, int(raw.upvotes) ?? 0),
         mine: prev?.mine ?? false,
         comments: [],
@@ -4752,27 +4765,4 @@ ${c}`)]).join("\n\n");
       },
       이도형: {
         level: 6,
-        register: "반말",
-        self: "나",
-        up: "국장님",
-        peer: "부장",
-        down: "거기",
-        outsider: "너"
-      },
-      이병진: {
-        level: 4,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "과장님",
-        down: "자네",
-        outsider: "그쪽 분"
-      },
-      이성해: {
-        level: 2,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입님",
-        outsider: "
+   
