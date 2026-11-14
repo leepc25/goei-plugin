@@ -1,4 +1,30 @@
-
+inally {
+      quiet--;
+    }
+  }
+  function noteMiss(m) {
+    if (quiet) return;
+    if (misses.some((x) => x.name === m.name && x.icon === m.icon)) return;
+    misses.push(m);
+    if (misses.length > ICON_MISS_MAX) misses.splice(0, misses.length - ICON_MISS_MAX);
+  }
+  var isMod = (wd) => wd.length >= 2 && (wd.charCodeAt(wd.length - 1) - 44032) % 28 === 4;
+  var ICON_MIN = 0.7;
+  var A = 0.7;
+  var B = 0.3;
+  var NAME_W = 0.2;
+  var HEAD_MISS = 0.65;
+  var TAIL = 0.15;
+  var MOD_W = 0.5;
+  function iconFrags(s8) {
+    const out = /* @__PURE__ */ new Map();
+    const put = (f, m) => out.set(f, Math.max(out.get(f) ?? 0, m));
+    let tail2 = "";
+    let last2 = "";
+    for (const p2 of normIcon(s8).match(/[가-힣]+(?: +[가-힣]+)*|[0-9a-z]+/g) ?? []) {
+      if (/[가-힣]/.test(p2)) {
+        const words = p2.split(" ");
+        const c = words.join("");
         const mult = [];
         words.forEach((wd, i) => {
           const m = i < words.length - 1 && isMod(wd) ? MOD_W : 1;
@@ -1835,7 +1861,7 @@ ${SEED_CLOSE}` : "", missing };
         $seed_lore: seed2.text,
         $seed_inputs: "0",
         $goei_last: "",
-        // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
+        // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 손에 드는 것은 손 칸, 장비는 장착 (모델 호출 없음, 11-07 사용자; 손 칸은 사용자 2026-11-14). 페르소나는 빈 소지품
         ...startItemsVars(startItems && choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
         // 소지 한도 (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」, 페르소나·값 없는 인물은 설정 값
         ...startCarryVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.carry : void 0),
@@ -2009,7 +2035,7 @@ ${SEED_CLOSE}` : "", missing };
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.12" : "0";
+  var PLUGIN_VERSION = true ? "0.21.13" : "0";
 
   // src/core/lore.ts
   var LORE_KINDS = ["org", "site", "anomaly", "agent"];
@@ -2814,7 +2840,7 @@ ${block5.trim()}` };
   var ITEM_RULES_VAR = "$it_rules";
   var ITEM_LEFT_WORDS_VAR = "$it_left_words";
   var ITEM_OFF_WORDS_VAR = "$it_off_words";
-  var ITEM_RULES_DEFAULT = ["옷 → 장비", "무기 → 무기", "음식 → 소모1", "의료 → 소모1", "소모품 → 소모1", "열쇠 → 사용", "부적 → 사용", "봉인 → 사용", "서류 → -", "귀중품 → -", "잡동사니 → -", "괴이 → -", "도구 → 사용", "기기 → 사용"].join("\n");
+  var ITEM_RULES_DEFAULT = "";
   var ITEM_LEFT_WORDS_DEFAULT = "두고, 놓고, 보관해, 맡겨, 반납, 압수, 버리고, 잃어";
   var ITEM_OFF_WORDS_DEFAULT = "벗어, 벗고, 내려놓, 풀어";
   var ITEM_GRADE_WORDS_DEFAULT = ["그늘 → F", "황혼 → E", "땅거미 → D", "어스름 → C", "어둠 → B", "암흑 → A", "심연 → S"].join("\n");
@@ -3961,17 +3987,4 @@ ${JSON.stringify({ feature: "homeshop", ...withShow && log.title ? { program: lo
       genres: g2.length ? g2 : D.genres,
       tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
       useful: u === "0" || u === "1" || u === "2" ? u : "auto",
-      gmode: gm === "any" || gm === "one" ? gm : "uniq",
-      tmode: tm === "even" || tm === "same" ? tm : "weight"
-    };
-  }
-  var rollChanged = (vars, site) => Object.values(rollKeys(site)).some((k) => String(vars?.[k] ?? "") !== "");
-  var rollPrice = (site, lo, hi) => site === "bm" ? `${lo.toLocaleString("en-US")}-${hi.toLocaleString("en-US")} p` : `₩${lo.toLocaleString("en-US")}-${hi.toLocaleString("en-US")}`;
-  var pickTier = (tiers, rnd) => {
-    const total = tiers.reduce((a, t) => a + t.w, 0);
-    let x = rnd() * total;
-    for (const t of tiers) {
-      x -= t.w;
-      if (x < 0) return t;
-    }
-    return tiers[tiers.lengt
+      gmode: gm =

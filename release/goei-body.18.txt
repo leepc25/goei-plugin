@@ -1,4 +1,68 @@
-) === 0 && k === 0 || free(r))) return at = k, placed.push(r), true;
+(e) => {
+      if (mode2 !== "back") return void (mode2 = "off");
+      mode2 = "off";
+      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
+      const run6 = dx * sign >= FIRE ? act2 : null;
+      act2 = null;
+      reset(!run6);
+      run6?.();
+    };
+    root3.addEventListener("touchend", end, { passive: true });
+    root3.addEventListener("touchcancel", () => {
+      mode2 = "off";
+      reset(true);
+    }, { passive: true });
+  }
+
+  // src/ui/mapzoom.ts
+  var MAX = 4;
+  var MOVE = 6;
+  var views = /* @__PURE__ */ new Map();
+  function mapZoomControls(nation = false) {
+    return `<div class="gx-zoom" aria-label="지도 확대">
+      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
+      <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
+      ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
+    </div>`;
+  }
+  function clamp3(v, cw, ch, lw, lh) {
+    const z = Math.min(MAX, Math.max(1, v.z));
+    const fit = (p2, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p2));
+    return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
+  }
+  var hit3 = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+  var box2 = (el) => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left, t: r.top, r: r.right, b: r.bottom };
+  };
+  var rank2 = (el) => el.classList.contains("sel") ? 0 : /\bhot/.test(el.className) ? 1 : 2;
+  function declutter(layer, frame, z) {
+    const labs = [...layer.querySelectorAll(".gx-pin.gx-plab")];
+    const dots = [...layer.querySelectorAll(".gx-pin.gx-pdot")];
+    if (!labs.length) return;
+    for (const el of labs) el.style.removeProperty("--lx"), el.style.removeProperty("--ly");
+    const F = box2(frame);
+    const inFrame = (r) => r.l >= F.l && r.r <= F.r && r.t >= F.t && r.b <= F.b;
+    const dotBox = dots.map((d) => {
+      const dot2 = d.querySelector(".gx-dot");
+      return dot2 ? box2(dot2) : null;
+    });
+    const order2 = labs.map((el, i) => ({ el, i })).sort((a, b) => rank2(a.el) - rank2(b.el) || a.i - b.i);
+    const placed = [...frame.querySelectorAll(".gx-zbtn")].map(box2);
+    for (const { el, i } of order2) {
+      const name = el.querySelector(".gx-pname");
+      const D = dotBox[i];
+      if (!name || !D) continue;
+      const N2 = box2(name);
+      const w = N2.r - N2.l, h = N2.b - N2.t, my = (D.t + D.b) / 2 - h / 2;
+      const up = D.t - 2 - h, dn = D.b + 2, rt = D.r + 1, lt = D.l - 1 - w;
+      const spots = [[N2.l, N2.t], [N2.l, up], [D.r + 3, my], [D.l - 3 - w, my], [rt, up], [lt, up], [rt, dn], [lt, dn]];
+      const free = (r) => !placed.some((p2) => hit3(p2, r)) && !dotBox.some((d2, j) => j !== i && d2 && hit3(d2, r));
+      let at = -1;
+      spots.some(([l, t], k) => {
+        const r = { l, t, r: l + w, b: t + h };
+        if ((k === 0 || inFrame(r)) && (rank2(el) === 0 && k === 0 || free(r))) return at = k, placed.push(r), true;
         return false;
       });
       const blocked2 = at < 0;
@@ -1371,8 +1435,8 @@ ${note2.trim()}` : card3;
     const dropOk = (z) => {
       if (!z || !dragItem) return false;
       const to = z.dataset.drop ?? "";
-      if (to === "auto") return !!dragItem.equip || dragItem.usable;
-      if (to.startsWith("equip:")) return to.split(":")[1] === dragItem.equip;
+      if (to === "auto") return true;
+      if (to.startsWith("equip:")) return to.split(":")[1] === "weapon" || dragItem.equip === "gear";
       if (to === "use") return dragItem.usable;
       return to === "grid" || to === "drop";
     };
@@ -1385,6 +1449,7 @@ ${note2.trim()}` : card3;
       dragItem = null;
       root2?.querySelector(".gx-items")?.classList.remove("it-dragging");
       root2?.querySelectorAll(".it-over-ok").forEach((x) => x.classList.remove("it-over-ok"));
+      root2?.querySelectorAll(".it-can, .it-cant").forEach((x) => x.classList.remove("it-can", "it-cant"));
     };
     root2.addEventListener("dragstart", (ev) => {
       const el = ev.target instanceof Element ? ev.target.closest("[data-drag]") : null;
@@ -1393,6 +1458,7 @@ ${note2.trim()}` : card3;
       ev.dataTransfer?.setData("text/plain", dragItem.id);
       if (ev.dataTransfer) ev.dataTransfer.effectAllowed = "move";
       root2?.querySelector(".gx-items")?.classList.add("it-dragging");
+      root2?.querySelectorAll('.it-slot[data-drop^="equip:"], .it-usebox[data-drop="use"]').forEach((z) => z.classList.add(dropOk(z) ? "it-can" : "it-cant"));
     });
     root2.addEventListener("dragover", (ev) => {
       if (!dragItem) return;
@@ -3864,55 +3930,4 @@ ${texts.anomaly}`;
     lap("설정·위키·토크나이저 읽음");
     assetsFirst = loadModuleAssets();
     void redrawAfterLoad();
-    setWikiOpener((title2) => void openWiki2(title2));
-    setRecordsOpener((id2) => void openRecords2(id2));
-    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
-    setShopOpener((site) => void openShop(site));
-    let stopWatcher = null;
-    let fab = null;
-    try {
-      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
-      const f = fab;
-      void f.setTheme(currentTheme());
-      onThemeChange((t) => void f.setTheme(t).catch(() => {
-      }));
-      try {
-        prog = await createProgWin();
-        const pw = prog;
-        void pw.setTheme(currentTheme());
-        onThemeChange((t) => void pw.setTheme(t).catch(() => {
-        }));
-      } catch (error) {
-        console.log(`[goei] 호출 진행 창을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-        prog = null;
-      }
-      stopWatcher = startWatcher(fab);
-      lap("유령 단추 붙임");
-    } catch (error) {
-      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      fab = null;
-      stopWatcher = startWatcher(null);
-      await risuai.registerButton({ name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` }, () => void openApp({ quietIfNotLite: true })).catch((e) => console.log(`[goei] 채팅 메뉴 단추를 두지 못했어요: ${e instanceof Error ? e.message : String(e)}`));
-    }
-    return {
-      beforeRequest: onBeforeRequest,
-      sanitize,
-      input: onInput,
-      output: onOutput,
-      display: onDisplay,
-      install: () => openInstall(),
-      unload: async () => {
-        stopWatcher?.();
-        await fab?.remove().catch(() => {
-        });
-        await prog?.remove().catch(() => {
-        });
-        prog = null;
-        progKey = "";
-      }
-    };
-  }
-
-  // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.12", start: start2 };
-})();
+    setWikiOpener((title2) => 

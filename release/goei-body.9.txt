@@ -1,4 +1,55 @@
-}
+slice(0, t.at + 1);
+    t.hist.push(key);
+    if (t.hist.length > HIST_MAX) t.hist.shift();
+    t.at = t.hist.length - 1;
+  }
+  var tabCan = (dir2) => {
+    const t = curTab();
+    return t.at + dir2 >= 0 && t.at + dir2 < t.hist.length;
+  };
+  function tabGo(dir2) {
+    if (!tabCan(dir2)) return null;
+    const t = curTab();
+    t.at += dir2;
+    return JSON.parse(t.hist[t.at]);
+  }
+  function tabState(i = br.cur) {
+    const t = br.tabs[i];
+    return t && t.at >= 0 ? JSON.parse(t.hist[t.at]) : null;
+  }
+  function newTab() {
+    br.tabs.push({ id: seq3++, site: "", hist: [], at: -1 });
+    br.cur = br.tabs.length - 1;
+  }
+  function closeTab(i) {
+    const [gone] = br.tabs.splice(i, 1);
+    if (gone?.site) br.closed = [...br.closed, gone].slice(-CLOSED_MAX);
+    if (!br.tabs.length) br.tabs.push({ id: seq3++, site: "", hist: [], at: -1 });
+    if (br.cur >= i && br.cur > 0) br.cur--;
+    br.cur = Math.min(br.cur, br.tabs.length - 1);
+  }
+  function reopenTab() {
+    const t = br.closed.pop();
+    if (!t) return false;
+    const empty2 = br.tabs.length === 1 && !br.tabs[0].site ? 0 : -1;
+    if (empty2 >= 0) br.tabs.splice(empty2, 1);
+    br.tabs.push({ ...t, id: seq3++ });
+    br.cur = br.tabs.length - 1;
+    return true;
+  }
+  function openSite(site) {
+    const i = br.tabs.findIndex((t) => t.site === site);
+    if (i < 0) {
+      curTab().site = site;
+      return "here";
+    }
+    if (i !== br.cur) {
+      const id2 = br.tabs[i].id;
+      if (!curTab().site) closeTab(br.cur);
+      br.cur = br.tabs.findIndex((t) => t.id === id2);
+    }
+    return "tab";
+  }
   var focusSite = (site) => void openSite(site);
   var BR_TABS_VAR = "$br_tabs";
   var SAVE_HIST = 10;
@@ -3026,6 +3077,10 @@ ${nick}: ${text5.slice(0, 200)}`;
     return [it.equip ? EQUIP_LABEL[it.equip] : "", left !== void 0 ? `남은 ${left}` : it.use ? "사용" : "", it.weight !== void 0 ? it.uses !== void 0 ? `${weightText(lineWeight(it, left))} (1개 ${weightText(it.weight)})` : weightText(it.weight) : "", it.state !== "ok" ? STATE_LABEL[it.state] : ""].filter(Boolean).join(" · ");
   }
   var FROM_NAME = { store: "상점", story: "본문", manual: "직접" };
+  var needsEquip = (ctx2, it) => it.equip === "gear" && !isEquipped(it, liveOf(ctx2));
+  var equipLabel = (it, equipped) => (equipped ? slotKind(it) : it.equip ?? "weapon") === "weapon" ? equipped ? "넣기" : "들기" : equipped ? "해제" : "장착";
+  var fullText = (k) => `${EQUIP_LABEL[k]} 칸이 다 찼어요. ${k === "weapon" ? "손에 든 것을 먼저 넣으세요" : "칸에 있는 것을 먼저 해제하세요"}${isPhone() ? "" : " (칸으로 끌어다 바꿔도 돼요)"}.`;
+  var usableNow = (ctx2, it) => canUse(it) && !needsEquip(ctx2, it);
   function whenOf(ctx2) {
     const at = /* @__PURE__ */ new Map();
     let cur = "";
@@ -3123,11 +3178,11 @@ ${nick}: ${text5.slice(0, 200)}`;
     let when3;
     const slot = (k, i) => {
       const it = eq[k][i];
-      if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
+      if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${k === "weapon" ? ICONS.hand : ICONS.gear}</span></div>`;
       const act2 = where2 === "sell" ? "shop-sell-pick" : "items-open";
       const left = itemLeft(items, it, alive);
       when3 ??= whenOf(ctx2);
-      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc17(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc17(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when3)}</button>`;
+      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act2}" data-value="${esc17(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}" data-equip="${it.equip ?? ""}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc17(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${tipOf(it, left, when3)}</button>`;
     };
     const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join("")}</div>`;
     return { av: avatarHtml(ctx2), slots };
@@ -3162,16 +3217,17 @@ ${nick}: ${text5.slice(0, 200)}`;
     if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
     const w = whenOf(ctx2);
     const queued2 = new Map(useQueue(ctx2).map((u) => [u.id, u.n]));
-    const cells2 = list4.map((it, i) => cell(it, itemLeft(items, it, alive), !q && i >= slots, w, queued2.get(it.id) ?? 0));
+    const live = liveItems(items, alive);
+    const cells2 = list4.map((it, i) => cell(it, itemLeft(items, it, alive), !q && i >= slots, w, queued2.get(it.id) ?? 0, canUse(it) && (it.equip !== "gear" || isEquipped(it, live))));
     if (!q) for (let i = list4.length; i < slots; i++) cells2.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
     return `<div class="it-grid" data-drop="grid">${cells2.join("")}</div>`;
   }
-  function cell(it, left, over, w, queued2) {
+  function cell(it, left, over, w, queued2, usable) {
     const all = queued2 > 0 && (left === void 0 || queued2 >= left);
-    const drag = !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${canUse(it) ? ' data-usable="1"' : ""}` : "";
+    const drag = !isPhone() ? ` draggable="true" data-drag="${esc17(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${usable ? ' data-usable="1"' : ""}` : "";
     return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}${all ? " queued" : ""}${stateCls(it)}" data-action="items-open" data-value="${esc17(it.id)}"${drag} aria-label="${esc17(it.name)}${over ? " (넘침)" : ""}${queued2 ? " (사용 예정)" : ""}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued2 ? `<span class="it-q8">사용 예정${queued2 > 1 ? ` ×${queued2}` : ""}</span>` : ""}<b>${esc17(it.name)}</b>${tipOf(it, left, w)}</button>`;
   }
-  var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖", left: "없어짐", off: "장착 풀기" };
+  var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖", left: "없어짐", off: "해제" };
   var BY = { story: "본문", manual: "직접", use: "사용 단추", store: "상점" };
   var WEEK4 = "일월화수목금토";
   function dayOf3(when3) {
@@ -3227,7 +3283,7 @@ ${nick}: ${text5.slice(0, 200)}`;
     }
     const queued2 = useQueue(ctx2).find((u) => u.id === it.id)?.n ?? 0;
     const left = leftOf(ctx2, it);
-    const more = canUse(it) && (left === void 0 ? !queued2 : queued2 < left);
+    const more = usableNow(ctx2, it) && (left === void 0 ? !queued2 : queued2 < left);
     const equipped = isEquipped(it, liveOf(ctx2));
     const body5 = `${head3}
     ${it.desc ? `<p>${esc17(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
@@ -3236,10 +3292,10 @@ ${nick}: ${text5.slice(0, 200)}`;
     ${it.text ? `<div class="it-note">${esc17(it.text)}</div>` : ""}
     ${it.quote ? `<p class="qt">근거 「${esc17(it.quote)}」</p>` : ""}
     <div class="it-btns">
-      ${it.use ? `<button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc17(it.id)}" ${more || queued2 ? "" : "disabled"}>${queued2 ? more ? `한 번 더 (×${queued2 + 1})` : `사용 ×${queued2}` : "사용"}</button>` : ""}
+      ${it.use ? `<button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc17(it.id)}" ${more || queued2 ? "" : "disabled"}${needsEquip(ctx2, it) ? ' title="장착해야 쓸 수 있어요"' : ""}>${queued2 ? more ? `한 번 더 (×${queued2 + 1})` : `사용 ×${queued2}` : "사용"}</button>` : ""}
       ${queued2 ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc17(it.id)}">사용 취소</button>` : ""}
       ${boxButton(ctx2, it.id)}
-      ${it.equip ? `<button class="gx-chip" data-action="${equipped ? "items-unequip" : "items-equip"}" data-value="${esc17(it.id)}">${equipped ? "장착 풀기" : "장착"}</button>` : ""}
+      <button class="gx-chip" data-action="${equipped ? "items-unequip" : "items-equip"}" data-value="${esc17(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ""}>${equipLabel(it, equipped)}</button>
       ${itemEditOn(ctx2.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ""}
       ${it.uses !== void 0 ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx2, it).length ? "" : "disabled"} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ""}
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc17(it.id)}">버리기</button>
@@ -3257,7 +3313,7 @@ ${nick}: ${text5.slice(0, 200)}`;
     <label><span>이름</span><input name="name" maxlength="30" required value="${esc17(it?.name ?? "")}" placeholder="예: 소금 봉지"></label>
     <label><span>설명</span><input name="desc" maxlength="80" value="${esc17(it?.desc ?? "")}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
     <label><span>효과</span><input name="effect" maxlength="60" value="${esc17(it?.effect ?? "")}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
-    <label><span>장착</span><select name="equip">${opt("", "없음")}${opt("weapon", "무기")}${opt("gear", "장비")}</select></label>
+    <label><span>장착</span><select name="equip">${opt("", "없음")}${opt("weapon", "손")}${opt("gear", "장비")}</select></label>
     <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? " checked" : ""}> 쓸 수 있음</span></label>
     <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ""}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
     <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ""}" placeholder="kg"></label>
@@ -3279,6 +3335,19 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
       if (next === cur) return null;
       return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemsVars(next) } };
     });
+    const full = (k) => {
+      itemsUi.info = fullText(k);
+      env3.render();
+    };
+    const holdFirst = async (it) => {
+      if (it.equip !== "weapon" || !canUse(it) || isEquipped(it, liveOf(ctx2))) return true;
+      if (!equippedOf(liveOf(ctx2)).weapon.some((x) => !x)) {
+        full("weapon");
+        return false;
+      }
+      await write((x, alive) => equipItem(x, alive, it.id));
+      return true;
+    };
     switch (action) {
       case "items-sub":
         itemsUi.sub = value === "wallet" || value === "points" ? value : "items";
@@ -3316,81 +3385,3 @@ ${pics2 ? `<label><span>그림</span><select name="pic">${pics2.some((n3) => n3 
         env3.render();
         return true;
       case "items-add":
-        itemsUi.open = "";
-        itemsUi.mode = "add";
-        env3.render();
-        return true;
-      case "items-edit":
-        if (!itemEditOn(ctx2.chat.scriptstate)) return true;
-        itemsUi.mode = "edit";
-        env3.render();
-        return true;
-      case "items-merge":
-        itemsUi.mode = "merge";
-        env3.render();
-        return true;
-      case "items-merge-start": {
-        const first = liveOf(ctx2).find((x) => mergeMates(ctx2, x).length);
-        if (!first) return true;
-        itemsUi.open = first.id;
-        itemsUi.mode = "merge";
-        itemsUi.info = "남길 물건의 팝업에서 합칠 상대를 고르세요. 다른 물건을 남기려면 그 칸을 먼저 누르세요.";
-        env3.render();
-        return true;
-      }
-      case "items-merge-to": {
-        const keep2 = itemsUi.open;
-        if (!keep2 || !value) return true;
-        const anchor = lastBotKey(ctx2.chat);
-        await write((it, alive) => mergeItems(it, alive, keep2, value, anchor));
-        itemsUi.mode = "view";
-        itemsUi.info = "합쳤어요.";
-        await env3.refresh();
-        return true;
-      }
-      case "items-drop-ask":
-        if (!value) return true;
-        itemsUi.open = value;
-        itemsUi.mode = "drop";
-        itemsUi.dragDrop = false;
-        env3.render();
-        return true;
-      case "items-purge-ask":
-        if (!value) return true;
-        itemsUi.open = value;
-        itemsUi.mode = "purge";
-        itemsUi.dragDrop = false;
-        env3.render();
-        return true;
-      case "items-purge": {
-        if (!value) return true;
-        await write((it) => purgeItem(it, value));
-        await dropFromUse(ctx2, value);
-        itemsUi.open = "";
-        itemsUi.mode = "view";
-        itemsUi.dragDrop = false;
-        itemsUi.info = "삭제했어요.";
-        await env3.refresh();
-        return true;
-      }
-      case "items-drop": {
-        if (!value) return true;
-        const msgs4 = ctx2.chat.message ?? [];
-        const key = msgs4.length ? messageKey(msgs4[msgs4.length - 1], msgs4.length - 1) : "";
-        await write((it) => removeItem(it, value, "drop", "manual", "", { key }));
-        await dropFromUse(ctx2, value);
-        itemsUi.open = "";
-        itemsUi.mode = "view";
-        itemsUi.dragDrop = false;
-        itemsUi.info = "버렸어요. 기록에 남아요.";
-        await env3.refresh();
-        return true;
-      }
-      case "items-save": {
-        const f = formEl;
-        if (!f) return true;
-        const get = (n3) => String(f.querySelector(`[name="${n3}"]`)?.value ?? "").trim();
-        const use = !!f.querySelector('[name="use"]')?.checked;
-        const usesRaw = get("uses");
-        const uses = /^\d+$/.test(usesRaw) && Number(usesRaw) >= 1 ? Math.min(999, Number(usesRaw)) : void 0;
-        cons

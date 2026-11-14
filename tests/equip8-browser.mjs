@@ -134,11 +134,11 @@ if (PART.includes('drag')) {
   await drag(cell('i_boot'), '[data-drop="equip:gear:4"]');
   const s5 = await stateOf(page);
   if (s5.slots.i_boot !== 'gear:4') bad(`[drag] 칸에 직접 놓기(장비 5번째 칸): ${JSON.stringify(s5.slots)}`);
-  // 쓰는 물건(장착 아님)을 빈 손 칸 위에 놓으면 = 장착 묶음에 놓은 것 → 사용 예정
+  // 손 칸에는 아무 물건이나 (사용자 2026-11-14): 쓰는 물건(장착 갈래 없음)을 빈 손 칸 위에 놓으면 그 손 칸에 든다. 사용 예정에는 안 들어간다
   await drag(cell('i_light'), '[data-drop="equip:weapon:1"]');
   const s6 = await stateOf(page);
-  if (!s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 쓰는 물건을 칸 위에: ${JSON.stringify(s6.use)}`);
-  if (JSON.stringify(s6.slots) !== JSON.stringify(s5.slots)) bad(`[drag] 쓰는 물건이 칸에 들어감 ${JSON.stringify(s6.slots)}`);
+  if (s6.use.some((u) => u.id === 'i_light')) bad(`[drag] 손 칸에 놓은 물건이 사용 예정에: ${JSON.stringify(s6.use)}`);
+  if (!String(s6.slots.i_light ?? '').endsWith(':1')) bad(`[drag] 손 칸에 안 들어감 ${JSON.stringify(s6.slots)}`);
   // 쓰지도 장착하지도 않는 물건 → 아바타 = 아무 일 없음
   await drag(cell('i_pouch'), '.gx-items .it-av');
   const s7 = await stateOf(page);

@@ -1,4 +1,82 @@
-t name = get("name");
+
+        itemsUi.open = "";
+        itemsUi.mode = "add";
+        env3.render();
+        return true;
+      case "items-edit":
+        if (!itemEditOn(ctx2.chat.scriptstate)) return true;
+        itemsUi.mode = "edit";
+        env3.render();
+        return true;
+      case "items-merge":
+        itemsUi.mode = "merge";
+        env3.render();
+        return true;
+      case "items-merge-start": {
+        const first = liveOf(ctx2).find((x) => mergeMates(ctx2, x).length);
+        if (!first) return true;
+        itemsUi.open = first.id;
+        itemsUi.mode = "merge";
+        itemsUi.info = "남길 물건의 팝업에서 합칠 상대를 고르세요. 다른 물건을 남기려면 그 칸을 먼저 누르세요.";
+        env3.render();
+        return true;
+      }
+      case "items-merge-to": {
+        const keep2 = itemsUi.open;
+        if (!keep2 || !value) return true;
+        const anchor = lastBotKey(ctx2.chat);
+        await write((it, alive) => mergeItems(it, alive, keep2, value, anchor));
+        itemsUi.mode = "view";
+        itemsUi.info = "합쳤어요.";
+        await env3.refresh();
+        return true;
+      }
+      case "items-drop-ask":
+        if (!value) return true;
+        itemsUi.open = value;
+        itemsUi.mode = "drop";
+        itemsUi.dragDrop = false;
+        env3.render();
+        return true;
+      case "items-purge-ask":
+        if (!value) return true;
+        itemsUi.open = value;
+        itemsUi.mode = "purge";
+        itemsUi.dragDrop = false;
+        env3.render();
+        return true;
+      case "items-purge": {
+        if (!value) return true;
+        await write((it) => purgeItem(it, value));
+        await dropFromUse(ctx2, value);
+        itemsUi.open = "";
+        itemsUi.mode = "view";
+        itemsUi.dragDrop = false;
+        itemsUi.info = "삭제했어요.";
+        await env3.refresh();
+        return true;
+      }
+      case "items-drop": {
+        if (!value) return true;
+        const msgs4 = ctx2.chat.message ?? [];
+        const key = msgs4.length ? messageKey(msgs4[msgs4.length - 1], msgs4.length - 1) : "";
+        await write((it) => removeItem(it, value, "drop", "manual", "", { key }));
+        await dropFromUse(ctx2, value);
+        itemsUi.open = "";
+        itemsUi.mode = "view";
+        itemsUi.dragDrop = false;
+        itemsUi.info = "버렸어요. 기록에 남아요.";
+        await env3.refresh();
+        return true;
+      }
+      case "items-save": {
+        const f = formEl;
+        if (!f) return true;
+        const get = (n3) => String(f.querySelector(`[name="${n3}"]`)?.value ?? "").trim();
+        const use = !!f.querySelector('[name="use"]')?.checked;
+        const usesRaw = get("uses");
+        const uses = /^\d+$/.test(usesRaw) && Number(usesRaw) >= 1 ? Math.min(999, Number(usesRaw)) : void 0;
+        const name = get("name");
         if (!name) {
           itemsUi.notice = "이름을 적어 주세요.";
           env3.render();
@@ -25,6 +103,12 @@ t name = get("name");
       case "items-use": {
         const it = liveOf(ctx2).find((x) => x.id === value);
         if (!it) return true;
+        if (needsEquip(ctx2, it)) {
+          itemsUi.info = `「${it.name}」은 장착해야 쓸 수 있어요.`;
+          env3.render();
+          return true;
+        }
+        if (!await holdFirst(it)) return true;
         await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
         itemsUi.info = canUse(it) ? `「${it.name}」을 다음 메시지에 같이 보내요.` : `「${it.name}」은 지금 쓸 수 없어요.`;
         await env3.refresh();
@@ -41,8 +125,9 @@ t name = get("name");
       case "items-unequip": {
         if (!value) return true;
         await write((it2, alive) => action === "items-equip" ? equipItem(it2, alive, value) : unequipItem(it2, value));
+        if (action === "items-unequip") await dropFromUse(ctx2, value);
         const it = liveOf(ctx2).find((x) => x.id === value);
-        if (action === "items-equip" && it?.equip && !equippedOf(liveOf(ctx2))[it.equip].some((x) => !x || x.id === it.id)) itemsUi.info = `${EQUIP_LABEL[it.equip]} 칸이 다 찼어요. 칸에 있는 것을 먼저 풀거나, 칸으로 끌어다 바꾸세요.`;
+        if (action === "items-equip" && it && !isEquipped(it, liveOf(ctx2))) itemsUi.info = fullText(it.equip ?? "weapon");
         await env3.refresh();
         return true;
       }
@@ -52,32 +137,34 @@ t name = get("name");
         if (!it) return true;
         if (to.startsWith("equip:")) {
           const [, k, n3] = to.split(":");
-          if (it.equip !== k) {
-            itemsUi.info = it.equip ? `「${it.name}」은 ${EQUIP_LABEL[it.equip]} 칸에 들어가요.` : `「${it.name}」은 장착하는 물건이 아니에요.`;
+          if (k !== "weapon" && it.equip !== k) {
+            itemsUi.info = `「${it.name}」은 입거나 차는 물건이 아니라 ${EQUIP_LABEL.gear} 칸에 들어가지 않아요.`;
             env3.render();
             return true;
           }
-          await write((x, alive) => equipItem(x, alive, id2, Number(n3)));
+          await write((x, alive) => equipItem(x, alive, id2, Number(n3), k === "weapon" ? "weapon" : "gear"));
         } else if (to === "grid") {
           if (!isEquipped(it, liveOf(ctx2))) return true;
           await write((x) => unequipItem(x, id2));
+          await dropFromUse(ctx2, id2);
         } else if (to === "auto") {
-          if (it.equip) {
-            if (isEquipped(it, liveOf(ctx2))) return true;
-            if (!equippedOf(liveOf(ctx2))[it.equip].some((x) => !x)) {
-              itemsUi.info = `${EQUIP_LABEL[it.equip]} 칸이 다 찼어요. 칸에 있는 것을 먼저 풀거나, 칸으로 끌어다 바꾸세요.`;
-              env3.render();
+          if (isEquipped(it, liveOf(ctx2))) return true;
+          if (!it.equip && canUse(it)) await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
+          else {
+            const k = it.equip ?? "weapon";
+            if (!equippedOf(liveOf(ctx2))[k].some((x) => !x)) {
+              full(k);
               return true;
             }
             await write((x, alive) => equipItem(x, alive, id2));
-          } else if (canUse(it)) await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
-          else return true;
+          }
         } else if (to === "use") {
-          if (!canUse(it)) {
-            itemsUi.info = it.state === "broken" ? `「${it.name}」은 고장 나서 쓸 수 없어요.` : `「${it.name}」은 쓰는 물건이 아니에요.`;
+          if (!usableNow(ctx2, it)) {
+            itemsUi.info = needsEquip(ctx2, it) && canUse(it) ? `「${it.name}」은 장착해야 쓸 수 있어요.` : it.state === "broken" ? `「${it.name}」은 고장 나서 쓸 수 없어요.` : `「${it.name}」은 쓰는 물건이 아니에요.`;
             env3.render();
             return true;
           }
+          if (!await holdFirst(it)) return true;
           await queueUse(ctx2, (q) => addUse(q, it, leftOf(ctx2, it)));
         } else if (to === "drop") {
           itemsUi.open = id2;
@@ -3347,46 +3434,4 @@ ${themeVars("[x-goei-prog]")}
     rows3.push(row8(
       "카드",
       `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc21(cur)}`}${cardNew ? ` → <b>v${esc21(L.card)}</b>` : ""}</span>`,
-      !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
-    ));
-    let actions = `<button class="gx-mini" data-action="upd-check" ${busy6 ? "disabled" : ""}>${busy6 && !updateUi.payload ? esc21(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
-    if (cardNew && !needPlugin) {
-      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy6 ? "disabled" : ""}>${busy6 ? esc21(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy6 ? "disabled" : ""}>카드 업데이트 준비</button>`;
-    }
-    const plan = updateUi.plan;
-    const pics2 = updateUi.pics;
-    const summary = plan ? `<ul class="upd-plan">
-        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc21(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
-        <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
-        <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-        ${pics2?.get.length || pics2?.drop.length ? `<li>카드 사진: 바뀜 ${pics2.replaced} · 새로 ${pics2.added}${pics2.drop.length ? ` · 지움 ${pics2.drop.length}` : ""} <small>(약 ${mb(pics2.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ""}
-      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>` : "";
-    return section2(rows3.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc21(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc21(updateUi.done)}</p>` : ""));
-  }
-  var mb = (n3) => n3 >= 1e6 ? `${(n3 / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n3 / 1e3))}KB`;
-  function section2(body5) {
-    return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body5}</div></section>`;
-  }
-  var FIELD_NAMES = {
-    characterVersion: "캐릭터 버전",
-    firstMessage: "첫 안내",
-    alternateGreetings: "첫 장면",
-    creatorNotes: "제작 노트",
-    desc: "설명",
-    personality: "성격",
-    scenario: "시나리오",
-    exampleMessage: "예시 대화",
-    systemPrompt: "시스템 프롬프트",
-    postHistoryInstructions: "탈옥 프롬프트",
-    backgroundHTML: "배경 HTML",
-    lowLevelAccess: "저수준 접근",
-    virtualscript: "가상 스크립트",
-    triggerscript: "트리거"
-  };
-  var fieldName = (f) => FIELD_NAMES[f] ?? f;
-  async function handleUpdate(action, ctx2, env3) {
-    if (!action.startsWith("upd-")) return false;
-    if (updateUi.busy) return true;
-    if (action === "upd-skip") {
-      skipped = skipKey(newVersions(ctx2));
-    
+      !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 

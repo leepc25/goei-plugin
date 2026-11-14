@@ -1,3 +1,58 @@
+     env3.render();
+        return true;
+    }
+    return false;
+  }
+  function stageMid2(max) {
+    const i = STAGES.findIndex((s8) => s8.max === max);
+    if (i < 0) return NaN;
+    const lo = i ? STAGES[i - 1].max + 1 : AFF_MIN;
+    return Math.round((lo + max) / 2);
+  }
+
+  // src/ui/editor/flowpage.ts
+  var esc36 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var ONOFF3 = [["1", "ON"], ["0", "OFF"]];
+  var MODEL2 = [["main", "메인 모델"], ["aux", "보조 모델"]];
+  var MODEL3 = [["same", "갱신과 같게"], ["main", "메인 모델"], ["aux", "보조 모델"]];
+  var fmt2 = (v) => v.toLocaleString("ko-KR");
+  var FLOW_DO = "fl-do";
+  var pick3 = (id2, label2, cur, opts, to, hide = false) => ({ id: id2, label: label2, kind: "pick", cur, opts, act: (v) => [to(v)], hide });
+  var sw = (id2, label2, on3, to) => pick3(id2, label2, on3 ? "1" : "0", ONOFF3, to);
+  var doBtn = (cls, a, on3, text5, more = "") => `<button class="${cls}${on3 ? " on" : ""}" data-action="${FLOW_DO}" data-value="${esc36(a)}" aria-pressed="${on3}"${more}>${text5}</button>`;
+  function ctlHtml(c, aria) {
+    if (c.kind === "step") {
+      const n3 = Number(c.cur) || 0;
+      const shown5 = n3 === 0 && c.zero ? c.zero : `${n3}${c.unit ?? ""}`;
+      const b = (to, sign, word, off) => `<button class="gx-step" data-action="${FLOW_DO}" data-value="${esc36(c.act(String(to))[0] ?? "")}" ${off ? "disabled" : ""} aria-label="${esc36(aria)} ${word}">${sign}</button>`;
+      return `<div class="st-step${stepSizeText(`${c.hi ?? n3}${c.unit ?? ""}`, c.zero ?? "")}">${b(n3 - 1, "−", "줄이기", n3 <= (c.lo ?? 0))}<b>${esc36(shown5)}</b>${b(n3 + 1, "+", "늘리기", n3 >= (c.hi ?? n3))}</div>`;
+    }
+    const opts = c.opts ?? [];
+    if (isOnOff(opts)) {
+      const on3 = c.cur === "1";
+      return switchHtml({ action: FLOW_DO, value: c.act(on3 ? "0" : "1")[0], on: on3, label: aria });
+    }
+    return `<div class="gx-segs gx-segs-sm">${opts.map(([v, l]) => doBtn("gx-seg", c.act(v)[0], c.cur === v, esc36(l))).join("")}</div>`;
+  }
+  var go2 = (g2) => g2 ? `<button class="gx-mini fl-go" data-action="ed-flow-go" data-value="${esc36(g2[0])}|${esc36(g2[1])}">설정 →</button>` : "";
+  function lastTurn() {
+    return [...traceUi.turns ?? []].reverse().find((t) => t.main || t.calls.some((c) => c.phase !== "manual"));
+  }
+  function real(match) {
+    const t = lastTurn();
+    if (!t) return "";
+    const cs = t.calls.filter((c) => match(baseLabel(c.label)));
+    if (!cs.length) return "";
+    const sent2 = cs.reduce((s8, c) => s8 + (c.requestTokens ?? 0), 0);
+    return cs.some((c) => !c.ok) ? `<em class="fl-fail" title="실패">${fmt2(sent2)}</em>` : fmt2(sent2);
+  }
+  var is = (...labels) => (l) => labels.includes(l);
+  var shown3 = (r) => r.ctls.filter((c) => !c.hide);
+  var WIDE_PX = 198;
+  var optPx = (l) => [...l].reduce((n3, ch) => n3 + (ch === " " ? 3.6 : /[0-9,.()]/.test(ch) ? 8 : 12.4), 19);
+  function wide2(c) {
+    const label2 = c.label ? optPx(c.label) - 19 + 8 : 0;
+    if (c.kind === "step") return label2 + 206 > WIDE_PX;
     const opts = c.opts ?? [];
     if (isOnOff(opts)) return label2 + 64 > WIDE_PX;
     return label2 + opts.reduce((n3, [, l]) => n3 + optPx(l), 8) > WIDE_PX;
@@ -300,7 +355,8 @@
           { key: "items-carry", label: "소지 한도", ctl: { t: "custom" } },
           { key: "items-edit", label: "고치기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요." },
           { key: "items-limit", label: "지닐 수 있는 한계", ctl: { t: "custom" }, help: "모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요." },
-          { key: "items-rules", label: "판정 표", ctl: { t: "custom" }, help: "물건의 판정(무기·장비·사용·소모)을 모델이 적은 대로 믿지 않고 이 표로 정해요. 왼쪽은 종류(옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니)나 물건말, 오른쪽은 판정이에요(무기·장비·사용·소모N을 「·」로 잇고, 없으면 -). 물건말 줄이 종류 줄보다 먼저예요. 표에 없는 종류는 모델이 적은 대로 들어가요. 직접 넣은 물건과 시작 소지품에는 쓰지 않아요. 줄을 전부 지우면 기본 표로 돌아가요." },
+          { key: "items-rules", label: "판정 표", ctl: { t: "custom" }, help: "표에 적은 종류·물건만 이 표대로 정하고, 나머지는 모델이 지침대로 정해요. 예: 망치 → 손" },
+          // 기본 표는 비움 (사용자 2026-11-14)
           { key: "items-left-words", label: "두고 옴 말", ctl: { t: "text", ph: "", def: ITEM_LEFT_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: "갱신기가 물건을 없앴다고 알리지 않고 설명만 「…에 두고 온」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 소지품에서 빼요(기록에 남고, 본문에서 다시 얻으면 같은 물건으로 돌아와요). 쉼표로 나눠 적어요." },
           { key: "items-off-words", label: "장착 풀기 말", ctl: { t: "text", ph: "", def: ITEM_OFF_WORDS_DEFAULT, max: ITEM_WORDS_MAX }, help: "갱신기가 장착한 물건의 설명을 「벗어 둔 …」처럼 고쳐 보냈을 때, 설명에 이 말이 있으면 장착만 풀어요(소지품에는 남아요). 쉼표로 나눠 적어요." },
           { key: "items-alias", label: "그림 대체 말", ctl: { t: "custom" }, help: "물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 「외투 → 코트」면 이름이 외투로 끝나는 물건을 코트 그림으로 찾아요. 줄을 전부 지우면 기본 표로 돌아가요. 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 전체에서 찾아요. 그래도 없으면 상자 그림이에요." },
@@ -312,7 +368,7 @@
           { key: "items-state", label: "상태 바꾸기", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "켜면 갱신기가 응답을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요." },
           { key: "items-spent", label: "다 쓴 물건", ctl: { t: "seg", opts: [["remove", "목록에서 빼기"], ["keep", "남겨 두기"]] }, help: "남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 메인 요청에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼)." },
           { key: "items-logturns", label: "사용·처분 기록 넘기기", ctl: { t: "custom" } },
-          { key: "items-start", label: "시작 소지품", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 무기·장비를 장착할지예요. 새 채팅을 시작할 때만 쓰여요." }
+          { key: "items-start", label: "시작 소지품", ctl: { t: "seg", opts: [["1", "ON"], ["0", "OFF"]] }, help: "고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 손에 드는 것은 손 칸, 장비는 장착할지예요. 새 채팅을 시작할 때만 쓰여요." }
         ]
       },
       {
@@ -1087,7 +1143,7 @@
       const key = normIcon(r.a).replace(/ /g, "");
       const kindKey = Object.entries(ICON_KIND_LABEL).find(([, v]) => v === r.a.trim())?.[0];
       const ok = kindKey ? used.kinds.has(kindKey) : used.words.has(key);
-      const bad = (r.a || r.b) && !ok ? !r.a ? "종류·물건말이 비어 있어 이 줄은 안 쓰여요." : !r.b ? "판정이 비어 있어 이 줄은 안 쓰여요." : "판정은 무기·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요." : "";
+      const bad = (r.a || r.b) && !ok ? !r.a ? "종류·물건말이 비어 있어 이 줄은 안 쓰여요." : !r.b ? "판정이 비어 있어 이 줄은 안 쓰여요." : "판정은 손·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요." : "";
       return `<div class="ms-tb-r${bad ? " bad" : ""}">
       <label class="ms-tb-c n"><span>종류·물건말</span><input class="gx-search" data-change="set-items-rules-cell" data-key="${i}:a" value="${esc38(r.a)}" maxlength="${ALIAS_WORD_MAX}" aria-label="종류·물건말"${dis}></label>
       <i class="ms-arrow" aria-hidden="true">→</i>
@@ -2826,47 +2882,4 @@ ${talk}` }
         if (!e.hasAttribute("aria-pressed")) continue;
         const key = keyOf3(value);
         const mates = els.filter((x) => x.tagName === "BUTTON" && x.hasAttribute("aria-pressed") && x.dataset.action === action && keyOf3(x.dataset.value ?? "") === key && !x.classList.contains("gx-step") && x.getAttribute("role") !== "switch");
-        const round = e.classList.contains("round");
-        const [cg2, co] = cellAt(e);
-        if (mates.length < 2 && !round) {
-          const on3 = e.getAttribute("aria-pressed") === "true";
-          const name = isGrid ? [cg2, co === "켬" ? "" : co].filter(Boolean).join(" ") : e.classList.contains("gx-chip") ? txt(e) : subOf2(e, label2);
-          push3({ id: `${action}${key ? `.${key}` : ""}`, name, kind: "pick", cur: on3 ? "1" : "0", opts: [["1", "ON"], ["0", "OFF"]], locked, colGroup: cg2 || void 0, ctl: { t: "toggle", action, send: value } });
-          continue;
-        }
-        mates.forEach((x) => used.add(x));
-        const opts = mates.map((x) => [x.dataset.value ?? "", (isGrid ? cellAt(x)[1] : "") || txt(x) || (x.getAttribute("aria-label") ?? "")]);
-        const curEl = mates.find((x) => x.getAttribute("aria-pressed") === "true");
-        push3({ id: `${action}${key ? `.${key}` : ""}`, name: isGrid ? cg2 : "", kind: "pick", cur: curEl?.dataset.value ?? "", opts, locked: mates.every((x) => x.hasAttribute("disabled")), colGroup: cg2 || void 0, ctl: { t: "pick", action, send: Object.fromEntries(opts.map(([v]) => [v, v])) } });
-      }
-      if (!made.length) {
-        out.push({ id: `row.${page}.${++infoN}`, page, menu, group: group4, name: label2, kind: "info", cur: "", help, go: spot(), keys: [label2] });
-        return;
-      }
-      for (const r of made) {
-        r.name = r.name && (made.length > 1 || !isPs) ? `${label2} · ${r.name}` : label2;
-        out.push(r);
-      }
-    });
-    doc2.querySelectorAll(".ps-group > .mx-foot").forEach((foot) => {
-      if (foot.closest(TWIN)) return;
-      const title2 = txt(foot.parentElement?.querySelector("h3"));
-      const help = txt(foot);
-      if (title2 && help) out.push({ id: `row.${page}.${++infoN}`, page, menu, group: title2, name: title2, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [title2] });
-    });
-    doc2.querySelectorAll("details.ps-adv").forEach((d) => {
-      if (d.closest(TWIN) || !d.querySelector(".ms-tb") || d.querySelector(ROW)) return;
-      const name = txt(d.querySelector(":scope > summary > b"));
-      if (!name) return;
-      const count2 = txt(d.querySelector(":scope > summary > .adv-count"));
-      const help = `${count2 ? `지금 ${count2}. ` : ""}${txt(d.querySelector(".ps-note"))} 상담에서는 바꾸지 못해요. 설정 화면에서 펼쳐 칸으로 고쳐요.`.trim();
-      out.push({ id: `row.${page}.${++infoN}`, page, menu, group: txt(d.closest(".ps-group")?.querySelector("h3")), name, kind: "info", cur: "", help, go: [`set:${page}`, ""], keys: [name] });
-    });
-    return out;
-  }
-  var host2 = null;
-  var setCatalogHost = (h) => {
-    host2 = h;
-  };
-  function catalogPage(page) {
-    const p2 = host2?.pages().
+        const round = e.classList.contai

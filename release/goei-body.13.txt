@@ -1,4 +1,62 @@
-ain(it.target, 40) : void 0;
+lang === "en" ? " in English" : " in Korean", slot_hints: slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ") });
+  var consolidateUserText = (dataText) => guideOr("UpdaterExtra", "CONSOLIDATE.USER", () => `Record to tidy:
+${dataText}
+
+Return the JSON object.`, { data: dataText });
+  function buildConsolidate(store3, chat, who, settings) {
+    const p2 = store3.people[who];
+    if (!p2) return null;
+    const live = liveness(chat);
+    const slots = {};
+    const ids = /* @__PURE__ */ new Map();
+    const enabled = slotsFor(settings.features, settings.qualitative);
+    for (const slot of enabled) {
+      if (SLOT_META[slot].once) continue;
+      const cur = liveEntries(p2.slots[slot], live).filter((e) => !e.pin);
+      if (!cur.length) continue;
+      const pos = (e) => live.at.get(e.anchor) ?? -1;
+      const sorted = [...cur].sort((a, b) => pos(a) - pos(b) || a.seq - b.seq);
+      slots[slot] = sorted.map((e) => ({ id: e.id, text: e.text, ...e.target ? { target: e.target } : {} }));
+      for (const e of sorted) ids.set(e.id, { slot, entry: e });
+    }
+    if (!ids.size) return null;
+    return { system: CONSOLIDATE_PROMPT(settings.lang, enabled), data: { name: who, chars: recordChars(p2, live), target: Math.round(settings.personCap * 0.8), slots }, ids };
+  }
+  function parseConsolidate(raw) {
+    let t = raw.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").trim();
+    const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(t);
+    if (fence) t = fence[1].trim();
+    const a = t.indexOf("{");
+    const b = t.lastIndexOf("}");
+    if (a < 0 || b <= a) throw new Error("JSON 객체가 없어요");
+    const v = JSON.parse(t.slice(a, b + 1));
+    if (!v || typeof v !== "object" || Array.isArray(v)) throw new Error("JSON 객체가 아니에요");
+    const r = v;
+    if (r.slots !== void 0 && (!r.slots || typeof r.slots !== "object" || Array.isArray(r.slots))) throw new Error("slots 는 객체여야 해요");
+    return r;
+  }
+  function applyConsolidate(store3, who, input3, r, live, settings) {
+    const report = { slots: 0, before: 0, after: 0, dropped: [] };
+    const p2 = store3.people[who];
+    if (!p2 || !r.slots) return report;
+    for (const [slotName, items] of Object.entries(r.slots)) {
+      const slot = slotName;
+      if (!slotsFor(settings.features, settings.qualitative).includes(slot) || !input3.data.slots[slot] || !Array.isArray(items)) {
+        report.dropped.push({ slot: slotName, reason: "없는 칸이거나 목록이 아님", item: items });
+        continue;
+      }
+      const inputIds = new Set(input3.data.slots[slot].map((e) => e.id));
+      const next = [];
+      let bad = false;
+      for (const it of items) {
+        const text5 = plain(it?.text, 300);
+        const from = Array.isArray(it?.from) ? it.from.map((x) => String(x)).filter((id2) => inputIds.has(id2)) : [];
+        if (!text5 || !from.length) {
+          report.dropped.push({ slot, reason: !text5 ? "글 없음" : "from 에 이 칸의 항목 id 가 없음", item: it });
+          bad = true;
+          break;
+        }
+        const target = typeof it.target === "string" && it.target ? plain(it.target, 40) : void 0;
         next.push({ text: text5, ...target ? { target } : {}, from });
       }
       if (bad || !next.length || next.length >= input3.data.slots[slot].length) {
@@ -2689,58 +2747,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       case "pp-jump":
         if (peopleUi.evOpen.has(v)) peopleUi.evOpen.delete(v);
         else peopleUi.evOpen.add(v);
-        env3.render();
-        return true;
-    }
-    return false;
-  }
-  function stageMid2(max) {
-    const i = STAGES.findIndex((s8) => s8.max === max);
-    if (i < 0) return NaN;
-    const lo = i ? STAGES[i - 1].max + 1 : AFF_MIN;
-    return Math.round((lo + max) / 2);
-  }
-
-  // src/ui/editor/flowpage.ts
-  var esc36 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var ONOFF3 = [["1", "ON"], ["0", "OFF"]];
-  var MODEL2 = [["main", "메인 모델"], ["aux", "보조 모델"]];
-  var MODEL3 = [["same", "갱신과 같게"], ["main", "메인 모델"], ["aux", "보조 모델"]];
-  var fmt2 = (v) => v.toLocaleString("ko-KR");
-  var FLOW_DO = "fl-do";
-  var pick3 = (id2, label2, cur, opts, to, hide = false) => ({ id: id2, label: label2, kind: "pick", cur, opts, act: (v) => [to(v)], hide });
-  var sw = (id2, label2, on3, to) => pick3(id2, label2, on3 ? "1" : "0", ONOFF3, to);
-  var doBtn = (cls, a, on3, text5, more = "") => `<button class="${cls}${on3 ? " on" : ""}" data-action="${FLOW_DO}" data-value="${esc36(a)}" aria-pressed="${on3}"${more}>${text5}</button>`;
-  function ctlHtml(c, aria) {
-    if (c.kind === "step") {
-      const n3 = Number(c.cur) || 0;
-      const shown5 = n3 === 0 && c.zero ? c.zero : `${n3}${c.unit ?? ""}`;
-      const b = (to, sign, word, off) => `<button class="gx-step" data-action="${FLOW_DO}" data-value="${esc36(c.act(String(to))[0] ?? "")}" ${off ? "disabled" : ""} aria-label="${esc36(aria)} ${word}">${sign}</button>`;
-      return `<div class="st-step${stepSizeText(`${c.hi ?? n3}${c.unit ?? ""}`, c.zero ?? "")}">${b(n3 - 1, "−", "줄이기", n3 <= (c.lo ?? 0))}<b>${esc36(shown5)}</b>${b(n3 + 1, "+", "늘리기", n3 >= (c.hi ?? n3))}</div>`;
-    }
-    const opts = c.opts ?? [];
-    if (isOnOff(opts)) {
-      const on3 = c.cur === "1";
-      return switchHtml({ action: FLOW_DO, value: c.act(on3 ? "0" : "1")[0], on: on3, label: aria });
-    }
-    return `<div class="gx-segs gx-segs-sm">${opts.map(([v, l]) => doBtn("gx-seg", c.act(v)[0], c.cur === v, esc36(l))).join("")}</div>`;
-  }
-  var go2 = (g2) => g2 ? `<button class="gx-mini fl-go" data-action="ed-flow-go" data-value="${esc36(g2[0])}|${esc36(g2[1])}">설정 →</button>` : "";
-  function lastTurn() {
-    return [...traceUi.turns ?? []].reverse().find((t) => t.main || t.calls.some((c) => c.phase !== "manual"));
-  }
-  function real(match) {
-    const t = lastTurn();
-    if (!t) return "";
-    const cs = t.calls.filter((c) => match(baseLabel(c.label)));
-    if (!cs.length) return "";
-    const sent2 = cs.reduce((s8, c) => s8 + (c.requestTokens ?? 0), 0);
-    return cs.some((c) => !c.ok) ? `<em class="fl-fail" title="실패">${fmt2(sent2)}</em>` : fmt2(sent2);
-  }
-  var is = (...labels) => (l) => labels.includes(l);
-  var shown3 = (r) => r.ctls.filter((c) => !c.hide);
-  var WIDE_PX = 198;
-  var optPx = (l) => [...l].reduce((n3, ch) => n3 + (ch === " " ? 3.6 : /[0-9,.()]/.test(ch) ? 8 : 12.4), 19);
-  function wide2(c) {
-    const label2 = c.label ? optPx(c.label) - 19 + 8 : 0;
-    if (c.kind === "step") return label2 + 206 > WIDE_PX;
+   

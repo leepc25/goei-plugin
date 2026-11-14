@@ -1,4 +1,40 @@
-gw .flc.sub { margin-left: 18px; position: relative; }
+; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
+  .gw .flc.sub { margin-left: 18px; position: relative; }
+  .gw .flc.sub::before { content: ''; position: absolute; left: -13px; top: -9px; width: 9px; height: 34px; border-left: 1.5px solid var(--gline); border-bottom: 1.5px solid var(--gline); }
+  .gw .flc.sub { margin-top: -4px; }
+  .gw .flc-top { display: flex; align-items: center; gap: 8px; min-height: 34px; }
+  .gw .flc-nm { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; flex: 1 1 auto; min-width: 0; }
+  .gw .flc-calls { font-size: 12.5px; line-height: 1.35; color: var(--dim); }
+  .gw .flc.on .flc-calls { color: var(--text); }
+  .gw .flc-num { margin-top: -4px; font-size: 12.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .gw .flc-num b { font-weight: 600; color: var(--text); }
+  /* 조작 줄 (전수점검 B1): 조작 하나에 한 줄, 카드 안쪽 왼쪽 끝에서 시작. 격자 줄(.row)만 두 조작을 한 줄에 */
+  .gw .flc-sw { display: inline-flex; align-items: center; flex: none; }
+  .gw .flc-top > .fl-go { flex: none; }
+  .gw .flc-top > span.fl-go { width: 59px; height: 1px; }
+  .gw .flc-side { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .gw .flc-side.row { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+  .gw .flc-c { display: flex; align-items: center; gap: 8px; min-height: 34px; min-width: 0; max-width: 100%; }
+  .gw .flc-c > .gx-segs { display: flex; min-width: 0; }
+  .gw .flc-c > .gx-segs > .gx-seg { flex: 0 1 auto; white-space: nowrap; }
+  .gw .flc-c .fl-help { margin: 0; }
+}
+/* 본문 칸이 한 줄(약 930px)보다 좁으면 (노트북 1280·1366, AI 상담을 연 창, 창 폭을 줄인 경우) PC 줄이 오른쪽에서 잘렸다 → 폰과 같은 카드로 (전수검사 11-13, 사용자 승인).
+   1002 = 줄 932(테두리 포함) + .gw-page 좌우 48 + .fl-page 오른쪽 22. 둘 중 하나가 바뀌면 다시 셈. 위 폰 규칙을 그대로 옮긴 것 (@media 와 @container 는 규칙을 나눠 쓸 수 없다) */
+@container (max-width: 1001px) {
+  .gw .fl-pc { display: none; }
+  .gw .fl-ph { display: flex; }
+  /* 폰: 오른쪽 숫자 칸은 왼쪽 두 줄(메인 + 보조 = 합)에 이미 있어 숨긴다. 글이 한 줄씩 들어가게 */
+  .gw .fl-bar { position: static; grid-template-columns: minmax(0, 1fr); padding: 8px 11px; margin-bottom: 14px; }
+  .gw .fl-bar > p { font-size: 12.5px; line-height: 1.35; }
+  .gw .fl-bar > div { display: none; }
+  .gw .fl-bar > div > span { font-size: 11.5px; }
+  .gw .fl-bar > div > b { font-size: 14px; }
+  .gw .fl-bar > i { display: none; }
+  .gw .fl .ps-rows.fl-ph { background: none; border: 0; box-shadow: none; padding: 0; flex-direction: column; gap: 8px; }
+  .gw .fl .ps-rows.fl-ph > .flc { border: 1px solid var(--line); }
+  .gw .flc { display: flex; flex-direction: column; gap: 6px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r, 8px); background: var(--panel); }
+  .gw .flc.sub { margin-left: 18px; position: relative; }
   .gw .flc.sub::before { content: ''; position: absolute; left: -13px; top: -9px; width: 9px; height: 34px; border-left: 1.5px solid var(--gline); border-bottom: 1.5px solid var(--gline); }
   .gw .flc.sub { margin-top: -4px; }
   .gw .flc-top { display: flex; align-items: center; gap: 8px; min-height: 34px; }
@@ -2041,7 +2077,7 @@ ${tail2}`;
       ...sexualAnyOn(o.settings) ? { sexual_profile: { sexual_desire_enabled: sexualGlobal(o.settings).desire, paraphilia_enabled: sexualGlobal(o.settings).paraphilia, explicit_sexual_style_enabled: o.settings.explicitStyle, policy: "sexual_context_only" } } : {},
       ...speechVariety(o.settings).level !== "off" ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === "two" && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {},
       // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
-      items_now: o.items ? o.items.map((e) => ({ name: e.name, desc: e.desc || void 0, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || void 0, condition: e.state === "ok" ? void 0 : e.state, pictures: e.pictures?.length ? e.pictures : void 0 })) : void 0,
+      items_now: o.items ? o.items.map((e) => ({ name: e.name, desc: e.desc || void 0, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip === "weapon" ? "hand" : e.equip, equipped: e.equipped || void 0, condition: e.state === "ok" ? void 0 : e.state, pictures: e.pictures?.length ? e.pictures : void 0 })) : void 0,
       // 물건으로 만드는 범위·만들지 않을 것 (설정 → 소지품, core/items.ts itemsRule)
       items_rule: o.items ? itemsRule(chat.scriptstate) : void 0,
       items_away: o.items && o.away?.length ? o.away.map((e) => ({ name: e.name, place: e.place || void 0 })) : void 0,
@@ -2905,7 +2941,7 @@ ${rules3}`;
         }
         seen4.add(norm(listed ?? name));
         const act2 = action === "new" && listed ? "update" : action;
-        const eq = t.equip === void 0 ? void 0 : t.equip === null || /^(none|null|-|)$/i.test(str9(t.equip).trim()) ? null : itemEquip(str9(t.equip).trim().toLowerCase());
+        const eq = t.equip === void 0 ? void 0 : t.equip === null || /^(none|null|-|)$/i.test(str9(t.equip).trim()) ? null : itemEquip(str9(t.equip).trim().toLowerCase().replace(/^(hand|held|손)$/, "weapon"));
         const uses = t.uses === void 0 || t.uses === null ? void 0 : str9(t.uses).trim() === "0" ? 0 : itemUses(t.uses);
         const cond = t.condition ? str9(t.condition).trim().toLowerCase() : "";
         const icon = cleanIcon(t.icon);
@@ -3024,62 +3060,4 @@ ${rules3}`;
     "Output exactly one JSON object, nothing else:",
     '{"slots":{"<slot>":[{"text":"<statement>","target":"<name|@user|null>","from":["<id>"]}]}}',
     "Slot hints: " + slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ")
-  ].join("\n"), { lang_note: lang === "en" ? " in English" : " in Korean", slot_hints: slots.map((s8) => `${s8} = ${SLOT_META[s8].hint}`).join("; ") });
-  var consolidateUserText = (dataText) => guideOr("UpdaterExtra", "CONSOLIDATE.USER", () => `Record to tidy:
-${dataText}
-
-Return the JSON object.`, { data: dataText });
-  function buildConsolidate(store3, chat, who, settings) {
-    const p2 = store3.people[who];
-    if (!p2) return null;
-    const live = liveness(chat);
-    const slots = {};
-    const ids = /* @__PURE__ */ new Map();
-    const enabled = slotsFor(settings.features, settings.qualitative);
-    for (const slot of enabled) {
-      if (SLOT_META[slot].once) continue;
-      const cur = liveEntries(p2.slots[slot], live).filter((e) => !e.pin);
-      if (!cur.length) continue;
-      const pos = (e) => live.at.get(e.anchor) ?? -1;
-      const sorted = [...cur].sort((a, b) => pos(a) - pos(b) || a.seq - b.seq);
-      slots[slot] = sorted.map((e) => ({ id: e.id, text: e.text, ...e.target ? { target: e.target } : {} }));
-      for (const e of sorted) ids.set(e.id, { slot, entry: e });
-    }
-    if (!ids.size) return null;
-    return { system: CONSOLIDATE_PROMPT(settings.lang, enabled), data: { name: who, chars: recordChars(p2, live), target: Math.round(settings.personCap * 0.8), slots }, ids };
-  }
-  function parseConsolidate(raw) {
-    let t = raw.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").trim();
-    const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(t);
-    if (fence) t = fence[1].trim();
-    const a = t.indexOf("{");
-    const b = t.lastIndexOf("}");
-    if (a < 0 || b <= a) throw new Error("JSON 객체가 없어요");
-    const v = JSON.parse(t.slice(a, b + 1));
-    if (!v || typeof v !== "object" || Array.isArray(v)) throw new Error("JSON 객체가 아니에요");
-    const r = v;
-    if (r.slots !== void 0 && (!r.slots || typeof r.slots !== "object" || Array.isArray(r.slots))) throw new Error("slots 는 객체여야 해요");
-    return r;
-  }
-  function applyConsolidate(store3, who, input3, r, live, settings) {
-    const report = { slots: 0, before: 0, after: 0, dropped: [] };
-    const p2 = store3.people[who];
-    if (!p2 || !r.slots) return report;
-    for (const [slotName, items] of Object.entries(r.slots)) {
-      const slot = slotName;
-      if (!slotsFor(settings.features, settings.qualitative).includes(slot) || !input3.data.slots[slot] || !Array.isArray(items)) {
-        report.dropped.push({ slot: slotName, reason: "없는 칸이거나 목록이 아님", item: items });
-        continue;
-      }
-      const inputIds = new Set(input3.data.slots[slot].map((e) => e.id));
-      const next = [];
-      let bad = false;
-      for (const it of items) {
-        const text5 = plain(it?.text, 300);
-        const from = Array.isArray(it?.from) ? it.from.map((x) => String(x)).filter((id2) => inputIds.has(id2)) : [];
-        if (!text5 || !from.length) {
-          report.dropped.push({ slot, reason: !text5 ? "글 없음" : "from 에 이 칸의 항목 id 가 없음", item: it });
-          bad = true;
-          break;
-        }
-        const target = typeof it.target === "string" && it.target ? pl
+  ].join("\n"), { lang_note: 

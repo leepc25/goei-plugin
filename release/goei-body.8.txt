@@ -1,4 +1,44 @@
-"null") delete vars[k];
+ta-theme", theme);
+    box3.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (btn && act2 && box3.contains(btn)) {
+        box3.remove();
+        act2(btn.dataset.action, btn.dataset.value);
+        return;
+      }
+      if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
+      box3.remove();
+    });
+    document.body.appendChild(box3);
+  }
+
+  // src/core/josa.ts
+  function josa(word, withBatchim, without) {
+    const last2 = word.trim().slice(-1);
+    const code2 = last2.charCodeAt(0) - 44032;
+    if (!(code2 >= 0 && code2 <= 11171)) return `${word}${withBatchim}(${without})`;
+    return `${word}${code2 % 28 ? withBatchim : without}`;
+  }
+
+  // src/host/prefs.ts
+  var KEY = "goei:prefs";
+  async function loadPrefs() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(KEY);
+      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
+    } catch (error) {
+      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      return getPrefs();
+    }
+  }
+  async function saveVarDefaults(prefixes, state2) {
+    const mine3 = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    await savePrefs((p2) => {
+      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state2 ?? {}), ...Object.keys(p2.vars ?? {})])].filter(mine3);
+      const vars = { ...p2.vars ?? {} };
+      for (const k of keys) {
+        const v = state2?.[k];
+        if (v === void 0 || v === null || v === "" || v === "null") delete vars[k];
         else vars[k] = String(v);
       }
       return { ...p2, vars };
@@ -3718,55 +3758,4 @@ ${retryAnalyze()}`, { reason: reason3.slice(0, 600), analyze: retryAnalyze() }) 
     const t = curTab();
     const key = JSON.stringify(state2);
     if (t.hist[t.at] === key) return;
-    t.hist = t.hist.slice(0, t.at + 1);
-    t.hist.push(key);
-    if (t.hist.length > HIST_MAX) t.hist.shift();
-    t.at = t.hist.length - 1;
-  }
-  var tabCan = (dir2) => {
-    const t = curTab();
-    return t.at + dir2 >= 0 && t.at + dir2 < t.hist.length;
-  };
-  function tabGo(dir2) {
-    if (!tabCan(dir2)) return null;
-    const t = curTab();
-    t.at += dir2;
-    return JSON.parse(t.hist[t.at]);
-  }
-  function tabState(i = br.cur) {
-    const t = br.tabs[i];
-    return t && t.at >= 0 ? JSON.parse(t.hist[t.at]) : null;
-  }
-  function newTab() {
-    br.tabs.push({ id: seq3++, site: "", hist: [], at: -1 });
-    br.cur = br.tabs.length - 1;
-  }
-  function closeTab(i) {
-    const [gone] = br.tabs.splice(i, 1);
-    if (gone?.site) br.closed = [...br.closed, gone].slice(-CLOSED_MAX);
-    if (!br.tabs.length) br.tabs.push({ id: seq3++, site: "", hist: [], at: -1 });
-    if (br.cur >= i && br.cur > 0) br.cur--;
-    br.cur = Math.min(br.cur, br.tabs.length - 1);
-  }
-  function reopenTab() {
-    const t = br.closed.pop();
-    if (!t) return false;
-    const empty2 = br.tabs.length === 1 && !br.tabs[0].site ? 0 : -1;
-    if (empty2 >= 0) br.tabs.splice(empty2, 1);
-    br.tabs.push({ ...t, id: seq3++ });
-    br.cur = br.tabs.length - 1;
-    return true;
-  }
-  function openSite(site) {
-    const i = br.tabs.findIndex((t) => t.site === site);
-    if (i < 0) {
-      curTab().site = site;
-      return "here";
-    }
-    if (i !== br.cur) {
-      const id2 = br.tabs[i].id;
-      if (!curTab().site) closeTab(br.cur);
-      br.cur = br.tabs.findIndex((t) => t.id === id2);
-    }
-    return "tab";
-  
+    t.hist = t.hist.
