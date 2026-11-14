@@ -1,5 +1,5 @@
 // 사용자 11-14 D-3·C-5 (가): 받아 둔 위키 기본 문서가 옛 판이면 설치·점검 점검표 글은 「새 판 있음 (다시 받기, 약 1MB)」,
-// 관리 → 상태 점검은 「있음」 대신 「없음」 + 받기 단추 (C-5 (가): 새 글 없음). 새 판 확인은 한 번만 보내고, 설치·점검 창은 짧은 한도까지만 기다린다.
+// 관리 → 상태 점검 배지도 같은 말 「새 판 있음」 + 받기 단추 (사용자 11-14 19:26 물음 1). 새 판 확인은 한 번만 보내고, 설치·점검 창은 짧은 한도까지만 기다린다.
 // 실행: node --test tests/install-wiki-old.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -52,7 +52,7 @@ const ctx = (box) => ({ charIndex: 0, chatIndex: 0, char: box.char, chat: {} });
 const INDEX = { parts: ['wiki-base.0.txt'], length: PACK.length, digest: 'new' };
 const wikiRow = (html) => html.split('<div class="ps-row').find((r) => r.includes('<b>위키 기본 문서')) ?? '';
 
-test('옛 판: 점검표 글이 「새 판 있음 (다시 받기, 약 1MB)」, 상태 점검은 「없음」 + 받기 단추. 확인은 한 번만', async () => {
+test('옛 판: 점검표 글이 「새 판 있음 (다시 받기, 약 1MB)」, 상태 점검 배지는 「새 판 있음」 + 받기 단추. 확인은 한 번만', async () => {
   await M.dropWikiPack().catch(() => {});
   const box = fakeRisu({ digest: 'old', index: INDEX });
   M.setStoredWikiPack(PACK);
@@ -71,9 +71,9 @@ test('옛 판: 점검표 글이 「새 판 있음 (다시 받기, 약 1MB)」, �
   assert.doesNotMatch(row, /없음/, '있는 문서를 「없음」이라고 하지 않는다');
 
   row = wikiRow(M.managePage(ctx(box), 'manage:diag', false));
-  assert.match(row, />없음</);
+  assert.match(row, />새 판 있음</, '설치·점검과 같은 말');
   assert.doesNotMatch(row, />있음</);
-  assert.doesNotMatch(row, /새 판 있음/, '상태 점검에는 새 말을 넣지 않는다 (C-5 (가))');
+  assert.doesNotMatch(row, />없음</, '있는 문서를 「없음」이라고 하지 않는다');
   assert.match(row, /data-action="man-get-wiki"/, '받기 단추가 나온다');
   assert.match(row, /받기 \(약 1MB\)/);
 
@@ -140,6 +140,6 @@ test('새 판 확인 응답이 멈춰도 설치·점검은 짧은 한도 뒤에 
   r = await M.checkInstall(0);
   assert.equal(r.wikiOld, true);
   assert.equal(box.indexFetches, 1, '다시 보내지 않는다');
-  assert.match(wikiRow(M.managePage(ctx(box), 'manage:diag', false)), />없음</);
+  assert.match(wikiRow(M.managePage(ctx(box), 'manage:diag', false)), />새 판 있음</);
   await M.dropWikiPack();
 });

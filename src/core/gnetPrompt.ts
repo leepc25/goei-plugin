@@ -33,7 +33,7 @@ export interface GnetBooks {
   read(name: string): string;
   /** 출력 언어 문장 (고급 설정 → 생성 언어) */
   language: string;
-  /** 지침의 __SITE_PICS__ 자리 채우기: 이번 요청 자료(material)에 이름이 나온 사진만 (사용자 2026-11-14). read 는 자리를 그대로 두고, 요청문을 묶을 때(pack) 채운다 */
+  /** 지침의 __SITE_PICS__ 자리 채우기: 이번 요청의 최근 본문·게시판/쪽지 내용(material)에 이름이 나온 사진만 (사용자 2026-11-14. 참고 기록은 넣지 않는다). read 는 자리를 그대로 두고, 요청문을 묶을 때(pack) 채운다 */
   pics(text: string, material: string): string;
 }
 
@@ -111,8 +111,10 @@ function pack(src: RefSource, b: GnetBooks, fn: GnetOp, thoughts: ThoughtsKey, g
   // 참고 자료 머리말은 프로그램 안에 둔다 (사용자 2026-11-14 C-4 (나): 공통 지침에서 읽지 않음)
   const material = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${refText(rows)}\n[최근 본문]\n${story}\n[현재 작업]\n${extras}`;
   const attachments = hasAttachment(material);
+  // 사진 이름은 최근 본문과 게시판·쪽지 내용(현재 작업)에서만 찾는다. 늘 붙는 참고 기록(🙂Roster 등)에는 모든 인물 이름이 있어 거르기가 듣지 않는다 (사용자 2026-11-14 E-14 물음 2)
+  const named = `${story}\n${extras}`;
   const messages: CraftMessage[] = [
-    { role: 'system', content: factionCodesToNames(b.pics(systemText(b, guideline, format, identity, attachments), material), factionNames) },
+    { role: 'system', content: factionCodesToNames(b.pics(systemText(b, guideline, format, identity, attachments), named), factionNames) },
     { role: 'user', content: factionCodesToNames(material, factionNames) },
   ];
   return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'gn'), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }), retryRule: b.read('RETRY.FORMAT') };

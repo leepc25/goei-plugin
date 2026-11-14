@@ -55,7 +55,7 @@ function pics(char: Char): Pic[] {
 
 /** 모델에게 줄 목록 (지침의 __SITE_PICS__ 자리).
  *  sec: 지침 절 읽기 (PICS_NONE · PICS_PEOPLE · PICS_EXPR · PICS_THINGS, {list} 자리). 절이 없으면 코드에 남긴 옛 글 (전수검사 11-13)
- *  within: 이번 요청 자료(참고 기록·최근 본문·게시판/쪽지 내용). 주면 거기에 이름(한글·영문·별칭)이 나온 것만 넣는다 (사용자 2026-11-14: 요청마다 전체 목록이 붙지 않게) */
+ *  within: 이번 요청의 최근 본문·게시판/쪽지 내용 (늘 붙는 인물 명부 같은 참고 기록은 넣지 않는다: 모든 이름이 걸린다). 주면 거기에 이름(한글·영문·별칭)이 나온 것만 넣는다 (사용자 2026-11-14: 요청마다 전체 목록이 붙지 않게) */
 export function sitePicList(char: Char, sec?: (name: string) => string | null | undefined, within?: string): string {
   const low = within?.toLowerCase();
   const list = low === undefined ? pics(char) : pics(char).filter((p) => p.terms.some((t) => !!t && t.trim().length >= 2 && low.includes(t.trim().toLowerCase())));

@@ -13,7 +13,8 @@ await build({
     contents: `
       export { useBoxCss, markUseSent, sentUseIds, dropUseUnlessSent } from './src/host/usebox';
       export { setWaiting } from './src/host/waiting';
-      export { readItemUse, ITEM_USE_VAR, ITEM_USE_AT_VAR } from './src/core/items';
+      export { readItemUse, ITEM_USE_VAR, ITEM_USE_AT_VAR, addItem, itemsVars, readItems, liveItems } from './src/core/items';
+      export { dropFromUse, itemsAction, itemsTab, itemsUi } from './src/ui/items';
     `,
     resolveDir: process.cwd(), loader: 'ts',
   },
@@ -21,6 +22,7 @@ await build({
   loader: { '.css': 'text', '.txt': 'text', '.svg': 'text', '.html': 'text', '.png': 'dataurl', '.webp': 'dataurl' },
 });
 // 본 화면이 없는 것으로 둔다 (칩 그리기는 건너뛰고 상태만 본다)
+globalThis.matchMedia ??= () => ({ matches: false }); // PC 크기로 본다 (ui/media.ts)
 globalThis.risuai = { getRootDocument: async () => null, getChatFromIndex: async () => null };
 const U = await import(pathToFileURL(join(dir, 'usebox.mjs')));
 
@@ -62,4 +64,77 @@ test('보내는 중: 실려 나간 것은 눌러도 그대로, 그 뒤 새로 �
   U.setWaiting(false, true);
   assert.equal(U.sentUseIds(chat, 0, 0), null);
   assert.deepEqual(U.readItemUse(U.dropUseUnlessSent(chat, 0, 0, 'a').scriptstate), []);
+});
+
+// ── 소지품 창 (물음 3 사용자 답): 보내는 중에는 「사용 취소」를 숨기고 눌러도 무시, 버리기·삭제·해제(넣기)에도 보낸 사용은 사용 목록에 남긴다 ──
+const alive = new Set();
+/** 붕대(쓰는 물건) 하나를 가진 채팅을 가짜 Risu 저장소에 넣는다. 마지막이 유저 메시지 (요청이 나간 뒤, 답이 오기 전) */
+function seed(chatIndex) {
+  const items = U.addItem({ list: [], log: [] }, alive, { name: '붕대', desc: '', effect: '', use: true, uses: 3, from: 'manual', anchor: '' });
+  const id = items.list[0].id;
+  const chat = {
+    message: [{ role: 'char', data: '안녕' }, { role: 'user', data: '붕대를 감는다' }],
+    scriptstate: { ...U.itemsVars(items), [U.ITEM_USE_VAR]: JSON.stringify([{ id, n: 1 }]) },
+  };
+  const store = { chat };
+  globalThis.risuai.getChatFromIndex = async (c, i) => (i === chatIndex ? structuredClone(store.chat) : null);
+  globalThis.risuai.setChatToIndex = async (c, i, next) => { store.chat = structuredClone(next); };
+  const ctx = () => ({ charIndex: 0, chatIndex, chat: structuredClone(store.chat), character: {} });
+  const env = { render() {}, refresh: async () => {} };
+  const queue = () => U.readItemUse(store.chat.scriptstate).map((u) => u.id);
+  const has = () => U.liveItems(U.readItems(store.chat.scriptstate), alive).some((x) => x.id === id);
+  return { id, store, ctx, env, queue, has };
+}
+const popupHtml = (t) => {
+  U.itemsUi.sub = 'items';
+  U.itemsUi.view = 'grid';
+  U.itemsUi.mode = 'view';
+  U.itemsUi.open = t.id;
+  U.itemsUi.info = ''; // 잠깐 뜨는 안내(시계)를 띄우지 않는다
+  return U.itemsTab(t.ctx());
+};
+
+test('소지품 창, 보내기 전: 「사용 취소」가 보이고 누르면 빠진다', async () => {
+  const t = seed(5);
+  assert.match(popupHtml(t), /data-action="items-unuse"/);
+  U.itemsUi.info = '';
+  await U.itemsAction('items-unuse', t.id, t.ctx(), t.env);
+  assert.deepEqual(t.queue(), []);
+  assert.equal(U.itemsUi.info, '사용을 취소했어요.');
+});
+
+test('소지품 창, 보내는 중: 「사용 취소」를 숨기고 눌러도 무시한다. 실패해 풀리면 전과 같다', async () => {
+  const t = seed(6);
+  U.setWaiting(true);
+  await U.markUseSent(0, 6, t.store.chat);
+  assert.doesNotMatch(popupHtml(t), /data-action="items-unuse"/);
+  U.itemsUi.info = '';
+  await U.itemsAction('items-unuse', t.id, t.ctx(), t.env);
+  assert.deepEqual(t.queue(), [t.id]);
+  assert.equal(U.itemsUi.info, '', '취소했다는 말을 띄우지 않는다');
+  assert.equal(await U.dropFromUse({ charIndex: 0, chatIndex: 6 }, t.id), false);
+  // 요청 실패 → 다시 보이고 빠진다
+  U.setWaiting(false, true);
+  assert.match(popupHtml(t), /data-action="items-unuse"/);
+  await U.itemsAction('items-unuse', t.id, t.ctx(), t.env);
+  assert.deepEqual(t.queue(), []);
+});
+
+for (const [action, label] of [['items-drop', '버리기'], ['items-purge', '삭제']]) {
+  test(`소지품 창, 보내는 중 ${label}: 물건은 처리하고 보낸 사용은 사용 목록에 남긴다`, async () => {
+    const t = seed(action === 'items-drop' ? 7 : 8);
+    U.setWaiting(true);
+    await U.markUseSent(0, action === 'items-drop' ? 7 : 8, t.store.chat);
+    await U.itemsAction(action, t.id, t.ctx(), t.env);
+    assert.equal(t.has(), false, '물건 처리는 그대로');
+    assert.deepEqual(t.queue(), [t.id], '보낸 사용은 남는다');
+    U.setWaiting(false, true);
+  });
+}
+
+test('소지품 창, 보내기 전 버리기: 사용 목록에서도 빠진다 (전과 같다)', async () => {
+  const t = seed(9);
+  await U.itemsAction('items-drop', t.id, t.ctx(), t.env);
+  assert.equal(t.has(), false);
+  assert.deepEqual(t.queue(), []);
 });

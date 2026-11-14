@@ -7,7 +7,7 @@
 // 플러그인은 막지도 경고하지도 않는다: 칸이 넘치면 넘친 칸을 붉은 테두리로 보여 줄 뿐, 푸는 건 본편 응답 (core/items.ts).
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
-import { refreshUseBox } from '../host/usebox';
+import { refreshUseBox, useSending } from '../host/usebox';
 import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
@@ -241,6 +241,9 @@ export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''):
   return { av: avatarHtml(ctx), slots };
 }
 
+/** 「보내는 중」(요청에 실려 나가 답을 기다리는 사용): 「사용 취소」 단추를 숨긴다 (재검토 11-14 B-9 사용자 답) */
+const sendingUse = (ctx: ChatContext, id: string) => useSending(ctx.chat, ctx.charIndex, ctx.chatIndex, id);
+
 /** 「사용」칸 (장착 띠 오른쪽, PC만): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
 function useBox(ctx: ChatContext): string {
   const live = liveOf(ctx);
@@ -248,7 +251,7 @@ function useBox(ctx: ChatContext): string {
     const it = live.find((x) => x.id === u.id);
     return it ? [{ it, n: u.n }] : [];
   });
-  const chips = q.map(({ it, n }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${n > 1 ? `<em>×${n}</em>` : ''}<button class="it-ux" data-action="items-unuse" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 사용 취소">${ICONS.close}</button></span>`).join('');
+  const chips = q.map(({ it, n }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${n > 1 ? `<em>×${n}</em>` : ''}${sendingUse(ctx, it.id) ? '' : `<button class="it-ux" data-action="items-unuse" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 사용 취소">${ICONS.close}</button>`}</span>`).join('');
   return `<div class="it-usebox${q.length ? '' : ' empty'}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips || '<p class="it-uhint">쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.</p>'}</div></div>`;
 }
 
@@ -369,7 +372,7 @@ function popup(ctx: ChatContext): string {
     ${it.quote ? `<p class="qt">근거 「${esc(it.quote)}」</p>` : ''}
     <div class="it-btns">
       ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}${needsEquip(ctx, it) ? ' title="장착해야 쓸 수 있어요"' : ''}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
-      ${queued ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
+      ${queued && !sendingUse(ctx, it.id) ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
       ${boxButton(ctx, it.id)}
       <button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ''}>${equipLabel(it, equipped)}</button>
       ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
@@ -601,7 +604,8 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     }
     case 'items-unuse': {
       if (!value) return true;
-      await dropFromUse(ctx, value);
+      // 보내는 중이면 눌러도 무시한다 (이미 요청에 실려 나간 사용, 재검토 11-14 B-9 사용자 답)
+      if (!(await dropFromUse(ctx, value))) return true;
       itemsUi.info = '사용을 취소했어요.';
       await env.refresh();
       return true;
@@ -691,15 +695,22 @@ async function queueUse(ctx: ChatContext, fn: (q: ItemUse[]) => ItemUse[]): Prom
   });
   void refreshUseBox(ctx.charIndex, ctx.chatIndex);
 }
-/** 사용 자리에서 빼기 (버리기·팔기·취소). 상점 팔기도 쓴다 */
-export async function dropFromUse(ctx: { charIndex: number; chatIndex: number }, id: string): Promise<void> {
+/** 사용 자리에서 빼기 (버리기·삭제·해제·끌어 바꾸기). 상점·쇼핑몰 팔기는 여기를 거치지 않고 saleDone 에서 직접 뺀다(ui/shop.ts, ui/malls.ts).
+ *  「보내는 중」인 사용은 빼지 않고 남긴다 (모델은 이미 쓴 것으로 받았다. 물건 처리 자체는 부르는 쪽이 그대로 한다. 재검토 11-14 B-9 사용자 답) → false */
+export async function dropFromUse(ctx: { charIndex: number; chatIndex: number }, id: string): Promise<boolean> {
+  let held = false;
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     if (chat.scriptstate?.[ITEM_USE_AT_VAR]) return null;
+    if (useSending(chat, ctx.charIndex, ctx.chatIndex, id)) {
+      held = true;
+      return null;
+    }
     const cur = readItemUse(chat.scriptstate);
     const next = dropUse(cur, id);
     return next.length === cur.length ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next) } };
   });
   void refreshUseBox(ctx.charIndex, ctx.chatIndex);
+  return !held;
 }
 
 /** 찾기 칸 입력: 격자·기록만 다시 그린다 (입력칸 초점 유지) */

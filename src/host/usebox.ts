@@ -62,6 +62,13 @@ export function sentUseIds(chat: Chat | null, charIndex: number, chatIndex: numb
   return sent.ids;
 }
 
+/** 이 물건의 사용이 「보내는 중」인가 (소지품 창: 「사용 취소」를 숨기고, 버리기·삭제·해제·끌어 바꾸기에도 사용 목록에 남긴다. 재검토 11-14 B-9 사용자 답).
+ *  sentUseIds 와 달리 적어 둔 것을 지우지 않는다: 소지품 창이 든 채팅이 조금 옛것이어도 보낸 표시를 잃지 않게 */
+export function useSending(chat: Chat | null | undefined, charIndex: number, chatIndex: number, id: string): boolean {
+  if (!sent || !chat || sent.charIndex !== charIndex || sent.chatIndex !== chatIndex) return false;
+  return !chat.scriptstate?.[ITEM_USE_AT_VAR] && lastUserKey(chat) === sent.userKey && sent.ids.has(id);
+}
+
 /** 본편 요청에 「사용」이 실려 나갔다 (body.ts onBeforeRequest, [Inventory] 를 넣은 바로 뒤). 칩 이름표를 바로 「보내는 중」으로 */
 export async function markUseSent(charIndex: number, chatIndex: number, chat: Chat): Promise<void> {
   const userKey = lastUserKey(chat);
