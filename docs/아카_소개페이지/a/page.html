@@ -1,0 +1,442 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;400;700;900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+body{margin:0;width:860px;background:#fff}
+.plate{width:860px;box-sizing:border-box;position:relative;overflow:hidden;background:#f5f3ee;color:#141312;font-family:'Noto Serif KR',serif;-webkit-font-smoothing:antialiased;word-break:keep-all}
+.plate *{box-sizing:border-box}
+.plate p{margin:0}
+.plate s{text-decoration:line-through;text-decoration-color:#cf2a1c;text-decoration-thickness:2px;color:#5f5b55}
+.red{color:#cf2a1c;font-style:normal} .gray{color:#5f5b55}
+.plate.dk{background:#141312;color:#f5f3ee}
+.dk .gray,.dk s,.dkband s{color:#a8a299}
+.dkband{background:#141312;color:#f5f3ee}
+.fig{position:absolute;width:auto;max-width:none}
+.pic{background-size:cover;background-repeat:no-repeat;image-rendering:pixelated;flex:none}
+.shot{background-repeat:no-repeat;flex:none}
+.rule{position:absolute;height:0;border-top:1.5px solid #141312}
+.cap{position:absolute;font-family:'Pretendard',sans-serif;font-size:31px;line-height:1.38;letter-spacing:-.02em;font-weight:400}
+.cap b{font-weight:700}
+.kicker{font-family:'Pretendard',sans-serif;font-size:31px;font-weight:700;letter-spacing:-.02em;border-top:1.5px solid currentColor;padding-top:16px}
+.kicker.abs{position:absolute}
+.kicker em{font-style:normal;font-weight:400;color:#5f5b55;float:right}
+.dk .kicker em{color:#a8a299}
+.mast{position:absolute;left:14px;top:-40px;font-size:450px;line-height:1;font-weight:900;letter-spacing:-.07em;white-space:nowrap}
+.sub{position:absolute;font-family:'Bodoni Moda',serif;font-size:60px;line-height:1;font-weight:500;letter-spacing:.02em;white-space:nowrap}
+.sub .red{font-family:'Noto Serif KR',serif;font-weight:900;font-size:120px;line-height:.5;vertical-align:-14px;margin:0 4px 0 -12px}
+.coverq{position:absolute;font-size:46px;line-height:1.36;font-weight:700;letter-spacing:-.04em}
+.small{font-size:34px;line-height:1.6;font-weight:400;letter-spacing:-.03em}
+.huge{font-size:112px;line-height:1.14;font-weight:900;letter-spacing:-.06em}
+.huge.thin{font-weight:200}
+.h1{font-size:132px;line-height:1.05;font-weight:900;letter-spacing:-.06em;margin-bottom:34px}
+.h2{font-size:84px;line-height:1.1;font-weight:900;letter-spacing:-.06em}
+.irow{display:flex;align-items:baseline;border-top:1px solid currentColor;padding:15px 0 16px}
+.irow.last{border-bottom:1.5px solid currentColor}
+.irow span{flex:0 0 250px;font-family:'Pretendard',sans-serif;font-size:31px;color:#5f5b55;letter-spacing:-.02em}
+.dkband .irow span{color:#a8a299}
+.irow b{font-size:36px;line-height:1.4;font-weight:700;letter-spacing:-.04em}
+.irow b.giant{font-size:190px;line-height:1;font-weight:900;letter-spacing:-.07em}
+.fname{font-weight:900;line-height:1.08;letter-spacing:-.07em;white-space:nowrap}
+.fblurb{font-size:33px;line-height:1.5;font-weight:400;letter-spacing:-.04em;margin-top:22px !important}
+.scn{margin-top:34px}
+.scn>span{display:block;font-family:'Pretendard',sans-serif;font-size:30px;color:#5f5b55;letter-spacing:-.02em}
+.dkband .scn>span{color:#a8a299}
+.scn b{display:block;font-size:66px;line-height:1.2;font-weight:900;letter-spacing:-.06em;margin-top:2px}
+.scn p{font-size:34px;line-height:1.5;font-weight:700;letter-spacing:-.04em;margin-top:10px !important}
+.scn p i{font-style:normal;font-weight:200;color:#5f5b55;margin:0 12px 0 4px}
+.vert{position:absolute;writing-mode:vertical-rl;font-size:118px;line-height:1;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+.bigq{position:absolute;font-size:84px;line-height:1.16;font-weight:900;letter-spacing:-.06em}
+.midq{position:absolute;font-size:54px;line-height:1.36;font-weight:700;letter-spacing:-.05em}
+.mega{position:absolute;font-size:400px;line-height:1;font-weight:900;letter-spacing:-.08em;white-space:nowrap}
+.run{position:absolute;font-size:218px;line-height:1;font-weight:900;letter-spacing:-.08em;white-space:nowrap}
+.ye{position:absolute;font-size:410px;line-height:1;font-weight:900;letter-spacing:-.06em;white-space:nowrap}
+.eighty{position:absolute;font-family:'Bodoni Moda',serif;font-size:300px;line-height:1;font-weight:700;letter-spacing:-.04em;white-space:nowrap}
+.mini{position:absolute;font-size:31px;line-height:1.4;font-weight:700;letter-spacing:-.04em}
+.mini div{border-top:1px solid currentColor;padding:10px 0 12px}
+.mini span{display:block;font-family:'Pretendard',sans-serif;font-weight:400;color:#5f5b55;letter-spacing:-.02em}
+.dk .mini span{color:#a8a299}
+.mini.wide div{display:flex} .mini.wide span{flex:0 0 250px} .mini em{font-style:normal;display:block}
+.tcol{position:absolute;top:990px;width:236px}
+.tcol b{display:block;font-size:44px;font-weight:900;letter-spacing:-.05em;line-height:1.2}
+.tcol p{font-size:32px;line-height:1.42;font-weight:700;letter-spacing:-.05em;margin-top:14px !important;min-height:184px}
+.tcol i{display:block;font-style:normal;font-family:'Pretendard',sans-serif;font-size:30px;line-height:1.35;color:#5f5b55;letter-spacing:-.04em;min-height:84px}
+.tcol u{display:block;text-decoration:none;font-size:30px;line-height:1.35;font-weight:700;letter-spacing:-.05em;border-top:1px solid #141312;padding-top:10px;margin-top:10px}
+.tcol u span{display:block;font-family:'Pretendard',sans-serif;font-weight:400;color:#5f5b55}
+.gname{position:absolute;width:180px;text-align:center;font-size:32px;font-weight:700;letter-spacing:-.06em;line-height:1.2;white-space:nowrap}
+.pcol{position:absolute;width:356px}
+.pcol span{display:block;font-family:'Pretendard',sans-serif;font-size:30px;color:#5f5b55;letter-spacing:-.02em;font-weight:400}
+.pcol b{display:block;font-size:40px;font-weight:900;letter-spacing:-.06em;line-height:1.25}
+.pcol p{font-size:34px;line-height:1.46;font-weight:700;letter-spacing:-.05em;margin-top:18px !important}
+.pcol i{display:block;font-style:normal;font-family:'Pretendard',sans-serif;font-size:30px;line-height:1.35;color:#5f5b55;letter-spacing:-.03em;margin-top:14px}
+.pcol u{display:block;text-decoration:none;font-size:34px;line-height:1.35;font-weight:700;letter-spacing:-.05em;border-top:1px solid #141312;padding-top:10px;margin-top:22px}
+.face{display:block;position:relative;overflow:hidden}
+.face img{position:absolute;max-width:none}
+.band{display:flex;flex-wrap:wrap;width:756px}
+.bc{width:108px;margin-bottom:26px}
+.bc b{display:block;font-size:30px;font-weight:700;letter-spacing:-.08em;line-height:1.2;margin-top:6px;white-space:nowrap}
+.glabel{font-family:'Pretendard',sans-serif;font-size:31px;color:#5f5b55;letter-spacing:-.02em}
+.glabel b{color:#141312;font-weight:700;margin-right:10px}
+.mgrid{display:flex;flex-wrap:wrap;margin-top:26px}
+.mc{width:150px;margin-bottom:34px}
+.mc b{display:block;font-size:32px;font-weight:900;letter-spacing:-.07em;line-height:1.2;margin-top:8px}
+.mc i{display:block;font-style:normal;font-size:30px;font-weight:400;letter-spacing:-.07em;line-height:1.25;padding-right:8px}
+.sgrid{display:flex;flex-wrap:wrap;border-top:1.5px solid #141312;padding-top:30px;margin-top:6px}
+.sc{width:250px;display:flex;margin-bottom:26px}
+.sc>div{padding:8px 0 0 12px}
+.sc b{display:block;font-size:32px;font-weight:900;letter-spacing:-.07em;line-height:1.2}
+.sc i{display:block;font-style:normal;font-family:'Pretendard',sans-serif;font-size:30px;color:#5f5b55;letter-spacing:-.06em;line-height:1.25;margin-top:4px}
+.jrow{display:flex;margin-top:36px}
+.jlist{margin-top:30px}
+.jlist div{display:flex;align-items:baseline;border-top:1px solid #141312;padding:9px 0 11px}
+.jlist span{flex:0 0 150px;font-family:'Pretendard',sans-serif;font-size:31px;color:#5f5b55;letter-spacing:-.03em}
+.jlist b{font-size:38px;font-weight:900;letter-spacing:-.05em;line-height:1.3}
+.solo{position:absolute;width:358px}
+.solo .srule{border-top:1.5px solid #141312}
+.solo b{display:block;font-size:56px;font-weight:900;letter-spacing:-.06em;line-height:1.2;margin-top:14px}
+.solo i{display:block;font-style:normal;font-family:'Pretendard',sans-serif;font-size:30px;color:#5f5b55;letter-spacing:-.03em;line-height:1.3;margin-top:2px}
+.solo p{font-size:34px;line-height:1.44;font-weight:700;letter-spacing:-.05em;margin-top:16px !important}
+.solo u{display:block;text-decoration:none;font-size:32px;line-height:1.35;font-weight:700;letter-spacing:-.05em;margin-top:18px}
+.solo u span,.pcol u span{display:block;font-family:'Pretendard',sans-serif;font-size:30px;font-weight:400;color:#5f5b55;letter-spacing:-.02em}
+.col{position:absolute} .col>.cap,.col>.bigq,.col>.midq,.col>.mini{position:static}
+.pcap{position:absolute;font-size:31px;line-height:1.4;font-weight:700;letter-spacing:-.04em}
+.pcap b{display:block;font-size:42px;font-weight:900;letter-spacing:-.06em;line-height:1.2;margin-bottom:6px}
+.pcap span{font-family:'Pretendard',sans-serif;font-weight:400;color:#a8a299;margin-right:6px}
+.joke span{display:block;font-family:'Pretendard',sans-serif;font-size:31px;color:#a8a299;letter-spacing:-.02em}
+.joke b{display:block;font-size:62px;line-height:1.2;font-weight:900;letter-spacing:-.06em;margin-top:8px}
+.joke s{display:block;font-size:40px;line-height:1.35;font-weight:400;letter-spacing:-.05em;margin-top:10px}
+.joke.big b{font-size:76px}
+.joke.huge2 b{font-size:104px;white-space:nowrap}
+.trow{display:flex;justify-content:space-between;padding:0 54px}
+.tile b,.stn b{display:block;font-family:'Pretendard',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.05em;line-height:1.25;margin-top:12px}
+.tile i,.stn i{display:block;font-style:normal;font-size:30px;font-weight:400;letter-spacing:-.05em;line-height:1.35;margin-top:4px}
+.tile em,.wcap em{font-style:normal;font-family:'Pretendard',sans-serif;color:#a8a299;margin-right:4px}
+.stn{width:215px;text-align:center}
+.wcap{padding:16px 54px 0;font-size:34px;line-height:1.4;font-weight:400;letter-spacing:-.04em}
+.wcap b{font-family:'Pretendard',sans-serif;font-weight:700;margin-right:18px}
+.slab b{display:block;font-size:96px;line-height:1.1;font-weight:900;letter-spacing:-.06em}
+.slab span{display:block;font-family:'Pretendard',sans-serif;font-size:32px;line-height:1.45;color:#a8a299;letter-spacing:-.02em;margin-top:12px}
+.scap{font-family:'Pretendard',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.03em;margin:14px 54px 0}
+</style></head>
+<body>
+<section class="plate" data-name="cover" style="height:1500px">
+  <div class="mast">괴이</div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Aileen_default.avif" style="height:1290px;left:150px;top:250px;">
+  <div class="sub" style="left:54px;top:528px"><i class="red">ː</i>ANOMALY</div>
+  <div class="cap" style="left:56px;top:660px;width:300px">RisuAI용<br>괴담 시뮬레이션 봇</div>
+  <div class="coverq" style="left:54px;top:850px;width:340px">“관리국이 하는<br>일은 쓰레기<br>회사랑<br>다를 게 없어.”</div>
+  <div class="cap gray" style="left:56px;top:1150px;width:300px">에일린<br>자기 직장에 대해, 야근하면서</div>
+  <div style="position:absolute;left:0;right:0;top:1404px;height:96px;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;right:54px;top:1404px"></div>
+  <div class="cap" style="left:54px;top:1424px;right:54px">인물 55 · 괴이 63 · 조직 17 · 위키 문서 143</div>
+</section>
+<section class="plate" data-name="rules" style="padding:90px 54px 80px">
+  <div class="cap gray" style="position:static">첫 장면 「근무 수칙」에서</div>
+  <p class="small gray" style="margin:50px 0 0;width:660px">2. 이상현상에 대한 자료를 전자기기에 입력하지 마십시오. 이는 안전을 위한 것입니다.</p>
+  <p class="huge" style="margin:44px 0 0">3.<br>식사 시간을<br>준수해<br>주십시오.</p>
+  <p class="huge thin" style="margin:6px 0 0">이는 안전을<br>위한 것입니다.</p>
+  <p class="small" style="margin:64px 0 0 190px;width:562px;font-weight:700">7. 관리국의 불이 꺼지는 일은 없습니다. 불이 꺼졌다고 생각될 경우 그 무엇도 믿지 말고 당장 건물 바깥으로 탈출하십시오. 이는 안전을 위한 것입니다.</p>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:34px 6% 40px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“불이 꺼지면 아무것도 믿지 말고 뛰어라. 관리국의 불은 꺼지지 않는다.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">관리국 내부에 오래전부터 전해지는 경고</div></div><div style="margin:0 0 14px 0;"><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">불이 꺼진 관리국 · 공식 입장</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">관리국의 불은 꺼지지 않는다</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">비공식 입장</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);"><span style="text-decoration:line-through;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">꺼진다</span></div></div></div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;font-weight:700;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin:0 0 14px 0;">관리국</div><div style="margin:0 0 14px 0;"><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">본부</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">서울 종로구 <span style="text-decoration:line-through;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">어딘지는 묻지 마라</span></div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">인원</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">적음, 대신 하나하나가 괴물</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">사내 분위기</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">군대보다 회사</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">회식</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">근처 파스타집</div></div></div></div></div>
+
+<section class="plate" data-name="soraland">
+  <div class="pic" style="width:860px;height:800px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Sora%20Land.avif');background-position:50% 60%;"></div>
+  <div style="padding:46px 54px 70px">
+    <div class="h1">소라 랜드</div>
+    <div class="irow first"><span>분류</span><b>장소형 괴담</b></div>
+    <div class="irow"><span>영업시간</span><b>낮에는 정상 영업 <s>밤에도 영업은 한다</s></b></div>
+    <div class="irow"><span>마스코트</span><b>많음, 다들 어딘가 하나씩 없음</b></div>
+    <div class="irow last"><span>재방문 후기</span><b class="giant">없음</b></div>
+  </div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:10px 6% 30px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“꿈과 환상이 가득한 소라 랜드로~ 즐거운 소라 랜드로 오세요~”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">생환자 전원이 귀에서 안 떠난다고 증언한 안내 노래</div></div></div></div>
+
+<section class="plate" data-name="start-a">
+  <div style="padding:70px 54px 0">
+    <div class="kicker">시작하는 자리 <em>세력 다섯 곳</em></div>
+    <div style="margin-top:56px;overflow:hidden">
+      <div class="pic" style="width:300px;height:380px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Factions/Management%20Bureau.avif');background-position:60% 50%;float:right;margin:14px 0 0 30px"></div>
+      <div class="fname" style="font-size:150px">관리국</div>
+      <p class="fblurb">괴이로부터 인류를 지키는 비밀 조직. 소수 정예 초인 요원들이 일상 뒤에 숨어 움직인다.</p>
+    </div>
+    <div class="scn"><span>첫 장면</span><b>면접</b><p><span style="white-space:nowrap">코드네임</span> <span style="white-space:nowrap"><i>/</i>근무 수칙</span> <span style="white-space:nowrap"><i>/</i>격리 실습</span> <span style="white-space:nowrap"><i>/</i>격리팀</span> <span style="white-space:nowrap"><i>/</i>교전</span> <span style="white-space:nowrap"><i>/</i>한설인육공장</span></p></div>
+    <div class="irow first" style="margin-top:44px;border-top-width:1.5px"><span>천적</span><b>가짜 관리국</b></div>
+  </div>
+  <div class="dkband" style="padding:0 54px 76px">
+    <div class="irow" style="border-top:0"><span>관리국과의 관계</span><b>확인 즉시 제거</b></div>
+    <div style="margin-top:40px;overflow:hidden">
+      <div class="pic" style="width:236px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Factions/Fake%20Management%20Bureau.avif');background-position:50% 50%;float:left;margin:10px 30px 0 0"></div>
+      <div class="fname" style="font-size:94px">가짜 관리국</div>
+      <p class="fblurb">스스로를 진짜 관리국이라 여기는 또 하나의 관리국. 괴이를 이물이라 부르며 체계화된 무력으로 대응한다.</p>
+    </div>
+    <div class="scn"><span>첫 장면</span><b>취조실</b><p><span style="white-space:nowrap">신입 교육</span> <span style="white-space:nowrap"><i>/</i>오리엔테이션</span> <span style="white-space:nowrap"><i>/</i>스카우트</span> <span style="white-space:nowrap"><i>/</i>검사부대</span> <span style="white-space:nowrap"><i>/</i>데이터베이스</span> <span style="white-space:nowrap"><i>/</i>상황 발생</span></p></div>
+  </div>
+</section>
+<section class="plate" data-name="start-b">
+  <div class="pic" style="width:860px;height:330px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Factions/Baekilmong.avif');background-position:50% 46%;"></div>
+  <div style="padding:34px 54px 0">
+    <div class="fname" style="font-size:104px">백일몽 주식회사</div>
+    <div style="display:flex;margin-top:6px">
+      <p class="fblurb" style="flex:0 0 350px;margin-right:40px">괴이를 상품으로 만드는 제약 대기업. 겉으로는 제약사, 진짜 상품은 꿈결이다.</p>
+      <div style="flex:1"><div class="scn"><span>첫 장면</span><b>신입 OT</b><p><span style="white-space:nowrap">D조 첫 출근</span> <span style="white-space:nowrap"><i>/</i>화요 퀴즈쇼</span> <span style="white-space:nowrap"><i>/</i>유쾌 테마파크</span> <span style="white-space:nowrap"><i>/</i>커스텀 장비</span> <span style="white-space:nowrap"><i>/</i>착한 친구</span> <span style="white-space:nowrap"><i>/</i>세광특별시</span></p></div></div>
+    </div>
+  </div>
+  <div style="display:flex;margin-top:90px;padding-right:54px">
+    <div class="pic" style="width:330px;height:560px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Factions/Civilian.avif');background-position:55% 50%;"></div>
+    <div style="flex:1;padding:20px 0 0 40px">
+      <div class="fname" style="font-size:128px">민간인</div>
+      <p class="fblurb">괴이의 존재를 모르는 평범한 사람. 우연한 조우가 모든 것을 바꾼다.</p>
+      <div class="scn"><span>첫 장면</span><b>지하철의 여자</b><p><span style="white-space:nowrap">기독교 상점</span> <span style="white-space:nowrap"><i>/</i>세계정치 게시판</span> <span style="white-space:nowrap"><i>/</i>무엇이든 자판기</span> <span style="white-space:nowrap"><i>/</i>중림 지하상가</span></p></div>
+    </div>
+  </div>
+  <div style="display:flex;margin-top:90px;padding:0 54px 84px;align-items:flex-end">
+    <div style="flex:1;padding-right:36px">
+      <div class="fname" style="font-size:112px">프리랜서</div>
+      <p class="fblurb">특수재난대응협회와 뒷골목 알선소의 의뢰로 먹고사는 해결사.</p>
+      <div class="scn"><span>첫 장면</span><b>협회 접수창구</b><p><span style="white-space:nowrap">대박알선</span></p></div>
+    </div>
+    <div class="pic" style="width:250px;height:250px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Factions/Freelancer.avif');background-position:50% 50%;"></div>
+  </div>
+</section>
+<section class="plate" data-name="jyaldi" style="height:1400px">
+  <div class="kicker abs" style="left:54px;top:70px;right:54px">인물 <em>관리국 종합대응팀</em></div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Jyaldi_default.avif" style="height:1190px;left:-250px;top:150px;">
+  <div class="col" style="left:508px;top:190px;width:310px">
+  <div class="bigq" style="font-size:72px">“하아.<br>잼트리.<br>이것 좀<br>어떻게<br>해 봐.”</div>
+  <div class="cap gray" style="margin-top:34px">쟈알디<br>사무실에서<br>하루 평균 n회</div>
+  <div class="mini" style="margin-top:56px">
+    <div><span>직책</span>부장 (팀장)<br><s>사실상 현장 총대</s></div>
+    <div><span>커피</span>블랙</div>
+    <div><span>특기</span>폭파, 영입 면담,<br>고기 굽기</div>
+  </div></div>
+  <div style="position:absolute;left:0;right:0;top:1296px;height:104px;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;right:54px;top:1296px"></div>
+</section>
+<section class="plate" data-name="trio" style="height:1450px">
+  <div class="h2" style="position:absolute;left:54px;top:10px">악명 높은 3인조</div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Deadpole_default.avif" style="height:780px;left:-60px;top:150px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Geshugan_default.avif" style="height:780px;left:180px;top:160px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Rojemon_default.avif" style="height:780px;left:420px;top:150px;">
+  <div style="position:absolute;left:0;right:0;top:920px;bottom:0;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;right:54px;top:920px"></div>
+  <div class="tcol" style="top:950px;left:54px"><b>데드폴</b><p>“여기서 제가 한 번 죽으면 시간이 벌리니까요.”</p><i>작전 회의, 아무렇지 않게</i><u><span>사망 횟수</span> 세다가 포기</u></div><div class="tcol" style="top:950px;left:316px"><b>게슈간</b><p>“그래. 미안.”</p><i>팀원을 죽인 일에 대한 완전한 사과</i><u><span>사과</span> 두 글자</u></div><div class="tcol" style="top:950px;left:578px"><b>로제몬</b><p>“현장 출동이면 난 안 가.”</p><i>공식 기록, 이후 출동함</i><u><span>전투력</span> 없음<br>(본인 강력 주장)</u></div>
+</section>
+<section class="plate" data-name="bureau-team" style="height:910px">
+  <div class="cap gray" style="left:54px;top:20px">종합대응팀</div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Jyaldi_default.avif" style="height:670px;left:-70px;top:150px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Spangdal_default.avif" style="height:670px;left:141px;top:150px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Jaemtri_default.avif" style="height:670px;left:346px;top:150px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Aileen_default.avif" style="height:670px;left:498px;top:150px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Deadpole_default.avif" style="height:680px;left:-153px;top:300px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Geshugan_default.avif" style="height:680px;left:37px;top:300px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Rojemon_default.avif" style="height:680px;left:226px;top:300px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Konjyuce_default.avif" style="height:680px;left:404px;top:300px;">
+  <div style="position:absolute;left:0;right:0;top:800px;bottom:0;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;right:54px;top:800px"></div>
+  <div class="gname" style="left:86px;top:92px">쟈알디</div><div class="gname" style="left:276px;top:92px">스팡달</div><div class="gname" style="left:466px;top:92px">잼트리</div><div class="gname" style="left:656px;top:92px">에일린</div><div class="gname" style="left:-8px;top:824px">데드폴</div><div class="gname" style="left:182px;top:824px">게슈간</div><div class="gname" style="left:372px;top:824px">로제몬</div><div class="gname" style="left:562px;top:824px">콘쥬스</div>
+</section>
+<section class="plate" data-name="bureau-pairs" style="height:1110px">
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Gorgodio_default.avif" style="height:700px;left:62px;top:40px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Kyuras_default.avif" style="height:640px;left:-106px;top:100px;">
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Gognija_default.avif" style="height:640px;left:363px;top:100px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Dejure_default.avif" style="height:590px;left:565px;top:150px;">
+  <div style="position:absolute;left:0;right:0;top:640px;bottom:0;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;width:356px;top:640px"></div>
+  <div class="rule" style="left:450px;width:356px;top:640px"></div>
+  <div class="pcol" style="left:54px;top:660px"><span>진압팀</span><b>큐라스 · 고르고디오</b><p>“로이 머스탱 얘기 내 평생 백 번은 들었어! ...헛소리 말고! 신입으로 들어오면 각오해!”</p><i>큐라스, 백한 번째로 그 이름을 들은 날</i></div>
+  <div class="pcol" style="left:450px;top:660px"><span>격리팀</span><b>고그니쟈 · 데쥬레</b><p>“데쥬레!!! 커피 좀 타 오게! 달달한 커피가 마시고 싶네, 빨리!!!”</p><i>고그니쟈 — 하루 평균 n회, 지하 전 층에 생중계</i></div>
+</section>
+<section class="plate" data-name="fake-bureau" style="height:1560px">
+  <div class="kicker abs" style="left:54px;top:70px;right:54px">가짜 관리국 <em>운영 방식</em></div>
+  <div class="mega" style="left:40px;top:120px">물량</div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Lee%20Gil-hwan_default.avif" style="height:660px;left:-70px;top:420px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Song%20Ju-ik_default.avif" style="height:660px;left:42px;top:438px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Go%20Young-hoon_default.avif" style="height:660px;left:154px;top:420px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Kim%20Jo-hak_default.avif" style="height:660px;left:266px;top:438px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/No%20Gi-gyun_default.avif" style="height:660px;left:378px;top:420px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Yun%20Byeong-su_default.avif" style="height:660px;left:490px;top:438px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Kwak%20Seong-ju_default.avif" style="height:660px;left:602px;top:420px;">
+  <div style="position:absolute;left:0;right:0;top:1080px;height:480px;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;right:54px;top:1080px"></div>
+  <div class="midq" style="left:54px;top:1112px;width:750px">“대학은 왜 가? 좋은 직장 가려고<br>가는 거잖아. 축하해, 취직했어.<br>요원으로.”</div>
+  <div class="cap gray" style="left:54px;top:1356px;width:740px">김조학 — 영입 권유의 마무리</div>
+  <div class="mini wide" style="left:54px;top:1430px;width:752px">
+    <div><span>복장</span>검은 정장, 선글라스</div>
+    <div><span>모집 방식</span>납치</div>
+  </div>
+</section>
+<section class="plate" data-name="fake-faces" style="padding:40px 0 80px">
+  <p class="midq" style="position:static;margin:0 54px;font-size:44px;line-height:1.5">“갑자기 이런 곳에 오게 되어서 얼마나 당황스러우신지 충분히 이해합니다. 하지만 이제부터 여러분은 관리국 요원으로 살아가셔야 합니다. 양해 부탁드립니다.”</p>
+  <div class="cap gray" style="position:static;margin:24px 54px 0">이길환 — 붙잡혀 온 사람들에게</div>
+  <div class="band" style="margin:70px 52px 0"><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Sa-jang_default.avif" style="width:272.3px;left:-80.8px;top:5.6px"></span><b>사장</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Do%20Pil-heon_default.avif" style="width:272.3px;left:-54.0px;top:-0.7px"></span><b>도필헌</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Gil-hwan_default.avif" style="width:272.3px;left:-80.8px;top:-9.8px"></span><b>이길환</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Gi-seok_default.avif" style="width:272.3px;left:-83.5px;top:-13.7px"></span><b>이기석</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Kim%20Jo-hak_default.avif" style="width:272.3px;left:-81.5px;top:-2.3px"></span><b>김조학</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Do-hyeong_default.avif" style="width:272.3px;left:-114.2px;top:1.3px"></span><b>이도형</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Go%20Young-hoon_default.avif" style="width:272.3px;left:-79.5px;top:-2.3px"></span><b>고영훈</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/No%20Gi-gyun_default.avif" style="width:272.3px;left:-80.2px;top:5.9px"></span><b>노기균</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Song%20Ju-ik_default.avif" style="width:272.3px;left:-80.8px;top:-7.5px"></span><b>송주익</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Kwak%20Seong-ju_default.avif" style="width:272.3px;left:-82.8px;top:7.5px"></span><b>곽성주</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Cho%20Seong-choon_default.avif" style="width:272.3px;left:-106.7px;top:-8.2px"></span><b>조성춘</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Yun%20Byeong-su_default.avif" style="width:272.3px;left:-76.9px;top:-9.5px"></span><b>윤병수</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Kim%20Seong-jin_default.avif" style="width:272.3px;left:-71.3px;top:-1.6px"></span><b>김성진</b></div><div class="bc"><span class="face" style="width:108px;height:128px"><img src="file:///home/user/goei-plugin/assets/agents/Song%20Jin-seob_default.avif" style="width:272.3px;left:-80.5px;top:-4.6px"></span><b>송진섭</b></div></div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:6px 6% 40px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“대대로 막내가 햄스터 담당이라는 영광스러운 임무를 맡아 부장님의 햄스터를 길러 왔습니다. 그리고 이제 제가 그걸 너에게 물려준다!”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">송주익 — 햄스터 계승식, 목이 멘 채로</div></div><div style="margin:0 0 14px 0;"><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">가짜 관리국 · 자칭</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">관리국 <span style="text-decoration:line-through;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">본인들 기준 진짜</span></div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">표어</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">"우리는 세계의 이면에서 인류를 섬긴다"</div></div></div></div></div>
+
+<section class="plate" data-name="jaheon" style="height:1380px">
+  <div class="kicker abs" style="left:54px;top:70px;right:54px">백일몽 주식회사 <em>현장탐사팀 D조</em></div>
+  <div class="ye" style="left:24px;top:130px">예.</div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Lee%20Ja-heon_default.avif" style="height:1220px;left:330px;top:190px;">
+  <div class="col" style="left:56px;top:760px;width:300px">
+  <div class="cap gray">이자헌<br>대답의 70퍼센트</div>
+  <div class="mini" style="margin-top:60px">
+    <div><span>가면</span>도마뱀</div>
+    <div><span>장비</span>특제 버터나이프</div>
+    <div><span>말투</span>누구에게나 하십시오체</div>
+  </div></div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:34px 6% 40px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“회사가 좋아서 다니는 사람 없어. 여기 아니면 못 구하는 게 있어서 다니는 거지. 그리고 그걸 회사도 알아.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">어느 현장탐사팀 대리</div></div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;font-weight:700;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin:0 0 14px 0;">백일몽 주식회사</div><div style="margin:0 0 14px 0;"><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">실제 상품</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">꿈결 (괴담 생존 경험을 액체로 만든 것)</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">입사 시험</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">괴담에 들어갔다 살아 나오기</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">퇴사</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">부서에 따라 불가능 <span style="text-decoration:line-through;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">평생직장 실현</span></div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #d9d5cc;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">복지</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">복지몰 포인트</div></div></div></div></div>
+
+<section class="plate" data-name="daydream-masks" style="padding:30px 54px 80px">
+  <div class="glabel"><b>현장탐사팀</b> 가면</div>
+  <div class="mgrid"><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Baek%20Seok-ju_default.avif" style="width:302.1px;left:-93.0px;top:5.4px"></span><b>백석주</b><i>금빛<br>청둥오리</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Jin%20Na-sol_default.avif" style="width:302.1px;left:-89.3px;top:10.9px"></span><b>진나솔</b><i>금빛<br>나비</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Seong-hae_default.avif" style="width:302.1px;left:-82.8px;top:3.3px"></span><b>이성해</b><i>금빛<br>돌고래</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Ja-heon_default.avif" style="width:302.1px;left:-74.8px;top:9.8px"></span><b>이자헌</b><i>도마뱀</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Eun%20Ha-je_default.avif" style="width:302.1px;left:-82.1px;top:9.4px"></span><b>은하제</b><i>송골매</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Park%20Min-seong_default.avif" style="width:302.1px;left:-80.6px;top:5.8px"></span><b>박민성</b><i>오소리</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Baek%20Sa-heon_default.avif" style="width:302.1px;left:-81.3px;top:6.9px"></span><b>백사헌</b><i>염소</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Go%20Young-eun_default.avif" style="width:302.1px;left:-87.5px;top:2.2px"></span><b>고영은</b><i>산양</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Kang%20I-hak_default.avif" style="width:302.1px;left:-83.5px;top:4.4px"></span><b>강이학</b><i>조랑말</i></div><div class="mc"><span class="face" style="width:138px;height:160px"><img src="file:///home/user/goei-plugin/assets/agents/Jang%20Heo-un_default.avif" style="width:302.1px;left:-55.2px;top:1.8px"></span><b>장허운</b><i>소</i></div></div>
+  <div class="sgrid"><div class="sc"><span class="face" style="width:112px;height:132px"><img src="file:///home/user/goei-plugin/assets/agents/Cheong%20Dal-lae_default.avif" style="width:282.4px;left:-96.0px;top:4.1px"></span><div><b>청달래</b><i>개발본부<br>임원</i></div></div><div class="sc"><span class="face" style="width:112px;height:132px"><img src="file:///home/user/goei-plugin/assets/agents/Ho%20Yu-won_default.avif" style="width:282.4px;left:-82.8px;top:6.1px"></span><div><b>호유원</b><i></i></div></div><div class="sc"><span class="face" style="width:112px;height:132px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Byeong-jin_default.avif" style="width:282.4px;left:-89.3px;top:4.4px"></span><div><b>이병진</b><i>행정지원</i></div></div><div class="sc"><span class="face" style="width:112px;height:132px"><img src="file:///home/user/goei-plugin/assets/agents/Kwak%20Je-gang_default.avif" style="width:282.4px;left:-66.9px;top:7.5px"></span><div><b>곽제강</b><i>연구1팀</i></div></div><div class="sc"><span class="face" style="width:112px;height:132px"><img src="file:///home/user/goei-plugin/assets/agents/Lee%20Yeon-hwa_default.avif" style="width:282.4px;left:-91.3px;top:3.4px"></span><div><b>이연화</b><i>연구1팀</i></div></div><div class="sc"><span class="face" style="width:112px;height:132px"><img src="file:///home/user/goei-plugin/assets/agents/Jay_default.avif" style="width:282.4px;left:-62.1px;top:4.4px"></span><div><b>제이</b><i>보안관리부</i></div></div></div>
+  <div class="mini wide" style="position:static;margin-top:40px">
+    <div><span>이병진 · 가면</span>없음, 사무직이라서</div>
+    <div><span>곽제강 · 가면</span>안 씀 (연구직)</div>
+  </div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:6px 6% 40px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“이 부서는 다들 1년쯤 되면 주임 달아. 너도 곧 달 거야. 그 전에 죽을 수도 있지만.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">박민성, 해맑게</div></div><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“도넛을 좋아하는데… 회사까지 배달해 주는 데가 없고… 낮에는 나갈 수가 없어서……”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">제이 — 좋아하는 것을 묻자</div></div></div></div>
+
+<section class="plate" data-name="residents" style="height:1010px">
+  <div class="pic" style="width:640px;height:860px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Factions/Residents%20of%20the%20Hidden%20World.avif');background-position:42% 50%;position:absolute;right:0;top:70px"></div>
+  <div class="vert" style="left:50px;top:70px">이면의 주민들</div>
+  <div class="cap" style="left:54px;top:800px;width:160px"><b>13명</b></div>
+  <div class="cap gray" style="left:54px;top:846px;width:160px">그 인물로<br>시작하는<br>첫 장면</div>
+</section>
+<section class="plate" data-name="jungnim" style="height:1450px">
+  <div class="cap" style="left:54px;top:60px"><b>중림 지하상가</b> <span class="gray">헐값매입</span></div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Ma%20Deok-hee_default.avif" style="height:760px;left:420px;top:130px;">
+  <div class="eighty" style="left:40px;top:150px">80.</div>
+  <div class="col" style="left:54px;top:450px;width:400px">
+  <div class="midq" style="font-size:46px">“80. 얘기 끝났어요.<br>쟁반 열렸습니다.”</div>
+  <div class="cap gray" style="margin-top:22px">마덕희 — 흥정 종료 선언</div></div>
+  <div style="position:absolute;left:0;right:0;top:780px;height:670px;background:#f5f3ee;padding:0 54px">
+    <div class="rule" style="position:static"></div>
+    <div class="jrow"><div class="jc"><span class="face" style="width:150px;height:176px"><img src="file:///home/user/goei-plugin/assets/agents/Go%20Yeon-ji_default.avif" style="width:328.4px;left:-95.5px;top:4.3px"></span></div><div class="jc"><span class="face" style="width:150px;height:176px"><img src="file:///home/user/goei-plugin/assets/agents/Yun%20Ji-a_default.avif" style="width:328.4px;left:-84.1px;top:5.9px"></span></div><div class="jc"><span class="face" style="width:150px;height:176px"><img src="file:///home/user/goei-plugin/assets/agents/Ma%20Deok-hee_default.avif" style="width:328.4px;left:-90.0px;top:4.7px"></span></div><div class="jc"><span class="face" style="width:150px;height:176px"><img src="file:///home/user/goei-plugin/assets/agents/Mun%20Hye-ran_default.avif" style="width:328.4px;left:-92.4px;top:4.3px"></span></div><div class="jc"><span class="face" style="width:150px;height:176px"><img src="file:///home/user/goei-plugin/assets/agents/Shin%20Yuri_default.avif" style="width:328.4px;left:-97.9px;top:6.3px"></span></div></div>
+    <div class="jlist"><div><span>고연지</span><b>선불입니다</b></div><div><span>윤지아</span><b>야간 접수</b></div><div><span>마덕희</span><b>도금이에요, 자기야</b></div><div><span>문혜란</span><b>사인 먼저, 밥은 나중에</b></div><div><span>신유리</span><b>십. 퍼센트. 매주.</b></div></div>
+  </div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:6px 6% 40px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“병원에는 심사위원회가 있죠. 저한테는 가격표가 있고요.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">고연지 — 윤리에 관한 질문에</div></div><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">“협회는 우리를 보호하지 않는다. 협회는 협회를 보호한다.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:8px;">프리랜서 커뮤니티의 오래된 격언</div></div></div></div>
+
+<section class="plate" data-name="association" style="height:1400px">
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Cha%20Yeo-jin_default.avif" style="height:900px;left:-62px;top:60px;"><img class="fig" src="file:///home/user/goei-plugin/assets/agents/Seo%20Yun-ji_default.avif" style="height:860px;left:253px;top:110px;">
+  <div style="position:absolute;left:0;right:0;top:800px;bottom:0;background:#f5f3ee"></div>
+  <div class="rule" style="left:54px;right:54px;top:800px"></div>
+  <div class="cap" style="left:54px;top:816px;right:54px"><b>특수재난대응협회</b> <span class="gray">의뢰조정실</span></div>
+  <div class="pcol" style="left:54px;top:900px;width:356px"><b>차여진</b><p>“위험 등급? 그거 서류상 부풀린 거야. 점심 전에 끝나, 진짜로.”</p><i>위험 등급을 묻는 신입에게</i><u><span>첫 장면</span>특별한 의뢰</u></div>
+  <div class="pcol" style="left:450px;top:900px;width:356px"><b>서윤지</b><p>“재량은 오류가 기록에 들어오는 경로입니다.”</p><i>재량을 쓰라는 지시에</i><u><span>첫 장면</span>녹음기</u></div>
+</section>
+<section class="plate" data-name="aestheticism" style="height:1500px">
+  <div style="position:absolute;right:0;top:0"><span class="face" style="width:470px;height:600px"><img src="file:///home/user/goei-plugin/assets/agents/Aestheticism_default.avif" style="width:752.0px;left:-108.5px;top:34.3px"></span></div>
+  <div class="cap" style="left:54px;top:70px;width:330px"><b>탐미주의</b><br><span class="gray">없음. 혼자서 하나의 세력</span></div>
+  <div class="cap gray" style="left:54px;top:420px;width:330px">관리국 공식 대응 지침</div>
+  <div class="run" style="left:28px;top:470px">도망쳐라</div>
+  <p class="midq" style="left:54px;top:770px;width:752px;font-size:42px;line-height:1.56">하나, 도망쳐라. 갈 수 있는 한 멀리.<br>둘, 도망칠 수 없다면 거리를 유지하고 광기에 몸을 맡겨라.<br>셋, 그래도 길이 보이지 않는다면 죽음보다 끔찍한 결말이 영원히 기다릴 것이다.<br>넷, 그것보다 먼저 죽어라.<br>도움이 되지 못해 미안하다.</p>
+  <div class="mini wide" style="left:54px;top:1290px;width:752px">
+    <div><span>화구</span><em>사람 <s>재료비는 안 든다</s></em></div>
+    <div><span>첫 장면</span>넌 내 최고의 작품이야</div>
+  </div>
+</section>
+<section class="plate" data-name="brownie" style="height:1450px">
+  <div class="bigq" style="left:54px;top:60px;width:780px;font-size:80px">“제가 맞혀 볼게요.<br>…정답!”</div>
+  <div class="cap gray" style="left:58px;top:270px;width:700px">브라우니 — 출연자가 아직 아무 말도 안 했을 때</div>
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Brownie_default.avif" style="height:1040px;left:12px;top:350px;">
+  <div class="pic" style="width:200px;height:200px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Tuesday%20Quiz%20Show.avif');background-position:50% 50%;position:absolute;right:54px;top:420px"></div>
+  <div style="position:absolute;left:0;right:0;top:1170px;bottom:0;background:#f5f3ee"></div>
+  <div class="mini wide" style="left:54px;top:1170px;width:752px">
+    <div><span>소속</span><em>없음, 독립 괴이</em></div>
+    <div><span>호칭</span><em>모두 "친구"</em></div>
+    <div><span>첫 장면</span><em>화요일의 즐거움, 화요일의 열기</em></div>
+  </div>
+</section>
+<section class="plate" data-name="solos" style="height:1830px"><div class="solo" style="left:54px;top:70px"><span class="face" style="width:358px;height:430px"><img src="file:///home/user/goei-plugin/assets/agents/Blaret_default.avif" style="width:465.4px;left:-53.7px;top:12.9px"></span><div class="srule"></div><b>블라렛</b><i>교황청</i><p>“어때요? 그 이슬람 같은 거 그만두고 우리 쪽으로 개종하는 거.”</p><u><span>첫 장면</span>이교도와 수녀</u></div><div class="solo" style="left:448px;top:250px"><span class="face" style="width:358px;height:430px"><img src="file:///home/user/goei-plugin/assets/agents/Saladin_default.avif" style="width:465.4px;left:-67.7px;top:9.5px"></span><div class="srule"></div><b>살라딘</b><i>이슬람 성전 십자군</i><p>“형제여! 이교도의 말에 귀를 기울이지 마시오!”</p><u><span>첫 장면</span>여기서 불타리라</u></div><div class="solo" style="left:54px;top:880px"><span class="face" style="width:358px;height:430px"><img src="file:///home/user/goei-plugin/assets/agents/Avensha_default.avif" style="width:465.4px;left:-57.1px;top:13.4px"></span><div class="srule"></div><b>아벤샤</b><i>발푸르기스 협회, 십마녀</i><p>“이번 산책에서는 심장을 꽤 많이 얻을 수 있었어요.”</p><u><span>첫 장면</span>마녀의 산책</u></div><div class="solo" style="left:448px;top:1060px"><span class="face" style="width:358px;height:290px"><img src="file:///home/user/goei-plugin/assets/agents/Secriem_default.avif" style="width:465.4px;left:-52.6px;top:10.6px"></span><div class="srule"></div><b>세크리엠</b><i>흡혈귀, 진조 혈통</i><p>“저기요? 저 여기 갇힌 것 같은데, 이것 좀 열어 주실래요?”</p><u><span>첫 장면</span>갇힌 여자</u></div></section>
+<section class="plate dk" data-name="abyss" style="height:1390px">
+  <div class="kicker abs" style="left:54px;top:90px;right:54px">괴이 <em>63곳</em></div>
+  <div class="pic" style="width:470px;height:1100px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Abyss%20Transit%20Authority.avif');background-position:38% 50%;position:absolute;left:0;top:190px"></div>
+  <div class="midq" style="left:520px;top:190px;width:300px;font-size:50px;line-height:1.36">“이번 역은,<br>슬픔,<br>슬픔역입니다. 내리실 문은<br>오른쪽입니다.”</div>
+  <div class="cap gray" style="left:522px;top:700px;width:290px">심연교통공사 열차 안내 방송</div>
+  <div class="mini" style="left:522px;top:850px;width:290px">
+    <div><span>탑승 방법</span>졸면 된다<br><s>수도권 시민 대부분 해당</s></div>
+    <div><span>노선도</span>없다</div>
+    <div><span>정차역</span>슬픔, 원한, 황홀, 분노, 증오…</div>
+  </div>
+</section>
+<section class="plate dk" data-name="monkey" style="height:900px">
+  <div class="pic" style="width:380px;height:760px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Monkey%20Dream.avif');background-position:62% 50%;position:absolute;right:0;top:0"></div>
+  <div class="midq" style="left:54px;top:70px;width:390px;font-size:46px;line-height:1.42">“지금부터 역내 고객 여러분을 도려내기 시작하겠습니다. 이용에 불편을 드려 죄송합니다.”</div>
+  <div class="cap gray" style="left:54px;top:500px;width:380px">원숭이 꿈 괴담<br>차장의 안내 방송</div>
+  <div class="mini wide" style="left:54px;top:790px;width:752px">
+    <div><span>다음 역</span><em>도려내기 역 <s>정차하지 마세요</s></em></div>
+  </div>
+</section>
+<section class="plate dk" data-name="plates" style="height:1640px">
+  <div class="pic" style="width:520px;height:520px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Lookymart.avif');background-position:50% 50%;position:absolute;left:0px;top:60px"></div><div class="pcap" style="left:54px;top:594px;width:600px"><b>룩키마트</b><span>층수</span> 지하 1층, 지상 3층, 없는 4층</div>
+  <div class="pic" style="width:200px;height:200px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Dimensional%20Elevator.avif');background-position:50% 50%;position:absolute;left:606px;top:60px"></div><div class="pcap" style="left:556px;top:276px;width:250px"><b>차원 승강기</b><span>층수</span> 세다가 포기함</div>
+  <div class="pic" style="width:300px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Myeongil%20Apartment.avif');background-position:50% 50%;position:absolute;left:506px;top:780px"></div><div class="pcap" style="left:506px;top:1094px;width:310px"><b>명일 아파트</b><span>엘리베이터</span> 있음, 버튼이 가끔 하나 많음</div>
+  <div class="pic" style="width:210px;height:210px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Cheongak%20Mary%20Hospital.avif');background-position:50% 50%;position:absolute;left:54px;top:900px"></div><div class="pcap" style="left:54px;top:1124px;width:330px"><b>청악메리병원</b><span>퇴사</span> <s>사례 없음</s></div>
+  <div class="pic" style="width:300px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Tuesday%20Quiz%20Show.avif');background-position:50% 50%;position:absolute;left:54px;top:1270px"></div><div class="pcap" style="left:390px;top:1270px;width:400px"><b>화요퀴즈쇼</b><span>방청객</span> 보이지 않는데 엄청 시끄럽다</div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#141312,#141312);color:#f5f3ee;padding:10px 6% 30px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">“이거 보는 사람 있으면 우리 엄마한테 나 우유 사러 나왔다가 늦는 거라고 전해 줘. 아직 늦는 중이라고.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#a8a299;margin-top:8px;">룩키마트 — 영수증 뒷면 메모. 날짜 칸은 이십 년 전이었다</div></div><div style="margin:0 0 26px 0;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:19px;line-height:1.55;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">“띵. 1층입니다. 문이 열립니다.”</div><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.5;color:#a8a299;margin-top:8px;">차원 승강기의 첫 안내 방송. 생환자들은 이 "띵" 소리가 평생 귀에 남는다고 한다</div></div></div></div>
+
+<section class="plate dk" data-name="jokes">
+  <div class="pic" style="width:860px;height:380px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/The%20Riverside.avif');background-position:50% 62%;"></div>
+  <div style="padding:30px 54px 0"><div class="joke "><span>강변 · <span style="display:inline;white-space:nowrap">위치</span></span><b>서울을 가로지르는 그 강</b><s>한강이라고 하면 서울시가 싫어한다</s></div></div>
+  <div style="display:flex;margin-top:110px;align-items:flex-end">
+    <div class="pic" style="width:330px;height:440px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Mystery%20World%20Adventure%20Park.avif');background-position:30% 50%;"></div>
+    <div style="flex:1;padding:0 54px 0 36px"><div class="joke big"><span>미스테리 월드 어드벤쳐 파크 · <span style="display:inline;white-space:nowrap">입장 방법</span></span><b>정문에서 표를 산다</b><s>그게 제일 무섭다</s></div></div>
+  </div>
+  <div style="display:flex;margin-top:110px;padding:0 0 90px 54px;align-items:flex-start">
+    <div style="flex:1;padding-right:30px"><div class="joke huge2"><span>영원마을 · <span style="display:inline;white-space:nowrap">화폐</span></span><b>구리 > 은 > 금</b><s>거꾸로 된 거 맞다</s></div></div>
+    <div class="pic" style="width:260px;height:340px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Yeongwon%20Village.avif');background-position:50% 50%;"></div>
+  </div>
+</section>
+<section class="plate dk" data-name="mosaic-a" style="padding:0 0 70px">
+  <div class="pic" style="width:860px;height:400px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Samangdan.avif');background-position:50% 58%;"></div>
+  <div class="wcap"><b>사망단길</b><em>결제 수단</em> 기억, 감각, 신체, 사람 등 <s style="white-space:nowrap">카드 안 받음</s></div>
+  <div class="trow" style="margin-top:70px">
+    <div class="tile" style="width:240px"><div class="pic" style="width:240px;height:240px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Jogyesa.avif');background-position:50% 50%;"></div><b>조계사</b><i><em>이용 후기</em> 소원은 이루어진다. 그게 문제다</i></div>
+    <div class="tile" style="width:240px"><div class="pic" style="width:240px;height:240px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Forbidden%20Video.avif');background-position:50% 50%;"></div><b>금지된 비디오</b><i><em>러닝타임</em> 끝까지 본 사람이 없음</i></div>
+    <div class="tile" style="width:240px"><div class="pic" style="width:240px;height:240px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Hanseol%20Human%20Meat%20Factory.avif');background-position:50% 50%;"></div><b>한설인육공장</b><i><em>입구</em> 정육점</i></div>
+  </div>
+  <div class="trow" style="margin-top:70px">
+    <div class="tile" style="width:300px"><div class="pic" style="width:300px;height:420px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Fearble%20Theater.avif');background-position:30% 50%;"></div><b>피어블 극장</b><i><em>주 관객층</em> 키 2미터 이상의 주민들</i></div>
+    <div class="tile" style="width:436px"><div class="pic" style="width:436px;height:420px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Flower%20Golden%20Resort.avif');background-position:50% 50%;"></div><b>플라워 골든 리조트</b><i><em>퇴실</em> 어렵다</i></div>
+  </div>
+</section>
+<section class="plate dk" data-name="mosaic-b" style="padding:20px 0 80px">
+  <div class="wcap" style="margin-bottom:22px"><b>세광 순환선</b><em>부역명</em></div>
+  <div style="display:flex"><div class="stn"><div class="pic" style="width:215px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Midnight%20Station.avif');background-position:50% 50%;"></div><b>자정역</b><i>신체 카지노</i></div><div class="stn"><div class="pic" style="width:215px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Dusk%20Station.avif');background-position:50% 50%;"></div><b>황혼역</b><i>양심판매대</i></div><div class="stn"><div class="pic" style="width:215px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Morning%20Station.avif');background-position:50% 50%;"></div><b>아침역</b><i>저울 재판소</i></div><div class="stn"><div class="pic" style="width:215px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Midday%20Station.avif');background-position:50% 50%;"></div><b>한낮역</b><i>낮잠용 쉼터</i></div></div>
+  <div class="trow" style="margin-top:90px;align-items:flex-end">
+    <div class="tile" style="width:470px"><div class="pic" style="width:470px;height:330px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Hungry%20Hangman.avif');background-position:50% 40%;"></div><b>헝그리 행맨</b><i><em>원아</em> 한 명도 안 온다</i></div>
+    <div class="tile" style="width:266px"><div class="pic" style="width:266px;height:266px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Living%20Orphanage.avif');background-position:50% 50%;"></div><b>살아있는 보육원</b><i><em>조명</em> 벽등 (원래 사람)</i></div>
+  </div>
+  <div class="trow" style="margin-top:70px">
+    <div class="tile" style="width:240px"><div class="pic" style="width:240px;height:240px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Frost%20Waterpark.avif');background-position:50% 50%;"></div><b>프러스트 워터파크</b></div>
+    <div class="tile" style="width:240px"><div class="pic" style="width:240px;height:240px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Sotos%20Department%20Store.avif');background-position:50% 50%;"></div><b>소토스 백화점</b></div>
+    <div class="tile" style="width:240px"><div class="pic" style="width:240px;height:240px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Fairytale%20Park.avif');background-position:50% 50%;"></div><b>페어리테일 파크</b></div>
+  </div>
+  <div style="margin-top:90px"><div class="pic" style="width:860px;height:300px;background-image:url('file:///home/user/goei-plugin/assets/wiki/Anomalies/Segwang%20Special%20City.avif');background-position:50% 40%;"></div></div>
+  <div class="wcap"><b>세광특별시</b><em>인구</em> 재난 이전 수십만,<br>현재 약 25명 + 기타 <s style="white-space:nowrap">기타가 더 많다</s></div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#141312,#141312);color:#f5f3ee;padding:10px 6% 50px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;font-weight:700;color:#f5f3ee;margin:0 0 14px 0;">괴이위키 정보상자에서</div><div style="margin:0 0 14px 0;"><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">인류의 신비전 · 관람료</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">있음 <span style="text-decoration:line-through;color:#a8a299;">본인이 내는 건 아님</span></div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">샛별 고시원 · 방 크기</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">2~3평 <span style="text-decoration:line-through;color:#a8a299;">관 하나 크기</span></div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">한밤역 · 입장료</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">무료 <span style="text-decoration:line-through;color:#a8a299;">진짜다, 그래서 더 무섭다</span></div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">코즈믹 판타지 동물원 · 전시 동물</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">원숭이, 말, 사자, 표범, 판다 <span style="text-decoration:line-through;color:#a8a299;">판다 귀엽겠다는 생각은 접어 두자</span></div></div></div></div></div>
+
+<section class="plate dk" data-name="screen-talk" style="padding:90px 0 0">
+  <div class="kicker" style="margin:0 54px">화면 <em>실제 캡처</em></div>
+  <div class="slab" style="margin:50px 54px 40px"><b>괴담톡</b><span>연락처 · 대화 · 공지 · 전화 · 단톡</span></div>
+  <div class="shot" style="width:860px;height:1136px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/promo/phone-play-04-phone.png');background-size:860.0px auto;background-position:0.0px -143.3px;"></div>
+</section>
+<section class="plate dk" data-name="screen-hs" style="padding:110px 0 0">
+  <div class="slab" style="margin:0 54px 40px"><b>망상홈쇼핑</b><span>인터넷 · 생방송</span></div>
+  <div class="shot" style="width:860px;height:904px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/s-hs/phone_2_%EC%A7%84%ED%96%89%EC%9E%90.png');background-size:860.0px auto;background-position:0.0px -333.0px;"></div>
+</section>
+<section class="plate dk" data-name="screen-map" style="padding:110px 0 0">
+  <div style="display:flex;align-items:flex-end">
+    <div class="shot" style="width:500px;height:392px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/promo/phone-play-03-map.png');background-size:524.2px auto;background-position:-12.1px -169.4px;"></div>
+    <div class="slab" style="margin:0 54px 0 36px"><b>임무</b><span>지도에서 장소를 골라 요원 넷을 편성해 출동 · 커스텀 임무</span></div>
+  </div>
+  <div class="slab" style="margin:120px 54px 40px"><b>기록</b><span>일지 · 연대기 · 인물 · 세력</span></div>
+  <div class="shot" style="width:860px;height:939px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/s-chron/phone_%EC%97%B0%EB%8C%80%EA%B8%B0.png');background-size:860.0px auto;background-position:0.0px -262.4px;"></div>
+</section>
+<section class="plate dk" data-name="screen-net" style="padding:110px 0 90px">
+  <div class="slab" style="margin:0 54px 40px"><b>인터넷</b><span>괴담넷 · 괴담 갤러리 · 세정게 · 연어 마켓 · 우주 쇼핑몰 · 괴이위키 · 백일몽 포인트몰 · 망상홈쇼핑</span></div>
+  <div class="shot" style="width:860px;height:211px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/s-malls/pc-01-cos.png');background-size:1249.5px auto;background-position:-306.5px -212.8px;"></div>
+  <div class="scap">우주 쇼핑몰</div>
+  <div class="shot" style="width:860px;height:129px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/s-boards/pc-08-wpf.png');background-size:1255.2px auto;background-position:-308.9px -213.8px;margin-top:70px"></div>
+  <div class="scap">세계정치 게시판</div>
+  <div style="display:flex;align-items:flex-end;margin-top:70px">
+    <div class="shot" style="width:470px;height:627px;background-image:url('file:///home/user/goei-plugin/.scratch/arca/kit/screens/s-wiki/phone-05-doc.png');background-size:470.0px auto;background-position:0.0px -265.1px;"></div>
+    <div class="slab" style="flex:1;margin:0 54px 0 36px"><b style="font-size:72px">괴이위키</b><span>문서 143개</span></div>
+  </div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#141312,#141312);color:#f5f3ee;padding:40px 6% 50px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="margin:0 0 14px 0;"><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">상황판</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">요원 화면 · 지금 벌어진 괴이 / 사건 / 특수 상황</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">소지품</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">무기 2칸 · 장비 4칸 장착 · 가계부</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">그림</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">인물당 표정 41종</div></div><div style="display:inline-block;width:46%;min-width:236px;vertical-align:top;margin:0 3% 16px 0;border-top:1px solid #3a3835;padding-top:8px;"><div style="font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:14px;line-height:1.4;color:#a8a299;">언어</div><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;line-height:1.5;font-weight:700;letter-spacing:-0.03em;color:#f5f3ee;">한국어 · English</div></div></div></div></div>
+
+<section class="plate" data-name="closing" style="height:1120px">
+  <img class="fig" src="file:///home/user/goei-plugin/assets/agents/Jaemtri_default.avif" style="height:1080px;left:330px;top:90px;">
+  <div class="bigq" style="left:54px;top:150px;width:420px;font-size:92px">“어머,<br>후배,<br>왔어?”</div>
+  <div class="cap gray" style="left:58px;top:620px;width:300px">잼트리<br>사무실 문간에서, 매일</div>
+</section>
+<div class="arca"><div style="background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);color:#141312;padding:10px 6% 60px;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;word-break:keep-all;"><div style="border-top:1px solid #141312;padding-top:26px;"><div style="font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:28px;line-height:1.3;font-weight:900;letter-spacing:-0.03em;color:#141312;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);">괴이 ː ANOMALY</div><div style="font-size:14px;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin:6px 0 22px 0;">RisuAI용 괴담 시뮬레이션 봇 · 인물 55명 · 괴이 63곳 · 조직 17곳 · 특수 장소 11곳</div><a href="https://github.com/leepc25/goei-plugin/releases/latest" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><span style="display:inline-block;padding:15px 44px;background:linear-gradient(180deg,#141312,#141312);border:1px solid #141312;color:#f5f3ee;font-family:'Noto Serif KR','Nanum Myeongjo','AppleMyungjo','Batang',serif;font-size:17px;font-weight:700;">받기</span></a><div style="font-size:14px;color:#5f5b55;background:linear-gradient(180deg,#f5f3ee,#f5f3ee);background-color:rgba(0,0,0,0.004);margin-top:14px;word-break:break-all;">github.com/leepc25/goei-plugin/releases/latest</div></div></div></div>
+
+</body></html>
