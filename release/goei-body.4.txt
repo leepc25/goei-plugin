@@ -1,4 +1,38 @@
- === null || seen4.has(pid)) continue;
+n3 === "number" && Number.isInteger(n3) ? n3 : null;
+  };
+  var ATTACH_LABEL = /\[ATTACHMENT A\d+\]/g;
+  function attachSwap(text5, mark2) {
+    let s8 = String(text5 ?? "");
+    for (const r of attachmentRecords(s8).reverse()) s8 = s8.slice(0, r.start) + mark2 + s8.slice(r.end);
+    return s8.replace(ATTACH_LABEL, mark2).split("[지원하지 않는 첨부]").join(mark2).trim();
+  }
+  var attachShape = (text5) => attachSwap(text5, "");
+  var attachText = (text5) => attachSwap(text5, "").trim();
+  function applyBoard(before, current5, value, o) {
+    if (snapshotKey(before) !== snapshotKey(current5)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
+    if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
+    const rows3 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
+    if (!Array.isArray(rows3) || !rows3.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
+    const st = structuredClone(current5);
+    const old = new Map(st.posts.map((p2) => [p2.id, p2]));
+    const posts = [];
+    const seen4 = /* @__PURE__ */ new Set();
+    let skippedPosts = 0;
+    let skippedComments = 0;
+    let commentTotal = 0;
+    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
+    const floor = Math.max(1e5, current5.seq);
+    for (const raw of rows3) {
+      if (!isObj(raw)) continue;
+      let pid = int(raw.id);
+      const prev = pid !== null ? old.get(pid) : void 0;
+      const author = str2(raw.author).trim();
+      if (!prev && (raw.mine === true || author === o.nick)) {
+        skippedPosts++;
+        continue;
+      }
+      if (!prev && (pid === null || pid <= floor || seen4.has(pid))) pid = Math.max(st.seq, floor) + 1;
+      if (pid === null || seen4.has(pid)) continue;
       seen4.add(pid);
       st.seq = Math.max(st.seq, pid);
       const comments = Array.isArray(raw.comments) ? raw.comments : [];
@@ -1032,8 +1066,8 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
     for (const e of events) {
       if (e.type === "message") {
         let last2;
-        for (const rec2 of splitRecords(stripForged(e.text))) {
-          last2 = push(st, r, e.sender, rec2, time2);
+        for (const rec3 of splitRecords(stripForged(e.text))) {
+          last2 = push(st, r, e.sender, rec3, time2);
           count2++;
         }
         const rx = last2 && e.reactions ? clampReactions(e.reactions, reactionCap(last2)) : "";
@@ -1122,13 +1156,13 @@ ${JSON.stringify({ feature: "gnet", ...site ? { site } : {}, records })}
   function commitAnnouncements(b, st, rows3, packet, time2) {
     let added = 0;
     for (const row8 of rows3) {
-      const rec2 = { channel: packet.channel, title: row8.title.trim(), text: row8.text.trim() };
-      const sig = signature(rec2);
+      const rec3 = { channel: packet.channel, title: row8.title.trim(), text: row8.text.trim() };
+      const sig = signature(rec3);
       if (b.seen[sig]) continue;
       b.seen[sig] = true;
       b.seq += 1;
       st.mid += 1;
-      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row8.issuer.trim(), category: row8.category, title: rec2.title, text: rec2.text, time: time2 });
+      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row8.issuer.trim(), category: row8.category, title: rec3.title, text: rec3.text, time: time2 });
       added++;
     }
     if (added && packet.allowed) b.lastIssuedTurns = { ...b.lastIssuedTurns ?? {}, [packet.channel]: packet.turn };
@@ -1316,9 +1350,9 @@ ${body5}
   }
   function agentStatus(chat, agentId) {
     if (!agentId) return void 0;
-    const rec2 = readWorld(chat).agents[agentId];
-    if (!rec2) return void 0;
-    return { state: rec2.st, situation: rec2.situation, since: rec2.since === null ? "" : String(rec2.since) };
+    const rec3 = readWorld(chat).agents[agentId];
+    if (!rec3) return void 0;
+    return { state: rec3.st, situation: rec3.situation, since: rec3.since === null ? "" : String(rec3.since) };
   }
   function phoneTime(chat) {
     return dateNow(chat);
@@ -1831,11 +1865,11 @@ ${body5}
 
   // src/core/thoughts.ts
   function stripThoughts(text5) {
-    const t = text5.replace(/<Thoughts>[\s\S]*?<\/Thoughts>\s*/gi, "");
-    return /^\s*<Thoughts>/i.test(t) ? "" : t;
+    const t = text5.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>\s*/gi, "");
+    return /^\s*<(?:thoughts|think)\b[^>]*>/i.test(t) ? "" : t;
   }
   function splitThoughts(text5) {
-    const m = /^\s*<Thoughts>[\s\S]*?<\/Thoughts>\s*/i.exec(text5);
+    const m = /^\s*(?:<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>\s*)+/i.exec(text5);
     return m ? { head: m[0], body: text5.slice(m[0].length) } : { head: "", body: text5 };
   }
 
@@ -2248,11 +2282,11 @@ ${c}`)]).join("\n\n");
     return out;
   }
   function readSexual(raw) {
-    const rec2 = (v) => {
+    const rec3 = (v) => {
       const r = v && typeof v === "object" ? v : {};
       return { text: plain(r.text, SEXUAL_CHARS), at: str3(r.at), ...r.manual ? { manual: true } : {} };
     };
-    return { desire: rec2(raw.desire), paraphilia: rec2(raw.paraphilia), desireOn: raw.desireOn !== false, paraphiliaOn: raw.paraphiliaOn !== false, explicit: raw.explicit === true ? true : raw.explicit === false ? false : null };
+    return { desire: rec3(raw.desire), paraphilia: rec3(raw.paraphilia), desireOn: raw.desireOn !== false, paraphiliaOn: raw.paraphiliaOn !== false, explicit: raw.explicit === true ? true : raw.explicit === false ? false : null };
   }
   function readCandidates(raw) {
     const out = {};
@@ -2278,19 +2312,30 @@ ${c}`)]).join("\n\n");
     return at;
   }
   var norm = (s8) => String(s8 ?? "").replace(/[^\p{L}\p{N}]+/gu, "").toLowerCase();
+  function sentText(raw) {
+    let t = String(raw ?? "");
+    for (const tag of findStatusTags(t)) t = t.replace(tag.raw, "");
+    return messageText(t).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\[\s*shop\s*[:：][^\]]*\]/giu, "");
+  }
   function liveness(chat) {
     const at = anchorPositions(chat);
     const texts = /* @__PURE__ */ new Map();
-    msgs(chat).forEach((m, i) => texts.set(i, norm(messageText(str3(m.data)))));
-    return { at, texts };
+    const sent2 = /* @__PURE__ */ new Map();
+    msgs(chat).forEach((m, i) => {
+      const t = norm(messageText(str3(m.data)));
+      texts.set(i, t);
+      const s8 = norm(sentText(str3(m.data)));
+      if (s8 !== t) sent2.set(i, s8);
+    });
+    return { at, texts, sent: sent2 };
   }
   function isAlive(x, live) {
     if (x.void || x.folded) return false;
     const pos = live.at.get(x.anchor);
     if (pos === void 0) return false;
     if (x.src === "story" && x.quote) {
-      const t = live.texts.get(pos);
-      if (!t || !t.includes(norm(x.quote))) return false;
+      const q = norm(x.quote);
+      if (!live.texts.get(pos)?.includes(q) && !live.sent?.get(pos)?.includes(q)) return false;
     }
     return true;
   }
@@ -2440,30 +2485,11 @@ ${c}`)]).join("\n\n");
     const keep2 = new Set(list4.map((m, i) => messageKey(m, i)));
     for (const k of Object.keys(store3.read)) if (!keep2.has(k)) delete store3.read[k];
   }
-  var LOG_CAP = 800;
-  function foldLog(store3, chat, refold) {
-    const live = liveness(chat);
-    store3.log = store3.log.filter((c) => c.anchor.startsWith("#") || live.at.has(c.anchor));
-    if (store3.log.length <= LOG_CAP) return;
-    const cut3 = msgs(chat).length - 200;
-    if (cut3 <= 0) return;
-    const key = (c) => c.group ?? c.anchor;
-    const pos = (c) => live.at.get(c.anchor) ?? -1;
-    const cues = liveChanges(store3, live).filter((c) => c.kind === "cue");
-    const drop = /* @__PURE__ */ new Set();
-    for (const who of new Set(cues.map((c) => c.who))) {
-      const mine3 = cues.filter((c) => c.who === who);
-      const old = mine3.filter((c) => pos(c) < cut3);
-      if (!old.length || old.some((c) => c.pin !== void 0)) continue;
-      const oldKeys = new Set(old.map(key));
-      if (mine3.some((c) => pos(c) >= cut3 && oldKeys.has(key(c)))) continue;
-      const v = refold(who, old, store3.folded[who] ?? 0);
-      if (v === null || !Number.isFinite(v)) continue;
-      store3.folded[who] = v;
-      for (const c of old) drop.add(c.id);
-      for (const c of store3.log) if (c.who === who && c.kind === "cue" && !isAlive(c, live) && (live.at.get(c.anchor) ?? cut3) < cut3) drop.add(c.id);
-    }
-    if (drop.size) store3.log = store3.log.filter((c) => !drop.has(c.id));
+  function dropGoneChanges(store3, chat) {
+    const at = anchorPositions(chat);
+    const before = store3.log.length;
+    store3.log = store3.log.filter((c) => c.src === "manual" || c.src === "seed" || c.anchor.startsWith("#") || at.has(c.anchor));
+    return before - store3.log.length;
   }
 
   // src/core/journal/mine.ts
@@ -4695,74 +4721,4 @@ ${c}`)]).join("\n\n");
         level: 2,
         register: "존댓말",
         self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      신유리: {
-        level: null,
-        register: "반말",
-        self: "",
-        up: "사장",
-        peer: "너",
-        down: "너",
-        outsider: "너"
-      },
-      에일린: {
-        level: 2,
-        register: "반말",
-        self: "",
-        up: "부장",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      윤병수: {
-        level: 3,
-        register: "반말",
-        self: "",
-        up: "과장님",
-        peer: "대리",
-        down: "너",
-        outsider: "너"
-      },
-      윤지아: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선생님",
-        peer: "사장님",
-        down: "손님",
-        outsider: "손님"
-      },
-      은하제: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "댁"
-      },
-      이기석: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "차장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "손님"
-      },
-      이길환: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "선생님"
-      },
-      이도형: {
-        level: 6,
-   
+        up: "부

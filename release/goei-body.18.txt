@@ -1,4 +1,271 @@
-  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+ .hs-l3 .nm { padding-top: 14px; }
+.hs .hs-l3 .tag { position: absolute; left: -2px; top: -14px; background: var(--hs-red); color: #fff; padding: 3px 6px; border: 2px solid var(--hs-ink); }
+.hs .hs-l3 .n { margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hs .hs-l3 .p2 { white-space: nowrap; overflow: hidden; }
+.hs .hs-l3 .p { color: var(--hs-red); }
+.hs .hs-l3 .ph { flex: none; background: var(--hs-ink); border: 2px solid var(--hs-yel); padding: 6px 8px; box-shadow: 2px 2px 0 #000; text-align: right; }
+.hs .hs-l3 .ph small { display: block; font-size: 16px; color: var(--hs-yel); margin-bottom: 4px; }
+.hs .hs-l3 .ph b { font-size: 32px; line-height: 32px; color: #fff; font-weight: normal; }
+/* 0.5배(폰): 256×192 칸에 줄인 구성 (도트 시안 폰판) */
+.hs .hs-scr.sm .hs-lg { left: 4px; top: 4px; }
+.hs .hs-scr.sm .hs-lg b, .hs .hs-scr.sm .hs-lg i { padding: 2px 4px; }
+.hs .hs-scr.sm .hs-live { right: 4px; top: 4px; padding: 2px 4px 2px 14px; }
+.hs .hs-scr.sm .hs-live::before { left: 4px; top: 6px; width: 4px; height: 4px; }
+.hs .hs-scr.sm .hs-soon { right: 4px; top: 28px; padding: 2px 4px; }
+.hs .hs-scr.sm .hs-left, .hs .hs-scr.sm .hs-l3 .tag, .hs .hs-scr.sm .hs-l3 .p2, .hs .hs-scr.sm .hs-l3 .ph small, .hs .hs-scr.sm .hs-board > .sm { display: none; }
+.hs .hs-scr.sm .hs-call { left: 4px; top: 28px; padding: 2px 4px; }
+.hs .hs-scr.sm .hs-board { gap: 2px; }
+.hs .hs-scr.sm .hs-board span .sm { display: none; }
+.hs .hs-scr.sm .hs-board.hs-bA { left: 88px; top: 64px; width: 82px; height: 44px; }
+.hs .hs-scr.sm .hs-board.hs-bB { right: 4px; top: 50px; width: 82px; height: 44px; }
+.hs .hs-scr.sm .hs-board .big { font-size: 16px; line-height: 16px; }
+.hs .hs-scr.sm .hs-band { padding: 4px; gap: 4px; }
+.hs .hs-scr.sm .hs-band.hs-kB, .hs .hs-scr.sm .hs-band.hs-kD { min-height: 48px; }
+.hs .hs-scr.sm .hs-sub { padding: 2px 4px; max-height: 40px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+.hs .hs-scr.sm .hs-l3 { gap: 4px; }
+.hs .hs-scr.sm .hs-l3 .nm, .hs .hs-scr.sm .hs-band.hs-t .hs-l3 .nm { padding: 4px 6px; }
+.hs .hs-scr.sm .hs-l3 .n { margin: 0; }
+.hs .hs-scr.sm .hs-l3 .ph { padding: 4px 6px; }
+.hs .hs-scr.sm .hs-l3 .ph b { font-size: 16px; line-height: 16px; }
+/* 상품 칸 · 주문 단추 */
+.hs .hs-prod { display: flex; align-items: stretch; gap: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, var(--card2), var(--card)); }
+.hs .hs-prod.none { padding: 16px; }
+.hs .hs-icon { position: relative; flex: none; width: 84px; height: 84px; display: grid; place-items: center; border: 1px solid var(--line2); border-radius: 6px; background: radial-gradient(circle at 50% 35%, #4a1a24, #1a0c0f 75%); overflow: hidden; }
+.hs .hs-icon img { max-width: 72px; max-height: 72px; }
+.hs .hs-icon svg { width: 34px; height: 34px; opacity: .6; }
+.hs .hs-stk { position: absolute; right: 0; top: 0; width: 26px; height: 26px; background: linear-gradient(225deg, #fff3a8 0 50%, var(--y) 50%); clip-path: polygon(0 0, 100% 0, 100% 100%); box-shadow: -2px 2px 3px #0007; }
+.hs .hs-icon:hover .hs-stk { width: 32px; height: 32px; }
+.hs .hs-prod .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.hs .hs-prod .tx small { color: var(--pink); font-weight: 700; font-size: 12px; }
+.hs .hs-prod .tx b { font-size: 19px; font-weight: 800; letter-spacing: -.4px; line-height: 1.25; overflow-wrap: anywhere; }
+.hs .hs-prod .tx p { margin: 2px 0 0; color: var(--sub); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hs .hs-prod .pr { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 120px; padding: 6px 14px; border-radius: 6px; background: linear-gradient(135deg, var(--r1), var(--r2)); }
+.hs .hs-prod .pr small { font-size: 11px; color: #ffd9dd; }
+.hs .hs-prod .pr b { font-size: 21px; font-weight: 900; color: var(--y); letter-spacing: -.5px; white-space: nowrap; text-shadow: 0 2px 0 #5a0613; }
+.hs .hs-ord { display: flex; gap: 8px; }
+.hs .hs-ord button { padding: 11px 16px; border: 1px solid var(--line2); border-radius: 6px; background: var(--card); font-weight: 800; font-size: 14px; white-space: nowrap; text-align: center; }
+.hs .hs-ord button:not(:disabled):hover { background: var(--card2); }
+.hs .hs-ord .call { flex: 1; background: linear-gradient(180deg, #ee2b43, #c8102e); border-color: #ee2b43; color: #fff; font-size: 15.5px; box-shadow: 0 3px 0 #6d0919; }
+.hs .hs-ord .call:not(:disabled):hover { background: linear-gradient(180deg, #ff3b53, #d4142f); }
+.hs .hs-ord .aud { border-color: var(--y); color: var(--y); }
+/* 채팅 */
+.hs .hs-chat { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line2); border-radius: 8px; background: #0e0809; overflow: hidden; }
+.hs .hs-chat h5 { margin: 0; height: 36px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; font-weight: 700; color: #ddd; background: linear-gradient(180deg, #2a1318, #1a0c0f); border-bottom: 1px solid var(--line); }
+.hs .ch-b { flex: 1; min-height: 0; position: relative; }
+.hs .hs-chlog { position: absolute; inset: 0; padding: 8px 12px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #3d1f25 transparent; font-size: 13px; line-height: 1.75; }
+.hs .hs-chlog p { margin: 0; word-break: break-word; }
+.hs .hs-chlog p span { margin-right: 6px; font-weight: 700; color: var(--pink); }
+.hs .hs-chlog p.q { color: #bbb; font-style: italic; }
+.hs .hs-chlog p.q span { color: #999; font-style: normal; }
+.hs .hs-chlog p.host { margin: 3px -6px; padding: 2px 6px; border-left: 3px solid var(--y); background: #ffd4000f; color: #ffe9a6; }
+.hs .hs-chlog p.host span { color: var(--y); }
+.hs .hs-chlog p.me span { color: #8fd3ff; }
+.hs .hs-chlog p.sys { color: var(--sub); font-size: 12px; text-align: center; }
+.hs .hs-chlog p.sys span { display: none; }
+.hs .hs-in { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--line); }
+.hs .hs-in input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 4px; background: #170d10; color: inherit; font: inherit; font-size: 13px; }
+.hs .hs-in input:focus { outline: none; border-color: var(--line2); }
+.hs .hs-in button { flex: none; padding: 0 12px; border-radius: 4px; background: var(--card2); border: 1px solid var(--line2); font-weight: 700; font-size: 13px; }
+/* 편성 */
+.hs .hs-sec { margin-top: 20px; }
+.hs .hs-sec h4 { margin: 0 0 10px; color: var(--tx); display: flex; align-items: baseline; gap: 10px; font-size: 16px; font-weight: 800; }
+.hs .hs-sec h4::before { content: ""; align-self: center; width: 4px; height: 16px; border-radius: 2px; background: var(--r1); }
+.hs .hs-sec h4 small { font-weight: 400; font-size: 12px; color: var(--sub); }
+.hs .hs-sec h5 { margin: 18px 0 8px; font-size: 13.5px; font-weight: 700; color: var(--pink); }
+.hs .hs-lu { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.hs .hs-lu.col { grid-template-columns: 1fr; }
+.hs .hs-lc { position: relative; display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px 8px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); text-align: left; }
+.hs .hs-lc .pic { flex: none; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 5px; background: #2a171b; overflow: hidden; }
+.hs .hs-lc .pic img { max-width: 48px; max-height: 48px; }
+.hs .hs-lc .pic svg { width: 24px; height: 24px; opacity: .5; }
+.hs .hs-lc .pic .q { font: 900 24px ui-monospace, monospace; color: #6a3a42; }
+.hs .hs-lc .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.hs .hs-lc .tx small { color: var(--sub); font-size: 11.5px; }
+.hs .hs-lc .tx b { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs .hs-lc .tx em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--y); }
+.hs .hs-lc .tx i { font-style: normal; margin-top: 2px; font-size: 12.5px; color: var(--sub); white-space: normal; }
+.hs .hs-lu.col .hs-lc .tx b { white-space: normal; }
+.hs .hs-lc .st { flex: none; align-self: flex-start; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line2); font-size: 11px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+.hs .hs-lc .st.on { border-color: #e0263b; background: #e0263b; color: #fff; }
+.hs .hs-lc .st.off { border-color: #55393d; color: #8d7175; }
+.hs .hs-lc.now { border-color: #e0263b; background: linear-gradient(180deg, #34121a, #24161a); box-shadow: 0 0 0 1px #e0263b inset; }
+.hs .hs-lc.past { opacity: .62; }
+.hs .hs-lc.soon .tx b { color: var(--sub); font-weight: 500; }
+.hs .hs-none { margin: 0; padding: 22px 0; text-align: center; color: var(--sub); border: 1px dashed var(--line); border-radius: 8px; }
+.hs .hs-tip { margin: 8px 2px 0; font-size: 12px; color: var(--sub); }
+/* 주문 조회 */
+.hs .hs-audrow { margin-bottom: 4px; padding: 10px 12px; border: 1px solid var(--y); border-radius: 8px; color: var(--y); font-weight: 700; background: #ffd4000d; }
+.hs .hs-audrow b { font: 800 15px ui-monospace, monospace; }
+.hs .hs-ol { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--card); overflow: hidden; }
+.hs .hs-ol li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+.hs .hs-ol li + li { border-top: 1px solid var(--line); }
+.hs .hs-ol .pic { flex: none; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 5px; background: #2a171b; overflow: hidden; }
+.hs .hs-ol .pic img { max-width: 38px; max-height: 38px; }
+.hs .hs-ol .pic svg { width: 20px; height: 20px; opacity: .5; }
+.hs .hs-ol .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.hs .hs-ol .tx b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs .hs-ol .tx small { color: var(--sub); font-size: 12.5px; }
+.hs .hs-ol .bar { flex: none; width: 120px; height: 8px; border-radius: 4px; background: #2a171b; overflow: hidden; }
+.hs .hs-ol .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--r1), var(--y)); }
+.hs .hs-ol .st { flex: none; min-width: 74px; text-align: right; font-size: 12.5px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+.hs .hs-ol .st.on { color: var(--y); }
+.hs .hs-ol li.done { opacity: .55; }
+/* 창: 전화 주문 · 스티커 · 방청 신청 */
+.hs .hs-dim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 16px; }
+.hs .hs-dimx { position: absolute; inset: 0; width: 100%; height: 100%; background: #000a; cursor: default; }
+.hs .hs-pop { position: sticky; top: 60px; bottom: 16px; width: min(400px, 100%); max-height: min(560px, 100%); display: flex; flex-direction: column; border: 1px solid var(--line2); border-radius: 10px; background: var(--card); box-shadow: 0 20px 60px #000c; overflow: hidden; }
+.hs .hs-pop > header { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 6px 0 14px; background: linear-gradient(180deg, var(--r1), var(--r2)); font-size: 15px; }
+.hs .hs-pop > header button { width: 34px; height: 34px; border-radius: 4px; font-size: 15px; color: #fff; text-align: center; }
+.hs .hs-pop .pb { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.hs .hs-pop > footer { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.hs .hs-pop > footer button { flex: 1; padding: 10px 0; border: 1px solid var(--line2); border-radius: 6px; font-weight: 800; text-align: center; }
+.hs .hs-pop > footer .pri { flex: 2; background: linear-gradient(180deg, #ee2b43, #c8102e); border-color: #ee2b43; color: #fff; }
+.hs .hs-pi { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card2); }
+.hs .hs-pi .pic, .hs .hs-sticker .pic, .hs .hs-pick .pic { flex: none; display: grid; place-items: center; border-radius: 5px; background: #2a171b; overflow: hidden; }
+.hs .hs-pi .pic { width: 48px; height: 48px; }
+.hs .hs-pi .pic img { max-width: 42px; max-height: 42px; }
+.hs .hs-pi .tx { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.hs .hs-pi .tx small { color: var(--y); font-weight: 700; }
+.hs .hs-op { margin: 0; padding: 9px 12px; border-radius: 4px 12px 12px 12px; background: #2a171b; }
+.hs .hs-op i { display: block; font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--pink); }
+.hs .hs-pays { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hs .hs-pays button { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--card2); }
+.hs .hs-pays button small { color: var(--sub); font-size: 12px; }
+.hs .hs-pays button.on { border-color: var(--y); background: #ffd4000f; }
+.hs .hs-pays button.on b { color: var(--y); }
+.hs .hs-pick { display: flex; flex-direction: column; gap: 4px; max-height: 190px; overflow-y: auto; }
+.hs .hs-pick button { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 2px solid transparent; border-radius: 6px; background: var(--card2); }
+.hs .hs-pick button.on { border-color: var(--y); }
+.hs .hs-pick .pic { width: 34px; height: 34px; }
+.hs .hs-pick .pic img { max-width: 30px; max-height: 30px; }
+.hs .hs-pick .pic svg { width: 18px; height: 18px; opacity: .5; }
+.hs .hs-ok { margin: 0; text-align: center; font-weight: 700; color: var(--y); }
+.hs .hs-no { margin: 0; text-align: center; color: var(--sub); }
+.hs .hs-no b { display: block; font: 900 30px ui-monospace, monospace; color: #fff; letter-spacing: 3px; }
+.hs .hs-sticker { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 16px; border-radius: 4px; background: #ffe45c; color: #2a1a00; text-align: center; box-shadow: 0 4px 0 #b99a00, 0 10px 20px #0006; transform: rotate(-1.2deg); }
+.hs .hs-sticker .pic { width: 72px; height: 72px; background: #fff7c2; }
+.hs .hs-sticker .pic img { max-width: 64px; max-height: 64px; }
+.hs .hs-sticker b { font-size: 17px; font-weight: 900; }
+.hs .hs-sticker p { margin: 0; font-size: 13.5px; font-weight: 500; }
+.hs .hs-sticker .ef { font-weight: 800; color: #b00020; }
+.hs .hs-lift { margin-top: 6px; padding: 5px 12px; border: 1px dashed #7a6400; border-radius: 4px; font-size: 12.5px; font-weight: 700; color: #5a4a00; }
+.hs .hs-under { margin-top: 6px !important; padding: 6px 10px; border-top: 1px dashed #7a6400; font-size: 12.5px !important; color: #5a4a00; font-style: italic; }
+.hs .hs-f { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--sub); }
+.hs .hs-f input { height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: #170d10; color: var(--tx); font: inherit; font-size: 14px; }
+.hs .hs-chk { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card2); }
+.hs .hs-chk i { flex: none; width: 18px; height: 18px; border: 2px solid var(--line2); border-radius: 4px; }
+.hs .hs-chk.on i { border-color: var(--y); background: var(--y) linear-gradient(135deg, transparent 0 0) ; box-shadow: inset 0 0 0 3px var(--card2); }
+/* 폰 */
+.hs.hs-m .hs-gnb { flex-wrap: wrap; height: auto; gap: 0 12px; padding: 8px 12px 0; }
+.hs.hs-m .hs-logo { font-size: 20px; flex: 1; }
+.hs.hs-m .hs-tel { font-size: 14px; }
+.hs.hs-m .hs-tel small { display: none; }
+.hs.hs-m .hs-menu { flex: none; order: 3; width: 100%; height: 40px; margin: 4px -6px 0; overflow-x: auto; scrollbar-width: none; }
+.hs.hs-m .hs-menu::-webkit-scrollbar { display: none; }
+.hs.hs-m .hs-menu button { padding: 0 10px; font-size: 14px; }
+.hs.hs-m .hs-wrap { padding: 10px 10px 24px; }
+.hs.hs-m .hs-main { width: auto; }
+.hs.hs-m .hs-prod { flex-wrap: wrap; }
+.hs.hs-m .hs-icon { width: 64px; height: 64px; }
+.hs.hs-m .hs-icon img { max-width: 54px; max-height: 54px; }
+.hs.hs-m .hs-prod .tx b { font-size: 16px; }
+.hs.hs-m .hs-prod .pr { flex: 1 0 100%; flex-direction: row; justify-content: space-between; padding: 6px 12px; }
+.hs.hs-m .hs-prod .pr b { font-size: 18px; }
+.hs.hs-m .hs-ord { flex-wrap: wrap; }
+.hs.hs-m .hs-ord .call { flex: 1 0 100%; }
+.hs.hs-m .hs-ord button { flex: 1; padding: 11px 0; font-size: 13.5px; }
+.hs.hs-m .hs-chat { height: 240px; margin-top: 12px; }
+.hs.hs-m .hs-sec h4 { flex-wrap: wrap; gap: 2px 10px; }
+.hs.hs-m .hs-lu:not(.col) { grid-template-columns: 1fr 1fr; }
+.hs.hs-m .hs-lc .st { position: absolute; right: 6px; top: 6px; }
+.hs.hs-m .hs-ol .bar { display: none; }
+.hs.hs-m .hs-dim { place-items: end center; padding: 0; position: fixed; }
+.hs.hs-m .hs-pop { position: relative; top: auto; bottom: auto; width: 100%; max-height: 82%; border-radius: 14px 14px 0 0; border-bottom: 0; }
+
+
+/* 닫기·취소 단추 공통 (2026-11-13 사용자: X 가 상자 가운데에서 삐뚤다 → 다른 창도 같은 규칙으로).
+   아이콘이든 글자 ✕/× 든 단추 안쪽 여백을 지우고 격자 가운데에 놓는다. 크기·색·자리는 단추마다 제 규칙 그대로 */
+.gx-x, .it-ux, .gx-wt-del { padding: 0; line-height: 1; }
+.gx-agcard-x, .at-zoom-x, .hs .hs-pop > header button, .ms-cos .q-card .q-x { display: grid; place-items: center; padding: 0; line-height: 1; }
+.gx-x svg, .it-ux svg { display: block; }
+.ms-cos .q-card .q-x { display: inline-grid; }
+`;
+
+  // src/ui/frame.ts
+  var EXTRA_W = { tablet: 26 * 2 + 4, tactical: 44 * 2 + 8 * 2 };
+  var EXTRA_H = { tablet: 26 * 2, tactical: 44 * 2 };
+  var PAD2 = { tablet: 4, tactical: 8 };
+  var PANEL_W = { nav: 1280, pre: 1024 };
+  var TACTICAL_MIN_H = 600;
+  function frameState(pref, nav) {
+    const want = pref ?? "tablet";
+    if (want === "none") return { kind: "none", hidden: false };
+    if (isPhone() || document.fullscreenElement) return { kind: "none", hidden: false };
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (w < (nav ? PANEL_W.nav : PANEL_W.pre) + EXTRA_W[want] + PAD2[want] * 2) return { kind: "none", hidden: true };
+    if (want === "tactical" && (h - PAD2.tactical * 2) * 0.9 - EXTRA_H.tactical < TACTICAL_MIN_H) return { kind: "none", hidden: true };
+    return { kind: want, hidden: false };
+  }
+  function screw(n3, pos) {
+    const s8 = `gxf-s${n3}`;
+    const m = `gxf-m${n3}`;
+    const k = `gxf-k${n3}`;
+    return `<svg class="gxf-screw" aria-hidden="true" width="18" height="18" viewBox="0 0 26 26" style="${pos}"><defs><radialGradient id="${s8}" cx=".5" cy=".5" r=".5"><stop offset=".78" stop-color="#040506"/><stop offset=".9" stop-color="#15181b"/><stop offset="1" stop-color="#2a2f33"/></radialGradient><linearGradient id="${m}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#454b50"/><stop offset=".5" stop-color="#2b3035"/><stop offset="1" stop-color="#15181b"/></linearGradient><linearGradient id="${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#050607"/><stop offset="1" stop-color="#1a1e22"/></linearGradient></defs><circle cx="13" cy="13" r="13" fill="url(#${s8}) #15181b"/><circle cx="13" cy="13" r="9.4" fill="url(#${m}) #2b3035"/><circle cx="13" cy="13" r="9.4" fill="none" stroke="rgba(255,255,255,.1)" stroke-width=".6"/><path d="M6.4 9.2A7.8 7.8 0 0 1 9.4 6.1" stroke="rgba(255,255,255,.18)" stroke-width=".9" fill="none" stroke-linecap="round"/><polygon points="13,8.2 17.2,10.6 17.2,15.4 13,17.8 8.8,15.4 8.8,10.6" fill="url(#${k}) #0e1113"/><polygon points="13,8.2 17.2,10.6 17.2,15.4 13,17.8 8.8,15.4 8.8,10.6" fill="none" stroke="rgba(0,0,0,.85)" stroke-width=".7"/><path d="M9.4 15.2l3.6 2.1 3.6-2.1" stroke="rgba(255,255,255,.12)" stroke-width=".7" fill="none"/></svg>`;
+  }
+  var TABLET_BEFORE = '<i class="gxf-hi"></i><i class="gxf-glass"></i><i class="gxf-cam"><b></b><b></b></i><i class="gxf-pwr"></i><i class="gxf-vol"></i><i class="gxf-spk"></i><i class="gxf-spk r"></i>';
+  var TACTICAL_BEFORE = `<i class="gxf-tex"></i><i class="gxf-recess"></i>${["tl", "tr", "bl", "br"].map((c) => `<i class="gxf-bump ${c} base"></i><i class="gxf-bump ${c} body"></i><i class="gxf-bump ${c} ridge"></i>`).join("")}${screw(1, "left:18px;top:18px")}${screw(2, "right:18px;top:18px")}${screw(3, "left:18px;bottom:18px")}${screw(4, "right:18px;bottom:18px")}<i class="gxf-grip"></i><i class="gxf-grip r"></i><i class="gxf-leds"><span><b class="on-link"></b>LINK</span><span><b></b>STBY</span><span><b class="on-rec"></b>REC</span></i><i class="gxf-handle"></i><i class="gxf-pit"></i><i class="gxf-strap"></i>`;
+  function frameHtml(kind, pre2, panel) {
+    return `<div class="gx-frame${pre2 ? " pre" : ""}" data-kind="${kind}">${kind === "tablet" ? TABLET_BEFORE : TACTICAL_BEFORE}${panel}<i class="gxf-glare"></i></div>`;
+  }
+
+  // src/ui/swipeback.ts
+  var SWIPE_SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .wk .wdr, .wk .wgrab, .wk .wscrim, .ph-drawer";
+  var SKIP = SWIPE_SKIP;
+  var FIRE = 72;
+  var bound2 = /* @__PURE__ */ new WeakSet();
+  function inSideScroller(el, root3) {
+    for (let n3 = el; n3 && n3 !== root3; n3 = n3.parentElement) {
+      if (n3.scrollWidth > n3.clientWidth + 2) {
+        const ox = getComputedStyle(n3).overflowX;
+        if (ox === "auto" || ox === "scroll") return true;
+      }
+    }
+    return false;
+  }
+  function bindSwipeBack(root3, step) {
+    if (bound2.has(root3)) return;
+    bound2.add(root3);
+    let x0 = 0;
+    let y0 = 0;
+    let mode2 = "off";
+    let act2 = null;
+    let sign = 1;
+    let box3 = null;
+    const reset = (animate) => {
+      if (!box3) return;
+      const el = box3;
+      el.style.transition = animate ? "transform .2s ease, opacity .2s ease" : "";
+      el.style.transform = "";
+      el.style.opacity = "";
+      if (animate) setTimeout(() => el.style.transition = "", 220);
+      box3 = null;
+    };
+    root3.addEventListener("touchstart", (e) => {
+      mode2 = "off";
+      if (e.touches.length !== 1 || !isPhone()) return;
+      const t = e.target;
+      if (t.closest(SKIP) || inSideScroller(t, root3)) return;
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+      mode2 = "wait";
+    }, { passive: true });
+    root3.addEventListener("touchmove", (e) => {
+      if (mode2 === "off") return;
+      const dx = e.touches[0].clientX - x0;
+      const dy = e.touches[0].clientY - y0;
+      if (mode2 === "wait") {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
         act2 = Math.abs(dx) > Math.abs(dy) * 1.4 ? step(dx > 0 ? -1 : 1) : null;
         sign = dx > 0 ? 1 : -1;
         if (!act2) return void (mode2 = "off");
@@ -696,8 +963,8 @@
     return `<button class="gx-chip gx-unplace" data-action="${action}" ${on3 ? "" : "disabled"}>취소</button>`;
   }
   function lockedState(x, id2) {
-    const rec2 = x.world.agents[id2];
-    return agentLocked(rec2) ? rec2.st : null;
+    const rec3 = x.world.agents[id2];
+    return agentLocked(rec3) ? rec3.st : null;
   }
   function teamPanel(x, goal, action, label2, busy6, ctx2) {
     const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
@@ -2438,7 +2705,7 @@ ${note2.trim()}` : card3;
   }
   var INNER_SCROLL = ".gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups, .gx-lookg";
   var PAGE_SCROLL = ".st-featpage .ph-form-body, .nw-pane .nw-doc, .wk .wsc";
-  var pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
+  var pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec2.sub}|${rec2.view}|${rec2.id}`;
   var DRAFT_SEL = '[data-it-form] [name], input[name="wt-adj"], input[name="br-nick"]';
   var draftKey = () => `${tab}|${itemsUi.sub}|${itemsUi.mode}|${itemsUi.open}|${walletUi.kind}|${walletUi.edit}|${br.login}|${curTab().id}`;
   function render2() {
@@ -2961,8 +3228,8 @@ ${note2.trim()}` : card3;
     const deployedAt = (id2) => w.an.find((e) => e.state === "활성" && sentTo(e.deploy, id2))?.name ?? w.inc.find((e) => e.state === "진행" && sentTo(e.deploy, id2))?.name ?? "";
     const dir2 = readDirectory(ctx2.char.globalLore ?? []).agents;
     const agents = roster.map((p2) => {
-      const rec2 = w.agents[p2.id];
-      const st = rec2?.st ?? "미정";
+      const rec3 = w.agents[p2.id];
+      const st = rec3?.st ?? "미정";
       const c = agentContact(ctx2, p2.id);
       const big = p2.english ? mainPic(ctx2.char, dir2.find((x) => x.english === p2.english) ?? { english: p2.english }) : "";
       return {
@@ -2970,8 +3237,8 @@ ${note2.trim()}` : card3;
         name: p2.name,
         english: p2.english ?? "",
         st: stLabel(st),
-        side: st === "작전투입" ? "op" : agentLocked(rec2) ? "lock" : "ok",
-        situation: rec2?.situation ?? "",
+        side: st === "작전투입" ? "op" : agentLocked(rec3) ? "lock" : "ok",
+        situation: rec3?.situation ?? "",
         dept: p2.department ?? "",
         rank: p2.rank ?? "",
         face: avatar(ctx2.char, p2.english, p2.name, "sq"),
@@ -3281,7 +3548,7 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     if (type !== "model" || !Array.isArray(messages)) return messages;
     if (faultOn("beforeRequest")) throw new Error("시험용 예외 주입(beforeRequest)");
     if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
-    const input0 = new Set(sysTexts(messages));
+    const input0 = messages;
     const failed4 = [];
     let added;
     const step = (name, run6, fallback) => {
@@ -3315,7 +3582,10 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
         const chat0 = ctx2?.chat ?? await stepAsync("지시문 채팅 읽기", async () => await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex()), null);
         const last2 = chat0?.message?.at(-1);
         const lastData = last2?.role === "user" && typeof last2.data === "string" ? last2.data : "";
-        const o = chat0 ? { cardIsLast: hasSceneCard(lastData), callIsLast: hasCall(lastData) } : {};
+        let cardFresh = false;
+        const all = chat0?.message ?? [];
+        for (let k = all.length - 1; k >= 0 && all[k]?.role === "user" && !cardFresh; k--) cardFresh = typeof all[k].data === "string" && hasSceneCard(all[k].data);
+        const o = chat0 ? { cardIsLast: hasSceneCard(lastData), cardFresh, callIsLast: hasCall(lastData) } : {};
         messages = step("지시문·전화 풀기", () => unwrapCalls(unwrapScenes(messages, o).messages, o).messages, messages);
       }
       const marked = (t) => typeof t === "string" && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
@@ -3360,7 +3630,7 @@ ${orderReadyCard(tag.site, shop, tag.names)}` : body5;
     if (failed4.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed4.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
     const out = sanitize(messages);
     if (liteNow) step("호출 기록", () => traceMain(out, failed4, added), void 0);
-    lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
+    lastAdded = new Set(insertedSystemTexts(input0, out));
     return out;
   }
   function stripAllImgTags(messages) {
@@ -3526,408 +3796,4 @@ ${texts.anomaly}`;
     const ss = chat.scriptstate;
     const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view: view2 }) => !!view2.scriptstate?.[GN_RAW] && gnetSettings(view2.scriptstate).context);
     const wantGnet = boardsOn.length > 0;
-    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
-    const wantWiki = wikiContextOn(ss);
-    const wantHs = hsMainOn(ss);
-    if (!wantGnet && !wantPhone && !wantWiki && !wantHs) return [];
-    applyAdvanced(ss);
-    const src = { char: { globalLore: char.globalLore }, chat };
-    const rules3 = { phone: mainContextRules2(src), wiki: wikiContextRules(char.globalLore) };
-    const focus = makeFocus(scene2, buildRegistry(char.globalLore));
-    const parts = [];
-    for (const { site, view: view2 } of boardsOn) {
-      const rule = mainContextRules({ char: src.char, chat: view2 });
-      const st = readGnet(view2);
-      if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: CONTEXT.tokens, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rule, focus, BOARD_NAME[site])) });
-    }
-    if (wantPhone && rules3.phone) {
-      try {
-        const st = readPhone(chat);
-        const notices = readBulletins(chat);
-        parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules3.phone, focus)) });
-      } catch (error) {
-        console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
-    if (wantWiki && rules3.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules3.wiki, focus, cap) });
-    if (wantHs) parts.push({ cap: hsMainSettings(ss).tokens, build: (cap) => hsMainContext(chat, hsMainRules(), focus, cap) });
-    return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
-  }
-  function withCap(box3, key, cap, run6) {
-    const keep2 = box3[key];
-    box3[key] = cap;
-    try {
-      return run6();
-    } finally {
-      box3[key] = keep2;
-    }
-  }
-  function stripHistoryTags(messages) {
-    const dirty3 = (c) => typeof c === "string" && (hasWorldTags(c) || hasUnlockTag(c));
-    if (!messages.some((m) => m?.role === "assistant" && dirty3(m.content))) return messages;
-    return messages.map((m) => m?.role === "assistant" && dirty3(m.content) ? { ...m, content: stripUnlockTags(hasWorldTags(m.content) ? cleanOutput(m.content) : m.content) } : m);
-  }
-  async function applyUnlocks(char, charIndex, chatIndex, messageIndex) {
-    const lockable = new Set(readDirectory(char.globalLore).appendices.filter((r) => r.unlock).map((r) => r.lore));
-    return updateChat(charIndex, chatIndex, (cur) => {
-      const m = cur.message?.[messageIndex];
-      const text5 = typeof m?.data === "string" ? m.data : "";
-      if (!m || !hasUnlockTag(text5)) return null;
-      const got = unlockTags(text5).filter((n3) => lockable.has(n3));
-      const message = [...cur.message ?? []];
-      message[messageIndex] = { ...m, data: stripUnlockTags(text5) };
-      const ss = got.length ? { ...cur.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
-      return { ...cur, message, scriptstate: ss };
-    });
-  }
-  async function onOutput(arg) {
-    setWaiting(false);
-    const after = [];
-    const pTurn = progressTurn();
-    const tTurn = traceTurnId();
-    try {
-      const raw0 = arg.char;
-      const chat = arg.chat;
-      if (!raw0 || !chat || !isGoeiLore(raw0.globalLore)) return;
-      const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
-      const raw = chat.message?.[arg.messageIndex]?.data;
-      if (typeof raw !== "string") {
-        progressAbort(pTurn);
-        return;
-      }
-      traceReply(raw);
-      let latest = null;
-      if (chat.scriptstate?.["$st_anomaly_on"] === "1") {
-        const catalog = parseCatalog(char.globalLore);
-        latest = await updateChat(
-          arg.characterIndex,
-          arg.chatIndex,
-          (cur) => processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random)
-        );
-      }
-      if (hasUnlockTag(raw)) latest = await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null) ?? latest;
-      const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
-      if (colConfig(chat.scriptstate).wallet !== "off" && walletSyncOn(chat.scriptstate) && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
-        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
-          return w ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...walletVars(w) } } : null;
-        }).catch(() => null) ?? latest;
-      }
-      {
-        const cur0 = latest ?? chat;
-        const flag2 = pointsAuto(cur0.scriptstate) ? pointsFlagFor(cur0, isPointsOrg(String(cur0.scriptstate?.["$ib_affiliation"] ?? ""))) : null;
-        const needSync = colConfig(cur0.scriptstate).points !== "off" && walletSyncOn(cur0.scriptstate) && !!syncPointsToStatus(readPoints(cur0.scriptstate), cur0);
-        if (flag2 || needSync) {
-          latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-            const add = {};
-            const f = pointsAuto(cur.scriptstate) ? pointsFlagFor(cur, isPointsOrg(String(cur.scriptstate?.["$ib_affiliation"] ?? ""))) : null;
-            if (f) {
-              const vars = { ...cur.scriptstate ?? {}, [POINTS_ON_VAR]: f };
-              add[POINTS_ON_VAR] = f;
-              add[COL_LOG_VAR] = withColLog(cur.scriptstate, (cur.message ?? []).length, usedCols(colConfig(vars)));
-            }
-            const s8 = { ...cur.scriptstate ?? {}, ...add };
-            if (colConfig(s8).points !== "off" && walletSyncOn(s8)) {
-              const p2 = syncPointsToStatus(readPoints(s8), { ...cur, scriptstate: s8 });
-              if (p2) Object.assign(add, pointsVars(p2));
-            }
-            return Object.keys(add).length ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...add } } : null;
-          }).catch(() => null) ?? latest;
-        }
-      }
-      if (settleItemUse(latest ?? chat, arg.messageIndex)) {
-        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const vars = settleItemUse(cur, arg.messageIndex);
-          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
-        }).catch(() => null) ?? latest;
-      }
-      const selfNames = hasShopTag(raw) ? [playerAgent((await getChar(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? "", userInfo().name] : [];
-      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
-        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const r = settleShop(cur, arg.messageIndex, selfNames);
-          return r ? { ...cur, ...r.message ? { message: r.message } : {}, scriptstate: { ...cur.scriptstate ?? {}, ...r.vars } } : null;
-        }).catch(() => null) ?? latest;
-      }
-      {
-        const base = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
-        if (base && settleReady(base, cosReadyMode(base.scriptstate) !== "off")) {
-          latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-            const message = settleReady(cur, cosReadyMode(cur.scriptstate) !== "off");
-            return message ? { ...cur, message } : null;
-          }).catch(() => null) ?? latest;
-        }
-      }
-      let now2 = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
-      if (now2) await refreshUseBox(arg.characterIndex, arg.chatIndex, now2).catch(() => {
-      });
-      if (!now2 || chatPhase(now2) !== "started") return;
-      now2.message ??= [];
-      const missing = (ss) => {
-        const vars = { ...missingBasicVars(char.globalLore, ss), ...staleFactionVars(char.globalLore, ss) };
-        return Object.keys(vars).length ? vars : null;
-      };
-      if (missing(now2.scriptstate)) {
-        now2 = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const vars = missing(cur.scriptstate);
-          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
-        }) ?? now2;
-      }
-      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now2 }).catch(() => {
-      });
-      if (latest && chatCardsAt(now2, arg.messageIndex).length) now2 = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null) ?? now2;
-      await storeLore(arg.characterIndex, arg.chatIndex, void 0, { char, chat: now2 }).catch(() => {
-      });
-      if (now2.message.some((m) => typeof m.data === "string" && isUnsent(m.data))) now2 = await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent) ?? now2;
-      {
-        const pp = requestPeopleUpdate("turn", { at: { charIndex: arg.characterIndex, chatIndex: arg.chatIndex } }).catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`)).then(() => readReports(now2).items.some((r) => r.mine && r.idx === arg.messageIndex) ? updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const v = refreshClosures(cur, arg.messageIndex, walletStart);
-          return v ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...v } } : null;
-        }).catch(() => null) : null);
-        after.push(pp);
-        if (!peopleSettings(now2.scriptstate).parallel) await pp;
-      }
-      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now2 }).catch(() => {
-      });
-      await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now2, messageIndex: arg.messageIndex });
-      const netTasks = autoTasks(now2.scriptstate);
-      const viewAuto = viewSettings(now2.scriptstate).auto === "turn";
-      const wikiAuto = wikiSettings(now2.scriptstate).auto === "turn";
-      const malls = MALL_SITES.filter((site) => mallAutoTurn(now2, site));
-      if (netTasks.length || viewAuto || wikiAuto || malls.length) {
-        const fresh3 = async () => {
-          const c = await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex) ?? now2;
-          c.message ??= [];
-          return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char, chat: c };
-        };
-        after.push((async () => {
-          applyAdvanced(now2.scriptstate);
-          await readPersona();
-          const phoneFail = (error) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
-          const wikiFail = (error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
-          const mallFail = (error) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
-          const gnetFail = (site) => (error) => console.log(`[goei] ${BOARD_NAME[site] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
-          for (const group4 of jointGroups(now2.scriptstate)) {
-            const joint = group4.length > 1 ? new Joint(group4[0].model, group4[0].fixed, group4.map((t) => t.kind), genSettings(now2.scriptstate).concurrent) : void 0;
-            await Promise.all(group4.map(async (t) => {
-              try {
-                if (t.kind === "phone") await autoRefresh(await fresh3(), arg.messageIndex, void 0, joint);
-                else await autoRefreshGnet(await fresh3(), arg.messageIndex, false, joint, t.kind);
-              } catch (error) {
-                (t.kind === "phone" ? phoneFail : gnetFail(t.kind))(error);
-              } finally {
-                joint?.done(t.kind);
-              }
-            }));
-          }
-          if (viewAuto) await autoView(await fresh3(), arg.messageIndex).catch(phoneFail);
-          if (wikiAuto) await autoWriteWiki(await fresh3(), arg.messageIndex).catch(wikiFail);
-          for (const site of malls) await autoRefreshMall(await fresh3(), site).catch(mallFail);
-        })());
-      }
-    } catch (error) {
-      console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
-    } finally {
-      void Promise.allSettled(after).then(() => {
-        progressEnd(pTurn);
-        traceEnd(tTurn);
-      });
-    }
-  }
-  var escHtml = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function unsentRow() {
-    const p2 = cardPalette2();
-    unsentShown();
-    return `<span style="flex:1;color:${p2.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span><button type="button" data-goei-cancel="1" style="${cardButtonStyle()}">취소</button>`;
-  }
-  function sceneCardHtml(s8) {
-    const p2 = cardPalette2();
-    const note2 = s8.note ? `<span style="flex-basis:100%;display:flex;align-items:baseline;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p2.accentLine};white-space:pre-wrap"><span style="flex:none;color:${p2.signal};font-weight:600">메모</span><span>${escHtml(s8.note)}</span></span>` : "";
-    const unsent = s8.unsent ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p2.accentLine}">${unsentRow()}</span>` : "";
-    return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap"><span style="color:${p2.signal};font-weight:600">목표</span><span>${escHtml(s8.target)}</span><span style="opacity:.5">|</span><span style="color:${p2.signal};font-weight:600">투입</span><span>${escHtml(s8.party)}</span>${note2}${unsent}</div>`;
-  }
-  function startCardHtml(body5, unsent) {
-    const p2 = cardPalette2();
-    const row8 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p2.accentLine}">${unsentRow()}</span>` : "";
-    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p2.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p2.text};white-space:pre-wrap">${escHtml(body5.trim())}</span>${row8}</div>`;
-  }
-  function unsentMarkHtml() {
-    return `<div data-goei-card="unsent" style="${cardStyle()}">${unsentRow()}</div>`;
-  }
-  function openingHintHtml() {
-    const p2 = cardPalette2();
-    openingShown();
-    return `<div data-goei-card="opening" style="${cardStyle()}flex-wrap:wrap"><span style="flex:1 1 14em;color:${p2.text}"><b style="color:${p2.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span><button type="button" data-goei-repick="1" style="${cardButtonStyle()}">재선택</button></div>`;
-  }
-  function callCardHtml(target) {
-    const p2 = cardPalette2();
-    return `<div data-goei-card="call" style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p2.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
-  }
-  function landingHtml2() {
-    return landingHtml(cardPalette2());
-  }
-  function cardPalette2() {
-    return cardPalette(currentTheme());
-  }
-  function cardStyle() {
-    const p2 = cardPalette2();
-    return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
-  }
-  function cardButtonStyle() {
-    const p2 = cardPalette2();
-    return `flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer`;
-  }
-  var assetsFirst = Promise.resolve();
-  async function onDisplay(text5) {
-    if (typeof text5 !== "string") return text5;
-    if (hasImgTag(text5) && !modulePicker()) await assetsFirst.catch(() => void 0);
-    if (isSceneMessage(text5) && !wantsOpeningHint(text5)) await ensureOpeningHint().catch(() => void 0);
-    return displayNow(text5);
-  }
-  async function ensureOpeningHint() {
-    const charIndex = await risuai.getCurrentCharacterIndex();
-    const chatIndex = await risuai.getCurrentChatIndex();
-    if (Number.isInteger(charIndex) && charIndex >= 0 && Number.isInteger(chatIndex) && chatIndex >= 0) await refreshOpeningHint(charIndex, chatIndex);
-  }
-  async function redrawAfterLoad() {
-    try {
-      await assetsFirst;
-      if (isWaiting()) return;
-      const ctx2 = await loadContext();
-      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
-      if (!ctx2.chat.message.some((m) => typeof m.data === "string" && m.data.includes("<img="))) return;
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({
-        ...cur,
-        message: (cur.message ?? []).map((m) => typeof m.data === "string" && m.data.includes("<img=") ? { ...m, data: m.data.endsWith("\n") ? m.data.slice(0, -1) : `${m.data}
-` } : m)
-      }));
-    } catch {
-    }
-  }
-  function displayNow(text5) {
-    const ours = liteNow || isLanding(text5) || text5.includes(UNSENT_MARK) || text5.includes(START_MARK) || text5.includes(SCENE_MARK) || hasStatusTag(text5) || hasSceneCard(text5) || hasCall(text5) || hasShopTag(text5) || hasReadyTag(text5);
-    let out = text5;
-    if (isLanding(text5)) out = landingHtml2();
-    else {
-      if (out.includes(SCENE_MARK)) out = stripSceneMark(out);
-      if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
-      if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
-      if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
-      if (hasCall(out)) out = renderCalls(out, callCardHtml);
-      if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
-      if (hasStatusTag(out)) out = renderStatus(out);
-      if (hasShopTag(out)) out = renderShopCard(out);
-      if (hasReadyTag(out)) out = renderReadyCard(out);
-      if (hasImgTag(out)) {
-        const pick4 = modulePicker();
-        const self = userInfo().name;
-        if (ours || imgTagsKnown(out, pick4, self)) out = renderImgTags(out, pick4, getPrefs().imgShow ?? IMG_RECENT.def, self);
-      }
-      if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
-      if (wantsOpeningHint(text5)) out += openingHintHtml();
-    }
-    if (ours && !out.includes("data-goei-user")) out += USER_MARK;
-    if (ours && !isLanding(text5) && !out.includes('data-goei-card="use"')) out += USE_SLOT;
-    return out;
-  }
-  async function readSnapshot(fab) {
-    const none3 = { charIndex: -1, chatIndex: -1, chatScreen: false };
-    try {
-      const charIndex = await risuai.getCurrentCharacterIndex();
-      if (!Number.isInteger(charIndex) || charIndex < 0) return none3;
-      const chatIndex = await risuai.getCurrentChatIndex();
-      const chatScreen = fab ? await fab.chatScreenVisible() : true;
-      return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
-    } catch {
-      return none3;
-    }
-  }
-  async function isLiteCharacter(charIndex) {
-    if (charIndex < 0) return false;
-    try {
-      const char = await getChar(charIndex);
-      const lite = isGoeiLore(char?.globalLore);
-      if (lite && char) prefetchFactions(char);
-      return lite;
-    } catch {
-      return false;
-    }
-  }
-  async function readTheme(snap) {
-    if (snap.chatIndex < 0) return;
-    const chat = await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex);
-    if (!chat) return;
-    const on3 = chat.scriptstate?.["$st_asset_on"];
-    const changed = setImgHidden(on3 === void 0 || on3 === null || on3 === "" ? getPrefs().basic.assetOn === false : on3 === "0" || on3 === 0 || on3 === false);
-    const before = currentTheme();
-    setCurrentTheme(themeName(chat.scriptstate?.["$st_fixed_theme"], chat.message?.length ? "light" : themeName(getPrefs().theme)));
-    if (changed && currentTheme() === before) repaintTheme();
-  }
-  var prog = null;
-  var progKey = "";
-  function startWatcher(fab) {
-    const state2 = new WatchState();
-    setInstalledHook(() => {
-      state2.forget();
-    });
-    let stopped = false;
-    let timer5;
-    let shownChat = "";
-    let lastChar;
-    const tick4 = async () => {
-      try {
-        const snap = await readSnapshot(fab);
-        const lite = state2.needsCharacterCheck(snap) ? await isLiteCharacter(snap.charIndex) : void 0;
-        if (stopped) return;
-        const next = state2.update(snap, lite);
-        liteNow = state2.lite;
-        if (snap.charIndex >= 0) {
-          if (lastChar !== void 0 && (snap.charIndex !== lastChar || next.changed && next.fabVisible)) void loadModuleAssets().catch(() => false);
-          lastChar = snap.charIndex;
-        }
-        const chatKey8 = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : "";
-        if (next.fabVisible && (next.changed || chatKey8 !== shownChat)) {
-          const switched = shownChat !== "" && chatKey8 !== shownChat;
-          if (switched) resetStatusContext();
-          await readTheme(snap).catch(() => {
-          });
-          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {
-          });
-          if (switched) await updateChat(snap.charIndex, snap.chatIndex, (cur) => ({ ...cur })).catch(() => null);
-          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {
-          });
-          await refreshUseBox(snap.charIndex, snap.chatIndex).catch(() => {
-          });
-        } else if (!next.fabVisible && next.changed) {
-          await hideUseBox().catch(() => {
-          });
-        }
-        shownChat = chatKey8;
-        if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
-        const pShow = (next.fabVisible || appShown()) && progressOn();
-        const pKey = `${pShow}`;
-        if (prog && pKey !== progKey) {
-          progKey = pKey;
-          await prog.setVisible(pShow).catch(() => {
-          });
-        } else if (prog && pShow) await prog.setVisible(true).catch(() => {
-        });
-        if (prog) await prog.setPanel(appShown()).catch(() => {
-        });
-        progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
-      } catch (error) {
-        console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
-      } finally {
-        if (!stopped) timer5 = setTimeout(() => void tick4(), WATCH_MS);
-      }
-    };
-    void tick4();
-    return () => {
-      stopped = true;
-      setInstalledHook(null);
-      clearTimeout(timer5);
-    };
-  }
-  async function start2(o = {}) {
-    void dropOldGame();
-    const t0 = Date.now();
-    const lap = (
+    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS

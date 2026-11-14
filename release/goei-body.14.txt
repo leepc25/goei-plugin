@@ -1,4 +1,501 @@
-       env3.render();
+})}</div>`;
+  }
+  function peopleDocsView(ctx2) {
+    const store3 = peopleStore(ctx2.chat);
+    const live = liveness(ctx2.chat);
+    const byType = /* @__PURE__ */ new Map();
+    for (const d of Object.values(store3.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)).push(d);
+    const docEntry = (docKey, e, st, storeKey) => {
+      const no = msgNo(e.anchor, live);
+      const key = `doc|${docKey}|${e.id}`;
+      const meta = [e.date ? `<span title="일시">${esc35(e.date)}</span>` : "", e.place ? `<span title="장소">${esc35(e.place)}</span>` : "", e.who?.length ? `<span title="관련 인물">${esc35(e.who.join(", "))}</span>` : "", no ? evidenceButton(key, no) : "", e.quote ? `<q title="근거 메시지에서 따온 인용">${esc35(e.quote)}</q>` : ""].filter(Boolean).join("");
+      return `<li class="pp-entry${st !== "alive" && !e.void ? " dead" : ""}${e.void ? " void" : ""}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc35(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}<span class="pp-entry-btns">${voidBtn("pp-doc-void", `${storeKey}|${e.id}`, !!e.void)}</span></div>${evidenceBox(ctx2, live, key, e.anchor, e.quote)}</li>`;
+    };
+    const sections3 = DOC_TYPES.filter((t) => byType.has(t)).map((t) => {
+      const docs = byType.get(t);
+      const inner = docs.map((d) => {
+        const aliveN = liveEntries(d.entries, live).length;
+        return `<section class="pp-slot"><h4>${esc35(d.key)}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(d.entries, live, `pp-old:doc:${d.type}:${d.key}`, (e, st) => docEntry(d.key, e, st, `${d.type}:${d.key}`))}</section>`;
+      }).join("");
+      return `<section class="nw-hsec pp-sec"><h3>${DOC_LABEL[t]}<b>${docs.length}</b></h3>${inner}</section>`;
+    }).join("");
+    return `<div class="ph-room nw-pane pp-pane">${head("기록 문서", "사건 · 장소 · 세력 · 물건")}
+    <article class="nw-doc pp-doc">${sections3 || '<div class="ph-blank"><p>아직 기록된 문서가 없어요.<br>메인 응답에서 사건·장소·세력·물건이 바뀌면 여기에 쌓여요.</p></div>'}</article></div>`;
+  }
+  async function mutate3(ctx2, env3, fn2) {
+    peopleUi.busy = true;
+    peopleUi.notice = "";
+    env3.render();
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const store3 = peopleStore(chat);
+        return fn2(store3, chat) ? withPeople(chat, store3) : null;
+      });
+    } catch (error) {
+      peopleUi.notice = error instanceof Error ? error.message : String(error);
+    }
+    peopleUi.busy = false;
+    await env3.refresh();
+  }
+  function findEntry(store3, key) {
+    const [who, slot, id2] = key.split("|");
+    const list4 = store3.people[who]?.slots[slot];
+    return list4?.find((e) => e.id === id2) ?? null;
+  }
+  function nextSeq(store3, anchor) {
+    return store3.log.filter((c) => c.anchor === anchor).reduce((m, c) => Math.max(m, c.seq), -1) + 1;
+  }
+  function userFaction2(chat) {
+    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
+    return typeof v === "string" ? v : "";
+  }
+  function peopleInput(name, value) {
+    switch (name) {
+      case "pp-aff-num":
+        peopleUi.affNum = value;
+        return true;
+      case "pp-aff-reason":
+        peopleUi.affReason = value;
+        return true;
+      case "pp-addr-to":
+        peopleUi.addrTo = value;
+        return true;
+      case "pp-sex-text":
+        peopleUi.sexDraft = value;
+        return true;
+      case "pp-rules":
+      case "pp-director-rules":
+        return true;
+      default:
+    }
+    return false;
+  }
+  async function handlePeople(action, value, ctx2, env3) {
+    const v = value ?? "";
+    if (action.startsWith("pp-def-")) {
+      try {
+        const msg = await defaultsAction("pp", action, v, ctx2, env3.refresh);
+        if (msg) peopleUi.info = msg;
+      } catch (error) {
+        peopleUi.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      env3.render();
+      return true;
+    }
+    switch (action) {
+      case "pp-goto": {
+        setTimeout(() => {
+          const [blockId, label2] = PP_GOTO_ROW[v] ?? [v, ""];
+          const row8 = [...document.getElementById(blockId)?.querySelectorAll(".ps-row") ?? []].find((r) => r.querySelector(".ps-label > b")?.firstChild?.textContent?.trim() === label2);
+          if (!row8) return;
+          row8.scrollIntoView({ block: "center" });
+          row8.classList.remove("gw-find-flash");
+          void row8.offsetWidth;
+          row8.classList.add("gw-find-flash");
+          setTimeout(() => row8.classList.remove("gw-find-flash"), 2200);
+        }, 30);
+        return true;
+      }
+      case "pp-set": {
+        const i = v.indexOf("=");
+        if (i < 0) return true;
+        const k = v.slice(0, i);
+        const val = v.slice(i + 1);
+        if (!(k in PP_DEFAULTS)) return true;
+        if (!peopleUi.warned && (k === "when" && val === "turn" || k === "model" && val === "main")) {
+          peopleUi.warned = true;
+          peopleUi.info = k === "model" ? "응답마다 메인 모델을 한 번 더 불러요." : "응답마다 보조 모델을 한 번 더 불러요.";
+        }
+        await setVars3(ctx2, env3, { [PP(k)]: val });
+        if (k === "explicit_style") await mutate3(ctx2, env3, (store3) => {
+          let n3 = 0;
+          for (const p2 of Object.values(store3.people)) if (p2.sexual && p2.sexual.explicit !== null) {
+            p2.sexual.explicit = null;
+            n3++;
+          }
+          return n3 > 0;
+        });
+        return true;
+      }
+      case "pp-undo-run":
+        peopleUi.undoAsk = undoKey(ctx2, peopleStore(ctx2.chat));
+        env3.render();
+        return true;
+      case "pp-undo-run-no":
+        peopleUi.undoAsk = "";
+        env3.render();
+        return true;
+      case "pp-undo-run-yes": {
+        const asked = peopleUi.undoAsk;
+        peopleUi.undoAsk = "";
+        let n3 = 0;
+        await mutate3(ctx2, env3, (store3, chat) => (n3 = asked && undoKey({ ...ctx2, chat }, store3) === asked ? undoLastRun(store3) : 0) > 0);
+        peopleUi.info = n3 ? `마지막 갱신을 되돌렸어요 (${n3}개 취소).` : "되돌릴 갱신이 없어요.";
+        env3.render();
+        return true;
+      }
+      case "pp-rules-save":
+      case "pp-drules-save":
+      case "pp-rrules-save": {
+        const key = action === "pp-drules-save" ? "director_rules" : action === "pp-rrules-save" ? "router_rules" : "rules";
+        await setVars3(ctx2, env3, { [PP(key)]: v.slice(0, key === "rules" ? 4e3 : 2e3) });
+        return true;
+      }
+      case "pp-update": {
+        if (peopleStatus().busy) return true;
+        peopleUi.notice = "";
+        const s8 = peopleSettings(ctx2.chat.scriptstate);
+        if (!s8.on) {
+          peopleUi.notice = "인물 기록이 꺼져 있어요. 설정에서 켜 주세요.";
+          env3.render();
+          return true;
+        }
+        env3.render();
+        try {
+          const r = await requestPeopleUpdate("manual", { manual: true });
+          peopleUi.info = r.errors.length ? `갱신 실패: ${r.errors[0]}` : r.ran ? `갱신 ${r.ran}회 · 반영 ${r.applied}개` : r.skipped.length ? `건너뜀: ${r.skipped[0]}` : "읽을 응답이 없어요.";
+        } catch (error) {
+          peopleUi.notice = error instanceof Error ? error.message : String(error);
+        }
+        peopleUi.diag = null;
+        await env3.refresh();
+        return true;
+      }
+      case "pp-diag-toggle":
+        if (peopleUi.diagOpen.has(v)) peopleUi.diagOpen.delete(v);
+        else peopleUi.diagOpen.add(v);
+        if (!peopleUi.diagShow.startsWith(`${v}:`)) peopleUi.diagShow = "";
+        env3.render();
+        return true;
+      case "pp-diag-show":
+        peopleUi.diagShow = peopleUi.diagShow === v ? "" : v;
+        env3.render();
+        return true;
+      case "pp-diag-clear":
+        await clearDiag();
+        peopleUi.diag = [];
+        peopleUi.diagOpen.clear();
+        peopleUi.diagShow = "";
+        env3.render();
+        return true;
+      case "pp-register": {
+        const sheet = sheetOf(ctx2);
+        await mutate3(ctx2, env3, (store3, chat) => {
+          const pend = store3.pending[v];
+          if (!pend || store3.people[v]) return false;
+          const base = seedBaseFor(v, userFaction2(chat), store3.identity);
+          store3.people[v] = seedPerson(v, sheet(v), { ...base, aliases: [.../* @__PURE__ */ new Set([...base.aliases ?? [], ...pend.aliases ?? []])] });
+          delete store3.pending[v];
+          return true;
+        });
+        peopleUi.info = `「${v}」을(를) 등록했어요.`;
+        env3.render();
+        return true;
+      }
+      case "pp-ignore":
+        await mutate3(ctx2, env3, (store3) => {
+          if (!store3.pending[v]) return false;
+          delete store3.pending[v];
+          if (!store3.ignored.includes(v)) store3.ignored.push(v);
+          return true;
+        });
+        return true;
+      case "pp-pin":
+        await mutate3(ctx2, env3, (store3) => {
+          const e = findEntry(store3, v);
+          if (!e) return false;
+          if (e.pin) delete e.pin;
+          else e.pin = true;
+          return true;
+        });
+        return true;
+      case "pp-sex-on":
+      case "pp-sex-clear":
+      case "pp-sex-save": {
+        const key = action === "pp-sex-save" ? peopleUi.sexEdit : v;
+        const text5 = action === "pp-sex-save" ? v : "";
+        const [who, f] = key.split("|");
+        await mutate3(ctx2, env3, (store3) => {
+          const p2 = store3.people[who];
+          if (!p2 || !SEXUAL_FIELDS.includes(f)) return false;
+          const sx = ensureSexual(p2);
+          if (action === "pp-sex-on") {
+            if (f === "desire") sx.desireOn = !sx.desireOn;
+            else sx.paraphiliaOn = !sx.paraphiliaOn;
+          } else setSexualText(p2, f, action === "pp-sex-clear" ? "" : text5, (/* @__PURE__ */ new Date()).toISOString(), true);
+          return true;
+        });
+        if (action === "pp-sex-save") {
+          peopleUi.sexEdit = "";
+          peopleUi.info = "저장했어요.";
+        }
+        if (action === "pp-sex-clear") peopleUi.info = "글을 지웠어요. 다음 갱신에서 모델이 다시 써요.";
+        env3.render();
+        return true;
+      }
+      case "pp-sex-style": {
+        await mutate3(ctx2, env3, (store3) => {
+          const p2 = store3.people[v];
+          if (!p2) return false;
+          ensureSexual(p2).explicit = !explicitOn(p2, peopleSettings(ctx2.chat.scriptstate));
+          return true;
+        });
+        return true;
+      }
+      case "pp-sex-edit": {
+        const [who, f] = v.split("|");
+        peopleUi.sexEdit = v;
+        peopleUi.sexDraft = peopleStore(ctx2.chat).people[who]?.sexual?.[f]?.text ?? "";
+        env3.render();
+        return true;
+      }
+      case "pp-sex-cancel":
+        peopleUi.sexEdit = "";
+        env3.render();
+        return true;
+      case "pp-speech-approve":
+      case "pp-speech-reject": {
+        const approve = action === "pp-speech-approve";
+        await mutate3(ctx2, env3, (store3) => {
+          const [who, slot] = v.split("|");
+          const e = findEntry(store3, v);
+          if (!e || slot !== "speech" || speechState(e.text) !== "pending") return false;
+          const text5 = decideSpeechPending(e.text, approve);
+          const seq4 = nextSeq(store3, e.anchor);
+          return putEntry(store3, who, "speech", { id: entryId(who, "speech", e.anchor, seq4, `${approve ? "+" : "-"}${e.id}`), text: text5, src: "manual", anchor: e.anchor, seq: seq4, replaces: e.id, ...e.target ? { target: e.target } : {} });
+        });
+        peopleUi.info = approve ? "다음 턴에 갱신기가 말투를 바꿀 수 있어요." : "말투 변경을 거절했어요. 조짐을 지웠어요.";
+        return true;
+      }
+      case "pp-void":
+        await mutate3(ctx2, env3, (store3) => {
+          const e = findEntry(store3, v);
+          if (!e) return false;
+          if (e.void) delete e.void;
+          else e.void = true;
+          return true;
+        });
+        return true;
+      case "pp-axis-approve":
+      case "pp-axis-reject":
+      case "pp-axis-revert": {
+        const i = v.indexOf("|");
+        const who = v.slice(0, i);
+        const id2 = v.slice(i + 1);
+        await mutate3(ctx2, env3, (store3, chat) => {
+          const p2 = store3.people[who];
+          if (!p2) return false;
+          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const err = action === "pp-axis-approve" ? approveCandidate(p2, id2, liveness(chat), now2) : action === "pp-axis-reject" ? rejectCandidate(p2, id2, now2) : revertCandidate(p2, id2, now2);
+          if (err) throw new Error(err);
+          return true;
+        });
+        peopleUi.info = action === "pp-axis-approve" ? "성격 변화를 반영했어요." : action === "pp-axis-reject" ? "이 후보는 더 모으지 않아요." : "전으로 되돌렸어요.";
+        env3.render();
+        return true;
+      }
+      case "pp-doc-void":
+        await mutate3(ctx2, env3, (store3) => {
+          const cut3 = v.lastIndexOf("|");
+          const e = store3.docs[v.slice(0, cut3)]?.entries.find((x) => x.id === v.slice(cut3 + 1));
+          if (cut3 < 0 || !e) return false;
+          if (e.void) delete e.void;
+          else e.void = true;
+          return true;
+        });
+        return true;
+      case "pp-change-void":
+        await mutate3(ctx2, env3, (store3) => {
+          const c = store3.log.find((x) => x.id === v);
+          if (!c) return false;
+          if (c.void) delete c.void;
+          else c.void = true;
+          return true;
+        });
+        return true;
+      case "pp-num-toggle":
+        peopleUi.showNum = !peopleUi.showNum;
+        env3.render();
+        return true;
+      case "pp-aff-edit":
+        Object.assign(peopleUi, { affEdit: true, affStage: "", affNum: "", affReason: "", notice: "" });
+        env3.render();
+        return true;
+      case "pp-fac-save": {
+        const reason3 = peopleUi.affReason.trim();
+        const fs = peopleSettings(ctx2.chat.scriptstate);
+        const qualStage = fs.factionQual ? peopleUi.affStage || factionNow(peopleStore(ctx2.chat), v, liveChanges(peopleStore(ctx2.chat), liveness(ctx2.chat)), userFactionOf(peopleStore(ctx2.chat), ctx2.chat), fs).stage.id : "";
+        const raw = qualStage ? stageMid(qualStage, fs.factionBounds) : Number(peopleUi.affNum);
+        if (!qualStage && (!Number.isFinite(raw) || peopleUi.affNum.trim() === "")) {
+          peopleUi.notice = "숫자를 적어 주세요.";
+          env3.render();
+          return true;
+        }
+        if (!reason3) {
+          peopleUi.notice = "이유를 적어 주세요. 변경 기록에 남아요.";
+          env3.render();
+          return true;
+        }
+        const pin2 = Math.max(FACTION_MIN, Math.min(FACTION_MAX, Math.round(raw)));
+        const who = factionWho(v);
+        await mutate3(ctx2, env3, (store3, chat) => {
+          if (!store3.factions[v]) store3.factions[v] = { code: v, name: factionName2(ctx2, v), seeded: { at: (/* @__PURE__ */ new Date()).toISOString() } };
+          const anchor = anchorOf(chat);
+          const seq4 = nextSeq(store3, anchor);
+          return putChange(store3, { id: changeId(who, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
+        });
+        peopleUi.affEdit = false;
+        peopleUi.info = qualStage ? `세력 평판을 「${FACTION_STAGES[qualStage].label}」로 고정했어요.` : `세력 평판을 ${pin2}으로 고정했어요.`;
+        env3.render();
+        return true;
+      }
+      case "pp-aff-cancel":
+        peopleUi.affEdit = false;
+        env3.render();
+        return true;
+      case "pp-aff-stage":
+        peopleUi.affStage = v;
+        return true;
+      case "pp-aff-save": {
+        const reason3 = peopleUi.affReason.trim();
+        const raw = peopleUi.affNum.trim() !== "" ? Number(peopleUi.affNum) : peopleUi.affStage !== "" ? stageMid2(Number(peopleUi.affStage)) : NaN;
+        if (!Number.isFinite(raw)) {
+          peopleUi.notice = "단계를 고르거나 숫자를 적어 주세요.";
+          env3.render();
+          return true;
+        }
+        if (!reason3) {
+          peopleUi.notice = "이유를 적어 주세요. 변경 기록에 남아요.";
+          env3.render();
+          return true;
+        }
+        const pin2 = Math.max(AFF_MIN, Math.min(AFF_MAX, Math.round(raw)));
+        await mutate3(ctx2, env3, (store3, chat) => {
+          if (!store3.people[v]) return false;
+          const anchor = anchorOf(chat);
+          const seq4 = nextSeq(store3, anchor);
+          return putChange(store3, { id: changeId(v, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who: v, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
+        });
+        peopleUi.affEdit = false;
+        peopleUi.info = `호감을 ${pin2}(${stageOf(pin2).label})으로 고정했어요.`;
+        env3.render();
+        return true;
+      }
+      case "pp-addr-edit": {
+        const store3 = peopleStore(ctx2.chat);
+        const p2 = store3.people[v];
+        const cur = p2 ? addressOf(p2, liveChanges(store3, liveness(ctx2.chat))) : null;
+        Object.assign(peopleUi, { addrEdit: true, addrTo: cur?.toUser ?? "", addrReg: cur?.register ?? "존댓말", addrPin: !!p2?.address.pin, notice: "" });
+        env3.render();
+        return true;
+      }
+      case "pp-addr-cancel":
+        peopleUi.addrEdit = false;
+        env3.render();
+        return true;
+      case "pp-addr-reg": {
+        const reg = v.replace(/^reg=/, "");
+        if (REGISTERS.includes(reg)) peopleUi.addrReg = reg;
+        env3.render();
+        return true;
+      }
+      case "pp-addr-pin":
+        peopleUi.addrPin = !peopleUi.addrPin;
+        return true;
+      case "pp-diag-all":
+        peopleUi.diagAll = !peopleUi.diagAll;
+        return true;
+      case "pp-old-more":
+        peopleUi.oldAll.add(v);
+        env3.render();
+        return true;
+      case "pp-cap": {
+        const n3 = Math.max(0, Math.min(100, Math.round(Number(v))));
+        if (!Number.isFinite(n3)) return true;
+        await setVars3(ctx2, env3, { [PP("turn_cap")]: String(n3) });
+        return true;
+      }
+      case "pp-always": {
+        await setVars3(ctx2, env3, { [PP("always")]: v.replace(/\s*,\s*/g, ", ").trim().slice(0, 400) });
+        return true;
+      }
+      case "pp-bounds": {
+        const ok = /^\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*$/.test(v) && (() => {
+          const n3 = v.split(",").map(Number);
+          return n3[0] > n3[1] && n3[1] > n3[2] && n3[2] > n3[3] && n3.every((x) => x >= -100 && x <= 100);
+        })();
+        if (!ok) {
+          peopleUi.notice = "경계는 −100~100 사이 정수 넷을 내림차순으로 적어 주세요 (예: 61,21,-20,-60).";
+          env3.render();
+          return true;
+        }
+        await setVars3(ctx2, env3, { [PP("faction_bounds")]: v.replace(/\s+/g, "") });
+        return true;
+      }
+      case "pp-addr-save": {
+        const toUser = plain(peopleUi.addrTo, 40);
+        const register = peopleUi.addrReg;
+        const pinIt = peopleUi.addrPin;
+        await mutate3(ctx2, env3, (store3, chat) => {
+          const p2 = store3.people[v];
+          if (!p2) return false;
+          if (pinIt) {
+            p2.address = { toUser, register, pin: true };
+            return true;
+          }
+          if (p2.address.pin) delete p2.address.pin;
+          const anchor = anchorOf(chat);
+          const seq4 = nextSeq(store3, anchor);
+          return putChange(store3, { id: changeId(v, "address", anchor, seq4, `${toUser}|${register}`), anchor, seq: seq4, src: "manual", who: v, kind: "address", toUser: toUser || p2.address.toUser, register, reason: "직접 수정" });
+        });
+        peopleUi.addrEdit = false;
+        peopleUi.info = "호칭을 저장했어요.";
+        env3.render();
+        return true;
+      }
+      case "pp-backfill-turns":
+        peopleUi.backfillTurns = v;
+        return true;
+      case "pp-reread-turns":
+        peopleUi.rereadTurns = v;
+        return true;
+      case "pp-backfill": {
+        if (peopleUi.busy || peopleStatus().busy) return true;
+        peopleUi.busy = true;
+        peopleUi.notice = "";
+        env3.render();
+        try {
+          const r = await backfillPeople(Number(peopleUi.backfillTurns) || 0);
+          peopleUi.info = r.errors.length ? `읽기 실패: ${r.errors[0]}` : r.ran ? `지난 응답 읽기: 갱신 ${r.ran}회 · 반영 ${r.applied}개` : r.skipped[0] ?? "읽을 응답이 없어요.";
+        } catch (error) {
+          peopleUi.notice = error instanceof Error ? error.message : String(error);
+        }
+        peopleUi.busy = false;
+        peopleUi.diag = null;
+        await env3.refresh();
+        return true;
+      }
+      case "pp-reread": {
+        if (!v || peopleUi.busy || peopleStatus().busy) return true;
+        peopleUi.busy = true;
+        peopleUi.notice = "";
+        env3.render();
+        try {
+          const r = await rereadPerson(v, Number(peopleUi.rereadTurns) || 0);
+          peopleUi.info = r.errors.length ? `다시 읽기 실패: ${r.errors[0]}` : `${v} 다시 읽기: 기록 ${r.cleared}개 비움 · 갱신 ${r.ran}회 · 반영 ${r.applied}개${r.skipped.length ? ` · ${r.skipped[0]}` : ""}`;
+        } catch (error) {
+          peopleUi.notice = error instanceof Error ? error.message : String(error);
+        }
+        peopleUi.busy = false;
+        peopleUi.diag = null;
+        await env3.refresh();
+        return true;
+      }
+      case "pp-tidy": {
+        if (!v || peopleUi.busy || peopleStatus().busy) return true;
+        peopleUi.busy = true;
+        peopleUi.notice = "";
+        env3.render();
         try {
           const r = await consolidatePerson(v);
           if (r.ok) peopleUi.info = r.message;
@@ -57,7 +554,7 @@
   function real(match) {
     const t = lastTurn();
     if (!t) return "";
-    const cs = t.calls.filter((c) => match(baseLabel(c.label)));
+    const cs = t.calls.filter((c) => c.phase !== "manual" && match(baseLabel(c.label)));
     if (!cs.length) return "";
     const sent2 = cs.reduce((s8, c) => s8 + (c.requestTokens ?? 0), 0);
     return cs.some((c) => !c.ok) ? `<em class="fl-fail" title="실패">${fmt2(sent2)}</em>` : fmt2(sent2);
@@ -576,7 +1073,7 @@
 
   // src/ui/records.ts
   var esc37 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var rec = {
+  var rec2 = {
     sub: "journal",
     view: "list",
     id: "",
@@ -592,22 +1089,22 @@
     png: null
   };
   function dropPng() {
-    if (rec.png) {
+    if (rec2.png) {
       try {
-        URL.revokeObjectURL(rec.png.url);
+        URL.revokeObjectURL(rec2.png.url);
       } catch {
       }
     }
-    rec.png = null;
+    rec2.png = null;
   }
   function resetRecords() {
     dropPng();
-    Object.assign(rec, { sub: "journal", view: "list", id: "", filter: "all", q: "", notice: "", info: "", busy: false });
+    Object.assign(rec2, { sub: "journal", view: "list", id: "", filter: "all", q: "", notice: "", info: "", busy: false });
     closeToast();
   }
-  var recordsNav = () => ({ sub: rec.sub, view: rec.view, id: rec.id });
+  var recordsNav = () => ({ sub: rec2.sub, view: rec2.view, id: rec2.id });
   function applyRecordsNav(r) {
-    Object.assign(rec, { sub: r.sub, view: r.view, id: r.id, notice: "" });
+    Object.assign(rec2, { sub: r.sub, view: r.view, id: r.id, notice: "" });
   }
   var two7 = (n3) => String(n3).padStart(2, "0");
   var WEEK5 = "일월화수목금토";
@@ -635,33 +1132,33 @@
   }
   var SUBS = [["journal", "일지"], ["chronicle", "연대기"], ["people", "인물"], ["factions", "세력"]];
   function recordsTab(ctx2) {
-    const tabs2 = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec.sub === v ? " on" : ""}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join("")}</div>`;
-    const notice2 = rec.notice ? `<div class="gx-err" role="alert">${esc37(rec.notice)}</div>` : "";
-    const note2 = toast("rec", rec.info, (t) => {
-      if (rec.info === t) rec.info = "";
+    const tabs2 = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec2.sub === v ? " on" : ""}" data-action="rec-sub" data-value="${v}" aria-selected="${rec2.sub === v}" aria-pressed="${rec2.sub === v}">${l}</button>`).join("")}</div>`;
+    const notice2 = rec2.notice ? `<div class="gx-err" role="alert">${esc37(rec2.notice)}</div>` : "";
+    const note2 = toast("rec", rec2.info, (t) => {
+      if (rec2.info === t) rec2.info = "";
     });
-    const tools = rec.view !== "list" ? "" : rec.sub === "wallet" ? walletTools(ctx2) : rec.sub === "journal" ? journalTools() : rec.sub === "chronicle" ? chronicleTools() : "";
+    const tools = rec2.view !== "list" ? "" : rec2.sub === "wallet" ? walletTools(ctx2) : rec2.sub === "journal" ? journalTools() : rec2.sub === "chronicle" ? chronicleTools() : "";
     const drawer = tools && isPhone() ? drawerBox(tools, "gx-rdrawer") : "";
-    const rpt = rec.view === "report" ? `<div class="gx-agpop gx-rptpop" data-action="rec-back" role="dialog" aria-label="보고서"><div class="gx-agpop-card gx-rptcard" data-action="rec-png-keep"><button class="gx-agpop-x" data-action="rec-back" aria-label="닫기">${ICONS.close}</button>${reportPage(ctx2, rec.id)}</div></div>` : "";
+    const rpt = rec2.view === "report" ? `<div class="gx-agpop gx-rptpop" data-action="rec-back" role="dialog" aria-label="보고서"><div class="gx-agpop-card gx-rptcard" data-action="rec-png-keep"><button class="gx-agpop-x" data-action="rec-back" aria-label="닫기">${ICONS.close}</button>${reportPage(ctx2, rec2.id)}</div></div>` : "";
     return `<main class="gx-body gx-records">${tabs2}${notice2}${pane(ctx2)}${note2}</main>${rpt}${pngModal()}${drawer}`;
   }
   function pngModal() {
-    if (!rec.png) return "";
+    if (!rec2.png) return "";
     return `<div class="gx-agpop gx-pngpop" data-action="rec-png-x" role="dialog" aria-label="보고서 이미지">
     <div class="gx-agpop-card gx-pngcard" data-action="rec-png-keep">
       <button class="gx-agpop-x" data-action="rec-png-x" aria-label="닫기">${ICONS.close}</button>
-      <b class="gx-png-title">${esc37(rec.png.no)} · 900×1200</b>
-      <img class="gx-png-img" src="${esc37(rec.png.url)}" alt="보고서 이미지">
+      <b class="gx-png-title">${esc37(rec2.png.no)} · 900×1200</b>
+      <img class="gx-png-img" src="${esc37(rec2.png.url)}" alt="보고서 이미지">
       <p class="ps-note">내려받기를 시작했어요. 저장이 안 되는 기기(아이폰 등)는 그림을 길게 눌러 저장하세요.</p>
       <span class="gx-png-acts"><button class="gx-mini primary" data-action="rec-png-dl">${ICONS.down}다시 내려받기</button><button class="gx-mini" data-action="rec-png-x">닫기</button></span>
     </div></div>`;
   }
   function pane(ctx2) {
-    if (rec.view === "report") return rec.sub === "chronicle" ? chroniclePane(ctx2) : journalPane(ctx2);
-    if (rec.view === "person") return `<div class="gx-rec-pane">${personView(ctx2, rec.id)}</div>`;
-    if (rec.view === "docs") return `<div class="gx-rec-pane">${peopleDocsView(ctx2)}</div>`;
-    if (rec.view === "faction") return `<div class="gx-rec-pane">${factionView2(ctx2, rec.id)}</div>`;
-    switch (rec.sub) {
+    if (rec2.view === "report") return rec2.sub === "chronicle" ? chroniclePane(ctx2) : journalPane(ctx2);
+    if (rec2.view === "person") return `<div class="gx-rec-pane">${personView(ctx2, rec2.id)}</div>`;
+    if (rec2.view === "docs") return `<div class="gx-rec-pane">${peopleDocsView(ctx2)}</div>`;
+    if (rec2.view === "faction") return `<div class="gx-rec-pane">${factionView2(ctx2, rec2.id)}</div>`;
+    switch (rec2.sub) {
       case "chronicle":
         return chroniclePane(ctx2);
       case "wallet":
@@ -698,8 +1195,8 @@
   }
   var FILTERS = [["all", "전체"], ["mine", "내 사건"], ["bg", "그 외"]];
   function journalTools() {
-    const chips3 = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? " on" : ""}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join("");
-    return `<div class="gx-rec-tools gx-wt-tools">${chips3}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc37(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>`;
+    const chips3 = FILTERS.map(([v, l]) => `<button class="gx-chip${rec2.filter === v ? " on" : ""}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec2.filter === v}">${l}</button>`).join("");
+    return `<div class="gx-rec-tools gx-wt-tools">${chips3}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc37(rec2.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>`;
   }
   function journalPane(ctx2) {
     const rows3 = readJournal(ctx2.chat).rows;
@@ -724,8 +1221,8 @@
   }
   function journalList(ctx2) {
     const rows3 = readJournal(ctx2.chat).rows;
-    const q = rec.q.trim().toLowerCase();
-    const pass = (r) => (rec.filter === "mine" ? r.mine : rec.filter === "bg" ? !r.mine : true) && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(" ")} ${r.result}`.toLowerCase().includes(q));
+    const q = rec2.q.trim().toLowerCase();
+    const pass = (r) => (rec2.filter === "mine" ? r.mine : rec2.filter === "bg" ? !r.mine : true) && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(" ")} ${r.result}`.toLowerCase().includes(q));
     const shown5 = journalNewestFirst(rows3.filter(pass));
     if (!shown5.length) return `<p class="gx-wt-empty">${rows3.length ? "맞는 줄이 없어요." : "아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요."}</p>`;
     const reps = /* @__PURE__ */ new Map();
@@ -739,7 +1236,7 @@
     }
     groups.sort((a, b) => a.day === "" ? 1 : b.day === "" ? -1 : 0);
     const cnt = (list4) => [["an", "괴이"], ["in", "사건"], ["ms", "특수"]].map(([k, l]) => [l, list4.filter((r) => r.kind === k).length]).filter(([, n3]) => n3).map(([l, n3]) => `${l} ${n3}`).join(" · ");
-    const cut3 = moreCut("rec-journal", `${rec.filter}|${q}`, ctx2.chat.scriptstate, groups);
+    const cut3 = moreCut("rec-journal", `${rec2.filter}|${q}`, ctx2.chat.scriptstate, groups);
     return cut3.groups.map((g2) => `<section class="gx-jr-day"><h3><span>${esc37(g2.day || "시각 없음")}</span><em>${esc37(cnt(g2.rows))}</em></h3><ul>${g2.shown.map((r) => journalRow(ctx2, r, reps)).join("")}</ul></section>`).join("") + cut3.more;
   }
   function journalRow(ctx2, r, reps) {
@@ -758,11 +1255,11 @@
   }
   var CHRON_KINDS = Object.entries(CHRON_KIND_LABEL);
   function chronicleTools() {
-    return `<div class="gx-rec-tools gx-wt-tools">${CHRON_KINDS.map(([k, l]) => `<button class="gx-chip${rec.chronOff.includes(k) ? "" : " on"}" data-action="rec-chron" data-value="${k}" aria-pressed="${!rec.chronOff.includes(k)}">${l}</button>`).join("")}</div>`;
+    return `<div class="gx-rec-tools gx-wt-tools">${CHRON_KINDS.map(([k, l]) => `<button class="gx-chip${rec2.chronOff.includes(k) ? "" : " on"}" data-action="rec-chron" data-value="${k}" aria-pressed="${!rec2.chronOff.includes(k)}">${l}</button>`).join("")}</div>`;
   }
   function chroniclePane(ctx2) {
     const all = buildChronicle(ctx2.chat, ctx2.char.globalLore);
-    const shown5 = all.filter((e) => !rec.chronOff.includes(e.kind)).reverse();
+    const shown5 = all.filter((e) => !rec2.chronOff.includes(e.kind)).reverse();
     const n3 = (k) => all.filter((e) => e.kind === k).length;
     const mon = monitor("연대기", "", "", [
       { label: "사건", value: String(n3("event")), sub: "내가 나간 종료", tone: "mint" },
@@ -785,7 +1282,7 @@
       const inner = `${mark2}<span class="gx-cr-main"><b>${esc37(e.title)}</b><small>${esc37(e.text)}</small></span><em class="gx-cr-kind">${esc37(CHRON_KIND_LABEL[e.kind])}</em>`;
       return `<li>${act2 ? `<button class="gx-cr-row ${e.kind}"${act2}>${inner}</button>` : `<div class="gx-cr-row ${e.kind}">${inner}</div>`}</li>`;
     };
-    const cut3 = moreCut("rec-chronicle", [...rec.chronOff].sort().join(","), ctx2.chat.scriptstate, groups);
+    const cut3 = moreCut("rec-chronicle", [...rec2.chronOff].sort().join(","), ctx2.chat.scriptstate, groups);
     return `${mon}${tools}
     <div class="gx-jr-list gx-chron">${cut3.groups.map((g2) => `<section class="gx-jr-day"><h3><span>${esc37(g2.day || "날짜 없음")}</span><em>${g2.rows.length}줄</em></h3><ul>${g2.shown.map(line2).join("")}</ul></section>`).join("")}${cut3.more}</div>`;
   }
@@ -812,8 +1309,8 @@
     const agents = r.agents.length ? `<ul class="gx-rpt-agents">${r.agents.map((a) => `<li>${avatar(ctx2.char, byName.get(a.name)?.english, a.name, "sm")}<span><b>${esc37(a.name)}</b><small>${esc37([a.st ? stLabel(a.st) : "상태 미상", a.situation].filter(Boolean).join(" · "))}</small></span></li>`).join("")}</ul>` : '<p class="ps-note">투입 기록이 없어요.</p>';
     const people = r.full ? `<section class="gx-rpt-sec"><h3>인물 기록 변화 <small>(종료 시점)</small></h3>${r.people?.length ? `<ul class="gx-rpt-people">${r.people.map((p2) => `<li><b>${esc37(p2.who)}</b>${p2.quote ? `<q>${esc37(p2.quote)}</q>` : ""}<em class="${p2.delta < 0 ? "neg" : "pos"}">${p2.delta > 0 ? "+" : p2.delta < 0 ? "−" : ""}${Math.abs(p2.delta)}${p2.stage ? ` → ${esc37(p2.stage)}` : ""}</em></li>`).join("")}</ul>` : '<p class="ps-note">이 사건 동안 호감이 움직인 인물이 없어요.</p>'}</section>` : "";
     const wallet = r.full ? `<section class="gx-rpt-sec"><h3>가계부 <small>(이 사건 동안)</small></h3>${r.wallet?.length ? `<ul class="gx-rpt-wallet">${r.wallet.map((t) => `<li><span>${esc37(t.memo || "(메모 없음)")}</span><b class="${t.amount < 0 ? "out" : "in"}">${esc37(formatDelta(t.amount).replace(/^([+−-])/, "$1₩ "))}</b></li>`).join("")}${r.balance !== void 0 ? `<li class="bal"><span>종료 시점 잔고</span><b>${esc37(formatWon(r.balance))}</b></li>` : ""}</ul>` : `<p class="ps-note">이 사건 동안 거래가 없어요.${r.balance !== void 0 ? ` 종료 시점 잔고 ${esc37(formatWon(r.balance))}` : ""}</p>`}</section>` : "";
-    const acts = `<button class="gx-mini" data-action="rec-png" data-value="${esc37(r.id)}" ${rec.busy ? "disabled" : ""} title="PNG 900×1200 한 장으로 내려받아요">${ICONS.cctv}이미지로 저장</button>
-    <button class="gx-mini${r.pin ? " on" : ""}" data-action="rec-pin" data-value="${esc37(r.id)}" aria-pressed="${!!r.pin}" title="${r.pin ? "고정 풀기" : "고정: 상한에 밀려 지워지지 않아요"}" ${rec.busy ? "disabled" : ""}>${ICONS.pin}${r.pin ? "고정됨" : "고정"}</button>`;
+    const acts = `<button class="gx-mini" data-action="rec-png" data-value="${esc37(r.id)}" ${rec2.busy ? "disabled" : ""} title="PNG 900×1200 한 장으로 내려받아요">${ICONS.cctv}이미지로 저장</button>
+    <button class="gx-mini${r.pin ? " on" : ""}" data-action="rec-pin" data-value="${esc37(r.id)}" aria-pressed="${!!r.pin}" title="${r.pin ? "고정 풀기" : "고정: 상한에 밀려 지워지지 않아요"}" ${rec2.busy ? "disabled" : ""}>${ICONS.pin}${r.pin ? "고정됨" : "고정"}</button>`;
     return `<section class="gx-rpt">
     <header class="gx-rpt-head">${back}<b>보고서</b><span class="gx-rpt-acts">${acts}</span></header>
     <div class="gx-rpt-top">${gmark(r.kind, h.grade)}<div class="gx-rpt-title"><b>${esc37(h.name)}</b><span>${esc37(kindLine)}</span>${mineBadge(r)}${h.cleared ? '<span class="gx-badge live">클리어</span>' : ""}</div>
@@ -863,7 +1360,7 @@
     holdToast();
     toastTimer = setTimeout(() => {
       toastTimer = null;
-      rec.toast = null;
+      rec2.toast = null;
       render3();
     }, TOAST_MS);
   }
@@ -873,7 +1370,7 @@
     noticed.add(hit4.rpt);
     void savePrefs((p2) => ({ ...p2, noticedReports: [...(p2.noticedReports ?? []).filter((x) => x !== hit4.rpt), hit4.rpt].slice(-50) })).catch(() => {
     });
-    rec.toast = hit4;
+    rec2.toast = hit4;
     armToast(render3);
   }
   function holdToast() {
@@ -881,15 +1378,15 @@
     toastTimer = null;
   }
   function releaseToast(render3) {
-    if (rec.toast) armToast(render3);
+    if (rec2.toast) armToast(render3);
   }
   function closeToast() {
     holdToast();
-    rec.toast = null;
+    rec2.toast = null;
   }
   function closeToastHtml() {
-    if (!rec.toast) return "";
-    return `<div class="gx-rectoast" role="status"><span>${ICONS.records}보고서가 기록에 저장됐어요 · <b>${esc37(rec.toast.name)}</b></span><button class="gx-mini" data-action="rec-open" data-value="${esc37(rec.toast.rpt)}">보기</button><button class="gx-rectoast-x" data-action="rec-toast-x" aria-label="알림 닫기">${ICONS.close}</button></div>`;
+    if (!rec2.toast) return "";
+    return `<div class="gx-rectoast" role="status"><span>${ICONS.records}보고서가 기록에 저장됐어요 · <b>${esc37(rec2.toast.name)}</b></span><button class="gx-mini" data-action="rec-open" data-value="${esc37(rec2.toast.rpt)}">보기</button><button class="gx-rectoast-x" data-action="rec-toast-x" aria-label="알림 닫기">${ICONS.close}</button></div>`;
   }
   async function handleRecords(action, value, ctx2, env3) {
     const v = value ?? "";
@@ -897,97 +1394,97 @@
     switch (action) {
       case "rec-sub":
         if (!SUBS.some(([s8]) => s8 === v)) return true;
-        rec.sub = v;
-        rec.view = "list";
-        rec.id = "";
-        rec.notice = "";
+        rec2.sub = v;
+        rec2.view = "list";
+        rec2.id = "";
+        rec2.notice = "";
         resetPeopleUi();
         break;
       case "rec-journal":
-        Object.assign(rec, { sub: "journal", view: "list", id: "", notice: "" });
+        Object.assign(rec2, { sub: "journal", view: "list", id: "", notice: "" });
         break;
       case "rec-filter":
-        if (FILTERS.some(([f]) => f === v)) rec.filter = v;
+        if (FILTERS.some(([f]) => f === v)) rec2.filter = v;
         break;
       case "rec-chron":
         if (!(v in CHRON_KIND_LABEL)) return true;
-        rec.chronOff = rec.chronOff.includes(v) ? rec.chronOff.filter((k) => k !== v) : [...rec.chronOff, v];
+        rec2.chronOff = rec2.chronOff.includes(v) ? rec2.chronOff.filter((k) => k !== v) : [...rec2.chronOff, v];
         break;
       case "rec-open":
       case "rec-chron-open":
         closeToast();
         if (!readReports(ctx2.chat).items.some((r) => r.id === v)) {
-          rec.notice = "이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.";
+          rec2.notice = "이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.";
           break;
         }
-        Object.assign(rec, { sub: action === "rec-chron-open" ? "chronicle" : "journal", view: "report", id: v, notice: "" });
+        Object.assign(rec2, { sub: action === "rec-chron-open" ? "chronicle" : "journal", view: "report", id: v, notice: "" });
         break;
       case "rec-people":
-        Object.assign(rec, { sub: "people", view: "list", id: "", notice: "" });
+        Object.assign(rec2, { sub: "people", view: "list", id: "", notice: "" });
         resetPeopleUi();
         break;
       case "rec-person":
         if (!v) return true;
-        Object.assign(rec, { sub: "people", view: "person", id: v, notice: "" });
+        Object.assign(rec2, { sub: "people", view: "person", id: v, notice: "" });
         resetPeopleUi();
         break;
       case "rec-docs":
-        Object.assign(rec, { sub: "people", view: "docs", id: "", notice: "" });
+        Object.assign(rec2, { sub: "people", view: "docs", id: "", notice: "" });
         resetPeopleUi();
         break;
       case "rec-faction":
         if (!v) return true;
-        Object.assign(rec, { sub: "factions", view: "faction", id: v, notice: "" });
+        Object.assign(rec2, { sub: "factions", view: "faction", id: v, notice: "" });
         resetPeopleUi();
         break;
       case "rec-back":
-        if (rec.view === "list") return false;
-        rec.notice = "";
-        if (rec.view === "report") {
+        if (rec2.view === "list") return false;
+        rec2.notice = "";
+        if (rec2.view === "report") {
           dropPng();
-          Object.assign(rec, { sub: rec.sub === "chronicle" ? "chronicle" : "journal", view: "list", id: "" });
-        } else if (rec.view === "faction") Object.assign(rec, { sub: "factions", view: "list", id: "" });
-        else Object.assign(rec, { sub: "people", view: "list", id: "" });
+          Object.assign(rec2, { sub: rec2.sub === "chronicle" ? "chronicle" : "journal", view: "list", id: "" });
+        } else if (rec2.view === "faction") Object.assign(rec2, { sub: "factions", view: "list", id: "" });
+        else Object.assign(rec2, { sub: "people", view: "list", id: "" });
         resetPeopleUi();
         break;
       case "rec-toast-x":
         closeToast();
         break;
       case "rec-pin": {
-        if (rec.busy || !v) return true;
+        if (rec2.busy || !v) return true;
         const on3 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
-        rec.busy = true;
+        rec2.busy = true;
         try {
           await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...reportVars(pinReport(readReports(chat), v, on3)) } }));
-          rec.info = on3 ? "고정했어요. 상한에 밀려 지워지지 않아요." : "고정을 풀었어요.";
+          rec2.info = on3 ? "고정했어요. 상한에 밀려 지워지지 않아요." : "고정을 풀었어요.";
         } catch (error) {
-          rec.notice = error instanceof Error ? error.message : String(error);
+          rec2.notice = error instanceof Error ? error.message : String(error);
         }
-        rec.busy = false;
+        rec2.busy = false;
         await env3.refresh();
         return true;
       }
       case "rec-png": {
-        if (rec.busy || !v) return true;
+        if (rec2.busy || !v) return true;
         const r = readReports(ctx2.chat).items.find((x) => x.id === v);
         if (!r) return true;
-        rec.busy = true;
-        rec.notice = "";
+        rec2.busy = true;
+        rec2.notice = "";
         env3.render();
         try {
           dropPng();
           const png = await reportPng(ctx2, r, document.querySelector(".gx"), orgText(ctx2));
           downloadPng(png);
-          rec.png = { url: png.url, name: png.name, no: r.no };
-          rec.info = `${png.name} 내려받기를 시작했어요.`;
+          rec2.png = { url: png.url, name: png.name, no: r.no };
+          rec2.info = `${png.name} 내려받기를 시작했어요.`;
         } catch (error) {
-          rec.notice = `이미지를 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+          rec2.notice = `이미지를 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
         }
-        rec.busy = false;
+        rec2.busy = false;
         break;
       }
       case "rec-png-dl":
-        if (rec.png) downloadPng({ blob: new Blob(), url: rec.png.url, name: rec.png.name });
+        if (rec2.png) downloadPng({ blob: new Blob(), url: rec2.png.url, name: rec2.png.name });
         return true;
       case "rec-png-keep":
         return true;
@@ -1012,7 +1509,7 @@
     }
   }
   function recordsInput(name, value) {
-    if (name === "rec-q") return void (rec.q = value), true;
+    if (name === "rec-q") return void (rec2.q = value), true;
     return false;
   }
   var CHAT_CARD = [["off", "안 띄움"], ["mine", "내가 출동한 사건만"], ["all", "전부"]];
@@ -1023,8 +1520,8 @@
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="jr-set" data-value="${esc37(`${key}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   function stepper(key, shown5, canDown, canUp, label2, step, sizes = []) {
-    return `<div class="st-step${stepSizeText(shown5, ...sizes)}" data-step="${step}"><button class="gx-step" data-action="jr-step" data-value="${key}:-" ${!canDown || rec.busy ? "disabled" : ""} aria-label="${esc37(label2)} 줄이기">−</button>
-    <b>${esc37(shown5)}</b><button class="gx-step" data-action="jr-step" data-value="${key}:+" ${!canUp || rec.busy ? "disabled" : ""} aria-label="${esc37(label2)} 늘리기">+</button></div>`;
+    return `<div class="st-step${stepSizeText(shown5, ...sizes)}" data-step="${step}"><button class="gx-step" data-action="jr-step" data-value="${key}:-" ${!canDown || rec2.busy ? "disabled" : ""} aria-label="${esc37(label2)} 줄이기">−</button>
+    <b>${esc37(shown5)}</b><button class="gx-step" data-action="jr-step" data-value="${key}:+" ${!canUp || rec2.busy ? "disabled" : ""} aria-label="${esc37(label2)} 늘리기">+</button></div>`;
   }
   function journalSettingsPane(ctx2, canChat = true) {
     const s8 = journalSettings(ctx2.chat.scriptstate);
@@ -1036,39 +1533,32 @@
     ].join("");
     return `<div class="ph-form jr-set">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>일지 설정</b><small>${canChat ? "이 채팅" : "이 채팅 · 시작 전"}</small></div><span class="ph-act">${defaultsButtons("jr")}</span></header>${defaultsConfirm("jr")}
-    ${rec.notice ? `<div class="gx-err" role="alert">${esc37(rec.notice)}</div>` : ""}
+    ${rec2.notice ? `<div class="gx-err" role="alert">${esc37(rec2.notice)}</div>` : ""}
     <div class="ph-form-body ps">
       <section class="ps-group"><div class="ps-rows">${rows3}</div></section>
     </div>
-    ${toast("rec", rec.info, (t) => {
-      if (rec.info === t) rec.info = "";
+    ${toast("rec", rec2.info, (t) => {
+      if (rec2.info === t) rec2.info = "";
     })}
   </div>`;
   }
   async function setVars4(ctx2, env3, vars) {
-    rec.busy = true;
-    rec.notice = "";
+    rec2.busy = true;
+    rec2.notice = "";
     try {
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } }));
     } catch (error) {
-      rec.notice = error instanceof Error ? error.message : String(error);
+      rec2.notice = error instanceof Error ? error.message : String(error);
     }
-    rec.busy = false;
+    rec2.busy = false;
     await env3.refresh();
-  }
-  async function redrawChatCards(ctx2) {
-    try {
-      await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex);
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
-    } catch {
-    }
   }
   async function handleJournalSettings(action, v, ctx2, env3) {
     const isLoad = action === "jr-def-yes" && defaultsAsk.pane === "jr" && defaultsAsk.what === "load";
     const def = await defaultsAction("jr", action, v, ctx2, env3.refresh);
     if (def !== null) {
-      if (def) rec.info = def;
-      if (isLoad) await redrawChatCards(ctx2);
+      if (def) rec2.info = def;
+      if (isLoad) await redrawChatCards(ctx2.charIndex, ctx2.chatIndex);
       env3.render();
       return true;
     }
@@ -1080,7 +1570,7 @@
       if (key === "chat_card") val = val === "off" || val === "all" ? val : "mine";
       else return true;
       await setVars4(ctx2, env3, { [JR(key)]: val });
-      if (key === "chat_card") await redrawChatCards(ctx2);
+      if (key === "chat_card") await redrawChatCards(ctx2.charIndex, ctx2.chatIndex);
       return true;
     }
     if (action === "jr-step") {
@@ -1532,6 +2022,10 @@
     settingsUi.busy = false;
     await env3.refresh();
   }
+  var cardMode = (ss) => journalSettings(ss).chatCard;
+  async function redrawIfCard(ctx2, was, now2) {
+    if (!settingsUi.notice && was !== now2) await redrawChatCards(ctx2.charIndex, ctx2.chatIndex);
+  }
   function withBasic(ctx2, chat, patch) {
     return basicVars({ ...basicSettings(ctx2.char.globalLore, chat.scriptstate), ...patch });
   }
@@ -1703,6 +2197,7 @@
       if (!u || u.charIndex !== ctx2.charIndex || u.chatIndex !== ctx2.chatIndex) return true;
       settingsUi.undo = null;
       let shopOff = false;
+      let card3 = ["", ""];
       await save2(ctx2, env3, (chat) => {
         const prev = chat.scriptstate;
         const vars = {};
@@ -1717,12 +2212,14 @@
         const side = bulkSideVars(chat, prev, { ...ss, ...vars });
         shopOff = side.shopOff;
         if (drop.length) chat.scriptstate = ss;
+        card3 = [cardMode(prev), cardMode({ ...ss, ...vars, ...side.vars })];
         return { ...vars, ...side.vars };
       });
       if (shopOff) {
         resetShop();
         await dropShopTags(ctx2);
       }
+      await redrawIfCard(ctx2, card3[0], card3[1]);
       if (!settingsUi.notice) settingsUi.info = "기본값을 불러오기 전 설정으로 되돌렸어요.";
       env3.render();
       return true;
@@ -1740,6 +2237,7 @@
         const d = current3(ctx2, "defaults");
         let before = null;
         let shopOff = false;
+        let card3 = ["", ""];
         await save2(ctx2, env3, (chat) => {
           const r = varDefaultsToLoad(ALL_PREFIXES, chat.scriptstate);
           const prev = chat.scriptstate;
@@ -1757,18 +2255,21 @@
           before = {};
           for (const k of [...Object.keys(vars), ...r.drop]) before[k] = prev?.[k];
           if (r.drop.length) chat.scriptstate = base;
+          card3 = [cardMode(prev), cardMode({ ...base, ...vars })];
           return vars;
         });
         if (shopOff) {
           resetShop();
           await dropShopTags(ctx2);
         }
+        await redrawIfCard(ctx2, card3[0], card3[1]);
         if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx2.charIndex, chatIndex: ctx2.chatIndex, before };
         if (!settingsUi.notice) settingsUi.info = "기본값을 지금 채팅에 불러왔어요.";
         env3.render();
       } else if (what === "reset") {
         let before = null;
         let shopOff = false;
+        let card3 = ["", ""];
         await save2(ctx2, env3, (chat) => {
           const prev = chat.scriptstate;
           const ss = { ...chat.scriptstate ?? {} };
@@ -1784,21 +2285,20 @@
           for (const k of Object.keys(side.vars)) if (!(k in before)) before[k] = prev?.[k];
           chat.scriptstate = ss;
           const vars = { ...side.vars, [THEME_KEY]: "dark" };
-          if (walletStarted(chat) && !ss[WALLET_VAR]) {
-            Object.assign(vars, walletVars(readWallet(ss, getPrefs().walletStart ?? WALLET_START_DEFAULT)));
-            if (!(WALLET_VAR in before)) before[WALLET_VAR] = void 0;
-          }
+          if (walletStarted(chat) && !ss[WALLET_VAR]) Object.assign(vars, walletVars(readWallet(ss, getPrefs().walletStart ?? WALLET_START_DEFAULT)));
           if (worldOn(chat)) {
             const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? ""));
             for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k];
             Object.assign(vars, wv);
           }
+          card3 = [cardMode(prev), cardMode({ ...ss, ...vars })];
           return vars;
         });
         if (shopOff) {
           resetShop();
           await dropShopTags(ctx2);
         }
+        await redrawIfCard(ctx2, card3[0], card3[1]);
         if (!settingsUi.notice) {
           for (const g2 of GUIDE_NAMES) setGuideOverride(g2, "");
           await saveDefaults(env3, (p2) => ({ ...p2, basic: {}, world: {}, theme: void 0, vars: {}, guides: void 0, imgPrompt: void 0, imgKeywords: void 0, walletStart: void 0, imgNamesOff: void 0, imgNamesExtra: void 0 }));
@@ -2300,6 +2800,7 @@
     withChat: false
   };
   var rerender3 = null;
+  var diagOpen = false;
   async function refresh() {
     const sizes = {};
     for (const [key] of STORE) {
@@ -2417,6 +2918,8 @@
     const mode2 = String(advValue(ctx2.chat.scriptstate, "gen", "lore_mode") ?? "plugin");
     const msgs4 = Array.isArray(ctx2.chat.message) ? ctx2.chat.message.length : 0;
     const tok3 = tokenizerName();
+    const wikiOld = wikiPackOld();
+    if (!wikiOld) void checkWikiPackOld().then((old) => old && wikiPackOld() && diagOpen && rerender3?.());
     const rows3 = [
       row6("카드", badge2(goei, goei ? "괴이 카드" : "괴이 카드 아님"), goei ? `카드 ${ver === "0" ? "이전 판" : `v${ver}`} · 명부·매니페스트 있음` : "설치 · 점검에서 심으면 괴이 카드가 돼요"),
       row6("플러그인", badge2(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? "" : "업데이트를 받을 수 없는 빌드"),
@@ -2426,7 +2929,7 @@
       row6("채팅", badge2(canChat, canChat ? "진행 중" : "시작 전"), canChat ? `메시지 ${msgs4}개 · 이 채팅 값으로 동작해요` : "시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요"),
       // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
       row6("토크나이저", badge2(!!tok3, tok3 || "어림값") + getBtn("tok", "받기 (약 2MB)", !!tok3), tok3 ? "토큰 수를 정확히 세요" : "안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요."),
-      row6("위키 기본 문서", badge2(!!storedWikiPack(), storedWikiPack() ? "있음" : "없음") + getBtn("wiki", "받기 (약 1MB)", !!storedWikiPack()), storedWikiPack() ? "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)" : "안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요."),
+      row6("위키 기본 문서", badge2(!!storedWikiPack() && !wikiOld, wikiOld ? "새 판 있음" : storedWikiPack() ? "있음" : "없음") + getBtn("wiki", "받기 (약 1MB)", !!storedWikiPack() && !wikiOld), storedWikiPack() ? "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)" : "안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요."),
       row6("로어북 보내기", badge2(null, mode2 === "risu" ? "Risu가 직접" : "플러그인이 고름"), "설정 → 호출 → 로어북 호출 → 로어북 보내기")
     ].join("");
     const fails = [...boardFailures().map((f) => `${f.name}: ${f.reason}`), phone.failure ? `괴담톡: ${phone.failure.reason}` : "", wiki.failure ? `위키: ${wiki.failure.reason}` : ""].filter(Boolean);
@@ -2442,452 +2945,4 @@
     return `<div class="gw-page gw-set">${head2("", "실패 기록", "괴담넷·괴담톡·위키 요청이 실패했을 때 모델이 보낸 원문이에요. 인물 기록 갱신의 결과는 「인물 기록 점검」에 있어요.")}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>진단 묶음</h3><div class="ps-rows">${row6("내려받기", `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, "판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.")}</div></section>
-    <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ""}</div></section>
-    </div></div>`;
-  }
-  function manageConfirmPopup() {
-    if (manUi.confirm !== "import") return "";
-    return `<div class="gw-confirm"><div class="gw-confirm-box"><p>가져온 설정으로 지금 기기 설정(과 세계 편집)을 통째로 덮어쓸까요? 덮어쓴 설정은 되돌릴 수 없어요.</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="man-import-yes">적용</button><button class="gx-mini" data-action="man-no">취소</button></div></div></div>`;
-  }
-  function managePage(ctx2, node, canChat) {
-    if (node === "manage:backup") return backupPage(ctx2, canChat);
-    if (node === "manage:diag") return diagPage(ctx2, canChat);
-    if (node === "manage:people") {
-      return `<div class="gw-page gw-set">${head2("", "인물 기록 점검", "인물 기록 갱신을 지금 돌려 보고, 최근 갱신의 입력 크기·결과·실패 이유를 봐요.")}
-    <div class="gx-settings gw-setbody"><div class="ps pp-set">${peopleDiagPane(ctx2, canChat)}</div></div></div>`;
-    }
-    if (node === "manage:flow") {
-      ensureFlow(flowView(ctx2, canChat).ctx, () => rerender3?.());
-      return flowPage(ctx2, head2, canChat);
-    }
-    if (node === "manage:trace") {
-      const confirm = traceUi.confirm ? `<button class="gx-mini danger" data-action="man-drop-trace-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-trace">${ICONS.trash}기록 지우기</button>`;
-      return tracePage(head2, confirm);
-    }
-    return logPage(ctx2, canChat);
-  }
-  function manageInput(name, value) {
-    if (name !== "man-import-text") return false;
-    manUi.importText = value;
-    manUi.importName = "";
-    return true;
-  }
-  async function manageFile(el) {
-    if (el.dataset.change !== "man-import-file") return false;
-    const f = el.files?.[0];
-    if (!f) return true;
-    try {
-      manUi.importText = await f.text();
-      manUi.importName = f.name;
-      manUi.notice = "";
-    } catch (error) {
-      manUi.notice = `파일을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-    }
-    el.value = "";
-    return true;
-  }
-  async function manageAction(action, root3, ctx2 = null, canChat = true, value = "") {
-    if (!action.startsWith("man-")) return false;
-    manUi.notice = "";
-    manUi.info = "";
-    switch (action) {
-      case "man-no":
-        manUi.confirm = "";
-        traceUi.confirm = false;
-        return true;
-      case "man-trace-toggle":
-        if (traceUi.open.has(value)) traceUi.open.delete(value);
-        else traceUi.open.add(value);
-        return true;
-      case "man-drop-trace":
-        traceUi.confirm = true;
-        return true;
-      case "man-drop-trace-yes":
-        traceUi.confirm = false;
-        await clearTrace();
-        traceUi.turns = [];
-        traceUi.open.clear();
-        manUi.info = "호출 기록을 지웠어요.";
-        return true;
-      case "man-with-chat":
-        manUi.withChat = !manUi.withChat;
-        return true;
-      case "man-copy": {
-        if (!ctx2) return true;
-        const json = exportJson(ctx2, manUi.withChat && !!canChat);
-        const ok = await copyText(json);
-        manUi.info = ok ? `복사했어요 (${kb(json.length)}).` : "이 환경에서는 복사가 막혀 있어요. 「내려받기」로 파일로 받으세요.";
-        return true;
-      }
-      case "man-download": {
-        try {
-          const json = ctx2 ? exportJson(ctx2, manUi.withChat && !!canChat) : JSON.stringify(getPrefs(), null, 2);
-          downloadJson(`goei-settings-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`, json);
-          manUi.info = "내려받기를 시작했어요. 안 되면 「복사」로 글을 옮기세요.";
-        } catch (error) {
-          manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        return true;
-      }
-      case "man-diag-download": {
-        if (!ctx2) return true;
-        try {
-          downloadJson(`goei-diag-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`, diagBundle(ctx2, !!canChat));
-          manUi.info = "진단 묶음 내려받기를 시작했어요. 제보할 때 이 파일 하나를 보내면 돼요.";
-        } catch (error) {
-          manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        return true;
-      }
-      case "man-import":
-        manUi.confirm = "import";
-        return true;
-      case "man-import-yes": {
-        manUi.confirm = "";
-        try {
-          const parsed = JSON.parse(manUi.importText);
-          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("설정 JSON 이 아니에요.");
-          const { directory: directory2, chat, ...prefs2 } = parsed;
-          let wrote = "";
-          if (directory2 && typeof directory2 === "object" && !Array.isArray(directory2)) {
-            if (!ctx2) throw new Error("세계 편집을 적을 카드가 없어요.");
-            await updateCharacterLore(ctx2.charIndex, (lore) => withDirectory(lore, directory2));
-            wrote = " 세계 편집(명부)도 카드에 적었어요.";
-          }
-          const cv = chat && typeof chat === "object" && !Array.isArray(chat) ? chat.vars : null;
-          if (cv && typeof cv === "object" && !Array.isArray(cv)) {
-            const vars = Object.entries(cv).filter(([k, v]) => isChatSettingVar(k) && (typeof v === "string" || typeof v === "number" || typeof v === "boolean"));
-            if (ctx2 && canChat && vars.length) {
-              await updateChat(ctx2.charIndex, ctx2.chatIndex, (c) => {
-                c.scriptstate ??= {};
-                for (const [k, v] of vars) c.scriptstate[k] = String(v);
-                return c;
-              });
-              wrote += ` 채팅 값 ${vars.length}개도 이 채팅에 적었어요.`;
-            } else if (vars.length) wrote += " 채팅 값은 시작 전이라 적지 않았어요.";
-          }
-          await savePrefs(() => prefs2);
-          manUi.importText = "";
-          manUi.importName = "";
-          manUi.sizes = null;
-          manUi.info = `설정을 가져왔어요.${wrote} 창을 닫았다 열면 전부 반영돼요.`;
-        } catch (error) {
-          manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        return true;
-      }
-      case "man-get-tok":
-      case "man-get-wiki": {
-        if (manUi.getting) return true;
-        const what = action === "man-get-tok" ? "tok" : "wiki";
-        manUi.getting = what;
-        manUi.progress = "";
-        rerender3?.();
-        const progress4 = (t) => {
-          manUi.progress = t;
-          rerender3?.();
-        };
-        try {
-          if (what === "tok") await installTokenizer(progress4);
-          else await installWikiPack(progress4);
-          manUi.info = what === "tok" ? "토크나이저를 받았어요. 이제 토큰 수를 정확히 세요." : "위키 기본 문서를 받았어요. 위키 탭에서 읽을 수 있어요.";
-        } catch (error) {
-          manUi.notice = `${what === "tok" ? "토크나이저" : "위키 기본 문서"}를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        manUi.getting = "";
-        manUi.progress = "";
-        manUi.sizes = null;
-        return true;
-      }
-      case "man-drop-wiki":
-      case "man-drop-tok":
-      case "man-drop-diag":
-        manUi.confirm = action.slice(4);
-        return true;
-      case "man-drop-wiki-yes":
-        manUi.confirm = "";
-        await dropWikiPack();
-        manUi.info = "위키 기본 문서를 지웠어요.";
-        manUi.sizes = null;
-        return true;
-      case "man-drop-tok-yes":
-        manUi.confirm = "";
-        await dropTokenizer();
-        manUi.info = "토크나이저를 지웠어요. 토큰 수는 어림값이에요.";
-        manUi.sizes = null;
-        return true;
-      case "man-drop-diag-yes":
-        manUi.confirm = "";
-        await clearDiag();
-        manUi.info = "인물 기록 실행 기록을 지웠어요.";
-        manUi.sizes = null;
-        return true;
-      case "man-clear-fail":
-        clearBoardFailures();
-        phone.failure = null;
-        wiki.failure = null;
-        return true;
-    }
-    return true;
-  }
-
-  // src/core/consult.ts
-  var onOff2 = (l) => l === "ON" ? "켬" : l === "OFF" ? "끔" : l;
-  var EMPTY = "(빈 글)";
-  var oneLine = (s8) => s8.replace(/\r?\n/g, "\\n");
-  function consultLabel(item2, value) {
-    if (item2.kind === "text") return value === "" ? EMPTY : value;
-    if (item2.kind === "num" || item2.kind === "step") {
-      if (value.trim() === "") return item2.zero ?? "(비어 있음)";
-      const n3 = Number(value) || 0;
-      return n3 === 0 && item2.zero ? item2.zero : `${n3}${item2.unit ?? ""}`;
-    }
-    const o = item2.opts?.find(([v]) => v === value);
-    return o ? onOff2(o[1]) : value;
-  }
-  var consultCan = (i) => i.kind !== "info" && !i.locked;
-  function choices(i) {
-    if (i.kind === "num") return `${i.lo ?? 0}~${i.hi ?? 0}${i.unit ?? ""} (정수)`;
-    if (i.kind === "step") return `정수${i.unit ? ` (${i.unit})` : ""}, ${i.stride && i.stride > 1 ? `지금 값에서 ${i.stride}씩` : "화면의 − + 단추가 닿는 값"}`;
-    if (i.kind === "text") return `글${i.max ? ` (최대 ${i.max}자)` : ""}${i.multi ? ", 여러 줄은 \\n 으로 이음" : ", 한 줄"}`;
-    return (i.opts ?? []).map(([, l]) => onOff2(l)).join(" / ");
-  }
-  function itemLine2(i) {
-    const name = `${i.group && i.group !== i.menu && i.group !== i.name ? `${i.group} · ` : ""}${i.name}`;
-    const help = i.help ? ` | 설명: ${i.help}` : "";
-    if (i.kind === "info") return `[${i.id}] ${name} | 바꾸기: 못 함${help}`;
-    const cur = i.kind === "text" ? oneLine(consultLabel(i, i.cur)) : consultLabel(i, i.cur);
-    return `[${i.id}] ${name} | 지금: ${cur} | ${i.locked ? "바꾸기: 못 함 (지금 잠김)" : `고를 수 있는 값: ${choices(i)}`}${i.scope ? ` | 저장: ${i.scope}` : ""}${help}`;
-  }
-  var dropMax = (text5) => String(text5 ?? "").replace(/[^.\n(]*\{max\}[^.\n)]*\.?\s?/g, "");
-  function consultPrompt(src) {
-    const g2 = guideSections("Consult");
-    const system = [g2.COMMON, g2.KNOWLEDGE, g2.CHANGE, g2.OUTPUT].map((t) => fillGuide(dropMax(t), {})).filter(Boolean).join("\n\n");
-    const byId = new Map(src.all.map((i) => [i.id, i]));
-    const pending2 = src.pending.map((c) => {
-      const i = byId.get(c.id);
-      return i ? `${c.id}=${i.kind === "text" ? oneLine(consultLabel(i, c.value)) : consultLabel(i, c.value)} (${i.menu} · ${i.name}, 지금 ${i.kind === "text" ? oneLine(consultLabel(i, i.cur)) : consultLabel(i, i.cur)})` : "";
-    }).filter(Boolean).join("\n");
-    const talk = src.talk.map((l) => `${l.who === "me" ? "[사용자]" : "[상담]"} ${l.text}`).join("\n");
-    const list4 = src.opened.map((o) => `## ${o.menu}
-${o.items.map(itemLine2).join("\n")}`).join("\n\n");
-    return [
-      { role: "system", content: system },
-      { role: "user", content: `[지금 상태]
-${src.state}
-
-[지난 턴 실제]
-${src.last}
-
-[메뉴]
-${src.menus}
-
-[설정 목록]
-${list4 || "(펼친 메뉴 없음)"}
-
-[바꾸자고 한 것]
-${pending2 || "(없음)"}
-
-[이 창의 대화 — 마지막 줄이 사용자가 방금 한 말]
-${talk}` }
-    ];
-  }
-  function parseConsult(raw) {
-    const block5 = (name) => new RegExp(`<${name}>([\\s\\S]*?)</${name}>`, "i").exec(raw)?.[1] ?? "";
-    const say2 = block5("say").trim();
-    const open3 = block5("open").split(/[,\n]/).map((s8) => s8.replace(/[「」\[\]]/g, "").trim()).filter(Boolean);
-    if (!say2 && !open3.length) throw new Error("<say> 블록이 없어요.");
-    const set2 = block5("set").split("\n").map((l) => /^\s*\[?([^\s=\[\]]+)\]?\s*=\s?(.*?)\s*$/.exec(l)).filter((m) => !!m).map((m) => ({ id: m[1], raw: m[2] }));
-    return { say: say2, set: set2, apply: /<apply>\s*yes\s*<\/apply>/i.test(raw), open: open3, go: block5("go").replace(/[\[\]]/g, "").trim() };
-  }
-  var norm3 = (s8) => s8.replace(/[「」『』"'`()\s]/g, "").toLowerCase();
-  function consultValue(item2, raw) {
-    if (item2.kind === "info") return null;
-    if (item2.kind === "text") {
-      const t = raw === EMPTY ? "" : raw;
-      const text5 = (item2.multi ? t.replace(/\\n/g, "\n") : t.replace(/\\n|\r?\n/g, " ")).trim();
-      if (/[<>]/.test(text5)) return null;
-      if (item2.max && text5.length > item2.max) return null;
-      return text5;
-    }
-    if (item2.kind === "num" || item2.kind === "step") {
-      const t = raw.trim().replace(/(\d),(?=\d{3})/g, "$1");
-      const n3 = item2.zero && norm3(t) === norm3(item2.zero) ? 0 : /^-?\d+/.test(t) && /^-?\d+\s*\D{0,3}$/.test(t) ? Number.parseInt(t, 10) : NaN;
-      if (!Number.isInteger(n3)) return null;
-      if (item2.kind === "step") return (item2.lo === void 0 || n3 >= item2.lo) && (item2.hi === void 0 || n3 <= item2.hi) && (!item2.stride || (n3 - Number(item2.cur)) % item2.stride === 0) ? String(n3) : null;
-      return n3 >= (item2.lo ?? 0) && n3 <= (item2.hi ?? 0) ? String(n3) : null;
-    }
-    const want = norm3(raw);
-    const hit4 = (item2.opts ?? []).find(([v, l]) => norm3(onOff2(l)) === want || norm3(l) === want || v === raw.trim());
-    return hit4 ? hit4[0] : null;
-  }
-  function consultWhy(item2, raw) {
-    if (item2.kind === "info") return "상담에서 바꿀 수 없는 설정";
-    if (item2.locked) return "지금은 잠겨 있는 설정";
-    if (item2.kind === "text" && /[<>]/.test(raw)) return "글에 < > 는 쓸 수 없어요";
-    if (item2.kind === "text") return `글이 너무 길어요 (최대 ${item2.max}자)`;
-    return `고를 수 없는 값 「${raw.slice(0, 40)}」`;
-  }
-  function checkConsult(items, set2) {
-    const byId = new Map(items.map((i) => [i.id, i]));
-    const ok = /* @__PURE__ */ new Map();
-    const bad = [];
-    for (const s8 of set2) {
-      const item2 = byId.get(s8.id);
-      if (!item2) {
-        bad.push(`${s8.id}: 목록에 없는 설정`);
-        continue;
-      }
-      const value = consultCan(item2) ? consultValue(item2, s8.raw) : null;
-      if (value === null) {
-        bad.push(`${item2.name}: ${consultWhy(item2, s8.raw)}`);
-        continue;
-      }
-      ok.delete(s8.id);
-      if (value !== item2.cur) ok.set(s8.id, { id: s8.id, value });
-    }
-    return { ok: [...ok.values()], bad };
-  }
-
-  // src/ui/editor/catalog.ts
-  function txt(el) {
-    if (!el) return "";
-    const parts = [];
-    const walk = (n3) => n3.childNodes.forEach((c) => {
-      if (c.nodeType === 3) parts.push(c.textContent ?? "");
-      else if (c.nodeType === 1) {
-        parts.push(" ");
-        walk(c);
-        parts.push(" ");
-      }
-    });
-    walk(el);
-    return parts.join("").replace(/\s+/g, " ").trim();
-  }
-  var own = (el) => el ? [...el.childNodes].filter((n3) => n3.nodeType === 3).map((n3) => n3.textContent ?? "").join("").replace(/\s+/g, " ").trim() : "";
-  var ROW = ".ps-row, .ck-row, .mx-row, .st-col-row";
-  var NOT_SETTING = ".lc-row";
-  var TWIN = ".ck-ph, .fl-ph";
-  var CTL = "button[data-action], input[data-change], textarea[data-change]";
-  var keyOf3 = (v) => v.includes("=") ? v.slice(0, v.lastIndexOf("=")) : v.includes(":") ? v.slice(0, v.lastIndexOf(":")) : "";
-  function gridCols(section3) {
-    if (!section3) return [];
-    const opts = [...section3.querySelectorAll(":scope > .ps-rows > .ck-h2 > span")].slice(1).map(txt);
-    const groups = [];
-    section3.querySelectorAll(":scope > .ps-rows > .ck-h1 > b").forEach((b) => {
-      const n3 = Number(/span\s+(\d+)/.exec(b.getAttribute("style") ?? "")?.[1] ?? 1);
-      for (let i = 0; i < n3; i++) groups.push(txt(b));
-    });
-    return opts.map((o, i) => [groups[i] ?? "", o]);
-  }
-  function subOf2(el, rowLabel) {
-    const set1 = el.closest(".fam-set1");
-    if (set1) {
-      const l = txt(set1.querySelector(":scope > span"));
-      if (l) return l;
-    }
-    const box3 = el.closest(".st-step") ?? el.closest(".gx-switch-wrap") ?? el.closest(".gx-segs") ?? el;
-    const prev = box3.previousElementSibling;
-    if (prev && prev.tagName === "SPAN" && !prev.querySelector(CTL) && !prev.matches(".gx-switch-wrap, .ph-inline")) {
-      const l = txt(prev);
-      if (l && l.length <= 12) return l;
-    }
-    const site = txt(el.closest(".mx-cell")?.querySelector(":scope > .mx-site"));
-    if (site) return site;
-    const aria = (el.getAttribute("aria-label") ?? "").replace(/\s+/g, " ").trim();
-    const rest = aria.startsWith(rowLabel) ? aria.slice(rowLabel.length).trim() : aria;
-    return rest === rowLabel ? "" : rest;
-  }
-  function pageRows(html, page, menu) {
-    const doc2 = new DOMParser().parseFromString(html, "text/html");
-    const out = [];
-    const seen4 = /* @__PURE__ */ new Set();
-    let infoN = 0;
-    const cols = /* @__PURE__ */ new Map();
-    const colsOf = (s8) => {
-      if (!s8) return [];
-      if (!cols.has(s8)) cols.set(s8, gridCols(s8));
-      return cols.get(s8);
-    };
-    doc2.querySelectorAll(ROW).forEach((row8) => {
-      if (row8.closest(TWIN) || row8.matches(NOT_SETTING)) return;
-      const section3 = row8.closest(".ps-group, .ps-card, details");
-      const headEl = section3?.querySelector("h3, h4, summary") ?? null;
-      const group4 = own(headEl) || txt(headEl);
-      const isPs = row8.matches(".ps-row");
-      const isGrid = row8.matches(".ck-row");
-      const labelEl = row8.querySelector(isPs ? ":scope > .ps-label > b" : isGrid ? ":scope > .ck-name" : row8.matches(".mx-row") ? ":scope > .mx-label" : ":scope > .st-col-name > b");
-      const label2 = isPs ? own(labelEl) : txt(labelEl);
-      if (!label2) return;
-      const help = txt(row8.querySelector(isPs ? ":scope > .ps-label > small" : row8.matches(".mx-row") ? ":scope > .mx-help" : ":scope > .st-col-name > small"));
-      const badge3 = isPs ? txt(labelEl?.querySelector("i.gx-scope")) : "";
-      const scope = badge3 && badge3 !== "이 채팅" ? badge3 : void 0;
-      const grp = txt(section3?.querySelector("h3"));
-      const spot = (colGroup = "") => [`set:${page}`, isPs ? `r:${label2}${grp ? `@${grp}` : ""}` : colGroup ? `r:${colGroup}` : ""];
-      const els = [...row8.querySelectorAll(CTL)].filter((e) => e.closest(ROW) === row8 && !e.closest('[data-consult="no"]'));
-      const gcols = isGrid ? colsOf(section3) : [];
-      const cellAt = (e) => {
-        const cell3 = e.closest(".ck-cell");
-        const i = cell3 ? [...row8.querySelectorAll(":scope > .ck-cell")].indexOf(cell3) : -1;
-        return gcols[i] ?? ["", ""];
-      };
-      const made = [];
-      const used = /* @__PURE__ */ new Set();
-      const push3 = (r) => {
-        if (seen4.has(r.id)) return;
-        seen4.add(r.id);
-        const { colGroup, ...rest } = r;
-        made.push({ ...rest, page, menu, group: group4, help, scope, go: spot(colGroup), keys: colGroup ? [label2, colGroup] : [label2] });
-      };
-      for (const e of els) {
-        if (used.has(e)) continue;
-        used.add(e);
-        const locked = e.hasAttribute("disabled") || e.hasAttribute("readonly");
-        if (e.tagName !== "BUTTON") {
-          const input3 = e;
-          const type = (input3.getAttribute("type") ?? "text").toLowerCase();
-          if (["hidden", "file", "checkbox", "radio", "color"].includes(type)) continue;
-          const action2 = input3.dataset.change ?? "";
-          const key2 = input3.dataset.key ?? "";
-          const [cg3, co2] = cellAt(e);
-          const lone = isGrid && !!cg3 && gcols.filter(([g2]) => g2 === cg3).length === 1;
-          const sub = isGrid ? lone ? cg3 : [cg3, co2].filter(Boolean).join(" ") : subOf2(e, label2);
-          const value2 = (e.tagName === "TEXTAREA" ? e.textContent ?? "" : input3.getAttribute("value") ?? "").replace(/\r/g, "");
-          const lo = Number(input3.getAttribute("min"));
-          const hi = Number(input3.getAttribute("max"));
-          const isNum = (type === "number" || type === "range") && input3.hasAttribute("min") && input3.hasAttribute("max") && Number.isFinite(lo) && Number.isFinite(hi);
-          const unit = (lone ? co2 : "") || txt(e.closest(".st-step")?.querySelector(":scope > span")) || txt(e.parentElement?.querySelector(":scope > output")).replace(/^-?[\d,.\s]+/, "") || void 0;
-          const max = Number(input3.getAttribute("maxlength")) || void 0;
-          push3({ id: key2 ? `${action2}.${key2}` : action2, name: sub, kind: isNum ? "num" : "text", cur: isNum ? value2.trim() : value2.trim(), ...isNum ? { lo, hi, unit } : { max, multi: e.tagName === "TEXTAREA" }, locked, colGroup: cg3 || void 0, ctl: { t: "input", action: action2, key: key2 } });
-          continue;
-        }
-        const action = e.dataset.action ?? "";
-        const value = e.dataset.value ?? "";
-        if (e.getAttribute("role") === "switch") {
-          const on3 = e.getAttribute("aria-checked") === "true";
-          push3({ id: `${action}${keyOf3(value) ? `.${keyOf3(value)}` : ""}`, name: subOf2(e, label2), kind: "pick", cur: on3 ? "1" : "0", opts: [["1", "ON"], ["0", "OFF"]], locked, ctl: { t: "toggle", action, send: value } });
-          continue;
-        }
-        if (e.classList.contains("gx-step")) {
-          const box3 = e.closest(".st-step");
-          if (!box3 || box3.querySelector("input[data-change]")) continue;
-          const btns = [...box3.querySelectorAll("button.gx-step[data-action]")];
-          btns.forEach((b) => used.add(b));
-          const minus = btns.find((b) => (b.dataset.value ?? "").endsWith("-"));
-          const plus = btns.find((b) => (b.dataset.value ?? "").endsWith("+"));
-          if (!minus || !plus) continue;
-          const shown5 = txt(box3.querySelector(":scope > b"));
-          const m = /-?\d[\d,]*/.exec(shown5);
-          const n3 = m ? Number(m[0].replace(/,/g, "")) : 0;
-          const key2 = (minus.dataset.value ?? "").slice(0, -1).replace(/:$/, "");
-          push3({
-            id: key2 ? `${action}.${key2}` : action,
-            name: subOf2(e, label2),
-            kind: "step",
-            cur: String(n3),
-            unit: m ? shown5.slice((m.index ?? 0) + m[0].length).trim() || void 0 : void 0,
-            zero: m ? void 0 : shown5 || void 0,
-            ...Number(box3.dataset.step) > 1 ? { stride: Number(box3.dataset.step) } : {},
-            ...minus.hasAttribute("disabled") ? { lo: n3 } : {},
-            ...plus.hasAttribute("disabled") ? { hi: n3 } : {},
-           
+    <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ?

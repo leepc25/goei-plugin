@@ -1,7 +1,7 @@
 //@name goei-plugin
-//@display-name 괴이: ANOMALY v0.21.14
+//@display-name 괴이: ANOMALY v0.21.15
 //@api 3.0
-//@version 0.21.14
+//@version 0.21.15
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/texthash.ts
@@ -42,6 +42,20 @@ async function fetchParts(names, get, onDone, limit = PART_CONCURRENCY) {
   };
   await Promise.all(Array.from({ length: Math.min(limit, names.length) }, worker));
   return out.join("");
+}
+
+// src/core/stalever.ts
+var VERSION = /^\d+(\.\d+)*$/;
+function oldPluginMessage(mine, up) {
+  if (typeof up !== "string" || !VERSION.test(up) || !VERSION.test(mine)) return null;
+  const a = mine.split(".").map(Number);
+  const b = up.split(".").map(Number);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const d = (b[i] ?? 0) - (a[i] ?? 0);
+    if (d < 0) return null;
+    if (d > 0) return `플러그인이 옛 판(v${mine})이에요. 새 판 v${up}가 나왔어요. Risu 설정 → 플러그인에서 업데이트해 주세요.`;
+  }
+  return null;
 }
 
 // src/loader/body.ts
@@ -98,7 +112,7 @@ async function fetchBody(version) {
   } catch {
     throw new BodyError("본체 정보를 받지 못했어요.");
   }
-  if (index?.version !== version) throw new BodyError("아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.");
+  if (index?.version !== version) throw new BodyError(oldPluginMessage(version, index?.version) ?? "아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.");
   if (!Array.isArray(index.parts) || typeof index.length !== "number") throw new BodyError("본체 정보가 올바르지 않아요.");
   for (const name of index.parts) {
     if (typeof name !== "string" || !/^goei-body\.\d+\.txt$/.test(name)) throw new BodyError("본체 정보가 올바르지 않아요.");
@@ -207,12 +221,13 @@ function showPanel(version, install2, message = "") {
 }
 
 // src/main.ts
-var VERSION = true ? "0.21.14" : "";
+var VERSION2 = true ? "0.21.15" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", "%%GOEI_SCENE%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
 var body = null;
 var loading = null;
+var starting = null;
 var stopped = false;
 var failedAt = 0;
 var startError = "";
@@ -228,20 +243,21 @@ async function load(prompt) {
   const lap = (what) => console.log(`[goei] 시작 ${what}: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
   try {
     const saved = await risuai.pluginStorage.getItem(BODY_KEY);
-    if (typeof saved === "string" && bodyVersion(saved) === VERSION) code = saved, fromStore = true;
+    if (typeof saved === "string" && bodyVersion(saved) === VERSION2) code = saved, fromStore = true;
   } catch {
   }
   lap(fromStore ? "저장된 본체 읽음" : "저장된 본체 없음(받는다)");
   if (!code) {
     try {
-      code = await fetchBody(VERSION);
+      code = await fetchBody(VERSION2);
     } catch (error) {
       console.log(`[goei] 본체를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
       failedAt = Date.now();
-      if (prompt) showPanel(VERSION, install);
+      if (prompt) showPanel(VERSION2, install);
       return null;
     }
     lap("본체 받음");
+    if (body) return body;
     await save(code);
     lap("본체 저장");
   }
@@ -251,7 +267,7 @@ async function load(prompt) {
     failedAt = Date.now();
     if (fromStore && codeBroken) await risuai.pluginStorage.removeItem(BODY_KEY).catch(() => {
     });
-    if (prompt && !link.__goeiBodyPanel) showPanel(VERSION, install, `본체를 시작하지 못했어요: ${startError}`);
+    if (prompt && !link.__goeiBodyPanel) showPanel(VERSION2, install, `본체를 시작하지 못했어요: ${startError}`);
   }
   return b;
 }
@@ -263,10 +279,24 @@ async function save(code) {
   }
 }
 async function start(code, prompt) {
+  while (starting) {
+    const b = await starting;
+    if (b) return b;
+  }
+  if (body) return body;
+  const p = startOnce(code, prompt);
+  starting = p;
+  try {
+    return await p;
+  } finally {
+    if (starting === p) starting = null;
+  }
+}
+async function startOnce(code, prompt) {
   codeBroken = false;
   let api;
   try {
-    api = runBody(code, VERSION);
+    api = runBody(code, VERSION2);
   } catch (error) {
     codeBroken = true;
     startError = error instanceof Error ? error.message : String(error);

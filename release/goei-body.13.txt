@@ -1,4 +1,383 @@
-lt entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.",
+> h.key === d.key);
+        const extendsNow = !!head3?.ext && !prev?.extended;
+        if (extendsNow && prev?.extended) {
+          drop("doc", d, "연장은 한 번만", d.key);
+          continue;
+        }
+        if (++hookActions > 1) {
+          drop("doc", d, "응답당 훅 행동 1개", d.key);
+          continue;
+        }
+      }
+      const key = plain(d.key, 40);
+      const ev = norm(str9(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
+      if (!key || typeof ev === "string") {
+        drop("doc", d, typeof ev === "string" ? ev : "이름 없음");
+        continue;
+      }
+      const doc2 = store3.docs[`${type}:${key}`];
+      const cur = doc2 ? liveEntries(doc2.entries, live) : [];
+      const text5 = plain(d.text, 200);
+      if (type === "rhythm" && text5 && !rhythmTextOk(key, text5)) {
+        drop("doc", d, "리듬 문서 본문 표식이 없음 ([phase:…] 또는 [hook:…])", key);
+        continue;
+      }
+      let replaces;
+      const drid = typeof d.replace === "string" ? d.replace.trim() : "";
+      const dop = d.op === "upsert" && !drid && cur.length === 0 ? "add" : d.op;
+      if (dop === "upsert" || dop === "remove") {
+        const target = drid ? cur.find((x) => x.id === drid) : dop === "upsert" && cur.length === 1 ? cur[0] : void 0;
+        if (!target) {
+          drop("doc", d, "replace 가 실제 항목이 아님");
+          continue;
+        }
+        if (target.pin) {
+          drop("doc", d, "고정된 항목");
+          continue;
+        }
+        replaces = target.id;
+      }
+      if (dop !== "remove" && !text5) {
+        drop("doc", d, "본문 없음");
+        continue;
+      }
+      if (dop === "add" && cur.some((x) => similar2(x.text, text5))) {
+        drop("doc", d, "같은 뜻의 항목이 이미 있음");
+        continue;
+      }
+      const seq4 = nextSeq2(ev.anchor);
+      const body5 = dop === "remove" ? `(해소) ${cur.find((x) => x.id === replaces).text}`.slice(0, 200) : text5;
+      if (putDoc(store3, type, key, { id: entryId(`${type}:${key}`, "doc", ev.anchor, seq4, body5), text: body5, src: "story", anchor: ev.anchor, seq: seq4, ...norm(str9(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
+    }
+    if (ctx2.settings.features.has("suspicion") && !ctx2.settings.qualitative.has("suspicion")) {
+      for (const s8 of r.suspicion ?? []) {
+        const who = nameOf(str9(s8?.who));
+        if (!who) {
+          drop("suspicion", s8, "명단에 없는 이름", str9(s8?.who));
+          continue;
+        }
+        if (!SUSP_KINDS.has(str9(s8.kind))) {
+          drop("suspicion", s8, "없는 의심 종류", who);
+          continue;
+        }
+        const ev = evidence(s8.m, s8.quote);
+        if (typeof ev === "string") {
+          drop("suspicion", s8, ev, who);
+          continue;
+        }
+        const target = s8.target === "@user" ? "@user" : nameOf(str9(s8.target)) ?? plain(s8.target, 30);
+        const text5 = plain(s8.text, 200);
+        if (!target || !text5) {
+          drop("suspicion", s8, "대상 또는 본문 없음", who);
+          continue;
+        }
+        const cur = liveEntries(store3.people[who].slots.suspicion, live).filter((x) => x.target === target && x.kind === s8.kind);
+        const seq4 = nextSeq2(ev.anchor);
+        const tag = s8.op === "clue" && s8.weight && s8.weight in SUSP_WEIGHT ? `·${s8.weight}` : s8.op === "respond" && s8.stage && /^(지켜봄|시험|대면|보고)$/.test(s8.stage) ? `·${s8.stage}` : s8.op === "close" && s8.result && /^(확인|해소|묻음)$/.test(s8.result) ? `·${s8.result}` : "";
+        const prefix = s8.op === "open" ? "[시작] " : s8.op === "clue" ? `[단서${tag}] ` : s8.op === "respond" ? `[반응${tag}] ` : s8.op === "close" ? `[해소${tag}] ` : "";
+        if (!prefix) {
+          drop("suspicion", s8, "없는 연산", who);
+          continue;
+        }
+        if (cur.some((x) => similar2(x.text, prefix + text5))) {
+          drop("suspicion", s8, "같은 뜻의 항목이 이미 있음", who);
+          continue;
+        }
+        if (putEntry(store3, who, "suspicion", { id: entryId(who, "suspicion", ev.anchor, seq4, prefix + text5), text: prefix + text5, src: "story", anchor: ev.anchor, seq: seq4, quote: s8.quote, target, kind: s8.kind })) report.applied.suspicion++;
+      }
+    }
+    if (ctx2.settings.features.has("faction_rep") && ctx2.settings.factionQual && !ctx2.only?.length) {
+      const seen4 = /* @__PURE__ */ new Set();
+      const known = knownFactionCodes(store3, input3.factionNames);
+      for (const f of r.faction_stance ?? []) {
+        const raw = str9(f?.faction).trim();
+        const code2 = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input3.factionNames[c] && raw && input3.factionNames[c] === raw) || "";
+        if (!code2) {
+          drop("faction", f, "모르는 세력 이름", raw);
+          continue;
+        }
+        const stage2 = str9(f?.stage).trim().toLowerCase();
+        if (!(stage2 in FACTION_STAGES)) {
+          drop("faction", f, "표에 없는 단계", code2);
+          continue;
+        }
+        const ev = evidence(f.m, f.quote);
+        if (typeof ev === "string") {
+          drop("faction", f, ev, code2);
+          continue;
+        }
+        if (seen4.has(code2)) {
+          drop("faction", f, "세력당 1건", code2);
+          continue;
+        }
+        const who = factionWho(code2);
+        const userFaction3 = userFactionOf(store3, chat);
+        const now2 = factionNow(store3, code2, liveChanges(store3, live), userFaction3, ctx2.settings, input3.factionNames);
+        const reason3 = plain(f.reason, 80);
+        if (now2.stage.id === stage2 && now2.note === reason3) {
+          drop("faction", f, "지금 단계·이유 그대로", code2);
+          continue;
+        }
+        seen4.add(code2);
+        if (!store3.factions[code2]) store3.factions[code2] = { code: code2, name: factionName(code2, input3.factionNames, store3), seeded: { at: ctx2.now ?? (/* @__PURE__ */ new Date()).toISOString() } };
+        const seq4 = nextSeq2(ev.anchor);
+        const pin2 = stageMid(stage2, ctx2.settings.factionBounds);
+        if (putChange(store3, { id: changeId(who, "cue", ev.anchor, seq4, `stance:${stage2}:${reason3}`), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "cue", pin: pin2, quote: f.quote, reason: reason3 || FACTION_STAGES[stage2].label })) report.applied.factions++;
+      }
+    }
+    if (ctx2.settings.features.has("faction_rep") && !ctx2.settings.factionQual && !ctx2.only?.length) {
+      const changes = liveChanges(store3, live);
+      const seen4 = /* @__PURE__ */ new Set();
+      const known = knownFactionCodes(store3, input3.factionNames);
+      for (const f of r.faction_cues ?? []) {
+        const raw = str9(f?.faction).trim();
+        const code2 = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input3.factionNames[c] && raw && input3.factionNames[c] === raw) || "";
+        if (!code2) {
+          drop("faction", f, "모르는 세력 이름", raw);
+          continue;
+        }
+        if (!CUES.includes(f.cue)) {
+          drop("faction", f, "표에 없는 계기", code2);
+          continue;
+        }
+        const ev = evidence(f.m, f.quote);
+        if (typeof ev === "string") {
+          drop("faction", f, ev, code2);
+          continue;
+        }
+        if (seen4.has(code2)) {
+          drop("faction", f, "세력당 1건", code2);
+          continue;
+        }
+        const who = factionWho(code2);
+        if (changes.some((x) => x.kind === "cue" && x.who === who && x.anchor === ev.anchor && x.cue === f.cue)) {
+          drop("faction", f, "같은 메시지에 같은 계기가 이미 있음", code2);
+          continue;
+        }
+        seen4.add(code2);
+        if (!store3.factions[code2]) store3.factions[code2] = { code: code2, name: factionName(code2, input3.factionNames, store3), seeded: { at: ctx2.now ?? (/* @__PURE__ */ new Date()).toISOString() } };
+        const seq4 = nextSeq2(ev.anchor);
+        if (putChange(store3, { id: changeId(who, "cue", ev.anchor, seq4, f.cue), anchor: ev.anchor, seq: seq4, src: "story", who, kind: "cue", cue: f.cue, quote: f.quote, reason: plain(f.reason, 40) })) report.applied.factions++;
+      }
+    }
+    if (ctx2.wallet && input3.wallet && !ctx2.only?.length) {
+      const seen4 = /* @__PURE__ */ new Set();
+      for (const t of (r.transactions ?? []).slice(0, 6)) {
+        const amount = typeof t?.amount === "number" ? Math.trunc(t.amount) : parseWon(str9(t?.amount));
+        if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
+          drop("wallet", t, "금액을 읽을 수 없음");
+          continue;
+        }
+        const ev = evidence(str9(t.m), str9(t.quote));
+        if (typeof ev === "string") {
+          drop("wallet", t, ev);
+          continue;
+        }
+        if (!ctx2.walletLoose && !mentionsAmount(str9(t.quote)) && !/\d/.test(str9(t.quote))) {
+          drop("wallet", t, "인용에 금액이 없음");
+          continue;
+        }
+        const memo2 = plain(t.memo, 30) || (amount < 0 ? "지출" : "수입");
+        const key = `${ev.anchor}|${amount}|${memo2}`;
+        if (seen4.has(key)) {
+          drop("wallet", t, "같은 거래 중복");
+          continue;
+        }
+        seen4.add(key);
+        report.wallet.push({ anchor: ev.anchor, amount, memo: memo2, quote: str9(t.quote).slice(0, 120) });
+        report.applied.transactions++;
+      }
+    }
+    if (ctx2.points && input3.points && !ctx2.only?.length) {
+      const seen4 = /* @__PURE__ */ new Set();
+      for (const t of (r.point_transactions ?? []).slice(0, 6)) {
+        const amount = typeof t?.amount === "number" ? Math.trunc(t.amount) : parsePoints(str9(t?.amount));
+        if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
+          drop("points", t, "포인트를 읽을 수 없음");
+          continue;
+        }
+        const ev = evidence(str9(t.m), str9(t.quote));
+        if (typeof ev === "string") {
+          drop("points", t, ev);
+          continue;
+        }
+        if (!mentionsPoints(str9(t.quote)) && !/\d/.test(str9(t.quote))) {
+          drop("points", t, "인용에 포인트가 없음");
+          continue;
+        }
+        const memo2 = plain(t.memo, 30) || (amount < 0 ? "사용" : "지급");
+        const key = `${ev.anchor}|${amount}|${memo2}`;
+        if (seen4.has(key)) {
+          drop("points", t, "같은 거래 중복");
+          continue;
+        }
+        seen4.add(key);
+        report.points.push({ anchor: ev.anchor, amount, memo: memo2, quote: str9(t.quote).slice(0, 120) });
+        report.applied.transactions++;
+      }
+    }
+    if (input3.shop && !ctx2.only?.length && r.shop !== void 0) {
+      const t = r.shop && typeof r.shop === "object" && !Array.isArray(r.shop) ? r.shop : null;
+      const name = plain(t?.name, 30);
+      const ev = evidenceLoose(input3.shop.m);
+      if (typeof ev !== "string") report.shop = name ? { index: ev.index, name, owner: plain(t?.owner, 30) } : null;
+      if (t && !name) drop("shop", t, "가게 이름 없음");
+    }
+    if (ctx2.items && input3.items && !ctx2.only?.length) {
+      report.applied.items = 0;
+      const seen4 = /* @__PURE__ */ new Set();
+      const has3 = (n3) => input3.items.find((x) => sameItemName(x, n3));
+      for (const t of (r.items ?? []).slice(0, 8)) {
+        const name = plain(t?.name, 30);
+        const action = str9(t?.action).trim().toLowerCase();
+        if (!name) {
+          drop("items", t, "이름 없음");
+          continue;
+        }
+        if (action !== "new" && action !== "update" && action !== "unequip" && action !== "left" && action !== "gone" && action !== "destroyed") {
+          drop("items", t, "모르는 action", name);
+          continue;
+        }
+        const usedAt = action === "unequip" || action === "left" ? void 0 : (input3.used ?? []).find((u) => sameItemName(u.name, name));
+        const ev0 = evidence(str9(t.m), str9(t.quote));
+        const ev = typeof ev0 === "string" && usedAt ? { anchor: usedAt.anchor, index: -1 } : ev0;
+        if (typeof ev === "string") {
+          drop("items", t, ev, name);
+          continue;
+        }
+        const listed = has3(name);
+        if (action !== "new" && !listed) {
+          drop("items", t, "목록에 없는 이름", name);
+          continue;
+        }
+        if (action === "unequip" && !(input3.itemsWorn ?? []).some((x) => sameItemName(x, name))) {
+          drop("items", t, "장착하지 않은 물건", name);
+          continue;
+        }
+        if (seen4.has(norm(listed ?? name))) {
+          drop("items", t, "같은 물건 중복", name);
+          continue;
+        }
+        if (report.items.length >= 4) {
+          drop("items", t, "한 번에 4개까지", name);
+          continue;
+        }
+        seen4.add(norm(listed ?? name));
+        const act2 = action === "new" && listed ? "update" : action;
+        const eq = t.equip === void 0 ? void 0 : t.equip === null || /^(none|null|-|)$/i.test(str9(t.equip).trim()) ? null : itemEquip(str9(t.equip).trim().toLowerCase().replace(/^(hand|held|손)$/, "weapon"));
+        const uses = t.uses === void 0 || t.uses === null ? void 0 : str9(t.uses).trim() === "0" ? 0 : itemUses(t.uses);
+        const cond = t.condition ? str9(t.condition).trim().toLowerCase() : "";
+        const icon = cleanIcon(t.icon);
+        const weight = t.weight === void 0 || t.weight === null ? void 0 : itemWeight(t.weight);
+        const quote = str9(t.quote);
+        const nameCut = act2 === "new" ? stripGrades(name, quote) : { text: name, cut: [] };
+        const descCut = stripGrades(plain(t.desc, 80), quote);
+        if (nameCut.cut.length || descCut.cut.length) drop("items", t, `본문에 없는 등급 말을 뺌: ${[...nameCut.cut, ...descCut.cut].join(", ")}`, name);
+        const outName = act2 === "new" ? nameCut.text || name : listed ?? name;
+        const place3 = plain(t.place, 30);
+        const more = action === "new" && !!listed;
+        const desc = more && (leftWordIn(descCut.text) || offWordIn(descCut.text)) ? "" : descCut.text;
+        report.items.push({
+          anchor: ev.anchor,
+          name: outName,
+          action: act2,
+          desc,
+          effect: plain(t.effect, 60),
+          quote: str9(t.quote).slice(0, 120),
+          // 사용·장착 갈래는 새로 얻을 때만 받는다 (update 의 「equip: none」에 갈래가 지워지던 것)
+          ...act2 !== "new" ? {} : typeof t.usable === "boolean" ? { use: t.usable } : /^(true|false)$/i.test(str9(t.usable).trim()) ? { use: /^true$/i.test(str9(t.usable).trim()) } : {},
+          ...uses !== void 0 && !more ? { uses } : {},
+          ...act2 === "new" && eq !== void 0 ? { equip: eq ?? null } : {},
+          ...cond === "ok" || cond === "damaged" || cond === "broken" ? { state: itemState(cond) } : {},
+          ...icon ? { icon } : {},
+          ...weight !== void 0 ? { weight } : {},
+          ...act2 === "left" && place3 ? { place: place3 } : {}
+        });
+        report.applied.items++;
+      }
+    }
+    if (r.identity && (r.identity.faction || r.identity.rank) && (!store3.identity || store3.identity.from !== "status")) {
+      const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
+      store3.identity = { faction: plain(r.identity.faction, 20), rank: plain(r.identity.rank, 20), level: null, from: "scan", anchor };
+      report.applied.identity = true;
+    }
+    if (ctx2.settings.director === "note") {
+      const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
+      for (const n3 of r.next_note ?? []) {
+        const who = nameOf(str9(n3?.who));
+        if (!who || !input3.people.includes(who)) {
+          drop("note", n3, "장면 인물이 아님", str9(n3?.who));
+          continue;
+        }
+        const now2 = plain(n3.now, 160);
+        const mustNot = Array.isArray(n3.must_not_reveal) ? n3.must_not_reveal.map((x) => plain(x, 100)).filter(Boolean).slice(0, 5) : [];
+        if (!now2 && !mustNot.length) continue;
+        const seq4 = nextSeq2(anchor);
+        if (putChange(store3, { id: changeId(who, "note", anchor, seq4, now2 + mustNot.join("|")), anchor, seq: seq4, src: "story", who, kind: "note", now: now2, mustNot, reason: "다음 턴 메모" })) report.applied.notes++;
+      }
+    }
+    if (ctx2.settings.features.has("rhythm") && ctx2.settings.director === "note") {
+      const now2 = plain(r.rhythm_note, 200);
+      if (now2) {
+        const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
+        const seq4 = nextSeq2(anchor);
+        if (putChange(store3, { id: changeId("@rhythm", "note", anchor, seq4, now2), anchor, seq: seq4, src: "story", who: "@rhythm", kind: "note", now: now2, reason: "리듬 메모" })) report.applied.notes++;
+      }
+    }
+    if (!ctx2.keepRead) markRead(store3, chat, input3.indexes);
+    return report;
+  }
+  function clearStoryRecords(store3, who) {
+    const p2 = store3.people[who];
+    if (!p2) return 0;
+    let n3 = 0;
+    for (const slot of SLOTS) {
+      const list4 = p2.slots[slot];
+      if (!list4) continue;
+      const keep2 = list4.filter((e) => e.src !== "story" || e.pin);
+      n3 += list4.length - keep2.length;
+      p2.slots[slot] = keep2;
+    }
+    const before = store3.log.length;
+    store3.log = store3.log.filter((c) => !(c.who === who && c.src === "story"));
+    n3 += before - store3.log.length;
+    for (const [id2, c] of Object.entries(p2.candidates ?? {})) if (c.status === "collecting" || c.status === "rejected") {
+      delete p2.candidates[id2];
+      n3++;
+    }
+    return n3;
+  }
+  function mentionIndexes(chat, who, aliases2, turns3) {
+    const list4 = msgs3(chat);
+    const match = nameMatcher([{ name: who, aliases: aliases2, titles: [] }]);
+    const bots = list4.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0).slice(-turns3);
+    return bots.filter((i) => match(messageText(str9(list4[i].data))).length || list4[i - 1] && match(messageText(str9(list4[i - 1].data))).length);
+  }
+  function rhythmTextOk(key, text5) {
+    if (key === "scene") {
+      const m = /^\[phase:([a-z_]+)\]\s*\[engagement:([a-z_]+)\]/.exec(text5);
+      return !!m && RHYTHM_PHASES.includes(m[1]) && RHYTHM_ENGAGEMENT.includes(m[2]);
+    }
+    if (key.startsWith("hook:")) {
+      const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\](?:\s*\[ext\])?/.exec(text5);
+      return !!m && RHYTHM_HOOK_STAGES.includes(m[1]) && RHYTHM_HOOK_TIERS.includes(m[2]);
+    }
+    return key === "chapter" || key === "arc" || key === "pending";
+  }
+  function latestNote(store3, who, live) {
+    const n3 = [...store3.log].reverse().find((c) => c.kind === "note" && c.who === who && isAlive(c, live));
+    return n3 ? { now: n3.now, mustNot: n3.mustNot } : null;
+  }
+
+  // src/core/people/consolidate.ts
+  var CONSOLIDATE_PROMPT = (lang, slots = [...CORE_SLOTS]) => guideOr("UpdaterExtra", "CONSOLIDATE", () => [
+    "You tidy the per-chat record of one roleplay character. The record is a set of slots, each a list of short entries. Over time entries pile up, overlap, or go stale. Rewrite each slot into fewer, denser entries without losing any fact that is still true.",
+    "",
+    "Rules:",
+    "- Merge entries that describe the same thing; drop nothing that is still true. Keep concrete details (names, numbers, places, dates). When two entries conflict, keep the later one (entries are listed oldest first) and you may note the change.",
+    `- \`chars\` is the record's current size and \`target\` the size to reach (sum of entry texts). Reduce toward target; a result near it is enough; never pad. Each entry is one statement ≤300 chars${lang === "en" ? " in English" : " in Korean"}. Names, quotes, address terms, Korean labels and prefixes stay as written.`,
+    "- `state` and `scene` are the present: merge aggressively, keep only what is still true. `history` is a chronological digest: merge adjacent events into one line each. `relationship`, `speech` and the feature slots (`affinity.*`, `register.*`) keep one entry per `target`.",
+    "- Give every result entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.",
     "- Slots you do not return stay as they are.",
     "",
     "Output exactly one JSON object, nothing else:",
@@ -17,7 +396,7 @@ Return the JSON object.`, { data: dataText });
     const ids = /* @__PURE__ */ new Map();
     const enabled = slotsFor(settings.features, settings.qualitative);
     for (const slot of enabled) {
-      if (SLOT_META[slot].once) continue;
+      if (SLOT_META[slot].once || slot === "suspicion") continue;
       const cur = liveEntries(p2.slots[slot], live).filter((e) => !e.pin);
       if (!cur.length) continue;
       const pos = (e) => live.at.get(e.anchor) ?? -1;
@@ -165,9 +544,10 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     if (!people.length) return { text: "", people: [], sheets: [] };
     const live = liveness(chat);
     const changes = liveChanges(o.store, live);
-    const blocks = [];
     const own2 = [];
     let policyShown = false;
+    const make = [];
+    const share = Math.max(1, Math.floor(o.settings.blockCap / people.length));
     for (const n3 of people) {
       const p2 = o.store.people[n3];
       const sheet = o.sheetOf(n3);
@@ -175,32 +555,60 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
       own2.push({ sheet: sheet || null, exempt });
       const note2 = o.settings.director === "note" ? latestNote(o.store, n3, live) : null;
       const sx = sexualTexts(p2, o.settings);
-      blocks.push(
-        personBlock(p2, o.store, live, changes, {
+      const sexualPolicy = !policyShown;
+      const unknown = o.settings.features.has("perception") ? unknownTo(p2, o.store, live) : [];
+      make.push(
+        (maxChars) => personBlock(p2, o.store, live, changes, {
           sheet,
           mode: o.settings.inject,
-          unknown: o.settings.features.has("perception") ? unknownTo(p2, o.store, live) : [],
+          unknown,
           user: o.user,
           note: note2,
           temper: o.temperOf?.(n3),
           speed: o.settings.speed,
           speedDown: o.settings.speedDown,
           turnCap: o.settings.turnCap,
-          // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
-          maxChars: Math.floor(o.settings.blockCap / people.length),
+          maxChars,
           taste: o.settings.features.has("taste"),
           openness: o.settings.features.has("openness"),
           axes: o.settings.features.has("axes"),
           features: o.settings.features,
           qual: o.settings.qualitative,
           sexual: sx,
-          sexualPolicy: !policyShown
+          sexualPolicy
         })
       );
       if (sx.desire || sx.paraphilia) policyShown = true;
     }
+    const blocks = make.map((f) => f(share));
+    const lenOf = (i) => blocks[i].length + 2 - own2[i].exempt;
+    const sizeOf3 = (k) => blocks.slice(0, k).reduce((s8, _b, i) => s8 + lenOf(i), 0);
+    const trim = people.map((n3) => {
+      const slots = o.store.people[n3].slots;
+      const sz = (l) => liveEntries(l ?? [], live).reduce((m, e) => m + e.text.length + 3, 0);
+      const counted = Object.values(slots).reduce((s8, l) => s8 + sz(l), 0);
+      const items = TRIM_ORDER.flatMap((k) => liveEntries(slots[k] ?? [], live).map((e) => e.text.length + 3));
+      let left = counted;
+      let drop = 0;
+      while (left > share && drop < items.length) left -= items[drop++];
+      return { items, left, drop };
+    });
+    for (; ; ) {
+      const over = sizeOf3(blocks.length) - o.settings.blockCap;
+      if (over <= 0) break;
+      const can = trim.map((t2, i2) => i2).filter((i2) => trim[i2].drop < trim[i2].items.length);
+      if (!can.length) break;
+      const i = can.reduce((a, c) => lenOf(c) > lenOf(a) ? c : a);
+      const t = trim[i];
+      const want = Math.ceil(over / can.length);
+      let cut3 = 0;
+      do
+        cut3 += t.items[t.drop++];
+      while (cut3 < want && t.drop < t.items.length);
+      t.left -= cut3;
+      blocks[i] = make[i](Math.max(1, t.left));
+    }
     let keep2 = blocks.length;
-    const sizeOf3 = (k) => blocks.slice(0, k).reduce((s8, b) => s8 + b.length + 2, 0) - own2.slice(0, k).reduce((s8, x) => s8 + x.exempt, 0);
     while (keep2 > 1 && sizeOf3(keep2) > o.settings.blockCap) keep2--;
     blocks.length = keep2;
     const sheets = own2.slice(0, keep2).map((x) => x.sheet).filter((x) => !!x);
@@ -526,14 +934,8 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
             items: itemsOn
           });
           diag.report = report;
-          if (!o.scope?.only) {
-            recordRun(s8, before, (/* @__PURE__ */ new Date()).toISOString());
-            foldLog(s8, cur, (who, cues, folded) => {
-              const p2 = s8.people[who];
-              if (!p2) return null;
-              return sumCues(who, p2.affinity.base, cues, folded, AFF_MIN, AFF_MAX, { temper: temperOf(who), speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }) - p2.affinity.base;
-            });
-          }
+          if (!o.scope?.only) recordRun(s8, before, (/* @__PURE__ */ new Date()).toISOString());
+          dropGoneChanges(s8, cur);
           let next = cur;
           if (report.wallet.length) {
             let w = readWallet(cur.scriptstate, walletStart);
@@ -891,7 +1293,7 @@ ${shopKeyLine()}`;
         key: `${t.id}:main`,
         kind: "main",
         title: "메인 요청 조립",
-        meta: `Risu 메인 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n3]) => `${r} ${n3}`).join(", ")}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(", ")}` : ""}`,
+        meta: `Risu 메인 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n3]) => `${r} ${n3}`).join(", ")}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.added === void 0 ? "" : ` · 플러그인이 더한 토큰 ${m.added.toLocaleString("ko-KR")}`}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(", ")}` : ""}`,
         ok: m.failed.length ? false : true,
         // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
         body: () => `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg gw-copyto" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, false)}><summary><small>[${esc32(r.role)}]</small> ${esc32(r.content.replace(/\s+/g, " ").trim().slice(0, 80))}${r.content.length > 80 ? "…" : ""} <i>${chars(r.content.length)}</i>${copyBtn()}</summary><textarea readonly rows="8">${esc32(r.content)}</textarea></details>`).join("")}</div>`
@@ -1538,8 +1940,9 @@ ${shopKeyLine()}`;
     notice: "",
     info: "",
     busy: false,
-    /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기) */
-    undoAsk: false,
+    /** 「마지막 갱신 되돌리기」 확인 중 (전수검사 11-13, 사용자 승인: 한 번 더 묻기).
+     *  물은 갱신의 열쇠(undoKey: 채팅 + 그 갱신 시각). 빈 글 = 묻지 않는 중. 다른 채팅·다음 갱신에서는 열쇠가 달라 저절로 꺼진다 (재검토 11-14) */
+    undoAsk: "",
     /** 호감 숫자 보이기 (ⓘ) */
     showNum: false,
     /** 호감 직접 수정 칸 */
@@ -1576,9 +1979,10 @@ ${shopKeyLine()}`;
     evOpen: /* @__PURE__ */ new Set()
   };
   function resetPeopleUi() {
-    Object.assign(peopleUi, { notice: "", info: "", affEdit: false, addrEdit: false, showNum: false, diagShow: "", logOpen: false });
+    Object.assign(peopleUi, { notice: "", info: "", undoAsk: "", affEdit: false, addrEdit: false, showNum: false, diagShow: "", logOpen: false });
     peopleUi.evOpen.clear();
   }
+  var undoKey = (ctx2, store3) => store3.lastRun ? `${chatId(ctx2)}|${store3.lastRun.at}` : "";
   var rerender2 = null;
   function bindPeopleStatus(render3) {
     rerender2 = render3;
@@ -1699,7 +2103,7 @@ ${shopKeyLine()}`;
   }
   var FEATURE_HELP = {
     affinity: ["호감", "계기(작은친절·도움·배신…)를 기록하고 8단계로 계산해요"],
-    axes: ["성격 6축", "인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 기록 › 인물 상세에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요. 리수폿 People"],
+    axes: ["성격 6축", "인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 기록 › 인물 상세에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요."],
     register: ["호칭·말투", "이 인물이 주인공을 부르는 말과 존댓말·반말 변화"],
     perception: ["인식", "이 인물이 아는 것·모르는 것(비밀 누설 방지)"],
     perception_ext: ["인식 확장", "감각 경로·관찰 성향까지 기록해요"],
@@ -1988,9 +2392,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const docsN = Object.values(store3.docs).reduce((a, d) => a + liveEntries(d.entries, live).length, 0);
     const empty2 = !Object.keys(store3.people).length && !pending2.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>메인 응답에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : "";
     const undoN = store3.lastRun ? store3.lastRun.entries.length + store3.lastRun.docs.length + store3.lastRun.changes.length + store3.lastRun.observations.length + store3.lastRun.newPeople.length : 0;
-    const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목은 변경 기록에서 다시 살릴 수 있어요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? "disabled" : ""}>↶</button>` : "";
+    const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목·계기는 인물 상세에서, 문서는 기록 문서에서 다시 살릴 수 있어요. 관찰은 되살릴 수 없고 새 인물은 지워져요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? "disabled" : ""}>↶</button>` : "";
     const newN = store3.lastRun?.newPeople.length ?? 0;
-    const undoAsk = undoN && peopleUi.undoAsk ? `<div class="gx-hint">마지막 갱신 ${undoN}개를 취소할까요?${newN ? ` 새 인물 ${newN}명은 지워져요.` : ""} <button class="gx-mini danger" data-action="pp-undo-run-yes" ${peopleUi.busy ? "disabled" : ""}>취소하기</button><button class="gx-mini" data-action="pp-undo-run-no">그만</button></div>` : "";
+    const undoAsk = undoN && peopleUi.undoAsk && peopleUi.undoAsk === undoKey(ctx2, store3) ? `<div class="gx-hint">마지막 갱신 ${undoN}개를 취소할까요?${newN ? ` 새 인물 ${newN}명은 지워져요.` : ""} <button class="gx-mini danger" data-action="pp-undo-run-yes" ${peopleUi.busy ? "disabled" : ""}>취소하기</button><button class="gx-mini" data-action="pp-undo-run-no">그만</button></div>` : "";
     return `<div class="ph-room nw-pane pp-pane">${head("이 채팅의 인물", `${Object.keys(store3.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc35(peopleUi.notice)}</div>` : ""}${undoAsk}
@@ -2241,500 +2645,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       ${log}
     </article>${toast("pp", peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = "";
-    })}</div>`;
-  }
-  function peopleDocsView(ctx2) {
-    const store3 = peopleStore(ctx2.chat);
-    const live = liveness(ctx2.chat);
-    const byType = /* @__PURE__ */ new Map();
-    for (const d of Object.values(store3.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)).push(d);
-    const docEntry = (docKey, e, st, storeKey) => {
-      const no = msgNo(e.anchor, live);
-      const key = `doc|${docKey}|${e.id}`;
-      const meta = [e.date ? `<span title="일시">${esc35(e.date)}</span>` : "", e.place ? `<span title="장소">${esc35(e.place)}</span>` : "", e.who?.length ? `<span title="관련 인물">${esc35(e.who.join(", "))}</span>` : "", no ? evidenceButton(key, no) : "", e.quote ? `<q title="근거 메시지에서 따온 인용">${esc35(e.quote)}</q>` : ""].filter(Boolean).join("");
-      return `<li class="pp-entry${st !== "alive" && !e.void ? " dead" : ""}${e.void ? " void" : ""}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc35(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}<span class="pp-entry-btns">${voidBtn("pp-doc-void", `${storeKey}|${e.id}`, !!e.void)}</span></div>${evidenceBox(ctx2, live, key, e.anchor, e.quote)}</li>`;
-    };
-    const sections3 = DOC_TYPES.filter((t) => byType.has(t)).map((t) => {
-      const docs = byType.get(t);
-      const inner = docs.map((d) => {
-        const aliveN = liveEntries(d.entries, live).length;
-        return `<section class="pp-slot"><h4>${esc35(d.key)}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(d.entries, live, `pp-old:doc:${d.type}:${d.key}`, (e, st) => docEntry(d.key, e, st, `${d.type}:${d.key}`))}</section>`;
-      }).join("");
-      return `<section class="nw-hsec pp-sec"><h3>${DOC_LABEL[t]}<b>${docs.length}</b></h3>${inner}</section>`;
-    }).join("");
-    return `<div class="ph-room nw-pane pp-pane">${head("기록 문서", "사건 · 장소 · 세력 · 물건")}
-    <article class="nw-doc pp-doc">${sections3 || '<div class="ph-blank"><p>아직 기록된 문서가 없어요.<br>메인 응답에서 사건·장소·세력·물건이 바뀌면 여기에 쌓여요.</p></div>'}</article></div>`;
-  }
-  async function mutate3(ctx2, env3, fn2) {
-    peopleUi.busy = true;
-    peopleUi.notice = "";
-    env3.render();
-    try {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        const store3 = peopleStore(chat);
-        return fn2(store3, chat) ? withPeople(chat, store3) : null;
-      });
-    } catch (error) {
-      peopleUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    peopleUi.busy = false;
-    await env3.refresh();
-  }
-  function findEntry(store3, key) {
-    const [who, slot, id2] = key.split("|");
-    const list4 = store3.people[who]?.slots[slot];
-    return list4?.find((e) => e.id === id2) ?? null;
-  }
-  function nextSeq(store3, anchor) {
-    return store3.log.filter((c) => c.anchor === anchor).reduce((m, c) => Math.max(m, c.seq), -1) + 1;
-  }
-  function userFaction2(chat) {
-    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return typeof v === "string" ? v : "";
-  }
-  function peopleInput(name, value) {
-    switch (name) {
-      case "pp-aff-num":
-        peopleUi.affNum = value;
-        return true;
-      case "pp-aff-reason":
-        peopleUi.affReason = value;
-        return true;
-      case "pp-addr-to":
-        peopleUi.addrTo = value;
-        return true;
-      case "pp-sex-text":
-        peopleUi.sexDraft = value;
-        return true;
-      case "pp-rules":
-      case "pp-director-rules":
-        return true;
-      default:
-    }
-    return false;
-  }
-  async function handlePeople(action, value, ctx2, env3) {
-    const v = value ?? "";
-    if (action.startsWith("pp-def-")) {
-      try {
-        const msg = await defaultsAction("pp", action, v, ctx2, env3.refresh);
-        if (msg) peopleUi.info = msg;
-      } catch (error) {
-        peopleUi.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      env3.render();
-      return true;
-    }
-    switch (action) {
-      case "pp-goto": {
-        setTimeout(() => {
-          const [blockId, label2] = PP_GOTO_ROW[v] ?? [v, ""];
-          const row8 = [...document.getElementById(blockId)?.querySelectorAll(".ps-row") ?? []].find((r) => r.querySelector(".ps-label > b")?.firstChild?.textContent?.trim() === label2);
-          if (!row8) return;
-          row8.scrollIntoView({ block: "center" });
-          row8.classList.remove("gw-find-flash");
-          void row8.offsetWidth;
-          row8.classList.add("gw-find-flash");
-          setTimeout(() => row8.classList.remove("gw-find-flash"), 2200);
-        }, 30);
-        return true;
-      }
-      case "pp-set": {
-        const i = v.indexOf("=");
-        if (i < 0) return true;
-        const k = v.slice(0, i);
-        const val = v.slice(i + 1);
-        if (!(k in PP_DEFAULTS)) return true;
-        if (!peopleUi.warned && (k === "when" && val === "turn" || k === "model" && val === "main")) {
-          peopleUi.warned = true;
-          peopleUi.info = k === "model" ? "응답마다 메인 모델을 한 번 더 불러요." : "응답마다 보조 모델을 한 번 더 불러요.";
-        }
-        await setVars3(ctx2, env3, { [PP(k)]: val });
-        if (k === "explicit_style") await mutate3(ctx2, env3, (store3) => {
-          let n3 = 0;
-          for (const p2 of Object.values(store3.people)) if (p2.sexual && p2.sexual.explicit !== null) {
-            p2.sexual.explicit = null;
-            n3++;
-          }
-          return n3 > 0;
-        });
-        return true;
-      }
-      case "pp-undo-run":
-        peopleUi.undoAsk = true;
-        env3.render();
-        return true;
-      case "pp-undo-run-no":
-        peopleUi.undoAsk = false;
-        env3.render();
-        return true;
-      case "pp-undo-run-yes": {
-        peopleUi.undoAsk = false;
-        let n3 = 0;
-        await mutate3(ctx2, env3, (store3) => (n3 = undoLastRun(store3)) > 0);
-        peopleUi.info = n3 ? `마지막 갱신을 되돌렸어요 (${n3}개 취소).` : "되돌릴 갱신이 없어요.";
-        env3.render();
-        return true;
-      }
-      case "pp-rules-save":
-      case "pp-drules-save":
-      case "pp-rrules-save": {
-        const key = action === "pp-drules-save" ? "director_rules" : action === "pp-rrules-save" ? "router_rules" : "rules";
-        await setVars3(ctx2, env3, { [PP(key)]: v.slice(0, key === "rules" ? 4e3 : 2e3) });
-        return true;
-      }
-      case "pp-update": {
-        if (peopleStatus().busy) return true;
-        peopleUi.notice = "";
-        const s8 = peopleSettings(ctx2.chat.scriptstate);
-        if (!s8.on) {
-          peopleUi.notice = "인물 기록이 꺼져 있어요. 설정에서 켜 주세요.";
-          env3.render();
-          return true;
-        }
-        env3.render();
-        try {
-          const r = await requestPeopleUpdate("manual", { manual: true });
-          peopleUi.info = r.errors.length ? `갱신 실패: ${r.errors[0]}` : r.ran ? `갱신 ${r.ran}회 · 반영 ${r.applied}개` : r.skipped.length ? `건너뜀: ${r.skipped[0]}` : "읽을 응답이 없어요.";
-        } catch (error) {
-          peopleUi.notice = error instanceof Error ? error.message : String(error);
-        }
-        peopleUi.diag = null;
-        await env3.refresh();
-        return true;
-      }
-      case "pp-diag-toggle":
-        if (peopleUi.diagOpen.has(v)) peopleUi.diagOpen.delete(v);
-        else peopleUi.diagOpen.add(v);
-        if (!peopleUi.diagShow.startsWith(`${v}:`)) peopleUi.diagShow = "";
-        env3.render();
-        return true;
-      case "pp-diag-show":
-        peopleUi.diagShow = peopleUi.diagShow === v ? "" : v;
-        env3.render();
-        return true;
-      case "pp-diag-clear":
-        await clearDiag();
-        peopleUi.diag = [];
-        peopleUi.diagOpen.clear();
-        peopleUi.diagShow = "";
-        env3.render();
-        return true;
-      case "pp-register": {
-        const sheet = sheetOf(ctx2);
-        await mutate3(ctx2, env3, (store3, chat) => {
-          const pend = store3.pending[v];
-          if (!pend || store3.people[v]) return false;
-          const base = seedBaseFor(v, userFaction2(chat), store3.identity);
-          store3.people[v] = seedPerson(v, sheet(v), { ...base, aliases: [.../* @__PURE__ */ new Set([...base.aliases ?? [], ...pend.aliases ?? []])] });
-          delete store3.pending[v];
-          return true;
-        });
-        peopleUi.info = `「${v}」을(를) 등록했어요.`;
-        env3.render();
-        return true;
-      }
-      case "pp-ignore":
-        await mutate3(ctx2, env3, (store3) => {
-          if (!store3.pending[v]) return false;
-          delete store3.pending[v];
-          if (!store3.ignored.includes(v)) store3.ignored.push(v);
-          return true;
-        });
-        return true;
-      case "pp-pin":
-        await mutate3(ctx2, env3, (store3) => {
-          const e = findEntry(store3, v);
-          if (!e) return false;
-          if (e.pin) delete e.pin;
-          else e.pin = true;
-          return true;
-        });
-        return true;
-      case "pp-sex-on":
-      case "pp-sex-clear":
-      case "pp-sex-save": {
-        const key = action === "pp-sex-save" ? peopleUi.sexEdit : v;
-        const text5 = action === "pp-sex-save" ? v : "";
-        const [who, f] = key.split("|");
-        await mutate3(ctx2, env3, (store3) => {
-          const p2 = store3.people[who];
-          if (!p2 || !SEXUAL_FIELDS.includes(f)) return false;
-          const sx = ensureSexual(p2);
-          if (action === "pp-sex-on") {
-            if (f === "desire") sx.desireOn = !sx.desireOn;
-            else sx.paraphiliaOn = !sx.paraphiliaOn;
-          } else setSexualText(p2, f, action === "pp-sex-clear" ? "" : text5, (/* @__PURE__ */ new Date()).toISOString(), true);
-          return true;
-        });
-        if (action === "pp-sex-save") {
-          peopleUi.sexEdit = "";
-          peopleUi.info = "저장했어요.";
-        }
-        if (action === "pp-sex-clear") peopleUi.info = "글을 지웠어요. 다음 갱신에서 모델이 다시 써요.";
-        env3.render();
-        return true;
-      }
-      case "pp-sex-style": {
-        await mutate3(ctx2, env3, (store3) => {
-          const p2 = store3.people[v];
-          if (!p2) return false;
-          ensureSexual(p2).explicit = !explicitOn(p2, peopleSettings(ctx2.chat.scriptstate));
-          return true;
-        });
-        return true;
-      }
-      case "pp-sex-edit": {
-        const [who, f] = v.split("|");
-        peopleUi.sexEdit = v;
-        peopleUi.sexDraft = peopleStore(ctx2.chat).people[who]?.sexual?.[f]?.text ?? "";
-        env3.render();
-        return true;
-      }
-      case "pp-sex-cancel":
-        peopleUi.sexEdit = "";
-        env3.render();
-        return true;
-      case "pp-speech-approve":
-      case "pp-speech-reject": {
-        const approve = action === "pp-speech-approve";
-        await mutate3(ctx2, env3, (store3) => {
-          const [who, slot] = v.split("|");
-          const e = findEntry(store3, v);
-          if (!e || slot !== "speech" || speechState(e.text) !== "pending") return false;
-          const text5 = decideSpeechPending(e.text, approve);
-          const seq4 = nextSeq(store3, e.anchor);
-          return putEntry(store3, who, "speech", { id: entryId(who, "speech", e.anchor, seq4, `${approve ? "+" : "-"}${e.id}`), text: text5, src: "manual", anchor: e.anchor, seq: seq4, replaces: e.id, ...e.target ? { target: e.target } : {} });
-        });
-        peopleUi.info = approve ? "다음 턴에 갱신기가 말투를 바꿀 수 있어요." : "말투 변경을 거절했어요. 조짐을 지웠어요.";
-        return true;
-      }
-      case "pp-void":
-        await mutate3(ctx2, env3, (store3) => {
-          const e = findEntry(store3, v);
-          if (!e) return false;
-          if (e.void) delete e.void;
-          else e.void = true;
-          return true;
-        });
-        return true;
-      case "pp-axis-approve":
-      case "pp-axis-reject":
-      case "pp-axis-revert": {
-        const i = v.indexOf("|");
-        const who = v.slice(0, i);
-        const id2 = v.slice(i + 1);
-        await mutate3(ctx2, env3, (store3, chat) => {
-          const p2 = store3.people[who];
-          if (!p2) return false;
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
-          const err = action === "pp-axis-approve" ? approveCandidate(p2, id2, liveness(chat), now2) : action === "pp-axis-reject" ? rejectCandidate(p2, id2, now2) : revertCandidate(p2, id2, now2);
-          if (err) throw new Error(err);
-          return true;
-        });
-        peopleUi.info = action === "pp-axis-approve" ? "성격 변화를 반영했어요." : action === "pp-axis-reject" ? "이 후보는 더 모으지 않아요." : "전으로 되돌렸어요.";
-        env3.render();
-        return true;
-      }
-      case "pp-doc-void":
-        await mutate3(ctx2, env3, (store3) => {
-          const cut3 = v.lastIndexOf("|");
-          const e = store3.docs[v.slice(0, cut3)]?.entries.find((x) => x.id === v.slice(cut3 + 1));
-          if (cut3 < 0 || !e) return false;
-          if (e.void) delete e.void;
-          else e.void = true;
-          return true;
-        });
-        return true;
-      case "pp-change-void":
-        await mutate3(ctx2, env3, (store3) => {
-          const c = store3.log.find((x) => x.id === v);
-          if (!c) return false;
-          if (c.void) delete c.void;
-          else c.void = true;
-          return true;
-        });
-        return true;
-      case "pp-num-toggle":
-        peopleUi.showNum = !peopleUi.showNum;
-        env3.render();
-        return true;
-      case "pp-aff-edit":
-        Object.assign(peopleUi, { affEdit: true, affStage: "", affNum: "", affReason: "", notice: "" });
-        env3.render();
-        return true;
-      case "pp-fac-save": {
-        const reason3 = peopleUi.affReason.trim();
-        const fs = peopleSettings(ctx2.chat.scriptstate);
-        const qualStage = fs.factionQual ? peopleUi.affStage || factionNow(peopleStore(ctx2.chat), v, liveChanges(peopleStore(ctx2.chat), liveness(ctx2.chat)), userFactionOf(peopleStore(ctx2.chat), ctx2.chat), fs).stage.id : "";
-        const raw = qualStage ? stageMid(qualStage, fs.factionBounds) : Number(peopleUi.affNum);
-        if (!qualStage && (!Number.isFinite(raw) || peopleUi.affNum.trim() === "")) {
-          peopleUi.notice = "숫자를 적어 주세요.";
-          env3.render();
-          return true;
-        }
-        if (!reason3) {
-          peopleUi.notice = "이유를 적어 주세요. 변경 기록에 남아요.";
-          env3.render();
-          return true;
-        }
-        const pin2 = Math.max(FACTION_MIN, Math.min(FACTION_MAX, Math.round(raw)));
-        const who = factionWho(v);
-        await mutate3(ctx2, env3, (store3, chat) => {
-          if (!store3.factions[v]) store3.factions[v] = { code: v, name: factionName2(ctx2, v), seeded: { at: (/* @__PURE__ */ new Date()).toISOString() } };
-          const anchor = anchorOf(chat);
-          const seq4 = nextSeq(store3, anchor);
-          return putChange(store3, { id: changeId(who, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
-        });
-        peopleUi.affEdit = false;
-        peopleUi.info = qualStage ? `세력 평판을 「${FACTION_STAGES[qualStage].label}」로 고정했어요.` : `세력 평판을 ${pin2}으로 고정했어요.`;
-        env3.render();
-        return true;
-      }
-      case "pp-aff-cancel":
-        peopleUi.affEdit = false;
-        env3.render();
-        return true;
-      case "pp-aff-stage":
-        peopleUi.affStage = v;
-        return true;
-      case "pp-aff-save": {
-        const reason3 = peopleUi.affReason.trim();
-        const raw = peopleUi.affNum.trim() !== "" ? Number(peopleUi.affNum) : peopleUi.affStage !== "" ? stageMid2(Number(peopleUi.affStage)) : NaN;
-        if (!Number.isFinite(raw)) {
-          peopleUi.notice = "단계를 고르거나 숫자를 적어 주세요.";
-          env3.render();
-          return true;
-        }
-        if (!reason3) {
-          peopleUi.notice = "이유를 적어 주세요. 변경 기록에 남아요.";
-          env3.render();
-          return true;
-        }
-        const pin2 = Math.max(AFF_MIN, Math.min(AFF_MAX, Math.round(raw)));
-        await mutate3(ctx2, env3, (store3, chat) => {
-          if (!store3.people[v]) return false;
-          const anchor = anchorOf(chat);
-          const seq4 = nextSeq(store3, anchor);
-          return putChange(store3, { id: changeId(v, "cue", anchor, seq4, `pin:${pin2}:${reason3}`), anchor, seq: seq4, src: "manual", who: v, kind: "cue", pin: pin2, reason: plain(reason3, 80) });
-        });
-        peopleUi.affEdit = false;
-        peopleUi.info = `호감을 ${pin2}(${stageOf(pin2).label})으로 고정했어요.`;
-        env3.render();
-        return true;
-      }
-      case "pp-addr-edit": {
-        const store3 = peopleStore(ctx2.chat);
-        const p2 = store3.people[v];
-        const cur = p2 ? addressOf(p2, liveChanges(store3, liveness(ctx2.chat))) : null;
-        Object.assign(peopleUi, { addrEdit: true, addrTo: cur?.toUser ?? "", addrReg: cur?.register ?? "존댓말", addrPin: !!p2?.address.pin, notice: "" });
-        env3.render();
-        return true;
-      }
-      case "pp-addr-cancel":
-        peopleUi.addrEdit = false;
-        env3.render();
-        return true;
-      case "pp-addr-reg": {
-        const reg = v.replace(/^reg=/, "");
-        if (REGISTERS.includes(reg)) peopleUi.addrReg = reg;
-        env3.render();
-        return true;
-      }
-      case "pp-addr-pin":
-        peopleUi.addrPin = !peopleUi.addrPin;
-        return true;
-      case "pp-diag-all":
-        peopleUi.diagAll = !peopleUi.diagAll;
-        return true;
-      case "pp-old-more":
-        peopleUi.oldAll.add(v);
-        env3.render();
-        return true;
-      case "pp-cap": {
-        const n3 = Math.max(0, Math.min(100, Math.round(Number(v))));
-        if (!Number.isFinite(n3)) return true;
-        await setVars3(ctx2, env3, { [PP("turn_cap")]: String(n3) });
-        return true;
-      }
-      case "pp-always": {
-        await setVars3(ctx2, env3, { [PP("always")]: v.replace(/\s*,\s*/g, ", ").trim().slice(0, 400) });
-        return true;
-      }
-      case "pp-bounds": {
-        const ok = /^\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*$/.test(v) && (() => {
-          const n3 = v.split(",").map(Number);
-          return n3[0] > n3[1] && n3[1] > n3[2] && n3[2] > n3[3] && n3.every((x) => x >= -100 && x <= 100);
-        })();
-        if (!ok) {
-          peopleUi.notice = "경계는 −100~100 사이 정수 넷을 내림차순으로 적어 주세요 (예: 61,21,-20,-60).";
-          env3.render();
-          return true;
-        }
-        await setVars3(ctx2, env3, { [PP("faction_bounds")]: v.replace(/\s+/g, "") });
-        return true;
-      }
-      case "pp-addr-save": {
-        const toUser = plain(peopleUi.addrTo, 40);
-        const register = peopleUi.addrReg;
-        const pinIt = peopleUi.addrPin;
-        await mutate3(ctx2, env3, (store3, chat) => {
-          const p2 = store3.people[v];
-          if (!p2) return false;
-          if (pinIt) {
-            p2.address = { toUser, register, pin: true };
-            return true;
-          }
-          if (p2.address.pin) delete p2.address.pin;
-          const anchor = anchorOf(chat);
-          const seq4 = nextSeq(store3, anchor);
-          return putChange(store3, { id: changeId(v, "address", anchor, seq4, `${toUser}|${register}`), anchor, seq: seq4, src: "manual", who: v, kind: "address", toUser: toUser || p2.address.toUser, register, reason: "직접 수정" });
-        });
-        peopleUi.addrEdit = false;
-        peopleUi.info = "호칭을 저장했어요.";
-        env3.render();
-        return true;
-      }
-      case "pp-backfill-turns":
-        peopleUi.backfillTurns = v;
-        return true;
-      case "pp-reread-turns":
-        peopleUi.rereadTurns = v;
-        return true;
-      case "pp-backfill": {
-        if (peopleUi.busy || peopleStatus().busy) return true;
-        peopleUi.busy = true;
-        peopleUi.notice = "";
-        env3.render();
-        try {
-          const r = await backfillPeople(Number(peopleUi.backfillTurns) || 0);
-          peopleUi.info = r.errors.length ? `읽기 실패: ${r.errors[0]}` : r.ran ? `지난 응답 읽기: 갱신 ${r.ran}회 · 반영 ${r.applied}개` : r.skipped[0] ?? "읽을 응답이 없어요.";
-        } catch (error) {
-          peopleUi.notice = error instanceof Error ? error.message : String(error);
-        }
-        peopleUi.busy = false;
-        peopleUi.diag = null;
-        await env3.refresh();
-        return true;
-      }
-      case "pp-reread": {
-        if (!v || peopleUi.busy || peopleStatus().busy) return true;
-        peopleUi.busy = true;
-        peopleUi.notice = "";
-        env3.render();
-        try {
-          const r = await rereadPerson(v, Number(peopleUi.rereadTurns) || 0);
-          peopleUi.info = r.errors.length ? `다시 읽기 실패: ${r.errors[0]}` : `${v} 다시 읽기: 기록 ${r.cleared}개 비움 · 갱신 ${r.ran}회 · 반영 ${r.applied}개${r.skipped.length ? ` · ${r.skipped[0]}` : ""}`;
-        } catch (error) {
-          peopleUi.notice = error instanceof Error ? error.message : String(error);
-        }
-        peopleUi.busy = false;
-        peopleUi.diag = null;
-        await env3.refresh();
-        return true;
-      }
-      case "pp-tidy": {
-        if (!v || peopleUi.busy || peopleStatus().busy) return true;
-        peopleUi.busy = true;
-        peopleUi.notice = "";
- 
+    
