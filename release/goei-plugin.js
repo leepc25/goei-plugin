@@ -1,8 +1,8 @@
 //@name goei-plugin
-//@display-name 괴이: ANOMALY v0.21.16
+//@display-name 괴이: ANOMALY v0.21.17
 //@api 3.0
-//@version 0.21.16
-//@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
+//@version 0.21.17
+//@update-url https://raw.githubusercontent.com/leepc25/goei/release/goei-plugin.js
 //@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/texthash.ts
 function textHash(text) {
@@ -60,7 +60,7 @@ function oldPluginMessage(mine, up) {
 
 // src/loader/body.ts
 var BODY_KEY = "goei:body";
-var BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
+var BASE = true ? "https://raw.githubusercontent.com/leepc25/goei/release" : "";
 var BodyError = class extends Error {
 };
 function bodyVersion(code) {
@@ -221,7 +221,7 @@ function showPanel(version, install2, message = "") {
 }
 
 // src/main.ts
-var VERSION2 = true ? "0.21.16" : "";
+var VERSION2 = true ? "0.21.17" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", "%%GOEI_SCENE%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
