@@ -302,7 +302,7 @@ export function readDirectoryData(lore: LoreEntry[]): DirectoryData | null {
   return out;
 }
 
-export { ROSTER_V, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB, NEUTRAL_ENGLISH } from './roster-v';
+export { ROSTER_V, migrateRoster, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB, NEUTRAL_ENGLISH } from './roster-v';
 
 // ── 세력 호칭·괴담톡 탭·첫 턴 로어북 (명부, 없으면 옛 로어북) ──
 

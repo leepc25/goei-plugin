@@ -225,3 +225,62 @@ test('시작 묶음 「중립」「다른 세력」(판 5 이하)은 읽을 때 
   const d2 = readDirectory(withDirectory(base, data));
   assert.equal(d2.startGroups.find((x) => x.code === g.code).blurb, '내 글');
 });
+
+test('명부 판 7: 옛 기본값 그대로인 칸만 새 기본값으로 (협회 기록 이름 2곳·선임 요원 4명, 2026-11-14 사용자)', async () => {
+  const { migrateRoster, ROSTER_V } = await import('../dist-test/core.mjs');
+  assert.equal(ROSTER_V, 7);
+  const SENIOR = ['스팡달', '잼트리', '고르고디오', '큐라스'];
+  // 11-13 고침(패치 01) 앞의 기본 명부: 지금 기본 명부에서 여섯 칸만 옛 값으로 되돌린 것
+  const old = () => {
+    const d = JSON.parse(readFileSync(new URL('../src/data/install/directory.json', import.meta.url), 'utf8'));
+    for (const n of SENIOR) d.요원[n].rank = '요원';
+    d.거점.특수재난대응협회.lore = '협회';
+    d['시작 로어북']['E00-1'] = ['협회', '차여진', '서윤지'];
+    d.roster_v = 6;
+    return d;
+  };
+  const now = JSON.parse(readFileSync(new URL('../src/data/install/directory.json', import.meta.url), 'utf8'));
+  // 옛 기본값 → 바뀜 (다른 칸은 그대로: 지금 기본 명부와 판 번호만 다름)
+  const a = migrateRoster(old());
+  assert.deepEqual(SENIOR.map((n) => a.요원[n].rank), ['선임 요원', '선임 요원', '선임 요원', '선임 요원']);
+  assert.equal(a.거점.특수재난대응협회.lore, '특수재난대응협회');
+  assert.deepEqual(a['시작 로어북']['E00-1'], ['특수재난대응협회', '차여진', '서윤지']);
+  assert.equal(a.roster_v, 7);
+  assert.deepEqual({ ...a, roster_v: 0 }, { ...now, roster_v: 0 }, '여섯 칸 말고는 안 바뀜');
+  // 두 번 돌려도 같음 (판을 되돌려 다시 돌려도)
+  const once = j(a);
+  assert.equal(j(migrateRoster(a)), once);
+  assert.equal(j(migrateRoster({ ...JSON.parse(once), roster_v: 6 })), once);
+  // 사용자가 고친 값(옛 기본값과 다른 값)은 그대로
+  const mine = old();
+  mine.요원.스팡달.rank = '팀장';
+  mine.요원.잼트리.rank = '';
+  mine.거점.특수재난대응협회.lore = '내 협회 기록';
+  mine['시작 로어북']['E00-1'] = ['협회', '차여진'];
+  delete mine.요원.큐라스;
+  const b = migrateRoster(mine);
+  assert.deepEqual([b.요원.스팡달.rank, b.요원.잼트리.rank, b.요원.고르고디오.rank, b.요원.큐라스], ['팀장', '', '선임 요원', undefined]);
+  assert.equal(b.거점.특수재난대응협회.lore, '내 협회 기록');
+  assert.deepEqual(b['시작 로어북']['E00-1'], ['협회', '차여진']);
+  // 다른 요원의 「요원」 직급, 다른 시작 로어북 줄은 안 건드림
+  const other = old();
+  const plain = Object.keys(other.요원).find((n) => !SENIOR.includes(n) && other.요원[n].rank === '요원');
+  if (plain) assert.equal(migrateRoster(other).요원[plain].rank, '요원');
+  // 이미 판 7 → 안 건드림 (판 7에서 사용자가 일부러 옛 값으로 적은 것)
+  const v7 = old();
+  v7.roster_v = 7;
+  const before = j(v7);
+  assert.equal(j(migrateRoster(v7)), before);
+  // 거점·시작 로어북·요원 칸이 없는 명부도 그대로 읽힘
+  assert.deepEqual(migrateRoster({ schema: 1, roster_v: 6, 요원: {}, 조직: {} }).roster_v, 7);
+  // 읽기 경로(readDirectory)로도 옮겨짐
+  const base = small();
+  const data = directoryData(readDirectory(base));
+  data.요원.스팡달 = { id: 'P002', name: '스팡달', rank: '요원', affiliation: 'A00' };
+  data['시작 로어북'] = { 'E00-1': ['협회', '차여진', '서윤지'] };
+  data.roster_v = 6;
+  const lore = withDirectory([...base, L('스팡달', 'g', 'Spangdal')], data);
+  const d = readDirectory(lore);
+  assert.equal(d.agents.find((x) => x.name === '스팡달').rank, '선임 요원');
+  assert.deepEqual(d.seeds['E00-1'], ['특수재난대응협회', '차여진', '서윤지']);
+});
