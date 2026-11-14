@@ -362,7 +362,8 @@ function popup(ctx: ChatContext): string {
   }
   const queued = useQueue(ctx).find((u) => u.id === it.id)?.n ?? 0;
   const left = leftOf(ctx, it);
-  const more = usableNow(ctx, it) && (left === undefined ? !queued : queued < left);
+  const sending = sendingUse(ctx, it.id);
+  const more = !sending && usableNow(ctx, it) && (left === undefined ? !queued : queued < left);
   const equipped = isEquipped(it, liveOf(ctx));
   const body = `${head}
     ${it.desc ? `<p>${esc(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
@@ -371,8 +372,8 @@ function popup(ctx: ChatContext): string {
     ${it.text ? `<div class="it-note">${esc(it.text)}</div>` : ''}
     ${it.quote ? `<p class="qt">근거 「${esc(it.quote)}」</p>` : ''}
     <div class="it-btns">
-      ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}${needsEquip(ctx, it) ? ' title="장착해야 쓸 수 있어요"' : ''}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
-      ${queued && !sendingUse(ctx, it.id) ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
+      ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || (queued && !sending) ? '' : 'disabled'}${needsEquip(ctx, it) ? ' title="장착해야 쓸 수 있어요"' : ''}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
+      ${queued && !sending ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
       ${boxButton(ctx, it.id)}
       <button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ''}>${equipLabel(it, equipped)}</button>
       ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
@@ -597,7 +598,12 @@ export async function itemsAction(action: string, value: string | undefined, ctx
         return true;
       }
       if (!(await holdFirst(it))) return true;
-      await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)));
+      // 보내는 중이면 그 물건의 사용은 더 늘리지 않는다 (이미 보낸 횟수보다 더 깎이지 않게, 11-14 사용자)
+      if (!(await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id))) {
+        itemsUi.info = `「${it.name}」은 지금 보내는 중이라 답이 온 뒤에 더 쓸 수 있어요.`;
+        env.render();
+        return true;
+      }
       itemsUi.info = canUse(it) ? `「${it.name}」을 다음 메시지에 같이 보내요.` : `「${it.name}」은 지금 쓸 수 없어요.`;
       await env.refresh();
       return true;
@@ -652,7 +658,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
         // 아바타·장착 칸 쪽에 놓기 (2026-11-12 사용자): 장착 물건은 맞는 갈래의 빈 칸으로, 쓰는 물건은 사용 예정으로. 둘 다 되면 장착.
         // 갈래도 사용도 없는 물건은 손 칸으로 (사용자 2026-11-14: 손 칸에는 아무 물건이나)
         if (isEquipped(it, liveOf(ctx))) return true;
-        if (!it.equip && canUse(it)) await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)));
+        if (!it.equip && canUse(it)) await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
         else {
           const k: ItemEquip = it.equip ?? 'weapon';
           if (!equippedOf(liveOf(ctx))[k].some((x) => !x)) {
@@ -668,7 +674,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
           return true;
         }
         if (!(await holdFirst(it))) return true;
-        await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)));
+        await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
       } else if (to === 'drop') {
         itemsUi.open = id;
         itemsUi.mode = 'drop';
@@ -684,16 +690,24 @@ export async function itemsAction(action: string, value: string | undefined, ctx
   }
 }
 
-/** 「사용」 자리 바꾸기. 이미 보낸 자리($st_item_use_at 있음)는 비우고 새로 시작한다 (지난 턴 것을 또 넘기지 않게) */
-async function queueUse(ctx: ChatContext, fn: (q: ItemUse[]) => ItemUse[]): Promise<void> {
+/** 「사용」 자리 바꾸기. 이미 보낸 자리($st_item_use_at 있음)는 비우고 새로 시작한다 (지난 턴 것을 또 넘기지 않게).
+ *  id 물건이 「보내는 중」이면 바꾸지 않는다 → false (보낸 뒤 「한 번 더」로 횟수가 보낸 것보다 더 깎이던 것, 11-14 사용자) */
+async function queueUse(ctx: ChatContext, fn: (q: ItemUse[]) => ItemUse[], id: string): Promise<boolean> {
+  let held = false;
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    if (useSending(chat, ctx.charIndex, ctx.chatIndex, id)) {
+      held = true;
+      return null;
+    }
     const sent = !!chat.scriptstate?.[ITEM_USE_AT_VAR];
     const cur = sent ? [] : readItemUse(chat.scriptstate);
     const next = fn(cur);
     if (!sent && JSON.stringify(next) === JSON.stringify(cur)) return null;
     return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next), [ITEM_USE_AT_VAR]: '' } };
   });
+  if (held) return false;
   void refreshUseBox(ctx.charIndex, ctx.chatIndex);
+  return true;
 }
 /** 사용 자리에서 빼기 (버리기·삭제·해제·끌어 바꾸기). 상점·쇼핑몰 팔기는 여기를 거치지 않고 saleDone 에서 직접 뺀다(ui/shop.ts, ui/malls.ts).
  *  「보내는 중」인 사용은 빼지 않고 남긴다 (모델은 이미 쓴 것으로 받았다. 물건 처리 자체는 부르는 쪽이 그대로 한다. 재검토 11-14 B-9 사용자 답) → false */

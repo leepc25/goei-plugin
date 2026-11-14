@@ -138,3 +138,29 @@ test('소지품 창, 보내기 전 버리기: 사용 목록에서도 빠진다 (
   assert.equal(t.has(), false);
   assert.deepEqual(t.queue(), []);
 });
+
+// ── 보내는 중 「한 번 더」(11-14 사용자): 보낸 사용 횟수를 못 늘린다. 실패해 풀리면 전과 같다 ──
+const nOf = (t) => U.readItemUse(t.store.chat.scriptstate).find((u) => u.id === t.id)?.n ?? 0;
+test('소지품 창, 보내기 전: 「한 번 더」를 누르면 ×2', async () => {
+  const t = seed(10);
+  assert.match(popupHtml(t), /한 번 더 \(×2\)/);
+  await U.itemsAction('items-use', t.id, t.ctx(), t.env);
+  assert.equal(nOf(t), 2);
+});
+test('소지품 창, 보내는 중: 「한 번 더」가 없고 눌러도 횟수는 그대로. 실패해 풀리면 다시 늘릴 수 있다', async () => {
+  const t = seed(11);
+  U.setWaiting(true);
+  await U.markUseSent(0, 11, t.store.chat);
+  const html = popupHtml(t);
+  assert.doesNotMatch(html, /한 번 더/);
+  assert.match(html, /data-action="items-use"[^>]*disabled/);
+  await U.itemsAction('items-use', t.id, t.ctx(), t.env);
+  assert.equal(nOf(t), 1, '보낸 횟수 그대로');
+  U.itemsUi.info = '';
+  // 끌어 놓기로도 늘지 않는다
+  await U.itemsAction('items-dnd', `${t.id}|use`, t.ctx(), t.env);
+  assert.equal(nOf(t), 1);
+  U.setWaiting(false, true);
+  await U.itemsAction('items-use', t.id, t.ctx(), t.env);
+  assert.equal(nOf(t), 2);
+});

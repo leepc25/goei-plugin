@@ -27,6 +27,10 @@ const ANSWERED = [
   ["the user's latest input (≤120 chars)", "the user's latest input (≤400 chars)"],
   ['{"name":"<canonical>","reason":"<≤40 chars>"}', '{"name":"<canonical>"}'],
   ['updates: PATCH rows, add /messages/- only, each supplied room ID at most once.', 'updates: PATCH rows, each supplied room ID at most once.'],
+  // 11-14 사용자: 「댓글을 다 비우지 마라」 네 번 → 한 번만 (AUTO.GUIDELINE 것만 남김)
+  [' Empty comments is [] only for a quiet thread.', ''],
+  [' do not copy identical counts or treat every topic as a silent thread.', ' do not copy identical counts.'],
+  [' Zero comments is valid for an individual quiet post, not a default for every topic.', ''],
 ];
 const moved = Object.entries(OLD.sections).flatMap(([file, list]) => list.map(([name, body]) => ({ file, name, body })));
 
