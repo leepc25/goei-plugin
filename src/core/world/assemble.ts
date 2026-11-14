@@ -76,36 +76,37 @@ function sections(rec: WorldRecord, defs: FieldDef[], faction?: string, skip: st
     const def = defs.find((f) => f.id === id);
     if (!def) continue;
     const base = fieldValue(rec, id);
-    // 세력별 시점 글(variants). 조직 소개의 첫 문단은 📜Faction 요약 자리라, 한 문단짜리 시점 글은 그 첫 문단만 바꾸고 뒷글은 남긴다
-    const swapHead = kind === 'org' && id === 'intro' && !rec.noSummary && paragraphs(base).length > 1;
-    const split = (t: string, own: boolean): [string, string] => {
-      const ps = paragraphs(t);
-      if (swapHead && (!own || ps.length === 1)) return [ps[0] ?? '', paragraphs(base).slice(1).join('\n\n')];
-      return [t, ''];
+    // 조직 소개의 첫 문단은 📜Faction 요약에 늘 들어가므로, 소개가 두 문단 이상이면 상세 로어에서는 첫 문단을 뺀다 (사용자 2026-11-14).
+    // 한 문단뿐인 소개와 요약에 안 나오는 조직(noSummary)은 그대로. 한 문단짜리 세력별 시점 글(variants)은 그 첫 문단 자리(요약)에만 쓰인다
+    const cut = kind === 'org' && id === 'intro' && !rec.noSummary;
+    const tail = (t: string): string => t.trim().replace(/^[\s\S]*?\n\s*\n/, '').trim();
+    const baseMulti = paragraphs(base).length > 1;
+    const detail = (t: string, own: boolean): string => {
+      if (!cut) return t;
+      const n = paragraphs(t).length;
+      if (own && n === 1 && baseMulti) return tail(base);
+      return n > 1 ? tail(t) : t;
     };
-    const whole = ([h, r]: [string, string]) => (r ? `${h}\n\n${r}` : h);
+    const b = detail(base, false);
     const vs = Object.entries(rec.variants ?? {})
       .filter(([c, f]) => typeof f[id] === 'string' && f[id].trim() && (faction === undefined || c === faction))
-      .map(([c, f]) => [c, split(f[id].trim(), true)] as const);
-    if (!vs.length) {
-      if (base) out.push(`#### ${def.title}\n${base}`);
+      .map(([c, f]) => [c, detail(f[id].trim(), true)] as const);
+    if (!vs.length || (cut && vs.every(([, v]) => v === b))) {
+      if (b) out.push(`#### ${def.title}\n${b}`);
       continue;
     }
     if (faction !== undefined) {
-      out.push(`#### ${def.title}\n${whole(vs[0][1])}`);
+      out.push(`#### ${def.title}\n${vs[0][1]}`);
       continue;
     }
     // 세력을 안 정했으면 CBS 분기로 남긴다 (요청 때 플러그인이 푼다)
     const on = (c: string, t: string) => `{{#if {{equal::${VAR}::${c}}}}}${t}{{/if}}`;
-    if (!base) {
-      out.push(vs.map(([c, v]) => on(c, `#### ${def.title}\n${whole(v)}`)).join(''));
+    if (!b) {
+      out.push(vs.map(([c, v]) => on(c, `#### ${def.title}\n${v}`)).join(''));
       continue;
     }
-    const b = split(base, false);
     const others = (t: string) => `${vs.map(([c]) => `{{#if {{not_equal::${VAR}::${c}}}}}`).join('')}${t}${'{{/if}}'.repeat(vs.length)}`;
-    const t = vs.every(([, v]) => v[1] === b[1])
-      ? `${others(b[0])}${vs.map(([c, v]) => on(c, v[0])).join('')}${b[1] ? `\n\n${b[1]}` : ''}`
-      : `${others(whole(b))}${vs.map(([c, v]) => on(c, whole(v))).join('')}`;
+    const t = `${others(b)}${vs.map(([c, v]) => on(c, v)).join('')}`;
     out.push(`#### ${def.title}\n${t}`);
   }
   return out;

@@ -11,7 +11,7 @@ import { refreshUseBox } from '../host/usebox';
 import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gearUnseated, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
+  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems, seatLost, useNeedsSeat,
   purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, slotKind, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
@@ -609,8 +609,10 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     case 'items-equip':
     case 'items-unequip': {
       if (!value) return true;
+      const was = liveOf(ctx).find((x) => x.id === value);
       await write((it, alive) => (action === 'items-equip' ? equipItem(it, alive, value) : unequipItem(it, value)));
-      if (action === 'items-unequip') await dropFromUse(ctx, value); // 해제하면 사용 예정도 뺀다 (장착해야 쓴다, 사용자 2026-11-14)
+      // 해제하면 사용 예정도 뺀다 (장착해야 쓴다, 사용자 2026-11-14). 들지 않아도 쓸 수 있는 물건은 손에서 넣어도 남긴다 (C-12 (나))
+      if (action === 'items-unequip' && (!was || useNeedsSeat(was))) await dropFromUse(ctx, value);
       const it = liveOf(ctx).find((x) => x.id === value);
       if (action === 'items-equip' && it && !isEquipped(it, liveOf(ctx))) itemsUi.info = fullText(it.equip ?? 'weapon'); // 갈래 없는 물건은 손 칸 (사용자 2026-11-14)
       await env.refresh();
@@ -629,18 +631,19 @@ export async function itemsAction(action: string, value: string | undefined, ctx
           env.render();
           return true;
         }
-        // 찬 장비 칸에 놓아 바꾸면 밀려난 장비의 사용 예정도 뺀다 (장착해야 쓴다, 사용자 2026-11-14 · 11-14 재검토 ①-2). 손 칸에서 밀려난 것은 그대로 둔다
+        // 찬 칸에 놓아 바꾸면 밀려난 장비·손에 드는 물건(무기·도구)의 사용 예정도 뺀다 (장착해야 쓴다, 사용자 2026-11-14 · 11-14 재검토 ①-2).
+        // 들지 않아도 쓸 수 있는 물건은 손에서 밀려나도 남긴다 (C-12 (나))
         let bumped: string[] = [];
         await write((x, alive) => {
           const next = equipItem(x, alive, id, Number(n), k === 'weapon' ? 'weapon' : 'gear');
-          bumped = k === 'weapon' || next === x ? [] : gearUnseated(liveItems(x, alive), liveItems(next, alive));
+          bumped = next === x ? [] : seatLost(liveItems(x, alive), liveItems(next, alive));
           return next;
         });
         for (const b of bumped) await dropFromUse(ctx, b);
       } else if (to === 'grid') {
         if (!isEquipped(it, liveOf(ctx))) return true;
         await write((x) => unequipItem(x, id));
-        await dropFromUse(ctx, id);
+        if (useNeedsSeat(it)) await dropFromUse(ctx, id); // C-12 (나): 넣기와 같게
       } else if (to === 'auto') {
         // 아바타·장착 칸 쪽에 놓기 (2026-11-12 사용자): 장착 물건은 맞는 갈래의 빈 칸으로, 쓰는 물건은 사용 예정으로. 둘 다 되면 장착.
         // 갈래도 사용도 없는 물건은 손 칸으로 (사용자 2026-11-14: 손 칸에는 아무 물건이나)

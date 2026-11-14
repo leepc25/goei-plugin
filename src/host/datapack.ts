@@ -11,7 +11,8 @@ import { applyInstallPack, applyWorldPack, INSTALL_PACK, packMatches, WORLD_PACK
 import { installDataReady } from '../core/install';
 import { sha256Text, textHash } from '../core/texthash';
 import { fetchParts } from '../core/fetchparts';
-import { UPDATE_BASE } from '../core/update';
+import { oldPluginMessage } from '../core/stalever';
+import { PLUGIN_VERSION, UPDATE_BASE } from '../core/update';
 import { worldDataReady } from '../core/world/records';
 import { toBytes } from './assets';
 
@@ -73,14 +74,15 @@ export async function fetchPack(pack: PackSpec, progress?: Progress): Promise<st
   if (!UPDATE_BASE) throw new DataPackError('받을 곳이 정해지지 않은 빌드예요.');
   if (!pack.expect.hash) throw new DataPackError(`이 빌드에는 ${pack.label} 지문이 없어요.`);
   progress?.(`${pack.label} 목록 받는 중…`);
-  let index: { parts?: unknown; length?: unknown; hash?: unknown } | null = null;
+  let index: { parts?: unknown; length?: unknown; hash?: unknown; version?: unknown } | null = null;
   try {
     index = JSON.parse((await getText(`${pack.name}.json`)).replace(/^﻿/, ''));
   } catch (error) {
     throw new DataPackError(`${pack.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
   }
   if (!index || !Array.isArray(index.parts) || typeof index.length !== 'number') throw new DataPackError(`${pack.label} 목록 형식이 달라요.`);
-  if (index.hash !== pack.expect.hash) throw new DataPackError(`아직 이 판의 ${pack.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
+  // 올라온 자료가 더 새 판의 것이면 다시 받아도 안 맞는다 → 플러그인 업데이트 안내 (11-14 D-4)
+  if (index.hash !== pack.expect.hash) throw new DataPackError(oldPluginMessage(PLUGIN_VERSION, index.version) ?? `아직 이 판의 ${pack.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
   const re = new RegExp(`^${pack.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.\\d+\\.txt$`);
   for (const name of index.parts) {
     if (typeof name !== 'string' || !re.test(name)) throw new DataPackError(`${pack.label} 목록 형식이 달라요.`);

@@ -269,6 +269,16 @@ export function gearUnseated(before: Item[], after: Item[]): string[] {
     return !!now && !isEquipped(now, after);
   });
 }
+/** 칸에서 빠지면 「사용 예정」도 빠지는 물건인가 (사용자 2026-11-14 여쭐 것 C-12 (나)): 원래 손에 드는 물건(무기·도구)과 장비는 빠지고,
+ *  들지 않아도 쓸 수 있는 물건(갈래 없음)은 손에서 빠져도 사용 예정이 남는다. 넣기·격자로 끌기·밀려남 모두 같게 */
+export const useNeedsSeat = (e: Item): boolean => !!e.equip;
+/** 장착을 바꾼 뒤 칸(손·장비)에서 밀려나 사용 예정에서도 빼야 하는 물건의 id: 앞에서는 칸에 놓여 있었고 뒤에서는 아닌 것 가운데 useNeedsSeat 인 것 */
+export function seatLost(before: Item[], after: Item[]): string[] {
+  return before.filter((e) => useNeedsSeat(e) && isEquipped(e, before)).map((e) => e.id).filter((id) => {
+    const now = after.find((x) => x.id === id);
+    return !!now && !isEquipped(now, after);
+  });
+}
 export const liveItemsOf = (it: Items, chat: Chat): Item[] => liveItems(it, aliveAnchors(chat));
 
 const hash = (text: string) => {

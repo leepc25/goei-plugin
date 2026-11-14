@@ -95,11 +95,12 @@ test('조직 상세: 세력별 시점 글(variants)과 한글 이름 바꾸기�
   const [enemy, ...rest] = fake.fields.intro.trim().split(/\n\s*\n/);
   const own = fake.variants.B00.intro.trim();
   assert.match(enemy, /absolute enemy/);
-  // 가짜 관리국(B00)으로 플레이: 제 조직이 「Management Bureau (관리국)」, 첫 문단은 제 시점 글, 뒷글은 그대로
+  // 가짜 관리국(B00)으로 플레이: 제 조직이 「Management Bureau (관리국)」. 첫 문단(요약 자리)은 상세에서 빠지고 뒷글만 남는다 (D-5, 사용자 2026-11-14)
   const b = as('가짜 관리국', 'B00');
   assert.ok(b.startsWith('### Management Bureau (관리국)\n\n[Affiliation code: B00]\n\n'), b.slice(0, 80));
   assert.ok(!b.includes('absolute enemy'), 'B00 에게 관리국 시점 첫 문단이 가지 않는다');
-  assert.ok(b.includes(`${own}\n\n${rest.join('\n\n')}`), '첫 문단만 시점 글로 바뀌고 뒷글은 남는다');
+  assert.ok(!b.includes(own), '한 문단짜리 시점 글은 요약에만 쓰이고 상세에는 안 들어간다');
+  assert.ok(b.includes(`[Affiliation code: B00]\n\n#### Identity\n${rest.join('\n\n')}\n\n#### `), '상세 소개는 둘째 문단부터');
   assert.ok(as('관리국', 'B00').startsWith('### Fake Management Bureau (가짜 관리국)\n'));
   assert.ok(as('관리국', 'B00').includes(worldRecord('org', '관리국').variants.B00.intro.trim()));
   assert.ok(!as('관리국', 'B00').includes(worldRecord('org', '관리국').fields.intro.trim()));
@@ -107,19 +108,52 @@ test('조직 상세: 세력별 시점 글(variants)과 한글 이름 바꾸기�
   for (const code of ['A00', 'C00', '']) {
     const a = as('가짜 관리국', code);
     assert.ok(a.startsWith('### Fake Management Bureau (가짜 관리국)\n\n[Affiliation code: B00]\n\n'), a.slice(0, 80));
-    assert.ok(a.includes(fake.fields.intro.trim()) && !a.includes(`${own}\n\n`), `기본 글 그대로 (${code})`);
+    assert.ok(a.includes(`#### Identity\n${rest.join('\n\n')}\n\n#### `) && !a.includes(enemy) && !a.includes(own), `요약 문단 없이 뒷글만 (${code})`);
     assert.ok(as('관리국', code).startsWith('### Management Bureau (관리국)\n'));
     assert.ok(as('관리국', code).includes(worldRecord('org', '관리국').fields.intro.trim()));
   }
+  // 첫 문단만 다른 시점 글은 상세에서 빠지므로 CBS 분기도 남지 않는다 (제목의 호칭 분기만)
+  assert.ok(!out.find((e) => isVirtual(e) && e.comment === '가짜 관리국').content.split('#### Identity')[1].includes('{{#if'));
   // 시점 글이 없는 조직은 CBS 없이 그대로
   assert.ok(!out.find((e) => isVirtual(e) && e.comment === '교황청').content.includes('{{#if'));
   // 세력을 정해 조립해도 같은 결과
   const org = dir.orgs.find((o) => o.name === '가짜 관리국');
   assert.equal(evaluate(assembleOrg(fake, org, dir, 'B00'), { vars: { $st_faction: 'B00' } }), b);
   assert.equal(evaluate(assembleOrg(fake, org, dir, 'A00'), { vars: { $st_faction: 'A00' } }), as('가짜 관리국', 'A00'));
-  // 여러 문단짜리 시점 글은 칸을 통째로 바꾼다
+  // 여러 문단짜리 시점 글은 칸을 통째로 바꾼다 (그 첫 문단은 요약에, 나머지가 상세에)
   const multi = { ...fake, variants: { B00: { intro: 'one\n\ntwo' } } };
   const m = evaluate(assembleOrg(multi, org, dir), { vars: { $st_faction: 'B00' } });
-  assert.ok(m.includes('#### ') && m.includes('one\n\ntwo') && !m.includes(rest[0]));
-  assert.ok(evaluate(assembleOrg(multi, org, dir), { vars: { $st_faction: 'A00' } }).includes(fake.fields.intro.trim()));
+  assert.ok(m.includes('#### Identity\ntwo\n\n#### ') && !m.includes('one\n\ntwo') && !m.includes(rest[0]));
+  const ma = evaluate(assembleOrg(multi, org, dir), { vars: { $st_faction: 'A00' } });
+  assert.ok(ma.includes(`#### Identity\n${rest.join('\n\n')}\n\n#### `) && !ma.includes(enemy));
+});
+
+test('조직 상세: 소개가 두 문단 이상이면 첫 문단(Faction 요약)을 빼고, 한 문단뿐인 조직과 남해지사는 그대로 (D-5)', () => {
+  const dir = readDirectory(withWorldLore(slots));
+  const paras = (t) => t.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  let cut = 0, kept = 0;
+  for (const org of dir.orgs) {
+    const rec = worldRecord('org', org.name);
+    const intro = (rec?.fields?.intro ?? '').trim();
+    if (!intro) continue;
+    const ps = paras(intro);
+    const text = assembleOrg({ ...rec, variants: undefined }, org, dir);
+    const identity = text.split('#### Identity\n')[1] ?? '';
+    if (ps.length > 1 && !rec.noSummary) {
+      cut++;
+      assert.ok(!text.includes(ps[0]), `${org.name}: 요약 문단이 상세에 다시 들어가지 않는다`);
+      assert.ok(identity.startsWith(ps[1]), `${org.name}: 상세 소개는 둘째 문단부터`);
+      for (const p of ps.slice(1)) assert.ok(text.includes(p), `${org.name}: 뒷글은 빠지지 않는다`);
+    } else {
+      kept++;
+      assert.ok(identity.startsWith(intro), `${org.name}: 소개 그대로`);
+    }
+  }
+  assert.ok(cut >= 12 && kept >= 2, `뺀 조직 ${cut}, 그대로 ${kept}`);
+  const one = worldRecord('org', '관리국');
+  assert.equal(paras(one.fields.intro).length, 1);
+  const south = worldRecord('org', '남해지사');
+  assert.ok(south.noSummary && assembleOrg(south, dir.orgs.find((o) => o.name === '남해지사'), dir).includes(south.fields.intro.trim()));
+  // 편집기 「소개」 칸 설명
+  assert.equal(FIELDS.org.find((f) => f.id === 'intro').hint, '첫 문단은 Faction 지침 요약에, 나머지는 세력 상세 로어에');
 });

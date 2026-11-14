@@ -286,3 +286,29 @@ test('자료 items_away: 두고 온 것·없어진 것은 이름·자리로 넘�
   const back = applyItemChanges(s, alive, [ch({ anchor: 'c3', name: '사내용 정장 세트', action: 'new', quote: '사물함에서 정장을 꺼냈다' })], { order });
   assert.deepEqual(itemsAwayOf(chat(back)), [{ name: '손전등' }]);
 });
+
+// 사용자 2026-11-14 C-10·C-11: 손 칸에서 넣은 것은 본편에 「put X away (still carrying it)」, 기록 탭에 「넣기」. 장비 칸은 「took off」·「해제」 그대로
+test('C-10·C-11 손 칸에서 넣기: 본편 말 「put X away」, 기록 탭 「넣기」. 장비 칸은 「took off」·「해제」', async () => {
+  const { recentItemLog } = await import('../dist-test/core.mjs');
+  const { build } = await import('esbuild');
+  const out = '/tmp/goei-c1011-ui';
+  await build({ entryPoints: ['src/ui/items.ts'], outdir: out, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, loader: { '.txt': 'text', '.css': 'text', '.svg': 'text', '.png': 'dataurl' }, logLevel: 'silent' });
+  const { logWhatLabel } = await import(`${out}/ui/items.mjs`);
+  setItemRules(undefined);
+  let s = addItem(empty, alive, { name: '망치', equip: 'weapon', from: 'story', anchor: 'c1', quote: 'q1' });
+  s = addItem(s, alive, { name: '손전등', use: true, from: 'story', anchor: 'c1', quote: 'q1' }); // 갈래 없는 물건을 손 칸에 든 것(held)
+  s = addItem(s, alive, { name: '방독면', equip: 'gear', from: 'story', anchor: 'c1', quote: 'q1' });
+  for (const e of s.list) s = equipItem(s, alive, e.id);
+  assert.equal(s.list.find((x) => x.name === '손전등').held, true);
+  const r = applyItemChanges(s, alive, ['망치', '손전등', '방독면'].map((name) => ch({ anchor: 'c2', name, action: 'unequip' })), { order });
+  assert.deepEqual(movedNow(r, 'c2'), ['put 망치 away (still carrying it)', 'put 손전등 away (still carrying it)', 'took off 방독면 (still carrying it)']);
+  const off = r.log.filter((l) => l.what === 'off');
+  assert.deepEqual(off.map((l) => logWhatLabel(l)), ['넣기', '넣기', '해제']);
+  // 저장했다 읽어도 남는다
+  const back = readItems(itemsVars(r));
+  assert.deepEqual(back.log.filter((l) => l.what === 'off').map((l) => logWhatLabel(l)), ['넣기', '넣기', '해제']);
+  // 「Recently」 줄도 같은 말
+  const chat = { message: [{ role: 'user', chatId: 'u1' }, { role: 'char', chatId: 'c1' }, { role: 'user', chatId: 'u2' }, { role: 'char', chatId: 'c2' }] };
+  const recent = recentItemLog(chat, r, 1);
+  assert.deepEqual(recent, ['put 망치 away', 'put 손전등 away', 'took off 방독면']);
+});

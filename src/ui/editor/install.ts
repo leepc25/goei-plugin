@@ -10,11 +10,15 @@ import { updateGroup } from '../update';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const mb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`);
 
-type Step = '' | 'all' | 'icon-back';
+type Step = '' | 'all' | 'icon' | 'icon-back';
 
 export const instUi = {
   state: null as InstallState | null,
   iconPrev: '',
+  /** 「이전 아이콘으로」 되돌린 봇: 전체 단추가 아이콘을 건드리지 않는다 (사용자 11-14 D-2) */
+  iconDeclined: false,
+  /** 받아 둔 위키 기본 문서가 옛 판: 점검표 글이 「없음」이 아니라 「새 판 있음」 (사용자 11-14 D-3) */
+  wikiOld: false,
   /** 마지막으로 점검한 캐릭터 */
   forChar: -1,
   /** 점검 진행 중 (화면이 다시 그려질 때 두 번 점검하지 않게) */
@@ -37,6 +41,8 @@ export async function refreshInstall(ctx: ChatContext, render?: () => void): Pro
     if (instUi.forChar !== ctx.charIndex) instUi.setName = !r.state.goei;
     instUi.state = r.state;
     instUi.iconPrev = r.iconPrev;
+    instUi.iconDeclined = r.iconDeclined;
+    instUi.wikiOld = r.wikiOld;
     instUi.forChar = ctx.charIndex;
   } catch (error) {
     // 설치 자료를 못 받았거나(네트워크) 캐릭터를 못 읽음: 화면에 까닭과 「다시 점검」. 이 캐릭터는 점검한 것으로 치워야
@@ -63,7 +69,7 @@ function statusList(s: InstallState): string {
     ${li(s.greetings.ok, '인사말', s.greetings.ok ? `${s.greetings.total}개` : `${s.greetings.total - s.greetings.missing.length}/${s.greetings.total}개`)}
     ${li(!pics.missing.length, '카드 사진', pics.missing.length ? `${pics.total - pics.missing.length}/${pics.total}장 (약 ${mb(pics.bytes)} 받아야 함)` : `${pics.total}장`)}
     ${li(s.icon, '아이콘', s.icon ? '플러그인 아이콘이 메인' : '다른 아이콘')}
-    ${li(s.wikiPack, '위키 기본 문서', s.wikiPack ? '저장소에 있음 (이 기기 공통)' : '없음 (약 1MB)')}
+    ${!s.wikiPack && instUi.wikiOld ? setRow('위키 기본 문서', '<span class="gw-inst-no">새 판 있음</span>', '새 판 있음 (다시 받기, 약 1MB)') : li(s.wikiPack, '위키 기본 문서', s.wikiPack ? '저장소에 있음 (이 기기 공통)' : '없음 (약 1MB)')}
     ${li(s.tokenizer, '토크나이저 (o200k_base)', s.tokenizer ? '저장소에 있음 (이 기기 공통). 토큰 수를 정확히 세요' : '없음 (약 2MB). 받기 전엔 토큰 수가 어림값')}
   </div></section>`;
 }
@@ -78,7 +84,7 @@ export function installPage(ctx: ChatContext): string {
       ${failed ? `<div class="gx-err" role="alert">${esc(instUi.notice)}</div>` : `<p class="gx-muted">${esc(instUi.progress || '점검하는 중…')}</p>`}</div>`;
   }
   const missing = installSummary(s);
-  const allDone = s.goei && !missing.length && s.icon && s.tokenizer;
+  const allDone = s.goei && !missing.length && (s.icon || instUi.iconDeclined) && s.tokenizer;
   const name = String(ctx.char.name ?? '이 캐릭터');
   const head = s.goei
     ? missing.length
@@ -100,6 +106,7 @@ export function installPage(ctx: ChatContext): string {
     <section class="ps-group"><h3>세부 선택</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc(BRAND.name)}」로 바꿀지. 지금 이름: ${esc(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy || instUi.setName ? 'disabled' : ''}>바꿈</button><button class="gx-seg${instUi.setName ? '' : ' on'}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy || !instUi.setName ? 'disabled' : ''}>그대로</button></div></div></div>
       ${instUi.iconPrev ? `<div class="ps-row"><div class="ps-label"><b>이전 아이콘</b><small>설치 전 아이콘으로 되돌려요 (아이콘 목록에는 둘 다 남아요).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon-back" ${busy ? 'disabled' : ''}>이전 아이콘으로</button></div></div>` : ''}
+      ${instUi.iconDeclined && !s.icon ? `<div class="ps-row"><div class="ps-label"><b>아이콘</b></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon" ${busy ? 'disabled' : ''}>플러그인 아이콘으로</button></div></div>` : ''}
     </div></section>
     <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요. 받은 위키 문서·토크나이저는 「점검 → 저장·불러오기」의 저장소 사용량에서 지울 수 있어요.</p>
     </div>
@@ -126,7 +133,7 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
     return true;
   }
   const step = action.slice(8) as Step;
-  if (step !== 'all' && step !== 'icon-back') return true;
+  if (step !== 'all' && step !== 'icon' && step !== 'icon-back') return true;
   instUi.busy = step;
   instUi.notice = '';
   instUi.info = '';
@@ -159,9 +166,11 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
       const n = await installPictures(ctx.charIndex, progress);
       return n ? `사진 ${n}장` : null;
     });
-    if (!s?.icon) await run('아이콘', async () => (await installIcon(ctx.charIndex, progress), '아이콘'));
+    if (!s?.icon && !instUi.iconDeclined) await run('아이콘', async () => (await installIcon(ctx.charIndex, progress), '아이콘'));
     if (!s?.wikiPack) await run('위키 기본 문서', async () => (await installWikiPack(progress), '위키 기본 문서'));
     if (!s?.tokenizer) await run('토크나이저', async () => (await installTokenizer(progress), '토크나이저'));
+  } else if (step === 'icon') {
+    await run('아이콘', async () => (await installIcon(ctx.charIndex, progress), '아이콘'));
   } else if (step === 'icon-back') {
     await run('이전 아이콘', async () => ((await restoreIcon(ctx.charIndex)) ? '이전 아이콘' : null));
   }

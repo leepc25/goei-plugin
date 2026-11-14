@@ -29,10 +29,12 @@ export async function loadStoredWikiPack(): Promise<void> {
   }
 }
 
-/** 아이콘 기록: 캐릭터 id → { ours: 우리 아이콘 경로, prev: 설치 전 아이콘 } */
+/** 아이콘 기록: 캐릭터 id → { ours: 우리 아이콘 경로, prev: 설치 전 아이콘, declined: 「이전 아이콘으로」 되돌린 봇 } */
 interface IconNote {
   ours: string;
   prev: string;
+  /** 사용자가 「이전 아이콘으로」 되돌렸다: 전체 설치 단추가 아이콘을 다시 넣지 않는다 (사용자 11-14 D-2). installIcon 이 기록을 새로 쓰면 풀린다 */
+  declined?: boolean;
 }
 async function iconNotes(): Promise<Record<string, IconNote>> {
   try {
@@ -47,7 +49,7 @@ async function iconNotes(): Promise<Record<string, IconNote>> {
 const charId = (char: Record<string, unknown>) => String(char.chaId ?? char.name ?? '');
 
 /** 지금 캐릭터의 설치 상태. 설치 자료가 아직 없으면 먼저 받는다 (진행 글은 progress 로) */
-export async function checkInstall(charIndex: number, progress?: Progress): Promise<{ state: InstallState; iconPrev: string }> {
+export async function checkInstall(charIndex: number, progress?: Progress): Promise<{ state: InstallState; iconPrev: string; iconDeclined: boolean; wikiOld: boolean }> {
   await ensureInstallData(progress);
   const char = ((await risuai.getCharacterFromIndex(charIndex)) ?? {}) as Record<string, unknown>;
   const notes = await iconNotes();
@@ -61,11 +63,12 @@ export async function checkInstall(charIndex: number, progress?: Progress): Prom
     alternateGreetings: char.alternateGreetings,
     assets: char.additionalAssets,
     iconOurs: !!note && note.ours === String(char.image ?? ''),
-    // 받아 둔 묶음이 릴리스 판과 다르면 「없음」으로 보아 설치·점검이 다시 받게 한다 (전수검사 11-13)
+    // 받아 둔 묶음이 릴리스 판과 다르면 빠진 것으로 세어 설치·점검이 다시 받게 한다 (전수검사 11-13). 글은 「새 판 있음」(wikiOld, 사용자 11-14 D-3)
     wikiPack: packInLore || (!!storedWikiPack() && !(await wikiPackStale())),
     tokenizer: !!tokenizerName(),
   });
-  return { state, iconPrev: note?.prev ?? '' };
+  // 되돌린 봇은 이미 이전 아이콘이므로 「이전 아이콘으로」를 내지 않는다
+  return { state, iconPrev: note && !note.declined ? (note.prev ?? '') : '', iconDeclined: !!note?.declined, wikiOld: !packInLore && wikiPackOld() };
 }
 
 export type InstallStep = 'lore' | 'pictures' | 'icon' | 'wiki';
@@ -194,7 +197,8 @@ export async function restoreIcon(charIndex: number): Promise<boolean> {
   const note = notes[charId(char)];
   if (!note?.prev) return false;
   await risuai.setCharacterToIndex(charIndex, { ...char, image: note.prev });
-  delete notes[charId(char)];
+  // 기록을 지우지 않고 되돌렸다고 적어 둔다: 지우면 「빠진 것 전부 채우기」가 아이콘을 다시 플러그인 것으로 바꾼다 (사용자 11-14 D-2)
+  notes[charId(char)] = { ...note, declined: true };
   await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
   return true;
 }
@@ -223,12 +227,21 @@ export async function installWikiPack(progress: Progress): Promise<number> {
   // 받은 판의 지문을 적어 두고 다음 점검 때 릴리스 지문과 견준다 (전수검사 11-13)
   if (typeof index.digest === 'string') await risuai.pluginStorage.setItem(WIKI_DIGEST_KEY, index.digest);
   setStoredWikiPack(text);
+  // 방금 받은 것이 릴리스 판이다
+  staleKnown = false;
+  staleCheck = null;
   return text.length;
 }
 
+// 새 판 확인은 세션에 한 번만 한다 (사용자 11-14 D-3): 설치·점검 창을 열 때마다 받기를 기다리지 않게.
+// staleKnown: 확인이 끝난 답 (null = 아직 모름). 묶음을 새로 받거나 지우면 다시 정한다
+let staleKnown: boolean | null = null;
+let staleCheck: Promise<boolean> | null = null;
+/** 설치·점검 창이 새 판 확인을 기다리는 한도. 넘으면 옛 판이 아닌 것으로 보고 창을 띄운다 (확인은 뒤에서 끝나 다음 점검에 반영) */
+export const WIKI_CHECK_MS = 4000;
+
 /** 받아 둔 위키 묶음이 릴리스 판(wiki-base.json digest)과 다른가. 못 받거나 지문이 없으면 false (오프라인 점검이 다시 받게 만들지 않게, 전수검사 11-13) */
-async function wikiPackStale(): Promise<boolean> {
-  if (!storedWikiPack() || !UPDATE_BASE) return false;
+async function readWikiPackStale(): Promise<boolean> {
   try {
     const idx: unknown = JSON.parse((await getText('wiki-base.json')).replace(/^\uFEFF/, ''));
     const want = idx && typeof idx === 'object' ? (idx as { digest?: unknown }).digest : undefined;
@@ -238,6 +251,33 @@ async function wikiPackStale(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/** 새 판 확인 (한 번만 보낸다, 끝까지 기다린다). 관리 → 상태 점검이 뒤에서 부른다 */
+export function checkWikiPackOld(): Promise<boolean> {
+  if (!storedWikiPack() || !UPDATE_BASE) return Promise.resolve(false);
+  if (staleKnown !== null) return Promise.resolve(staleKnown);
+  if (!staleCheck) {
+    const mine: Promise<boolean> = readWikiPackStale().then((v) => {
+      // 확인하는 사이 묶음을 새로 받았거나 지웠으면 그쪽 답이 맞다
+      if (staleCheck === mine) staleKnown = v;
+      return staleKnown ?? false;
+    });
+    staleCheck = mine;
+  }
+  return staleCheck;
+}
+
+/** 받아 둔 위키 묶음이 옛 판으로 확인됐는가 (기다리지 않는다. 아직 확인 전이면 false) */
+export function wikiPackOld(): boolean {
+  return !!storedWikiPack() && staleKnown === true;
+}
+
+/** 설치·점검용: 새 판 확인을 WIKI_CHECK_MS 까지만 기다린다 */
+async function wikiPackStale(): Promise<boolean> {
+  let t: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<boolean>((res) => (t = setTimeout(() => res(false), WIKI_CHECK_MS)));
+  return Promise.race([checkWikiPackOld(), limit]).finally(() => clearTimeout(t));
 }
 
 /** 저장소의 토크나이저 순위표를 올린다 (본체 시작 때 한 번, 화면을 막지 않게 뒤로 미룸) */
@@ -283,6 +323,8 @@ export async function dropWikiPack(): Promise<void> {
   await risuai.pluginStorage.removeItem(WIKI_KEY).catch(() => {});
   await risuai.pluginStorage.removeItem(WIKI_DIGEST_KEY).catch(() => {});
   setStoredWikiPack(null);
+  staleKnown = null;
+  staleCheck = null;
 }
 
 /** 옛 필드 게임 자료(코드·자산 팩)를 저장소에서 지운다. 2026-11-04 필드를 뺄 때 파일은 남겨 둔 실수 → 11-05 사용자: 지우기 단추 + 플러그인이 뜰 때 자동으로 */

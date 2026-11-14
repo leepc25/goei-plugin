@@ -4,6 +4,7 @@ import type { LoreEntry } from './types';
 import { fillVars, guideOr, guideSec } from './guides';
 import { readDirectory } from './world/directory';
 import { termPresent } from './world/registry';
+import { splitThoughts, stripThoughts } from './thoughts';
 
 export class AssetError extends Error {}
 
@@ -77,19 +78,18 @@ export function stripImageTags(content: string): string {
   return content.replace(/\n\s*\n\s*<img\s*=[^>]*>\s*\n\s*\n/g, '\n\n').replace(/<img\s*=[^>]*>\s*/g, '');
 }
 
-/** 이미지 태그를 붙일 본문과, 건드리지 않을 앞쪽(Risu 생각 칸 <Thoughts>)·뒤쪽(상태창 [▣| / [◎| 블록부터) */
+/** 이미지 태그를 붙일 본문과, 건드리지 않을 앞쪽(Risu 생각 칸 <Thoughts>·<think>)·뒤쪽(상태창 [▣| / [◎| 블록부터) */
 export function splitNarrative(content: string): { leading: string; narrative: string; trailing: string } {
   // 맨 앞 생각 칸은 번호·인물 판정에서 빼고 저장 본문에는 그대로 둔다 (전수검사 11-13)
-  const head = /^\s*(?:<Thoughts>[\s\S]*?<\/Thoughts>\s*)+/.exec(content);
-  const leading = head ? head[0] : '';
-  const rest = content.slice(leading.length);
+  // 상황판 쪽과 같은 기준: 이어진 블록 전부, <Thoughts>·<think> 둘 다, 대소문자 안 가림 (재검토 11-14 F-7)
+  const { head: leading, body: rest } = splitThoughts(content);
   const cut = ['[▣|', '[◎|'].map((p) => rest.indexOf(p)).filter((i) => i >= 0);
   const at = cut.length ? Math.min(...cut) : -1;
   const narrative = at >= 0 ? rest.slice(0, at) : rest;
   const trailing = at >= 0 ? rest.slice(at) : '';
   return {
     leading,
-    narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/gi, '').replace(/<!--[\s\S]*?-->/g, '')).trim(),
+    narrative: stripImageTags(stripThoughts(narrative).replace(/<!--[\s\S]*?-->/g, '')).trim(),
     trailing,
   };
 }

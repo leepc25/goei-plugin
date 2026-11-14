@@ -70,3 +70,42 @@ test('칸으로 끌어다 바꾸기: 밀려난 장비(gear)만 찾아 사용 예
   assert.ok(!isEquipped(ha.find((x) => x.name === '손전등'), ha));
   assert.deepEqual(gearUnseated(hb, ha), []);
 });
+
+// 여쭐 것 C-12 사용자 답 (나): 원래 손에 드는 물건(무기·도구)만 손에서 빠질 때 「사용 예정」을 빼고,
+// 들지 않아도 쓸 수 있는 물건은 남긴다. 넣기·격자로 끌기·밀려남 모두 같게. 장비가 밀려난 경우는 지금처럼 뺀다
+test('C-12: 칸에서 빠질 때 사용 예정을 뺄 물건 — 손에 드는 물건·장비는 빼고, 갈래 없는 물건은 남긴다', async () => {
+  const { equipItem, unequipItem, liveItems, seatLost, useNeedsSeat, isEquipped } = await import('../dist-test/core.mjs');
+  const alive = new Set();
+  let it = { list: [], log: [] };
+  for (const [name, equip] of [['방독면', 'gear'], ['코트', 'gear'], ['망치', 'weapon'], ['손전등', undefined], ['칼', 'weapon'], ['라디오', undefined]]) {
+    it = addItem(it, alive, { name, use: true, ...(equip ? { equip } : {}), from: 'manual', anchor: '' });
+  }
+  const id = (name) => it.list.find((x) => x.name === name).id;
+  const of = (name) => it.list.find((x) => x.name === name);
+  // 넣기·격자로 끌기: 물건 갈래로 정한다
+  assert.equal(useNeedsSeat(of('망치')), true, '손에 드는 물건');
+  assert.equal(useNeedsSeat(of('방독면')), true, '장비');
+  assert.equal(useNeedsSeat(of('손전등')), false, '들지 않아도 쓸 수 있는 물건');
+  // 손에 든 채(held)여도 갈래 없는 물건은 남긴다
+  let hand = equipItem(it, alive, id('망치'), 0, 'weapon');
+  hand = equipItem(hand, alive, id('손전등'), 1, 'weapon');
+  assert.equal(useNeedsSeat(hand.list.find((x) => x.name === '손전등')), false);
+  const hb = liveItems(hand, alive);
+  // 밀려남: 손에 드는 물건은 뺀다
+  let ha = liveItems(equipItem(hand, alive, id('칼'), 0, 'weapon'), alive);
+  assert.deepEqual(seatLost(hb, ha), [id('망치')]);
+  // 밀려남: 들지 않아도 쓸 수 있는 물건은 남긴다 (누가 밀어내든)
+  ha = liveItems(equipItem(hand, alive, id('칼'), 1, 'weapon'), alive);
+  assert.ok(!isEquipped(ha.find((x) => x.name === '손전등'), ha));
+  assert.deepEqual(seatLost(hb, ha), []);
+  ha = liveItems(equipItem(hand, alive, id('라디오'), 1, 'weapon'), alive);
+  assert.deepEqual(seatLost(hb, ha), []);
+  // 손 칸 사이 옮기기(자리 바꿈 없이 빈 칸으로)·넣기 뒤 비교: 밀려난 것만
+  assert.deepEqual(seatLost(hb, liveItems(unequipItem(hand, id('망치')), alive)), [id('망치')]);
+  assert.deepEqual(seatLost(hb, liveItems(unequipItem(hand, id('손전등')), alive)), []);
+  // 장비가 밀려난 경우는 지금처럼 뺀다 (장비 칸 · 손 칸에 든 장비 모두)
+  const g = equipItem(it, alive, id('방독면'), 0, 'gear');
+  assert.deepEqual(seatLost(liveItems(g, alive), liveItems(equipItem(g, alive, id('코트'), 0, 'gear'), alive)), [id('방독면')]);
+  const gh = equipItem(it, alive, id('방독면'), 0, 'weapon');
+  assert.deepEqual(seatLost(liveItems(gh, alive), liveItems(equipItem(gh, alive, id('칼'), 0, 'weapon'), alive)), [id('방독면')]);
+});

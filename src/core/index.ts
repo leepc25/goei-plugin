@@ -42,6 +42,7 @@ export * from './statusctx';
 export * from './install';
 export * from './datapack';
 export * from './texthash';
+export * from './stalever';
 export * from './tokenizer';
 export * from './wallet';
 export * from './points';

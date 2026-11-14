@@ -63,6 +63,19 @@ test('사진 보내기: 끝이 맞는 가장 긴 표정, 밑줄·띄어쓰기 �
   assert.equal(S.resolveSitePic(char, 'Aileen_nope'), null);
 });
 
+test('사진 목록: 요청 자료를 주면 거기에 이름이 나온 것만 넣는다 (11-14 E-14)', () => {
+  const char = { globalLore: lore([{ name: '에일린', english: 'Aileen' }, { name: '진나솔', english: 'Jin Na-sol' }, { name: '최요원', english: 'Choi' }]) };
+  const expr = `Expressions: ${[...T.EMOTIONS].join(', ')}`;
+  assert.equal(S.sitePicList(char).split('\n')[0], 'People (may add _expression): 에일린, 진나솔, 최요원', '자료를 안 주면 전과 같이 전부');
+  assert.equal(S.sitePicList(char, undefined, '[최근 본문]\n진나솔이 관람차를 올려다봤다.'), `People (may add _expression): 진나솔\n${expr}`);
+  assert.equal(S.sitePicList(char, undefined, '{"content":"aileen 봤냐"}'), `People (may add _expression): 에일린\n${expr}`, '영문 이름·대소문자');
+  assert.equal(S.sitePicList(char, undefined, '에일린과 최요원'), `People (may add _expression): 에일린, 최요원\n${expr}`, '명부 차례 그대로');
+  assert.equal(S.sitePicList(char, undefined, '아무도 안 나오는 글'), 'Available pictures: none.', '하나도 없으면 지침의 「없음」 줄');
+  assert.equal(S.sitePicList(char, undefined, ''), 'Available pictures: none.');
+  assert.equal(S.sitePicList(char, (k) => (k === 'PICS_PEOPLE' ? 'P: {list}' : undefined), '진나솔').split('\n')[0], 'P: 진나솔', '머리말은 지침 절 그대로');
+  assert.equal(S.resolveSitePic(char, '최요원'), 'Choi_default', '보여 줄 때 찾기는 목록과 무관하게 전과 같다');
+});
+
 test('사진 목록 머리말: 기본은 옛 글 그대로, 절을 주면 그 글', () => {
   const char = { globalLore: LORE };
   const old = `People (may add _expression): 에일린\nExpressions: ${[...T.EMOTIONS].join(', ')}`;

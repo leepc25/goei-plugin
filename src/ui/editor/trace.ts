@@ -54,7 +54,7 @@ function nodes(t: TraceTurn): Node[] {
       key: `${t.id}:main`,
       kind: 'main',
       title: '메인 요청 조립',
-      meta: `Risu 메인 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
+      meta: `Risu 메인 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.added === undefined ? '' : ` · 플러그인이 더한 토큰 ${m.added.toLocaleString('ko-KR')}`}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
       ok: m.failed.length ? false : true,
       // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
       body: () => `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg gw-copyto" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, false)}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i>${copyBtn()}</summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,

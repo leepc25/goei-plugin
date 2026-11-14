@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import {
   decode, encode, applyBoard, acceptComments, deleteComment, reconcileUnread, incomingPlan, commitIncoming, applyActivity, activityContext,
   mainContext, gnetSettings, parseJsonPayload, parseDmBody, parsePostDraft, addUserPost, addUserComment, addOutgoingDm, dmThreads, writeGnet,
-  readGnet, refreshPrompt, commentPrompt, dmPrompt, postPrompt, bodyParts, G_POST_BASE, CFG, GnetError,
+  readGnet, refreshPrompt, commentPrompt, dmPrompt, postPrompt, bodyParts, G_POST_BASE, CFG, GnetError, setGuideOverride, guideDefault,
 } from '../dist-test/core.mjs';
 
 import { REAL } from './realcard.mjs';
@@ -187,6 +187,17 @@ test('prompts from the real card: frame, CBS settled, privacy branch, references
   assert.ok(d.messages[0].content.includes('ROLE BINDING (application-owned metadata):\n{"speaker":{"role":"npc_correspondent","handle":"x"}'));
   assert.ok(d.messages[1].content.includes('YOU ARE: x'));
   assert.ok(d.messages[1].content.includes('No verified public post links'));
+});
+
+test('게시판 참고 자료 머리말은 프로그램 안의 글: 공통 지침에 HEAD.REFS 절을 넣어도 안 바뀐다 (11-14 C-4)', { skip: !realLore }, () => {
+  const chat = { message: [{ role: 'user', data: '간다' }], scriptstate: {}, note: '' };
+  const src = { char: { name: '괴이봇', desc: '설명', globalLore: realLore }, chat };
+  const st = { seq: G_POST_BASE, posts: [], dms: [], sources: {} };
+  const user = () => refreshPrompt(src, st, incomingPlan(chat, st, gnetSettings({}), '나', () => 0), '나', {}).messages[1].content;
+  try {
+    setGuideOverride('Common', `${guideDefault('Common')}\n\n@@SECTION HEAD.REFS\n[자료 고침]\n@@END\n`);
+    assert.ok(user().startsWith('[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n'));
+  } finally { setGuideOverride('Common', null); }
 });
 
 test('댓글 시각: 모델 시각을 글·부모·지금 사이로 맞추고, 틀리면 앱이 고친다', async () => {
