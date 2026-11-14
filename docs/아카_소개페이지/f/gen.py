@@ -134,7 +134,7 @@ B.append(para('채팅 화면의 유령 단추를 누르면 열리는 창입니�
 C=(0,0,2200,1800)
 B.append(block('상황판','채팅을 이어 가는 동안 다른 곳에서도 괴이가 터집니다. 방금 발생한 사건과 지금 출동해 있는 요원이 여기에 올라옵니다.',screen('promo/pc-play-02-board','m_board.jpg')))
 B.append(block('임무','상황판에 뜬 사건 현장으로 요원 넷을 데리고 나갑니다. 다음 장면은 그 넷과 함께 현장에 도착하는 데서 시작합니다. 원하는 상황을 직접 써서 임무로 만들 수도 있습니다.',screen('promo/pc-play-03-map','m_map.jpg',CB)))
-B.append(block('괴담톡','채팅을 하고 있으면 인물한테서 먼저 문자가 옵니다. 「부장님 지금 어디세요? 본부 4층 비었어요」 단톡방에 불려 들어가기도 하고, 여기서 나눈 이야기는 본편의 인물도 기억합니다.',screen('promo/pc-play-04-phone','m_talk.jpg',CB)))
+B.append(block('괴담톡','채팅을 하고 있으면 인물한테서 먼저 문자가 옵니다. 단톡방에 불려 들어가기도 하고, 여기서 나눈 이야기는 본편의 인물도 기억합니다.',screen('promo/pc-play-04-phone','m_talk.jpg',CB)))
 B.append(block('인터넷','지금 벌어지는 사건을 두고 괴담넷과 갤러리에 글과 댓글이 올라옵니다. 직접 글을 쓰면 답글이 달립니다. 상점에서 산 물건은 소지품으로 들어오고, 괴이위키에서는 마주친 괴이의 문서를 찾아봅니다.',screen('promo/pc-play-05-net','m_net.jpg',CB),
    mini('게시판, 상점, 위키 화면',
    sub('게시판',[(screen('s-boards/pc-01-gn','n_gn.jpg',CB),'괴담넷'),(screen('s-boards/pc-04-gal','n_gal.jpg',CB),'괴담 갤러리'),(screen('s-boards/pc-08-wpf','n_wpf.jpg',CB),'세정게')],'게시판마다 글과 댓글이 올라오고, 직접 글을 쓰면 답글이 달립니다.')
