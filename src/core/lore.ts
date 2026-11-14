@@ -491,13 +491,25 @@ function pickAppendices(entries: ManagedEntry[], picks: Map<number, LorePick>, s
   entries.forEach((e, i) => {
     const a = e.appendix;
     if (!a) return;
-    if (a.when.target && state.target && a.parentNames.some((n) => sameName(n, state.target))) add(i, 'status', state.target, state.target, 100);
+    // 목표 칸: 본 항목 이름·키, 부록 자신의 키, 적어 둔 위치 이름과 같으면 (망상홈쇼핑 · 상품: 목표가 오후역일 때도)
+    const hit = a.when.target && state.target && (a.parentNames.some((n) => sameName(n, state.target)) || names(e, state.target) || a.when.places.some((x) => sameName(x, state.target)));
+    if (hit) add(i, 'status', state.target, state.target, 100);
     const w = place ? a.when.places.find((x) => squash(x) && place.includes(squash(x))) : undefined;
     if (w) add(i, 'place', w, state.place ?? '', 40);
     for (const group of a.agentNames) {
       const who = present.find((p) => group.some((n) => sameName(n, p)));
       if (who) add(i, 'agent', group[0], who, 20);
     }
+  });
+  // 부록 키에 다른 본 항목의 이름이 있으면 그 항목이 켜질 때 같이 켠다: 명부(세계 탭)에서 넣은 별칭·바꾼 영문명으로 켜졌을 때도 따라간다.
+  // 부록 키는 기본 키를 베껴 둔 것이라 그런 말은 모른다 (망상홈쇼핑 · 상품 ↔ 오후역, 11-14 재검토)
+  // 본 항목이 상태창 목표만으로 켜졌으면 부록의 「목표」 스위치가 켜져 있을 때만 따라간다 (사용자가 끈 스위치를 돌아가지 않게)
+  const mains = [...picks.values()].filter((p) => !p.entry.appendix).map((p) => ({ name: p.entry.name, said: p.reasons.some((r) => r.why !== 'status') }));
+  entries.forEach((e, i) => {
+    const a = e.appendix;
+    if (!a || picks.has(i)) return;
+    const m = mains.find((x) => (x.said || a.when.target) && e.rawKeys.some((k) => sameName(k, x.name)));
+    if (m) add(i, 'parent', m.name, m.name, 10);
   });
   const on = new Set([...picks.values()].map((p) => p.entry.name));
   entries.forEach((e, i) => {

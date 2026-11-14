@@ -26,6 +26,8 @@ export const ITEMS_VAR = '$st_items';
 export const ITEM_USE_VAR = '$st_item_use';
 /** 「사용」 상자를 보낸 턴의 마지막 유저 메시지 키. 비면 아직 안 보냄. 같은 키면 그 턴의 다시 굴리기 (상자를 다시 넘긴다) */
 export const ITEM_USE_AT_VAR = '$st_item_use_at';
+/** 답이 붙은 턴의 「사용」 자리 사본 (JSON {at, from, q, after?}). 답이 온 뒤 새로 넣어 자리를 새로 시작할 때 적는다: 그 답을 다시 굴리면 이것을 다시 보낸다 (useTurn) */
+export const ITEM_USE_PREV_VAR = '$st_item_use_prev';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars): 칸 수·한계 문장·본편에 넘기기·보조 모델 자동 읽기 */
 export const ITEM_SLOTS_VAR = '$it_slots';
 export const ITEM_LIMIT_VAR = '$it_limit';
@@ -676,19 +678,21 @@ export function readItemUse(vars: Record<string, unknown> | undefined): ItemUse[
   const raw = vars?.[ITEM_USE_VAR];
   if (typeof raw !== 'string' || !raw.trim()) return [];
   try {
-    const a = JSON.parse(raw);
-    if (!Array.isArray(a)) return [];
-    const out: ItemUse[] = [];
-    for (const x of a) {
-      const id = typeof x?.id === 'string' ? x.id : '';
-      const n = Number(x?.n ?? 1);
-      if (!id || !Number.isSafeInteger(n) || n < 1 || out.some((u) => u.id === id)) continue;
-      out.push({ id, n: Math.min(99, n) });
-    }
-    return out.slice(0, 40);
+    return useList(JSON.parse(raw));
   } catch {
     return [];
   }
+}
+function useList(a: unknown): ItemUse[] {
+  if (!Array.isArray(a)) return [];
+  const out: ItemUse[] = [];
+  for (const x of a) {
+    const id = typeof x?.id === 'string' ? x.id : '';
+    const n = Number(x?.n ?? 1);
+    if (!id || !Number.isSafeInteger(n) || n < 1 || out.some((u) => u.id === id)) continue;
+    out.push({ id, n: Math.min(99, n) });
+  }
+  return out.slice(0, 40);
 }
 export const itemUseVars = (list: ItemUse[]): Record<string, string> => ({ [ITEM_USE_VAR]: list.length ? JSON.stringify(list.slice(0, 40)) : '' });
 
@@ -706,6 +710,36 @@ export function addUse(list: ItemUse[], e: Item, left: number | undefined): Item
 }
 /** 「사용」 자리에서 빼기 */
 export const dropUse = (list: ItemUse[], id: string): ItemUse[] => list.filter((u) => u.id !== id);
+/** 합친 뒤의 「사용」 자리: 빠진 줄(other)에 넣어 둔 사용을 남는 줄(keep)로 옮긴다 (둘 다 있으면 횟수를 더한다). 줄이 사라져 사용이 말없이 빠지지 않게 (11-14 재검토) */
+export function mergeUse(list: ItemUse[], keepId: string, otherId: string): ItemUse[] {
+  const other = list.find((u) => u.id === otherId);
+  if (!other || keepId === otherId) return list;
+  const n = Math.min(99, other.n + (list.find((u) => u.id === keepId)?.n ?? 0));
+  const has = list.some((u) => u.id === keepId);
+  return list.flatMap((u) => (u.id === otherId ? (has ? [] : [{ id: keepId, n }]) : u.id === keepId ? [{ id: keepId, n }] : [u]));
+}
+
+/** 답이 붙은 턴의 자리 사본: at = 보낸 유저 키, from = 자리를 새로 시작할 때의 마지막 응답, q = 그 턴에 보낸 사용, after = 그 사용보다 앞선 응답(있으면 그 뒤 기록만 q 의 것) */
+export interface UsePrev {
+  at: string;
+  from: string;
+  q: ItemUse[];
+  after?: string;
+}
+export function readUsePrev(vars: Record<string, unknown> | undefined): UsePrev | null {
+  const raw = vars?.[ITEM_USE_PREV_VAR];
+  if (typeof raw !== 'string' || !raw.trim()) return null;
+  try {
+    const p = JSON.parse(raw);
+    const at = typeof p?.at === 'string' ? p.at : '';
+    const from = typeof p?.from === 'string' ? p.from : '';
+    if (!at || !from) return null;
+    return { at, from, q: useList(p.q), ...(typeof p.after === 'string' && p.after ? { after: p.after } : {}) };
+  } catch {
+    return null;
+  }
+}
+export const usePrevVars = (p: UsePrev | null): Record<string, string> => ({ [ITEM_USE_PREV_VAR]: p ? JSON.stringify(p) : '' });
 
 /** 마지막 응답 뒤에 직접 합친 것 → 「This turn」 사건 (2026-11-08 사용자: 합쳐도 본편이 몰랐다) */
 export function mergedNow(it: Items, lastAnchor: string): string[] {
@@ -893,6 +927,65 @@ export function pendingItemUse(vars: Record<string, unknown> | undefined, userKe
   return !at || at === userKey ? readItemUse(vars) : [];
 }
 
+/** 이 유저 턴에서 볼 「사용」: 보통은 자리 그대로(pendingItemUse).
+ *  reroll = 답이 온 뒤 새로 넣어 자리를 새로 시작했는데(사본 있음) 그 답이 사라졌다(다시 굴리기·지움): 그 턴에 보낸 사본을 다시 보내고, 새 자리는 다음 메시지용으로 둔다 (11-14 재검토: 지난 사용이 사라지고 새 물건이 지난 메시지에 쓰였다).
+ *  after = 이 응답 뒤의 기록만 「이미 실린 것」으로 센다 (같은 턴에 같은 물건을 또 쓴 응답을 다시 굴릴 때 앞 응답의 기록에 속지 않게). anchor = 지금 정리하는 응답 (다시 불려도 같은 판정) */
+function useTurn(chat: Chat, userKey: string, anchor = ''): { reroll: boolean; queue: ItemUse[]; after: string } {
+  const prev = userKey ? readUsePrev(chat.scriptstate) : null;
+  const mine = prev && prev.at === userKey ? prev : null;
+  const keys = aliveAnchors(chat);
+  const there = (k: string | undefined) => (k && keys.has(k) ? k : '');
+  if (mine && (!keys.has(mine.from) || mine.from === anchor)) return { reroll: true, queue: mine.q, after: there(mine.after) };
+  return { reroll: false, queue: pendingItemUse(chat.scriptstate, userKey), after: there(mine?.from) };
+}
+/** 이 유저 턴의 다른 살아 있는 응답에 그 물건의 사용 기록이 있나 (after 가 있으면 그 응답 뒤 것만. skip = 지금 정리하는 응답) */
+const usedThisTurn = (chat: Chat, it: Items, id: string, userKey: string, alive: Set<string>, after: string, skip = ''): boolean =>
+  it.log.some((l) => l.what === 'use' && l.by === 'use' && l.item === id && l.anchor !== skip && alive.has(l.anchor) && keyAfter(chat, l.anchor, userKey) && (!after || keyAfter(chat, l.anchor, after)));
+
+/** 이 유저 턴에 이미 보낸 사용이 살아 있는 응답에 적혀 있나 (유저 메시지 없이 이어 받는 두 번째 응답·이어 쓰기).
+ *  그러면 요청에 「uses」를 또 넣지 않는다: 답이 붙을 때 settleItemUse 도 또 적지 않으니, 넣으면 이야기만 두 번 쓴다 (11-14 재검토).
+ *  보낸 자리(at = 이 유저 키)일 때만 본다: 답이 온 뒤 같은 물건을 새로 넣은 것(at 비어 있음)은 새 사용이라 그대로 보낸다.
+ *  그렇게 새로 넣어 보낸 응답을 다시 굴리면, 새로 넣기 전 응답의 기록은 세지 않는다 (useTurn 의 after) */
+export function useCarried(chat: Chat, it: Items, id: string, userKey = lastUserKey(chat), alive = aliveAnchors(chat)): boolean {
+  if (!userKey) return false;
+  const t = useTurn(chat, userKey);
+  if (!t.reroll && chat.scriptstate?.[ITEM_USE_AT_VAR] !== userKey) return false;
+  return usedThisTurn(chat, it, id, userKey, alive, t.after);
+}
+
+/** 이번 요청에 실제로 실리는 사용 (inventoryText 의 「uses」 줄과 같은 셈): 살아 있고 쓸 수 있고 횟수가 남은 것만, 이어 받는 응답이면 이미 쓴 것은 뺀다 */
+export function usesToSend(chat: Chat, it = readItems(chat.scriptstate), alive = aliveAnchors(chat)): (BlockUse & { id: string })[] {
+  const userKey = lastUserKey(chat);
+  const live = liveItems(it, alive);
+  return useTurn(chat, userKey).queue.flatMap((u) => {
+    if (useCarried(chat, it, u.id, userKey, alive)) return [];
+    const e = live.find((x) => x.id === u.id);
+    if (!e || !canUse(e)) return [];
+    const l = itemLeft(it, e, alive);
+    const n = l !== undefined ? Math.min(u.n, l) : 1;
+    return n > 0 ? [{ id: e.id, name: e.name, n, ...(l !== undefined ? { after: l - n } : {}) }] : [];
+  });
+}
+
+/** 「사용」 자리를 바꾼 뒤의 변수 (소지품 창의 사용·한 번 더). 바뀔 게 없으면 null.
+ *  답이 붙은 턴의 자리(at 있음, 그 유저 메시지 뒤에 응답이 있다)는 비우고 새로 시작한다 (지난 턴 것을 또 넘기지 않게). 지난 자리는 사본으로 남긴다: 그 답을 다시 굴리면 사본을 다시 보낸다 (useTurn).
+ *  응답을 지워 그 유저 메시지가 끝이면 아직 안 쓰인 자리다: 비우지 않고 이어 넣는다 */
+export function queueUseVars(chat: Chat, fn: (q: ItemUse[]) => ItemUse[]): Record<string, string> | null {
+  const vars = chat.scriptstate;
+  const at = typeof vars?.[ITEM_USE_AT_VAR] === 'string' ? (vars[ITEM_USE_AT_VAR] as string) : '';
+  const old = readItemUse(vars);
+  const done = !!at && !keysAfterLastBot(chat).includes(at);
+  const cur = done ? [] : old;
+  const next = fn(cur);
+  if (JSON.stringify(next) === JSON.stringify(cur)) return null;
+  if (!done) return { ...itemUseVars(next), [ITEM_USE_AT_VAR]: '' };
+  const was = readUsePrev(vars);
+  const from = lastBotKey(chat);
+  // 이 유저 턴의 자리일 때만 사본을 둔다 (지난 턴 것은 다시 굴릴 일이 없다)
+  const prev: UsePrev | null = at === lastUserKey(chat) && from && old.length ? { at, from, q: old, ...(was?.at === at ? { after: was.from } : {}) } : null;
+  return { ...itemUseVars(next), [ITEM_USE_AT_VAR]: '', ...usePrevVars(prev) };
+}
+
 /** 이 채팅의 [Inventory] 글 (소지품이 꺼졌거나 넘길 게 없으면 '') */
 export function inventoryText(chat: Chat): string {
   const vars = chat.scriptstate;
@@ -902,22 +995,14 @@ export function inventoryText(chat: Chat): string {
     return soldOff.length ? [SHOP_HEAD, `This turn: ${soldOff.join('; ')}`].join('\n') : '';
   }
   const it = readItems(vars);
-  const userKey = lastUserKey(chat);
-  // 다시 굴리기: 이번 턴 사용 기록(옛 응답에 묶인 것)은 셈에서 빼고 본다 — 지금 응답이 그 사용을 다시 쓰는 중
+  // 다시 굴리기: 리수가 옛 응답을 먼저 지우고 요청하니 그 사용 기록은 이미 죽어 있다 (횟수가 돌아온 채로 다시 넘긴다).
+  // 옛 응답이 살아 있으면 다시 굴리기가 아니라 유저 메시지 없이 이어 받는 응답이다: 그 사용은 이미 쓴 것으로 세고 다시 넘기지 않는다 (useCarried)
   const alive = aliveAnchors(chat);
-  const reroll = typeof vars?.[ITEM_USE_AT_VAR] === 'string' && vars[ITEM_USE_AT_VAR] === userKey && userKey;
-  const after = reroll ? new Set([...alive].filter((k) => !it.log.some((l) => l.what === 'use' && l.by === 'use' && l.anchor === k && keyAfter(chat, k, userKey)))) : alive;
-  const live = liveItems(it, after);
-  const left = (e: Item) => itemLeft(it, e, after);
+  const live = liveItems(it, alive);
+  const left = (e: Item) => itemLeft(it, e, alive);
   // 상점(core/shop.ts): 켜져 있으면 물건이 없어도 블록을 보내 표식 지침을 넘기고, 이번 방문의 사건(주인과 나눈 말·쫓겨남)을 This turn 에 더한다
   const shop = shopOn(vars);
-  const use = pendingItemUse(vars, userKey).flatMap((u): BlockUse[] => {
-    const e = live.find((x) => x.id === u.id);
-    if (!e || !canUse(e)) return [];
-    const l = left(e);
-    const n = l !== undefined ? Math.min(u.n, l) : 1;
-    return n > 0 ? [{ name: e.name, n, ...(l !== undefined ? { after: l - n } : {}) }] : [];
-  });
+  const use = usesToSend(chat, it, alive).map(({ id: _id, ...u }): BlockUse => u);
   const resumed = invJustResumed(chat);
   const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop, (place, plain) => soldPasses(vars, place, plain)), ...mallEvents(chat)];
   const text = itemsBlock(live, {
@@ -965,35 +1050,60 @@ export function withInventory<M extends PromptMessage>(messages: M[], chat: Chat
  * - 같은 턴 다시 굴리기: 기록만 새 응답에 다시 묶는다 (옛 응답의 기록은 그 응답과 함께 사라짐)
  * - 다음 턴: 자리를 비운다
  * 소모성은 남은 횟수가 0이 되면 목록에서 빠진다 (liveItems) — 따로 지우지 않는다
+ * sent = 이번 요청에 실려 나간 물건 id (host/usebox.ts sentOut). 보낸 뒤 버리거나 판 물건도 쓴 것으로 적는다: 모델은 이미 쓴 것으로 받았고,
+ *  그 물건이 돌아오면(다시 줍기·판 응답 다시 굴리기) 횟수가 맞아야 한다. 모르면(안 줌) 살아 있는 물건만 적는다
  */
-export function settleItemUse(chat: Chat, responseIndex: number): Record<string, string> | null {
+export function settleItemUse(chat: Chat, responseIndex: number, sent?: ReadonlySet<string> | null): Record<string, string> | null {
   const vars = chat.scriptstate ?? {};
   const queue = readItemUse(vars);
   const at = typeof vars[ITEM_USE_AT_VAR] === 'string' ? (vars[ITEM_USE_AT_VAR] as string) : '';
-  if (!queue.length && !at) return null;
+  const prev = readUsePrev(vars);
+  if (!queue.length && !at && !prev) return null;
   const userKey = lastUserKey(chat);
-  if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: '' };
-  if (!queue.length) return { [ITEM_USE_AT_VAR]: '' };
   const m = chat.message?.[responseIndex];
-  if (!m || m.role !== 'char') return null;
-  const anchor = messageKey(m, responseIndex);
+  const anchor = m && m.role === 'char' ? messageKey(m, responseIndex) : '';
+  const turn = useTurn(chat, userKey, anchor);
   const it0 = readItems(vars);
   let it = it0;
   // 이 응답 기록을 빼고 센 남은 횟수 (다시 굴리기면 옛 응답 기록은 이미 죽어 있다)
   const alive = new Set([...aliveAnchors(chat)].filter((k) => k !== anchor));
-  for (const u of queue) {
-    if (it.log.some((l) => l.what === 'use' && l.by === 'use' && l.anchor === anchor && l.item === u.id)) continue;
-    // 이 턴의 다른 응답이 살아 있는 채로 이미 썼으면(유저 메시지 없이 이어 받은 응답) 또 빼지 않는다. 진짜 리롤은 옛 응답이 사라져 여기 안 걸린다 (전수검사 11-13)
-    if (it.log.some((l) => l.what === 'use' && l.by === 'use' && l.item === u.id && l.anchor !== anchor && alive.has(l.anchor) && keyAfter(chat, l.anchor, userKey))) continue;
-    const item = liveItems(it0, alive).find((e) => e.id === u.id);
-    if (!item || !canUse(item)) continue;
-    const left = itemLeft(it0, item, alive);
-    const n = left !== undefined ? Math.min(u.n, left) : 1;
-    if (n < 1) continue;
-    it = addItemLog(it, { name: item.name, item: item.id, n, ...(item.icon ? { icon: item.icon } : {}), what: 'use', by: 'use', anchor, ...(left !== undefined && left - n <= 0 ? { note: '다 씀' } : {}) }, alive);
+  /** list 의 사용을 이 응답에 적는다. carried = 이 턴의 다른 살아 있는 응답이 이미 쓴 것은 건너뛴다 */
+  const log = (list: ItemUse[], carried: boolean) => {
+    for (const u of list) {
+      if (it.log.some((l) => l.what === 'use' && l.by === 'use' && l.anchor === anchor && l.item === u.id)) continue;
+      // 요청에 없던 것은 적지 않는다 (기다림이 풀린 틈에 넣은 것이 쓴 것으로 깎이지 않게)
+      if (sent && !sent.has(u.id)) continue;
+      // 이 턴의 다른 응답이 살아 있는 채로 이미 썼으면(유저 메시지 없이 이어 받은 응답) 또 빼지 않는다. 진짜 리롤은 옛 응답이 사라져 여기 안 걸린다 (전수검사 11-13)
+      if (carried && usedThisTurn(chat, it, u.id, userKey, alive, turn.after, anchor)) continue;
+      // 보낸 뒤 버리거나 판 물건: 줄이 남아 있으면 그 줄로 적는다 (삭제한 것은 줄이 없어 건너뛴다)
+      const item = liveItems(it0, alive).find((e) => e.id === u.id) ?? (sent?.has(u.id) ? it0.list.find((e) => e.id === u.id && (!e.anchor || alive.has(e.anchor))) : undefined);
+      if (!item || !canUse(item)) continue;
+      const left = itemLeft(it0, item, alive);
+      const n = left !== undefined ? Math.min(u.n, left) : 1;
+      if (n < 1) continue;
+      it = addItemLog(it, { name: item.name, item: item.id, n, ...(item.icon ? { icon: item.icon } : {}), what: 'use', by: 'use', anchor, ...(left !== undefined && left - n <= 0 ? { note: '다 씀' } : {}) }, alive);
+    }
+  };
+  if (turn.reroll && prev) {
+    // 답이 온 뒤 새로 넣은 자리가 있는 턴을 다시 굴렸다: 그 턴에 보낸 사본을 이 응답에 적고, 새 자리는 다음 메시지용으로 그대로 둔다
+    if (!anchor) return null;
+    log(turn.queue, true);
+    // 지난 턴 자리가 남아 있으면 비운다. 이 턴에 보낸 자리(at = 유저 키)면 사본은 더 쓸 일이 없다
+    const stale = at && at !== userKey ? { ...itemUseVars([]), [ITEM_USE_AT_VAR]: '' } : {};
+    const keep = at === userKey ? null : { ...prev, from: anchor };
+    if (it === it0 && !at && keep?.from === prev.from) return null;
+    return { ...(it === it0 ? {} : itemsVars(it)), ...stale, ...usePrevVars(keep) };
   }
+  // 지난 턴의 사본은 지운다
+  const drop = prev && prev.at !== userKey ? usePrevVars(null) : {};
+  if (!queue.length && !at) return prev && prev.at !== userKey ? drop : null;
+  if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: '', ...drop };
+  if (!queue.length) return { [ITEM_USE_AT_VAR]: '', ...drop };
+  if (!anchor) return null;
+  // 보낸 자리(at = 이 유저 키)일 때만 이미 쓴 것을 거른다: 답이 온 뒤 같은 물건을 새로 넣은 것(at 비어 있음)은 새 사용이라 적는다
+  log(queue, at === userKey);
   if (it === it0 && at === userKey) return null;
-  return { ...(it === it0 ? {} : itemsVars(it)), [ITEM_USE_AT_VAR]: userKey };
+  return { ...(it === it0 ? {} : itemsVars(it)), [ITEM_USE_AT_VAR]: userKey, ...drop };
 }
 
 // ── 보조 모델(인물 갱신기) 자료·보고 (host/people.ts) ──

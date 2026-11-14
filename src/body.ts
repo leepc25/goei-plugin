@@ -72,7 +72,7 @@ import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
 import { cosReadyMode } from './core/malls';
-import { hideUseBox, markUseSent, refreshUseBox, USE_SLOT } from './host/usebox';
+import { hideUseBox, holdUseSettle, markUseSent, refreshUseBox, sentOut, setUseLockAt, USE_SLOT } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
@@ -163,7 +163,10 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (type !== 'model' || !Array.isArray(messages)) return messages;
   if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
   // 자동 재시도: 이미 조립한 요청이 다시 들어왔다. 참고 기록·인물 기록이 두 번 끼고 호출 기록 턴이 새로 열리지 않게 그대로 보낸다 (전수검사 11-13)
-  if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
+  if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) {
+    if (isWaiting()) setWaiting(true); // 기다리는 시간을 이 재시도부터 다시 잰다 (재시도가 길어져 「사용」 잠금이 중간에 풀리지 않게)
+    return sanitize(messages);
+  }
   const input0 = messages;
   const failed: string[] = [];
   /** 플러그인이 끼운 글 (호출 기록의 「플러그인이 더한 토큰」, 전수검사 11-13) */
@@ -189,6 +192,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   };
   try {
     setWaiting(true);
+    setUseLockAt(null); // 「사용」 잠금: 어느 채팅인지 읽기 전에는 전부 (host/usebox.ts)
     setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
     // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
     // 지시문 풀기가 채팅의 마지막 메시지를 봐야 해서 그 앞에서 읽는다 (전수검사 11-13)
@@ -197,6 +201,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       // 호출 흐름 기록: 새 턴 (host/trace.ts). 이 뒤의 라우터·디렉터 호출은 이 턴의 「본편 전」
       await stepAsync('호출 기록', () => traceBegin(), undefined);
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
+      if (ctx) setUseLockAt(ctx); // 「사용」 잠금은 요청을 보낸 이 채팅에만
       // 진행 창 (core/progress.ts): 이 턴에 돌 단계를 설정으로 미리 깐다
       if (ctx) step('진행 계획', () => progressPlan(turnPlan(ctx!.char, ctx!.chat)), undefined);
     }
@@ -557,6 +562,8 @@ async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: numbe
 
 /** 모델 응답이 채팅에 들어간 뒤: 상황판 태그 반영 + 저장 본문 정리 + 다음 턴 브리핑 */
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
+  // 사용 정리가 끝날 때까지 「사용」에 새로 못 넣게 잠근다 (기다림이 꺼진 뒤 정리 전에 넣은 것이 쓴 것으로 적히지 않게, host/usebox.ts)
+  const useDone = holdUseSettle();
   setWaiting(false);
   // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 이 턴만 닫는다. 뒤 작업이 없으면 바로
   const after: Promise<unknown>[] = [];
@@ -618,12 +625,15 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       }
     }
     // 소지품 「사용」 상자: 보낸 것은 사용 기록으로 이 응답에 묶고, 다음 턴이면 비운다 (core/items.ts settleItemUse)
-    if (settleItemUse(latest ?? chat, arg.messageIndex)) {
+    // 요청에 실려 나간 것(sentOut)을 같이 넘긴다: 보낸 뒤 버리거나 판 물건도 쓴 것으로 적고, 요청에 없던 것은 적지 않는다
+    const useSent = sentOut(arg.characterIndex, arg.chatIndex, latest ?? chat);
+    if (settleItemUse(latest ?? chat, arg.messageIndex, useSent)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-        const vars = settleItemUse(cur, arg.messageIndex);
+        const vars = settleItemUse(cur, arg.messageIndex, useSent);
         return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
       }).catch(() => null)) ?? latest;
     }
+    useDone();
     // 상점 표식 `[shop: 가게|주인]`: 이 응답 기준으로 상점 상태를 맞추고 지난 응답의 표식은 지운다 (core/shop.ts settleShop). 설정이 꺼져 있어도 남은 표식은 정리
     // 주인공 자기 가게는 상점이 아니다 (11-09 사용자: 마덕희로 플레이 → 헐값매입 상점이 뜸): 캐릭터 플레이 요원 이름·페르소나 이름
     const selfNames = hasShopTag(raw) ? [playerAgent((await getChar<LoreChar>(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? '', userInfo().name] : [];
@@ -724,6 +734,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   } catch (error) {
     console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
+    useDone(); // 일찍 끝났거나 던졌어도 잠금은 푼다
     void Promise.allSettled(after).then(() => { progressEnd(pTurn); traceEnd(tTurn); });
   }
 }

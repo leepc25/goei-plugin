@@ -7,11 +7,11 @@
 // 플러그인은 막지도 경고하지도 않는다: 칸이 넘치면 넘친 칸을 붉은 테두리로 보여 줄 뿐, 푸는 건 본편 응답 (core/items.ts).
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
-import { refreshUseBox, useSending } from '../host/usebox';
+import { freeUseLock, refreshUseBox, useLocked, useSending } from '../host/usebox';
 import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems, seatLost, useNeedsSeat,
+  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_SPENT_VAR, ITEM_USE_AT_VAR, ITEMS_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems, mergeUse, queueUseVars, usesToSend, seatLost, useNeedsSeat,
   purgeItem, readItemUse, readItems, removeItem, searchItems, setItemLeft, slotKind, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
@@ -244,6 +244,15 @@ export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''):
 /** 「보내는 중」(요청에 실려 나가 답을 기다리는 사용): 「사용 취소」 단추를 숨긴다 (재검토 11-14 B-9 사용자 답) */
 const sendingUse = (ctx: ChatContext, id: string) => useSending(ctx.chat, ctx.charIndex, ctx.chatIndex, id);
 
+/** 답을 기다리는 동안 「사용」에 넣으려 할 때의 안내 (11-14 사용자) */
+const WAIT_NOTE = '답을 기다리는 중이라 지금은 사용에 넣을 수 없어요. 답이 온 뒤에 넣어 주세요.';
+/** 답을 기다리는 동안 「사용 취소」를 눌렀을 때 */
+const WAIT_UNUSE_NOTE = '답을 기다리는 중이라 지금은 사용을 취소할 수 없어요. 답이 온 뒤에 해 주세요.';
+/** 답을 기다리는 동안 사용에 넣은 물건을 합치려 할 때 */
+const WAIT_MERGE_NOTE = '사용에 넣은 물건은 답이 온 뒤에 합칠 수 있어요.';
+const lockedHere = (ctx: { charIndex: number; chatIndex: number }) => useLocked(ctx.charIndex, ctx.chatIndex);
+const useNote = (why: UseHeld, it: Item) => (why === 'wait' ? WAIT_NOTE : `「${it.name}」은 지금 보내는 중이라 답이 온 뒤에 더 쓸 수 있어요.`);
+
 /** 「사용」칸 (장착 띠 오른쪽, PC만): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
 function useBox(ctx: ChatContext): string {
   const live = liveOf(ctx);
@@ -363,6 +372,7 @@ function popup(ctx: ChatContext): string {
   const queued = useQueue(ctx).find((u) => u.id === it.id)?.n ?? 0;
   const left = leftOf(ctx, it);
   const sending = sendingUse(ctx, it.id);
+  // 답을 기다리는 동안에도 단추는 켜 둔다: 누르면 안내가 뜬다. 꺼 두면 답이 온 뒤에도 창을 다시 열 때까지 죽어 있고, 폰에서는 까닭도 안 보였다 (11-14 재검토)
   const more = !sending && usableNow(ctx, it) && (left === undefined ? !queued : queued < left);
   const equipped = isEquipped(it, liveOf(ctx));
   const body = `${head}
@@ -372,7 +382,7 @@ function popup(ctx: ChatContext): string {
     ${it.text ? `<div class="it-note">${esc(it.text)}</div>` : ''}
     ${it.quote ? `<p class="qt">근거 「${esc(it.quote)}」</p>` : ''}
     <div class="it-btns">
-      ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || (queued && !sending) ? '' : 'disabled'}${needsEquip(ctx, it) ? ' title="장착해야 쓸 수 있어요"' : ''}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
+      ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}${needsEquip(ctx, it) ? ' title="장착해야 쓸 수 있어요"' : ''}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
       ${queued && !sending ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
       ${boxButton(ctx, it.id)}
       <button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}"${!equipped && !it.equip ? ' title="손 칸에 들어가요"' : ''}>${equipLabel(it, equipped)}</button>
@@ -445,6 +455,8 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     await write((x, alive) => equipItem(x, alive, it.id));
     return true;
   };
+  // 중지·실패로 끝난 요청이 「사용」을 계속 막지 않게, 사용을 건드리는 동작 앞에서 리수 화면을 한 번 본다 (host/usebox.ts freeUseLock)
+  if (/^items-(use|unuse|dnd|drop|purge|equip|unequip|merge-to)$/.test(action)) await freeUseLock();
   switch (action) {
     case 'items-sub':
       itemsUi.sub = value === 'wallet' || value === 'points' ? value : 'items';
@@ -509,9 +521,30 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     case 'items-merge-to': {
       const keep = itemsUi.open;
       if (!keep || !value) return true;
-      // 합친 기록은 마지막 응답에 묶어 다음 요청 「This turn」에 넘긴다 (core/items.ts mergedNow)
-      const anchor = lastBotKey(ctx.chat);
-      await write((it, alive) => mergeItems(it, alive, keep, value, anchor));
+      let held = false;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const vars = chat.scriptstate;
+        const q = readItemUse(vars);
+        // 답을 기다리는 중에는 사용에 넣은 줄을 합치지 않는다: 줄이 사라지면 모델은 쓴 것으로 받았는데 기록·횟수가 안 맞았다 (11-14 재검토)
+        const busy = (id: string) => useSending(chat, ctx.charIndex, ctx.chatIndex, id) || (lockedHere(ctx) && (q.some((u) => u.id === id) || usesToSend(chat).some((u) => u.id === id)));
+        if (busy(keep) || busy(value)) {
+          held = true;
+          return null;
+        }
+        const cur = readItems(vars);
+        // 합친 기록은 마지막 응답에 묶어 다음 요청 「This turn」에 넘긴다 (core/items.ts mergedNow)
+        const next = mergeItems(cur, aliveAnchors(chat), keep, value, lastBotKey(chat));
+        if (next === cur) return null;
+        // 아직 안 보낸 사용은 남는 줄로 옮긴다 (빠진 줄의 칩이 말없이 사라지지 않게)
+        const use = vars?.[ITEM_USE_AT_VAR] ? {} : itemUseVars(mergeUse(q, keep, value));
+        return { ...chat, scriptstate: { ...(vars ?? {}), ...itemsVars(next), ...use } };
+      });
+      if (held) {
+        itemsUi.info = WAIT_MERGE_NOTE;
+        env.render();
+        return true;
+      }
+      void refreshUseBox(ctx.charIndex, ctx.chatIndex);
       itemsUi.mode = 'view';
       itemsUi.info = '합쳤어요.';
       await env.refresh();
@@ -597,10 +630,17 @@ export async function itemsAction(action: string, value: string | undefined, ctx
         env.render();
         return true;
       }
+      // 답을 기다리는 중이면 손에 들기 전에 막는다 (11-14 사용자)
+      if (lockedHere(ctx)) {
+        itemsUi.info = WAIT_NOTE;
+        env.render();
+        return true;
+      }
       if (!(await holdFirst(it))) return true;
       // 보내는 중이면 그 물건의 사용은 더 늘리지 않는다 (이미 보낸 횟수보다 더 깎이지 않게, 11-14 사용자)
-      if (!(await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id))) {
-        itemsUi.info = `「${it.name}」은 지금 보내는 중이라 답이 온 뒤에 더 쓸 수 있어요.`;
+      const why = await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
+      if (why) {
+        itemsUi.info = useNote(why, it);
         env.render();
         return true;
       }
@@ -610,8 +650,14 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     }
     case 'items-unuse': {
       if (!value) return true;
-      // 보내는 중이면 눌러도 무시한다 (이미 요청에 실려 나간 사용, 재검토 11-14 B-9 사용자 답)
-      if (!(await dropFromUse(ctx, value))) return true;
+      // 보내는 중이면 눌러도 무시한다 (이미 요청에 실려 나간 사용, 재검토 11-14 B-9 사용자 답). 답을 기다리는 중이면 까닭을 알린다
+      if (!(await dropFromUse(ctx, value))) {
+        if (lockedHere(ctx)) {
+          itemsUi.info = WAIT_UNUSE_NOTE;
+          env.render();
+        }
+        return true;
+      }
       itemsUi.info = '사용을 취소했어요.';
       await env.refresh();
       return true;
@@ -658,8 +704,14 @@ export async function itemsAction(action: string, value: string | undefined, ctx
         // 아바타·장착 칸 쪽에 놓기 (2026-11-12 사용자): 장착 물건은 맞는 갈래의 빈 칸으로, 쓰는 물건은 사용 예정으로. 둘 다 되면 장착.
         // 갈래도 사용도 없는 물건은 손 칸으로 (사용자 2026-11-14: 손 칸에는 아무 물건이나)
         if (isEquipped(it, liveOf(ctx))) return true;
-        if (!it.equip && canUse(it)) await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
-        else {
+        if (!it.equip && canUse(it)) {
+          const why = await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
+          if (why) {
+            itemsUi.info = useNote(why, it);
+            env.render();
+            return true;
+          }
+        } else {
           const k: ItemEquip = it.equip ?? 'weapon';
           if (!equippedOf(liveOf(ctx))[k].some((x) => !x)) {
             full(k);
@@ -673,8 +725,19 @@ export async function itemsAction(action: string, value: string | undefined, ctx
           env.render();
           return true;
         }
+        // 답을 기다리는 중이면 손에 들기 전에 막고 알린다 (11-14 사용자)
+        if (lockedHere(ctx)) {
+          itemsUi.info = WAIT_NOTE;
+          env.render();
+          return true;
+        }
         if (!(await holdFirst(it))) return true;
-        await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
+        const why = await queueUse(ctx, (q) => addUse(q, it, leftOf(ctx, it)), it.id);
+        if (why) {
+          itemsUi.info = useNote(why, it);
+          env.render();
+          return true;
+        }
       } else if (to === 'drop') {
         itemsUi.open = id;
         itemsUi.mode = 'drop';
@@ -690,32 +753,33 @@ export async function itemsAction(action: string, value: string | undefined, ctx
   }
 }
 
-/** 「사용」 자리 바꾸기. 이미 보낸 자리($st_item_use_at 있음)는 비우고 새로 시작한다 (지난 턴 것을 또 넘기지 않게).
- *  id 물건이 「보내는 중」이면 바꾸지 않는다 → false (보낸 뒤 「한 번 더」로 횟수가 보낸 것보다 더 깎이던 것, 11-14 사용자) */
-async function queueUse(ctx: ChatContext, fn: (q: ItemUse[]) => ItemUse[], id: string): Promise<boolean> {
-  let held = false;
+/** 사용에 못 넣은 까닭: wait = 답을 기다리는 중(아무 물건도 못 넣는다) · sending = 그 물건이 보내는 중 */
+type UseHeld = 'wait' | 'sending';
+/** 「사용」 자리 바꾸기. 답이 붙은 자리($st_item_use_at 있음)는 비우고 새로 시작한다 (지난 턴 것을 또 넘기지 않게. 지난 자리는 사본으로 남아 그 답을 다시 굴리면 다시 나간다). 넣었으면 '', 못 넣었으면 까닭.
+ *  답을 기다리는 중(다시 굴리기 포함)이면 어떤 물건도 넣지 않는다: 요청에 없던 것이 쓴 것으로 적히거나, 다시 굴리는 턴의 보낸 자리가 지워졌다 (11-14 사용자).
+ *  id 물건이 「보내는 중」이면 바꾸지 않는다 (보낸 뒤 「한 번 더」로 횟수가 보낸 것보다 더 깎이던 것, 11-14 사용자) */
+async function queueUse(ctx: ChatContext, fn: (q: ItemUse[]) => ItemUse[], id: string): Promise<UseHeld | ''> {
+  let held: UseHeld | '' = '';
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-    if (useSending(chat, ctx.charIndex, ctx.chatIndex, id)) {
-      held = true;
-      return null;
-    }
-    const sent = !!chat.scriptstate?.[ITEM_USE_AT_VAR];
-    const cur = sent ? [] : readItemUse(chat.scriptstate);
-    const next = fn(cur);
-    if (!sent && JSON.stringify(next) === JSON.stringify(cur)) return null;
-    return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next), [ITEM_USE_AT_VAR]: '' } };
+    held = lockedHere(ctx) ? 'wait' : useSending(chat, ctx.charIndex, ctx.chatIndex, id) ? 'sending' : '';
+    if (held) return null;
+    // 자리 바꾸기·지난 자리 사본은 core/items.ts queueUseVars
+    const vars = queueUseVars(chat, fn);
+    return vars ? { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } } : null;
   });
-  if (held) return false;
+  if (held) return held;
   void refreshUseBox(ctx.charIndex, ctx.chatIndex);
-  return true;
+  return '';
 }
 /** 사용 자리에서 빼기 (버리기·삭제·해제·끌어 바꾸기). 상점·쇼핑몰 팔기는 여기를 거치지 않고 saleDone 에서 직접 뺀다(ui/shop.ts, ui/malls.ts).
- *  「보내는 중」인 사용은 빼지 않고 남긴다 (모델은 이미 쓴 것으로 받았다. 물건 처리 자체는 부르는 쪽이 그대로 한다. 재검토 11-14 B-9 사용자 답) → false */
+ *  「보내는 중」이거나 답을 기다리는 중인 사용은 빼지 않고 남긴다 (모델은 이미 쓴 것으로 받았다. 물건 처리 자체는 부르는 쪽이 그대로 한다. 재검토 11-14 B-9 사용자 답) → false.
+ *  그렇게 남긴 사용은 답이 붙을 때 버리거나 판 물건이어도 쓴 것으로 적힌다 (core/items.ts settleItemUse 의 sent) */
 export async function dropFromUse(ctx: { charIndex: number; chatIndex: number }, id: string): Promise<boolean> {
   let held = false;
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     if (chat.scriptstate?.[ITEM_USE_AT_VAR]) return null;
-    if (useSending(chat, ctx.charIndex, ctx.chatIndex, id)) {
+    // 답을 기다리는 중·정리 중에도 남긴다: 보낸 표시가 붙기 전(요청 조립 중)에 빼면 모델은 쓴 것으로 받았는데 기록이 안 남았다 (11-14 재검토)
+    if (useSending(chat, ctx.charIndex, ctx.chatIndex, id) || (lockedHere(ctx) && readItemUse(chat.scriptstate).some((u) => u.id === id))) {
       held = true;
       return null;
     }
