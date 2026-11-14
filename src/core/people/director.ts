@@ -31,7 +31,7 @@ const SYSTEM_SEARCH = [
   `Only when a judgment this turn depends on material not supplied (the exact wording of an earlier line, a past event's details, a lore or wiki fact about a named thing), return instead {"need":[{"kind":"chat|lore|wiki","query":"<Korean term exactly as it would appear>","reason":"<≤60 chars>"}]} with at most ${SEARCH_MAX} items and nothing else. \`chat\` searches earlier messages of this chat, \`lore\` the character's lorebook, \`wiki\` the chat's wiki documents by title or body. The program runs the searches and calls you once more with \`found\` (hits with a \`ref\` and an excerpt); that second call must return notes and may not ask again. Do not request a search for a stable relationship or a scene with no open question; a search costs a turn's time.`,
 ];
 const SYSTEM_PASS2 = 'This is the second pass. `found` holds the search results (an empty `hits` means nothing matched; say nothing rather than fill the gap). Return notes now; `need` is not allowed.';
-const OUTPUT = 'Return one JSON object only, no code fence: {"notes":[{"who":"<name>","now":"<≤400 chars>","react":"<≤400 chars or omit>","must_not_reveal":["<≤120 chars>"],"uncertain":["<≤160 chars>"]}]}';
+const OUTPUT = 'Return one JSON object only, no code fence: {"notes":[{"who":"<name>","now":"<≤400 chars>","react":"<≤400 chars, only when `react` is defined above; else omit>","must_not_reveal":["<≤120 chars>"],"uncertain":["<≤160 chars>"]}]}';
 
 /** 기능별 Director 적용 지침 (리수폿 Director Application 요약). 켜진 기능만 */
 export const FEATURE_GUIDE: Record<string, string[]> = {

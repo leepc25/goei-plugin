@@ -111,7 +111,7 @@ refresh: consider a relevant follow-up or first incoming message; a click create
 
 @@SECTION REFRESH
 Check supplied rooms independently; first decide whether there is reason to speak. Do not generate a fresh topic for every eligible contact. receiveMessages=false forbids updates to that room. An empty direct room establishes no relationship; any or all rooms may be silent.
-updates: PATCH rows, add /messages/- only, each supplied room ID at most once. Omit silent rooms. Do not create or rename rooms here.
+updates: PATCH rows, each supplied room ID at most once. Omit silent rooms. Do not create or rename rooms here.
 invitations: use GROUP_INVITES only when invitationCheck.allowed; otherwise []. announcements: require announcementCheck.allowed and ANNOUNCEMENTS; otherwise []. Every limit is a ceiling; keep the entire result complete.
 @@END
 

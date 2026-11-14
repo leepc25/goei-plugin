@@ -127,6 +127,8 @@ export interface ItemLog {
   n?: number;
   /** 그림 찾기용 낱말 */
   icon?: string;
+  /** off 줄: 손 칸에서 넣은 것 (없으면 장비 칸에서 해제). 본편 말·기록 탭 말을 나눈다 (사용자 2026-11-14 C-10·C-11) */
+  hand?: boolean;
   at: string;
 }
 
@@ -705,7 +707,7 @@ export function mergedNow(it: Items, lastAnchor: string): string[] {
 export function movedNow(it: Items, lastAnchor: string): string[] {
   if (!lastAnchor) return [];
   return it.log.filter((l) => l.by === 'story' && l.anchor === lastAnchor).flatMap((l) => {
-    if (l.what === 'off') return [`took off ${l.name} (still carrying it)`];
+    if (l.what === 'off') return [l.hand ? `put ${l.name} away (still carrying it)` : `took off ${l.name} (still carrying it)`];
     if (l.what === 'left') { const place = /^두고 옴: ([^·]+)/.exec(String(l.note ?? ''))?.[1]?.trim(); return [`left ${l.name}${place ? ` at ${place}` : ' behind'} — no longer carrying or wearing it`]; }
     if (l.what === 'gone' || l.what === 'destroy') return l.note === '다 씀' ? [] : [`no longer has ${l.name}`];
     return [];
@@ -840,7 +842,7 @@ export function recentItemLog(chat: Chat, it: Items, n: number, vars?: Record<st
       return !e || (e.store === 'hs' ? hsBuyPasses(vars) : boughtPasses(vars, e.store));
     }
     return true;
-  }).map((l) => `${l.what === 'gone' && l.note === '다 씀' ? 'used up' : LOG_VERB[l.what]} ${l.name}${(l.n ?? 1) > 1 ? ` ×${l.n}` : ''}`);
+  }).map((l) => (l.what === 'off' && l.hand ? `put ${l.name} away` : `${l.what === 'gone' && l.note === '다 씀' ? 'used up' : LOG_VERB[l.what]} ${l.name}${(l.n ?? 1) > 1 ? ` ×${l.n}` : ''}`)); // 손 칸에서 넣은 것은 「put X away」 (사용자 2026-11-14 C-10)
 }
 
 /** 채팅의 마지막 봇 응답 키 (없으면 '') */
@@ -1084,7 +1086,8 @@ export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemCh
 }
 /** 본문에서 장착을 풂: 칸만 비우고(갈래는 그대로 — 다시 장착할 수 있다) 기록 한 줄 */
 function offItem(it: Items, cur: Item, c: ItemChange): Items {
-  return addItemLog(unequipItem(it, cur.id), { name: cur.name, item: cur.id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'off', by: 'story', anchor: c.anchor, ...(c.quote ? { quote: c.quote } : {}) });
+  // 손 칸에 있던 것이면 hand 를 적는다 (풀고 나면 held 가 지워져 나중에는 알 수 없다)
+  return addItemLog(unequipItem(it, cur.id), { name: cur.name, item: cur.id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'off', by: 'story', anchor: c.anchor, ...(slotKind(cur) === 'weapon' ? { hand: true } : {}), ...(c.quote ? { quote: c.quote } : {}) });
 }
 
 // ── 고유 인물 시작 소지품 (core/startitems.ts 의 줄) ──

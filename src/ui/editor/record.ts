@@ -86,20 +86,28 @@ export function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides):
   });
 }
 
+/** 요원 순서 ▲▼ 단추 두 개 (같은 소속 안에서만, moveAgent). 목록 줄과 폰·좁은 창의 기록 머리(이름 옆)가 같이 쓴다 */
+export function agentMoveButtons(d: Directory, name: string): string {
+  const a = d.agents.find((x) => x.lore === name);
+  if (!a) return '';
+  const same = d.agents.filter((x) => agentGroup(x) === agentGroup(a));
+  const i = same.indexOf(a);
+  return `<button class="gx-mini icon" data-action="dir-move" data-value="${esc(`up|${a.lore}`)}" aria-label="${esc(a.name)} 위로" title="위로" ${i <= 0 ? 'disabled' : ''}>${ICONS.up}</button>`
+    + `<button class="gx-mini icon" data-action="dir-move" data-value="${esc(`down|${a.lore}`)}" aria-label="${esc(a.name)} 아래로" title="아래로" ${i >= same.length - 1 ? 'disabled' : ''}>${ICONS.down}</button>`;
+}
+/** 폰·좁은 창: 목록이 드롭다운 한 줄로 바뀌어 목록 줄의 ▲▼가 안 보이므로, 요원 기록 머리의 이름 옆에 같은 단추를 둔다 (11-14 사용자 B-11). 넓은 창에서는 CSS 가 숨긴다 */
+export const headMove = (kind: WorldKind, d: Directory, name: string): string => {
+  const b = kind === 'agent' ? agentMoveButtons(d, name) : '';
+  return b ? `<span class="gw-hmove">${b}</span>` : '';
+};
+
 export function recordList(ctx: ChatContext, kind: WorldKind, over: WorldOverrides, q: string): string {
   const rows = rowsOf(ctx, kind, over).filter((r) => !q || r.name.toLowerCase().includes(q.toLowerCase()) || r.sub.toLowerCase().includes(q.toLowerCase()));
   const sel = edUi.sel[kind] ?? '';
   const badge: Record<string, string> = { default: '', edited: '<i class="gw-badge">고침</i>', new: '<i class="gw-badge new">추가</i>', deleted: '<i class="gw-badge del">지움</i>' };
   // 요원 순서 ▲▼ (전수검사 11-13, 사용자 승인): 명부 순서대로 「요원 표시 인원」을 자르므로 여기서 바꾼다. 같은 소속 안에서만(moveAgent), 검색 중에는 없음
   const d = kind === 'agent' && !q ? directoryDraft(ctx) : null;
-  const move = (name: string): string => {
-    const a = d?.agents.find((x) => x.lore === name);
-    if (!d || !a) return '';
-    const same = d.agents.filter((x) => agentGroup(x) === agentGroup(a));
-    const i = same.indexOf(a);
-    return `<button class="gx-mini icon" data-action="dir-move" data-value="${esc(`up|${a.lore}`)}" aria-label="${esc(a.name)} 위로" title="위로" ${i <= 0 ? 'disabled' : ''}>${ICONS.up}</button>`
-      + `<button class="gx-mini icon" data-action="dir-move" data-value="${esc(`down|${a.lore}`)}" aria-label="${esc(a.name)} 아래로" title="아래로" ${i >= same.length - 1 ? 'disabled' : ''}>${ICONS.down}</button>`;
-  };
+  const move = (name: string): string => (d ? agentMoveButtons(d, name) : '');
   return rows.length
     ? rows.map((r) => `<div class="gw-rowbox${r.name === sel ? ' on' : ''}${r.state === 'deleted' ? ' deleted' : ''}"><button class="gw-row" data-action="ed-sel" data-value="${esc(r.name)}"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}${badge[r.state]}</button>${presetToggle(kind, r.name, r.preset)}${move(r.name)}</div>`).join('')
     : '<p class="gx-muted">맞는 기록이 없어요.</p>';
@@ -206,7 +214,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   let detail: string;
   if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
   else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === 'org' && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? delBtn(kind, sel, '삭제') : ''}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}${kind === 'agent' ? sceneCard(sel, d) : ''}${kind === 'org' ? membersCard(ctx, sel, d) : ''}</div>`;
+  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}${headMove(kind, d, sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === 'org' && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? delBtn(kind, sel, '삭제') : ''}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}${kind === 'agent' ? sceneCard(sel, d) : ''}${kind === 'org' ? membersCard(ctx, sel, d) : ''}</div>`;
   else {
     const order = fieldOrder(kind, rec);
     const defs = FIELDS[kind];
@@ -242,7 +250,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       return `${a ? `<p class="gw-ro">id ${esc(a.id)}${a.legacyEnglish.length ? ` · 옛 영문명 ${esc(a.legacyEnglish.join(', '))}` : ''}</p>` : ''}${keysRow(kind, sel, rec)}`;
     })() : `${keysRow(kind, sel, rec)}${rec.title ? `<p class="gw-ro">제목 ${esc(rec.title)}</p>` : ''}`;
     detail = `<div class="gw-detail">
-      <header class="gw-head"><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
+      <header class="gw-head"><h2>${esc(sel)}${headMove(kind, d, sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
         <div class="gw-head-act">${recUi.tokensHtml(ctx, kind, over)}
           <button class="gx-mini${recUi.preview ? ' on' : ''}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>

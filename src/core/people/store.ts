@@ -331,6 +331,18 @@ export function markRead(store: PeopleStore, chat: Chat, indexes: number[]): voi
   for (const k of Object.keys(store.read)) if (!keep.has(k)) delete store.read[k];
 }
 
+// ── 사라진 응답의 변경 버리기 ──
+
+/** 다시 굴리거나 지워서 채팅에서 사라진 응답이 만든 변경 기록 줄만 버린다 (사용자 2026-11-14 F-1 (나)). 버린 개수.
+ *  살아 있는 응답의 변경은 전부 남긴다 (접지 않는다). 직접 고친 줄(manual)·시작값(seed)은 응답이 만든 것이 아니라 남긴다.
+ *  '#N' 기준은 chatId 가 없는 메시지라 사라졌는지 가릴 수 없어 남긴다 */
+export function dropGoneChanges(store: PeopleStore, chat: Chat): number {
+  const at = anchorPositions(chat);
+  const before = store.log.length;
+  store.log = store.log.filter((c) => c.src === 'manual' || c.src === 'seed' || c.anchor.startsWith('#') || at.has(c.anchor));
+  return before - store.log.length;
+}
+
 // ── 접기 ──
 
 export const LOG_CAP = 800;

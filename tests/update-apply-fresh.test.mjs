@@ -21,7 +21,8 @@ const { handleUpdate, updateUi } = await import(pathToFileURL(outfile));
 
 const bytes = new Uint8Array([1, 2, 3, 4, 5]);
 const hash = createHash('sha1').update(bytes).digest('hex').slice(0, 12);
-const manifest = (version, pictures) => ({ comment: 'Plugin manifest', content: JSON.stringify({ schema: 1, plugin: 'goei-plugin', version, greetings: {}, pictures }), key: '', mode: 'normal' });
+// 정식 카드(매니페스트에 source 있음). 내 봇에 설치한 경우(source 없음)는 카드 칸을 바꾸지 않는다 (tests/update.test.mjs D-1)
+const manifest = (version, pictures) => ({ comment: 'Plugin manifest', content: JSON.stringify({ schema: 1, plugin: 'goei-plugin', version, source: { name: 'card' }, greetings: {}, pictures }), key: '', mode: 'normal' });
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
 function setup() {

@@ -291,8 +291,10 @@ function cell(it: Item, left: number | undefined, over: boolean, w: When, queued
   return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}${all ? ' queued' : ''}${stateCls(it)}" data-action="items-open" data-value="${esc(it.id)}"${drag} aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}${queued ? ' (사용 예정)' : ''}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued ? `<span class="it-q8">사용 예정${queued > 1 ? ` ×${queued}` : ''}</span>` : ''}<b>${esc(it.name)}</b>${tipOf(it, left, w)}</button>`;
 }
 
-// 두고 온 것은 「없어짐」 + 메모 「두고 옴: 자리」, 본문에서 벗은 것은 「해제」 (새 말을 만들지 않는다)
+// 두고 온 것은 「없어짐」 + 메모 「두고 옴: 자리」, 본문에서 벗은 것은 「해제」, 손 칸에서 넣은 것은 「넣기」 (단추 말 그대로, 새 말을 만들지 않는다. 사용자 2026-11-14 C-11)
 const WHAT: Record<ItemLog['what'], string> = { get: '획득', use: '사용', drop: '버림', gone: '없어짐', destroy: '파괴', merge: '합침', sell: '팖', left: '없어짐', off: '해제' };
+/** 기록 한 줄의 말 (시험이 부른다) */
+export const logWhatLabel = (l: Pick<ItemLog, 'what' | 'hand'>): string => (l.what === 'off' && l.hand ? '넣기' : WHAT[l.what] ?? l.what);
 const BY: Record<ItemLog['by'], string> = { story: '본문', manual: '직접', use: '사용 단추', store: '상점' };
 const WEEK = '일월화수목금토';
 /** 「2025.05.10 15:41」 → 「2025.05.10 (토)」 (가계부 날짜 줄과 같은 꼴) */
@@ -320,7 +322,7 @@ function logList(ctx: ChatContext): string {
   const row = (l: ItemLog) => {
     const when = whenLabel(w, l.anchor, l.at);
     const sub = [BY[l.by] ?? l.by, l.what === 'use' && (l.n ?? 1) > 1 ? `×${l.n}` : '', l.note, l.quote ? `「${l.quote}」` : ''].filter(Boolean).join(' · ');
-    return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic(l)}</span><span class="gx-wt-memo"><b>${esc(l.name)} <em class="it-what ${l.what === 'get' ? 'get' : 'out'}">${WHAT[l.what] ?? l.what}</em></b><small>${esc(sub)}</small></span><span class="gx-wt-amt"><small>${esc(when.split(' ')[1] ?? when)}</small></span></div></li>`;
+    return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic(l)}</span><span class="gx-wt-memo"><b>${esc(l.name)} <em class="it-what ${l.what === 'get' ? 'get' : 'out'}">${logWhatLabel(l)}</em></b><small>${esc(sub)}</small></span><span class="gx-wt-amt"><small>${esc(when.split(' ')[1] ?? when)}</small></span></div></li>`;
   };
   // RP 날짜별 묶음 (가계부처럼). 같은 날은 한 묶음, 묶음 머리에 획득·사용 수
   const groups: { day: string; rows: ItemLog[] }[] = [];

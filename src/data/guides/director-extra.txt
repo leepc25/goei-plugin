@@ -9,7 +9,7 @@ This is the second pass. `found` holds the search results (an empty `hits` means
 @@END
 
 @@SECTION OUTPUT
-Return one JSON object only, no code fence: {"notes":[{"who":"<name>","now":"<≤400 chars>","react":"<≤400 chars or omit>","must_not_reveal":["<≤120 chars>"],"uncertain":["<≤160 chars>"]}]}
+Return one JSON object only, no code fence: {"notes":[{"who":"<name>","now":"<≤400 chars>","react":"<≤400 chars, only when `react` is defined above; else omit>","must_not_reveal":["<≤120 chars>"],"uncertain":["<≤160 chars>"]}]}
 @@END
 
 @@SECTION APPLY.AXES

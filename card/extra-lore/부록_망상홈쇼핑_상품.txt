@@ -1,6 +1,6 @@
 folder: 📎부록
 name: 망상홈쇼핑 · 상품
-key: Into the Vacuum, 인투 더 배큠, Happy-Maker, 해피메이커, 혈액 욕조, 다이어트 보조제, Beauty Pills, 미인 약, 불운 포스트잇, 계란무드등
+key: Into the Vacuum, 인투 더 배큠, Happy-Maker, 해피메이커, 혈액 욕조, 알주머니 다이어트 보조제, Beauty Pills, 미인 약, 불운 포스트잇, 계란무드등
 appendix: {"keys": true, "with_parent": false, "need_parent": false, "target": true, "places": ["망상홈쇼핑", "망상 홈쇼핑", "오후역"]}
 ---
 ### Delusion Home Shopping Appendix: Catalog Examples

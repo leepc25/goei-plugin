@@ -227,6 +227,43 @@ function keepOneDirectory(current: LoreEntry[], lore: { list: LoreEntry[]; count
   }
 }
 
+/**
+ * 내 봇에 설치한 경우(매니페스트에 source 없음)의 매니페스트: 지금 것을 그대로 두고 버전과 카드 사진 목록만 새 카드 것으로 올린다.
+ * 새 카드 매니페스트로 바꾸면 인사말 번호(greetings)가 내 봇의 인사말과 어긋나고 source 가 붙어 정식 카드로 잘못 읽힌다
+ */
+function ownManifest(list: LoreEntry[], mine: LoreEntry, incoming: LoreEntry[], version: string): LoreEntry[] {
+  let m: Record<string, unknown>;
+  try {
+    m = JSON.parse(String(mine.content ?? '')) as Record<string, unknown>;
+  } catch {
+    return list;
+  }
+  let pics: unknown;
+  try {
+    pics = (JSON.parse(String(manifestEntry(incoming)?.content ?? '')) as { pictures?: unknown }).pictures;
+  } catch {
+    pics = undefined;
+  }
+  const next = { ...m, version, ...(Array.isArray(pics) && pics.length ? { pictures: pics } : {}) };
+  const content = JSON.stringify(next);
+  const kept: LoreEntry = content === JSON.stringify(m) ? mine : { ...mine, content };
+  const slot = manifestEntry(list);
+  // 짝이 안 맞아 지금 매니페스트가 뒤에 따로 남았으면 그것은 뺀다 (매니페스트는 하나)
+  return slot ? list.map((e) => (e === slot ? kept : e)).filter((e) => e !== mine || e === kept) : [...list, kept];
+}
+
+/** 내 봇에 「괴이 설치」를 한 봇인가: 매니페스트가 있고 정식 카드 표시(source)가 없다 */
+function ownBotManifest(lore: LoreEntry[] | undefined): LoreEntry | undefined {
+  const entry = manifestEntry(lore);
+  if (!entry) return undefined;
+  try {
+    const m = JSON.parse(String(entry.content ?? '')) as { plugin?: unknown; greetings?: unknown; source?: unknown };
+    return m && m.plugin === 'goei-plugin' && m.greetings && typeof m.greetings === 'object' && !m.source ? entry : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
 export function planUpdate(char: Record<string, unknown>, payload: CardPayload): UpdatePlan {
   const incoming = alignFolder((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore);
@@ -242,6 +279,13 @@ export function planUpdate(char: Record<string, unknown>, payload: CardPayload):
   if (compareVersions(cardVersion(char.globalLore as LoreEntry[]), '0.16.37') < 0) lore.list = dropOldOutsidePlaces(lore.list);
   // 사용자 명부(보호됨)에 남은 원본 기본 별칭 중 규칙에 걸리는 것만 지운다. 사용자가 더한 별칭은 남는다 (2026-10-21)
   lore.list = dropDefaultAliases(lore.list);
+  // 내 봇에 설치한 경우: 명부의 빠진 칸·카드 사진·버전만 올린다. 봇 설명·인사말·트리거·첫 메시지·정규식은 그대로 둔다 (사용자 2026-11-14 D-1 (가))
+  const own = ownBotManifest(char.globalLore as LoreEntry[]);
+  if (own) {
+    lore.list = ownManifest(lore.list, own, incoming, payload.version);
+    const mineScripts = Array.isArray(char.customscript) ? char.customscript.length : 0;
+    return { next: { ...char, globalLore: lore.list }, lore: lore.count, scripts: { replaced: 0, added: 0, kept: mineScripts, protected: 0 }, fields: [] };
+  }
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
   // 상태창 정규식은 플러그인이 그리게 되어(v0.16.31) 옛 카드에서 뺀다 (새 카드에 같은 이름이 있으면 그대로)
   const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ''));

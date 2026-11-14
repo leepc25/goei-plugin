@@ -6,7 +6,7 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, repairDirector, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun, dropGoneChanges } from '../core/people/store';
 import { genSettings } from '../core/advanced';
 import { hypaSummaries } from '../core/people/hypa';
 import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, shopKeyLine, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
@@ -386,8 +386,10 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope; 
         });
         diag.report = report;
         // 되돌리기용 (리수폿 J-4): 이 갱신이 새로 만든 것. 다시 읽기(only)는 적지 않는다
-        // 변경 기록(store.log)은 줄이지 않고 전부 남긴다 (사용자 결정 나-80 ②). 여기서 접기 함수를 부르지 않는다
+        // 변경 기록(store.log)은 접지 않고 전부 남긴다 (사용자 결정 나-80 ②). 여기서 접기 함수를 부르지 않는다
         if (!o.scope?.only) recordRun(s, before, new Date().toISOString());
+        // 다시 굴려(지워서) 채팅에서 사라진 응답이 만든 변경 줄만 버린다 (사용자 2026-11-14 F-1 (나))
+        dropGoneChanges(s, cur);
         let next = cur;
         if (report.wallet.length) {
           let w = readWallet(cur.scriptstate, walletStart);

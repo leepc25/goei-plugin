@@ -39,6 +39,8 @@ export function useBoxCss(names: { label: string }[], sending = false): string {
     `${LAST} [data-gu-x]::before { content: "×"; }`,
     ...show.map((n, i) => `${LAST} [data-gu="${i}"] { display: inline-flex; } ${LAST} [data-gu="${i}"]::before { content: ${cssStr(n.label)}; }`),
     more > 0 ? `${LAST} [data-gu-more]::before { content: "외 ${more}개"; }` : '',
+    // 보내는 중에는 × 를 숨긴다: 이미 요청에 실려 나간 사용이라 뺄 수 없다 (재검토 11-14 B-9 사용자 결정)
+    sending ? `${LAST} [data-gu-x] { display: none; } ${LAST} [data-gu] { padding-right: 10px; }` : '',
   ].join('\n');
 }
 
@@ -107,6 +109,13 @@ async function ensure(): Promise<{ doc: Root['doc']; style: El } | null> {
   return { doc, style };
 }
 
+/** × 로 뺀 뒤의 채팅. 「보내는 중」인 물건이면 null (그대로 둔다): 모델은 이미 쓴 것으로 받았으니 빼면 횟수·기록이 어긋난다 (재검토 11-14 B-9) */
+export function dropUseUnlessSent(chat: Chat, charIndex: number, chatIndex: number, id: string): Chat | null {
+  if (sentUseIds(chat, charIndex, chatIndex)?.has(id)) return null;
+  const next = dropUse(readItemUse(chat.scriptstate), id);
+  return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next) } };
+}
+
 // × 를 눌렀는지 좌표로 본다 (채팅 속 단추와 같은 길, host/chatclicks.ts)
 onChatClick('use', async (doc, x, y) => {
   if (!shown.length || where.charIndex < 0) return 'idle';
@@ -119,10 +128,7 @@ onChatClick('use', async (doc, x, y) => {
     busy = true;
     try {
       const { charIndex, chatIndex } = where;
-      await updateChat(charIndex, chatIndex, (chat) => {
-        const next = dropUse(readItemUse(chat.scriptstate), id);
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next) } };
-      });
+      await updateChat(charIndex, chatIndex, (chat) => dropUseUnlessSent(chat, charIndex, chatIndex, id));
       await refreshUseBox(charIndex, chatIndex);
     } catch (error) {
       console.log(`[goei] 사용 상자 빼기 실패: ${error instanceof Error ? error.message : String(error)}`);

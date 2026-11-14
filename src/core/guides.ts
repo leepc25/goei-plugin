@@ -70,7 +70,9 @@ function salmonGuide(): string {
     .replace(/^괴담갤 \(괴담 갤러리\) is a completely civilian[^\n]*$/m, SALMON_ABOUT)
     .replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS)
     // 괴담갤에서 물려받은 DC 말투 기본 문장 대신 여러 사람이 쓰는 중고 거래 앱 말투 (사용자 2026-11-14)
-    .replace('Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', SALMON_TONE);
+    .replace('Default to Korean DCInside-style anonymous-community speech: informal, casual, slang, memes, blunt skepticism, rough jokes, occasional profanity and arguments; casual comments often omit final periods. ', SALMON_TONE)
+    // 「not a story board」 바로 뒤에 붙는 괴담갤 문장은 연어 마켓에서만 뺀다 (사용자 2026-11-14, C-13)
+    .replace('{{/when}}Include serious firsthand accounts too. Vary ages', '{{/when}}Vary ages');
 }
 const SALMON_TONE = 'Write like a busy neighborhood resale app used by very different people, each in their own way: terse sellers who give only the item, condition and price; chatty sellers who explain why they are selling; older users in polite full sentences; younger users in clipped casual speech; collectors precise about provenance; brokers vague about where things came from; buyers who haggle, ask to reserve, ask for more photos or never reply. Vary length, politeness, spelling care and how much each poster reveals. Keep it a trade board, not a story board. ';
 const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";

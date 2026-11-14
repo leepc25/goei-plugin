@@ -169,3 +169,44 @@ test('카드 업데이트 안전망: 사용자 명부가 다른 폴더에 있어
   assert.equal(again.filter((e) => e.comment === 'Directory').length, 1);
   assert.equal(core.readDirectoryData(again)['요원'][agent].__mine, 'USER EDIT');
 });
+
+test('카드 업데이트: 내 봇에 설치한 경우 명부의 빠진 칸·카드 사진·버전만 올리고 봇 설명·인사말·트리거·첫 메시지·정규식은 그대로 (사용자 2026-11-14 D-1 (가))', () => {
+  const { char, payload, agent } = bareBotAndCard();
+  const mine = {
+    desc: '내 봇 설명', firstMessage: '내 첫 메시지', alternateGreetings: ['내 인사', '인사1'], triggerscript: [{ comment: '내 트리거' }],
+    personality: '내 성격', scenario: '내 시나리오', systemPrompt: '내 지시', characterVersion: '내 판', customscript: [{ comment: '내 정규식', in: 'a', out: 'b' }, { comment: '📊상태창' }],
+  };
+  Object.assign(char, mine);
+  // 명부에서 칸 하나를 빼 둔다 (새 카드 명부에서 채워져야 함)
+  const dirEntry = char.globalLore.find((e) => e.comment === 'Directory');
+  const dj = JSON.parse(dirEntry.content);
+  const gone = Object.keys(dj['요원'])[1];
+  delete dj['요원'][gone];
+  dirEntry.content = JSON.stringify(dj);
+  const before = JSON.parse(char.globalLore.find((e) => e.comment === 'Plugin manifest').content);
+  Object.assign(payload.data, { desc: '', firstMessage: '', alternateGreetings: [''], triggerscript: [], personality: '', scenario: '', systemPrompt: '', characterVersion: '9.9.9', customscript: [{ comment: '카드 정규식' }] });
+  const cardMan = payload.data.globalLore.find((e) => e.comment === 'Plugin manifest');
+  const pics = [['새사진', 'abc', 'webp', 10]];
+  cardMan.content = JSON.stringify({ ...JSON.parse(cardMan.content), source: { name: 'card' }, greetings: { 'A00-ko-1': 7 }, pictures: pics });
+  const check = (plan) => {
+    for (const [k, v] of Object.entries(mine)) assert.deepEqual(plan.next[k], v, `${k} 는 그대로`);
+    assert.deepEqual(plan.fields, [], '바뀌는 카드 칸 없음');
+    assert.deepEqual([plan.scripts.replaced, plan.scripts.added], [0, 0]);
+    const lore = plan.next.globalLore;
+    const m = readManifest(lore);
+    assert.equal(m.version, '9.9.9', '버전은 올라간다');
+    assert.equal(m.source, undefined, '정식 카드 표시가 붙지 않는다');
+    assert.deepEqual(m.greetings, before.greetings, '인사말 번호는 내 봇 것 그대로');
+    assert.deepEqual(m.keys, before.keys, '폴더 key 그대로');
+    assert.deepEqual(m.pictures, pics, '카드 사진 목록은 새 카드 것');
+    assert.equal(lore.filter((e) => e.comment === 'Plugin manifest').length, 1);
+    const d = core.readDirectoryData(lore);
+    assert.equal(d['요원'][agent].__mine, 'USER EDIT', '고친 명부 값은 그대로');
+    assert.ok(d['요원'][gone], '명부의 빠진 칸은 채운다');
+    assert.ok(lore.some((e) => e.comment === '내 로어'));
+  };
+  const plan = planUpdate(char, payload);
+  check(plan);
+  // 한 번 더 적용해도 그대로 (정식 카드로 잘못 읽히지 않는다)
+  check(planUpdate(plan.next, payload));
+});

@@ -160,3 +160,26 @@ test('변경 기록: 갱신기를 비롯한 어느 코드도 foldLog 를 부르�
   }
   assert.deepEqual(callers, []);
 });
+
+// 사용자 2026-11-14 F-1 (나): 다시 굴려 사라진 응답이 만든 변경 줄만 버린다. 살아 있는 응답의 변경은 전부 남긴다 (접지 않는다)
+test('변경 기록: 사라진 응답이 만든 줄만 버리고, 살아 있는 응답의 줄은 상한을 넘어도 전부 남긴다', async () => {
+  const n = 260;
+  const chat = { message: Array.from({ length: n }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: `m${i}`, chatId: `k${i}` })) };
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  for (let i = 0; i < 900; i++) store.log.push({ id: `x${i}`, anchor: `k${1 + (i % 25) * 2}`, seq: i, src: 'story', who: '쟈알디', kind: 'cue', cue: '도움', reason: '' });
+  store.log.push({ id: 'gone-story', anchor: 'rerolled', seq: 900, src: 'story', who: '쟈알디', kind: 'cue', cue: '헌신', reason: '' });
+  store.log.push({ id: 'gone-address', anchor: 'rerolled', seq: 901, src: 'story', who: '쟈알디', kind: 'address', toUser: '선배', reason: '' });
+  store.log.push({ id: 'gone-manual', anchor: 'rerolled', seq: 902, src: 'manual', who: '쟈알디', kind: 'address', toUser: '후배', reason: '' });
+  store.log.push({ id: 'hash', anchor: '#999', seq: 903, src: 'story', who: '쟈알디', kind: 'cue', cue: '헌신', reason: '' });
+  assert.equal(typeof S.dropGoneChanges, 'function', 'dropGoneChanges 가 있다');
+  const dropped = S.dropGoneChanges(store, chat);
+  assert.equal(dropped, 2);
+  const ids = new Set(store.log.map((c) => c.id));
+  assert.ok(!ids.has('gone-story') && !ids.has('gone-address'), '사라진 응답이 만든 줄은 버린다');
+  assert.ok(ids.has('gone-manual') && ids.has('hash'), '직접 고친 줄·#N 기준 줄은 남긴다');
+  assert.equal(store.log.filter((c) => c.id.startsWith('x')).length, 900, '살아 있는 응답의 줄은 접지 않고 전부 남는다');
+  assert.deepEqual(store.folded, {});
+  // 갱신기 저장 길이 이 함수를 부른다
+  assert.match(await readFile(join('src', 'host', 'people.ts'), 'utf8'), /dropGoneChanges\(s, cur\)/);
+});
