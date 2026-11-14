@@ -13,7 +13,7 @@ import { guidePrompt, RP_HEAD } from './core/guides';
 import { evaluate } from './core/cbs';
 import { shouldKeepSeed } from './core/request';
 import { messageText } from './core/refs';
-import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
+import { insertedSystemTexts, processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { viewSettings } from './core/phoneView';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
@@ -164,7 +164,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
   // 자동 재시도: 이미 조립한 요청이 다시 들어왔다. 참고 기록·인물 기록이 두 번 끼고 호출 기록 턴이 새로 열리지 않게 그대로 보낸다 (전수검사 11-13)
   if (lastAdded.size && sysTexts(messages).some((t) => lastAdded.has(t))) return sanitize(messages);
-  const input0 = new Set(sysTexts(messages));
+  const input0 = messages;
   const failed: string[] = [];
   /** 플러그인이 끼운 글 (호출 기록의 「플러그인이 더한 토큰」, 전수검사 11-13) */
   let added: string[] | undefined;
@@ -206,7 +206,11 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       const chat0 = ctx?.chat ?? (await stepAsync('지시문 채팅 읽기', async () => (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null, null));
       const last = chat0?.message?.at(-1);
       const lastData = last?.role === 'user' && typeof last.data === 'string' ? last.data : '';
-      const o = chat0 ? { cardIsLast: hasSceneCard(lastData), callIsLast: hasCall(lastData) } : {};
+      // 채팅 끝의 user 글 묶음(지시문 + 덧붙여 보낸 글)에 카드가 있으면 아직 답이 없는 새 지시문이다 (11-14 재검토 ①-5)
+      let cardFresh = false;
+      const all = chat0?.message ?? [];
+      for (let k = all.length - 1; k >= 0 && all[k]?.role === 'user' && !cardFresh; k--) cardFresh = typeof all[k].data === 'string' && hasSceneCard(all[k].data);
+      const o = chat0 ? { cardIsLast: hasSceneCard(lastData), cardFresh, callIsLast: hasCall(lastData) } : {};
       messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages, o).messages, o).messages, messages);
     }
     const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
@@ -267,7 +271,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
   const out = sanitize(messages);
   if (liteNow) step('호출 기록', () => traceMain(out, failed, added), undefined);
-  lastAdded = new Set(sysTexts(out).filter((t) => !input0.has(t)));
+  // 새로 끼운 글만 기억한다. 원래 있던 system 글을 고친 결과(자리 로어북 보정 등)는 다음 새 요청에도 똑같이 들어올 수 있어 뺀다 (11-14 재검토 ①-2)
+  lastAdded = new Set(insertedSystemTexts(input0, out));
   return out;
 }
 

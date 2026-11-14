@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -124,4 +124,15 @@ test('변경 기록: 지워진 메시지의 변경은 버리고, 상한을 넘�
   for (let i = 0; i < 801; i++) s2.log.push({ id: `y${i}`, anchor: `k${1 + (i % 50) * 2}`, seq: i, src: 'field', who: '쟈알디', kind: 'cue', cue: '도움', ...(i === 3 ? { pin: 50, cue: undefined } : {}) });
   S.foldLog(s2, chat, () => 0);
   assert.equal(s2.log.length, 801);
+});
+
+// 사용자 결정 나-80 ②(전부 남기기): 접기 함수(foldLog)는 남아 있어도 실제 코드 어디서도 부르지 않는다 (11-14 재검토 ①-1)
+test('변경 기록: 갱신기를 비롯한 어느 코드도 foldLog 를 부르지 않는다 (전부 남기기)', async () => {
+  const walk = async (d) => (await Promise.all((await readdir(d, { withFileTypes: true })).map((e) => (e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.ts') ? [join(d, e.name)] : [])))).flat();
+  const callers = [];
+  for (const f of await walk('src')) {
+    if (f === join('src', 'core', 'people', 'store.ts')) continue;
+    if (/\bfoldLog\b/.test(await readFile(f, 'utf8'))) callers.push(f);
+  }
+  assert.deepEqual(callers, []);
 });

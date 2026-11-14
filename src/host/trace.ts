@@ -3,7 +3,7 @@
 // 저장: 플러그인 저장소 goei-trace 에 최근 TRACE_KEEP 턴의 id 목록, 턴마다 goei-trace:<id> (바뀐 턴만 다시 쓴다. 전수검사 11-13). 요청·응답 원문은 한 건당 TRACE_TEXT 자까지(앞 2/3 + 뒤 1/3). 화면은 ui/editor/trace.ts.
 import type { LlmMessage } from './llm';
 import { tokens } from '../core/gnet';
-import { progressBegin, progressMain, progressMainTokens, progressReply, progressTurn } from '../core/progress';
+import { PROGRESS_WATCHDOG, progressBegin, progressMain, progressMainTokens, progressReply, progressTurn } from '../core/progress';
 
 export interface TraceCall {
   /** 호출 종류 (라우터·디렉터·갱신기·괴담넷·괴담톡·위키·소지품·상점·…) */
@@ -245,7 +245,9 @@ export function traceEnd(id: string | null): void {
 /** 보조 호출 한 건 (runModel 이 부른다). 열린 턴이 없으면 수동 턴을 만든다. 턴이 끝난 뒤의 호출은 그 턴에 manual 로 붙는다 */
 export async function traceCall(c: Omit<TraceCall, 'phase' | 'at'> & { at: string }): Promise<void> {
   let t = open;
-  let phase: TraceCall['phase'] = ended ? 'manual' : replied ? 'after' : 'before';
+  // 본편이 실패·중지되면 응답 훅이 안 와 traceEnd 가 안 불린다. 진행 창(core/progress.ts)과 같은 시간만큼 응답이 없으면 끝난 턴으로 본다 (재검토 11-14). 늦게라도 응답이 붙으면 그 뒤 호출은 다시 after
+  const dead = !!t && !replied && Date.now() - new Date(t.at).getTime() >= PROGRESS_WATCHDOG;
+  let phase: TraceCall['phase'] = ended || dead ? 'manual' : replied ? 'after' : 'before';
   if (!t) {
     const list = await load();
     const last = list[list.length - 1];

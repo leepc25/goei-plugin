@@ -114,3 +114,28 @@ test('카드 업데이트: 사용자 명부에 없는 부록 조건만 더한다
   assert.deepEqual(row('남해지사 · 시설').places, ['내가 고친 위치'], '사용자가 고친 것은 그대로');
   assert.equal(row('남해지사 · 숨은 진실').unlock, '작업자 재활용을 알게 됨', '새 부록 조건은 들어온다');
 });
+
+test('옛 명부(부록 줄 없음): 플러그인 기본 명부의 같은 이름 줄을 쓴다 (화요퀴즈쇼 · 합창단 퍼레이드 목표 끔)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { withWorldLore } = await import('../dist-test/core.mjs');
+  const fresh = JSON.parse(readFileSync(new URL('../src/data/install/directory.json', import.meta.url), 'utf8'));
+  const PARADE = '화요퀴즈쇼 · 합창단 퍼레이드';
+  assert.equal(fresh.부록[PARADE].target, false, '기본 명부: 목표 끔');
+  const old = structuredClone(fresh);
+  delete old.부록[PARADE];
+  const books = (d) => withWorldLore([{ comment: 'Directory', key: '', mode: 'normal', content: JSON.stringify(d) }]);
+  const picked = (bs) =>
+    lore.pickLore(lore.managedEntries(bs), [{ role: 'user', data: '조용한 밤' }], { target: '화요퀴즈쇼', board: [], deployed: [] }, { depth: 10, budget: 0 }).map((p) => p.entry.name);
+  assert.deepEqual(picked(books(fresh)), ['화요퀴즈쇼']);
+  assert.deepEqual(picked(books(old)), ['화요퀴즈쇼'], '줄이 없는 옛 명부도 목표만으로는 퍼레이드를 싣지 않는다');
+  const row = (bs) => readDirectory(bs).appendices.find((r) => r.lore === PARADE);
+  assert.equal(row(books(old)).target, false);
+  assert.equal(directoryData(readDirectory(books(old))).부록[PARADE].target, false, '그 사이 명부를 저장해도 「켬」으로 굳지 않는다');
+  // 사용자가 명부에 직접 적은 줄은 그대로 (기본값이 덮지 않는다)
+  const mine = structuredClone(old);
+  mine.부록[PARADE] = { keys: true, with_parent: false, need_parent: false, target: true };
+  assert.equal(row(books(mine)).target, true);
+  assert.deepEqual(picked(books(mine)), ['화요퀴즈쇼', PARADE]);
+  // 기본 명부에 없는 부록은 코드 기본값 그대로
+  assert.equal(readDirectory(base).appendices.find((r) => r.lore === '이름 모를 부록').target, true);
+});

@@ -3,6 +3,7 @@
 // 사라진 항목은 지우지 않는다 (화면에서 회색, 되살리기 가능).
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
+import { findStatusTags } from '../world/status';
 import { AXES, PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, DEFAULT_AXES, EXPRESS_TO_AXIS, emptyStore, expressOf, type Candidate, type Change, type Doc, type Entry, type LastRun, type Observation, type PeopleStore, type Person, type Register, type SexualProfile, type SexualRecord, type SlotId, SEXUAL_CHARS } from './types';
 
 /** 채팅 마지막 메시지 chatId (없으면 #순번): 기록의 기준 자리 */
@@ -117,15 +118,35 @@ export function anchorPositions(chat: Chat): Map<string, number> {
 /** 인용 검사용 정규화: 공백·따옴표·말줄임표 차이를 무시 */
 export const norm = (s: string) => String(s ?? '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
 
+/** 갱신기에 보내는 글 (updater.ts cleanSpan 이 쓴다): 상태창·생각·주석·그림 태그·상점 표식을 지운 것.
+ *  모델은 이 글을 보고 인용하므로, 태그를 사이에 둔 인용은 지우기 전 글에는 없고 여기에만 있다 (재검토 11-14 ①-9) */
+export function sentText(raw: string): string {
+  let t = String(raw ?? '');
+  for (const tag of findStatusTags(t)) t = t.replace(tag.raw, '');
+  return messageText(t)
+    .replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<img\s*=[^>]*>/g, '')
+    .replace(/\[\s*shop\s*[:：][^\]]*\]/giu, '');
+}
+
 export interface Liveness {
   at: Map<string, number>;
   texts: Map<number, string>;
+  /** 지운 글(sentText)의 정규화. 지우기 전 글과 다를 때만 담는다 */
+  sent?: Map<number, string>;
 }
 export function liveness(chat: Chat): Liveness {
   const at = anchorPositions(chat);
   const texts = new Map<number, string>();
-  msgs(chat).forEach((m, i) => texts.set(i, norm(messageText(str(m.data)))));
-  return { at, texts };
+  const sent = new Map<number, string>();
+  msgs(chat).forEach((m, i) => {
+    const t = norm(messageText(str(m.data)));
+    texts.set(i, t);
+    const s = norm(sentText(str(m.data)));
+    if (s !== t) sent.set(i, s);
+  });
+  return { at, texts, sent };
 }
 
 /** 항목·변경이 살아 있나: 기준 메시지가 있고, story 인용은 그 메시지에 아직 있어야 */
@@ -134,8 +155,9 @@ export function isAlive(x: { anchor: string; quote?: string; src?: string; void?
   const pos = live.at.get(x.anchor);
   if (pos === undefined) return false;
   if (x.src === 'story' && x.quote) {
-    const t = live.texts.get(pos);
-    if (!t || !t.includes(norm(x.quote))) return false;
+    // 인용은 지우기 전 글이나 갱신기에 보낸(지운) 글 중 하나에 있으면 된다 (재검토 11-14 ①-9)
+    const q = norm(x.quote);
+    if (!live.texts.get(pos)?.includes(q) && !live.sent?.get(pos)?.includes(q)) return false;
   }
   return true;
 }

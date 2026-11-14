@@ -593,14 +593,6 @@ LORE_PATCHES = [
      'For conversational pacing only, use type="pause", sender="-", content=a brief pause without external events.',
      'For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). '
      'A pause never narrates: no names, actions, emotions, sounds or scene description. Put such things in the NPC\'s own message text or omit them.'),
-    # 미인 약(망상홈쇼핑)으로 불려 나오는 연옥합창단 퍼레이드 (2026-10-26, 원작 395~398화)
-    ('화요퀴즈쇼', 'leaving a persistent risk of future invitations or recruitment.\n',
-     'leaving a persistent risk of future invitations or recruitment.\n\n'
-     '#### Outside Summoning: Purgatory Choir Parade\n'
-     '- The Purgatory Choir can also be drawn out of the studio by people turned into living instruments (for example by Delusion Home Shopping\'s Beauty Pills taken with alcohol). It opens silver arch passages in walls, reliefs of judgment gates, purgatory, sulfur, notes, and staff lines; choristers wear oversized old suits under dead animal heads (a rat with yarn-stitched eyes, a rotting rooster, a fly-covered ox, a balding sheep, a dog).\n'
-     '- It tunes and selects instruments, announces "The performance will begin shortly. Please enter through the open doors and take your seats," and opens every door as a welcome to the audience, turning the whole building into a venue. It takes over local speakers.\n'
-     '- If the instruments do not take their seats, it switches to a Parade that visits every area with signs of life. An Intermission introduces a "distinguished guest" and gives a short window to act.\n'
-     '- Direct listening collapses thought; a completed harmony feels pleasant, which is the luring stage. Earplugs shrivel into treble-clef lumps. Known countermeasures: hide out of sight, break speakers, close doors, use the intermission, wake entranced allies by force, and keep alcohol away from pill-takers. Victims are found headless or with altered skeletons, hands pressed together as if clapping.\n'),
 ]
 
 # 캐릭터 설명 오타 (옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다

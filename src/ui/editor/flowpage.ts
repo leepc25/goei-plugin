@@ -79,11 +79,12 @@ function lastTurn() {
   // 턴 밖에서 누른 호출만 있는 묶음(상점 열기·AI 상담 등, phase manual)은 「지난 턴」이 아니다
   return [...(traceUi.turns ?? [])].reverse().find((t) => t.main || t.calls.some((c) => c.phase !== 'manual'));
 }
-function real(match: (label: string) => boolean): string {
+export function real(match: (label: string) => boolean): string {
   const t = lastTurn();
   if (!t) return '';
   // 「다시 묻기 1」「(통합 뒤 따로)」 꼬리는 떼고 센다. 안 떼면 줄 합이 맨 위 합계와 안 맞던 것 (전수검사 11-13)
-  const cs = t.calls.filter((c) => match(baseLabel(c.label)));
+  // 턴이 끝난 뒤 손으로 누른 호출(manual)은 맨 위 합계처럼 뺀다 (재검토 11-14)
+  const cs = t.calls.filter((c) => c.phase !== 'manual' && match(baseLabel(c.label)));
   if (!cs.length) return '';
   const sent = cs.reduce((s, c) => s + (c.requestTokens ?? 0), 0);
   return cs.some((c) => !c.ok) ? `<em class="fl-fail" title="실패">${fmt(sent)}</em>` : fmt(sent);

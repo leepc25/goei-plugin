@@ -315,7 +315,13 @@ function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unkno
   if (next.uses) next.use = true;
   if (p.equip !== undefined) {
     const eq = itemEquip(p.equip);
-    if (eq !== next.equip && !next.held) delete next.slot;
+    if (eq !== next.equip) {
+      // 손 칸에는 아무 물건이나 (사용자 2026-11-14): 손 칸에 있던 것은 갈래가 바뀌어도 손에 남긴다 (손 갈래가 아니면 held). 장비 칸 것은 내린다
+      const inHand = next.slot !== undefined && (next.held || next.equip === 'weapon');
+      if (!inHand) delete next.slot;
+      else if (eq === 'weapon') delete next.held;
+      else next.held = true;
+    }
     if (eq) next.equip = eq;
     else delete next.equip;
   }
@@ -700,9 +706,11 @@ export function movedNow(it: Items, lastAnchor: string): string[] {
 
 /** 마지막 응답 뒤에 소지품 창에서 직접 버린 것 → 「This turn」 사건 (사용자 2026-11-14, 전수검사 mainreach#6·items#9).
  *  버리기 기록은 anchor 가 빈 글이라 물건의 outKey(버린 때의 마지막 메시지)로 찾는다 */
-export function droppedNow(it: Items, lastAnchor: string): string[] {
-  if (!lastAnchor) return [];
-  return it.list.filter((x) => x.outHow === 'drop' && x.outKey === lastAnchor).map((x) => `threw ${x.name} away — the protagonist discarded it on purpose and no longer has it`);
+export function droppedNow(it: Items, lastAnchor: string, after: string[] = []): string[] {
+  // outKey 는 버린 때의 마지막 메시지(누구 글이든)라, 마지막 응답 뒤의 메시지(사용자 글) 키도 받는다 (11-14 재검토 ①-1)
+  const keys = new Set([lastAnchor, ...after].filter(Boolean));
+  if (!keys.size) return [];
+  return it.list.filter((x) => x.outHow === 'drop' && !!x.outKey && keys.has(x.outKey)).map((x) => `threw ${x.name} away — the protagonist discarded it on purpose and no longer has it`);
 }
 
 /** 이번 턴에 인터넷 쇼핑몰 등에 판 것 (2026-11-10 사용자: 우주 쇼핑몰에 입던 옷을 팔았는데 본편은 그 옷을 계속 입고 나왔다 — 판 일이 본편에 안 넘어가고 있었다).
@@ -833,6 +841,13 @@ export function lastBotKey(chat: Chat): string {
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') return messageKey(list[i], i);
   return '';
 }
+/** 마지막 봇 응답 뒤에 온 메시지들의 키 (봇 응답이 없으면 전부) */
+export function keysAfterLastBot(chat: Chat): string[] {
+  const list = chat.message ?? [];
+  const out: string[] = [];
+  for (let i = list.length - 1; i >= 0 && list[i].role !== 'char'; i--) out.push(messageKey(list[i], i));
+  return out;
+}
 
 export interface UsedNow {
   name: string;
@@ -892,7 +907,7 @@ export function inventoryText(chat: Chat): string {
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).filter((e) => (e.store === 'hs' ? hsBuyPasses(vars) : boughtPasses(vars, e.store))).map(boughtLine),
-    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...droppedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
+    events: [...(resumed ? [resumedEvent()] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...droppedNow(it, lastBotKey(chat), keysAfterLastBot(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars), vars),

@@ -6,8 +6,7 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, repairDirector, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun, foldLog } from '../core/people/store';
-import { sumCues } from '../core/people/affinity';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
 import { genSettings } from '../core/advanced';
 import { hypaSummaries } from '../core/people/hypa';
 import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, shopKeyLine, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
@@ -39,7 +38,7 @@ import { guideSections } from '../core/guides';
 const routerBase = () => { const g = guideSections('Router'); return [g.ROLE, g.RULES].filter((x) => x?.trim()).join('\n'); };
 const directorBase = () => { const g = guideSections('Director'); return { facts: g.FACTS, scene: g.SCENE }; };
 import { parseIdentity, rankLevel } from '../core/people/identity';
-import { AFF_MAX, AFF_MIN, type Identity, type PeopleStore } from '../core/people/types';
+import type { Identity, PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
 
@@ -387,15 +386,8 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope; 
         });
         diag.report = report;
         // 되돌리기용 (리수폿 J-4): 이 갱신이 새로 만든 것. 다시 읽기(only)는 적지 않는다
-        if (!o.scope?.only) {
-          recordRun(s, before, new Date().toISOString());
-          // 변경 기록 줄이기: 지워진 응답의 변경은 버리고, 상한을 넘으면 오래된 호감 계기를 값으로 접는다. 세력 평판은 시작값이 바뀔 수 있어 접지 않는다 (전수검사 11-13)
-          foldLog(s, cur, (who, cues, folded) => {
-            const p = s.people[who];
-            if (!p) return null;
-            return sumCues(who, p.affinity.base, cues, folded, AFF_MIN, AFF_MAX, { temper: temperOf(who), speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }) - p.affinity.base;
-          });
-        }
+        // 변경 기록(store.log)은 줄이지 않고 전부 남긴다 (사용자 결정 나-80 ②). 여기서 접기 함수를 부르지 않는다
+        if (!o.scope?.only) recordRun(s, before, new Date().toISOString());
         let next = cur;
         if (report.wallet.length) {
           let w = readWallet(cur.scriptstate, walletStart);

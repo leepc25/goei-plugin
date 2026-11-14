@@ -43,7 +43,7 @@ export interface ItemTraits {
 export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> {
   const out: Omit<ItemTraits, 'icon' | 'weight'> = { use: false };
   // 「소모 3」「소모3회」「소모(3)」「소모 x3」은 쪼개기 전에 「소모3」으로 붙인다: 띄우면 1회로, 글자가 붙으면 소모가 빠졌다 (전수검사 11-13)
-  const src = String(text ?? '').replace(/(소모|consumable|uses?)\s*[:：]?\s*[(（x×]?\s*(\d+)\s*[)）]?\s*(?:회|번|개)?/gi, '$1$2');
+  const src = String(text ?? '').replace(/(소모|consumable|uses?)\s*[:：]?\s*[(（x×]?\s*(\d+)\s*[)）]?\s*(?:회|번|개)?/gi, '$1$2 '); // 끝에 띄어쓰기: 숫자 뒤 띄어쓰기까지 먹어 「소모3 장비」가 한 덩어리로 붙어 버려졌다 (재검토 11-14)
   for (const t0 of src.split(/[\s,，/·+]+/)) {
     const t = t0.trim().toLowerCase();
     if (!t) continue;

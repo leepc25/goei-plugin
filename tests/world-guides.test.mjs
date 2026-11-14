@@ -60,6 +60,26 @@ test('Faction·Roster 조립: 조직 소개 첫 문단 + 관계 목록 + 공통 
   assert.ok(!r.includes('Spangdal') === false, '소개가 있는 요원은 모두');
 });
 
+test('Roster: 옛 명부의 부서 이름(메뉴얼 심사팀)으로도 이병진 위에 부서 제목이 나온다', () => {
+  // 이미 설치된 봇의 명부에는 부서 키가 옛 이름으로 남아 있다 (설치·업데이트는 빈 칸만 채움)
+  for (const department of ['매뉴얼 심사팀', '메뉴얼 심사팀']) {
+    const d = JSON.parse(DIR.content);
+    d.요원.이병진 = { affiliation: 'C00', english: 'Lee Byeong-jin', department };
+    const dir = readDirectory(withWorldLore([...slots, { ...DIR, content: JSON.stringify(d) }]));
+    const r = evaluate(assembleRoster(dir, worldRecords('agent'), worldRecords('org')), { vars: { st_faction: 'A00' }, user: 'U' });
+    assert.match(r, /\n#### Administrative Support\n- Lee Byeong-jin /, department);
+  }
+});
+
+test('Roster: 부서 표에 없는 부서의 요원은 앞 부서 제목 아래가 아니라 조직 제목 바로 아래에 나온다', () => {
+  const d = JSON.parse(DIR.content);
+  d.요원.스팡달 = { ...d.요원.스팡달, department: '표에 없는 부서' };
+  const dir = readDirectory(withWorldLore([...slots, { ...DIR, content: JSON.stringify(d) }]));
+  const r = evaluate(assembleRoster(dir, worldRecords('agent'), worldRecords('org')), { vars: { st_faction: 'A00' }, user: 'U' });
+  assert.match(r, /### Management Bureau \[A00\]\n- Spangdal [^\n]*\n\n#### Comprehensive Response Team\n- Jyaldi /);
+  assert.ok(!/#### [^\n]*\n(?:[^#\n][^\n]*\n)*- Spangdal /.test(r), '부서 제목 아래에 들어가지 않는다');
+});
+
 test('가상 상시 항목(🏷️Tag·📜Faction·🙂Roster)은 카드에 없을 때만, 요청에는 한 덩어리로 첫 대화 앞에', () => {
   const out = withWorldLore([...slots, DIR]);
   const always = out.filter((e) => isVirtual(e) && e.alwaysActive);

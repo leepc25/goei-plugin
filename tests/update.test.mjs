@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import { REAL } from './realcard.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
+import * as core from '../dist-test/core.mjs';
 import { compareVersions, cardVersion, mergeByName, planUpdate, isPayload, readManifest, directoryData, readDirectory } from '../dist-test/core.mjs';
 
 test('버전 비교', () => {
@@ -100,4 +101,71 @@ test('카드 업데이트: 새 카드 명부에만 있는 칸(시작 소지품 �
   assert.equal(got.요원.살라딘.affiliation, '내가 고친 소속');
   assert.deepEqual(got.요원.살라딘.start_items, [{ name: '단검' }]);
   assert.ok(got.요원.새요원, '새 요원 칸도 들어옴');
+});
+
+// loader#1 (2026-11-14): 아무 봇에 설치한 봇은 ⚙️설정 폴더 key 가 무작위라 카드의 고정 key 와 다르다
+function bareBotAndCard() {
+  const planted = core.plantGreetings(['인사1']);
+  const lore = core.installLore([{ comment: '내 로어', key: 'a', content: 'x', mode: 'normal' }], planted.index);
+  const dirEntry = lore.find((e) => e.comment === 'Directory');
+  const dj = JSON.parse(dirEntry.content);
+  const agent = Object.keys(dj['요원'])[0];
+  dj['요원'][agent].__mine = 'USER EDIT';
+  dirEntry.content = JSON.stringify(dj);
+  const man = lore.find((e) => e.comment === 'Plugin manifest');
+  man.content = JSON.stringify({ ...JSON.parse(man.content), version: '0.21.11' });
+  const char = { name: '내 봇', globalLore: lore, customscript: [] };
+  // 카드: 폴더 key 가 고정값인 ⚙️설정 + Directory + Plugin manifest(source 있음, 버전 높음)
+  const CARD_KEY = 'folder:f3b3863b-card-fixed';
+  const base = core.installLore([], {});
+  const baseKey = base.find((e) => e.mode === 'folder').key;
+  const cardLore = base.map((e) => {
+    const out = { ...e };
+    if (out.mode === 'folder') out.key = CARD_KEY;
+    if (out.folder === baseKey) out.folder = CARD_KEY;
+    if (out.comment === 'Plugin manifest') out.content = JSON.stringify({ ...JSON.parse(out.content), version: '9.9.9', source: 'card', keys: { settings: CARD_KEY } });
+    return out;
+  });
+  const payload = { schema: 1, version: '9.9.9', minPlugin: '0.21.0', data: { globalLore: cardLore, customscript: [] } };
+  return { char, payload, agent, CARD_KEY };
+}
+
+test('카드 업데이트: 폴더 key 가 다른 봇(아무 봇에 설치)도 명부·매니페스트가 하나씩이고 사용자 명부를 지킨다 (loader#1)', () => {
+  const { char, payload, agent, CARD_KEY } = bareBotAndCard();
+  const before = JSON.stringify(payload);
+  const myKey = char.globalLore.find((e) => e.mode === 'folder').key;
+  assert.notEqual(myKey, CARD_KEY);
+  const plan = planUpdate(char, payload);
+  assert.equal(JSON.stringify(payload), before, 'payload 원본은 바꾸지 않는다');
+  const check = (lore) => {
+    assert.equal(lore.filter((e) => e.comment === 'Directory').length, 1, '명부는 하나');
+    const d = core.readDirectoryData(lore);
+    assert.ok(d, '명부를 읽을 수 있다');
+    assert.equal(d['요원'][agent].__mine, 'USER EDIT', '사용자가 고친 값이 남는다');
+    assert.equal(lore.filter((e) => e.comment === 'Plugin manifest').length, 1, '매니페스트는 하나');
+    assert.equal(lore.filter((e) => e.mode === 'folder').length, 1, '설정 폴더는 하나');
+    assert.equal(lore.find((e) => e.mode === 'folder').key, myKey, '폴더 key 는 지금 카드 것');
+    assert.ok(lore.filter((e) => e.folder).every((e) => e.folder === myKey), '폴더 안 항목은 모두 지금 폴더에');
+    assert.equal(core.findFolder(lore).key, myKey, '매니페스트의 폴더 key 도 맞음');
+    assert.ok(lore.some((e) => e.comment === '내 로어'), '직접 넣은 로어는 남는다');
+  };
+  check(plan.next.globalLore);
+  assert.equal(cardVersion(plan.next.globalLore), '9.9.9');
+  assert.equal(plan.lore.protected, 1);
+  assert.equal(plan.lore.added, 0);
+  // 한 번 더 적용해도 그대로
+  check(planUpdate(plan.next, payload).next.globalLore);
+});
+
+test('카드 업데이트 안전망: 사용자 명부가 다른 폴더에 있어 짝이 안 맞아도 명부는 사용자 것 하나만 남는다 (loader#1)', () => {
+  const { char, payload, agent } = bareBotAndCard();
+  char.globalLore = char.globalLore.map((e) => (e.comment === 'Directory' ? { ...e, folder: '' } : e));
+  const plan = planUpdate(char, payload);
+  const lore = plan.next.globalLore;
+  assert.equal(lore.filter((e) => e.comment === 'Directory').length, 1);
+  assert.equal(core.readDirectoryData(lore)['요원'][agent].__mine, 'USER EDIT');
+  assert.equal(plan.lore.protected, 1);
+  const again = planUpdate(plan.next, payload).next.globalLore;
+  assert.equal(again.filter((e) => e.comment === 'Directory').length, 1);
+  assert.equal(core.readDirectoryData(again)['요원'][agent].__mine, 'USER EDIT');
 });

@@ -106,7 +106,9 @@ export function assembleRoster(dir: Directory, agents: Map<string, WorldRecord>,
       const en = a.department ? depts[a.department] ?? '' : '';
       (groups.get(en) ?? groups.set(en, []).get(en)!).push(a);
     }
-    for (const [en, list] of groups) {
+    // 부서 표에 없는 부서·부서 없는 요원(제목 없는 묶음)은 조직 제목 바로 아래 맨 앞에. 뒤에 두면 앞 부서 제목 아래로 읽힌다
+    const ordered = [...groups].sort(([a], [b]) => Number(!!a) - Number(!!b));
+    for (const [en, list] of ordered) {
       if (en) lines.push(`\n#### ${en}`);
       let lastDept = '';
       for (const a of list) {

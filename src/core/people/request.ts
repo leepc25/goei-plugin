@@ -49,11 +49,14 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   if (!people.length) return { text: '', people: [], sheets: [] };
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
-  const blocks: string[] = [];
   /** 인물마다: 시트 원문(요청에서 뺄 것)과 상한 밖 길이(시트 고정 절) */
   const own: { sheet: string | null; exempt: number }[] = [];
   // 성적 프로필 정책 글(SEXUAL.POLICY)은 처음 프로필이 있는 인물 블록에만. 뒤에서부터 빼므로 첫 블록이 남는다 (전수검사 11-13)
   let policyShown = false;
+  /** 인물마다 블록을 만드는 함수 (글자 몫만 바꿔 다시 만들 수 있게) */
+  const make: ((maxChars: number) => string)[] = [];
+  // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
+  const share = Math.max(1, Math.floor(o.settings.blockCap / people.length));
   for (const n of people) {
     const p = o.store.people[n];
     const sheet = o.sheetOf(n);
@@ -61,34 +64,62 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     own.push({ sheet: sheet || null, exempt });
     const note = o.settings.director === 'note' ? latestNote(o.store, n, live) : null;
     const sx = sexualTexts(p, o.settings);
-    blocks.push(
+    const sexualPolicy = !policyShown;
+    const unknown = o.settings.features.has('perception') ? unknownTo(p, o.store, live) : [];
+    make.push((maxChars) =>
       personBlock(p, o.store, live, changes, {
         sheet,
         mode: o.settings.inject,
-        unknown: o.settings.features.has('perception') ? unknownTo(p, o.store, live) : [],
+        unknown,
         user: o.user,
         note,
         temper: o.temperOf?.(n),
         speed: o.settings.speed,
         speedDown: o.settings.speedDown,
         turnCap: o.settings.turnCap,
-        // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
-        maxChars: Math.floor(o.settings.blockCap / people.length),
+        maxChars,
         taste: o.settings.features.has('taste'),
         openness: o.settings.features.has('openness'),
         axes: o.settings.features.has('axes'),
         features: o.settings.features,
         qual: o.settings.qualitative,
         sexual: sx,
-        sexualPolicy: !policyShown,
+        sexualPolicy,
       }),
     );
     if (sx.desire || sx.paraphilia) policyShown = true;
   }
-  // 상한(본문 전체 글자 수)은 기록에만 건다 (고정 절 원문은 상한 밖). 넘치면 글 중간에서 자르지 않고 뒤 인물부터 통째로 뺀다 (모델이 고른 인물 → 글에 나온 인물, 항상 포함은 끝까지).
+  const blocks: string[] = make.map((f) => f(share));
+  // 상한(본문 전체 글자 수)은 기록에만 건다 (고정 절 원문은 상한 밖).
+  const lenOf = (i: number) => blocks[i].length + 2 - own[i].exempt;
+  const sizeOf = (k: number) => blocks.slice(0, k).reduce((s, _b, i) => s + lenOf(i), 0);
+  // 넘치면 먼저 인물별 몫을 줄여 블록을 다시 만든다 (personBlock 이 지난 일부터 뺀다). 몫은 칸 글자만 세고 머리말·관계 줄·제목은 안 세므로,
+  // 기록이 찬 인물이 둘만 있어도 합이 상한을 조금 넘어 마지막 인물이 통째로 빠졌다 (11-14 재검토 ①-1).
+  // 넘친 만큼을, 고른 몫(상한 ÷ 인물 수)보다 긴 인물들이 넘은 비율대로 나눠 줄인다.
+  const budget = people.map((n) => {
+    const slots = o.store.people[n].slots;
+    const counted = Object.values(slots).reduce((s, l) => s + liveEntries(l ?? [], live).reduce((m, e) => m + e.text.length + 3, 0), 0);
+    return Math.max(1, Math.min(share, counted));
+  });
+  for (let round = 0; round < 12; round++) {
+    const over = sizeOf(blocks.length) - o.settings.blockCap;
+    if (over <= 0) break;
+    const excess = blocks.map((_b, i) => Math.max(0, lenOf(i) - share));
+    const sum = excess.reduce((s, x) => s + x, 0);
+    if (sum <= 0) break;
+    let changed = false;
+    for (let i = 0; i < blocks.length; i++) {
+      if (!excess[i] || budget[i] <= 1) continue;
+      budget[i] = Math.max(1, budget[i] - Math.ceil((over * excess[i]) / sum));
+      const next = make[i](budget[i]);
+      if (next !== blocks[i]) changed = true;
+      blocks[i] = next;
+    }
+    if (!changed && budget.every((x, i) => !excess[i] || x <= 1)) break;
+  }
+  // 그래도 넘치면 글 중간에서 자르지 않고 뒤 인물부터 통째로 뺀다 (모델이 고른 인물 → 글에 나온 인물, 항상 포함은 끝까지).
   // 뺀 인물의 원래 시트는 요청에 남긴다 (전수검사 11-13: 4명부터 뒤 인물이 블록에서도 시트에서도 사라졌다)
   let keep = blocks.length;
-  const sizeOf = (k: number) => blocks.slice(0, k).reduce((s, b) => s + b.length + 2, 0) - own.slice(0, k).reduce((s, x) => s + x.exempt, 0);
   while (keep > 1 && sizeOf(keep) > o.settings.blockCap) keep--;
   blocks.length = keep;
   const sheets = own.slice(0, keep).map((x) => x.sheet).filter((x): x is string => !!x);

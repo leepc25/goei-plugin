@@ -68,6 +68,8 @@ export function applyWorldPack(text: string): void {
     relations: { pairs: rel.pairs as never, common: rel.common },
     // 첫 장면 기본값 (옛 팩에는 없다)
     ...(obj(j.scenes) && obj(j.scenes.세력) && obj(j.scenes.인물) ? { scenes: j.scenes as never } : {}),
+    // 부록 조건 기본값 (옛 팩에는 없다)
+    ...(obj(j.appendixWhen) ? { appendixWhen: j.appendixWhen as never } : {}),
   });
 }
 

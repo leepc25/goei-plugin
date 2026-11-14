@@ -10,7 +10,10 @@ const out = await build({
       export { HS_PAIRS } from './src/core/setdef/homeshop';
       export { shopGiveOn } from './src/core/shopfn';
       export { dropDoubleSync, syncPointsToStatus, readPoints } from './src/core/points';
-      export { mergeLate } from './src/ui/malls';
+      export { mergeLate, lateNow } from './src/ui/malls';
+      export { mallVarsOf, readMall } from './src/core/malls';
+      export { aliveAnchors } from './src/core/wallet';
+      export { markSold } from './src/core/shop';
     `,
     resolveDir: process.cwd(), loader: 'ts',
   },
@@ -77,6 +80,30 @@ test('malls#8: 답을 기다리는 동안 산 물건·취소한 판매는 되돌
   // 그사이 바뀐 게 없으면 답 그대로
   const same = { ...st0, items: [it('c')] };
   assert.deepEqual(M.mergeLate(st0, same, st0), same);
+});
+
+test('재검토 11-14 1-3: 산 응답을 다시 굴린 뒤 진열을 새로 짜도 옛 물건이 끼어 남지 않는다', () => {
+  const it = (id) => ({ id, name: id, price: 1, desc: '', effect: '' });
+  const base = { shop: 'S', owner: '', key: '', loaded: true, identity: { sells: '', never: '', prices: '' }, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] };
+  // A·B 진열, 응답 r1 에서 A 를 삼
+  const bought = { message: [{ role: 'user', data: 'u', chatId: 'u1' }, { role: 'char', data: 'x', chatId: 'r1' }] };
+  const soldKey = [...M.aliveAnchors(bought)][1];
+  const stored = M.markSold({ ...base, items: [it('A'), it('B')] }, 'A', soldKey);
+  // 그 응답을 다시 굴림 (새 chatId) → 산 것은 없던 일
+  const chat = { message: [{ role: 'user', data: 'u', chatId: 'u1' }, { role: 'char', data: 'y', chatId: 'r2' }], scriptstate: M.mallVarsOf('cos', stored) };
+  assert.equal(M.aliveAnchors(chat).has(soldKey), false);
+  const st0 = M.readMall(chat.scriptstate, 'cos', M.aliveAnchors(chat));
+  assert.deepEqual(st0.items.map((x) => [x.id, !!x.sold]), [['A', false], ['B', false]]);
+  // 저장된 값에는 팔린 표시가 남아 있다 (기준 없이 읽으면 팔린 것으로 보인다)
+  assert.equal(M.readMall(chat.scriptstate, 'cos').items.find((x) => x.id === 'A').sold, true);
+  // C·D 로 새로 짬: 저장 직전 상태도 같은 기준으로 읽어야 A 가 「기다리는 동안 산 것」이 되지 않는다
+  const next = { ...st0, items: [it('C'), it('D')] };
+  const merged = M.mergeLate(M.lateNow(chat, 'cos'), next, st0);
+  assert.deepEqual(merged.items.map((x) => x.id), ['C', 'D']);
+  // 기다리는 동안 산 응답이 살아 있으면 그대로 팔린 채로 앞에 붙는다 (malls#8 은 그대로)
+  const live = { ...bought, scriptstate: M.mallVarsOf('cos', stored) };
+  const st0b = { ...base, items: [it('A'), it('B')] };
+  assert.deepEqual(M.mergeLate(M.lateNow(live, 'cos'), { ...st0b, items: [it('C'), it('D')] }, st0b).items.map((x) => [x.id, !!x.sold]), [['A', true], ['C', false], ['D', false]]);
 });
 
 test('settings#6: 최소가 최대를 넘으면 짝도 같이 맞춘다', () => {

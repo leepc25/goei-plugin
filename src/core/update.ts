@@ -4,7 +4,7 @@
 import { DIRECTORY_COMMENT, isDirectory, LEGACY_DATA, manifestEntry, OLD_DIRECTORY, RETIRED } from './lorebooks';
 import { dropOldOutsidePlaces, migrateLore, readDirectoryData, withDirectory } from './world/directory';
 import { dropDefaultAliases } from './world/registry';
-import { fillDirectory } from './install';
+import { fillDirectory, findFolder } from './install';
 import type { LoreEntry } from './types';
 
 export const UPDATE_SCHEMA = 1;
@@ -179,15 +179,65 @@ function addDirectoryDefaults(list: LoreEntry[], incoming: LoreEntry[]): LoreEnt
   return filled.gaps ? withDirectory(list, filled.data as never) : list;
 }
 
+/**
+ * ⚙️설정 폴더 key 맞추기: 아무 봇에 설치한 봇은 폴더 key 가 무작위라 카드의 고정 key 와 다르다. 그대로 합치면
+ * 이름+폴더 짝이 안 맞아 명부·매니페스트가 둘씩 생기고 명부를 읽지 못한다 (loader#1).
+ * 새 카드 목록의 사본에서 폴더 key 를 지금 카드 것으로 바꿔 돌려준다 (payload 원본은 그대로. key 가 같으면 원본 그대로)
+ */
+function alignFolder(current: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
+  const curKey = String(findFolder(current)?.key ?? '');
+  const inKey = String(findFolder(incoming)?.key ?? '');
+  if (!curKey || !inKey || curKey === inKey) return incoming;
+  const manifest = manifestEntry(incoming);
+  return incoming.map((e) => {
+    let out = e;
+    if (e.mode === 'folder' && e.key === inKey) out = { ...out, key: curKey };
+    if ((e as { folder?: string }).folder === inKey) out = { ...out, folder: curKey } as LoreEntry;
+    if (e === manifest) {
+      try {
+        const m = JSON.parse(String(e.content ?? '')) as { keys?: Record<string, unknown> };
+        if (m && typeof m === 'object' && m.keys && typeof m.keys === 'object' && m.keys.settings === inKey) {
+          out = { ...out, content: JSON.stringify({ ...m, keys: { ...m.keys, settings: curKey } }) };
+        }
+      } catch {
+        // 읽을 수 없는 매니페스트는 그대로 둔다
+      }
+    }
+    return out;
+  });
+}
+
+/**
+ * 안전망: 합친 뒤에도 명부가 둘 이상이면(사용자가 명부를 다른 폴더로 옮긴 경우 등) 사용자 것만 남긴다.
+ * 카드 명부 자리에 사용자 명부를 두고, 뒤에 남은 사용자 명부·카드 명부는 목록에서 뺀다 (사용자 명부 글은 그대로)
+ */
+function keepOneDirectory(current: LoreEntry[], lore: { list: LoreEntry[]; count: MergeCount }): void {
+  const dirs = lore.list.filter((e) => isDirectory(e.comment));
+  if (dirs.length < 2) return;
+  const mine = dirs.find((e) => current.includes(e));
+  if (!mine) return;
+  const slot = lore.list.findIndex((e) => isDirectory(e.comment));
+  const slotWasMine = lore.list[slot] === mine;
+  lore.list = lore.list.map((e, i) => (i === slot ? mine : e)).filter((e, i) => i === slot || !isDirectory(e.comment));
+  if (!slotWasMine) {
+    // 카드 명부를 「새로 넣음」, 사용자 명부를 「직접 넣은 항목」으로 센 것을 「지킴」 하나로 바로잡는다
+    lore.count.added = Math.max(0, lore.count.added - 1);
+    lore.count.kept = Math.max(0, lore.count.kept - 1);
+    lore.count.protected++;
+  }
+}
+
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
 export function planUpdate(char: Record<string, unknown>, payload: CardPayload): UpdatePlan {
-  const current = renamed((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore);
-  const lore = mergeByName(current, payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
-  keepUserKeys(current, lore.list, shippedKeys(payload.data.globalLore));
+  const incoming = alignFolder((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore);
+  const current = renamed((char.globalLore as LoreEntry[]) ?? [], incoming);
+  const lore = mergeByName(current, incoming, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
+  keepOneDirectory(current, lore);
+  keepUserKeys(current, lore.list, shippedKeys(incoming));
   // 옛 데이터 로어북(Faction display 등)은 새 카드에 없어 「사용자가 넣은 것」으로 남는다. 명부로 옮기고 지운다
   if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? '')))) lore.list = migrateLore(lore.list);
   // 새 카드 명부의 칸: 사용자 명부에 없는 항목·빈 칸만 채운다 (부록 조건·시작 소지품 등, 사용자가 고친 값은 그대로). 옛 기본값 정리보다 먼저 (채운 뒤 정리)
-  lore.list = addDirectoryDefaults(lore.list, payload.data.globalLore);
+  lore.list = addDirectoryDefaults(lore.list, incoming);
   // 0.16.37 전 카드: 명부 괴이·특수에 기본으로 있던 세력·요원 로어북 후보를 뺀다 (2026-10-21 사용자). 그 뒤에 사용자가 다시 넣은 것은 둔다
   if (compareVersions(cardVersion(char.globalLore as LoreEntry[]), '0.16.37') < 0) lore.list = dropOldOutsidePlaces(lore.list);
   // 사용자 명부(보호됨)에 남은 원본 기본 별칭 중 규칙에 걸리는 것만 지운다. 사용자가 더한 별칭은 남는다 (2026-10-21)
