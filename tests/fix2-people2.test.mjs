@@ -96,6 +96,30 @@ test('성적 지침: 고친 지침에도 「거짓일 때」 조건이 남는다
   assert.ok(/When false[,:]/.test(sec));
 });
 
+// 11-14 재검토 ①-11: 위 시험은 기본 글이라 고침이 없어도 통과한다. 지침을 고친 경로를 따로 본다.
+// (sexual 과 guides 가 같은 묶음에 있어야 고친 지침이 보인다)
+test('성적 지침: PLAIN_STYLE 절의 첫 구절을 고쳐도 「거짓일 때」 조건이 붙는다 (고친 글)', async () => {
+  const outfile = join(dir, `sexual-guides-${process.pid}.mjs`);
+  await build({
+    stdin: { contents: "export * as X from './src/core/people/sexual'; export * as G from './src/core/guides'; export * as St from './src/core/people/settings';", resolveDir: process.cwd(), loader: 'ts' },
+    bundle: true, platform: 'node', format: 'esm', charset: 'utf8', outfile, logLevel: 'silent',
+  });
+  const M = await import(pathToFileURL(outfile));
+  const flags = { ...M.St.peopleSettings({}), features: new Set(['axes']), sexualDesire: true, paraphilia: false, explicitStyle: false };
+  const EDIT = 'Keep the wording blunt and everyday ZZ-PLAIN-EDIT.';
+  const def = M.G.guideDefault('UpdaterExtra');
+  const edited = def.replace(/(@@SECTION SEXUAL\.PLAIN_STYLE\n)[\s\S]*?(\n@@END)/, (a, h, e) => h + EDIT + e);
+  assert.notEqual(edited, def, 'PLAIN_STYLE 절을 찾아 바꿨다');
+  M.G.setGuideOverride('UpdaterExtra', edited);
+  try {
+    const sec = M.X.sexualWriterSection(flags);
+    assert.ok(sec.includes(`When false: ${EDIT} When true, `), sec);
+    assert.ok(!sec.includes('Use the 0.10.7 style'));
+  } finally { M.G.setGuideOverride('UpdaterExtra', ''); }
+  // 되돌린 뒤에는 기본 글
+  assert.ok(M.X.sexualWriterSection(flags).includes('When false, use the 0.10.7 style'));
+});
+
 test('변경 기록: 지워진 메시지의 변경은 버리고, 상한을 넘으면 오래된 계기를 값이 같게 접는다', () => {
   const n = 260;
   const chat = { message: Array.from({ length: n }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: `m${i}`, chatId: `k${i}` })) };

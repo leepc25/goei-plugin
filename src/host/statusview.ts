@@ -10,7 +10,7 @@ import { statusHtml, type StatusContext } from '../ui/status';
 import { reportCardHtml } from '../ui/reportcard';
 import { cardPalette, currentTheme } from '../ui/theme';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
-import { getChar } from './risu';
+import { getChar, updateChat } from './risu';
 
 let ctx: StatusContext = { timeline: null, terms: [], hide: new Set() };
 /** 채팅을 옮길 때: 앞 채팅의 목록을 바로 버린다 (다시 모을 때까지 비교 없이 그린다) */
@@ -82,6 +82,16 @@ export async function refreshStatusContext(charIndex: number, chatIndex: number,
   setStatusColumns(chat.scriptstate);
   ctx = { timeline: statusTimeline(texts), terms, hide: hiddenCols(colConfig(chat.scriptstate)) };
   cards = collectCards(chat);
+}
+
+/** 채팅 카드는 display 처리기가 그린다: 열쇠 표를 다시 모으고, 이미 그려진 메시지도 다시 그리게 채팅을 그대로 한 번 저장한다 (끄면 카드가 사라진다) */
+export async function redrawChatCards(charIndex: number, chatIndex: number): Promise<void> {
+  try {
+    await refreshStatusContext(charIndex, chatIndex);
+    await updateChat(charIndex, chatIndex, (cur) => ({ ...cur }));
+  } catch {
+    /* 다시 못 그려도 설정은 저장됐다 (다음 채팅 전환 때 반영) */
+  }
 }
 
 /** display: 상태창 태그 → 상자 (+ 그 응답에서 종료된 사건의 보고서 카드) */

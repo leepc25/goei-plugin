@@ -1,4 +1,4 @@
-// 릴리스 준비 (전수점검 §11-8, 2026-11-06): 손으로 하던 ①판 올림 → ②빌드 → ③카드·release 부속 → ④release 복사 → ⑤형 검사·단위 시험을
+// 릴리스 준비 (전수점검 §11-8, 2026-11-06): 손으로 하던 ①판 올림 → ③카드·release 부속 → ②빌드(카드 빌드가 팩 원료를 다시 쓰므로 그 뒤) → ④release 복사 → ⑤형 검사·단위 시험을
 // 한 번에 돌리고, 남은 절차(브라우저 시험·PR·릴리스)를 체크리스트로 보여 준다. main 반영·릴리스는 하지 않는다 (사용자가 「릴리스해」라고 할 때만).
 //
 // 사용법: npm run release:prep -- [옵션]
@@ -63,9 +63,6 @@ if (version !== before) {
   }
 } else log(`① 판 그대로 ${version} (--bump 또는 --version 으로 올릴 수 있음)`);
 
-// ② 빌드
-run('npm', ['run', 'build'], '② 빌드');
-
 // ③ 카드 + release 부속 (card-update.* · version.json · wiki-base.* · icon.png · pic/)
 if (opt.card) {
   const src = 'card/원본_봇카드.jpeg';
@@ -78,6 +75,10 @@ if (opt.card) {
     if (!opt.dry) spawnSync('git', ['checkout', '--', ...deleted], { cwd: ROOT, stdio: 'inherit' });
   }
 } else log('③ 카드 빌드 건너뜀 (--no-card)');
+
+// ② 빌드 — 카드 빌드(③) 뒤에 돌린다. 카드 빌드가 팩의 원료(src/data/install/*.json · src/data/world/greetings.json)를 다시 쓰므로,
+// 먼저 빌드하면 ④ 가 옛 자료로 만든 본체·팩을 release 에 복사한다 (재검토 11-14 loader#10). 카드 빌드는 dist 를 읽지 않는다
+run('npm', ['run', 'build'], '② 빌드');
 
 // ④ dist → release (시작기·본체 조각·자료 팩·토크나이저 조각). 옛 조각은 지우지 않는다
 {

@@ -45,6 +45,7 @@ test('답하지 않은 사이 새 갱신이 오면 뜨지 않고, 「취소하�
   await handlePeople('pp-undo-run-yes', '', ctx, env);
   assert.ok(chats[0][KEY].people['병'], '새 갱신이 만든 인물이 남는다');
   assert.equal(chats[0][KEY].lastRun?.at, '2026-11-14T00:10:00.000Z');
+  peopleUi.info = '';
 });
 
 test('화면을 옮기면(resetPeopleUi) 확인이 꺼진다', async () => {
@@ -61,6 +62,7 @@ test('물은 그 갱신에 「취소하기」: 되돌린다', async () => {
   await handlePeople('pp-undo-run-yes', '', ctx, env);
   assert.equal(chats[1][KEY].people['을'], undefined);
   assert.equal(chats[1][KEY].lastRun, undefined);
+  peopleUi.info = ''; // 알림(toast)은 화면(document)이 있어야 하니 그리기 전에 비운다
   assert.equal(asking(ctxOf(1)), false);
 });
 

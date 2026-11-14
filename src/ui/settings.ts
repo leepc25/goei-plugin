@@ -39,6 +39,8 @@ import { drawerBox } from './drawer';
 import { toast } from './toast';
 import { ICONS } from './icons';
 import { resetShop } from './shop';
+import { journalSettings } from '../core/journal';
+import { redrawChatCards } from '../host/statusview';
 
 export interface SettingsEnv {
   render: () => void;
@@ -596,6 +598,12 @@ async function save(ctx: ChatContext, env: SettingsEnv, change: (chat: Chat) => 
   await env.refresh();
 }
 
+/** 머리 동작(불러오기·초기화·되돌리기)으로 보고서 카드 표시가 바뀌었으면 이미 뜬 카드도 다시 그린다 (재검토 11-14, 1-4) */
+const cardMode = (ss: ScriptState | undefined) => journalSettings(ss).chatCard;
+async function redrawIfCard(ctx: ChatContext, was: string, now: string): Promise<void> {
+  if (!settingsUi.notice && was !== now) await redrawChatCards(ctx.charIndex, ctx.chatIndex);
+}
+
 function withBasic(ctx: ChatContext, chat: Chat, patch: Partial<BasicSettings>): ScriptState {
   return basicVars({ ...basicSettings(ctx.char.globalLore, chat.scriptstate), ...patch });
 }
@@ -769,6 +777,7 @@ export async function handleSettings(action: string, value: string | undefined, 
     if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex) return true;
     settingsUi.undo = null;
     let shopOff = false;
+    let card = ['', ''];
     await save(ctx, env, (chat) => {
       const prev = chat.scriptstate;
       const vars: ScriptState = {};
@@ -784,12 +793,14 @@ export async function handleSettings(action: string, value: string | undefined, 
       const side = bulkSideVars(chat, prev, { ...ss, ...vars });
       shopOff = side.shopOff;
       if (drop.length) chat.scriptstate = ss;
+      card = [cardMode(prev), cardMode({ ...ss, ...vars, ...side.vars })];
       return { ...vars, ...side.vars };
     });
     if (shopOff) {
       resetShop();
       await dropShopTags(ctx);
     }
+    await redrawIfCard(ctx, card[0], card[1]);
     if (!settingsUi.notice) settingsUi.info = '기본값을 불러오기 전 설정으로 되돌렸어요.';
     env.render();
     return true;
@@ -811,6 +822,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 덮어쓰기 직전에 바뀔 키의 지금 값을 보관한다 (2026-11-06 사용자 승인, 전수점검 9-7): 불러온 뒤 「되돌리기」 한 번
       let before: Record<string, string | number | boolean | undefined> | null = null;
       let shopOff = false;
+      let card = ['', ''];
       await save(ctx, env, (chat) => {
         // 기본값에 없는 항목은 ''로 덮지 않고 지운다: ''를 0으로 읽어 소지 칸·한도·선쪽지 확률이 최솟값이 됐다 (전수검사 11-13)
         const r = varDefaultsToLoad(ALL_PREFIXES, chat.scriptstate);
@@ -829,12 +841,14 @@ export async function handleSettings(action: string, value: string | undefined, 
         before = {};
         for (const k of [...Object.keys(vars), ...r.drop]) before[k] = prev?.[k];
         if (r.drop.length) chat.scriptstate = base;
+        card = [cardMode(prev), cardMode({ ...base, ...vars })];
         return vars;
       });
       if (shopOff) {
         resetShop();
         await dropShopTags(ctx);
       }
+      await redrawIfCard(ctx, card[0], card[1]);
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
       if (!settingsUi.notice) settingsUi.info = '기본값을 지금 채팅에 불러왔어요.';
       env.render();
@@ -843,6 +857,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 저장해 둔 새 채팅 기본값(prefs basic·world·theme·vars)도 비운다. 상황판 켜기·끄기는 그대로. 불러오기와 같은 「되돌리기」 띠 한 번
       let before: Record<string, string | number | boolean | undefined> | null = null;
       let shopOff = false;
+      let card = ['', ''];
       await save(ctx, env, (chat) => {
         const prev = chat.scriptstate;
         const ss = { ...(chat.scriptstate ?? {}) };
@@ -860,21 +875,21 @@ export async function handleSettings(action: string, value: string | undefined, 
         chat.scriptstate = ss;
         const vars: ScriptState = { ...side.vars, [THEME_KEY]: 'dark' };
         // 시작 잔고 기본값도 지우므로, 이야기 중인데 장부가 아직 없는 채팅은 지금 시작값을 고정해 잔고가 튀지 않게 (전수검사 11-13, 사용자 16-1)
-        if (walletStarted(chat) && !ss[WALLET_VAR]) {
-          Object.assign(vars, walletVars(readWallet(ss, getPrefs().walletStart ?? WALLET_START_DEFAULT)));
-          if (!(WALLET_VAR in before)) before[WALLET_VAR] = undefined;
-        }
+        // 장부는 설정이 아니라 상태라 되돌릴 것(before)에 넣지 않는다: 넣으면 되돌리기가 장부와 그 사이 거래 줄을 통째로 지웠다 (재검토 11-14)
+        if (walletStarted(chat) && !ss[WALLET_VAR]) Object.assign(vars, walletVars(readWallet(ss, getPrefs().walletStart ?? WALLET_START_DEFAULT)));
         if (worldOn(chat)) {
           const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? ''));
           for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k] as string | number | boolean | undefined;
           Object.assign(vars, wv);
         }
+        card = [cardMode(prev), cardMode({ ...ss, ...vars })];
         return vars;
       });
       if (shopOff) {
         resetShop();
         await dropShopTags(ctx);
       }
+      await redrawIfCard(ctx, card[0], card[1]);
       // 고친 지침도 원래 글로 (2026-11-08 사용자: 지침마다 있던 「기본으로」를 없애고 초기화 한 곳으로)
       if (!settingsUi.notice) {
         for (const g of GUIDE_NAMES) setGuideOverride(g, '');
