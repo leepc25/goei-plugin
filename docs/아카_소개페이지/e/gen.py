@@ -94,7 +94,7 @@ B.append(h('스타트 패널'))
 sp=save(Image.open(K+'promo/pc-start-01-open.png').convert('RGB').crop((705,95,1857,1630)).resize((691,921),Image.LANCZOS),'start.jpg',86)
 def step(i,t,d): return f'<div style="display:table;margin:0 0 14px 0;"><div style="display:table-cell;width:28px;font-size:15px;font-weight:900;color:{ACC};">{i}</div><div style="display:table-cell;"><div style="font-size:16px;font-weight:800;line-height:1.4;">{t}</div><div style="font-size:13px;color:{SUB};line-height:1.5;">{d}</div></div></div>'
 B.append(f'<div style="font-size:0;margin:0 0 26px 0;"><div style="display:inline-block;vertical-align:top;width:340px;max-width:100%;margin:0 32px 16px 0;">{img(sp,"스타트 패널")}</div>'
-         f'<div style="display:inline-block;vertical-align:top;width:300px;max-width:100%;padding-top:10px;">{step(1,"세력","다섯 세력과 이면의 주민들")}{step(2,"첫 장면","세력마다 준비된 시작 장면")}{step(3,"언어","한국어, English")}{step(4,"출발","")}</div></div>')
+         f'<div style="display:inline-block;vertical-align:top;width:300px;max-width:100%;padding-top:10px;">{step(1,"세력","")}{step(2,"첫 장면","")}{step(3,"언어","한국어, English")}{step(4,"출발","")}</div></div>')
 P={'관리국':[('쟈알디','종합대응팀 부장'),('스팡달','종합대응팀 선임 요원'),('잼트리','종합대응팀 선임 요원'),('에일린','종합대응팀 선임 요원'),('고그니쟈','격리팀 연구 책임자'),('큐라스','진압팀 선임 요원'),('고르고디오','진압팀 선임 요원'),('데쥬레','격리팀 연구원'),('데드폴','종합대응팀 요원'),('게슈간','종합대응팀 요원'),('로제몬','종합대응팀 요원'),('콘쥬스','종합대응팀 요원')],
  '가짜 관리국':[('사장','최고 책임자'),('도필헌','국장'),('이길환','신입 교육 과장'),('이기석','신입 교육 과장'),('김조학','수석 심문관'),('이도형','검사부대 부장'),('고영훈','검사부대 차장'),('노기균','검사부대 대리'),('송주익','검사부대 대리'),('곽성주','진압부대 과장'),('조성춘','진압부대 과장'),('윤병수','신입 7팀 팀장'),('김성진','신입 7팀 사원'),('송진섭','신입 7팀 사원')],
  '백일몽 주식회사':[('청달래','개발본부 임원'),('호유원','이사'),('이병진','행정지원'),('백석주','정예 A조 조장'),('진나솔','정예 A조'),('이성해','정예 B조'),('이자헌','D조 조장'),('은하제','D조'),('박민성','D조'),('백사헌','F조'),('고영은','R조'),('강이학','I조'),('장허운','Y조'),('곽제강','연구1팀'),('이연화','연구1팀'),('제이','경비반장')]}
@@ -119,16 +119,16 @@ def sub(label,items):
         o+=f'<div style="display:inline-block;vertical-align:top;width:50%;min-width:150px;margin:0 0 14px 0;"><div style="padding:0 5px;">{img(src,name,"border-radius:8px;")}<div style="margin-top:6px;font-size:13px;font-weight:700;">{name}</div></div></div>'
     return o+'</div>'
 C=(0,0,2200,1800)
-MENU=[('상황판','지금 벌어진 괴이와 사건, 요원들의 상태',screen('promo/pc-play-02-board','m_board.jpg'),''),
- ('임무','지도에서 장소를 골라 넷을 편성해 출동',screen('promo/pc-play-03-map','m_map.jpg'),''),
- ('괴담톡','인물들과 주고받는 문자와 전화',screen('promo/pc-play-04-phone','m_talk.jpg'),''),
- ('인터넷','그 세계의 게시판과 상점과 위키',screen('promo/pc-play-05-net','m_net.jpg'),
+MENU=[('상황판','',screen('promo/pc-play-02-board','m_board.jpg'),''),
+ ('임무','',screen('promo/pc-play-03-map','m_map.jpg'),''),
+ ('괴담톡','',screen('promo/pc-play-04-phone','m_talk.jpg'),''),
+ ('인터넷','',screen('promo/pc-play-05-net','m_net.jpg'),
    sub('게시판',[(screen('s-boards/pc-01-gn','n_gn.jpg'),'괴담넷'),(screen('s-boards/pc-04-gal','n_gal.jpg'),'괴담 갤러리'),(screen('s-boards/pc-08-wpf','n_wpf.jpg'),'세정게')])
    +sub('상점',[(screen('s-boards/pc-09-sm','n_sm.jpg'),'연어 마켓'),(screen('s-malls/pc-01-cos','n_cos.jpg'),'우주 쇼핑몰'),(screen('s-malls/pc-08-bm','n_bm.jpg'),'백일몽 포인트몰')])
    +sub('위키',[(screen('s-wiki/pc-01-home','n_wk.jpg'),'괴이위키')])),
- ('소지품','가진 물건과 장착, 가계부',screen('promo/pc-play-06-items','m_items.jpg'),
+ ('소지품','',screen('promo/pc-play-06-items','m_items.jpg'),
    sub('가계부',[(screen('s-chron/pc_가계부_달줄','i_led.jpg',C),'가계부')])),
- ('기록','일지와 연대기, 만난 인물과 세력',screen('promo/pc-play-07-records','m_rec.jpg'),
+ ('기록','',screen('promo/pc-play-07-records','m_rec.jpg'),
    sub('연대기',[(screen('s-chron/pc_연대기','r_chron.jpg',C),'연대기')]))]
 ov='<div style="font-size:0;margin:0 -5px 18px -5px;">'
 for nm,ds,src,_ in MENU:
