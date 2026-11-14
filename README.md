@@ -13,6 +13,8 @@
 
 RisuAI용 괴담 시뮬레이션 「괴이 ː ANOMALY」의 전용 플러그인과 카드입니다. 지금은 개발 중인 판입니다.
 
+> 이 저장소는 더 이상 갱신하지 않습니다. 새 주소: https://github.com/leepc25/goei (설치된 플러그인은 업데이트하면 새 주소로 넘어갑니다.)
+
 ## 설치
 
 1. [Releases](https://github.com/leepc25/goei-plugin/releases)에서 최신 zip을 받습니다.
