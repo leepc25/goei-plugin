@@ -153,8 +153,8 @@ for (const vp of ['pc', 'phone']) {
   if (before) continue;
   const P = JSON.parse(distPack('goei-data-items'));
   const fileOf = (name) => P.table.find((r) => r.k[0] === name)?.f;
-  // 손전등 갈래: 기본 표는 비어 모델 값(usable, equip 없음) 그대로 → 사용만 (사용자 2026-11-14)
-  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착') && !torch.btns.includes('들기'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
+  // 손전등 갈래: 기본 표는 비어 모델 값(usable, equip 없음) 그대로 → 사용, 손 칸에는 아무 물건이나 들 수 있어 「들기」도 (사용자 2026-11-14)
+  assert.ok(torch.btns.includes('사용') && !torch.btns.includes('장착') && torch.btns.includes('들기'), `[${vp}] 손전등 팝업 단추: ${torch.btns}`);
   // 정장 사례: 격자·장착 칸에서 빠지고 무게가 줄고, 기록에 「없어짐 · 두고 옴」
   assert.ok(v1.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 처음엔 장착 칸에`);
   assert.ok(!v2.grid.includes('사내용 정장 세트') && !v2.slots.some((x) => x.startsWith('사내용 정장 세트')), `[${vp}] 정장이 소지품에서 빠짐: ${JSON.stringify(v2)}`);
@@ -168,7 +168,7 @@ for (const vp of ['pc', 'phone']) {
   assert.ok(!v3.grid.includes('손전등'), `[${vp}] 버린 뒤 격자: ${v3.grid}`);
   assert.deepEqual(result[vp].same.includes('손전등'), false, `[${vp}] 같은 응답 근거로는 안 되살아남`);
   assert.ok(v4.grid.includes('손전등'), `[${vp}] 다시 주움: ${v4.grid}`);
-  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착') && !torch2.btns.includes('들기'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
+  assert.ok(torch2.btns.includes('사용') && !torch2.btns.includes('장착') && torch2.btns.includes('들기'), `[${vp}] 다시 주운 손전등도 갈래 그대로: ${torch2.btns}`);
   assert.equal(again.list.filter((e) => e.name === '손전등').length, 1, '새 줄이 생기지 않음');
   assert.equal(await Promise.resolve(errorsAll.length), 0, errorsAll.join('\n'));
 }
