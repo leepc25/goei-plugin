@@ -166,10 +166,11 @@ Under a constraint (marriage, engagement, oath, professional ethics, rank differ
 Distinguish direct expression, teasing or provocation, avoidance, a cold mask, quiet service, and approach disregarding the target's wishes. Proactive is not always closer: an avoidant person works to keep distance; a formal one hides feeling behind politeness. Accumulated experience may raise restrained warmth and voluntary care without changing base personality. Interest and aversion show in attention, effort, tolerance, distance, self-expression, utterance length and endings, voluntary questions, and must appear in the span, not only in inner monologue, before you record them. Negative feeling is not always rudeness; duty may be done while discretionary effort is withheld. Hidden feeling may run ahead of the relationship; do not erase it to match progress. Across scenes, preserve the last approach, the actual response and confirmed boundaries; a repeated approach in new wording is not acceptance; a possible next approach is not an event.
 
 <<SECTION:affinity_num>>
+<<SECTION:cue_table>>
 ### 7.8 Cues (what the program scores)
-- Report only events in which the USER'S CHARACTER did something toward this person, or its direct confirmed consequence. `who` is the person; the target is always the user. Kindness the person showed first is not the user's act. Never score the user's own feelings.
+<<END:cue_table>>- Report only events in which the USER'S CHARACTER did something toward this person, or its direct confirmed consequence. `who` is the person; the target is always the user. Kindness the person showed first is not the user's act. Never score the user's own feelings.
 - Exactly one cue name from `cues`; never numbers, stage names or totals. The program computes the score from the names; never predict the result or write stage-derived prose into entries.
-| Cue | Base | Meaning |
+<<SECTION:cue_table>>| Cue | Base | Meaning |
 |---|---:|---|
 | 작은친절 | +1 | Small personal kindness actually delivered and received |
 | 도움 | +3 | Meaningful support or a promise kept |
@@ -180,7 +181,7 @@ Distinguish direct expression, teasing or provocation, avoidance, a cold mask, q
 | 배신 | −5 | Meaningful betrayal or humiliation |
 | 파탄 | −10 | Serious rupture of trust or relationship |
 | 중대위반 | −50 | Explicit, established grave violation by the setting's standards; exceptional |
-- Never a cue: appearance, greeting, looks, rank or title, routine duties, repeated description, small talk, an unanswered offer, a polite refusal or boundary, retold or remembered content, `already_recorded`, the same event rephrased, kindness the person showed first. Coercion, violation or a bodily reaction is never evidence of affection.
+<<END:cue_table>>- Never a cue: appearance, greeting, looks, rank or title, routine duties, repeated description, small talk, an unanswered offer, a polite refusal or boundary, retold or remembered content, `already_recorded`, the same event rephrased, kindness the person showed first. Coercion, violation or a bodily reaction is never evidence of affection.
 - Judge by THIS person's `values` and the response actually given; each person needs their own `reason` (Korean ≤40).
 - ≤2 cues per person per span; merge several small acts of one kind into the stronger single cue; never split one act or restate one piece of evidence into several cues.
 - Initial values already exist; a newly registered person starts at 0; never propose an initial value or count past relationship evidence as a cue. 무관심 is a real value, not a missing one.
@@ -189,10 +190,10 @@ A stage never authorizes romance, 반말, pet names, consent or obedience; nonro
 <<END:affinity_num>>
 <<SECTION:affinity_qual>>
 ### 7.8 Qualitative mode (no score exists)
-Affinity numbers are off: no `cues`, no `affinity_now`, no stage, no taste band. Judge goodwill in concrete prose; never create or infer a score, band, grade or threshold. Decide whether a kindness, support, kept promise, costly help, repair, commitment, disappointment, disregard or betrayal actually happened and was received; never count events. A close relationship does not vanish without an appraisal; a reserved person may show goodwill through brief concern or quiet help; goodwill never authorizes an intimate address or approach by itself.
+Affinity numbers are off: no person cues, no `affinity_now`, no stage, no taste band. Judge goodwill in concrete prose; never create or infer a score, band, grade or threshold. Decide whether a kindness, support, kept promise, costly help, repair, commitment, disappointment, disregard or betrayal actually happened and was received; never count events. A close relationship does not vanish without an appraisal; a reserved person may show goodwill through brief concern or quiet help; goodwill never authorizes an intimate address or approach by itself.
 Record as one entry per `target` (`@user`, or a name when `npc_relations` is true), only on actual change: `affinity.regard` (current goodwill or ill will, its basis, what was accepted, which reactions differ), `affinity.speech` (adjustment of speech toward this target, apart from base `speech`), `affinity.behavior` (adjustment of attention, questions, care, distance). Base slots keep facts; these hold the assessment; never resave an unchanged sentence. 7.4 slots apply unchanged.
 <<END:affinity_qual>>
-<<END:affinity>>
+<<END:affinity>><<CUE_TABLE>>
 <<SECTION:register>>
 ## 8. Relationship, address and speech register
 Speech grounded in relationship and knowledge does not change with a scene's mood. Keep address terms, honorific level, relationship progress, gaps in contact and knowledge boundaries distinct. Closeness needs a catalyst experienced and accepted together; one-sided rejection or betrayal may widen distance fast.

@@ -382,13 +382,18 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
+  // 계기 뜻풀이 표(cue_table 절: 제목 줄 + 표)는 호감 수치 절 안에 있다. 호감 수치가 빠지고 세력 평판 수치만 켜진 요청에는
+  // 같은 글을 <<CUE_TABLE>> 자리에 한 번 싣는다 (사용자 2026-11-14 A-8). 호감 수치가 켜져 있으면 제자리 것만 남는다
+  const cueTable = on.has('cue_table') && !(on.has('affinity') && on.has('affinity_num'))
+    ? `\n${[...text.matchAll(/<<SECTION:cue_table>>\n?([\s\S]*?)<<END:cue_table>>/g)].map((m) => m[1]).join('')}`
+    : '';
   let out = text;
   for (let prev = ''; prev !== out; ) {
     prev = out;
     out = out.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
   }
   // 성적 욕망·이상성욕 절 본문은 설정(켠 칸·발정모드)에 따라 조립된다 (sexual.ts sexualWriterSection)
-  out = out.replace('<<SEXUAL_RULES>>', () => sexualRules.trim()).replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  out = out.replace('<<CUE_TABLE>>', () => cueTable).replace('<<SEXUAL_RULES>>', () => sexualRules.trim()).replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
   if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
 }
@@ -400,6 +405,8 @@ export function enabledSections(s: PeopleSettings): Set<string> {
   for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
   // 세력 평판도 수치/정성 (11-07 사용자: 호감·의심·음란도처럼 같이 따라간다)
   if (s.features.has('faction_rep')) on.add(s.factionQual ? 'faction_rep_qual' : 'faction_rep_num');
+  // 계기 뜻풀이 표: 호감 수치나 세력 평판 수치 중 하나만 켜져도 싣는다 (자료의 cues 와 같은 조건. 사용자 2026-11-14 A-8)
+  if (on.has('affinity_num') || on.has('faction_rep_num')) on.add('cue_table');
   if (s.director === 'note') on.add('next_note');
   if (sexualAnyOn(s)) on.add('sexual');
   return on;

@@ -167,6 +167,15 @@ test('맞춤 주문 납기 단위: 개월·달·분 (11-14 재검토 ①-6)', ()
   assert.equal(h('2주'), 336);
 });
 
+test('맞춤 주문 납기 범위는 뒤 숫자 (사용자 11-14)', () => {
+  const h = (cell) => M.parseOrderLine(`가림 내의|1200000|${cell}|장비|-|0.3|설명|효과|진실`)?.hours;
+  assert.equal(h('2~3일'), 72);
+  assert.equal(h('2-3 days'), 72);
+  assert.equal(h('1~2주'), 336);
+  assert.equal(h('24~48'), 48);
+  assert.equal(h('48시간 (2일)'), 48, '범위가 아니면 첫 숫자 그대로');
+});
+
 test('currency 줄: 원으로 시작하면 원 가게 (shop#10)', () => {
   const id = (cur) => M.parseShelf(`<shop-identity>\nsells: x\ncurrency: ${cur}\n</shop-identity>\n<shelf>\n붕대|2500\n</shelf>`, null).identity.points === true;
   assert.equal(id('points'), true);

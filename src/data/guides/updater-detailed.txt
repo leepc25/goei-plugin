@@ -218,10 +218,11 @@ Whether someone else notices is a separate knowledge-boundary question.
 Distinguish direct expression, teasing or provocation, avoidance, a cold mask, quiet service, and an approach that disregards the target's wishes. Being proactive does not always mean moving closer: an avoidant person may spend effort keeping distance, and a formal person may hide feeling behind more politeness. As relationship experience accumulates, restrained warmth and voluntary care may increase without changing base personality. Interest and aversion appear through attention, effort, tolerance, distance, self-expression, utterance length and endings, and voluntary questions; they must appear as real differences in the span, not only in inner monologue, before you record them. Negative feeling is not always rudeness; a person with duties may still do what is required while withholding discretionary effort. Hidden feeling may run ahead of the relationship: do not erase the feeling to match relationship progress. Across scene changes, preserve the last approach, the target's actual response and confirmed boundaries; never treat a repeated approach in new wording as acceptance, and never record a possible next approach as an event.
 
 <<SECTION:affinity_num>>
+<<SECTION:cue_table>>
 ### 7.8 Cues (what the program scores)
-- Report only events in which the USER'S CHARACTER did something toward this person, or its direct, confirmed consequence. `who` is the person; the target is always the user. Kindness the person showed first is not the user's act. Never create a score for the user's own feelings.
+<<END:cue_table>>- Report only events in which the USER'S CHARACTER did something toward this person, or its direct, confirmed consequence. `who` is the person; the target is always the user. Kindness the person showed first is not the user's act. Never create a score for the user's own feelings.
 - Choose exactly one cue name from `cues`. Never output numbers, stage names, or totals. The program computes the score from the names; you never predict the result and never write stage-derived prose into entries.
-- Base meanings (the program's table; cue names are in `cues`):
+<<SECTION:cue_table>>- Base meanings (the program's table; cue names are in `cues`):
 
 | Cue | Base | Meaning |
 |---|---:|---|
@@ -234,7 +235,7 @@ Distinguish direct expression, teasing or provocation, avoidance, a cold mask, q
 | 배신 | −5 | Meaningful betrayal or humiliation |
 | 파탄 | −10 | Serious rupture of trust or of the relationship |
 | 중대위반 | −50 | An explicit, established grave violation by the setting's standards; exceptional |
-
+<<END:cue_table>>
 - Never a cue: mere appearance, a greeting, looks, rank or title, routine duties, repeated description, small talk, an offer not yet answered, a polite refusal or boundary, anything retold or remembered, anything in `already_recorded`, the same event rephrased, kindness the person showed first. A polite refusal is not a wrongdoing. Coercion, violation, or a bodily reaction is never evidence of affection.
 - Judge the event's meaning by THIS person's `values` and by the response the person actually gave. The same act may please one person and annoy another; each needs its own reason, written in `reason` (Korean, ≤40 chars).
 - At most 2 cues per person per span. Combine several small acts of the same kind into the stronger single cue instead of listing each. Never split one act into several cues, and never restate one piece of evidence in several ways to manufacture rewards.
@@ -256,12 +257,12 @@ A stage never automatically authorizes romance, informal speech, pet names, cons
 <<END:affinity_num>>
 <<SECTION:affinity_qual>>
 ### 7.8 Qualitative mode (no score exists)
-Affinity numbers are off for this chat: there is no `cues` list, no `affinity_now`, no stage, and no taste band. Judge personal goodwill and relationship experience in concrete prose. Never create a score, band, grade name, threshold or hidden ladder, and never infer one from an old value. Describe what the person actually received, what they accepted, and which reactions now differ.
+Affinity numbers are off for this chat: there are no person cues, no `affinity_now`, no stage, and no taste band. Judge personal goodwill and relationship experience in concrete prose. Never create a score, band, grade name, threshold or hidden ladder, and never infer one from an old value. Describe what the person actually received, what they accepted, and which reactions now differ.
 - Determine whether the person actually received a small kindness, meaningful support or a kept promise; whether help at a cost, repair or commitment actually occurred; and whether disappointment, disregard or betrayal was actually delivered. Never count events or gifts. An existing close relationship does not vanish because no appraisal exists; a person who expresses little may show goodwill through brief concern or quiet help. Goodwill never by itself authorizes an intimate address or approach.
 - Record in three per-target slots (`target` `@user`, or a name when `npc_relations` is true), as one entry per target, only when something actually changed: `affinity.regard` (the current goodwill or ill will, what it rests on, what the person accepted, and which reactions now differ), `affinity.speech` (how it adjusts speech toward this target, apart from the base `speech` entry), `affinity.behavior` (how it adjusts attention, questions, care and distance). Base `speech`, `personality` and `relationship` keep the confirmed facts; these slots hold the assessment. When nothing changed, never save the same sentence again.
 - The per-target slots of 7.4 (appraisal, intent, stance, constraint, private feeling, approach) apply unchanged, in prose.
 <<END:affinity_qual>>
-<<END:affinity>>
+<<END:affinity>><<CUE_TABLE>>
 <<SECTION:register>>
 ## 8. Relationship, address and speech register
 
