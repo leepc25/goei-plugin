@@ -1,0 +1,54 @@
+{
+ "usage": {
+  "type": "usd",
+  "usd": 0.0711741825178994
+ },
+ "id": "50a0886d-2fd0-42c1-a9d5-aec967669812",
+ "status": "completed",
+ "created_at": "2026-11-16T03:38:09.044283+00:00",
+ "last_response": {
+  "status": "completed",
+  "character_id": "c3448aa9-3318-4ad4-b447-0dd3673860dd",
+  "storage_urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/east.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/west.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/north.png",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/south.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/north-west.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c3448aa9-3318-4ad4-b447-0dd3673860dd/rotations/south-west.png"
+  },
+  "billing_usage": {
+   "usd": 0.0711741825178994,
+   "type": "usd"
+  },
+  "generation_id": "66a99f0c-45e7-4e80-8631-85c3287bb364",
+  "billing_stages": [
+   {
+    "stage": "first_direction",
+    "usage": {
+     "usd": 0.040643116908179386,
+     "type": "usd"
+    },
+    "generation_id": "0d9b564e-b613-4348-bcbc-fcb1c0fec0af"
+   },
+   {
+    "stage": "rotations",
+    "usage": {
+     "usd": 0.03053106560972002,
+     "type": "usd"
+    },
+    "generation_id": "66a99f0c-45e7-4e80-8631-85c3287bb364"
+   }
+  ],
+  "character_name": "Sora Land Factory",
+  "billing_charged": true,
+  "directions_type": "8-directions",
+  "generation_mode": "pro_flash",
+  "source_image_id": "5a3ccb87-3ca4-5a84-af94-6e31b6c3252b",
+  "directions_count": 8,
+  "character_description": "full body, a gaunt emaciated humanoid monster with a hunched bent spine, bald head, long hanging jaw, grotesquely swollen chest, several extra human torsos grafted chaotically onto its back and sides with their own thin arms, each grafted segment a different skin tone, long bony arms and legs, horror",
+  "first_direction_generated": true
+ }
+}
